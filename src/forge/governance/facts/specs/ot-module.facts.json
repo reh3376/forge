@@ -778,56 +778,18 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "pending-rehash-after-script-migration-additions",
-    "hash_state": "draft",
+    "spec_hash": "a99f6a8792f568a364f8b45c740f5c9a19543901e8f1be32fc8da7bfefba1529",
+    "hash_state": "pending_review",
     "previous_hash": "d66d9bd361c4a0d09a529bac9b48a13c4d73fcc94d77837642b2c44634d2d951",
-    "approved_by": null,
-    "approved_at": null,
     "change_history": [
       {
-        "previous_hash": null,
-        "new_hash": "d66d9bd361c4a0d09a529bac9b48a13c4d73fcc94d77837642b2c44634d2d951",
-        "changed_at": "2026-04-08T10:30:00Z",
-        "source": "manual",
-        "changed_by": "claude-opus",
-        "change_type": "initial",
-        "reason": "Initial OT Module FACTS spec — Epic 1.3.3 of P7 OT Module Sprint Plan"
-      },
-      {
         "previous_hash": "d66d9bd361c4a0d09a529bac9b48a13c4d73fcc94d77837642b2c44634d2d951",
-        "new_hash": "pending-rehash-after-alarm-additions",
-        "changed_at": "2026-04-09T14:30:00Z",
-        "source": "manual",
-        "changed_by": "claude-opus",
-        "change_type": "feature",
-        "reason": "Phase 3 Alarm Engine: ISA-18.2 state machine, alarm detection (HI/HIHI/LO/LOLO/digital/ROC/quality/comm), event-sourced journal, cross-module integration (MQTT alarm topics, RabbitMQ events, CMMS work orders, ContextualRecords, scripting dispatch), REST API, MQTT remote acknowledge. Added 5 new data sources, 10 new context fields, 3 enrichment rules, alarm sample record."
-      },
-      {
-        "previous_hash": "pending-rehash-after-alarm-additions",
-        "new_hash": "pending-rehash-after-control-write-additions",
-        "changed_at": "2026-04-09T16:00:00Z",
-        "source": "manual",
-        "changed_by": "claude-opus",
-        "change_type": "feature",
-        "reason": "Phase 4 Control Write Interface: 4-layer defense chain (WriteValidator, InterlockEngine, WriteAuthorizer, ControlWriteEngine with read-back), audit trail (WriteAuditLogger, 3 sink types: ContextualRecord, MQTT, Log), MES recipe integration (RecipeWriteAdapter with batch tracking), WriteRole RBAC (OPERATOR/ENGINEER/ADMIN), safety interlock patterns (fnmatch, 7 conditions, bypass with reason). Added 3 new data sources, 10 new context fields, 3 enrichment rules, control write sample record."
-      },
-      {
-        "previous_hash": "pending-rehash-after-control-write-additions",
-        "new_hash": "pending-rehash-after-bridge-adapter-additions",
-        "changed_at": "2026-04-09T20:00:00Z",
-        "source": "manual",
-        "changed_by": "claude-opus",
-        "change_type": "feature",
-        "reason": "Phase 5 Ignition Bridge Adapter: Read-only REST API polling adapter for parallel operation validation. IgnitionRestClient (batch reads, auth, retry), TagMapper (Ignition bracket↔Forge normalized paths, include/exclude filtering), IgnitionBridgeAdapter (AdapterBase + DiscoveryProvider, source.system='ignition-bridge'), DualWriteValidator (value/quality/timestamp comparison, configurable tolerances, ConsistencyReport with Gate 5 evaluation), BridgeHealthDashboard (side-by-side metrics, failover readiness, 8-item operator acceptance checklist). Added 3 new data sources (ignition_bridge_poll, ignition_bridge_browse, dual_write_validation)."
-      },
-      {
-        "previous_hash": "pending-rehash-after-bridge-adapter-additions",
-        "new_hash": "pending-rehash-after-script-migration-additions",
-        "changed_at": "2026-04-09T22:00:00Z",
-        "source": "manual",
-        "changed_by": "claude-opus",
-        "change_type": "feature",
-        "reason": "Phase 6 Script Migration: Python 3.12+ scripting engine replacing Ignition Jython 2.7. ScriptEngine (importlib discovery, TriggerRegistry decorators, hot-reload file watcher), ScriptSandbox (PEP 302 import allowlist, CPU/memory limits), ScriptRBAC (area+tag-pattern permissions, default DENY), ScriptAuditTrail (append-only 10K ring buffer), 6 new forge.* SDK modules (date, dataset, perspective, file, util, security) completing the 11-module API surface covering all 52 unique system.* calls. 120 new tests. Added 5 new data sources (script_engine, script_sandbox, script_rbac, script_audit, script_api_routes). API mapping reference: docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md."
+        "new_hash": "a99f6a8792f568a364f8b45c740f5c9a19543901e8f1be32fc8da7bfefba1529",
+        "changed_at": "2026-10-17T01:24:20Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "content",
+        "reason": "FB-073: P7 phases 3-6 (alarm engine, control-write interface, Ignition bridge adapter, script migration) were recorded on 2026-04-09 by claude-opus with placeholder hashes (pending-rehash-after-{alarm,control-write,bridge-adapter,script-migration}-additions) and hash_state 'draft', which FHTS cannot verify. Re-hashed from the last well-formed hash in one step; the four placeholder entries live in git history (commit d6db522c) and docs/p7-ot-module/P7_SPRINT_PLAN.md. Content unchanged. Awaiting owner approval."
       }
     ]
   }

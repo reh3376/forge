@@ -3,7 +3,7 @@
 **Framework ID:** FACTS
 **Full Name:** Forge Adapter Conformance Test Specification
 **CI Gate:** Hard-fail (merge-blocking for production adapters)
-**Status:** Sprints 1-4 complete — Schema (60 tests) + WMS Spec (48 tests) + MES Spec (64 tests) + Runner (72 tests) = 244/244 passing
+**Status:** Schema, runner (35 checks) and 9 adapter specs implemented; 252 tests under `tests/governance/facts/`. Gaps: FB-079 (OT spec vocabulary and identity), FB-080 (runner has no schema-valid check)
 **Phase:** F12
 **MDEMG Analog:** UPTS
 
@@ -34,10 +34,21 @@ Without FACTS, adapter development is ad hoc. Each adapter would make its own as
 
 ### Adapter Specs
 
-| Spec | Status | Tests | Data Sources | Context Mappings | Capabilities |
-|------|--------|-------|--------------|------------------|-------------|
-| `whk-wms.facts.json` | ✅ Sprint 2 complete | 48/48 | 14 | 11 + 3 enrichment | read, subscribe, backfill, discover |
-| `forge-mes.facts.json` | ✅ Sprint 3 complete | 64/64 | 17 | 15 + 3 enrichment | read, **write**, subscribe, backfill, discover |
+State on 2026-10-16 (`FACTSRunner` over `src/forge/governance/facts/specs/`):
+
+| Spec | Tier | Data sources | Context mappings | Capabilities | Hash state | Runner |
+|------|------|--------------|------------------|--------------|------------|--------|
+| `bosc-ims.facts.json` | MES_MOM | 8 (7 gRPC unary, 1 gRPC stream) | 12 + 2 enrichment | read, subscribe, backfill, discover | approved (no approver recorded) | pass |
+| `forge-mes.facts.json` | MES_MOM | 18 (10 GraphQL, 1 mutation, 1 RabbitMQ, 2 MQTT, 1 WS, 2 REST, 1 database) | 15 + 3 enrichment | read, **write**, subscribe, backfill, discover | approved (reh3376) | pass |
+| `next-trend.facts.json` | HISTORIAN | 5 (4 REST, 1 WS) | 8 | read, subscribe, backfill, discover | approved (no approver recorded) | pass |
+| `ot-module.facts.json` | OT_SCADA (not a FACTS tier) | 21 (OPC-UA, alarm, control-write, Ignition bridge, scripting) | 9 + 10 enrichment | read, **write**, subscribe, backfill, discover | pending_review (FB-073) | 8 vocabulary failures (FB-079) |
+| `scanner-gateway.facts.json` | OT | 5 (3 gRPC server unary, 2 gRPC server stream) | 9 | read, subscribe, discover | approved (no approver recorded) | pass |
+| `whk-cmms.facts.json` | MES_MOM | 5 (3 GraphQL, 1 REST, 1 RabbitMQ) | 19 + 2 enrichment | read, subscribe, backfill, discover | approved (reh3376) | pass |
+| `whk-erpi.facts.json` | ERP_BUSINESS | 5 (3 RabbitMQ, 1 REST, 1 GraphQL) | 12 + 2 enrichment | read, subscribe, backfill, discover | approved (forge-governance-audit) | pass |
+| `whk-nms.facts.json` | MES_MOM | 11 (10 REST, 1 WS) | 19 + 2 enrichment | read, subscribe, backfill, discover | approved (reh3376) | pass |
+| `whk-wms.facts.json` | MES_MOM | 14 (9 GraphQL, 1 subscription, 3 RabbitMQ, 1 REST) | 11 + 3 enrichment | read, subscribe, backfill, discover | approved (reh3376) | pass |
+
+"Runner" is the `FACTSRunner` verdict set (35 hand-coded checks). The runner does not yet validate a spec against `facts.schema.json`; 7 of the 9 specs fail that validation (FB-080). Per-spec test modules exist for whk-wms, forge-mes and ot-module (integrity block only, FB-073). Only the owner approves a hash (`approve_spec_hash(approved_by="reh3376")`); agents re-stamp as `pending_review`.
 
 **Cross-spoke consistency:** 6 shared context fields (`lot_id`, `shift_id`, `operator_id`, `event_timestamp`, `event_type`, `work_order_id`). Identical shift definitions (America/Kentucky/Louisville, day/night). Shared RabbitMQ exchange topology (`wh.whk01.distillery01.*`). Both MES_MOM tier.
 

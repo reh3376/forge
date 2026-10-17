@@ -155,7 +155,7 @@ Every FxTS framework follows the same structure:
 | Framework | Full Name | Scope | CI Gate | Status |
 |-----------|-----------|-------|---------|--------|
 | [FATS](FATS.md) | Forge API Test Specification | API contract verification | Hard-fail | Schema + Runner implemented |
-| [FACTS](FACTS.md) | Forge Adapter Conformance Test Specification | Adapter lifecycle and data contracts | Hard-fail | Sprint planned |
+| [FACTS](FACTS.md) | Forge Adapter Conformance Test Specification | Adapter lifecycle and data contracts | Hard-fail | Schema + runner (35 checks) + 9 specs implemented; FB-080 adds schema validation |
 | [FDTS](FDTS.md) | Forge Data Test Specification | Schema evolution and compatibility | Hard-fail | Planned |
 | [FQTS](FQTS.md) | Forge Quality Test Specification | Data quality rules | Hard-fail | Stub |
 | [FLTS](FLTS.md) | Forge Lineage Test Specification | Lineage chain integrity | Soft-fail | Planned |

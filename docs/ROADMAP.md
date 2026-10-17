@@ -39,7 +39,10 @@ Delivered 2026-10-15/16 on the hub ↔ MES ↔ OT path (all merged):
 | Durable adapter registry and ingest log | FB-060 (migration 007) |
 | Pull RPCs on the spoke (Backfill, Subscribe, Unsubscribe) | FB-061 |
 | Callback hardening: per-spoke token, TLS/mTLS to the spoke, scoped hub endpoints | FB-063 |
-| FVTS v0.1.0 draft (schema + OT reference spec, `pending_review`, no runner) | PR 26 |
+| FVTS v0.1.0 draft (schema + OT reference spec, `pending_review`) | PR 26 |
+| FVTS runner (19 checks), render-profile baseline, reference renderer, golden set; CI gate on | FB-077 (PR 36) |
+| Forge-issued module database credentials (`forge db access`) | FB-057 step 1 (PR 34) |
+| OT FACTS spec hash verifiable again (`pending_review`, owner approval open) | FB-073 |
 
 ---
 
@@ -79,7 +82,8 @@ Phases 1–4 of the P7 plan (OPC-UA client, tag engine, scripting/MQTT, alarms, 
 
 | Item | Status | Notes |
 |---|---|---|
-| FB-073 re-stamp the OT FACTS spec (placeholder hash, non-FHTS state) | Not started | Low; blocks FACTS verification of the OT module. |
+| FB-073 re-stamp the OT FACTS spec (placeholder hash, non-FHTS state) | Done 2026-10-16 (awaiting owner approval) | Hash verifies; `pending_review`. Approve after FB-079. |
+| FB-079 OT FACTS spec vocabulary and identity (8 runner failures; three adapter identities) | Decision needed (D-8) | Extend the FACTS vocabulary for OT adapters or translate the spec; absorbs FB-018. |
 | FB-074 server-side two-step review and reason codes for tag writes | Not started | After the FVTS decisions (D-2/D-4). |
 | FB-018 OT manifest tier/output_format vs manifest builder · FB-020 remaining unwired OT ↔ MES hooks (`BatchContextResolver`) | Not started | FB-065 wired the recipe adapter; the batch resolver is still manual. |
 | P7 Phases 5–7 (Ignition bridge, script migration, decommission) | Reframed by A-4 | Becomes: forge-ignition integration module + optional forge-hmi-scada module (WS-6/WS-7). |
@@ -122,7 +126,7 @@ Needed before FB-076, forge-ignition and forge-hmi-scada can start the same way.
 
 ### WS-8 · Governance (FxTS)
 
-FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory row. FB-073 (OT FACTS hash). FB-022 ruff debt (1,148 findings; CI advisory) and FB-048 (advisory gates) — tighten gate by gate as debt is paid. FB-014 (DTZ rule).
+FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory row. FB-080 (the FACTS runner has no schema-valid check; 7 of 9 specs fail schema validation). FB-022 ruff debt (1,148 findings; CI advisory) and FB-048 (advisory gates) — tighten gate by gate as debt is paid. FB-014 (DTZ rule).
 
 ### WS-9 · Security and repository operations
 
@@ -171,7 +175,7 @@ Security/ops items (WS-9) run alongside and are gated by GitHub Support, not by 
 
 FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). The question is whether Forge has one security role model for people (hub API, UI actions, PLC writes) with `ENGINEER` added to the gateway and `WriteRole` mapped onto it, or keeps the OT write roles separate from platform access roles. Recommendation: one model (`viewer < operator < engineer < admin`), scopes derived from it, OT keeps its per-tag permissions but reads the role from the platform identity.
 
-**D-2 · FVTS runner and golden tests (not forge-mes).** *Decided 2026-10-16: yes to both — FB-077, FB-078.* This concerns the FVTS governance framework itself: `src/forge/governance/fvts/` has a schema and a reference spec for the **OT module** (`ot-module.fvts.json`, with invented fermenter tags), but no `fvts_runner.py` and no conformance tests, so nothing enforces the contract and the spec's hash cannot be approved. The questions: should the OT module stay the reference spec (replace the invented points with real OT tags), and is the runner wanted before forge-display work starts? Recommendation: yes to both; the runner is small and the golden messages become forge-display's first test fixtures.
+**D-2 · FVTS runner and golden tests (not forge-mes).** *Decided 2026-10-16: yes to both — FB-077 (done, PR 36), FB-078 (open).* This concerns the FVTS governance framework itself: `src/forge/governance/fvts/` has a schema and a reference spec for the **OT module** (`ot-module.fvts.json`, with invented fermenter tags), but no `fvts_runner.py` and no conformance tests, so nothing enforces the contract and the spec's hash cannot be approved. The questions: should the OT module stay the reference spec (replace the invented points with real OT tags), and is the runner wanted before forge-display work starts? Recommendation: yes to both; the runner is small and the golden messages become forge-display's first test fixtures.
 
 **D-3 · forge-mes Go rewrite design (FB-076).** What the Go module must carry on day one (hub link, changeover state machine, MQTT publishing, recipe/production-order queries), what stays in the NestJS bridge until cut-over, how Prisma data moves into `mod_mes`, and whether GraphQL survives or the hub API replaces it. Needs a short design doc for sign-off.
 
@@ -180,6 +184,8 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 **D-5 · Core language (Python vs Rust) for the hub.** Parked; not required by anything in section 4.
 
 **D-6 · Public flip timing.** When GitHub Support confirms GC.
+
+**D-8 · FACTS vocabulary for OT adapters (FB-079).** The FACTS v0.1.0 schema speaks the IT integration vocabulary of the first spokes (GraphQL, REST, RabbitMQ, MQTT, WebSocket, file, database; `REGISTERED…STOPPED` lifecycle; `none/basic/certificate…` auth). The OT module's spec uses OPC-UA terms (`opcua_read/subscribe/write/history/browse`, `on_demand`, `DISCONNECTED/CONNECTED/RECONNECTING`, `anonymous/username_password`, `enum`/`object` params, `tag_value`) and fails 8 runner checks, so its hash can be verified (FB-073) but should not be approved as-is. Options: (a) extend the schema with an OT vocabulary and keep the spec's meaning; (b) translate the spec into the existing vocabulary and lose the OPC-UA specifics; (c) a FACTS v0.2.0 with a per-tier vocabulary. Recommendation: (a) — the gRPC spokes (bosc-ims, scanner-gateway) already stretch the enum the same way (FB-080), so the schema is the thing to grow. The same item reconciles the adapter's three identities (`forge-ot-module` in code, `ot-module` in manifest.json and the spec) to one.
 
 **D-7 · Scope of the Go standard.** A-2 covers the formal management-service modules. Still to decide: whether the hub-hosted Python OT module (`src/forge/modules/ot`) and the Python ingestion adapters (`src/forge/adapters/*`) move to Go over time or stay Python inside the hub, and whether integration modules (forge-ignition) follow the Go template.
 
@@ -192,11 +198,11 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 | WS-1 transport | — | FB-072 | FB-055, FB-056, FB-071 | FB-002 to close as superseded |
 | WS-2 hub platform | FB-001, FB-003 | FB-004, FB-005, FB-006, FB-007, FB-059, FB-075 | FB-008, FB-009 | |
 | WS-3 data model | FB-010, FB-011 | FB-012, FB-013, FB-016 | FB-014, FB-015 | |
-| WS-4 OT module | — | FB-020 | FB-018, FB-073, FB-074 | |
+| WS-4 OT module | — | FB-020, FB-079 | FB-018, FB-074 | FB-073 done (awaiting approval) |
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
 | WS-6 forge-display | — | — | — | No backlog ids yet; tracked here until the design lands |
 | WS-7 module SDK | — | FB-017 | FB-019, FB-021 | |
-| WS-8 governance | — | FB-022, FB-048 | FB-014 | FTTS doc has no id yet |
+| WS-8 governance | — | FB-022, FB-048, FB-080 | FB-014 | FTTS doc has no id yet |
 | WS-9 security/ops | FB-029, FB-044, FB-046 | FB-043, FB-047 | FB-049 | public flip blocked on Support |
 | WS-10 MDEMG | — | FB-038, FB-042 | FB-039, FB-040, FB-041 | |
 | WS-11 docs | — | FB-025 | FB-024, FB-027 | personal docs refresh |

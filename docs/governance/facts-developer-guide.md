@@ -258,23 +258,42 @@ Rules:
 
 ### Step 7: Add Integrity Hash
 
-After assembling the complete spec, compute its integrity hash:
+Stamp the spec with the governance helper rather than hashing by hand. It hashes the
+canonical JSON (sorted keys, compact separators) of everything *except* the `integrity`
+block, pushes the old hash into `change_history` and `previous_hash`, and sets
+`hash_state` to `modified`:
 
 ```python
-import json, hashlib
+import json
+from forge.governance.shared.runner import add_spec_hash
 
 with open("my-system.facts.json") as f:
     spec = json.load(f)
 
-# Hash everything EXCEPT the integrity block
-spec_for_hash = {k: v for k, v in spec.items() if k != "integrity"}
-canonical = json.dumps(spec_for_hash, sort_keys=True, separators=(",", ":"))
-spec_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
-
-print(f"spec_hash: {spec_hash}")
+add_spec_hash(
+    spec,
+    source="agent",            # manual | ci | agent | spec_update
+    changed_by="claude-code",  # who made the change
+    change_type="content",     # structural | content | config
+    reason="FB-nnn: what changed and why",
+)
+spec["integrity"]["hash_state"] = "pending_review"   # until the owner approves
 ```
 
-Set the integrity block:
+A first stamp (no previous hash) leaves `hash_state: approved` with an empty history;
+set it to `pending_review` just the same. Keep `approved_by`/`approved_at` absent until
+approval — the schema types them as strings, so `null` is invalid. Every
+`change_history` entry needs 64-hex `previous_hash` and `new_hash` values; placeholder
+strings break FHTS verification (that was BACKLOG FB-073).
+
+**Only the owner approves.** On the owner's explicit word, and never on their behalf:
+
+```python
+from forge.governance.shared.runner import approve_spec_hash
+approve_spec_hash(spec, approved_by="reh3376")
+```
+
+The resulting block looks like:
 
 ```json
 {
@@ -282,25 +301,23 @@ Set the integrity block:
     "hash_method": "sha256-c14n-v1",
     "spec_hash": "<computed-hash>",
     "hash_state": "approved",
-    "previous_hash": null,
-    "approved_by": "your-name",
-    "approved_at": "2026-01-01T00:00:00Z",
+    "previous_hash": "<hash-before-this-change>",
+    "approved_by": "reh3376",
+    "approved_at": "2026-10-16T12:00:00Z",
     "change_history": [
       {
-        "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "previous_hash": "<hash-before-this-change>",
         "new_hash": "<computed-hash>",
-        "changed_at": "2026-01-01T00:00:00Z",
-        "source": "manual",
-        "changed_by": "your-name",
-        "change_type": "structural",
-        "reason": "Initial spec creation"
+        "changed_at": "2026-10-16T11:00:00Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "content",
+        "reason": "FB-nnn: what changed and why"
       }
     ]
   }
 }
 ```
-
-The hash is computed over the canonical JSON (sorted keys, compact separators, `ensure_ascii=True`) of the spec *excluding* the entire `integrity` block. This avoids circular dependencies since the integrity block references its own hash.
 
 ---
 
@@ -373,8 +390,8 @@ pytest tests/governance/facts/test_whk_wms_spec.py -v
 **Fix:** Add the missing fields to `sample_record.context`.
 
 ### `facts:integrity-hash-state` — FAIL
-**Cause:** `hash_state` is `modified` or `pending_review` — the spec was changed without re-approval.
-**Fix:** Recompute the hash (Step 7 above) and set `hash_state: "approved"`.
+**Cause:** `hash_state` is `modified` or `pending_review` — the spec changed and the owner has not approved the new hash.
+**Fix:** Re-stamp with `add_spec_hash()` (Step 7) and ask the owner to approve. Do not set `approved` yourself; the gate tolerates `pending_review` only where a test lists it as an allowed failure.
 
 ### `parity:*` — NOT_IMPLEMENTED
 **Cause:** The schema has a field that the runner doesn't check. This is a runner bug, not a spec bug.
