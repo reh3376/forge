@@ -2,6 +2,8 @@
 
 **General industrial / manufacturing decision matrix infrastructure.** Forge is a hub-and-spoke platform that transforms raw operational data from manufacturing systems into decision-quality information — structured, governed, and actionable.
 
+**Start here:** [What Forge will be](docs/VISION.md) · [Where we are going](docs/WHERE-WE-ARE-GOING.md) · [Where we are](docs/WHERE-WE-ARE.md) · [Roadmap](docs/ROADMAP.md) · [Backlog](BACKLOG.md)
+
 ---
 
 ## What Forge Does
@@ -362,6 +364,9 @@ By area:
 
 | Document | Location | Purpose |
 |----------|----------|---------|
+| What Forge will be | `docs/VISION.md` | The finished system, the problems it solves, the definition of complete |
+| Where we are going | `docs/WHERE-WE-ARE-GOING.md` | Direction: principles, milestones, what is next, what gates it |
+| Where we are | `docs/WHERE-WE-ARE.md` | Component-by-component state snapshot, updated before every push that changes it |
 | Roadmap | `docs/ROADMAP.md` | Decisions in force, workstreams, sequence and the owner decision queue (companion to `BACKLOG.md`) |
 | Sprint Plan | `docs/p7-ot-module/P7_SPRINT_PLAN.md` | P7 OT Module 24-sprint plan |
 | API Mapping | `docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md` | All 52 system.* → forge.* conversions |

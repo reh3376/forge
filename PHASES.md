@@ -1,5 +1,7 @@
 # Forge Platform — Phased Development Plan
 
+> **Historical planning record** (last revised 2026-10-15). The current statement of direction is [docs/WHERE-WE-ARE-GOING.md](docs/WHERE-WE-ARE-GOING.md), the target system is [docs/VISION.md](docs/VISION.md), the current state is [docs/WHERE-WE-ARE.md](docs/WHERE-WE-ARE.md) and open work is [BACKLOG.md](BACKLOG.md). Where this file disagrees with them, they win (BACKLOG FB-081).
+
 **Version:** 0.1 — April 2026
 **Branch Convention:** `forge_dev<01-09>` (mirrors MDEMG pattern)
 **Governance:** FxTS spec-first — every phase produces specs before implementation

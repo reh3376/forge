@@ -1,5 +1,7 @@
 # Sprint Development Plan: Path 3 — Working WMS Adapter (Vertical Slice)
 
+> **Historical planning record** (last revised 2026-04-06). The current statement of direction is [docs/WHERE-WE-ARE-GOING.md](docs/WHERE-WE-ARE-GOING.md), the target system is [docs/VISION.md](docs/VISION.md), the current state is [docs/WHERE-WE-ARE.md](docs/WHERE-WE-ARE.md) and open work is [BACKLOG.md](BACKLOG.md). Where this file disagrees with them, they win (BACKLOG FB-081).
+
 **Plan Version:** 1.0
 **Created:** 2026-04-06
 **Owner:** reh3376
