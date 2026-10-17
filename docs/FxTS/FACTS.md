@@ -3,7 +3,7 @@
 **Framework ID:** FACTS
 **Full Name:** Forge Adapter Conformance Test Specification
 **CI Gate:** Hard-fail (merge-blocking for production adapters)
-**Status:** Schema, runner (35 checks) and 9 adapter specs implemented; 252 tests under `tests/governance/facts/`. Gaps: FB-079 (OT spec vocabulary and identity), FB-080 (runner has no schema-valid check)
+**Status:** Schema v0.1.0 (vocabulary extended 2026-10-17, backward compatible), runner (`facts:schema-valid` + 35 rule checks whose enums are read from the schema) and 9 adapter specs; 8 of 9 validate against the schema; 298 tests under `tests/governance/facts/`. Gap: FB-079 (OT spec vocabulary and identity, decision D-8)
 **Phase:** F12
 **MDEMG Analog:** UPTS
 
@@ -34,21 +34,21 @@ Without FACTS, adapter development is ad hoc. Each adapter would make its own as
 
 ### Adapter Specs
 
-State on 2026-10-16 (`FACTSRunner` over `src/forge/governance/facts/specs/`):
+State on 2026-10-17 (`FACTSRunner` over `src/forge/governance/facts/specs/`; "Runner" counts the 36-verdict set, `facts:integrity-hash-state` excluded):
 
 | Spec | Tier | Data sources | Context mappings | Capabilities | Hash state | Runner |
 |------|------|--------------|------------------|--------------|------------|--------|
 | `bosc-ims.facts.json` | MES_MOM | 8 (7 gRPC unary, 1 gRPC stream) | 12 + 2 enrichment | read, subscribe, backfill, discover | approved (no approver recorded) | pass |
 | `forge-mes.facts.json` | MES_MOM | 18 (10 GraphQL, 1 mutation, 1 RabbitMQ, 2 MQTT, 1 WS, 2 REST, 1 database) | 15 + 3 enrichment | read, **write**, subscribe, backfill, discover | approved (reh3376) | pass |
-| `next-trend.facts.json` | HISTORIAN | 5 (4 REST, 1 WS) | 8 | read, subscribe, backfill, discover | approved (no approver recorded) | pass |
-| `ot-module.facts.json` | OT_SCADA (not a FACTS tier) | 21 (OPC-UA, alarm, control-write, Ignition bridge, scripting) | 9 + 10 enrichment | read, **write**, subscribe, backfill, discover | pending_review (FB-073) | 8 vocabulary failures (FB-079) |
-| `scanner-gateway.facts.json` | OT | 5 (3 gRPC server unary, 2 gRPC server stream) | 9 | read, subscribe, discover | approved (no approver recorded) | pass |
-| `whk-cmms.facts.json` | MES_MOM | 5 (3 GraphQL, 1 REST, 1 RabbitMQ) | 19 + 2 enrichment | read, subscribe, backfill, discover | approved (reh3376) | pass |
-| `whk-erpi.facts.json` | ERP_BUSINESS | 5 (3 RabbitMQ, 1 REST, 1 GraphQL) | 12 + 2 enrichment | read, subscribe, backfill, discover | approved (forge-governance-audit) | pass |
-| `whk-nms.facts.json` | MES_MOM | 11 (10 REST, 1 WS) | 19 + 2 enrichment | read, subscribe, backfill, discover | approved (reh3376) | pass |
+| `next-trend.facts.json` | HISTORIAN | 5 (4 REST, 1 WS) | 8 | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; was auto-approved, no approver) | pass |
+| `ot-module.facts.json` | OT_SCADA (not a FACTS tier) | 21 (OPC-UA, alarm, control-write, Ignition bridge, scripting) | 9 + 10 enrichment | read, **write**, subscribe, backfill, discover | pending_review (FB-073) | 9 failures: `facts:schema-valid` (66 violations) + 8 vocabulary checks (FB-079) |
+| `scanner-gateway.facts.json` | OT | 5 (3 gRPC server unary, 2 gRPC server stream) | 9 | read, subscribe, discover | pending_review (FB-080 re-stamp; was auto-approved, no approver) | pass |
+| `whk-cmms.facts.json` | MES_MOM | 5 (3 GraphQL, 1 REST, 1 RabbitMQ) | 19 + 2 enrichment | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; previous hash approved by reh3376) | pass |
+| `whk-erpi.facts.json` | ERP_BUSINESS | 5 (3 RabbitMQ, 1 REST, 1 GraphQL) | 12 + 2 enrichment | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; previous hash approved by forge-governance-audit) | pass |
+| `whk-nms.facts.json` | MES_MOM | 11 (10 REST, 1 WS) | 19 + 2 enrichment | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; previous hash approved by reh3376) | pass |
 | `whk-wms.facts.json` | MES_MOM | 14 (9 GraphQL, 1 subscription, 3 RabbitMQ, 1 REST) | 11 + 3 enrichment | read, subscribe, backfill, discover | approved (reh3376) | pass |
 
-"Runner" is the `FACTSRunner` verdict set (35 hand-coded checks). The runner does not yet validate a spec against `facts.schema.json`; 7 of the 9 specs fail that validation (FB-080). Per-spec test modules exist for whk-wms, forge-mes and ot-module (integrity block only, FB-073). Only the owner approves a hash (`approve_spec_hash(approved_by="reh3376")`); agents re-stamp as `pending_review`.
+The runner's first verdict is `facts:schema-valid` (JSON Schema 2020-12, one violation per offending path); the 35 rule checks that follow read their closed value sets from the schema's enums, so the two cannot drift (FB-080). `tests/governance/facts/test_specs_schema_valid.py` validates every file in `specs/` in CI; the OT spec is a strict xfail there until FB-079. Adapter-specific material the contract has no slot for — routing rules, cross-module flows, scan rejection, pre-FHTS history notes — lives under `metadata`, which the schema leaves free-form and the runner never inspects. Only the owner approves a hash (`approve_spec_hash(approved_by="reh3376")`); agents re-stamp as `pending_review`. Five specs await that approval after FB-080 moved their out-of-contract fields to `metadata` (content changes; adapter behaviour unchanged). Per-spec test modules exist for whk-wms, forge-mes and ot-module.
 
 **Cross-spoke consistency:** 6 shared context fields (`lot_id`, `shift_id`, `operator_id`, `event_timestamp`, `event_type`, `work_order_id`). Identical shift definitions (America/Kentucky/Louisville, day/night). Shared RabbitMQ exchange topology (`wh.whk01.distillery01.*`). Both MES_MOM tier.
 
@@ -76,22 +76,23 @@ facts.schema.json
 │   ├── health_check_interval_ms # integer
 │   └── restart_policy        # enum — always | on_failure | never
 ├── connection            # object — How does Forge connect to the source system?
-│   ├── params[]          #   array of ConnectionParam
-│   └── auth_methods[]    #   array of strings (none, bearer_token, api_key, basic, oauth2, certificate, azure_entra_id)
+│   ├── params[]          #   array of {name, type, required, secret, description, default (typed to match type), validation}
+│   └── auth_methods[]    #   array of strings (none, bearer_token, api_key, basic, oauth2, certificate, azure_entra_id, mtls, device_token)
 ├── data_contract         # object — What does the adapter produce?
 │   ├── schema_ref        #   string — forge:// URI to output schema
 │   ├── output_format     #   enum — contextual_record | raw
 │   ├── context_fields[]  #   array of required context field names
 │   ├── optional_context_fields[] # array of optional context field names
-│   ├── data_sources[]    #   array of {source_type, endpoint, description, entities, collection_mode}
+│   ├── external_contract_ref #   string — URI of an external contract this one derives from (e.g. AsyncAPI)
+│   ├── data_sources[]    #   array of {name?, source_type, endpoint, description, entities, collection_mode}
 │   └── sample_record     #   object — example ContextualRecord
 ├── context_mapping       # object — How do source fields become Forge context?
 │   ├── mappings[]        #   array of {source_field, context_field, transform?}
-│   └── enrichment_rules  #   object — rules for derived context
+│   └── enrichment_rules[] #  array of {target_field, rule_type, config, description}
 ├── error_handling        # object — How must the adapter handle failure?
-│   ├── retry_policy      #   object — {max_retries, initial_delay_ms, backoff_strategy, max_delay_ms}
+│   ├── retry_policy      #   object — {max_retries, initial_delay_ms, backoff_strategy, max_delay_ms, jitter, retryable_errors}
 │   ├── circuit_breaker   #   object — {failure_threshold, half_open_after_ms, success_threshold}
-│   ├── dead_letter       #   object — {enabled, topic, max_age_hours}
+│   ├── dead_letter       #   object — {enabled, topic, max_age_hours, description}
 │   └── health_degradation # object — {degraded_after_failures, failed_after_failures}
 ├── integrity             # object — Hashing lock + AI agent governance (FHTS)
 │   ├── hash_method       #   string — "sha256-c14n-v1" (normative)
@@ -101,46 +102,66 @@ facts.schema.json
 │   ├── approved_by       #   string — Who approved current hash state
 │   ├── approved_at       #   string — ISO8601 timestamp of approval
 │   └── change_history[]  #   array of {previous_hash, new_hash, changed_at, source, changed_by, change_type, reason}
-└── metadata              # object — Free-form adapter-specific data
+└── metadata              # object — Free-form; the only open section (adapter-specific material lives here); never inspected by the runner
 ```
+
+Every other section is closed (`additionalProperties: false`). The enums, as the schema carries them today and the runner reads them (`FactsVocabulary`): `source_type` graphql_query, graphql_mutation, graphql_subscription, rest_get, rest_post, rabbitmq, mqtt, websocket, file, database, grpc_unary, grpc_stream, grpc_server_unary, grpc_server_stream · `collection_mode` poll, subscribe, backfill, write, push · `auth_methods` none, bearer_token, api_key, basic, oauth2, certificate, azure_entra_id, mtls, device_token · `rule_type` timestamp_to_shift, location_to_area, lookup, computed, static, enum_normalize, composite · lifecycle states REGISTERED, CONNECTING, HEALTHY, DEGRADED, FAILED, STOPPED · `type` INGESTION, BIDIRECTIONAL, WRITE_ONLY, DISCOVERY_ONLY · `tier` OT, MES_MOM, ERP_BUSINESS, HISTORIAN, DOCUMENT. The gRPC, `push`, mTLS/device-token and the two enrichment rule types were added on 2026-10-17 (FB-080) because live spokes already used them; the OT vocabulary waits on D-8.
 
 ## Runner
 
 **Location:** `src/forge/governance/facts/runners/facts_runner.py`
 **Class:** `FACTSRunner(FxTSRunner)`
-**Status:** ✅ Implemented (Sprint 4 complete — 72/72 runner tests passing)
-**Tests:** `tests/governance/facts/test_facts_runner.py`
+**Status:** ✅ Implemented — `facts:schema-valid` plus 35 rule checks; enums read from the schema (FB-080)
+**Tests:** `tests/governance/facts/test_facts_runner.py`, `test_specs_schema_valid.py` (every spec), per-spec modules
 
 ### Check Catalog
 
-#### Static Checks (spec + manifest validation)
+#### Static Checks (spec validation)
+
+`facts:schema-valid` runs first. Every enum below is read from `facts.schema.json` at import (`FactsVocabulary`), so the runner and the schema cannot disagree (FB-080). A full spec yields 36 verdicts; checks marked *conditional* are emitted only when the section is present or only on failure.
 
 | Check ID | Category | What it validates |
 |----------|----------|-------------------|
-| `facts:spec-version` | Identity | Spec version supported |
-| `facts:identity-id-format` | Identity | adapter_id is kebab-case, no spaces |
-| `facts:identity-version` | Identity | Version is valid semver |
-| `facts:identity-tier` | Identity | Tier is valid enum member |
-| `facts:identity-protocol` | Identity | Protocol string non-empty |
-| `facts:capabilities-read` | Capabilities | read is true (required for all adapters) |
-| `facts:capabilities-valid` | Capabilities | All capability fields are boolean |
-| `facts:lifecycle-timeouts` | Lifecycle | All timeouts are positive integers |
-| `facts:lifecycle-restart` | Lifecycle | Restart policy is valid enum |
-| `facts:connection-params` | Connection | Each param has name and type |
-| `facts:connection-secrets` | Connection | Secret params exist and are flagged |
-| `facts:connection-auth` | Connection | At least one auth method declared |
-| `facts:data-contract-schema` | Data Contract | Schema ref is loadable |
-| `facts:data-contract-format` | Data Contract | Output format is valid enum |
-| `facts:data-contract-context` | Data Contract | Context fields list non-empty |
-| `facts:data-contract-sample` | Data Contract | Sample record validates against schema |
-| `facts:context-coverage` | Context Mapping | All declared context fields have mappings |
-| `facts:context-no-orphans` | Context Mapping | No mappings target undeclared context fields |
-| `facts:error-retry` | Error Handling | Retry count and delay are positive |
-| `facts:error-circuit-breaker` | Error Handling | Failure threshold and reset timeout configured |
-| `facts:error-dead-letter` | Error Handling | Dead letter topic is set |
-| `facts:metadata-valid` | Metadata | Metadata is a dict (always passes) |
+| `facts:schema-valid` | Schema | Spec validates against `facts.schema.json` (JSON Schema 2020-12); one violation per offending JSON path |
+| `facts:spec-version` | Identity | `spec_version` is `0.1.0` |
+| `facts:identity-id-format` | Identity | `adapter_id` is kebab-case, 3–64 chars |
+| `facts:identity-id-match` | Identity | `adapter_id` equals the run target |
+| `facts:identity-name` | Identity | `name` is 1–128 chars |
+| `facts:identity-version` | Identity | `version` is semver |
+| `facts:identity-type` | Identity | `type` is in the schema enum |
+| `facts:identity-tier` | Identity | `tier` is in the schema enum |
+| `facts:identity-protocol` | Identity | `protocol` is non-empty |
+| `facts:capabilities-read` | Capabilities | `read` is `true` |
+| `facts:capabilities-<cap>-type` | Capabilities | each declared capability is boolean (*conditional*, on failure) |
+| `facts:capabilities-valid` | Capabilities | summary when no capability check failed |
+| `facts:lifecycle-startup_timeout_ms` | Lifecycle | integer 1,000–300,000 |
+| `facts:lifecycle-shutdown_timeout_ms` | Lifecycle | integer 1,000–60,000 |
+| `facts:lifecycle-health_check_interval_ms` | Lifecycle | integer 1,000–300,000 |
+| `facts:lifecycle-restart-policy` | Lifecycle | `restart_policy` is in the schema enum |
+| `facts:lifecycle-state-transitions` | Lifecycle | every `from`/`to` is a schema lifecycle state (*conditional*) |
+| `facts:connection-params-present` | Connection | at least one param |
+| `facts:connection-params-valid` | Connection | snake_case names, `type` in the schema enum |
+| `facts:connection-auth-methods` | Connection | at least one method, each in the schema enum |
+| `facts:data-contract-schema-ref` | Data Contract | `schema_ref` starts with `forge://` |
+| `facts:data-contract-output-format` | Data Contract | `output_format` is in the schema enum |
+| `facts:data-contract-context-fields` | Data Contract | `context_fields` is non-empty |
+| `facts:data-contract-sources-valid` | Data Contract | `source_type` and `collection_mode` in the schema enums, ≥1 entity per source (*conditional*) |
+| `facts:data-contract-sample-coverage` | Data Contract | `sample_record.context` carries every required context field (*conditional*) |
+| `facts:context-mappings-present` | Context Mapping | at least one mapping |
+| `facts:context-mapping-coverage` | Context Mapping | every required context field is mapped or enriched |
+| `facts:context-mapping-no-orphans` | Context Mapping | mappings target declared fields |
+| `facts:context-enrichment-valid` | Context Mapping | `rule_type` in the schema enum (*conditional*) |
+| `facts:error-retry-policy` | Error Handling | `max_retries` 0–20, `initial_delay_ms` ≥100, `backoff_strategy` in the schema enum |
+| `facts:error-circuit-breaker` | Error Handling | `failure_threshold` ≥1, `half_open_after_ms` ≥1,000 |
+| `facts:metadata` | Metadata | `metadata` is a dict (free-form, never inspected) |
+| `facts:integrity-present` | Integrity | integrity block present (SKIP when absent) |
+| `facts:integrity-hash-format` | Integrity | `spec_hash` is 64-char hex |
+| `facts:integrity-hash-state` | Integrity | `approved` passes; `modified`/`pending_review` fail with severity *warning* |
+| `facts:cross-write-sources` | Cross-field | `write: true` needs a write source (`collection_mode: write` or `graphql_mutation`) (*conditional*) |
+| `facts:cross-subscribe-sources` | Cross-field | `subscribe: true` needs a `subscribe` source (*conditional*) |
+| `facts:cross-ingestion-read` | Cross-field | `INGESTION` type requires `read` (*conditional*, on failure) |
 
-#### Live Checks (adapter instantiation, `--live` flag)
+#### Live Checks (adapter instantiation, `live=True`) — planned; today the runner emits one `facts:live-not-implemented` SKIP
 
 | Check ID | What it validates |
 |----------|-------------------|

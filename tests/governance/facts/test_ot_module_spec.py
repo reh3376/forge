@@ -33,8 +33,10 @@ FHTS_STATES = frozenset({"approved", "modified", "pending_review", "reverted", "
 
 #: FACTS vocabulary the OT spec does not speak yet. Tracked by BACKLOG FB-079;
 #: remove an id here when FB-079 brings that section into conformance.
+#: ``facts:schema-valid`` (FB-080) fails for the same reason and leaves with them.
 KNOWN_VOCABULARY_FAILURES = frozenset(
     {
+        "facts:schema-valid",
         "facts:identity-tier",
         "facts:lifecycle-state-transitions",
         "facts:connection-params-valid",

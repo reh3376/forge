@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-16 · **Branch:** `reh3376_dev01` (last merged PR: 36) · **Owner:** reh3376
+**Status date:** 2026-10-17 · **Branch:** `reh3376_dev01` (last merged PR: 37) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -22,13 +22,13 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 346 files, ~65,000 lines |
-| Python tests | 245 files, ~50,700 lines, 3,929 test functions; full suite green on 2026-10-16 |
+| Python tests | 247 files, ~51,000 lines, 3,951 test functions; full suite green on 2026-10-17 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | forge-mes bridge (`modules/Forge MES`) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
 | Hub REST routes | 20 on the hub app, plus OT i3X (8) and OT control (11), plus the curation app mounted at `/curation` |
 | Storage migrations | 8 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions) |
-| FACTS specs | 9 (8 pass the runner; ot-module fails 8 vocabulary checks, FB-079) |
+| FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 5 await owner approval after the FB-080 re-stamp |
 | FATS specs | 21 |
 | FVTS specs | 1 (ot-module reference, `pending_review`) |
 | CI jobs | hub-python, hub-go, mes-module, secrets-scan; auto-PR workflow |
@@ -84,16 +84,16 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 |---|---|---|---|
 | whk-wms | ✅ 772 lines | approved (reh3376) | reference spec |
 | forge-mes | ✅ 1,078 lines + the NestJS spoke | approved (reh3376) | 18 data sources incl. AuditLog backfill (FB-071) |
-| whk-cmms | ✅ 810 | approved (reh3376) | |
-| whk-erpi | ✅ 769 | approved (audit) | |
-| whk-nms | ✅ 853 | approved (reh3376) | |
-| bosc-ims | ✅ 1,909 | approved (no approver recorded) | gRPC source types outside the schema enum (FB-080) |
-| next-trend (historian) | ✅ 801 | approved (no approver recorded) | |
-| scanner-gateway | ✅ 1,403 | approved (no approver recorded) | own proto under `proto/scanner` |
-| ot-module | ✅ (the OT module itself) | `pending_review` (FB-073) | 8 vocabulary failures; three disagreeing identities (FB-079) |
+| whk-cmms | ✅ 810 | `pending_review` (FB-080 re-stamp; previous hash approved by reh3376) | cross-module flows and pre-FHTS history moved to `metadata` |
+| whk-erpi | ✅ 769 | `pending_review` (FB-080 re-stamp; previous hash approved by audit) | same |
+| whk-nms | ✅ 853 | `pending_review` (FB-080 re-stamp; previous hash approved by reh3376) | pre-FHTS history moved to `metadata` |
+| bosc-ims | ✅ 1,909 | approved (no approver recorded) | gRPC source types now in the schema |
+| next-trend (historian) | ✅ 801 | `pending_review` (FB-080 re-stamp; was auto-approved) | dead-letter keys renamed to the schema's |
+| scanner-gateway | ✅ 1,403 | `pending_review` (FB-080 re-stamp; was auto-approved) | own proto under `proto/scanner`; routing rules and scan rejection moved to `metadata` |
+| ot-module | ✅ (the OT module itself) | `pending_review` (FB-073) | `facts:schema-valid` (66 violations) + 8 vocabulary failures; three disagreeing identities (FB-079) |
 | csv_file, mqtt_sparkplug, opcua, rest_generic | ⬜ | — | package stubs only (one-line `__init__`) |
 
-The FACTS runner does not yet validate specs against the JSON schema; 7 of 9 specs fail that validation (FB-080).
+The FACTS runner validates every spec against the JSON schema first (`facts:schema-valid`, FB-080) and reads its enums from the schema; 8 of 9 specs validate, the OT spec waits on D-8.
 
 ### 3.5 OT module (forge-ot)
 
@@ -143,7 +143,7 @@ The FACTS runner does not yet validate specs against the JSON schema; 7 of 9 spe
 | Framework | State |
 |---|---|
 | FATS | schema + runner + 21 specs |
-| FACTS | schema + runner (35 checks) + 9 specs; no schema-valid check (FB-080) |
+| FACTS | schema + runner (`facts:schema-valid` + 35 rule checks, enums read from the schema) + 9 specs; 8 validate (OT spec: FB-079); 5 re-stamped specs await owner approval |
 | FHTS | hashing, verification, approval, revert, registry; owner-only approval in practice |
 | FTTS | schema + runner + 1 spec; no doc page |
 | FVTS | schema + runner + reference renderer + 1 spec |
@@ -160,7 +160,7 @@ The FACTS runner does not yet validate specs against the JSON schema; 7 of 9 spe
 | Identity methods (OIDC, local, service; then LDAP/AD; then SAML) | ⬜ | R-10 |
 | Hub of hubs (site / enterprise / area), upward audit, on-demand data | ⬜ | R-9, R-13, R-14, R-16, R-17; no code |
 | Offline token verification, one-hour default lifetime | ⬜ | R-8, R-15 |
-| Repository hardening | 🟡 | private until GitHub Support confirms GC (ticket #4862642); gitleaks in CI; FB-044 re-enables scanning/CodeQL after the flip |
+| Repository hardening | 🟡 | public again since 2026-10-17 (owner's call, ahead of Support's GC); secret scanning, push protection, CodeQL default setup, Dependabot, private vulnerability reporting and fork-PR approval on; gitleaks in CI; the 4 open secret-scanning alerts are the rotated whk-mes values still reachable through `refs/pull/4..8` until Support GCs (ticket #4862642); non-provider patterns and validity checks are owner toggles the API refuses (FB-044) |
 
 ### 3.11 Deployment and operations
 
@@ -192,7 +192,6 @@ The FACTS runner does not yet validate specs against the JSON schema; 7 of 9 spe
 | D-3 | forge-mes Go design document | FB-076, FB-057 steps 2–5, the Go SDK scaffold |
 | D-4 | FVTS open items (name, write authority per profile, mobile acknowledge, transport, layout format, server-side enforcement) | forge-display design |
 | D-5 | Hub core language (Python vs Rust) — parked | nothing in the current sequence |
-| D-6 | Public flip timing — on GitHub Support | FB-044 |
 | D-7 | Scope of the Go standard (OT module and Python adapters) | long-term shape of `src/forge/modules` and `src/forge/adapters` |
 | D-8 | FACTS vocabulary for OT adapters (extend the schema vs translate the spec) | FB-079, approval of the OT FACTS spec |
 
@@ -205,7 +204,7 @@ The FACTS runner does not yet validate specs against the JSON schema; 7 of 9 spe
 3. **No scoped roles in force** (vision §P-11): the gateway's auth is off by default and the role model is still being designed.
 4. **No federation** (vision §P-10): a single hub only; no hub-of-hubs code.
 5. **Hub services unmounted** (FB-001): Context Engine and Schema Registry exist but are not served.
-6. **Seven governance frameworks are stubs or planned**, and FACTS does not validate against its own schema (FB-080).
+6. **Seven governance frameworks are stubs or planned**; FACTS now validates against its own schema, but six of its nine specs await the owner's hash approval.
 7. **No production deployment** (vision §P-12).
 
 ---

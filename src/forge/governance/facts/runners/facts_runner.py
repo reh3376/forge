@@ -1,8 +1,13 @@
 """FACTS runner — enforces adapter conformance against FACTS specs.
 
 This runner validates that an adapter (or its spec file) conforms to the
-FACTS schema. Every field in facts.schema.json is checked — schema-runner
-parity is verified by the base class.
+FACTS schema. ``facts:schema-valid`` applies facts.schema.json itself (JSON
+Schema 2020-12, one violation per offending path); the other checks add the
+rules the schema cannot express (cross-field consistency, context coverage,
+FHTS state). The closed value sets those checks use are read from the schema
+at import (``VOCABULARY``) and per runner instance (``runner.vocabulary``),
+so the runner cannot drift from the schema (BACKLOG FB-080). Schema-runner
+parity of the top-level sections is verified by the base class.
 
 Two modes:
   - **Static** (default): Validate spec structure, cross-field consistency,
@@ -14,6 +19,8 @@ Two modes:
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from forge.governance.shared.runner import (
@@ -21,46 +28,99 @@ from forge.governance.shared.runner import (
     FxTSVerdict,
     SpecViolation,
     VerdictStatus,
+    load_schema,
 )
 
 if TYPE_CHECKING:
-    from pathlib import Path
+    from jsonschema import Draft202012Validator
 
 
 # ---------------------------------------------------------------------------
-# Constants — mirrors facts.schema.json enums
+# Vocabulary — read from facts.schema.json, never hand-copied (BACKLOG FB-080)
 # ---------------------------------------------------------------------------
 
-VALID_ADAPTER_TYPES = frozenset({"INGESTION", "BIDIRECTIONAL", "WRITE_ONLY", "DISCOVERY_ONLY"})
-VALID_TIERS = frozenset({"OT", "MES_MOM", "ERP_BUSINESS", "HISTORIAN", "DOCUMENT"})
-VALID_RESTART_POLICIES = frozenset({"always", "on_failure", "never"})
-VALID_PARAM_TYPES = frozenset({"string", "integer", "boolean", "url", "path"})
-VALID_AUTH_METHODS = frozenset({
-    "none", "bearer_token", "api_key", "basic", "oauth2", "certificate", "azure_entra_id",
-    # gRPC-native auth methods
-    "mtls", "device_token",
-})
-VALID_OUTPUT_FORMATS = frozenset({"contextual_record", "raw"})
-VALID_SOURCE_TYPES = frozenset({
-    "graphql_query", "graphql_mutation", "graphql_subscription",
-    "rest_get", "rest_post", "rabbitmq", "mqtt", "websocket", "file", "database",
-    # gRPC source types (client-side and server-side)
-    "grpc_unary", "grpc_stream", "grpc_server_unary", "grpc_server_stream",
-})
-VALID_COLLECTION_MODES = frozenset({"poll", "subscribe", "backfill", "write", "push"})
-VALID_BACKOFF_STRATEGIES = frozenset({"constant", "linear", "exponential"})
-VALID_ENRICHMENT_RULE_TYPES = frozenset({
-    "timestamp_to_shift", "location_to_area", "lookup", "computed", "static",
-    # Domain-specific enrichment rules
-    "enum_normalize", "composite",
-})
-VALID_LIFECYCLE_STATES = frozenset({
-    "REGISTERED", "CONNECTING", "HEALTHY", "DEGRADED", "FAILED", "STOPPED",
-})
+PACKAGED_SCHEMA_PATH = Path(__file__).resolve().parents[1] / "schema" / "facts.schema.json"
+
+
+def schema_enum(schema: dict[str, Any], *path: str) -> frozenset[str]:
+    """Return the ``enum`` found at ``path`` inside a JSON schema.
+
+    Each step is a property name; the step ``"[]"`` descends into ``items``.
+    Raises ``KeyError`` when the path does not end at a non-empty enum, so a
+    renamed schema field fails at import instead of silently accepting anything.
+    """
+    node: Any = schema
+    for step in path:
+        node = node["items"] if step == "[]" else node["properties"][step]
+    values = node["enum"]
+    if not values:
+        msg = f"schema enum at /{'/'.join(path)} is empty"
+        raise KeyError(msg)
+    return frozenset(values)
+
+
+@dataclass(frozen=True)
+class FactsVocabulary:
+    """The closed value sets of a FACTS schema, as the runner consumes them."""
+
+    adapter_types: frozenset[str]
+    tiers: frozenset[str]
+    restart_policies: frozenset[str]
+    lifecycle_states: frozenset[str]
+    param_types: frozenset[str]
+    auth_methods: frozenset[str]
+    output_formats: frozenset[str]
+    source_types: frozenset[str]
+    collection_modes: frozenset[str]
+    enrichment_rule_types: frozenset[str]
+    backoff_strategies: frozenset[str]
+
+    #: Attribute → path of its enum in the schema (also the parity test's table).
+    PATHS: ClassVar[dict[str, tuple[str, ...]]] = {
+        "adapter_types": ("adapter_identity", "type"),
+        "tiers": ("adapter_identity", "tier"),
+        "restart_policies": ("lifecycle", "restart_policy"),
+        "lifecycle_states": ("lifecycle", "state_transitions", "[]", "from"),
+        "param_types": ("connection", "params", "[]", "type"),
+        "auth_methods": ("connection", "auth_methods", "[]"),
+        "output_formats": ("data_contract", "output_format"),
+        "source_types": ("data_contract", "data_sources", "[]", "source_type"),
+        "collection_modes": ("data_contract", "data_sources", "[]", "collection_mode"),
+        "enrichment_rule_types": ("context_mapping", "enrichment_rules", "[]", "rule_type"),
+        "backoff_strategies": ("error_handling", "retry_policy", "backoff_strategy"),
+    }
+
+    @classmethod
+    def from_schema(cls, schema: dict[str, Any]) -> FactsVocabulary:
+        return cls(**{name: schema_enum(schema, *path) for name, path in cls.PATHS.items()})
+
+
+VOCABULARY = FactsVocabulary.from_schema(load_schema(PACKAGED_SCHEMA_PATH))
+
+# Module-level names kept for importers; every one is derived from the schema.
+VALID_ADAPTER_TYPES = VOCABULARY.adapter_types
+VALID_TIERS = VOCABULARY.tiers
+VALID_RESTART_POLICIES = VOCABULARY.restart_policies
+VALID_LIFECYCLE_STATES = VOCABULARY.lifecycle_states
+VALID_PARAM_TYPES = VOCABULARY.param_types
+VALID_AUTH_METHODS = VOCABULARY.auth_methods
+VALID_OUTPUT_FORMATS = VOCABULARY.output_formats
+VALID_SOURCE_TYPES = VOCABULARY.source_types
+VALID_COLLECTION_MODES = VOCABULARY.collection_modes
+VALID_ENRICHMENT_RULE_TYPES = VOCABULARY.enrichment_rule_types
+VALID_BACKOFF_STRATEGIES = VOCABULARY.backoff_strategies
 
 ADAPTER_ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]*$")
 SEMVER_PATTERN = re.compile(r"^\d+\.\d+\.\d+")
 SNAKE_CASE_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
+
+
+def _short(value: Any, limit: int = 80) -> str:
+    """Compact rendering of an offending value for a SpecViolation."""
+    if isinstance(value, dict | list):
+        return f"<{type(value).__name__} of {len(value)}>"
+    text = repr(value)
+    return text if len(text) <= limit else text[: limit - 3] + "..."
 
 
 class FACTSRunner(FxTSRunner):
@@ -92,7 +152,20 @@ class FACTSRunner(FxTSRunner):
     }
 
     def __init__(self, schema_path: Path | str | None = None) -> None:
-        super().__init__(schema_path=schema_path)
+        # The packaged schema is the default, so ``FACTSRunner()`` validates too.
+        super().__init__(schema_path=schema_path or PACKAGED_SCHEMA_PATH)
+        self._vocabulary: FactsVocabulary | None = None
+        self._validator: Draft202012Validator | None = None
+
+    @property
+    def vocabulary(self) -> FactsVocabulary:
+        """Closed value sets read from the schema this runner enforces."""
+        if self._vocabulary is None:
+            schema = self.schema
+            self._vocabulary = (
+                VOCABULARY if schema is None else FactsVocabulary.from_schema(schema)
+            )
+        return self._vocabulary
 
     def implemented_fields(self) -> set[str]:
         return self._ENFORCED_FIELDS
@@ -123,7 +196,8 @@ class FACTSRunner(FxTSRunner):
 
         verdicts: list[FxTSVerdict] = []
 
-        # Static checks — always run
+        # Static checks — always run; the schema first, so reports lead with it
+        verdicts.append(self._check_schema_valid(spec))
         verdicts.append(self._check_spec_version(spec))
         verdicts.extend(self._check_identity(spec, target))
         verdicts.extend(self._check_capabilities(spec))
@@ -144,6 +218,55 @@ class FACTSRunner(FxTSRunner):
             verdicts.extend(live_verdicts)
 
         return verdicts
+
+    # ------------------------------------------------------------------
+    # facts:schema-valid — the schema itself, every keyword, every path
+    # ------------------------------------------------------------------
+
+    def _check_schema_valid(self, spec: dict[str, Any]) -> FxTSVerdict:
+        """Validate the spec against facts.schema.json (JSON Schema 2020-12).
+
+        One violation per error, keyed by the JSON pointer of the offending
+        value, so an author can fix every path in one pass. The other checks
+        are not a substitute: they add what the schema cannot express.
+        """
+        schema = self.schema
+        if schema is None:
+            return FxTSVerdict(
+                check_id="facts:schema-valid",
+                spec_ref="FACTS/schema",
+                status=VerdictStatus.SKIP,
+                message="No schema configured — schema validation skipped.",
+            )
+        if self._validator is None:
+            from jsonschema import Draft202012Validator
+
+            self._validator = Draft202012Validator(schema)
+        errors = sorted(self._validator.iter_errors(spec), key=lambda e: list(e.absolute_path))
+        if not errors:
+            return FxTSVerdict(
+                check_id="facts:schema-valid",
+                spec_ref="FACTS/schema",
+                status=VerdictStatus.PASS,
+                message=f"Spec validates against {schema.get('$id', 'facts.schema.json')}.",
+            )
+        violations = [
+            SpecViolation(
+                field="/" + "/".join(str(step) for step in e.absolute_path),
+                expected=e.validator,
+                actual=_short(e.instance),
+                message=e.message[:200],
+            )
+            for e in errors
+        ]
+        first = violations[0]
+        return FxTSVerdict(
+            check_id="facts:schema-valid",
+            spec_ref="FACTS/schema",
+            status=VerdictStatus.FAIL,
+            message=f"{len(errors)} schema violation(s); first: {first.field}: {first.message}",
+            violations=violations,
+        )
 
     # ------------------------------------------------------------------
     # spec_version
@@ -182,6 +305,7 @@ class FACTSRunner(FxTSRunner):
     ) -> list[FxTSVerdict]:
         verdicts: list[FxTSVerdict] = []
         identity = spec.get("adapter_identity", {})
+        vocab = self.vocabulary
 
         # adapter_id format
         aid = identity.get("adapter_id", "")
@@ -273,15 +397,15 @@ class FACTSRunner(FxTSRunner):
 
         # type enum
         atype = identity.get("type", "")
-        if atype not in VALID_ADAPTER_TYPES:
+        if atype not in vocab.adapter_types:
             verdicts.append(FxTSVerdict(
                 check_id="facts:identity-type",
                 spec_ref="FACTS/adapter_identity/type",
                 status=VerdictStatus.FAIL,
-                message=f"type '{atype}' not in {sorted(VALID_ADAPTER_TYPES)}.",
+                message=f"type '{atype}' not in {sorted(vocab.adapter_types)}.",
                 violations=[SpecViolation(
                     field="adapter_identity.type",
-                    expected=str(sorted(VALID_ADAPTER_TYPES)),
+                    expected=str(sorted(vocab.adapter_types)),
                     actual=atype,
                     message="Invalid adapter type.",
                 )],
@@ -296,15 +420,15 @@ class FACTSRunner(FxTSRunner):
 
         # tier enum
         tier = identity.get("tier", "")
-        if tier not in VALID_TIERS:
+        if tier not in vocab.tiers:
             verdicts.append(FxTSVerdict(
                 check_id="facts:identity-tier",
                 spec_ref="FACTS/adapter_identity/tier",
                 status=VerdictStatus.FAIL,
-                message=f"tier '{tier}' not in {sorted(VALID_TIERS)}.",
+                message=f"tier '{tier}' not in {sorted(vocab.tiers)}.",
                 violations=[SpecViolation(
                     field="adapter_identity.tier",
-                    expected=str(sorted(VALID_TIERS)),
+                    expected=str(sorted(vocab.tiers)),
                     actual=tier,
                     message="Invalid tier.",
                 )],
@@ -405,6 +529,7 @@ class FACTSRunner(FxTSRunner):
     def _check_lifecycle(self, spec: dict[str, Any]) -> list[FxTSVerdict]:
         verdicts: list[FxTSVerdict] = []
         lc = spec.get("lifecycle", {})
+        vocab = self.vocabulary
 
         # Timeout values
         for field, min_val, max_val in [
@@ -436,15 +561,15 @@ class FACTSRunner(FxTSRunner):
 
         # restart_policy enum
         policy = lc.get("restart_policy", "")
-        if policy not in VALID_RESTART_POLICIES:
+        if policy not in vocab.restart_policies:
             verdicts.append(FxTSVerdict(
                 check_id="facts:lifecycle-restart-policy",
                 spec_ref="FACTS/lifecycle/restart_policy",
                 status=VerdictStatus.FAIL,
-                message=f"restart_policy '{policy}' not in {sorted(VALID_RESTART_POLICIES)}.",
+                message=f"restart_policy '{policy}' not in {sorted(vocab.restart_policies)}.",
                 violations=[SpecViolation(
                     field="lifecycle.restart_policy",
-                    expected=str(sorted(VALID_RESTART_POLICIES)),
+                    expected=str(sorted(vocab.restart_policies)),
                     actual=policy,
                     message="Invalid restart policy.",
                 )],
@@ -464,7 +589,7 @@ class FACTSRunner(FxTSRunner):
             for t in transitions:
                 for key in ("from", "to"):
                     state = t.get(key, "")
-                    if state not in VALID_LIFECYCLE_STATES:
+                    if state not in vocab.lifecycle_states:
                         invalid_states.append(f"{key}={state}")
             if invalid_states:
                 verdicts.append(FxTSVerdict(
@@ -474,7 +599,7 @@ class FACTSRunner(FxTSRunner):
                     message=f"Invalid states in transitions: {invalid_states}.",
                     violations=[SpecViolation(
                         field="lifecycle.state_transitions",
-                        expected=str(sorted(VALID_LIFECYCLE_STATES)),
+                        expected=str(sorted(vocab.lifecycle_states)),
                         actual=str(invalid_states),
                         message="Invalid lifecycle state.",
                     )],
@@ -496,6 +621,7 @@ class FACTSRunner(FxTSRunner):
     def _check_connection(self, spec: dict[str, Any]) -> list[FxTSVerdict]:
         verdicts: list[FxTSVerdict] = []
         conn = spec.get("connection", {})
+        vocab = self.vocabulary
 
         # params — at least 1 required
         params = conn.get("params", [])
@@ -529,10 +655,10 @@ class FACTSRunner(FxTSRunner):
                     message=f"Param name '{name}' is not snake_case.",
                 ))
             ptype = p.get("type", "")
-            if ptype not in VALID_PARAM_TYPES:
+            if ptype not in vocab.param_types:
                 param_violations.append(SpecViolation(
                     field=f"connection.params[{i}].type",
-                    expected=str(sorted(VALID_PARAM_TYPES)),
+                    expected=str(sorted(vocab.param_types)),
                     actual=ptype,
                     message=f"Param type '{ptype}' is not valid.",
                 ))
@@ -565,7 +691,7 @@ class FACTSRunner(FxTSRunner):
                 )],
             ))
         else:
-            invalid_auth = [a for a in auth if a not in VALID_AUTH_METHODS]
+            invalid_auth = [a for a in auth if a not in vocab.auth_methods]
             if invalid_auth:
                 verdicts.append(FxTSVerdict(
                     check_id="facts:connection-auth-methods",
@@ -574,7 +700,7 @@ class FACTSRunner(FxTSRunner):
                     message=f"Invalid auth methods: {invalid_auth}.",
                     violations=[SpecViolation(
                         field="connection.auth_methods",
-                        expected=str(sorted(VALID_AUTH_METHODS)),
+                        expected=str(sorted(vocab.auth_methods)),
                         actual=str(invalid_auth),
                         message="Invalid auth method.",
                     )],
@@ -596,6 +722,7 @@ class FACTSRunner(FxTSRunner):
     def _check_data_contract(self, spec: dict[str, Any]) -> list[FxTSVerdict]:
         verdicts: list[FxTSVerdict] = []
         dc = spec.get("data_contract", {})
+        vocab = self.vocabulary
 
         # schema_ref starts with forge://
         schema_ref = dc.get("schema_ref", "")
@@ -622,15 +749,15 @@ class FACTSRunner(FxTSRunner):
 
         # output_format enum
         fmt = dc.get("output_format", "")
-        if fmt not in VALID_OUTPUT_FORMATS:
+        if fmt not in vocab.output_formats:
             verdicts.append(FxTSVerdict(
                 check_id="facts:data-contract-output-format",
                 spec_ref="FACTS/data_contract/output_format",
                 status=VerdictStatus.FAIL,
-                message=f"output_format '{fmt}' not in {sorted(VALID_OUTPUT_FORMATS)}.",
+                message=f"output_format '{fmt}' not in {sorted(vocab.output_formats)}.",
                 violations=[SpecViolation(
                     field="data_contract.output_format",
-                    expected=str(sorted(VALID_OUTPUT_FORMATS)),
+                    expected=str(sorted(vocab.output_formats)),
                     actual=fmt,
                     message="Invalid output format.",
                 )],
@@ -669,10 +796,10 @@ class FACTSRunner(FxTSRunner):
             src_violations: list[SpecViolation] = []
             for i, src in enumerate(sources):
                 st = src.get("source_type", "")
-                if st not in VALID_SOURCE_TYPES:
+                if st not in vocab.source_types:
                     src_violations.append(SpecViolation(
                         field=f"data_contract.data_sources[{i}].source_type",
-                        expected=str(sorted(VALID_SOURCE_TYPES)),
+                        expected=str(sorted(vocab.source_types)),
                         actual=st,
                         message=f"Invalid source_type '{st}'.",
                     ))
@@ -683,10 +810,10 @@ class FACTSRunner(FxTSRunner):
                         message="Data source must have at least one entity.",
                     ))
                 cm = src.get("collection_mode", "")
-                if cm and cm not in VALID_COLLECTION_MODES:
+                if cm and cm not in vocab.collection_modes:
                     src_violations.append(SpecViolation(
                         field=f"data_contract.data_sources[{i}].collection_mode",
-                        expected=str(sorted(VALID_COLLECTION_MODES)),
+                        expected=str(sorted(vocab.collection_modes)),
                         actual=cm,
                         message=f"Invalid collection_mode '{cm}'.",
                     ))
@@ -741,6 +868,7 @@ class FACTSRunner(FxTSRunner):
     def _check_context_mapping(self, spec: dict[str, Any]) -> list[FxTSVerdict]:
         verdicts: list[FxTSVerdict] = []
         cm = spec.get("context_mapping", {})
+        vocab = self.vocabulary
         dc = spec.get("data_contract", {})
 
         mappings = cm.get("mappings", [])
@@ -820,10 +948,10 @@ class FACTSRunner(FxTSRunner):
             rule_violations: list[SpecViolation] = []
             for i, rule in enumerate(enrichment_rules):
                 rt = rule.get("rule_type", "")
-                if rt not in VALID_ENRICHMENT_RULE_TYPES:
+                if rt not in vocab.enrichment_rule_types:
                     rule_violations.append(SpecViolation(
                         field=f"context_mapping.enrichment_rules[{i}].rule_type",
-                        expected=str(sorted(VALID_ENRICHMENT_RULE_TYPES)),
+                        expected=str(sorted(vocab.enrichment_rule_types)),
                         actual=rt,
                         message=f"Invalid enrichment rule_type '{rt}'.",
                     ))
@@ -852,6 +980,7 @@ class FACTSRunner(FxTSRunner):
     def _check_error_handling(self, spec: dict[str, Any]) -> list[FxTSVerdict]:
         verdicts: list[FxTSVerdict] = []
         eh = spec.get("error_handling", {})
+        vocab = self.vocabulary
 
         # retry_policy
         rp = eh.get("retry_policy", {})
@@ -874,10 +1003,10 @@ class FACTSRunner(FxTSRunner):
                 message="initial_delay_ms too low.",
             ))
         strategy = rp.get("backoff_strategy", "")
-        if strategy not in VALID_BACKOFF_STRATEGIES:
+        if strategy not in vocab.backoff_strategies:
             rp_violations.append(SpecViolation(
                 field="error_handling.retry_policy.backoff_strategy",
-                expected=str(sorted(VALID_BACKOFF_STRATEGIES)),
+                expected=str(sorted(vocab.backoff_strategies)),
                 actual=strategy,
                 message="Invalid backoff strategy.",
             ))

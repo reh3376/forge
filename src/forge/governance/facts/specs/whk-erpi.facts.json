@@ -238,60 +238,6 @@
         "collection_mode": "poll"
       }
     ],
-    "cross_module_data_flows": [
-      {
-        "flow_name": "erp_master_data_to_mes",
-        "direction": "NetSuite \u2192 ERPI \u2192 MES",
-        "entities": [
-          "Recipe",
-          "RecipeParameter",
-          "RecipeGroup",
-          "Bom",
-          "BomItem",
-          "Item",
-          "ItemGroup",
-          "Vendor",
-          "Customer"
-        ],
-        "indicator_field": "transactionInitiator",
-        "indicator_value": "ERP",
-        "description": "ERP-originated master data that MES depends on for recipe definitions and production planning. The Forge adapter preserves the ERP origin to maintain decision context."
-      },
-      {
-        "flow_name": "mes_execution_to_erp",
-        "direction": "MES \u2192 ERPI \u2192 NetSuite",
-        "entities": [
-          "ProductionOrderUnitProcedure",
-          "UnitProcedure",
-          "Operation",
-          "EquipmentPhase",
-          "ProductionSchedule",
-          "ScheduleOrder",
-          "ScheduleQueue",
-          "ItemReceipt"
-        ],
-        "indicator_field": "transactionInitiator",
-        "indicator_value": "WH",
-        "description": "Manufacturing execution data flowing to ERP for financial posting. ProductionOrderUnitProcedure has a special handler that posts directly to NetSuite. ItemReceipt has a 1-week delayed posting threshold."
-      },
-      {
-        "flow_name": "wms_inventory_to_erp",
-        "direction": "WMS \u2192 ERPI \u2192 NetSuite",
-        "entities": [
-          "Barrel",
-          "BarrelEvent",
-          "BarrelReceipt",
-          "Lot",
-          "Kit",
-          "Inventory",
-          "InventoryTransfer",
-          "Location"
-        ],
-        "indicator_field": "transactionInitiator",
-        "indicator_value": "WH",
-        "description": "Warehouse inventory movements flowing to ERP for stock reconciliation and financial tracking."
-      }
-    ],
     "sample_record": {
       "record_id": "whk-erpi:item:evt-20260407-001",
       "source_adapter": "whk-erpi",
@@ -446,16 +392,62 @@
     "external_contract": "AsyncAPI (whk-asyncapi-types submodule, compile-time type generation)",
     "deployment": "Docker Compose (PostgreSQL, Redis, RabbitMQ, Jaeger)",
     "cross_module_dependencies": "MES (recipe/production data), WMS (barrel/inventory data)",
-    "notes": "ERPI is the enterprise data backbone \u2014 33 entity topics carrying all cross-system data. Phase 1 adapter is passive (read-only RabbitMQ consumer). The existing fanout exchange architecture means Forge binds its own queues without touching ERPI. ERPI's own AsyncAPI contract is functionally equivalent to a FACTS data contract and should be referenced rather than duplicated."
-  },
-  "integrity": {
-    "hash_method": "sha256-c14n-v1",
-    "spec_hash": "85479c89667b40bb25bab8343477434936881e858f34d44b66321f6aac585c06",
-    "hash_state": "approved",
-    "previous_hash": "aef433522673556137018acf7c71a3203b75450638cb935ab43ab077d960bdc3",
-    "approved_by": "forge-governance-audit",
-    "approved_at": "2026-04-08T00:00:00Z",
-    "change_history": [
+    "notes": "ERPI is the enterprise data backbone \u2014 33 entity topics carrying all cross-system data. Phase 1 adapter is passive (read-only RabbitMQ consumer). The existing fanout exchange architecture means Forge binds its own queues without touching ERPI. ERPI's own AsyncAPI contract is functionally equivalent to a FACTS data contract and should be referenced rather than duplicated.",
+    "cross_module_data_flows": [
+      {
+        "flow_name": "erp_master_data_to_mes",
+        "direction": "NetSuite \u2192 ERPI \u2192 MES",
+        "entities": [
+          "Recipe",
+          "RecipeParameter",
+          "RecipeGroup",
+          "Bom",
+          "BomItem",
+          "Item",
+          "ItemGroup",
+          "Vendor",
+          "Customer"
+        ],
+        "indicator_field": "transactionInitiator",
+        "indicator_value": "ERP",
+        "description": "ERP-originated master data that MES depends on for recipe definitions and production planning. The Forge adapter preserves the ERP origin to maintain decision context."
+      },
+      {
+        "flow_name": "mes_execution_to_erp",
+        "direction": "MES \u2192 ERPI \u2192 NetSuite",
+        "entities": [
+          "ProductionOrderUnitProcedure",
+          "UnitProcedure",
+          "Operation",
+          "EquipmentPhase",
+          "ProductionSchedule",
+          "ScheduleOrder",
+          "ScheduleQueue",
+          "ItemReceipt"
+        ],
+        "indicator_field": "transactionInitiator",
+        "indicator_value": "WH",
+        "description": "Manufacturing execution data flowing to ERP for financial posting. ProductionOrderUnitProcedure has a special handler that posts directly to NetSuite. ItemReceipt has a 1-week delayed posting threshold."
+      },
+      {
+        "flow_name": "wms_inventory_to_erp",
+        "direction": "WMS \u2192 ERPI \u2192 NetSuite",
+        "entities": [
+          "Barrel",
+          "BarrelEvent",
+          "BarrelReceipt",
+          "Lot",
+          "Kit",
+          "Inventory",
+          "InventoryTransfer",
+          "Location"
+        ],
+        "indicator_field": "transactionInitiator",
+        "indicator_value": "WH",
+        "description": "Warehouse inventory movements flowing to ERP for stock reconciliation and financial tracking."
+      }
+    ],
+    "spec_history": [
       {
         "previous_hash": null,
         "new_hash": null,
@@ -473,6 +465,25 @@
         "changed_by": "claude-opus",
         "change_type": "structural",
         "reason": "D3.8 FTTS compliance: added missing context fields (transaction_initiator, data_flow_direction, entity_category, message_id) to match implemented adapter code. Moved event_timestamp to optional (not always present in RabbitMQ messages)."
+      }
+    ]
+  },
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "1b70a7d7af75ee804c40078444252b6a5770dbf942c3aa30ac3a0d4ec2a6c7b3",
+    "hash_state": "pending_review",
+    "previous_hash": "85479c89667b40bb25bab8343477434936881e858f34d44b66321f6aac585c06",
+    "approved_by": "forge-governance-audit",
+    "approved_at": "2026-04-08T00:00:00Z",
+    "change_history": [
+      {
+        "previous_hash": "85479c89667b40bb25bab8343477434936881e858f34d44b66321f6aac585c06",
+        "new_hash": "1b70a7d7af75ee804c40078444252b6a5770dbf942c3aa30ac3a0d4ec2a6c7b3",
+        "changed_at": "2026-10-17T04:48:26Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "structural",
+        "reason": "FB-080: schema conformance. data_contract.cross_module_data_flows moved to metadata; the two pre-FHTS change_history entries (null hashes, sources discovery/compliance) moved to metadata.spec_history. Adapter behaviour unchanged. Awaiting owner approval."
       }
     ]
   }

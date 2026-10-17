@@ -441,8 +441,6 @@
     "spec_hash": "ff29a4e51c482e7acc2e7cfc57f307fd474b5b6d2eba3a1e4319af226033a4a4",
     "hash_state": "approved",
     "previous_hash": null,
-    "approved_by": null,
-    "approved_at": null,
     "change_history": []
   }
 }

@@ -110,8 +110,8 @@
         "description": "REST polling interval in seconds for device, topology, and alert queries.",
         "default": 60,
         "validation": {
-          "minimum": 10,
-          "maximum": 3600
+          "min": 10,
+          "max": 3600
         }
       },
       {
@@ -456,16 +456,8 @@
     "erp_integration": "None",
     "deployment": "Docker Compose (PostgreSQL, Neo4j, Redis, Celery Beat)",
     "cross_module_dependencies": "OT Module (equipment topology enrichment), QMS (security compliance events), Support Orchestration (alert-to-incident workflow)",
-    "notes": "NMS is the first Python-native spoke \u2014 adapter runs directly inside Forge without a TypeScript sidecar. Closest tech stack match to Forge core (Python, FastAPI, Neo4j, TimescaleDB). Graph data (Neo4j device topology) can sync directly to Forge's Neo4j instance. 717+ devices discovered, 411 physical links, 75+ REST endpoints."
-  },
-  "integrity": {
-    "hash_method": "sha256-c14n-v1",
-    "spec_hash": "3bdc2a10aa3603f8b90e9f3786fa444db154ec20ac3490ae3b00514042046709",
-    "hash_state": "approved",
-    "previous_hash": null,
-    "approved_by": "reh3376",
-    "approved_at": "2026-04-08T00:00:00Z",
-    "change_history": [
+    "notes": "NMS is the first Python-native spoke \u2014 adapter runs directly inside Forge without a TypeScript sidecar. Closest tech stack match to Forge core (Python, FastAPI, Neo4j, TimescaleDB). Graph data (Neo4j device topology) can sync directly to Forge's Neo4j instance. 717+ devices discovered, 411 physical links, 75+ REST endpoints.",
+    "spec_history": [
       {
         "previous_hash": null,
         "new_hash": null,
@@ -483,6 +475,25 @@
         "changed_by": "claude-opus",
         "change_type": "structural",
         "reason": "D3.8 FTTS compliance: complete rewrite from non-standard specification_type schema to FACTS-compliant 10-section format. Mapped 14 REST endpoints and WebSocket stream to data_sources. Defined 19 context field mappings matching implemented adapter code. Added lifecycle state machine, connection params, error handling, and integrity tracking."
+      }
+    ]
+  },
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "3cfbd373f3522815e3ad5e6d2a2f9417e7196d9699e3851e67c1eef5eb59d282",
+    "hash_state": "pending_review",
+    "previous_hash": "3bdc2a10aa3603f8b90e9f3786fa444db154ec20ac3490ae3b00514042046709",
+    "approved_by": "reh3376",
+    "approved_at": "2026-04-08T00:00:00Z",
+    "change_history": [
+      {
+        "previous_hash": "3bdc2a10aa3603f8b90e9f3786fa444db154ec20ac3490ae3b00514042046709",
+        "new_hash": "3cfbd373f3522815e3ad5e6d2a2f9417e7196d9699e3851e67c1eef5eb59d282",
+        "changed_at": "2026-10-17T04:48:26Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "structural",
+        "reason": "FB-080: schema conformance. poll_interval_seconds validation keys renamed minimum/maximum\u2192min/max; the two pre-FHTS change_history entries (null hashes, sources discovery/compliance) moved to metadata.spec_history. Adapter behaviour unchanged. Awaiting owner approval."
       }
     ]
   }

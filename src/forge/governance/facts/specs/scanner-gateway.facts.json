@@ -294,7 +294,32 @@
         "context_field": "asset_id",
         "description": "IMS asset identifier for asset-type scans (ASSET_RECEIVE, ASSET_MOVE, ASSET_INSTALL)."
       }
-    ],
+    ]
+  },
+  "error_handling": {
+    "retry_policy": {
+      "max_retries": 5,
+      "initial_delay_ms": 500,
+      "backoff_strategy": "exponential",
+      "max_delay_ms": 15000,
+      "retryable_errors": [
+        "UNAVAILABLE",
+        "DEADLINE_EXCEEDED",
+        "RESOURCE_EXHAUSTED"
+      ]
+    },
+    "circuit_breaker": {
+      "failure_threshold": 5,
+      "half_open_after_ms": 30000
+    },
+    "dead_letter": {
+      "enabled": true,
+      "topic": "forge://dead-letter/scanner-gateway",
+      "max_age_hours": 720,
+      "description": "Undeliverable scan events (unroutable scan type, all target spokes down) are sent to dead letter queue for manual review."
+    }
+  },
+  "metadata": {
     "routing_rules": [
       {
         "scan_types": [
@@ -335,24 +360,7 @@
         "target_spoke": "qms_adapter_id",
         "description": "QMS sample operations \u2014 single-target routing to QMS spoke (future)."
       }
-    ]
-  },
-  "error_handling": {
-    "retry_policy": {
-      "max_retries": 5,
-      "initial_delay_ms": 500,
-      "backoff_strategy": "exponential",
-      "max_delay_ms": 15000,
-      "retryable_errors": [
-        "UNAVAILABLE",
-        "DEADLINE_EXCEEDED",
-        "RESOURCE_EXHAUSTED"
-      ]
-    },
-    "circuit_breaker": {
-      "failure_threshold": 5,
-      "half_open_after_ms": 30000
-    },
+    ],
     "scan_rejection": {
       "strategy": "per_event_rejection",
       "description": "Individual scan events within a batch may be rejected (ScanRejection) without failing the entire batch. Rejected scans are returned to the device for retry or operator intervention.",
@@ -364,22 +372,25 @@
         "DUPLICATE_SCAN"
       ]
     },
-    "dead_letter": {
-      "enabled": true,
-      "destination": "forge://dead-letter/scanner-gateway",
-      "retention_days": 30,
-      "description": "Undeliverable scan events (unroutable scan type, all target spokes down) are sent to dead letter queue for manual review."
-    }
+    "spec_created_at": "2026-04-06",
+    "spec_author": "forge-platform",
+    "spec_notes": "Phase 1 scaffold. Two-tier architecture: Android devices \u2192 ScannerService gRPC server (gateway) \u2192 Forge Hub. Multi-spoke routing based on ScanType classification. First Forge edge device adapter. Backfill not supported \u2014 scan events are ephemeral, authoritative records live in target spokes."
   },
   "integrity": {
-    "state": "draft",
-    "created_at": "2026-04-06",
-    "spec_author": "forge-platform",
-    "notes": "Phase 1 scaffold. Two-tier architecture: Android devices \u2192 ScannerService gRPC server (gateway) \u2192 Forge Hub. Multi-spoke routing based on ScanType classification. First Forge edge device adapter. Backfill not supported \u2014 scan events are ephemeral, authoritative records live in target spokes.",
-    "hash_state": "approved",
-    "previous_hash": null,
-    "change_history": [],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "b5ffbfaa4b7b4e4bbd7eb4a75135aecce494f2528e95b80f4b8f2d3c3ce15827"
+    "spec_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",
+    "hash_state": "pending_review",
+    "previous_hash": "b5ffbfaa4b7b4e4bbd7eb4a75135aecce494f2528e95b80f4b8f2d3c3ce15827",
+    "change_history": [
+      {
+        "previous_hash": "b5ffbfaa4b7b4e4bbd7eb4a75135aecce494f2528e95b80f4b8f2d3c3ce15827",
+        "new_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",
+        "changed_at": "2026-10-17T04:48:26Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "structural",
+        "reason": "FB-080: schema conformance. context_mapping.routing_rules and error_handling.scan_rejection moved to metadata (adapter-specific, outside the FACTS contract); dead_letter fields renamed to the schema's (destination\u2192topic, retention_days\u2192max_age_hours = days\u00d724); draft-era integrity notes (state 'draft', created_at, spec_author, notes) moved to metadata.spec_*. Adapter behaviour unchanged. Awaiting owner approval."
+      }
+    ]
   }
 }
