@@ -12,6 +12,8 @@ Covers:
 import pytest
 
 from forge.modules.ot.control.models import (
+    ConfirmationMode,
+    WriteOrigin,
     DataType,
     InterlockCondition,
     InterlockRule,
@@ -222,7 +224,41 @@ class TestWriteStatus:
     def test_all_values(self):
         expected = {
             "CONFIRMED", "UNCONFIRMED", "REJECTED_VALIDATION",
-            "REJECTED_INTERLOCK", "REJECTED_AUTH", "FAILED_WRITE",
-            "FAILED_READBACK", "PENDING",
+            "REJECTED_INTERLOCK", "REJECTED_AUTH", "REJECTED_REVIEW",
+            "FAILED_WRITE", "FAILED_READBACK", "PENDING",
         }
         assert {ws.value for ws in WriteStatus} == expected
+
+
+# ---------------------------------------------------------------------------
+# Write review vocabulary (FB-074)
+# ---------------------------------------------------------------------------
+
+
+class TestReviewModels:
+    def test_origin_and_confirmation_values(self):
+        assert {o.value for o in WriteOrigin} == {"OPERATOR", "SYSTEM"}
+        assert {c.value for c in ConfirmationMode} == {"confirm", "two_step_with_review"}
+
+    def test_request_defaults_are_policed(self):
+        req = WriteRequest(tag_path="t", value=1)
+        assert req.origin is WriteOrigin.OPERATOR
+        assert req.reason_code == "" and req.review_token == ""
+
+    def test_tag_config_defaults_and_coerce(self):
+        cfg = TagWriteConfig(tag_path="t", data_type=DataType.INT32)
+        assert cfg.confirmation is ConfirmationMode.CONFIRM
+        assert cfg.reason_code_required is False
+        assert cfg.coerce("42") == 42
+        with pytest.raises(ValueError):
+            cfg.coerce("forty-two")
+
+    def test_result_dict_carries_review_fields(self):
+        req = WriteRequest(
+            tag_path="t", value=1, reason_code="setpoint_tune", origin=WriteOrigin.SYSTEM
+        )
+        d = WriteResult(request=req).to_dict()
+        assert d["reason_code"] == "setpoint_tune" and d["origin"] == "SYSTEM"
+        assert d["review_passed"] is False and d["review_error"] == ""
+        assert d["stage_attempt"] is False and d["staged_at"] is None
+        assert "review_token" not in d

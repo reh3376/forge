@@ -10,6 +10,7 @@ hub registration check that no longer reports the hash.
 from __future__ import annotations
 
 import json
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -112,8 +113,11 @@ class TestIntegrityBlock:
             assert len(entry["previous_hash"]) == 64
             assert len(entry["new_hash"]) == 64
             assert entry["change_type"] in {"structural", "content", "config", "revert"}
-        assert history[0]["new_hash"] == integrity["spec_hash"]
-        assert history[0]["previous_hash"] == integrity["previous_hash"]
+        # ``add_spec_hash`` appends: the newest entry is last.
+        assert history[-1]["new_hash"] == integrity["spec_hash"]
+        assert history[-1]["previous_hash"] == integrity["previous_hash"]
+        for older, newer in pairwise(history):
+            assert newer["previous_hash"] == older["new_hash"]
 
 
 class TestRunnerVerdicts:

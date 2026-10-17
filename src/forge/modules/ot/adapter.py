@@ -18,7 +18,7 @@ with :class:`~forge.modules.ot.control.runtime.ControlDependencies`, it
 composes a :class:`~forge.modules.ot.control.runtime.ControlRuntime`
 (write engine, recipe adapter, PLC CIP runner, changeover orchestrator and
 MQTT ingress). ``start``/``stop`` drive it, and hub writes to Standard
-tags go through its four-layer write engine.
+tags go through its write engine (validation, review, interlocks, authorisation, write with read-back).
 """
 
 from __future__ import annotations
@@ -291,10 +291,13 @@ class OTModuleAdapter(
         """Write a value to a tag (Memory tag or PLC via OPC-UA).
 
         Memory tags are written straight into the registry. Every other tag
-        goes through the control runtime's four-layer write engine
-        (validation → interlocks → authorisation → OPC-UA write + read-back),
-        so a hub-originated write is held to the same rules as a recipe
-        download. Without a control runtime there is no PLC path.
+        goes through the control runtime's write engine (validation → review
+        → interlocks → authorisation → OPC-UA write + read-back), so a
+        hub-originated write is held to the same rules as a recipe download.
+        The hub's ``Write`` RPC carries no review token, so a tag configured
+        ``two_step_with_review`` refuses this path (``REJECTED_REVIEW``);
+        such writes go through the control API's stage/commit endpoints
+        (FB-074). Without a control runtime there is no PLC path.
         """
         tag = await self._registry.get_definition(tag_path)
         if tag is None:

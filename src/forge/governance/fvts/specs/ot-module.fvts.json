@@ -6,7 +6,7 @@
     "version": "0.1.0",
     "owner_module": "ot-module",
     "facts_spec_ref": "src/forge/governance/facts/specs/ot-module.facts.json",
-    "description": "Reference FVTS contract: operator HMI, trending and alarm summary for the OT module. Exercises every FVTS section, including the write path through the OT module's four-layer write engine."
+    "description": "Reference FVTS contract: operator HMI, trending and alarm summary for the OT module. Exercises every FVTS section, including the write path through the OT module's write engine (validation, two-step review, interlocks, authorization, write with read-back)."
   },
   "scope": {
     "isa95_levels": [
@@ -169,6 +169,7 @@
         "REJECTED_VALIDATION",
         "REJECTED_INTERLOCK",
         "REJECTED_AUTH",
+        "REJECTED_REVIEW",
         "FAILED_WRITE",
         "FAILED_READBACK",
         "PENDING"
@@ -317,8 +318,17 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": null,
+    "previous_hash": "d2344754a70a9b501267ca7cdc42be89b10bd576503f8640a32d9e83f926d179",
     "change_history": [
+      {
+        "previous_hash": "d2344754a70a9b501267ca7cdc42be89b10bd576503f8640a32d9e83f926d179",
+        "new_hash": "c7d1c3d44175dc1b4927bfdbf463b018eee6f413809555b54c4d3aef9d95c725",
+        "changed_at": "2026-10-17T17:43:03.508335+00:00",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "structural",
+        "reason": "FB-074: REJECTED_REVIEW added to handled_statuses of the setpoint write and the description names the review layer; forge-core now enforces two_step_with_review and reason codes server-side. Awaiting owner approval."
+      },
       {
         "previous_hash": "",
         "new_hash": "d2344754a70a9b501267ca7cdc42be89b10bd576503f8640a32d9e83f926d179",
@@ -330,7 +340,7 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "d2344754a70a9b501267ca7cdc42be89b10bd576503f8640a32d9e83f926d179",
+    "spec_hash": "c7d1c3d44175dc1b4927bfdbf463b018eee6f413809555b54c4d3aef9d95c725",
     "approved_by": null,
     "approved_at": null
   }

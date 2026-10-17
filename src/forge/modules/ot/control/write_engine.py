@@ -1,19 +1,28 @@
 """Control write engine — the orchestrator.
 
-Chains all four defense layers sequentially and short-circuits on any
+Chains the five defense layers sequentially and short-circuits on any
 rejection:
 
     1. Type/Range Validation  (WriteValidator)
-    2. Safety Interlocks      (InterlockEngine)
-    3. Role-Based Auth        (WriteAuthorizer)
-    4. OPC-UA Write + Read-Back
+    2. Write Review           (WriteReviewer, FB-074)
+    3. Safety Interlocks      (InterlockEngine)
+    4. Role-Based Auth        (WriteAuthorizer)
+    5. OPC-UA Write + Read-Back
 
 The OPC-UA write and read-back are behind injected Protocols so this
 module has zero transport dependencies.
 
+Two-step review (FB-074): ``stage`` runs layers 1, 3 and 4 plus the
+reason-code rule, reads the current value and issues a single-use review
+token; ``execute`` with that token is the commit.  A tag configured
+``two_step_with_review`` rejects an operator write that skips the stage
+(``REJECTED_REVIEW``).  System writes (``WriteOrigin.SYSTEM``) are
+confirmed upstream and pass layer 2.
+
 Design notes:
 - Every write attempt produces a WriteResult — even rejected writes.
-  This makes the audit trail complete.
+  This makes the audit trail complete.  A rejected ``stage`` is journaled
+  too (``stage_attempt``); a successful stage is not, nothing was written.
 - Read-back comparison uses a configurable tolerance for floating-point
   types (PLC may store 100 as 99.99998).
 - The engine maintains a bounded write journal (deque) for recent
@@ -28,6 +37,7 @@ from __future__ import annotations
 
 import logging
 from collections import deque
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Protocol, runtime_checkable
 
@@ -39,6 +49,7 @@ from forge.modules.ot.control.models import (
     WriteResult,
     WriteStatus,
 )
+from forge.modules.ot.control.review import ReviewTicket, WriteReviewer
 from forge.modules.ot.control.validation import WriteValidator
 
 logger = logging.getLogger(__name__)
@@ -97,8 +108,26 @@ _DEFAULT_JOURNAL_SIZE = 10_000
 _DEFAULT_READBACK_TOLERANCE = 0.001
 
 
+@dataclass(frozen=True)
+class StageOutcome:
+    """What ``ControlWriteEngine.stage`` returns: a ticket, or the rejection."""
+
+    ticket: ReviewTicket | None = None
+    result: WriteResult | None = None
+
+    @property
+    def accepted(self) -> bool:
+        return self.ticket is not None
+
+    def to_dict(self) -> dict[str, Any]:
+        if self.ticket is not None:
+            return self.ticket.to_dict()
+        assert self.result is not None
+        return self.result.to_dict()
+
+
 class ControlWriteEngine:
-    """Orchestrates the 4-layer control write defense chain.
+    """Orchestrates the 5-layer control write defense chain.
 
     Usage::
 
@@ -111,6 +140,13 @@ class ControlWriteEngine:
 
         result = await engine.execute(request)
         # result.status is CONFIRMED, UNCONFIRMED, or REJECTED_*
+
+    Two-step review (FB-074)::
+
+        staged = await engine.stage(request)        # ticket or rejection
+        if staged.accepted:
+            commit = replace(request, review_token=staged.ticket.review_token)
+            result = await engine.execute(commit)
     """
 
     def __init__(
@@ -121,10 +157,12 @@ class ControlWriteEngine:
         tag_writer: TagWriter | None = None,
         journal_size: int = _DEFAULT_JOURNAL_SIZE,
         readback_tolerance: float = _DEFAULT_READBACK_TOLERANCE,
+        reviewer: WriteReviewer | None = None,
     ) -> None:
         self._validator = validator
         self._interlocks = interlock_engine
         self._authorizer = authorizer
+        self._reviewer = reviewer or WriteReviewer(validator)
         self._writer: TagWriter = tag_writer or _NullWriter()
         self._readback_tolerance = readback_tolerance
 
@@ -133,6 +171,10 @@ class ControlWriteEngine:
 
         # Listeners (audit trail, integrations)
         self._listeners: list[WriteListener] = []
+
+    @property
+    def reviewer(self) -> WriteReviewer:
+        return self._reviewer
 
     # -- Listener management -------------------------------------------------
 
@@ -157,19 +199,66 @@ class ControlWriteEngine:
         if not result.validation_passed:
             return await self._finish(result)
 
-        # Layer 2: Safety Interlocks (async — reads live tags)
+        # Layer 2: Write Review — reason code and two-step token (FB-074)
+        self._reviewer.check(request, result)
+        if not result.review_passed:
+            return await self._finish(result)
+
+        # Layer 3: Safety Interlocks (async — reads live tags)
         await self._interlocks.check(request, result)
         if not result.interlock_passed:
             return await self._finish(result)
 
-        # Layer 3: Role-Based Authorization
+        # Layer 4: Role-Based Authorization
         self._authorizer.authorize(request, result)
         if not result.auth_passed:
             return await self._finish(result)
 
-        # Layer 4: OPC-UA Write + Read-Back
+        # Layer 5: OPC-UA Write + Read-Back
         await self._write_and_readback(request, result)
         return await self._finish(result)
+
+    async def stage(self, request: WriteRequest) -> StageOutcome:
+        """Step one of a two-step write: check, read the current value, issue a token.
+
+        Runs validation, the reason-code rule, interlocks and authorization
+        exactly as a commit would, so the operator reviews a write the chain
+        has already accepted.  A rejection is journaled and audited like any
+        other attempt (``stage_attempt``); nothing is written either way.
+        """
+        result = WriteResult(request=request, stage_attempt=True)
+
+        self._validator.validate(request, result)
+        if not result.validation_passed:
+            return StageOutcome(result=await self._finish(result))
+
+        if not self._reviewer.check_reason(request, result):
+            return StageOutcome(result=await self._finish(result))
+
+        await self._interlocks.check(request, result)
+        if not result.interlock_passed:
+            return StageOutcome(result=await self._finish(result))
+
+        self._authorizer.authorize(request, result)
+        if not result.auth_passed:
+            return StageOutcome(result=await self._finish(result))
+
+        current: Any = None
+        try:
+            current = await self._writer.read_tag(request.tag_path)
+        except Exception as exc:
+            logger.warning("Pre-stage read failed for %s: %s", request.tag_path, exc)
+
+        ticket = self._reviewer.stage(request, current)
+        logger.info(
+            "Write staged for review: tag=%s value=%r current=%r requestor=%s expires=%s",
+            ticket.tag_path,
+            ticket.value,
+            ticket.current_value,
+            ticket.requestor,
+            ticket.expires_at.isoformat(),
+        )
+        return StageOutcome(ticket=ticket)
 
     async def _finish(self, result: WriteResult) -> WriteResult:
         """Journal the outcome and tell every listener (audit trail)."""
@@ -177,7 +266,7 @@ class ControlWriteEngine:
         await self.notify_listeners(result)
         return result
 
-    # -- Layer 4: Write + Read-Back ------------------------------------------
+    # -- Layer 5: Write + Read-Back ------------------------------------------
 
     async def _write_and_readback(
         self, request: WriteRequest, result: WriteResult
@@ -297,6 +386,7 @@ class ControlWriteEngine:
             if r.status
             in (
                 WriteStatus.REJECTED_VALIDATION,
+                WriteStatus.REJECTED_REVIEW,
                 WriteStatus.REJECTED_INTERLOCK,
                 WriteStatus.REJECTED_AUTH,
             )
@@ -317,4 +407,5 @@ class ControlWriteEngine:
             "tag_configs": self._validator.tag_count,
             "interlock_rules": self._interlocks.rule_count,
             "permissions": self._authorizer.permission_count,
+            "review": self._reviewer.stats(),
         }

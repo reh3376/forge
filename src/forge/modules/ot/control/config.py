@@ -13,7 +13,10 @@ start-up rather than in the middle of a changeover::
     {
       "site": "whk01",
       "write_tags": [{"tag_path": "WH/WHK01/Cooker01/TIT_2010/SP", "data_type": "FLOAT",
-                      "min_value": 0, "max_value": 212, "engineering_units": "degF"}],
+                      "min_value": 0, "max_value": 212, "engineering_units": "degF",
+                      "confirmation": "two_step_with_review", "reason_code_required": true}],
+      "review_timeout_seconds": 120,
+      "reason_codes": ["setpoint_tune", "quality_hold"],
       "permissions": [{"area_pattern": "*", "tag_pattern": "WH/WHK01/**", "min_role": "ENGINEER"}],
       "recipes": [{"equipment_id": "Cooker01", "area": "cooker",
                    "mappings": [{"parameter_name": "target_temp",
@@ -43,7 +46,12 @@ from forge.modules.ot.control.changeover_orchestrator import (
     CipPolicy,
 )
 from forge.modules.ot.control.cip_runner import PlcCipSpec  # noqa: TC001 — pydantic field type
-from forge.modules.ot.control.models import InterlockRule, TagWriteConfig, WritePermission
+from forge.modules.ot.control.models import (
+    ConfirmationMode,
+    InterlockRule,
+    TagWriteConfig,
+    WritePermission,
+)
 from forge.modules.ot.control.recipe_integration import (
     RecipeParameterMapping,
     RecipeWriteConfig,
@@ -176,6 +184,10 @@ class OTControlConfig(BaseModel):
     act_on_retained: bool = False
     audit_log: bool = True
     readback_tolerance: float = Field(default=0.001, ge=0)
+    #: How long a staged two-step write may wait for its commit (FB-074).
+    review_timeout_seconds: float = Field(default=120.0, gt=0)
+    #: Site vocabulary for ``WriteRequest.reason_code``; empty accepts any non-blank code.
+    reason_codes: list[str] = Field(default_factory=list)
     mqtt: MqttIngressSettings = Field(default_factory=MqttIngressSettings)
     #: PLC connections (FB-069); empty means Standard tags have no live path.
     connections: list[PlcConnectionSpec] = Field(default_factory=list)
@@ -218,6 +230,9 @@ class OTControlConfig(BaseModel):
         problems += _duplicates("recipes.equipment_id", [r.equipment_id for r in self.recipes])
         problems += _duplicates("changeover_areas.area", [a.area for a in self.changeover_areas])
         problems += _duplicates("connections.name", [c.name for c in self.connections])
+        problems += _duplicates("reason_codes", self.reason_codes)
+        if any(not code.strip() for code in self.reason_codes):
+            problems.append("reason_codes: blank entries are not allowed")
 
         known = set(tag_paths)
         for recipe in self.recipes:
@@ -262,6 +277,14 @@ class OTControlConfig(BaseModel):
             "mqtt_mode": self.mqtt.mode,
             "connections": {c.name: c.endpoint for c in self.connections if c.enabled},
             "write_tags": len(self.write_tags),
+            "review": {
+                "two_step_tags": sum(
+                    t.confirmation is ConfirmationMode.TWO_STEP_WITH_REVIEW for t in self.write_tags
+                ),
+                "reason_code_tags": sum(t.reason_code_required for t in self.write_tags),
+                "timeout_seconds": self.review_timeout_seconds,
+                "reason_codes": len(self.reason_codes),
+            },
             "interlocks": len(self.interlocks),
             "permissions": len(self.permissions),
             "recipes": {r.equipment_id: len(r.mappings) for r in self.recipes},

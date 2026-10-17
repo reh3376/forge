@@ -1,6 +1,6 @@
 # Where we are going
 
-**Status date:** 2026-10-16 · **Owner:** reh3376
+**Status date:** 2026-10-17 · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) (the destination, in full) · [Where we are](WHERE-WE-ARE.md) (the snapshot) · [Roadmap](ROADMAP.md) (decisions, workstreams, sequence, decision queue) · [Backlog](../BACKLOG.md) (the unit of work)
 
 This is the short statement of direction. It names the destination, the principles already decided, the milestones between here and there, what is next, and what gates it. Detail lives in the companions; this page should fit in one reading.
@@ -41,7 +41,7 @@ From [`ROADMAP.md`](ROADMAP.md) §1 and [`docs/decisions/roles.md`](decisions/ro
 | **M2 · Decisions and designs** | Role model settled (D-1, Q21/Q22); forge-mes Go design signed off (D-3); FVTS open items answered (D-4); OT FACTS vocabulary (D-8); OT reference FVTS spec approved (FB-078). | **Now** |
 | **M3 · Go SDK and the first Go module** | Module SDK template in Go; forge-mes phase 1 speaks to the hub with FB-055 as the acceptance test; `mod_mes` in the hub (FB-057); changeover + MQTT in Go; parity; cut-over; NestJS backend retired. | Not started (FB-076, FB-017, FB-057) |
 | **M4 · forge-display** | Renderer scaffold and spike against the FVTS golden messages; MES surfaces first, then OT HMI surfaces; Next.js frontend retired. | Not started (needs D-4) |
-| **M5 · Hub platform hardening** | Context Engine and Schema Registry mounted (FB-001); scoped roles enforced in the gateway (FB-075); persistent access control and registries (FB-003, FB-005); server-side write review (FB-074); FACTS schema validation (FB-080, done 2026-10-17); FDTS, FQTS, FSTS from stub to gate. | Not started |
+| **M5 · Hub platform hardening** | Context Engine and Schema Registry mounted (FB-001); scoped roles enforced in the gateway (FB-075); persistent access control and registries (FB-003, FB-005); server-side write review (FB-074, done 2026-10-17); FACTS schema validation (FB-080, done 2026-10-17); FDTS, FQTS, FSTS from stub to gate. | Started (FB-074, FB-080 done) |
 | **M6 · Enterprise** | Hub of hubs, identity methods, offline tokens, Kubernetes deployment, backups and SLOs; forge-cmms and forge-whs in Go; forge-ignition. | Not started |
 
 Milestones overlap where the roadmap's sequence allows (forge-display work can start once D-4 is answered, in parallel with M3).
@@ -61,7 +61,7 @@ The proposed sequence in [`ROADMAP.md`](ROADMAP.md) §4, abridged:
 7. forge-display scaffold and renderer spike; MES surfaces first.
 8. Hub platform items (FB-001, FB-003, FB-007, FB-075) as the Go module and forge-display start needing them.
 
-Items that need no decision and can be taken any time: FB-074 (write review in the core), FB-021 (approval CLI), FB-022/FB-048 (lint gates), FB-081 (retire the top-level legacy planning documents).
+Items that need no decision and can be taken any time: FB-082 (scope check on the OT changeover and connection endpoints), FB-021 (approval CLI), FB-022/FB-048 (lint gates), FB-081 (retire the top-level legacy planning documents).
 
 ---
 
@@ -69,7 +69,7 @@ Items that need no decision and can be taken any time: FB-074 (write review in t
 
 | Decision | Gates | Where it is argued |
 |---|---|---|
-| D-1 role model (Q21 derived copy of assignments at the site hub; Q22 ladder preset) | FB-075, FB-078, FB-074, the gateway work in M5 | `docs/decisions/roles.md` §13 |
+| D-1 role model (Q21 derived copy of assignments at the site hub; Q22 ladder preset) | FB-075, FB-078, the multi-party approval step above FB-074, the gateway work in M5 | `docs/decisions/roles.md` §13 |
 | D-3 forge-mes Go design | all of M3 | `ROADMAP.md` §5 |
 | D-4 FVTS open items | M4 | `docs/FxTS/FVTS.md`, `ROADMAP.md` §5 |
 | D-8 FACTS vocabulary for OT adapters | approval of the OT FACTS spec; the OT module's identity | `ROADMAP.md` §5 |

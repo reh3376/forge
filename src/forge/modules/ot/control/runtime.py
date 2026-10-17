@@ -4,7 +4,7 @@
 plus the collaborators only the host can provide (hub write dispatcher,
 tag engine, record sink, broker) into the running objects::
 
-    config ──► WriteValidator + InterlockEngine + WriteAuthorizer
+    config ──► WriteValidator + WriteReviewer + InterlockEngine + WriteAuthorizer
            ──► ControlWriteEngine(tag_io) ──► WriteAuditLogger (log, MQTT)
            ──► RecipeWriteAdapter (per-equipment mappings)
            ──► PlcCipRunner (per-area CIP sequences, publishes cipState)
@@ -43,6 +43,7 @@ from forge.modules.ot.control.connections import PlcConnectionManager
 from forge.modules.ot.control.interlock import InterlockEngine
 from forge.modules.ot.control.mes_changeover import MesChangeoverClient
 from forge.modules.ot.control.recipe_integration import RecipeWriteAdapter
+from forge.modules.ot.control.review import WriteReviewer
 from forge.modules.ot.control.validation import WriteValidator
 from forge.modules.ot.control.write_engine import ControlWriteEngine
 from forge.modules.ot.mqtt.ingress import ExternalBrokerIngress, LocalBrokerIngress
@@ -230,12 +231,20 @@ class ControlRuntime:
         self.authorizer = WriteAuthorizer()
         for permission in config.permissions:
             self.authorizer.add_permission(permission)
+        # Write review (FB-074): two-step tokens and reason codes for operator writes.
+        self.reviewer = WriteReviewer(
+            self.validator,
+            timeout_seconds=config.review_timeout_seconds,
+            reason_codes=config.reason_codes,
+            now=deps.now,
+        )
         self.engine = ControlWriteEngine(
             validator=self.validator,
             interlock_engine=self.interlocks,
             authorizer=self.authorizer,
             tag_writer=self.tag_io,
             readback_tolerance=config.readback_tolerance,
+            reviewer=self.reviewer,
         )
         self.audit = WriteAuditLogger()
         if config.audit_log:

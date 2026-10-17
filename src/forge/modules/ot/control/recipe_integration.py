@@ -2,7 +2,7 @@
 
 Bridges the MES recipe system with the control write engine.  When a
 production order starts (or a recipe parameter changes), MES pushes
-setpoints to PLCs through the full 4-layer defense chain.
+setpoints to PLCs through the full control write defense chain.
 
 Components:
 
@@ -39,6 +39,7 @@ from typing import Any
 
 from forge.modules.ot.control.models import (
     DataType,
+    WriteOrigin,
     WriteRequest,
     WriteResult,
     WriteRole,
@@ -257,6 +258,7 @@ class RecipeWriteAdapter:
                 area=config.area,
                 equipment_id=equipment_id,
                 batch_id=batch_id,
+                origin=WriteOrigin.SYSTEM,  # confirmed by the changeover sequence (FB-074)
             )
 
             try:

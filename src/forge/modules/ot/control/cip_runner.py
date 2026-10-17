@@ -34,7 +34,13 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 from forge.modules.ot.control.changeover_orchestrator import OT_ADAPTER_ID, CipResult
-from forge.modules.ot.control.models import DataType, WriteRequest, WriteRole, WriteStatus
+from forge.modules.ot.control.models import (
+    DataType,
+    WriteOrigin,
+    WriteRequest,
+    WriteRole,
+    WriteStatus,
+)
 
 if TYPE_CHECKING:
     from forge.modules.ot.control.changeover_orchestrator import AreaChangeoverConfig
@@ -201,6 +207,7 @@ class PlcCipRunner:
             reason=f"CIP start: {area} changeover ({config.equipment_id})",
             area=config.area,
             equipment_id=config.equipment_id,
+            origin=WriteOrigin.SYSTEM,  # the changeover sequence confirmed it (FB-074)
         )
         started_at = self._now()
         result = await self._engine.execute(request)

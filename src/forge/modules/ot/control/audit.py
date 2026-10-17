@@ -35,7 +35,7 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.modules.ot.control.models import WriteResult, WriteStatus
+from forge.modules.ot.control.models import WriteOrigin, WriteResult, WriteStatus
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -94,7 +94,7 @@ def write_result_to_record(
     chain is the raw value, quality follows the outcome (CONFIRMED → GOOD,
     UNCONFIRMED → UNCERTAIN, anything else → BAD) and ``context.extra``
     carries ``event_type = "control.write"`` with the status, role, reason,
-    batch and request ids for filtering.
+    origin, reason code, review timing, batch and request ids for filtering.
     """
     now = now or datetime.now(UTC)
     status = str(record.get("status") or WriteStatus.PENDING.value)
@@ -114,15 +114,17 @@ def write_result_to_record(
         "write_status": status,
         "write_role": record.get("role"),
         "write_reason": record.get("reason"),
+        "write_origin": record.get("origin") or WriteOrigin.OPERATOR.value,
         "write_requested_by": record.get("requestor"),
         "request_id": record.get("request_id"),
         "event_timestamp": completed_at.isoformat(),
     }
-    for key in ("batch_id", "interlock_rule_id"):
+    for key in ("batch_id", "interlock_rule_id", "reason_code", "staged_at", "stage_attempt"):
         if record.get(key):
             extra[key] = record[key]
     error = (
         record.get("validation_error")
+        or record.get("review_error")
         or record.get("interlock_error")
         or record.get("auth_error")
         or record.get("write_error")
