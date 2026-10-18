@@ -17,7 +17,6 @@ from forge.modules.ot.control.models import (
     TagWriteConfig,
     WriteRequest,
     WriteResult,
-    WriteRole,
     WriteStatus,
 )
 from forge.modules.ot.control.validation import WriteValidator

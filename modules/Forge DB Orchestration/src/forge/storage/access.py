@@ -17,8 +17,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 from forge._compat import StrEnum
 
@@ -50,7 +49,7 @@ class ModulePermission:
     module_id: str
     schema_name: str
     access_level: AccessLevel
-    granted_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
+    granted_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
     granted_by: str = "forge-core"
     expires_at: datetime | None = None
     active: bool = True
@@ -59,7 +58,7 @@ class ModulePermission:
     def is_expired(self) -> bool:
         if self.expires_at is None:
             return False
-        return datetime.now(tz=timezone.utc) > self.expires_at
+        return datetime.now(tz=UTC) > self.expires_at
 
     @property
     def is_effective(self) -> bool:
@@ -74,7 +73,7 @@ class ConnectionGrant:
     connection_string: str
     schemas_accessible: list[str]
     access_level: AccessLevel
-    issued_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
+    issued_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
 
 
 @dataclass
@@ -86,7 +85,7 @@ class AccessAuditEntry:
     schema_name: str
     access_level: AccessLevel | None = None
     reason: str = ""
-    timestamp: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
 
 
 # Protected schemas that modules cannot be granted write access to
@@ -155,7 +154,7 @@ class AccessController:
         for perm in self._permissions:
             if perm.module_id == module_id and perm.schema_name == schema_name and perm.active:
                 perm.access_level = access_level
-                perm.granted_at = datetime.now(tz=timezone.utc)
+                perm.granted_at = datetime.now(tz=UTC)
                 perm.granted_by = granted_by
                 perm.expires_at = expires_at
                 self._audit("grant", module_id, schema_name, access_level, "updated")

@@ -71,7 +71,7 @@ class NextTrendConfig(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     @model_validator(mode="after")
-    def _check_auth(self) -> "NextTrendConfig":
+    def _check_auth(self) -> NextTrendConfig:
         """Ensure at least one authentication method is provided."""
         has_api_key = bool(self.api_key)
         has_jwt = bool(self.username and self.password)

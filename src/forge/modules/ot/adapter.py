@@ -23,16 +23,11 @@ tags go through its write engine (validation, review, interlocks, authorisation,
 
 from __future__ import annotations
 
-import asyncio
 import inspect
 import logging
-from collections.abc import AsyncIterator
-from datetime import datetime, timezone
-from typing import Any, Callable
-
-from forge.modules.ot.control.config import load_control_config, parse_control_config
-from forge.modules.ot.control.models import DataType, WriteRequest, WriteRole, WriteStatus
-from forge.modules.ot.control.runtime import ControlDependencies, ControlRuntime
+from collections.abc import AsyncIterator, Callable
+from datetime import UTC, datetime
+from typing import Any
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -53,7 +48,9 @@ from forge.core.models.contextual_record import ContextualRecord
 from forge.modules.ot.context.record_builder import build_ot_record
 from forge.modules.ot.context.resolvers import AreaResolver, AreaRule, EnrichmentPipeline
 from forge.modules.ot.context.store_forward import StoreForwardBuffer
-from forge.modules.ot.tag_engine.models import BaseTag, TagValue
+from forge.modules.ot.control.config import load_control_config, parse_control_config
+from forge.modules.ot.control.models import DataType, WriteRequest, WriteRole, WriteStatus
+from forge.modules.ot.control.runtime import ControlDependencies, ControlRuntime
 from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
@@ -183,7 +180,7 @@ class OTModuleAdapter(
             await self._control.start()
 
         self._state = AdapterState.HEALTHY
-        self._started_at = datetime.now(timezone.utc)
+        self._started_at = datetime.now(UTC)
         logger.info("OTModuleAdapter started")
 
     async def stop(self) -> None:
@@ -205,12 +202,12 @@ class OTModuleAdapter(
         """Return current health status."""
         uptime = 0.0
         if self._started_at:
-            uptime = (datetime.now(timezone.utc) - self._started_at).total_seconds()
+            uptime = (datetime.now(UTC) - self._started_at).total_seconds()
 
         return AdapterHealth(
             adapter_id=self.manifest.adapter_id,
             state=self._state,
-            last_check=datetime.now(timezone.utc),
+            last_check=datetime.now(UTC),
             last_healthy=self._started_at if self._state == AdapterState.HEALTHY else None,
             records_collected=self._records_collected,
             records_failed=self._records_failed,
@@ -471,7 +468,7 @@ class OTModuleAdapter(
 class _Subscription:
     """Internal subscription tracking."""
 
-    __slots__ = ("id", "tags", "callback")
+    __slots__ = ("callback", "id", "tags")
 
     def __init__(self, id: str, tags: set[str], callback: Any) -> None:
         self.id = id

@@ -1,4 +1,3 @@
-# ruff: noqa: TC001
 """forge-curation FastAPI service — HTTP endpoints for the curation layer.
 
 Provides REST API for:

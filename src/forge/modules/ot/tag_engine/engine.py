@@ -35,20 +35,17 @@ import logging
 import math
 import re
 import statistics
-from collections import defaultdict
-from datetime import datetime, timezone
 from typing import Any
 
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import (
+    SCAN_CLASS_INTERVALS_MS,
     ComputedTag,
     DerivedTag,
     ExpressionTag,
     ReferenceTag,
     ScanClass,
     TagType,
-    TagUnion,
-    SCAN_CLASS_INTERVALS_MS,
 )
 from forge.modules.ot.tag_engine.registry import TagRegistry
 
@@ -122,7 +119,7 @@ def _restricted_eval(expression: str, extra_vars: dict[str, Any] | None = None) 
     scope = dict(_SAFE_BUILTINS)
     if extra_vars:
         scope.update(extra_vars)
-    return eval(expression, scope)  # noqa: S307
+    return eval(expression, scope)
 
 
 class TagEngine:
@@ -221,7 +218,7 @@ class TagEngine:
             try:
                 path = await asyncio.wait_for(self._propagation_queue.get(), timeout=1.0)
                 await self._propagate(path, visited=set())
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 continue
             except asyncio.CancelledError:
                 break

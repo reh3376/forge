@@ -16,8 +16,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 from forge.core.models.contextual_record import ContextualRecord
 from forge.storage.pool import PoolManager
@@ -35,7 +34,7 @@ class WriteResult:
     engine: StorageEngine
     namespace: str
     success: bool
-    written_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
+    written_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
     error: str | None = None
     latency_ms: float = 0.0
 
@@ -105,11 +104,11 @@ class ShadowWriter:
             )
 
         decision = self.router.route(record)
-        start = datetime.now(tz=timezone.utc)
+        start = datetime.now(tz=UTC)
 
         try:
             await self._persist(record, decision)
-            elapsed = (datetime.now(tz=timezone.utc) - start).total_seconds() * 1000
+            elapsed = (datetime.now(tz=UTC) - start).total_seconds() * 1000
 
             self._metrics.records_written += 1
             self._metrics.by_engine[decision.target_engine.value] = (
@@ -117,7 +116,7 @@ class ShadowWriter:
             )
             spoke_id = record.source.system if record.source else "unknown"
             self._metrics.by_spoke[spoke_id] = self._metrics.by_spoke.get(spoke_id, 0) + 1
-            self._metrics.last_write_at = datetime.now(tz=timezone.utc)
+            self._metrics.last_write_at = datetime.now(tz=UTC)
 
             return WriteResult(
                 record_id=record_id_str,

@@ -13,8 +13,7 @@ from __future__ import annotations
 import importlib
 import importlib.util
 import json
-import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -28,8 +27,6 @@ from forge.storage.registry import (
     SchemaStatus,
     StorageEngine,
 )
-from forge.storage.router import DataRouter
-
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. Scaffold → Import Round-Trip
@@ -197,7 +194,7 @@ class TestScaffoldedFactsSpec:
         errors = [v for v in verdicts if v.status == VerdictStatus.ERROR]
         # SDK-generated specs may have some FAIL verdicts for fields
         # that need manual population, but should have ZERO errors
-        assert len(errors) == 0, f"SDK-generated spec has errors:\n" + "\n".join(
+        assert len(errors) == 0, "SDK-generated spec has errors:\n" + "\n".join(
             f"  {v.check_id}: {v.message}" for v in errors
         )
 
@@ -292,8 +289,8 @@ class TestSDKPipelineIntegration:
                 storage_engine=StorageEngine.TIMESCALEDB,
                 storage_namespace=f"{manifest.adapter_id.replace('-', '_')}",
                 status=SchemaStatus.ACTIVE,
-                registered_at=datetime.now(timezone.utc),
-                updated_at=datetime.now(timezone.utc),
+                registered_at=datetime.now(UTC),
+                updated_at=datetime.now(UTC),
             )
         )
 

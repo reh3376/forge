@@ -11,9 +11,8 @@ will be wired in Phase 2A.4 (Context Enrichment).
 
 from __future__ import annotations
 
-import asyncio
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 
 from forge.modules.ot.opcua_client.types import QualityCode

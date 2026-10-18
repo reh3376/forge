@@ -12,17 +12,17 @@ All providers share a common lifecycle: start → running → stop.
 The AcquisitionEngine orchestrates N providers concurrently.
 """
 
-from forge.modules.ot.tag_engine.providers.base import BaseProvider, ProviderState
-from forge.modules.ot.tag_engine.providers.opcua_provider import OpcUaProvider
-from forge.modules.ot.tag_engine.providers.memory_provider import MemoryProvider
-from forge.modules.ot.tag_engine.providers.expression_provider import ExpressionProvider
 from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
+from forge.modules.ot.tag_engine.providers.base import BaseProvider, ProviderState
+from forge.modules.ot.tag_engine.providers.expression_provider import ExpressionProvider
+from forge.modules.ot.tag_engine.providers.memory_provider import MemoryProvider
+from forge.modules.ot.tag_engine.providers.opcua_provider import OpcUaProvider
 
 __all__ = [
-    "BaseProvider",
-    "ProviderState",
-    "OpcUaProvider",
-    "MemoryProvider",
-    "ExpressionProvider",
     "AcquisitionEngine",
+    "BaseProvider",
+    "ExpressionProvider",
+    "MemoryProvider",
+    "OpcUaProvider",
+    "ProviderState",
 ]

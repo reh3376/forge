@@ -22,16 +22,16 @@ Endpoints:
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from typing import Any
 
+from forge.modules.ot.alarming.engine import AlarmEngine
 from forge.modules.ot.alarming.models import (
     AlarmConfig,
     AlarmPriority,
     AlarmType,
     ThresholdConfig,
 )
-from forge.modules.ot.alarming.engine import AlarmEngine
 
 logger = logging.getLogger("forge.alarm.api")
 

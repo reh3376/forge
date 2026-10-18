@@ -1,6 +1,5 @@
 """Tests for the Forge Schema Registry."""
 
-from datetime import datetime, timezone
 
 from forge.storage.registry import (
     RetentionPolicy,
@@ -9,7 +8,6 @@ from forge.storage.registry import (
     SchemaStatus,
     StorageEngine,
 )
-
 
 # ── SchemaEntry ─────────────────────────────────────────────────
 

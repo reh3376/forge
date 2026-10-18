@@ -11,27 +11,25 @@ Covers:
 - Custom role and requestor overrides
 """
 
-import pytest
 from unittest.mock import AsyncMock
 
+import pytest
+
+from forge.modules.ot.control.authorization import WriteAuthorizer
+from forge.modules.ot.control.interlock import InterlockEngine
 from forge.modules.ot.control.models import (
     DataType,
-    InterlockCondition,
-    InterlockRule,
     TagWriteConfig,
     WritePermission,
     WriteRole,
 )
-from forge.modules.ot.control.validation import WriteValidator
-from forge.modules.ot.control.interlock import InterlockEngine
-from forge.modules.ot.control.authorization import WriteAuthorizer
-from forge.modules.ot.control.write_engine import ControlWriteEngine
 from forge.modules.ot.control.recipe_integration import (
     RecipeParameterMapping,
     RecipeWriteAdapter,
     RecipeWriteConfig,
 )
-
+from forge.modules.ot.control.validation import WriteValidator
+from forge.modules.ot.control.write_engine import ControlWriteEngine
 
 # ---------------------------------------------------------------------------
 # Helpers

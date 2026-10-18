@@ -4,16 +4,17 @@ Tests the full script lifecycle: load script → dispatch event →
 handler invoked with execution context → audit trail records operation.
 """
 
-import pytest
 from pathlib import Path
 
-from forge.sdk.scripting.engine import ScriptEngine
-from forge.sdk.scripting.rbac import ScriptRBAC, ScriptPermission
+import pytest
+
 from forge.sdk.scripting.audit import (
     ScriptAuditTrail,
-    get_execution_context,
     clear_execution_context,
+    get_execution_context,
 )
+from forge.sdk.scripting.engine import ScriptEngine
+from forge.sdk.scripting.rbac import ScriptPermission, ScriptRBAC
 
 
 def _write_script(scripts_dir: Path, name: str, content: str) -> Path:
@@ -269,7 +270,7 @@ async def handler(event):
         ctx = mod._last_ctx
 
         # Record an audit entry as if forge.tag.write() was called
-        from forge.sdk.scripting.audit import set_execution_context, clear_execution_context
+        from forge.sdk.scripting.audit import set_execution_context
 
         set_execution_context(ctx)
         entry = audit.record_tag_write(

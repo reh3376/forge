@@ -1,13 +1,9 @@
 """Tests for the forge.file SDK module."""
 
-import os
-import tempfile
-from pathlib import Path
 
 import pytest
 
 from forge.sdk.scripting.modules.file import FileModule
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

@@ -10,9 +10,11 @@ Covers:
 - Multiple rules — first blocking rule wins
 """
 
-import pytest
 from unittest.mock import AsyncMock
 
+import pytest
+
+from forge.modules.ot.control.interlock import InterlockEngine
 from forge.modules.ot.control.models import (
     InterlockCondition,
     InterlockRule,
@@ -21,8 +23,6 @@ from forge.modules.ot.control.models import (
     WriteRole,
     WriteStatus,
 )
-from forge.modules.ot.control.interlock import InterlockEngine
-
 
 # ---------------------------------------------------------------------------
 # Helpers

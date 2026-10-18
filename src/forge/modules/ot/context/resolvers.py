@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import logging
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -284,7 +284,7 @@ class OperatingModeResolver:
             mode: Operating mode string (PRODUCTION, CIP, IDLE, etc.)
             source: Where this mode came from (plc, mes, manual)
         """
-        self._modes[area] = (mode.upper(), source, datetime.now(timezone.utc))
+        self._modes[area] = (mode.upper(), source, datetime.now(UTC))
 
     def resolve(self, area: str | None) -> str | None:
         """Get current operating mode for an area."""

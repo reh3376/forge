@@ -1,7 +1,7 @@
 """Tests for the Forge Data Router."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -35,9 +35,9 @@ def _make_record(
             connection_id="conn-001",
         ),
         timestamp=RecordTimestamp(
-            source_time=datetime(2026, 4, 7, 12, 0, tzinfo=timezone.utc),
-            server_time=datetime(2026, 4, 7, 12, 0, tzinfo=timezone.utc),
-            ingestion_time=datetime(2026, 4, 7, 12, 0, tzinfo=timezone.utc),
+            source_time=datetime(2026, 4, 7, 12, 0, tzinfo=UTC),
+            server_time=datetime(2026, 4, 7, 12, 0, tzinfo=UTC),
+            ingestion_time=datetime(2026, 4, 7, 12, 0, tzinfo=UTC),
         ),
         value=RecordValue(raw="{}", data_type=data_type),
         context=RecordContext(

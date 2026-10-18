@@ -1,8 +1,6 @@
 """Tests for the bridge health dashboard model."""
 
-from datetime import datetime, timezone
-
-import pytest
+from datetime import UTC, datetime
 
 from forge.modules.ot.bridge.dual_write import ConsistencyReport
 from forge.modules.ot.bridge.health import (
@@ -12,7 +10,6 @@ from forge.modules.ot.bridge.health import (
     OperatorChecklistItem,
 )
 from forge.modules.ot.bridge.models import BridgeHealth, BridgeState
-
 
 # ---------------------------------------------------------------------------
 # LatencyComparison
@@ -69,7 +66,7 @@ class TestOperatorChecklist:
     def test_check_item(self):
         item = OperatorChecklistItem(id="test", description="Test item")
         item.passed = True
-        item.checked_at = datetime.now(timezone.utc)
+        item.checked_at = datetime.now(UTC)
         item.checked_by = "engineer01"
         assert item.passed is True
 

@@ -5,8 +5,6 @@ Validates exception inheritance, attribute preservation, and repr formatting.
 
 from __future__ import annotations
 
-import pytest
-
 from forge.modules.ot.opcua_client.exceptions import (
     BrowseError,
     CertificateError,
@@ -27,7 +25,6 @@ from forge.modules.ot.opcua_client.exceptions import (
     TimeoutError,
     WriteError,
 )
-
 
 # ---------------------------------------------------------------------------
 # Base exception

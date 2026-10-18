@@ -18,9 +18,10 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from collections.abc import AsyncIterator
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, AsyncIterator
+from typing import Any
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -129,7 +130,7 @@ class WhkCmmsAdapter(
         # Phase 1: no live GraphQL/RabbitMQ connections yet — records injected for testing
         # Phase 2 will add aio-httpx for GraphQL polling and aio-pika for RabbitMQ
         self._state = AdapterState.HEALTHY
-        self._last_healthy = datetime.now(tz=timezone.utc)
+        self._last_healthy = datetime.now(tz=UTC)
         self._startup_time = self._last_healthy
         logger.info(
             "whk-cmms adapter started (phase 1: inject-only, %d graphql entities, %d rmq topics defined)",
@@ -148,11 +149,11 @@ class WhkCmmsAdapter(
         """Return current health status and record counters."""
         uptime = 0.0
         if self._startup_time is not None:
-            uptime = (datetime.now(tz=timezone.utc) - self._startup_time).total_seconds()
+            uptime = (datetime.now(tz=UTC) - self._startup_time).total_seconds()
         return AdapterHealth(
             adapter_id=self.adapter_id,
             state=self._state,
-            last_check=datetime.now(tz=timezone.utc),
+            last_check=datetime.now(tz=UTC),
             last_healthy=self._last_healthy,
             records_collected=self._records_collected,
             records_failed=self._records_failed,

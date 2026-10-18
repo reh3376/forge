@@ -12,20 +12,19 @@ Sits between the Tag Engine (source of live values) and the AlarmEngine
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import time
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
+from forge.modules.ot.alarming.engine import AlarmEngine
 from forge.modules.ot.alarming.models import (
     AlarmConfig,
     AlarmEvent,
     AlarmType,
     ThresholdConfig,
 )
-from forge.modules.ot.alarming.engine import AlarmEngine
 
 logger = logging.getLogger("forge.alarm.detector")
 

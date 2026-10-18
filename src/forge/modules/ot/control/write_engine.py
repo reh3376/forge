@@ -38,7 +38,7 @@ from __future__ import annotations
 import logging
 from collections import deque
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Protocol, runtime_checkable
 
 from forge.modules.ot.control.authorization import WriteAuthorizer
@@ -277,23 +277,23 @@ class ControlWriteEngine:
             logger.warning("Pre-write read failed for %s: %s", request.tag_path, exc)
 
         # Write
-        result.write_sent_at = datetime.now(timezone.utc)
+        result.write_sent_at = datetime.now(UTC)
         try:
             await self._writer.write_tag(request.tag_path, request.value)
         except Exception as exc:
             result.status = WriteStatus.FAILED_WRITE
             result.write_error = str(exc)
-            result.completed_at = datetime.now(timezone.utc)
+            result.completed_at = datetime.now(UTC)
             return
 
         # Read-back
-        result.readback_at = datetime.now(timezone.utc)
+        result.readback_at = datetime.now(UTC)
         try:
             result.new_value = await self._writer.read_tag(request.tag_path)
         except Exception as exc:
             result.status = WriteStatus.FAILED_READBACK
             result.readback_error = str(exc)
-            result.completed_at = datetime.now(timezone.utc)
+            result.completed_at = datetime.now(UTC)
             return
 
         # Compare
@@ -306,7 +306,7 @@ class ControlWriteEngine:
         else:
             result.status = WriteStatus.UNCONFIRMED
 
-        result.completed_at = datetime.now(timezone.utc)
+        result.completed_at = datetime.now(UTC)
 
     def _values_match(self, requested: Any, readback: Any, data_type: DataType) -> bool:
         """Compare requested value to read-back value with type-aware

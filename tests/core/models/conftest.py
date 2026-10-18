@@ -4,7 +4,7 @@ Applies Python 3.10 compatibility patches for code targeting 3.12+.
 These patches are ONLY needed in the test sandbox — production code
 correctly uses datetime.UTC and StrEnum on Python 3.12.
 """
-# ruff: noqa: UP017, UP042
+# ruff: noqa: UP017
 
 import datetime
 import enum

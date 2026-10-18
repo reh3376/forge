@@ -6,11 +6,9 @@ from forge.modules.ot.mqtt.topic_router import (
     TopicRouter,
     TopicTemplate,
     TopicType,
-    ResolvedTopic,
-    _normalize_path,
     _match_tag_pattern,
+    _normalize_path,
 )
-
 
 # ---------------------------------------------------------------------------
 # Path normalization

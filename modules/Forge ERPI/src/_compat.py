@@ -16,7 +16,7 @@ import sys
 # ── StrEnum shim ──────────────────────────────────────────────
 
 if sys.version_info >= (3, 11):
-    from enum import StrEnum  # noqa: F401
+    from enum import StrEnum
 else:
     from enum import Enum
 
@@ -29,6 +29,6 @@ else:
 
 # ── UTC alias ─────────────────────────────────────────────────
 
-from datetime import timezone  # noqa: E402
+from datetime import UTC
 
-UTC = timezone.utc
+UTC = UTC

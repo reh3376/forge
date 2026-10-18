@@ -24,15 +24,14 @@ import asyncio
 import logging
 import re
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import (
-    BaseTag,
-    ExpressionTag,
     ComputedTag,
     DerivedTag,
+    ExpressionTag,
     ReferenceTag,
     ScanClass,
     TagType,
@@ -165,7 +164,7 @@ class TagRegistry:
         if tv is None:
             return False
 
-        now = timestamp or datetime.now(timezone.utc)
+        now = timestamp or datetime.now(UTC)
         changed = (value != tv.value) or (quality != tv.quality)
 
         tv.previous_value = tv.value

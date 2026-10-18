@@ -17,10 +17,9 @@ Architecture:
 
 from __future__ import annotations
 
-import asyncio
 import logging
 from collections.abc import AsyncIterator
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.adapters.base.interface import AdapterBase, DiscoveryProvider
@@ -34,12 +33,14 @@ from forge.core.models.adapter import (
 )
 from forge.core.models.contextual_record import (
     ContextualRecord,
-    QualityCode as CoreQualityCode,
     RecordContext,
     RecordLineage,
     RecordSource,
     RecordTimestamp,
     RecordValue,
+)
+from forge.core.models.contextual_record import (
+    QualityCode as CoreQualityCode,
 )
 from forge.modules.ot.bridge.client import IgnitionRestClient
 from forge.modules.ot.bridge.models import (
@@ -47,11 +48,10 @@ from forge.modules.ot.bridge.models import (
     BridgeHealth,
     BridgeState,
     IgnitionQuality,
-    IgnitionTagResponse,
     IgnitionTagValue,
 )
 from forge.modules.ot.bridge.tag_mapper import TagMapper
-from forge.modules.ot.context.resolvers import EnrichmentContext, EnrichmentPipeline
+from forge.modules.ot.context.resolvers import EnrichmentPipeline
 
 logger = logging.getLogger(__name__)
 
@@ -153,7 +153,7 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
 
         self._state = AdapterState.HEALTHY
         self._bridge_health.state = BridgeState.HEALTHY
-        self._started_at = datetime.now(timezone.utc)
+        self._started_at = datetime.now(UTC)
         logger.info(
             "Bridge adapter started — %d tags mapped from Ignition",
             len(self._active_tags),
@@ -170,12 +170,12 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
         """Return combined adapter + bridge health."""
         uptime = 0.0
         if self._started_at:
-            uptime = (datetime.now(timezone.utc) - self._started_at).total_seconds()
+            uptime = (datetime.now(UTC) - self._started_at).total_seconds()
 
         return AdapterHealth(
             adapter_id=self.manifest.adapter_id,
             state=self._state,
-            last_check=datetime.now(timezone.utc),
+            last_check=datetime.now(UTC),
             last_healthy=self._started_at if self._state == AdapterState.HEALTHY else None,
             records_collected=self._records_collected,
             records_failed=self._records_failed,
@@ -205,7 +205,7 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
 
         # Update health
         self._bridge_health.total_polls += 1
-        self._bridge_health.last_poll_time = datetime.now(timezone.utc)
+        self._bridge_health.last_poll_time = datetime.now(UTC)
         self._bridge_health.tags_polled = len(response.values)
         self._bridge_health.tags_good = response.good_count
         self._bridge_health.tags_bad = response.bad_count
@@ -214,7 +214,7 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
         )
 
         if response.values:
-            self._bridge_health.last_success_time = datetime.now(timezone.utc)
+            self._bridge_health.last_success_time = datetime.now(UTC)
             self._bridge_health.consecutive_failures = 0
             self._bridge_health.state = BridgeState.HEALTHY
         else:
@@ -333,7 +333,7 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
             return None
 
         forge_path = mapping.forge_path
-        now = datetime.now(tz=timezone.utc)
+        now = datetime.now(tz=UTC)
 
         # Map Ignition quality to core quality
         core_quality = _map_ignition_quality(tag_value.quality)

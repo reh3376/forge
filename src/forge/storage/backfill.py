@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from forge._compat import StrEnum
 
@@ -197,7 +197,7 @@ class BackfillEngine:
             raise ValueError(f"No backfill plan for {spoke_id}.{source_table}")
 
         progress.status = BackfillStatus.IN_PROGRESS
-        progress.started_at = datetime.now(tz=timezone.utc)
+        progress.started_at = datetime.now(tz=UTC)
         logger.info(
             "Starting backfill: %s.%s → %s.%s",
             spoke_id,
@@ -211,7 +211,7 @@ class BackfillEngine:
             progress.rows_total = plan.estimated_rows or 0
             progress.rows_transferred = progress.rows_total
             progress.status = BackfillStatus.COMPLETE
-            progress.completed_at = datetime.now(tz=timezone.utc)
+            progress.completed_at = datetime.now(tz=UTC)
 
             logger.info(
                 "Backfill complete: %s.%s (%d rows)",

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from forge.adapters.whk_cmms.context import build_record_context
 
 

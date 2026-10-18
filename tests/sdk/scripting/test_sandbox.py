@@ -3,12 +3,9 @@
 import pytest
 
 from forge.sdk.scripting.sandbox import (
-    ScriptSandbox,
     SandboxConfig,
-    _STDLIB_ALLOWED,
-    _BLOCKED,
+    ScriptSandbox,
 )
-
 
 # ---------------------------------------------------------------------------
 # Module allowlist checks (without activating the hook)

@@ -3,11 +3,13 @@
 import pytest
 
 from forge.modules.ot.opcua_client.types import DataType
+from forge.modules.ot.tag_engine.builtin_templates import (
+    create_builtin_registry,
+)
 from forge.modules.ot.tag_engine.models import (
     MemoryTag,
     ScanClass,
     StandardTag,
-    TagType,
 )
 from forge.modules.ot.tag_engine.templates import (
     TagTemplate,
@@ -15,14 +17,6 @@ from forge.modules.ot.tag_engine.templates import (
     TemplateRegistry,
     TemplateTagDef,
 )
-from forge.modules.ot.tag_engine.builtin_templates import (
-    ANALOG_INSTRUMENT,
-    DISCRETE_VALVE,
-    MOTOR_STARTER,
-    VFD_DRIVE,
-    create_builtin_registry,
-)
-
 
 # ---------------------------------------------------------------------------
 # TemplateParam tests

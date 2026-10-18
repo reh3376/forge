@@ -8,7 +8,7 @@ ContextualRecord with full lineage and provenance.
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.core.models.contextual_record import (
@@ -47,7 +47,7 @@ def build_contextual_record(
     tag_name = tag_meta.get("name", "unknown")
     tag_path = _historian_tag_path(tag_name)
     source_time = _parse_timestamp(value_point.get("ts"))
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
 
     # Build record value
     raw_value = value_point.get("value")
@@ -103,28 +103,28 @@ def _historian_tag_path(tag_name: str) -> str:
 def _parse_timestamp(ts_value: Any) -> datetime:
     """Parse a NextTrend timestamp (RFC 3339 string) to datetime."""
     if ts_value is None:
-        return datetime.now(tz=timezone.utc)
+        return datetime.now(tz=UTC)
 
     if isinstance(ts_value, datetime):
         if ts_value.tzinfo is None:
-            return ts_value.replace(tzinfo=timezone.utc)
+            return ts_value.replace(tzinfo=UTC)
         return ts_value
 
     if isinstance(ts_value, (int, float)):
-        return datetime.fromtimestamp(ts_value, tz=timezone.utc)
+        return datetime.fromtimestamp(ts_value, tz=UTC)
 
     ts_str = str(ts_value)
     # Try fromisoformat first (handles most RFC 3339 variants)
     try:
         dt = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
+            dt = dt.replace(tzinfo=UTC)
         return dt
     except ValueError:
         pass
 
     logger.warning("Unparseable timestamp: %s — using now()", ts_str)
-    return datetime.now(tz=timezone.utc)
+    return datetime.now(tz=UTC)
 
 
 def _normalize_value(raw: Any, data_type: str | None) -> float | int | str | bool | None:

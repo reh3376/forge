@@ -12,7 +12,7 @@ import hashlib
 import json
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge._compat import StrEnum
@@ -87,8 +87,8 @@ class SchemaEntry:
     retention_policy: RetentionPolicy = RetentionPolicy.SEVEN_YEARS
     integrity_hash: str = ""
     status: SchemaStatus = SchemaStatus.DRAFT
-    registered_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
+    registered_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
 
     def __post_init__(self) -> None:
         if not self.integrity_hash:
@@ -139,7 +139,7 @@ class SchemaRegistry:
             )
 
         entry.integrity_hash = entry.compute_hash()
-        entry.updated_at = datetime.now(tz=timezone.utc)
+        entry.updated_at = datetime.now(tz=UTC)
         self._entries[entry.schema_id] = entry
         logger.info(
             "Registered schema: %s [%s] → %s/%s",

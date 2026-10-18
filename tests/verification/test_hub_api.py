@@ -21,8 +21,6 @@ from forge.core.models.adapter import (
     AdapterTier,
     DataContract,
 )
-from forge.storage.config import StorageConfig
-
 
 # ── Fixtures ─────────────────────────────────────────────────────
 

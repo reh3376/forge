@@ -18,15 +18,12 @@ Design decisions:
 
 from __future__ import annotations
 
-import json
 import logging
-import time
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.modules.ot.mqtt.publisher import OTMqttPublisher
-from forge.modules.ot.mqtt.topic_router import TopicRouter, TopicType
+from forge.modules.ot.mqtt.topic_router import TopicRouter
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +71,7 @@ def build_health_payload(
         "connected": connected,
         "latency_ms": round(latency_ms, 1),
         "scan_class": scan_class,
-        "ts": datetime.now(tz=timezone.utc).isoformat(),
+        "ts": datetime.now(tz=UTC).isoformat(),
         "error": error,
     }
 
@@ -91,7 +88,7 @@ def build_equipment_payload(
         "field": field_name,
         "v": value,
         "area": area,
-        "ts": datetime.now(tz=timezone.utc).isoformat(),
+        "ts": datetime.now(tz=UTC).isoformat(),
     }
 
 

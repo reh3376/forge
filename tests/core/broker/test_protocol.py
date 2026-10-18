@@ -1,32 +1,25 @@
 """Tests for MQTT 3.1.1 protocol codec — encoding and decoding."""
 
 import struct
-import pytest
 
 from forge.core.broker.protocol import (
-    PacketType,
     ConnectReturnCode,
-    ConnectPacket,
-    PublishPacket,
-    SubscribePacket,
-    SubscribeRequest,
-    UnsubscribePacket,
-    encode_remaining_length,
-    decode_remaining_length,
-    encode_utf8,
-    decode_utf8,
+    PacketType,
     decode_connect,
     decode_publish,
+    decode_remaining_length,
     decode_subscribe,
     decode_unsubscribe,
+    decode_utf8,
     encode_connack,
-    encode_publish,
+    encode_pingresp,
     encode_puback,
+    encode_publish,
+    encode_remaining_length,
     encode_suback,
     encode_unsuback,
-    encode_pingresp,
+    encode_utf8,
 )
-
 
 # ---------------------------------------------------------------------------
 # Remaining length encoding

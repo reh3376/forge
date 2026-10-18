@@ -17,12 +17,12 @@ The data is exposed via the Forge API for dashboard consumption.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
 from forge.modules.ot.bridge.dual_write import ConsistencyReport
-from forge.modules.ot.bridge.models import BridgeHealth, BridgeState
+from forge.modules.ot.bridge.models import BridgeHealth
 
 
 class FailoverState(str, Enum):
@@ -94,7 +94,7 @@ class BridgeHealthDashboard:
     """
 
     # Timestamps
-    generated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    generated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     # Source health
     ot_module_healthy: bool = False
@@ -164,7 +164,7 @@ class BridgeHealthDashboard:
         for item in self.checklist:
             if item.id == item_id:
                 item.passed = passed
-                item.checked_at = datetime.now(timezone.utc)
+                item.checked_at = datetime.now(UTC)
                 item.checked_by = checked_by
                 item.notes = notes
                 return True

@@ -7,9 +7,8 @@ backfill, subscription, discovery, and FACTS spec conformance.
 
 from __future__ import annotations
 
-import asyncio
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -30,7 +29,6 @@ from forge.adapters.next_trend.record_builder import (
 )
 from forge.core.models.adapter import AdapterState, AdapterTier
 from forge.core.models.contextual_record import QualityCode
-
 
 # ── Fixtures ──────────────────────────────────────────────────────
 
@@ -307,7 +305,7 @@ class TestRecordBuilder:
         assert isinstance(dt, datetime)
 
         # Datetime passthrough
-        now = datetime.now(tz=timezone.utc)
+        now = datetime.now(tz=UTC)
         assert _parse_timestamp(now) is now
 
     def test_normalize_value_float(self):
@@ -477,8 +475,8 @@ class TestBackfill:
         adapter.inject_backfill_records([tag_value_record])
         await adapter.start()
 
-        start = datetime(2026, 4, 1, tzinfo=timezone.utc)
-        end = datetime(2026, 4, 7, tzinfo=timezone.utc)
+        start = datetime(2026, 4, 1, tzinfo=UTC)
+        end = datetime(2026, 4, 7, tzinfo=UTC)
 
         records = [r async for r in adapter.backfill(["Temperature"], start, end)]
         assert len(records) == 1
@@ -491,8 +489,8 @@ class TestBackfill:
         adapter.inject_backfill_records([tag_value_record])
         await adapter.start()
 
-        start = datetime(2026, 4, 1, tzinfo=timezone.utc)
-        end = datetime(2026, 4, 7, tzinfo=timezone.utc)
+        start = datetime(2026, 4, 1, tzinfo=UTC)
+        end = datetime(2026, 4, 7, tzinfo=UTC)
         _ = [r async for r in adapter.backfill(["Temperature"], start, end)]
 
         health = await adapter.health()
@@ -619,7 +617,7 @@ class TestFACTSSpec:
             for v in report.verdicts
             if v.status == VerdictStatus.FAIL and v.check_id != "facts:integrity-hash-state"
         ]
-        assert len(errors) == 0, f"FACTS runner failed: " + "; ".join(
+        assert len(errors) == 0, "FACTS runner failed: " + "; ".join(
             f"[{e.check_id}] {e.message}" for e in errors
         )
 

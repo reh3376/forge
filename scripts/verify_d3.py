@@ -16,9 +16,8 @@ import json
 import subprocess
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-
 
 ROOT = Path(__file__).resolve().parents[1]
 VERIFICATION_DIR = ROOT / "tests" / "verification"
@@ -77,7 +76,7 @@ def run_verification(args: argparse.Namespace) -> dict:
     """Run the full D3.12 verification suite."""
     report = {
         "title": "D3.12 Production Verification Report",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "python_version": sys.version,
         "suites": {},
         "summary": {},

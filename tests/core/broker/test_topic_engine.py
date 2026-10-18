@@ -1,14 +1,10 @@
 """Tests for TopicEngine — subscription matching, fan-out, retained messages."""
 
-import pytest
 
 from forge.core.broker.topic_engine import (
     TopicEngine,
-    SubscriptionEntry,
-    RetainedMessage,
     mqtt_topic_matches,
 )
-
 
 # ---------------------------------------------------------------------------
 # MQTT topic matching (spec §4.7)

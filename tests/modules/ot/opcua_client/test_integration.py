@@ -21,7 +21,6 @@ Requirements:
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
 
 import pytest
 import pytest_asyncio

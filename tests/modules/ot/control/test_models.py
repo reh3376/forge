@@ -13,18 +13,17 @@ import pytest
 
 from forge.modules.ot.control.models import (
     ConfirmationMode,
-    WriteOrigin,
     DataType,
     InterlockCondition,
     InterlockRule,
     TagWriteConfig,
+    WriteOrigin,
     WritePermission,
     WriteRequest,
     WriteResult,
     WriteRole,
     WriteStatus,
 )
-
 
 # ---------------------------------------------------------------------------
 # WriteRole

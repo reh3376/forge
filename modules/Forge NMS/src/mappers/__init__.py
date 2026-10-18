@@ -19,10 +19,10 @@ from forge.adapters.whk_nms.mappers.events import (
 )
 
 __all__ = [
-    "map_device",
-    "map_trap_event",
     "map_alert",
-    "map_security_event",
     "map_baseline_anomaly",
+    "map_device",
+    "map_security_event",
     "map_spof_detection",
+    "map_trap_event",
 ]

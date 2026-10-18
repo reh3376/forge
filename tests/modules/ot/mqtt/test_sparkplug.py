@@ -1,7 +1,6 @@
 """Tests for SparkplugB encoding — topic/payload generation."""
 
-import pytest
-from datetime import datetime, timezone
+from datetime import datetime
 
 from forge.modules.ot.mqtt.sparkplug import (
     SparkplugDataType,
@@ -10,7 +9,6 @@ from forge.modules.ot.mqtt.sparkplug import (
     SparkplugPayload,
     infer_sparkplug_type,
 )
-
 
 # ---------------------------------------------------------------------------
 # Data type inference

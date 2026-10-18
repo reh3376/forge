@@ -1,4 +1,4 @@
-# ruff: noqa: E402, UP017, UP042
+# ruff: noqa: E402, UP017
 """Performance benchmark: JSON vs Protobuf-compatible serialization.
 
 Measures the throughput of converting ContextualRecords between

@@ -15,19 +15,16 @@ Covers:
 - Deduplication (same tag+type doesn't create duplicates)
 """
 
-import pytest
-import asyncio
-from unittest.mock import AsyncMock
 
+import pytest
+
+from forge.modules.ot.alarming.engine import AlarmEngine
 from forge.modules.ot.alarming.models import (
     AlarmConfig,
-    AlarmEvent,
     AlarmPriority,
-    AlarmState,
     AlarmType,
     ThresholdConfig,
 )
-from forge.modules.ot.alarming.engine import AlarmEngine
 
 
 @pytest.fixture

@@ -1,15 +1,12 @@
 """Tests for MqttRateLimiter — per-tag publish throttle."""
 
 import time
-import pytest
 
 from forge.modules.ot.mqtt.rate_limiter import (
     MqttRateLimiter,
     RateLimiterConfig,
     TokenBucket,
-    PendingPublish,
 )
-
 
 # ---------------------------------------------------------------------------
 # Token bucket

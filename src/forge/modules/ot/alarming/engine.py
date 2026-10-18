@@ -13,8 +13,9 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections import defaultdict, deque
-from datetime import datetime, timezone
-from typing import Any, Callable, Awaitable
+from collections.abc import Awaitable, Callable
+from datetime import UTC, datetime
+from typing import Any
 
 from forge.modules.ot.alarming.models import (
     AlarmAction,
@@ -195,7 +196,7 @@ class AlarmEngine:
                 return False
 
             inst.ack_operator = operator
-            inst.ack_time = datetime.now(timezone.utc)
+            inst.ack_time = datetime.now(UTC)
             self._total_acknowledged += 1
 
             event = self._make_event(inst, result, operator=operator)
@@ -276,7 +277,7 @@ class AlarmEngine:
                 return False
 
             inst.shelve_reason = reason
-            inst.shelved_until = datetime.now(timezone.utc)  # Simplified — real impl uses timedelta
+            inst.shelved_until = datetime.now(UTC)  # Simplified — real impl uses timedelta
             event = self._make_event(
                 inst, result, detail=f"shelved for {duration_minutes}m: {reason}"
             )
@@ -480,7 +481,7 @@ class AlarmEngine:
                 try:
                     result = self._sm.transition(inst, AlarmAction.TRIGGER)
                     inst.value = value
-                    inst.timestamp = datetime.now(timezone.utc)
+                    inst.timestamp = datetime.now(UTC)
                     self._total_triggered += 1
                     event = self._make_event(inst, result)
                     self._record_event(event)

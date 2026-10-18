@@ -14,7 +14,7 @@ from __future__ import annotations
 import enum
 import logging
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.modules.ot.tag_engine.registry import TagRegistry
@@ -70,7 +70,7 @@ class BaseProvider(ABC):
         try:
             await self._start()
             self._state = ProviderState.RUNNING
-            self._started_at = datetime.now(timezone.utc)
+            self._started_at = datetime.now(UTC)
             logger.info("Provider %s started", self.name)
         except Exception as e:
             self._state = ProviderState.FAILED

@@ -34,7 +34,7 @@ from __future__ import annotations
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.modules.ot.control.models import (
@@ -110,7 +110,7 @@ class RecipeWriteResult:
     failed: int = 0
     skipped: int = 0
     results: list[dict[str, Any]] = field(default_factory=list)
-    started_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    started_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     completed_at: datetime | None = None
 
     @property
@@ -226,7 +226,7 @@ class RecipeWriteAdapter:
                         "error": f"No config for equipment {equipment_id}",
                     }
                 )
-            batch_result.completed_at = datetime.now(timezone.utc)
+            batch_result.completed_at = datetime.now(UTC)
             return batch_result
 
         effective_role = role or config.default_role
@@ -298,5 +298,5 @@ class RecipeWriteAdapter:
                     }
                 )
 
-        batch_result.completed_at = datetime.now(timezone.utc)
+        batch_result.completed_at = datetime.now(UTC)
         return batch_result

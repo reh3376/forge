@@ -12,6 +12,7 @@ Covers:
 
 import pytest
 
+from forge.modules.ot.control.authorization import WriteAuthorizer
 from forge.modules.ot.control.models import (
     WritePermission,
     WriteRequest,
@@ -19,7 +20,6 @@ from forge.modules.ot.control.models import (
     WriteRole,
     WriteStatus,
 )
-from forge.modules.ot.control.authorization import WriteAuthorizer
 
 
 @pytest.fixture

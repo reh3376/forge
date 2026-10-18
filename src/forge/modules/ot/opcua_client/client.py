@@ -17,10 +17,12 @@ The client is an async context manager that owns the full connection lifecycle:
 from __future__ import annotations
 
 import asyncio
+import builtins
 import logging
 import time
-from datetime import datetime, timedelta, timezone
-from typing import Any, Callable
+from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from asyncua import Client as UaClient
 from asyncua import Node as UaNode
@@ -33,7 +35,6 @@ from forge.modules.ot.opcua_client.exceptions import (
     CreateSubscriptionError,
     EndpointUnreachable,
     HistoryReadError,
-    MonitoredItemError,
     OpcUaError,
     ReadError,
     SecurityNegotiationError,
@@ -176,12 +177,12 @@ def _convert_data_value(ua_dv: ua.DataValue) -> DataValue:
     value = ua_dv.Value.Value if ua_dv.Value is not None else None
 
     # Timestamps — asyncua gives datetime or None
-    source_ts = ua_dv.SourceTimestamp or datetime.now(timezone.utc)
-    server_ts = ua_dv.ServerTimestamp or datetime.now(timezone.utc)
+    source_ts = ua_dv.SourceTimestamp or datetime.now(UTC)
+    server_ts = ua_dv.ServerTimestamp or datetime.now(UTC)
     if source_ts.tzinfo is None:
-        source_ts = source_ts.replace(tzinfo=timezone.utc)
+        source_ts = source_ts.replace(tzinfo=UTC)
     if server_ts.tzinfo is None:
-        server_ts = server_ts.replace(tzinfo=timezone.utc)
+        server_ts = server_ts.replace(tzinfo=UTC)
 
     return DataValue(
         value=value,
@@ -260,11 +261,11 @@ class _ForgeSubHandler:
                 forge_dv = DataValue(
                     value=val,
                     quality=QualityCode.GOOD,
-                    source_timestamp=datetime.now(timezone.utc),
-                    server_timestamp=datetime.now(timezone.utc),
+                    source_timestamp=datetime.now(UTC),
+                    server_timestamp=datetime.now(UTC),
                 )
 
-            self._client_ref._last_data_received = datetime.now(timezone.utc)
+            self._client_ref._last_data_received = datetime.now(UTC)
             self._callback(node_id_str, forge_dv)
 
         except Exception:
@@ -481,7 +482,7 @@ class OpcUaClient:
 
             # Mark connected
             self._transition_state(ConnectionState.CONNECTED)
-            self._connected_since = datetime.now(timezone.utc)
+            self._connected_since = datetime.now(UTC)
             self._consecutive_failures = 0
 
             logger.info(
@@ -704,7 +705,7 @@ class OpcUaClient:
 
         except OpcUaError:
             raise
-        except asyncio.TimeoutError as exc:
+        except builtins.TimeoutError as exc:
             raise TimeoutError(
                 f"Browse timed out for node {parsed}",
                 timeout_ms=self._endpoint.request_timeout_ms,
@@ -765,14 +766,14 @@ class OpcUaClient:
 
             elapsed_ms = (time.monotonic() - t0) * 1000.0
             self._latency_ms = elapsed_ms
-            self._last_data_received = datetime.now(timezone.utc)
+            self._last_data_received = datetime.now(UTC)
 
             logger.debug("Read completed: %d values in %.1fms", len(results), elapsed_ms)
             return results
 
         except OpcUaError:
             raise
-        except asyncio.TimeoutError as exc:
+        except builtins.TimeoutError as exc:
             raise TimeoutError(
                 f"Read timed out for {len(parsed)} nodes",
                 timeout_ms=self._endpoint.request_timeout_ms,
@@ -840,7 +841,7 @@ class OpcUaClient:
             ) from exc
         except OpcUaError:
             raise
-        except asyncio.TimeoutError as exc:
+        except builtins.TimeoutError as exc:
             raise TimeoutError(
                 f"Write timed out for {parsed}",
                 timeout_ms=self._endpoint.request_timeout_ms,
@@ -1015,7 +1016,7 @@ class OpcUaClient:
         self._ensure_connected("history_read")
         parsed = self._parse_node_id(node_id)
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if end_time is None:
             end_time = now
         if start_time is None:
@@ -1052,7 +1053,7 @@ class OpcUaClient:
             ) from exc
         except OpcUaError:
             raise
-        except asyncio.TimeoutError as exc:
+        except builtins.TimeoutError as exc:
             raise TimeoutError(
                 f"HistoryRead timed out for {parsed}",
                 timeout_ms=self._endpoint.request_timeout_ms,

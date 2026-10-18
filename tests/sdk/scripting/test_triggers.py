@@ -1,26 +1,25 @@
 """Tests for the trigger system — decorators, pattern matching, registry."""
 
-import pytest
 from datetime import timedelta
 from types import ModuleType
 
+import pytest
+
 from forge.sdk.scripting.triggers import (
-    HandlerRegistration,
-    TagChangeEvent,
+    _HANDLER_ATTR,
     AlarmEvent,
     LifecycleEvent,
+    TagChangeEvent,
     TriggerRegistry,
     TriggerType,
     _match_tag_pattern,
     _parse_interval,
+    api,
+    on_alarm,
+    on_event,
     on_tag_change,
     timer,
-    on_event,
-    on_alarm,
-    api,
-    _HANDLER_ATTR,
 )
-
 
 # ---------------------------------------------------------------------------
 # _parse_interval

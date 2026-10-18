@@ -1,4 +1,4 @@
-# ruff: noqa: E402, UP017, UP042
+# ruff: noqa: E402, UP017
 """Integration tests for hardened gRPC transport (real server ↔ real client).
 
 These tests start a real grpc.aio server on a random port, connect a

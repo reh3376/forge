@@ -2,17 +2,17 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 from forge.adapters.whk_nms.mappers import (
-    map_device,
-    map_trap_event,
     map_alert,
-    map_security_event,
     map_baseline_anomaly,
+    map_device,
+    map_security_event,
     map_spof_detection,
+    map_trap_event,
 )
-from forge.core.models.manufacturing.enums import UnitStatus, EventSeverity
+from forge.core.models.manufacturing.enums import EventSeverity, UnitStatus
 
 
 class TestMapDevice:

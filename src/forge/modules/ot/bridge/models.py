@@ -9,9 +9,8 @@ from __future__ import annotations
 
 import enum
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
-
 
 # ---------------------------------------------------------------------------
 # Ignition REST API response models
@@ -55,7 +54,7 @@ class IgnitionTagValue:
     path: str  # Ignition bracket-notation path
     value: Any = None  # Raw value from Ignition
     quality: IgnitionQuality = IgnitionQuality.GOOD
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     data_type: str = "Unknown"  # Ignition data type string
 
     @staticmethod
@@ -79,11 +78,11 @@ class IgnitionTagValue:
         ts = data.get("timestamp")
         if isinstance(ts, (int, float)):
             # Ignition returns epoch milliseconds
-            timestamp = datetime.fromtimestamp(ts / 1000.0, tz=timezone.utc)
+            timestamp = datetime.fromtimestamp(ts / 1000.0, tz=UTC)
         elif isinstance(ts, str):
             timestamp = datetime.fromisoformat(ts.replace("Z", "+00:00"))
         else:
-            timestamp = datetime.now(timezone.utc)
+            timestamp = datetime.now(UTC)
 
         return IgnitionTagValue(
             path=path,
@@ -99,8 +98,8 @@ class IgnitionTagResponse:
     """Complete response from an Ignition tag read batch."""
 
     values: tuple[IgnitionTagValue, ...]
-    request_time: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    response_time: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    request_time: datetime = field(default_factory=lambda: datetime.now(UTC))
+    response_time: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     @property
     def latency_ms(self) -> float:

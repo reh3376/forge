@@ -13,7 +13,7 @@ Endpoints:
 
 from __future__ import annotations
 
-from datetime import datetime  # noqa: TC003
+from datetime import datetime
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query

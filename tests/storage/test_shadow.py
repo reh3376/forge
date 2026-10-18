@@ -1,9 +1,9 @@
 """Tests for the Forge Shadow Writer."""
 
 import uuid
+from datetime import UTC, datetime
 
 import pytest
-from datetime import datetime, timezone
 
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -15,7 +15,7 @@ from forge.core.models.contextual_record import (
 )
 from forge.storage.config import StorageConfig
 from forge.storage.pool import PoolManager
-from forge.storage.registry import SchemaEntry, SchemaRegistry, StorageEngine
+from forge.storage.registry import SchemaRegistry, StorageEngine
 from forge.storage.router import DataRouter
 from forge.storage.shadow import ShadowWriter
 
@@ -34,9 +34,9 @@ def _make_record(
             connection_id="conn-001",
         ),
         timestamp=RecordTimestamp(
-            source_time=datetime(2026, 4, 7, 12, 0, tzinfo=timezone.utc),
-            server_time=datetime(2026, 4, 7, 12, 0, tzinfo=timezone.utc),
-            ingestion_time=datetime(2026, 4, 7, 12, 0, tzinfo=timezone.utc),
+            source_time=datetime(2026, 4, 7, 12, 0, tzinfo=UTC),
+            server_time=datetime(2026, 4, 7, 12, 0, tzinfo=UTC),
+            ingestion_time=datetime(2026, 4, 7, 12, 0, tzinfo=UTC),
         ),
         value=RecordValue(raw='{"id": "BBL-001"}', data_type="json"),
         context=RecordContext(

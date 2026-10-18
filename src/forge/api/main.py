@@ -22,7 +22,7 @@ import logging
 import os
 import time
 from contextlib import asynccontextmanager
-from datetime import datetime  # noqa: TC003 — pydantic field type
+from datetime import datetime
 from functools import partial
 from typing import Any
 

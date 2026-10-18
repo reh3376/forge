@@ -10,10 +10,10 @@ Maps various NMS event types to Forge OperationalEvent:
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from forge.core.models.manufacturing.operational_event import OperationalEvent
 from forge.core.models.manufacturing.enums import EventCategory, EventSeverity
+from forge.core.models.manufacturing.operational_event import OperationalEvent
 
 
 def map_trap_event(raw_trap: dict) -> OperationalEvent | None:
@@ -294,15 +294,15 @@ def map_spof_detection(raw_spof: dict) -> OperationalEvent | None:
 def _parse_timestamp(value: any) -> datetime:
     """Parse an ISO timestamp string, falling back to now(utc)."""
     if value is None:
-        return datetime.now(tz=timezone.utc)
+        return datetime.now(tz=UTC)
     if isinstance(value, datetime):
-        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+        return value if value.tzinfo else value.replace(tzinfo=UTC)
     try:
         s = str(value)
         dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
-        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+        return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
     except (ValueError, TypeError):
-        return datetime.now(tz=timezone.utc)
+        return datetime.now(tz=UTC)
 
 
 def _map_severity(raw_severity: str) -> EventSeverity:

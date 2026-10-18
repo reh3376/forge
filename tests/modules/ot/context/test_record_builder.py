@@ -1,17 +1,19 @@
 """Tests for the OT record builder — tag + enrichment → ContextualRecord."""
 
+from datetime import UTC, datetime
+
 import pytest
-from datetime import datetime, timezone
 
 from forge.core.models.contextual_record import (
     ContextualRecord,
+)
+from forge.core.models.contextual_record import (
     QualityCode as CoreQualityCode,
 )
-from forge.modules.ot.context.record_builder import build_ot_record, _map_quality
+from forge.modules.ot.context.record_builder import _map_quality, build_ot_record
 from forge.modules.ot.context.resolvers import EnrichmentContext
-from forge.modules.ot.tag_engine.models import StandardTag, MemoryTag, TagValue, TagType
 from forge.modules.ot.opcua_client.types import DataType, QualityCode
-
+from forge.modules.ot.tag_engine.models import MemoryTag, StandardTag, TagValue
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -32,7 +34,7 @@ def sample_tag() -> StandardTag:
 
 @pytest.fixture
 def sample_value() -> TagValue:
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     return TagValue(
         value=78.4,
         quality=QualityCode.GOOD,
@@ -135,7 +137,7 @@ class TestBuildOtRecord:
         val = TagValue(
             value=100.0,
             quality=QualityCode.GOOD,
-            timestamp=datetime.now(tz=timezone.utc),
+            timestamp=datetime.now(tz=UTC),
             source_timestamp=None,
         )
         record = build_ot_record(tag=sample_tag, tag_value=val, enrichment=full_enrichment)

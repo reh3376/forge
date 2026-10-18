@@ -1,20 +1,19 @@
 """Tests for ScriptAuditTrail — append-only audit logging for script operations."""
 
+
 import pytest
-from datetime import datetime, timezone
 
 from forge.sdk.scripting.audit import (
     AuditEntry,
     ScriptAuditTrail,
     ScriptExecutionContext,
-    set_execution_context,
-    get_execution_context,
-    clear_execution_context,
+    _count_by_field,
     _safe_serialize,
     _truncate_sql,
-    _count_by_field,
+    clear_execution_context,
+    get_execution_context,
+    set_execution_context,
 )
-
 
 # ---------------------------------------------------------------------------
 # Execution context

@@ -7,10 +7,8 @@ location_id for topology correlation.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-
+from forge.core.models.manufacturing.enums import LifecycleState, UnitStatus
 from forge.core.models.manufacturing.manufacturing_unit import ManufacturingUnit
-from forge.core.models.manufacturing.enums import UnitStatus, LifecycleState
 
 
 def map_device(raw_device: dict) -> ManufacturingUnit | None:
@@ -111,13 +109,9 @@ def _map_lifecycle_state(raw_status: str) -> LifecycleState | None:
 
     lower = raw_status.lower().strip()
 
-    if lower in ("healthy", "up", "online", "active", "normal"):
+    if lower in ("healthy", "up", "online", "active", "normal") or lower in ("degraded", "warning"):
         return LifecycleState.IN_PROCESS
-    elif lower in ("degraded", "warning"):
-        return LifecycleState.IN_PROCESS
-    elif lower in ("down", "offline", "failed", "critical"):
-        return LifecycleState.WITHDRAWN
-    elif lower in ("quarantined", "blocked", "unauthorized"):
+    elif lower in ("down", "offline", "failed", "critical") or lower in ("quarantined", "blocked", "unauthorized"):
         return LifecycleState.WITHDRAWN
     else:
         return None

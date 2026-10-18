@@ -4,12 +4,9 @@ from __future__ import annotations
 
 import json
 
-import pytest
-
 from forge.adapters.whk_erpi.context import build_record_context
 from forge.adapters.whk_erpi.record_builder import build_contextual_record
 from forge.core.models.contextual_record import QualityCode
-
 
 _SAMPLE_EVENT = {
     "data": {

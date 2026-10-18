@@ -7,9 +7,8 @@ Mock strategy:
     - TagEngine is real for ExpressionProvider tests
 """
 
-import asyncio
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 import pytest_asyncio
@@ -27,7 +26,6 @@ from forge.modules.ot.tag_engine.models import (
     ExpressionTag,
     MemoryTag,
     StandardTag,
-    TagType,
     VirtualTag,
 )
 from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
@@ -39,7 +37,6 @@ from forge.modules.ot.tag_engine.providers.opcua_provider import OpcUaProvider
 from forge.modules.ot.tag_engine.providers.query_provider import QueryProvider
 from forge.modules.ot.tag_engine.providers.virtual_provider import VirtualProvider
 from forge.modules.ot.tag_engine.registry import TagRegistry
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -242,8 +239,8 @@ class TestOpcUaProvider:
             value=72.5,
             data_type=DataType.FLOAT,
             quality=QualityCode.GOOD,
-            server_timestamp=datetime.now(timezone.utc),
-            source_timestamp=datetime.now(timezone.utc),
+            server_timestamp=datetime.now(UTC),
+            source_timestamp=datetime.now(UTC),
         )
         await provider._on_data_change("ns=2;s=Distillery01.TIT_2010.Out_PV", dv)
 
@@ -303,7 +300,7 @@ class TestOpcUaProvider:
         dv = DataValue(
             value=65.0,
             quality=QualityCode.GOOD,
-            source_timestamp=datetime.now(timezone.utc),
+            source_timestamp=datetime.now(UTC),
         )
         client.read = AsyncMock(return_value=[dv])
 
@@ -836,7 +833,7 @@ class TestVirtualProvider:
     @pytest.mark.asyncio
     async def test_cache_cleared_on_stop(self, registry):
         provider = VirtualProvider(registry=registry)
-        provider._cache["test"] = ("value", datetime.now(timezone.utc))
+        provider._cache["test"] = ("value", datetime.now(UTC))
         await provider.start()
         await provider.stop()
         assert len(provider._cache) == 0

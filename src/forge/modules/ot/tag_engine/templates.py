@@ -43,10 +43,8 @@ Example usage:
 
 from __future__ import annotations
 
-import copy
 import logging
 import re
-from datetime import datetime, timezone
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
@@ -56,19 +54,18 @@ from forge.modules.ot.tag_engine.models import (
     AlarmConfig,
     BaseTag,
     ClampConfig,
-    HistoryConfig,
-    ScaleConfig,
-    ScanClass,
-    TagType,
-    TagUnion,
-    StandardTag,
-    MemoryTag,
-    ExpressionTag,
     ComputedTag,
     DerivedTag,
-    ReferenceTag,
-    QueryTag,
     EventTag,
+    ExpressionTag,
+    HistoryConfig,
+    MemoryTag,
+    QueryTag,
+    ReferenceTag,
+    ScaleConfig,
+    ScanClass,
+    StandardTag,
+    TagUnion,
     VirtualTag,
 )
 

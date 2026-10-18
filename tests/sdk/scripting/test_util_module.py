@@ -1,11 +1,9 @@
 """Tests for the forge.util SDK module."""
 
-import asyncio
 
 import pytest
 
 from forge.sdk.scripting.modules.util import UtilModule
-
 
 # ---------------------------------------------------------------------------
 # JSON

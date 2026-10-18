@@ -5,12 +5,13 @@ MQTT publish → verify correct topic/payload structure.
 """
 
 import json
+
 import pytest
 
 from forge.modules.ot.mqtt.publisher import MqttConfig, OTMqttPublisher
-from forge.modules.ot.mqtt.topic_router import TopicRouter, TopicType
-from forge.modules.ot.mqtt.tag_publisher import TagPublisher
 from forge.modules.ot.mqtt.rate_limiter import MqttRateLimiter, RateLimiterConfig
+from forge.modules.ot.mqtt.tag_publisher import TagPublisher
+from forge.modules.ot.mqtt.topic_router import TopicRouter
 
 
 class TestMqttFanoutPipeline:

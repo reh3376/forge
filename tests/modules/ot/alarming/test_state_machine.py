@@ -22,7 +22,6 @@ from forge.modules.ot.alarming.models import (
 from forge.modules.ot.alarming.state_machine import (
     AlarmStateMachine,
     InvalidTransition,
-    TransitionResult,
 )
 
 

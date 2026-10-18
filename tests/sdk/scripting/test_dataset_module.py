@@ -4,7 +4,6 @@ import pytest
 
 from forge.sdk.scripting.modules.dataset import Dataset, DatasetModule
 
-
 # ---------------------------------------------------------------------------
 # Dataset model
 # ---------------------------------------------------------------------------

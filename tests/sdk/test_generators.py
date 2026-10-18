@@ -27,7 +27,6 @@ from forge.sdk.module_builder.generators import (
 )
 from forge.sdk.module_builder.manifest_builder import ManifestBuilder
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------

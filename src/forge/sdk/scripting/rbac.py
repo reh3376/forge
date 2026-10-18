@@ -29,8 +29,7 @@ import fnmatch
 import logging
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +52,7 @@ class ScriptPermission:
     tag_pattern: str = "**"  # tag path pattern (same as trigger patterns)
     can_write_tags: bool = True
     can_write_db: bool = False
-    granted_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
+    granted_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
     granted_by: str = "forge-admin"
     description: str = ""
 

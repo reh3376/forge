@@ -3,15 +3,14 @@
 import pytest
 
 from forge.modules.ot.mqtt.publisher import MqttConfig, OTMqttPublisher
-from forge.modules.ot.mqtt.topic_router import TopicRouter
 from forge.modules.ot.mqtt.tag_publisher import (
     TagPublisher,
-    build_tag_payload,
-    build_health_payload,
-    build_equipment_payload,
     build_alarm_payload,
+    build_equipment_payload,
+    build_health_payload,
+    build_tag_payload,
 )
-
+from forge.modules.ot.mqtt.topic_router import TopicRouter
 
 # ---------------------------------------------------------------------------
 # Payload builders

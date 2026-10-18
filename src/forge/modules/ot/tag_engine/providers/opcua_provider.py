@@ -22,18 +22,15 @@ Design decisions:
 
 from __future__ import annotations
 
-import asyncio
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.modules.ot.opcua_client.client import OpcUaClient
 from forge.modules.ot.opcua_client.paths import PathNormalizer
 from forge.modules.ot.opcua_client.types import (
-    ConnectionState,
     DataType,
     DataValue,
-    QualityCode,
 )
 from forge.modules.ot.tag_engine.models import StandardTag, TagType
 from forge.modules.ot.tag_engine.providers.base import BaseProvider
@@ -182,13 +179,13 @@ class OpcUaProvider(BaseProvider):
             return
 
         self._values_received += 1
-        self._last_value_at = datetime.now(timezone.utc)
+        self._last_value_at = datetime.now(UTC)
 
         await self._registry.update_value(
             path=tag_path,
             value=data_value.value,
             quality=data_value.quality,
-            timestamp=data_value.server_timestamp or datetime.now(timezone.utc),
+            timestamp=data_value.server_timestamp or datetime.now(UTC),
             source_timestamp=data_value.source_timestamp,
         )
 

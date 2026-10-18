@@ -13,8 +13,6 @@ from __future__ import annotations
 import struct
 from dataclasses import dataclass, field
 from enum import IntEnum
-from typing import Any
-
 
 # ---------------------------------------------------------------------------
 # Packet types (4-bit, upper nibble of byte 1)

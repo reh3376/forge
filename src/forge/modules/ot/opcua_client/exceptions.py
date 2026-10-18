@@ -59,7 +59,7 @@ class OpcUaError(Exception):
 # ---------------------------------------------------------------------------
 
 
-class ConnectionError(OpcUaError):  # noqa: A001 — shadows builtin intentionally
+class ConnectionError(OpcUaError):
     """Failed to establish or maintain an OPC-UA connection.
 
     This shadows the Python builtin ConnectionError on purpose:
@@ -111,7 +111,7 @@ class SessionActivationError(ConnectionError):
 # ---------------------------------------------------------------------------
 
 
-class TimeoutError(OpcUaError):  # noqa: A001 — shadows builtin intentionally
+class TimeoutError(OpcUaError):
     """An OPC-UA operation exceeded its configured deadline.
 
     Attributes:

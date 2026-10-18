@@ -1,10 +1,8 @@
 """Tests for ForgeMqttBroker — lifecycle, in-process pub/sub, routing."""
 
-import asyncio
 import pytest
 
-from forge.core.broker.broker import ForgeMqttBroker, BrokerConfig
-
+from forge.core.broker.broker import BrokerConfig, ForgeMqttBroker
 
 # ---------------------------------------------------------------------------
 # Lifecycle

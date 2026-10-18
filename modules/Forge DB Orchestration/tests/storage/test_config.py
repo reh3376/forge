@@ -1,6 +1,5 @@
 """Tests for Forge Storage configuration."""
 
-import os
 
 from forge.storage.config import (
     KafkaConfig,

@@ -1,9 +1,6 @@
 """Tests for the dual-write data consistency validator."""
 
-import math
-from datetime import datetime, timedelta, timezone
-
-import pytest
+from datetime import UTC, datetime, timedelta
 
 from forge.modules.ot.bridge.dual_write import (
     ComparisonResult,
@@ -12,7 +9,6 @@ from forge.modules.ot.bridge.dual_write import (
     DualWriteConfig,
     DualWriteValidator,
 )
-
 
 # ---------------------------------------------------------------------------
 # ComparisonResult
@@ -39,8 +35,8 @@ class TestComparisonResult:
         assert r.discrepancy_type == DiscrepancyType.VALUE_MISMATCH
 
     def test_timestamp_delta(self):
-        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=timezone.utc)
-        t2 = datetime(2026, 4, 9, 12, 0, 0, 500000, tzinfo=timezone.utc)
+        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=UTC)
+        t2 = datetime(2026, 4, 9, 12, 0, 0, 500000, tzinfo=UTC)
         r = ComparisonResult(
             tag_path="tag",
             match=True,
@@ -195,7 +191,7 @@ class TestSingleTagComparison:
         assert r.match is True
 
     def test_timestamp_drift_within_limit(self):
-        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=timezone.utc)
+        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=UTC)
         t2 = t1 + timedelta(milliseconds=1000)
         v = DualWriteValidator(DualWriteConfig(timestamp_max_drift_ms=5000))
         r = v.compare_tag(
@@ -210,7 +206,7 @@ class TestSingleTagComparison:
         assert r.match is True
 
     def test_timestamp_drift_exceeds_limit(self):
-        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=timezone.utc)
+        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=UTC)
         t2 = t1 + timedelta(seconds=10)
         v = DualWriteValidator(DualWriteConfig(timestamp_max_drift_ms=5000))
         r = v.compare_tag(

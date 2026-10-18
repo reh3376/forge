@@ -203,7 +203,7 @@ def generate_adapter(manifest: dict[str, Any]) -> str:
         f"Forge adapter for {adapter_id}.",
         "",
         "Data flow:",
-        f"    Source → raw dicts → context mapper → ContextualRecord → governance",
+        "    Source → raw dicts → context mapper → ContextualRecord → governance",
         '"""',
         "",
         "from __future__ import annotations",

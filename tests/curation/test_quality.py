@@ -5,7 +5,6 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from tests.curation.conftest import make_record_batch
 
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -23,6 +22,7 @@ from forge.curation.quality import (
     QualityReport,
     RangeRule,
 )
+from tests.curation.conftest import make_record_batch
 
 
 class TestCompletenessRule:

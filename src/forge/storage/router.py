@@ -10,8 +10,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 from forge.core.models.contextual_record import ContextualRecord
 from forge.storage.registry import SchemaRegistry, StorageEngine
@@ -27,7 +26,7 @@ class RoutingDecision:
     target_engine: StorageEngine
     target_namespace: str
     entity_name: str
-    decided_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
+    decided_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
     reason: str = ""
 
 

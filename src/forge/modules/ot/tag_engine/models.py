@@ -19,13 +19,12 @@ Design decisions:
 from __future__ import annotations
 
 import enum
-from datetime import datetime, timezone
-from typing import Annotated, Any, Literal, Union
+from datetime import UTC, datetime
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
 from forge.modules.ot.opcua_client.types import DataType, QualityCode
-
 
 # ---------------------------------------------------------------------------
 # Enumerations
@@ -170,7 +169,7 @@ class TagValue(BaseModel):
 
     value: Any = None
     quality: QualityCode = QualityCode.NOT_AVAILABLE
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     source_timestamp: datetime | None = None
     previous_value: Any = None
     previous_quality: QualityCode | None = None
@@ -180,7 +179,7 @@ class TagValue(BaseModel):
     @classmethod
     def _ensure_utc(cls, v: Any) -> Any:
         if isinstance(v, datetime) and v.tzinfo is None:
-            return v.replace(tzinfo=timezone.utc)
+            return v.replace(tzinfo=UTC)
         return v
 
     def has_changed(self) -> bool:
@@ -451,17 +450,7 @@ class VirtualTag(BaseTag):
 # ---------------------------------------------------------------------------
 
 TagUnion = Annotated[
-    Union[
-        StandardTag,
-        MemoryTag,
-        ExpressionTag,
-        QueryTag,
-        DerivedTag,
-        ReferenceTag,
-        ComputedTag,
-        EventTag,
-        VirtualTag,
-    ],
+    StandardTag | MemoryTag | ExpressionTag | QueryTag | DerivedTag | ReferenceTag | ComputedTag | EventTag | VirtualTag,
     Field(discriminator="tag_type"),
 ]
 """Discriminated union of all 9 tag types.

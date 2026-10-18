@@ -27,7 +27,6 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-
 # Pattern for Ignition-style bracket prefix: [ConnectionName]rest/of/path
 _IGNITION_BRACKET_RE = re.compile(r"^\[([^\]]+)\](.*)$")
 

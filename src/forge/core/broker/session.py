@@ -14,22 +14,21 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from dataclasses import dataclass, field
-from typing import Any, Callable, Awaitable, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from forge.core.broker.protocol import (
-    PacketType,
     ConnectReturnCode,
+    PacketType,
     decode_connect,
     decode_publish,
     decode_subscribe,
     decode_unsubscribe,
     encode_connack,
-    encode_publish,
+    encode_pingresp,
     encode_puback,
+    encode_publish,
     encode_suback,
     encode_unsuback,
-    encode_pingresp,
     read_packet,
 )
 
@@ -140,7 +139,7 @@ class MqttSession:
                         read_packet(self._reader),
                         timeout=timeout,
                     )
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     logger.info("Client %s keepalive timeout", self.client_id)
                     break
 

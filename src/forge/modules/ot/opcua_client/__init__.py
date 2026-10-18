@@ -37,7 +37,6 @@ from forge.modules.ot.opcua_client._compat import patch_asyncua_binary as _patch
 _patch_asyncua()
 
 from forge.modules.ot.opcua_client.client import OpcUaClient
-from forge.modules.ot.opcua_client.paths import NormalizedPath, PathNormalizer
 from forge.modules.ot.opcua_client.exceptions import (
     BrowseError,
     CertificateError,
@@ -58,6 +57,7 @@ from forge.modules.ot.opcua_client.exceptions import (
     TimeoutError,
     WriteError,
 )
+from forge.modules.ot.opcua_client.paths import NormalizedPath, PathNormalizer
 from forge.modules.ot.opcua_client.security import (
     MessageSecurityMode,
     SecurityConfig,

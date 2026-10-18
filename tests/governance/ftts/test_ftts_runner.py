@@ -1,4 +1,4 @@
-# ruff: noqa: E402, UP017, UP042
+# ruff: noqa: E402, UP017
 """Tests for the FTTS runner — validates transport governance enforcement.
 
 Covers:

@@ -10,7 +10,6 @@ template_registry, acquisition_engine) via the factory function.
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
@@ -23,7 +22,6 @@ from forge.modules.ot.i3x.models import (
     I3xValue,
 )
 from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
-from forge.modules.ot.tag_engine.providers.opcua_provider import OpcUaProvider
 from forge.modules.ot.tag_engine.registry import TagRegistry
 from forge.modules.ot.tag_engine.templates import TemplateRegistry
 

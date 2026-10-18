@@ -1,11 +1,9 @@
 """Tests for context resolvers — area, equipment, batch, mode, and pipeline."""
 
-import pytest
 
 from forge.modules.ot.context.resolvers import (
     AreaResolver,
     AreaRule,
-    BatchContext,
     BatchContextResolver,
     EnrichmentContext,
     EnrichmentPipeline,
@@ -13,7 +11,6 @@ from forge.modules.ot.context.resolvers import (
     EquipmentRule,
     OperatingModeResolver,
 )
-
 
 # ---------------------------------------------------------------------------
 # AreaResolver

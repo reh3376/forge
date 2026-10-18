@@ -4,15 +4,13 @@ Tests the full SparkplugB path: tag change → SparkplugB encoding →
 MQTT publish to correct spBv1.0 topic namespace.
 """
 
-import json
 import pytest
 
 from forge.modules.ot.mqtt.publisher import MqttConfig, OTMqttPublisher
 from forge.modules.ot.mqtt.sparkplug import (
+    SparkplugDataType,
     SparkplugEncoder,
     SparkplugMetric,
-    SparkplugDataType,
-    infer_sparkplug_type,
 )
 
 
@@ -99,7 +97,7 @@ class TestSparkplugPublishPipeline:
                 ],
             )
             seqs.append(payload["seq"])
-            await pub.publish(f"spBv1.0/WHK/DDATA/ForgeOT-01/dev", payload)
+            await pub.publish("spBv1.0/WHK/DDATA/ForgeOT-01/dev", payload)
 
         assert seqs == [1, 2, 3, 4, 5]
 

@@ -1,13 +1,12 @@
 """Tests for the ScriptEngine — discovery, loading, dispatch, hot-reload."""
 
-import asyncio
-import pytest
 import time
 from pathlib import Path
 
-from forge.sdk.scripting.engine import ScriptEngine, ScriptInfo
-from forge.sdk.scripting.triggers import TriggerRegistry, TriggerType
+import pytest
 
+from forge.sdk.scripting.engine import ScriptEngine
+from forge.sdk.scripting.triggers import TriggerType
 
 # ---------------------------------------------------------------------------
 # Helpers

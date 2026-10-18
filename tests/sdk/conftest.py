@@ -1,4 +1,4 @@
-# ruff: noqa: E402, UP017, UP042
+# ruff: noqa: UP017
 """Shared fixtures for Module Builder SDK tests."""
 
 from __future__ import annotations

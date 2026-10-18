@@ -22,9 +22,9 @@ Usage::
 
 from __future__ import annotations
 
-import asyncio
 import logging
-from typing import Any, Callable, Awaitable, TYPE_CHECKING
+from collections.abc import Awaitable, Callable
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from forge.core.broker.broker import ForgeMqttBroker

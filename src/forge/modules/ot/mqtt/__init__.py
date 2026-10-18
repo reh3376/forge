@@ -12,12 +12,12 @@ Key components:
     - RateLimiter: Per-tag throttle to prevent broker overload
 """
 
-from forge.modules.ot.mqtt.publisher import OTMqttPublisher, MqttConfig
+from forge.modules.ot.mqtt.publisher import MqttConfig, OTMqttPublisher
 from forge.modules.ot.mqtt.topic_router import TopicRouter, TopicTemplate
 
 __all__ = [
-    "OTMqttPublisher",
     "MqttConfig",
+    "OTMqttPublisher",
     "TopicRouter",
     "TopicTemplate",
 ]

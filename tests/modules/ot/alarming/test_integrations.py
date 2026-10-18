@@ -12,23 +12,24 @@ Covers:
 """
 
 import json
-import pytest
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock
 
-from forge.modules.ot.alarming.models import AlarmEvent
+import pytest
+
 from forge.modules.ot.alarming.engine import AlarmEngine
 from forge.modules.ot.alarming.integrations import (
-    AlarmMqttPublisher,
-    AlarmMqttAckSubscriber,
-    AlarmRabbitMqPublisher,
     AlarmCmmsIntegration,
-    AlarmHistorianAnnotation,
-    AlarmScriptDispatch,
     AlarmContextualRecordWriter,
+    AlarmHistorianAnnotation,
     AlarmIntegrationHub,
+    AlarmMqttAckSubscriber,
+    AlarmMqttPublisher,
+    AlarmRabbitMqPublisher,
+    AlarmScriptDispatch,
     IntegrationConfig,
 )
+from forge.modules.ot.alarming.models import AlarmEvent
 
 
 def _make_event(**overrides) -> AlarmEvent:
@@ -44,7 +45,7 @@ def _make_event(**overrides) -> AlarmEvent:
         tag_path="WH/WHK01/Distillery01/TIT_2010/Out_PV",
         value=185.0,
         setpoint=180.0,
-        timestamp=datetime(2026, 4, 9, 12, 0, 0, tzinfo=timezone.utc),
+        timestamp=datetime(2026, 4, 9, 12, 0, 0, tzinfo=UTC),
         area="Distillery01",
         equipment_id="TIT_2010",
     )

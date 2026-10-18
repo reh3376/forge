@@ -17,15 +17,13 @@ All templates use the WHK tag path convention:
 from __future__ import annotations
 
 from forge.modules.ot.tag_engine.models import (
-    AlarmConfig,
     HistoryConfig,
-    ScaleConfig,
 )
 from forge.modules.ot.tag_engine.templates import (
     TagTemplate,
     TemplateParam,
-    TemplateTagDef,
     TemplateRegistry,
+    TemplateTagDef,
 )
 
 

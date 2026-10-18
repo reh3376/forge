@@ -15,8 +15,7 @@ import asyncio
 import logging
 from typing import Any
 
-from forge.modules.ot.opcua_client.types import QualityCode
-from forge.modules.ot.tag_engine.models import QueryTag, TagType
+from forge.modules.ot.tag_engine.models import TagType
 from forge.modules.ot.tag_engine.providers.base import BaseProvider
 from forge.modules.ot.tag_engine.registry import TagRegistry
 

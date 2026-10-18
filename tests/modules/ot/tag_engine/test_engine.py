@@ -2,10 +2,10 @@
 
 import asyncio
 
-import pytest
 import pytest_asyncio
 
-from forge.modules.ot.opcua_client.types import DataType, QualityCode
+from forge.modules.ot.opcua_client.types import QualityCode
+from forge.modules.ot.tag_engine.engine import TagEngine, _quality_rank
 from forge.modules.ot.tag_engine.models import (
     ComputedTag,
     DerivedSource,
@@ -15,7 +15,6 @@ from forge.modules.ot.tag_engine.models import (
     ReferenceTag,
     StandardTag,
 )
-from forge.modules.ot.tag_engine.engine import TagEngine, _quality_rank
 from forge.modules.ot.tag_engine.registry import TagRegistry
 
 

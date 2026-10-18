@@ -20,13 +20,12 @@ Design decisions:
 from __future__ import annotations
 
 import enum
-import fnmatch
+import logging
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Any, Callable
-
-import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
 

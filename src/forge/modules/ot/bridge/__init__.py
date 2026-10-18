@@ -37,17 +37,8 @@ Lifecycle:
 """
 
 # Epic 5.1: Bridge Adapter
-from forge.modules.ot.bridge.models import (
-    BridgeConfig,
-    BridgeHealth,
-    IgnitionTagResponse,
-    IgnitionTagValue,
-    TagMapping,
-    TagMappingRule,
-)
-from forge.modules.ot.bridge.client import IgnitionRestClient
-from forge.modules.ot.bridge.tag_mapper import TagMapper
 from forge.modules.ot.bridge.adapter import IgnitionBridgeAdapter
+from forge.modules.ot.bridge.client import IgnitionRestClient
 
 # Epic 5.2: Parallel Operation Validation
 from forge.modules.ot.bridge.dual_write import (
@@ -56,6 +47,15 @@ from forge.modules.ot.bridge.dual_write import (
     DualWriteValidator,
 )
 from forge.modules.ot.bridge.health import BridgeHealthDashboard
+from forge.modules.ot.bridge.models import (
+    BridgeConfig,
+    BridgeHealth,
+    IgnitionTagResponse,
+    IgnitionTagValue,
+    TagMapping,
+    TagMappingRule,
+)
+from forge.modules.ot.bridge.tag_mapper import TagMapper
 
 __all__ = [
     # Models

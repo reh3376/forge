@@ -1,6 +1,7 @@
 """Integration test: MQTT subscriber + message dispatch pipeline."""
 
 import json
+
 import pytest
 
 from forge.modules.ot.mqtt.subscriber import IncomingMessage, MqttSubscriber

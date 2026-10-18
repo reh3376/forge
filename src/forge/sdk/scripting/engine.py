@@ -26,19 +26,20 @@ import importlib.util
 import logging
 import sys
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Callable
+from typing import Any
 
 from forge.sdk.scripting.audit import (
     ScriptAuditTrail,
     ScriptExecutionContext,
-    set_execution_context,
     clear_execution_context,
+    set_execution_context,
 )
 from forge.sdk.scripting.rbac import ScriptRBAC
-from forge.sdk.scripting.sandbox import ScriptSandbox, SandboxConfig
+from forge.sdk.scripting.sandbox import SandboxConfig, ScriptSandbox
 from forge.sdk.scripting.triggers import (
     HandlerRegistration,
     TriggerRegistry,

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from forge.adapters.whk_nms.context import build_record_context
 from forge.adapters.whk_nms.record_builder import build_contextual_record
@@ -232,7 +232,7 @@ class TestRecordBuilder:
 
         # Should have current timestamp
         assert record.timestamp.source_time is not None
-        now = datetime.now(tz=timezone.utc)
+        now = datetime.now(tz=UTC)
         # Allow some time difference
         time_diff = abs((now - record.timestamp.source_time).total_seconds())
         assert time_diff < 5  # within 5 seconds

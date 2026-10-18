@@ -33,7 +33,6 @@ from pydantic import TypeAdapter
 from forge.modules.ot.tag_engine.models import (
     MemoryTag,
     TagUnion,
-    TagValue,
 )
 from forge.modules.ot.tag_engine.registry import TagRegistry
 

@@ -8,8 +8,6 @@ correctly derived.
 
 from __future__ import annotations
 
-import pytest
-
 from forge.adapters.whk_erpi.context import build_record_context
 
 

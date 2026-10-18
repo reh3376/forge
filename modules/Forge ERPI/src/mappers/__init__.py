@@ -13,6 +13,15 @@ from forge.adapters.whk_erpi.mappers.business_entity import (
     map_customer,
     map_vendor,
 )
+from forge.adapters.whk_erpi.mappers.inventory import (
+    map_barrel,
+    map_barrel_event,
+    map_barrel_receipt,
+    map_inventory,
+    map_inventory_transfer,
+    map_item_receipt,
+    map_lot,
+)
 from forge.adapters.whk_erpi.mappers.material_item import (
     map_bom_item,
     map_item,
@@ -30,15 +39,6 @@ from forge.adapters.whk_erpi.mappers.production import (
     map_production_order,
     map_production_order_unit_procedure,
     map_unit_procedure,
-)
-from forge.adapters.whk_erpi.mappers.inventory import (
-    map_barrel,
-    map_barrel_event,
-    map_barrel_receipt,
-    map_inventory,
-    map_inventory_transfer,
-    map_item_receipt,
-    map_lot,
 )
 
 __all__ = [

@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -139,7 +139,7 @@ class NextTrendAdapter(
         # In test mode (no real API), go straight to healthy
         if self._pending_records:
             self._state = AdapterState.HEALTHY
-            self._last_healthy = datetime.now(tz=timezone.utc)
+            self._last_healthy = datetime.now(tz=UTC)
             logger.info("NextTrend adapter started (test mode)")
             return
 
@@ -148,7 +148,7 @@ class NextTrendAdapter(
             healthy = await self._check_api_health()
             if healthy:
                 self._state = AdapterState.HEALTHY
-                self._last_healthy = datetime.now(tz=timezone.utc)
+                self._last_healthy = datetime.now(tz=UTC)
                 logger.info(
                     "NextTrend adapter started (url=%s)",
                     self._config.api_base_url,
@@ -176,7 +176,7 @@ class NextTrendAdapter(
                 healthy = await self._check_api_health()
                 if healthy:
                     self._consecutive_failures = 0
-                    self._last_healthy = datetime.now(tz=timezone.utc)
+                    self._last_healthy = datetime.now(tz=UTC)
                     self._state = AdapterState.HEALTHY
                 else:
                     self._consecutive_failures += 1

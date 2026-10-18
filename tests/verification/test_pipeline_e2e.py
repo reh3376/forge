@@ -10,7 +10,7 @@ adapter with injected test data to exercise every contract boundary.
 
 from __future__ import annotations
 
-import asyncio
+from datetime import UTC
 from typing import Any
 
 import pytest
@@ -32,7 +32,6 @@ from forge.storage.registry import (
     StorageEngine,
 )
 from forge.storage.router import DataRouter, RoutingDecision
-
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. Adapter Lifecycle
@@ -200,7 +199,7 @@ class TestStorageRouting:
     @pytest.fixture()
     def registry(self) -> SchemaRegistry:
         reg = SchemaRegistry()
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         reg.register(
             SchemaEntry(
@@ -213,8 +212,8 @@ class TestStorageRouting:
                 storage_engine=StorageEngine.TIMESCALEDB,
                 storage_namespace="whk_wms",
                 status=SchemaStatus.ACTIVE,
-                registered_at=datetime.now(timezone.utc),
-                updated_at=datetime.now(timezone.utc),
+                registered_at=datetime.now(UTC),
+                updated_at=datetime.now(UTC),
             )
         )
         return reg
@@ -388,7 +387,7 @@ class TestFullPipelineIntegration:
     @pytest.mark.asyncio()
     async def test_end_to_end_flow(self, barrel_events: list[dict[str, Any]]):
         """The complete data pipeline from adapter to routing decision."""
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         # 1. Create and configure adapter
         adapter = WhkWmsAdapter()
@@ -428,8 +427,8 @@ class TestFullPipelineIntegration:
                 storage_engine=StorageEngine.TIMESCALEDB,
                 storage_namespace="whk_wms",
                 status=SchemaStatus.ACTIVE,
-                registered_at=datetime.now(timezone.utc),
-                updated_at=datetime.now(timezone.utc),
+                registered_at=datetime.now(UTC),
+                updated_at=datetime.now(UTC),
             )
         )
         router = DataRouter(registry=registry)

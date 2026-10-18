@@ -12,19 +12,16 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 import pytest
 
 from forge.governance.facts.runners.facts_runner import FACTSRunner
 from forge.governance.shared.runner import (
-    FxTSVerdict,
     VerdictStatus,
     compute_spec_hash,
     verify_spec_hash,
     verify_spec_integrity,
 )
-
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. Spec Loading & Structure
@@ -111,7 +108,7 @@ class TestFACTSRunnerValidation:
         failures = [
             v for v in verdict_list if v.status in (VerdictStatus.FAIL, VerdictStatus.ERROR)
         ]
-        assert len(failures) == 0, f"FACTS validation failures:\n" + "\n".join(
+        assert len(failures) == 0, "FACTS validation failures:\n" + "\n".join(
             f"  {v.check_id}: {v.message}" for v in failures
         )
 

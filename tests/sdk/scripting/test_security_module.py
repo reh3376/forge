@@ -4,7 +4,6 @@ import pytest
 
 from forge.sdk.scripting.modules.security import SecurityModule, UserInfo
 
-
 # ---------------------------------------------------------------------------
 # Mock user provider
 # ---------------------------------------------------------------------------

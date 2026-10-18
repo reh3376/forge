@@ -19,8 +19,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Protocol
 
 from forge.modules.ot.bridge.models import (
@@ -181,7 +180,7 @@ class IgnitionRestClient:
         if not paths:
             return IgnitionTagResponse(values=())
 
-        request_time = datetime.now(timezone.utc)
+        request_time = datetime.now(UTC)
         all_values: list[IgnitionTagValue] = []
 
         # Split into batches
@@ -203,7 +202,7 @@ class IgnitionRestClient:
                 continue
             all_values.extend(result)
 
-        response_time = datetime.now(timezone.utc)
+        response_time = datetime.now(UTC)
 
         return IgnitionTagResponse(
             values=tuple(all_values),

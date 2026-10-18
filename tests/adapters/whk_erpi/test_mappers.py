@@ -6,34 +6,31 @@ Tests verify field mapping, missing field handling, and external ID construction
 
 from __future__ import annotations
 
-import pytest
-
-from forge.adapters.whk_erpi.mappers.business_entity import map_vendor, map_customer
-from forge.adapters.whk_erpi.mappers.material_item import map_item, map_item_group, map_bom_item
-from forge.adapters.whk_erpi.mappers.process_definition import (
-    map_recipe,
-    map_recipe_parameter,
-    map_recipe_group,
-    map_bom,
-)
-from forge.adapters.whk_erpi.mappers.production import (
-    map_production_order,
-    map_production_order_unit_procedure,
-    map_unit_procedure,
-    map_operation,
-    map_equipment_phase,
-)
+from forge.adapters.whk_erpi.mappers.business_entity import map_customer, map_vendor
 from forge.adapters.whk_erpi.mappers.inventory import (
     map_barrel,
     map_barrel_event,
     map_barrel_receipt,
-    map_lot,
-    map_item_receipt,
     map_inventory,
     map_inventory_transfer,
+    map_item_receipt,
+    map_lot,
+)
+from forge.adapters.whk_erpi.mappers.material_item import map_bom_item, map_item, map_item_group
+from forge.adapters.whk_erpi.mappers.process_definition import (
+    map_bom,
+    map_recipe,
+    map_recipe_group,
+    map_recipe_parameter,
+)
+from forge.adapters.whk_erpi.mappers.production import (
+    map_equipment_phase,
+    map_operation,
+    map_production_order,
+    map_production_order_unit_procedure,
+    map_unit_procedure,
 )
 from forge.core.models.manufacturing.enums import EntityType
-
 
 # ── Business Entity Mappers ────────────────────────────────────
 

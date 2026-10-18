@@ -5,8 +5,8 @@ from pydantic import TypeAdapter, ValidationError
 
 from forge.modules.ot.opcua_client.types import DataType, QualityCode
 from forge.modules.ot.tag_engine.models import (
+    SCAN_CLASS_INTERVALS_MS,
     AlarmConfig,
-    BaseTag,
     ClampConfig,
     ComputedTag,
     DerivedSource,
@@ -24,9 +24,7 @@ from forge.modules.ot.tag_engine.models import (
     TagUnion,
     TagValue,
     VirtualTag,
-    SCAN_CLASS_INTERVALS_MS,
 )
-
 
 # ---------------------------------------------------------------------------
 # TagType enum

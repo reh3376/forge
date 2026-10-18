@@ -1,21 +1,20 @@
 """Tests for OTModuleAdapter — the full-capability OT adapter."""
 
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
 
 from forge.core.models.adapter import AdapterState
 from forge.core.models.contextual_record import ContextualRecord
 from forge.modules.ot.adapter import OTModuleAdapter
-from forge.modules.ot.context.resolvers import EnrichmentContext, EnrichmentPipeline
 from forge.modules.ot.context.store_forward import StoreForwardBuffer
+from forge.modules.ot.opcua_client.types import DataType, QualityCode
 from forge.modules.ot.tag_engine.models import (
     MemoryTag,
     StandardTag,
     TagValue,
 )
-from forge.modules.ot.opcua_client.types import DataType, QualityCode
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -34,7 +33,7 @@ def _make_tag(path: str = "WH/WHK01/Distillery01/TIT_2010/Out_PV") -> StandardTa
 
 
 def _make_value(val: float = 78.4) -> TagValue:
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     return TagValue(
         value=val,
         quality=QualityCode.GOOD,

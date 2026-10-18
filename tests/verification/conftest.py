@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -22,7 +22,6 @@ if str(SRC_ROOT) not in sys.path:
 
 # ── Python 3.10 compat shims ─────────────────────────────────────
 import forge._compat  # noqa: F401, E402 — registers StrEnum/UTC shims
-
 
 # ── Sample WMS barrel event ──────────────────────────────────────
 
@@ -52,7 +51,7 @@ def barrel_event() -> dict[str, Any]:
         "entity_type": "barrel",
         "source_type": "graphql",
         "operating_mode": "PRODUCTION",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "operator_id": "jdoe",
     }
 

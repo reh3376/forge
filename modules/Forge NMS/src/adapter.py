@@ -24,9 +24,10 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from collections.abc import AsyncIterator
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, AsyncIterator
+from typing import Any
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -37,14 +38,6 @@ from forge.adapters.base.interface import (
 from forge.adapters.whk_nms.config import WhkNmsConfig
 from forge.adapters.whk_nms.context import build_record_context
 from forge.adapters.whk_nms.endpoints import NMS_REST_ENDPOINTS, NMS_WEBSOCKET_ENDPOINTS
-from forge.adapters.whk_nms.mappers import (
-    map_device,
-    map_trap_event,
-    map_alert,
-    map_security_event,
-    map_baseline_anomaly,
-    map_spof_detection,
-)
 from forge.adapters.whk_nms.record_builder import build_contextual_record
 from forge.core.models.adapter import (
     AdapterCapabilities,
@@ -144,7 +137,7 @@ class WhkNmsAdapter(
         # Phase 1: no live REST/WebSocket connections yet — records injected for testing
         # Phase 2 will add aio-httpx for REST polling and websockets for streaming
         self._state = AdapterState.HEALTHY
-        self._last_healthy = datetime.now(tz=timezone.utc)
+        self._last_healthy = datetime.now(tz=UTC)
         self._startup_time = self._last_healthy
         logger.info(
             "whk-nms adapter started (phase 1: inject-only, %d rest endpoints, %d ws subscriptions defined)",
@@ -163,11 +156,11 @@ class WhkNmsAdapter(
         """Return current health status and record counters."""
         uptime = 0.0
         if self._startup_time is not None:
-            uptime = (datetime.now(tz=timezone.utc) - self._startup_time).total_seconds()
+            uptime = (datetime.now(tz=UTC) - self._startup_time).total_seconds()
         return AdapterHealth(
             adapter_id=self.adapter_id,
             state=self._state,
-            last_check=datetime.now(tz=timezone.utc),
+            last_check=datetime.now(tz=UTC),
             last_healthy=self._last_healthy,
             records_collected=self._records_collected,
             records_failed=self._records_failed,
