@@ -453,14 +453,22 @@ class ChangeoverOrchestrator:
     # -- operator actions -----------------------------------------------------
 
     async def confirm_start(self, area: str, operator_id: str) -> WriteOutcome:
-        """Operator go-ahead: READY_TO_START → PRODUCTION."""
+        """Operator go-ahead: READY_TO_START → PRODUCTION.
+
+        ``operator_id`` is the acting subject: it goes to the MES as
+        ``startedBy`` and onto the audit record and event as ``actor``
+        (the hub user when the call comes over REST, FB-082).
+        """
         rt = self._runtime(area)
         async with rt.lock:
             if rt.mes_state != READY_TO_START:
                 msg = f"{area} is {rt.mes_state or 'unknown'}, not READY_TO_START"
                 raise ChangeoverSequenceError(msg)
             outcome = await self._write(
-                rt, "start-production", self._mes.start_production(area, operator_id)
+                rt,
+                "start-production",
+                self._mes.start_production(area, operator_id),
+                actor=operator_id,
             )
             if outcome is not None and outcome.success:
                 rt.awaiting_start_confirmation = False
@@ -469,8 +477,12 @@ class ChangeoverOrchestrator:
                 raise ChangeoverSequenceError(msg)
             return outcome
 
-    async def retry_recipe(self, area: str) -> bool:
-        """Re-run the pending recipe download (after a partial failure)."""
+    async def retry_recipe(self, area: str, *, actor: str | None = None) -> bool:
+        """Re-run the pending recipe download (after a partial failure).
+
+        ``actor`` (who asked, when known) is recorded as an
+        ``operator_action`` event before the download runs.
+        """
         rt = self._runtime(area)
         async with rt.lock:
             if rt.pending_recipe is None:
@@ -479,15 +491,23 @@ class ChangeoverOrchestrator:
             if rt.mes_state not in RECIPE_LOAD_STATES:
                 msg = f"{area} is {rt.mes_state or 'unknown'}; recipes load in {RECIPE_LOAD_STATES}"
                 raise ChangeoverSequenceError(msg)
+            if actor:
+                await self._event(rt, "operator_action", action="retry_recipe", actor=actor)
             return await self._load_pending_recipe(rt)
 
-    async def resume(self, area: str) -> None:
-        """Act on the area's current (possibly retained) MES state."""
+    async def resume(self, area: str, *, actor: str | None = None) -> None:
+        """Act on the area's current (possibly retained) MES state.
+
+        ``actor`` (who asked, when known) is recorded as an
+        ``operator_action`` event before the state is acted on.
+        """
         rt = self._runtime(area)
         async with rt.lock:
             if rt.mes_state is None:
                 msg = f"{area}: no MES state received yet"
                 raise ChangeoverSequenceError(msg)
+            if actor:
+                await self._event(rt, "operator_action", action="resume", actor=actor)
             await self._act(rt)
 
     # -- observability --------------------------------------------------------
@@ -648,9 +668,19 @@ class ChangeoverOrchestrator:
         return False
 
     async def _write(
-        self, rt: AreaRuntime, command: str, call: Awaitable[WriteOutcome]
+        self,
+        rt: AreaRuntime,
+        command: str,
+        call: Awaitable[WriteOutcome],
+        *,
+        actor: str | None = None,
     ) -> WriteOutcome | None:
-        """Run one MES write, update local state from the read-back, record it."""
+        """Run one MES write, update local state from the read-back, record it.
+
+        ``actor`` is the person behind an operator action (confirm-start);
+        system-initiated writes leave it unset and are attributed to
+        ``requested_by``.
+        """
         area = rt.config.area
         rt.writes += 1
         try:
@@ -661,13 +691,13 @@ class ChangeoverOrchestrator:
             await self._event(
                 rt, "write_undeliverable", command=command, code=exc.code, error=exc.message
             )
-            await self._sink_outcome(rt, command, None, exc)
+            await self._sink_outcome(rt, command, None, exc, actor=actor)
             return None
         except Exception as exc:  # keep the subscriber alive
             rt.writes_failed += 1
             rt.last_error = f"{command}: {type(exc).__name__}: {exc}"
             await self._event(rt, "write_error", command=command, error=str(exc))
-            await self._sink_outcome(rt, command, None, exc)
+            await self._sink_outcome(rt, command, None, exc, actor=actor)
             return None
 
         readback = transition_from(outcome)
@@ -689,8 +719,9 @@ class ChangeoverOrchestrator:
             success=outcome.success,
             message=outcome.message,
             mes_state=rt.mes_state,
+            **({"actor": actor} if actor else {}),
         )
-        await self._sink_outcome(rt, command, outcome, None)
+        await self._sink_outcome(rt, command, outcome, None, actor=actor)
         logger.info(
             "Changeover %s %s: %s (%s)",
             area,
@@ -706,10 +737,12 @@ class ChangeoverOrchestrator:
         command: str,
         outcome: WriteOutcome | None,
         error: Exception | None,
+        *,
+        actor: str | None = None,
     ) -> None:
         if self._record_sink is None:
             return
-        record = self.outcome_record(rt, command, outcome, error)
+        record = self.outcome_record(rt, command, outcome, error, actor=actor)
         try:
             await self._record_sink.write_batch([record])
         except Exception:  # pragma: no cover - sink problems must not stop the sequence
@@ -721,8 +754,15 @@ class ChangeoverOrchestrator:
         command: str,
         outcome: WriteOutcome | None,
         error: Exception | None,
+        *,
+        actor: str | None = None,
     ) -> ContextualRecord:
-        """One ContextualRecord per MES write attempt (audit trail)."""
+        """One ContextualRecord per MES write attempt (audit trail).
+
+        ``operator_id`` is the acting subject when there is one (an operator's
+        confirm-start), otherwise the orchestrator's own identity;
+        ``extra.write_requested_by`` is always the identity on the hub write.
+        """
         now = self._now()
         area = rt.config.area
         readback = transition_from(outcome) if outcome is not None else None
@@ -746,6 +786,8 @@ class ChangeoverOrchestrator:
             "write_requested_by": self._requested_by,
             "event_timestamp": now.isoformat(),
         }
+        if actor:
+            extra["actor"] = actor
         if rt.active_so_id:
             extra["schedule_order_id"] = rt.active_so_id
         if rt.next_so_id:
@@ -762,7 +804,7 @@ class ChangeoverOrchestrator:
                 area=area,
                 equipment_id=rt.config.equipment_id,
                 operating_mode=rt.mes_state,
-                operator_id=self._requested_by,
+                operator_id=actor or self._requested_by,
                 extra=extra,
             ),
             lineage=RecordLineage(

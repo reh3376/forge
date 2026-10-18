@@ -19,14 +19,17 @@ Mounted next to the i3X browse API under ``/api/v1/ot``:
 The router takes the runtime, or a callable returning it, so it can be
 mounted before the adapter has been configured.
 
-The write endpoints are the operator path into the control write engine.
-They require the hub's ``adapters:write`` scope (the scope that drives a
-spoke, FB-063; FB-075 narrows it to ``ot:tag:write``).  The requestor
-recorded on the write is the authenticated hub user; only when the auth
-kill-switch is off (``FORGE_AUTH_ENABLED=false``) is the body's
-``requestor`` used.  A non-admin hub user writes as ``OPERATOR``; naming
-``ENGINEER`` or ``ADMIN`` needs a hub admin until scoped roles land
-(D-1, FB-075).
+Every POST (the writes, the three changeover actions and the connection
+restart) requires the hub's ``adapters:write`` scope (the scope that
+drives a spoke, FB-063; FB-075 narrows it to ``ot:tag:write``); the GETs
+stay open like the rest of the control API (FB-007).  The subject recorded
+on a write or a confirm-start is the authenticated hub user; only when the
+auth kill-switch is off (``FORGE_AUTH_ENABLED=false``) is the body's
+``requestor`` / ``operator_id`` used, and then it is required.  A
+non-admin hub user writes as ``OPERATOR``; naming ``ENGINEER`` or
+``ADMIN`` needs a hub admin until scoped roles land (D-1, FB-075).
+retry-recipe, resume and a connection restart record the hub user as the
+actor (``anonymous`` while the kill-switch is off).
 """
 
 from __future__ import annotations
@@ -53,7 +56,11 @@ WRITE_SCOPE = "adapters:write"
 
 class ConfirmStartBody(BaseModel):
     operator_id: str = Field(
-        min_length=1, description="Who confirmed the start (recorded on the MES)."
+        default="",
+        description=(
+            "Who confirmed the start (sent to the MES as startedBy). Used only when hub "
+            "authentication is disabled; otherwise the hub user."
+        ),
     )
 
 
@@ -79,14 +86,19 @@ class WriteBody(BaseModel):
     equipment_id: str = ""
 
 
+def _actor(user: ForgeUser, supplied: str, field: str) -> str:
+    """The acting subject: the hub user, or the body's ``field`` under the kill-switch."""
+    if user.source != "bypass":
+        return user.user_id
+    actor = supplied.strip()
+    if not actor:
+        raise HTTPException(422, f"{field} is required while hub authentication is disabled")
+    return actor
+
+
 def _subject(user: ForgeUser, body: WriteBody) -> tuple[str, WriteRole]:
     """Who the write is recorded against, and the role it may claim."""
-    if user.source == "bypass":
-        requestor = body.requestor.strip()
-        if not requestor:
-            raise HTTPException(422, "requestor is required while hub authentication is disabled")
-    else:
-        requestor = user.user_id
+    requestor = _actor(user, body.requestor, "requestor")
     if body.role is not WriteRole.OPERATOR and user.role is not Role.ADMIN:
         raise HTTPException(
             403,
@@ -226,12 +238,15 @@ def create_control_router(runtime: RuntimeSource, *, prefix: str = "/api/v1/ot")
         return current.connections.status()
 
     @router.post("/control/connections/{name}/restart")
-    async def restart_connection(name: str) -> dict[str, Any]:
+    async def restart_connection(
+        name: str,
+        user: ForgeUser = Depends(require_scope(WRITE_SCOPE)),  # noqa: B008
+    ) -> dict[str, Any]:
         current = _runtime()
         if current.connections is None:
             raise HTTPException(404, "no PLC connections are configured")
         try:
-            return await current.connections.restart(name)
+            return await current.connections.restart(name, requested_by=user.user_id)
         except KeyError as exc:
             raise HTTPException(404, str(exc.args[0] if exc.args else exc)) from None
 
@@ -252,31 +267,42 @@ def create_control_router(runtime: RuntimeSource, *, prefix: str = "/api/v1/ot")
         return [event.to_dict() for event in _orchestrator(current).events(area)]
 
     @router.post("/changeover/{area}/confirm-start")
-    async def confirm_start(area: str, body: ConfirmStartBody) -> dict[str, Any]:
+    async def confirm_start(
+        area: str,
+        body: ConfirmStartBody,
+        user: ForgeUser = Depends(require_scope(WRITE_SCOPE)),  # noqa: B008
+    ) -> dict[str, Any]:
         current = _runtime()
         _area(current, area)
+        operator_id = _actor(user, body.operator_id, "operator_id")
         try:
-            outcome = await _orchestrator(current).confirm_start(area, body.operator_id)
+            outcome = await _orchestrator(current).confirm_start(area, operator_id)
         except ChangeoverSequenceError as exc:
             raise HTTPException(409, str(exc)) from None
         return outcome.to_dict()
 
     @router.post("/changeover/{area}/retry-recipe")
-    async def retry_recipe(area: str) -> dict[str, Any]:
+    async def retry_recipe(
+        area: str,
+        user: ForgeUser = Depends(require_scope(WRITE_SCOPE)),  # noqa: B008
+    ) -> dict[str, Any]:
         current = _runtime()
         rt = _area(current, area)
         try:
-            loaded = await _orchestrator(current).retry_recipe(area)
+            loaded = await _orchestrator(current).retry_recipe(area, actor=user.user_id)
         except ChangeoverSequenceError as exc:
             raise HTTPException(409, str(exc)) from None
         return {"area": area, "loaded": loaded, "mes_state": rt.mes_state}
 
     @router.post("/changeover/{area}/resume")
-    async def resume(area: str) -> dict[str, Any]:
+    async def resume(
+        area: str,
+        user: ForgeUser = Depends(require_scope(WRITE_SCOPE)),  # noqa: B008
+    ) -> dict[str, Any]:
         current = _runtime()
         rt = _area(current, area)
         try:
-            await _orchestrator(current).resume(area)
+            await _orchestrator(current).resume(area, actor=user.user_id)
         except ChangeoverSequenceError as exc:
             raise HTTPException(409, str(exc)) from None
         return {"area": area, "mes_state": rt.mes_state}

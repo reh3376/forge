@@ -297,10 +297,15 @@ class PlcConnectionManager:
             return await self._restart(entry, reason="unresponsive")
         return None
 
-    async def restart(self, name: str) -> dict[str, Any]:
-        """Operator-requested restart of one connection; returns its status."""
+    async def restart(self, name: str, *, requested_by: str = "") -> dict[str, Any]:
+        """Operator-requested restart of one connection; returns its status.
+
+        ``requested_by`` (the hub user over REST, FB-082) is logged with the
+        outcome so the supervisor log says who restarted what.
+        """
         entry = self._entry(name)
-        await self._restart(entry, reason="requested")
+        reason = f"requested by {requested_by}" if requested_by else "requested"
+        logger.info("PLC supervisor: %s", await self._restart(entry, reason=reason))
         return self._status_for(entry)
 
     async def _restart(self, entry: _Entry, *, reason: str) -> str:

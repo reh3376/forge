@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-17 · **Branch:** `reh3376_dev01` (last merged PR: 38) · **Owner:** reh3376
+**Status date:** 2026-10-17 · **Branch:** `reh3376_dev01` (last merged PR: 39) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -22,11 +22,11 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 347 files, ~66,000 lines |
-| Python tests | 248 files, ~51,800 lines, 3,984 test functions; full suite green on 2026-10-17 |
+| Python tests | 248 files, ~51,900 lines, 3,986 test functions; full suite green on 2026-10-17 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | forge-mes bridge (`modules/Forge MES`) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
-| Hub REST routes | 20 on the hub app, plus OT i3X (8) and OT control (15), plus the curation app mounted at `/curation` |
+| Hub REST routes | 20 on the hub app, plus OT i3X (8) and OT control (15; every POST behind `adapters:write`), plus the curation app mounted at `/curation` |
 | Storage migrations | 8 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions) |
 | FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 6 await owner approval after the FB-080 and FB-074 re-stamps |
 | FATS specs | 21 |
@@ -107,7 +107,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | i3X REST shape, MQTT ingress, Ignition bridge (read-only parallel run) | ✅ | `i3x`, `mqtt`, `bridge` |
 | Scripting SDK replacing `system.*` | ✅ | `forge.sdk.scripting` |
 | Server-side two-step review and reason codes for writes | ✅ | FB-074 (2026-10-17): `WriteReviewer`, stage/commit REST behind `adapters:write`, `REJECTED_REVIEW`; multi-party approval waits on D-1 |
-| OT control changeover/connection POST endpoints behind a hub scope | ⬜ | FB-082 |
+| OT control changeover/connection POST endpoints behind a hub scope | ✅ | FB-082 (2026-10-17): `adapters:write` on confirm-start, retry-recipe, resume and connection restart; the hub user is the actor on the MES write, audit record and events |
 | Batch context resolver wired to MES | ⬜ | FB-020 |
 | One adapter identity (code says `forge-ot-module`, manifest and spec say `ot-module`) | ⬜ | FB-079 (includes FB-018) |
 

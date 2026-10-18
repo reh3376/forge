@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -290,12 +291,17 @@ async def test_supervisor_task_recovers_in_the_background() -> None:
     assert manager.status()["supervisor"]["running"] is False
 
 
-async def test_operator_restart_and_unknown_names() -> None:
+async def test_operator_restart_and_unknown_names(caplog: pytest.LogCaptureFixture) -> None:
     registry = await registry_with_tags()
     manager, clients = make([spec()], registry, clock=Clock())
     await manager.start()
     status = await manager.restart("WHK01")
     assert status["restarts"] == 1 and status["connected"] and clients["WHK01"].connects == 2
+    # the supervisor log says who asked (the hub user over REST, FB-082)
+    with caplog.at_level(logging.INFO, logger="forge.modules.ot.control.connections"):
+        status = await manager.restart("WHK01", requested_by="alice")
+    assert status["restarts"] == 2 and clients["WHK01"].connects == 3
+    assert "WHK01: reconnected (requested by alice)" in caplog.text
     with pytest.raises(KeyError, match="nope"):
         await manager.restart("nope")
     with pytest.raises(KeyError):

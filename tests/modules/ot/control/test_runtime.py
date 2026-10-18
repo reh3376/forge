@@ -955,3 +955,82 @@ async def test_system_writes_are_not_held_to_the_operator_policy() -> None:
     journal = rt.engine.get_journal()
     assert {row["origin"] for row in journal} == {"SYSTEM"}
     assert all(row["review_passed"] for row in journal)
+
+
+async def test_operator_actions_use_the_hub_identity() -> None:
+    """FB-082: the changeover actions and a connection restart need ``adapters:write``
+    and record the hub user, not whatever the body names."""
+    from forge.gateway.auth import configure_auth
+    from forge.gateway.models import AuthConfig, ForgeUser, Role
+
+    rt, mes, _plc, sink = runtime(document(mqtt={"mode": "none"}))
+    assert rt.orchestrator is not None
+    mes.states["cooker"] = "READY_TO_START"
+    await rt.orchestrator.on_state("cooker", state_payload("READY_TO_START", entered="t1"))
+    keys = {
+        "op-key": ForgeUser(
+            user_id="alice",
+            role=Role.OPERATOR,
+            scopes=frozenset({"adapters:write"}),
+            source="api_key",
+        ),
+        "view-key": ForgeUser(
+            user_id="bob", role=Role.VIEWER, scopes=frozenset({"adapters:read"}), source="api_key"
+        ),
+    }
+    confirm = "/api/v1/ot/changeover/cooker/confirm-start"
+    retry = "/api/v1/ot/changeover/cooker/retry-recipe"
+    resume = "/api/v1/ot/changeover/cooker/resume"
+    restart = "/api/v1/ot/control/connections/WHK01/restart"
+    op = {"X-API-Key": "op-key"}
+    configure_auth(AuthConfig(enabled=True, api_keys=keys))
+    app = FastAPI()
+    app.include_router(create_control_router(rt))
+    transport = httpx.ASGITransport(app=app)
+    try:
+        async with httpx.AsyncClient(transport=transport, base_url="http://ot") as client:
+            # No credentials: 401. Read scope only: 403. Nothing happened on the MES.
+            for path, body in (
+                (confirm, {"operator_id": "x"}),
+                (retry, None),
+                (resume, None),
+                (restart, None),
+            ):
+                assert (await client.post(path, json=body)).status_code == 401, path
+                r = await client.post(path, json=body, headers={"X-API-Key": "view-key"})
+                assert r.status_code == 403, path
+            assert mes.calls == []
+
+            # confirm-start: the hub user is the operator, whatever the body says.
+            r = await client.post(confirm, json={"operator_id": "someone-else"}, headers=op)
+            assert r.status_code == 200, r.text
+            assert mes.calls[-1] == ("cooker", "start-production", {"startedBy": "alice"})
+            event = rt.orchestrator.events("cooker")[-1]
+            assert event.kind == "write" and event.detail["actor"] == "alice"
+            record = sink.records[-1]
+            assert record.context.operator_id == "alice"
+            assert record.context.extra["actor"] == "alice"
+            assert record.context.extra["write_requested_by"] != "alice"
+
+            # The body may be empty under hub auth; the sequence check still applies.
+            r = await client.post(confirm, json={}, headers=op)
+            assert r.status_code == 409 and "not READY_TO_START" in r.json()["detail"]
+
+            # resume / retry-recipe record who asked before acting.
+            r = await client.post(resume, headers=op)
+            assert r.status_code == 200 and r.json()["mes_state"] == "PRODUCTION"
+            actions = [e for e in rt.orchestrator.events("cooker") if e.kind == "operator_action"]
+            assert actions[-1].detail == {"action": "resume", "actor": "alice"}
+            r = await client.post(retry, headers=op)
+            assert r.status_code == 409 and "no pending recipe" in r.json()["detail"]
+
+            # The restart is authorised before the runtime looks for connections.
+            r = await client.post(restart, headers=op)
+            assert r.status_code == 404 and "no PLC connections" in r.json()["detail"]
+    finally:
+        configure_auth(AuthConfig(enabled=False))
+
+    # With the kill-switch off the body must name the operator (nothing else identifies them).
+    async with httpx.AsyncClient(transport=transport, base_url="http://ot") as client:
+        r = await client.post(confirm, json={})
+        assert r.status_code == 422 and "operator_id is required" in r.json()["detail"]
