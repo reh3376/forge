@@ -8,9 +8,9 @@
 
 ## What Forge Does
 
-Forge solves Industry / Manufacturing dataOPS.  Organizations runs on dozens of disconnected systems: WMS, MES, SCADA, CMMS, ERP, QMS, historians, ... . These systms are usually highly customized by use case. Each produces data in its own format with its own assumptions. Forge connects them through a common data model (ContextualRecords) and governance framework (FxTS) so decision-makers get trustworthy, correlated information rather than raw telemetry from siloed sources. Additionally, Forge Core curates datasets for various ML and AI use cases: Human in the loop semi-atonomous decision making, expterise specific training, and many of analytics, observability, monitoring purposes.
+Forge solves Industry / Manufacturing dataOPS.  Organizations run on dozens of disconnected systems: WMS, MES, SCADA, CMMS, ERP, QMS, historians, ... . These systems are usually highly customized by use case. Each produces data in its own format with its own assumptions. Forge connects them through a common data model (ContextualRecords) and governance framework (FxTS) so decision-makers get trustworthy, correlated information rather than raw telemetry from siloed sources. Additionally, Forge Core curates datasets for various ML and AI use cases: human-in-the-loop semi-autonomous decision making, expertise-specific training, analytics, observability and monitoring.
 
-**The core thesis**: Bad decisions in manufacturing don't come from lack of data — they come from lack of data *quality*, *context*, and *correlation*. Forge addresses all three. Poor decision are far more costly than generally realized, the costs is frequently spread across many units, and the root cause of a confidently wrong decision is rarely captured.
+**The core thesis**: Bad decisions in manufacturing don't come from lack of data — they come from lack of data *quality*, *context*, and *correlation*. Forge addresses all three. Poor decisions are far more costly than generally realized, the cost is frequently spread across many units, and the root cause of a confidently wrong decision is rarely captured.
 
 ## Architecture
 
@@ -51,17 +51,16 @@ Each spoke wraps one production system and produces ContextualRecords that confo
 
 | Component | Technology |
 |-----------|-----------|
-| Language Core | Go >= 1.24 |
-| Language - scripting / sidecar| Python 3.12+ |
-| Transport | gRPC + Protobuf (compiled binary, never JSON-over-gRPC) |
-| <Add Go package management, Linting, and Testing tools here |
-| PY Package Management | UV |
-| PY Linting | Ruff |
-| PY Testing | pytest (3,275 tests) |
-| Databases | PostgreSQL (hub), TimescaleDB (metrics), Neo4j (graph) |
-| Messaging | RabbitMQ (AMQP), MQTT 3.1.1 (embedded broker) |
-| OPC-UA | asyncua (asyncio client) |
-| i3X Restful API wrapper for OPC-UA |
+| Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,188 tests) |
+| Management and integration modules (`go/`) | Go 1.26 · `go build`, `go vet`, `go test` in CI; module SDK scaffold (the Go forge-mes is FB-076) |
+| forge-mes bridge (`modules/Forge MES`) | TypeScript · NestJS 10 · Next.js 14 (the migrated whk-mes application, until the Go module lands) |
+| User interfaces | forge-display renders every surface from FVTS specs (not built yet; the FVTS runner and reference renderer exist) |
+| Transport | gRPC + Protobuf (compiled binary, never JSON-over-gRPC); mTLS in both directions |
+| Databases | PostgreSQL 16 (hub), TimescaleDB (time series), Neo4j 5 (graph); hub-owned, modules get `mod_<name>` schemas |
+| Messaging | RabbitMQ (AMQP), MQTT 3.1.1 (embedded broker); Kafka in the compose stack for later |
+| OPC-UA | asyncua (asyncio client) behind a thin wrapper; i3X REST API over the tag engine |
+
+**Language policy.** The hub is Python. Formal `forge-<service>` management and integration modules are Go, generated from the module SDK (roadmap decisions A-2, A-5). Spokes are Python inside the hub or external processes in any language that speaks the proto. forge-mes runs as the migrated TypeScript application until its Go rewrite (FB-076). No module writes its own UI: forge-display renders them from FVTS specs (A-3). The status of each choice is in [`docs/PRINCIPLES.md`](docs/PRINCIPLES.md) §6.
 
 ## Project Structure
 
@@ -238,34 +237,37 @@ First-party modules that ship with both a backend and a frontend live under the 
 | `modules/Forge CMMS/`, `Forge ERPI/`, `Forge NMS/` | adapter template copies (`src/`, `specs/`, `docs/`, `tests/`) | Templates for the in-repo adapters |
 | `modules/Forge DB Orchestration/` | storage framework copy | Reference |
 
-## Governance: FxTS (Forge Test Suite)
+## Governance: FxTS (Forge Test Specifications)
 
-FxTS is **spec-first governance** — the specs define what must exist and the code conforms to the specs, not the other way around. This is not a testing framework; it's a compliance framework.
+FxTS is **spec-first governance** — the specs define what must exist and the code conforms to the specs, not the other way around. This is not a testing framework; it's a compliance framework. Every spec is hashed and approved only by the owner.
 
-| Suite | Purpose |
-|-------|---------|
-| **FACTS** | Forge Adapter Compliance Test Suite — validates spoke data contracts |
-| **FTTS** | Forge Transport Test Suite — validates gRPC/Protobuf transport layer |
-| **FATS** | Forge Adapter Test Suite — validates adapter behavior |
-| **FHTS** | Forge Hub Test Suite — validates hub operations |
-| **FQTS** | Forge Quality Test Suite — validates data quality pipeline |
-| **FSTS** | Forge Storage Test Suite — validates storage operations |
+| Framework | Governs | State |
+|-----------|---------|-------|
+| **FATS** | API contracts: routes, shapes, status codes | schema, runner, 21 specs |
+| **FACTS** | Adapter conformance: identity, capabilities, lifecycle, connection, data contract, context mapping, error handling | schema, runner, 9 specs |
+| **FTTS** | Transport: TLS, tokens, streaming behaviour | schema, runner, 1 spec |
+| **FVTS** | Module ↔ display contract: points, alarms, actions, surfaces, profiles | schema, runner, reference renderer, 1 spec |
+| **FHTS** | Hash integrity and owner approval of every spec above | hashing in the shared runner; `forge governance specs / stamp / approve` |
+| FQTS · FSTS | Data quality · security controls | stubs |
+| FDTS · FLTS · FNTS · FOTS · FPTS | Schema evolution · lineage · normalization · observability · performance | planned |
 
-### FACTS Specs (9 spokes configured)
+### FACTS Specs (9 spokes)
 
 Each spoke has a FACTS spec that declares its identity, capabilities, connection parameters, data sources, context field mappings, enrichment rules, error handling policy, and sample records. The spec is the contract — if the spoke doesn't match its spec, it can't connect.
 
-| Spoke | System | Status |
-|-------|--------|--------|
-| `ot-module` | OPC-UA / MQTT / Alarms / Control Write | v0.5.0 — 21 data sources |
-| `whk-wms` | Warehouse Management (NestJS) | Draft |
-| `forge-mes` | Manufacturing Execution (Forge MES module, NestJS + Next.js) | v0.1.0 — approved 2026-10-15 (renamed from whk-mes) |
-| `whk-cmms` | Computerized Maintenance (n8n) | Draft |
-| `bosc-ims` | Aerospace Inventory (Go gRPC) | Draft |
-| `whk-nms` | Network Management (FastAPI) | Draft |
-| `whk-erpi` | ERP Integration (NetSuite) | Draft |
-| `next-trend` | Time-Series Historian (Rust) | Draft |
-| `scanner-gateway` | Android Barcode Scanner | Draft |
+| Spoke | System (data sources) | Spec |
+|-------|-----------------------|------|
+| `whk-wms` | Warehouse management (GraphQL, RabbitMQ, REST; 14 sources) | v0.1.0 — approved (reh3376) |
+| `forge-mes` | Manufacturing execution, `modules/Forge MES` (GraphQL, RabbitMQ, MQTT, REST, WebSocket, database; 18 sources) | v0.1.0 — approved 2026-10-15 (reh3376) |
+| `bosc-ims` | Aerospace inventory (gRPC unary and stream; 8 sources) | v0.1.0 — approved (no approver recorded) |
+| `whk-cmms` | Maintenance management (GraphQL, REST, RabbitMQ; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
+| `whk-erpi` | ERP integration, NetSuite (RabbitMQ, REST, GraphQL; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
+| `whk-nms` | Network management (REST, WebSocket; 11 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
+| `next-trend` | Time-series historian (REST, WebSocket; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
+| `scanner-gateway` | Barcode scanner gateway (gRPC server unary and stream; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
+| `ot-module` | OPC-UA, MQTT, alarms, control writes, scripting (21 sources) | v0.5.0 — pending review; fails schema validation until D-8 (FB-079) |
+
+`forge governance specs --pending` lists what awaits the owner; `forge governance run facts <spoke>` runs one spec.
 
 ## OT Module (Phases 1-6)
 
@@ -305,11 +307,11 @@ The scripting SDK provides 11 modules that replace Ignition's `system.*` namespa
 | Spoke | Repo | Tech | Role |
 |-------|------|------|------|
 | WHK-WMS | `WhiskeyHouse/whk-wms` | NestJS + Next.js | Warehouse Management |
-| Forge MES | `modules/Forge MES` (in-repo; migrated from `WhiskeyHouse/whk-mes` on 2026-10-15) | NestJS + Next.js 15 | Manufacturing Execution — forge-mes replaces whk-mes |
-| WHK-CMMS | `reh3376/whk-cmms` | n8n + API | Maintenance Management |
+| Forge MES | `modules/Forge MES` (in-repo; migrated from `WhiskeyHouse/whk-mes` on 2026-10-15) | NestJS 10 + Next.js 14 | Manufacturing Execution — forge-mes replaces whk-mes |
+| WHK-CMMS | `reh3376/whk-cmms` | GraphQL + REST + RabbitMQ | Maintenance Management |
 | BOSC-IMS | `reh3376/bosc_ims` | Go + gRPC | Aerospace Inventory |
 | WHK-NMS | `WhiskeyHouse/net-topology` | FastAPI + Next.js | Network Management |
-| WHK-ERPI | `reh3376/whk-erpi` | Python | ERP Integration (NetSuite) |
+| WHK-ERPI | `reh3376/whk-erpi` | RabbitMQ + REST + GraphQL | ERP Integration (NetSuite) |
 | NextTrend | `TheThoughtagen/nexttrend` | Rust + Next.js | Time-Series Historian |
 | Scanner Gateway | `WhiskeyHouse/whk-wms-android` | Kotlin | Android Barcode Scanner |
 | Ignition SCADA | `WhiskeyHouse/whk-ignition-scada` | Ignition 8.x | SCADA/HMI (being replaced) |
@@ -349,17 +351,24 @@ uv run pytest tests/core/ -v                  # Core tests
 ### Test Coverage
 
 ```
-Total:  3,275 tests passing
-        173 test files
-        278 source files
+Total:  4,188 tests collected (full suite green on 2026-10-18)
+        249 test files
+        348 source files
 
 By area:
-  OT Module:        ~1,800 tests (alarming, bridge, control, mqtt, tag_engine, opcua)
-  Scripting SDK:      ~350 tests (engine, sandbox, triggers, rbac, audit, 11 modules)
-  Core/Curation:      ~600 tests (pipeline, normalization, quality, lineage)
-  Transport/Storage:  ~300 tests (gRPC, protobuf, router, pool)
-  Governance:         ~225 tests (FACTS runner, FTTS runner, schema validation)
+  OT module:                       1,129  (alarming, bridge, control, mqtt, tag_engine, opcua)
+  Spokes (adapters):                 994
+  Governance (FxTS):                 553  (FATS, FACTS, FTTS, FVTS runners and schemas)
+  Scripting SDK, module builder:     356
+  Core models, registry, context:    354
+  Storage:                           287
+  Transport, ingest, API, gateway:   246
+  Curation:                          130
+  Broker, integration, verification: 119
+  CLI:                                20
 ```
+
+Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE.md` §2 carries them and is updated before every push.
 
 ### Project Documentation
 
@@ -391,4 +400,4 @@ By area:
 
 ---
 
-*278 Python source files | 173 test files | 3,275 tests | 9 spoke specs | Python 3.12+ | MIT License*
+*348 Python source files | 249 test files | 4,188 tests | 9 FACTS · 21 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
