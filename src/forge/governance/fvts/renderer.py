@@ -53,6 +53,7 @@ WRITE_STATUSES = frozenset(
         "REJECTED_VALIDATION",
         "REJECTED_INTERLOCK",
         "REJECTED_AUTH",
+        "REJECTED_REVIEW",
         "FAILED_WRITE",
         "FAILED_READBACK",
         "PENDING",

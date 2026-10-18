@@ -33,7 +33,7 @@ Renderers — whatever framework implements them (Slint, egui, Dioxus, a browser
 | **Live updates** | Transport, max rate, coalescing, heartbeat, disconnect behaviour | Rate ≤ 20 Hz, `latest_wins`, `mark_all_stale` on disconnect |
 | **History** | Server-side decimation, algorithm, point cap, range, as-of support | Decimation is always server-side; caps present when enabled |
 | **Alarms** | States, priorities, reserved priority tokens, annunciation | All 7 ISA-18.2 states covered; tokens in the reserved `alarm.*` namespace |
-| **Actions** | Kind, target, role, confirmation, reason code, interlock feedback, handled statuses, audit, profiles | Tag writes need confirmation, a write-capable role, interlock feedback and all 8 WriteStatus values; audit always on |
+| **Actions** | Kind, target, role, confirmation, reason code, interlock feedback, handled statuses, audit, profiles | Tag writes need confirmation, a write-capable role, interlock feedback and all 9 WriteStatus values; audit always on |
 | **Settings** | Settings schema ref, edit role, apply mode, profiles | Required fields when exposed |
 | **Render profiles** | Supported profiles and tightening overrides | Overrides never loosen the baseline |
 | **Surfaces** | Kind, authoring (configured/coded), scope level, profiles, points, actions | HMI screens are `configured`; every referenced point/action exists |
@@ -114,7 +114,8 @@ fvts.schema.json
 - BAD / NOT_AVAILABLE values are never shown without a marker; UNCERTAIN always carries a marker.
 - `live_updates.on_disconnect` is `mark_all_stale`; values never silently freeze.
 - History decimation is `server`-side only.
-- `tag_write` actions: role ∈ {OPERATOR, ENGINEER, ADMIN}; confirmation `confirm` or `two_step_with_review`; `interlock_feedback: true`; all 8 `WriteStatus` values handled; `timeout_ms` required.
+- `tag_write` actions: role ∈ {OPERATOR, ENGINEER, ADMIN}; confirmation `confirm` or `two_step_with_review`; `interlock_feedback: true`; all 9 `WriteStatus` values handled (`REJECTED_REVIEW` since FB-074); `timeout_ms` required.
+- `two_step_with_review` and `reason_code_required` are enforced server-side (FB-074): the OT write engine stages the write, returns the current value and a single-use review token, and refuses a commit without it (`REJECTED_REVIEW`). A renderer draws the review; it cannot skip it.
 - Alarm `SHELVE`, `DISABLE` and `RESET` require a reason code.
 - Every action has `audit: true`.
 - `hmi_screen` surfaces are `configured` (versioned layout data), never hand-coded.

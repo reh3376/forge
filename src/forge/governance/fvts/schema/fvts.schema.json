@@ -377,7 +377,7 @@
     "writeStatus": {
       "type": "string",
       "description": "Mirrors forge.modules.ot.control.models.WriteStatus.",
-      "enum": ["CONFIRMED", "UNCONFIRMED", "REJECTED_VALIDATION", "REJECTED_INTERLOCK", "REJECTED_AUTH", "FAILED_WRITE", "FAILED_READBACK", "PENDING"]
+      "enum": ["CONFIRMED", "UNCONFIRMED", "REJECTED_VALIDATION", "REJECTED_INTERLOCK", "REJECTED_AUTH", "REJECTED_REVIEW", "FAILED_WRITE", "FAILED_READBACK", "PENDING"]
     },
     "profile": {
       "type": "string",
@@ -490,7 +490,7 @@
         "confirmation": {
           "type": "string",
           "enum": ["none", "confirm", "two_step_with_review"],
-          "description": "two_step_with_review: user enters value, then reviews old vs new value and confirms. Enforced by forge-core, not only drawn by the UI."
+          "description": "two_step_with_review: user enters value, then reviews old vs new value and confirms. Enforced by forge-core, not only drawn by the UI: the OT write engine stages the write, issues a single-use review token and rejects a commit without it (REJECTED_REVIEW, FB-074)."
         },
         "reason_code_required": { "type": "boolean", "default": false },
         "interlock_feedback": {
@@ -520,7 +520,7 @@
               "required_role": { "enum": ["OPERATOR", "ENGINEER", "ADMIN"] },
               "confirmation": { "enum": ["confirm", "two_step_with_review"] },
               "interlock_feedback": { "const": true },
-              "handled_statuses": { "minItems": 8 }
+              "handled_statuses": { "minItems": 9 }
             }
           }
         },

@@ -3,7 +3,7 @@
 This adapter polls Ignition's REST API for tag values and converts them
 to ContextualRecords with ``source.system="ignition-bridge"``.  It does
 NOT implement WritableAdapter — all writes must flow through the OT
-Module's 4-layer safety interlock chain.
+Module's control write defense chain.
 
 The adapter is temporary: it is activated during Phase 5 (parallel
 operation validation) and removed in Phase 7.3 (Ignition decommission).

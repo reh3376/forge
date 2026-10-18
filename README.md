@@ -205,8 +205,9 @@ src/forge/
         │   ├── sparkplug.py       # SparkplugB codec
         │   └── rate_limiter.py    # Per-topic rate limiting
         ├── control/               # Control Write Interface
-        │   ├── write_engine.py    # ControlWriteEngine — 4-layer defense chain
+        │   ├── write_engine.py    # ControlWriteEngine — 5-layer defense chain
         │   ├── validation.py      # WriteValidator — type/range checking
+        │   ├── review.py          # WriteReviewer — two-step review tokens, reason codes (FB-074)
         │   ├── interlock.py       # InterlockEngine — safety conditions
         │   ├── authorization.py   # WriteAuthorizer — RBAC (Operator/Engineer/Admin)
         │   ├── audit.py           # WriteAuditLogger — pluggable sinks
@@ -277,7 +278,7 @@ The OT Module is the most mature spoke, implemented directly in this repo. It re
 | 1 | OPC-UA Client | asyncua wrapper, tag engine with 8 provider types, path normalization (OPC-UA ↔ Ignition ↔ Forge), i3X discovery |
 | 2 | Scripting Engine | Python 3.12+ script engine replacing Jython 2.7, ScriptSandbox (PEP 302), TriggerRegistry decorators, RBAC, audit trail, 11 forge.* SDK modules |
 | 3 | Alarm Engine | ISA-18.2 compliant: 7-state machine, 9 alarm types, event-sourced journal, cross-module integration (MQTT, RabbitMQ, CMMS auto-work-orders) |
-| 4 | Control Write | 4-layer defense chain (validation → interlocks → RBAC → write+read-back), audit trail with pluggable sinks, MES recipe integration |
+| 4 | Control Write | 5-layer defense chain (validation → review → interlocks → RBAC → write+read-back), audit trail with pluggable sinks, MES recipe integration |
 | 5 | Ignition Bridge | Parallel operation adapter: REST API polling, dual-write consistency validation (<1% threshold), operator acceptance checklist |
 | 6 | Script Migration | 6 new forge.* SDK modules, API mapping for all 52 system.* calls, Tier 1 conversion targets identified (42 scripts) |
 

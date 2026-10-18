@@ -10,6 +10,7 @@ import pytest
 from forge.modules.ot.control import (
     CipPolicy,
     ConfigError,
+    ConfirmationMode,
     DataType,
     InterlockCondition,
     OTControlConfig,
@@ -115,6 +116,33 @@ def test_defaults_are_minimal() -> None:
     assert cfg.mqtt.mode == "local" and cfg.mqtt.port == 1883
     assert cfg.requested_by == "forge-ot-module"
     assert cfg.changeover_areas == [] and cfg.cip_specs() == {}
+    assert cfg.review_timeout_seconds == 120.0 and cfg.reason_codes == []
+    assert cfg.describe()["review"] == {
+        "two_step_tags": 0,
+        "reason_code_tags": 0,
+        "timeout_seconds": 120.0,
+        "reason_codes": 0,
+    }
+
+
+def test_write_review_policy_is_declared_per_tag() -> None:
+    """FB-074: confirmation mode and reason-code rule ride on write_tags."""
+    doc = document(review_timeout_seconds=45, reason_codes=["setpoint_tune", "quality_hold"])
+    doc["write_tags"][0]["confirmation"] = "two_step_with_review"
+    doc["write_tags"][0]["reason_code_required"] = True
+    cfg = parse_control_config(doc)
+    sp, rr, _cip = cfg.write_tags
+    assert sp.confirmation is ConfirmationMode.TWO_STEP_WITH_REVIEW and sp.reason_code_required
+    assert rr.confirmation is ConfirmationMode.CONFIRM and not rr.reason_code_required
+    assert cfg.review_timeout_seconds == 45
+    assert cfg.describe()["review"] == {
+        "two_step_tags": 1,
+        "reason_code_tags": 1,
+        "timeout_seconds": 45.0,
+        "reason_codes": 2,
+    }
+    with pytest.raises(ConfigError, match="confirmation"):
+        parse_control_config(document(write_tags=[{"tag_path": SP, "confirmation": "maybe"}]))
 
 
 @pytest.mark.parametrize(
@@ -122,6 +150,9 @@ def test_defaults_are_minimal() -> None:
     [
         ({"write_tags": [{"tag_path": SP, "data_typo": "FLOAT"}]}, "unknown key"),
         ({"nope": 1}, "nope"),
+        ({"reason_codes": ["a", "a"]}, "duplicate reason_codes"),
+        ({"reason_codes": ["a", " "]}, "blank entries"),
+        ({"review_timeout_seconds": 0}, "review_timeout_seconds"),
         (
             {
                 "recipes": [

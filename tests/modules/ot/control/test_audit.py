@@ -203,6 +203,45 @@ class TestContextualRecordAuditSink:
         weird = write_result_to_record({**base, "timestamp": "not-a-date", "completed_at": None})
         assert weird.timestamp.source_time.tzinfo is not None
 
+    @pytest.mark.asyncio
+    async def test_review_fields_reach_the_record(self):
+        """FB-074: origin, reason code, staging and the review rejection are audited."""
+        from forge.modules.ot.control.audit import write_result_to_record
+
+        base = _make_result().to_dict()
+        assert base["origin"] == "OPERATOR"
+        plain = write_result_to_record(base)
+        assert plain.context.extra["write_origin"] == "OPERATOR"
+        assert "reason_code" not in plain.context.extra and "staged_at" not in plain.context.extra
+
+        committed = write_result_to_record(
+            {
+                **base,
+                "reason_code": "setpoint_tune",
+                "staged_at": "2026-10-17T12:00:00+00:00",
+                "review_passed": True,
+            }
+        )
+        assert committed.context.extra["reason_code"] == "setpoint_tune"
+        assert committed.context.extra["staged_at"] == "2026-10-17T12:00:00+00:00"
+
+        refused = write_result_to_record(
+            {
+                **base,
+                "status": "REJECTED_REVIEW",
+                "review_error": "Tag X requires a reason code",
+                "stage_attempt": True,
+            }
+        )
+        assert refused.context.extra["error"] == "Tag X requires a reason code"
+        assert refused.context.extra["stage_attempt"] is True
+        assert refused.value.quality.value == "BAD"
+
+        system = write_result_to_record({**base, "origin": "SYSTEM"})
+        assert system.context.extra["write_origin"] == "SYSTEM"
+        legacy = write_result_to_record({k: v for k, v in base.items() if k != "origin"})
+        assert legacy.context.extra["write_origin"] == "OPERATOR"
+
 
 # ---------------------------------------------------------------------------
 # MqttAuditSink

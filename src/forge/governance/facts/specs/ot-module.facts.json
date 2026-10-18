@@ -674,9 +674,9 @@
         "target_field": "write_status",
         "rule_type": "enum_mapping",
         "config": {
-          "values": ["CONFIRMED", "UNCONFIRMED", "REJECTED_VALIDATION", "REJECTED_INTERLOCK", "REJECTED_AUTH", "FAILED_WRITE", "FAILED_READBACK", "PENDING"]
+          "values": ["CONFIRMED", "UNCONFIRMED", "REJECTED_VALIDATION", "REJECTED_INTERLOCK", "REJECTED_AUTH", "REJECTED_REVIEW", "FAILED_WRITE", "FAILED_READBACK", "PENDING"]
         },
-        "description": "Control write outcome status. CONFIRMED = write succeeded + read-back matched. UNCONFIRMED = write sent but read-back didn't match. REJECTED_* = pre-write defense layer blocked. FAILED_* = OPC-UA transport error."
+        "description": "Control write outcome status. CONFIRMED = write succeeded + read-back matched. UNCONFIRMED = write sent but read-back didn't match. REJECTED_* = pre-write defense layer blocked (REJECTED_REVIEW: two-step review token or reason code missing, FB-074). FAILED_* = OPC-UA transport error."
       },
       {
         "target_field": "write_role",
@@ -778,9 +778,9 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "a99f6a8792f568a364f8b45c740f5c9a19543901e8f1be32fc8da7bfefba1529",
+    "spec_hash": "8276e7fa27c55c2672ffdd84580f5dfdf9e90dd2e7efe6cc2e2326204d4a2cf7",
     "hash_state": "pending_review",
-    "previous_hash": "d66d9bd361c4a0d09a529bac9b48a13c4d73fcc94d77837642b2c44634d2d951",
+    "previous_hash": "a99f6a8792f568a364f8b45c740f5c9a19543901e8f1be32fc8da7bfefba1529",
     "change_history": [
       {
         "previous_hash": "d66d9bd361c4a0d09a529bac9b48a13c4d73fcc94d77837642b2c44634d2d951",
@@ -790,6 +790,15 @@
         "changed_by": "claude-code",
         "change_type": "content",
         "reason": "FB-073: P7 phases 3-6 (alarm engine, control-write interface, Ignition bridge adapter, script migration) were recorded on 2026-04-09 by claude-opus with placeholder hashes (pending-rehash-after-{alarm,control-write,bridge-adapter,script-migration}-additions) and hash_state 'draft', which FHTS cannot verify. Re-hashed from the last well-formed hash in one step; the four placeholder entries live in git history (commit d6db522c) and docs/p7-ot-module/P7_SPRINT_PLAN.md. Content unchanged. Awaiting owner approval."
+      },
+      {
+        "previous_hash": "a99f6a8792f568a364f8b45c740f5c9a19543901e8f1be32fc8da7bfefba1529",
+        "new_hash": "8276e7fa27c55c2672ffdd84580f5dfdf9e90dd2e7efe6cc2e2326204d4a2cf7",
+        "changed_at": "2026-10-17T17:35:43Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "structural",
+        "reason": "FB-074: REJECTED_REVIEW added to the write_status vocabulary (server-side two-step review and reason codes). Awaiting owner approval."
       }
     ]
   }

@@ -737,3 +737,221 @@ async def test_external_mode_builds_a_publisher_for_cip_state_and_audit() -> Non
     assert any(p["topic"].startswith("whk/whk01/cooker/ot/control/audit/") for p in published)
     await rt.stop()
     assert rt.status()["publisher"]["connected"] is False
+
+
+# ---------------------------------------------------------------------------
+# Operator writes over REST: two-step review and reason codes (FB-074)
+# ---------------------------------------------------------------------------
+
+
+def review_document() -> dict[str, Any]:
+    doc = document(mqtt={"mode": "none"}, areas=False)
+    doc["write_tags"][0]["confirmation"] = "two_step_with_review"
+    doc["write_tags"][0]["reason_code_required"] = True
+    doc["permissions"] = [{"area_pattern": "*", "tag_pattern": "*", "min_role": "OPERATOR"}]
+    doc["review_timeout_seconds"] = 30
+    doc["reason_codes"] = ["setpoint_tune", "quality_hold"]
+    return doc
+
+
+def write_body(**overrides: Any) -> dict[str, Any]:
+    body: dict[str, Any] = {
+        "tag_path": SP,
+        "value": 152.5,
+        "requestor": "op-7",
+        "reason": "tune after product change",
+        "reason_code": "setpoint_tune",
+        "area": "cooker",
+        "equipment_id": "Cooker01",
+    }
+    body.update(overrides)
+    return body
+
+
+async def test_two_step_write_over_rest() -> None:
+    rt, _mes, plc, sink = runtime(review_document())
+    plc.values[SP] = 150.0
+    await rt.start()
+    app = FastAPI()
+    app.include_router(create_control_router(rt))
+    try:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://ot"
+        ) as client:
+            tags = {t["tag_path"]: t for t in (await client.get("/api/v1/ot/control/tags")).json()}
+            assert tags[SP]["confirmation"] == "two_step_with_review"
+            assert tags[SP]["reason_code_required"] is True
+            assert tags[RR]["confirmation"] == "confirm"
+
+            # A commit that skipped the review is refused before anything is read or written.
+            r = await client.post("/api/v1/ot/control/writes", json=write_body())
+            assert r.status_code == 200, r.text
+            assert r.json()["status"] == "REJECTED_REVIEW"
+            assert "stage the write" in r.json()["review_error"]
+            assert plc.values[SP] == 150.0 and plc.writes == []
+
+            # Stage: the chain runs, the current value comes back for review, a token is issued.
+            r = await client.post("/api/v1/ot/control/writes/stage", json=write_body())
+            assert r.status_code == 200, r.text
+            ticket = r.json()
+            assert ticket["status"] == "STAGED"
+            assert ticket["current_value"] == 150.0 and ticket["requested_value"] == 152.5
+            assert ticket["requestor"] == "op-7" and ticket["engineering_units"] == ""
+            assert ticket["expires_at"] > ticket["staged_at"]
+            token = ticket["review_token"]
+            pending = (await client.get("/api/v1/ot/control/writes/pending")).json()
+            assert len(pending) == 1 and "review_token" not in pending[0]
+            assert pending[0]["tag_path"] == SP
+
+            # A stage that the chain refuses comes back as the rejected result.
+            r = await client.post("/api/v1/ot/control/writes/stage", json=write_body(value=999))
+            assert r.json()["status"] == "REJECTED_VALIDATION"
+            assert r.json()["stage_attempt"] is True
+            r = await client.post(
+                "/api/v1/ot/control/writes/stage", json=write_body(reason_code="because")
+            )
+            assert r.json()["status"] == "REJECTED_REVIEW"
+            assert "'because' is not one of" in r.json()["review_error"]
+
+            # Commit with the token: written, read back, journaled with the staging time.
+            r = await client.post("/api/v1/ot/control/writes", json=write_body(review_token=token))
+            assert r.status_code == 200, r.text
+            result = r.json()
+            assert result["status"] == "CONFIRMED" and result["review_passed"] is True
+            assert result["staged_at"] == ticket["staged_at"]
+            assert result["origin"] == "OPERATOR" and result["reason_code"] == "setpoint_tune"
+            assert plc.values[SP] == 152.5
+
+            # The token is spent; the pending list is empty; cancelling it is a 404.
+            r = await client.post("/api/v1/ot/control/writes", json=write_body(review_token=token))
+            assert r.json()["status"] == "REJECTED_REVIEW"
+            assert (await client.get("/api/v1/ot/control/writes/pending")).json() == []
+            r = await client.delete(f"/api/v1/ot/control/writes/stage/{token}")
+            assert r.status_code == 404
+
+            # Abandoning a staged write.
+            r = await client.post("/api/v1/ot/control/writes/stage", json=write_body(value=160))
+            fresh = r.json()["review_token"]
+            r = await client.delete(f"/api/v1/ot/control/writes/stage/{fresh}")
+            assert r.status_code == 200 and r.json() == {"cancelled": True}
+
+            # One-step tags commit directly; the body's data_type may override the config.
+            r = await client.post(
+                "/api/v1/ot/control/writes",
+                json=write_body(tag_path=RR, value=3, reason_code="", data_type="FLOAT"),
+            )
+            assert r.json()["status"] == "CONFIRMED" and plc.values[RR] == 3
+
+            # Requestor is mandatory while the auth kill-switch is off.
+            r = await client.post("/api/v1/ot/control/writes", json=write_body(requestor=" "))
+            assert r.status_code == 422 and "requestor" in r.json()["detail"]
+
+            status = (await client.get("/api/v1/ot/control/status")).json()
+            review = status["engine"]["review"]
+            assert review["staged"] == 2 and review["committed"] == 1
+            assert review["cancelled"] == 1 and review["pending"] == 0
+            assert review["rejected"] == 3  # no-token commit, bad reason code, spent token
+            assert status["config"]["review"]["two_step_tags"] == 1
+
+        # Every attempt, staged or committed, is one audit record in the hub store.
+        audited = [r.context.extra for r in sink.records]
+        assert [e["write_status"] for e in audited] == [
+            "REJECTED_REVIEW",
+            "REJECTED_VALIDATION",
+            "REJECTED_REVIEW",
+            "CONFIRMED",
+            "REJECTED_REVIEW",
+            "CONFIRMED",
+        ]
+        assert audited[3]["reason_code"] == "setpoint_tune" and "staged_at" in audited[3]
+        assert audited[1]["stage_attempt"] is True
+    finally:
+        await rt.stop()
+
+
+async def test_write_endpoints_use_the_hub_identity() -> None:
+    from forge.gateway.auth import configure_auth
+    from forge.gateway.models import AuthConfig, ForgeUser, Role
+
+    rt, _mes, plc, _sink = runtime(review_document())
+    plc.values[SP] = 150.0
+    keys = {
+        "op-key": ForgeUser(
+            user_id="alice",
+            role=Role.OPERATOR,
+            scopes=frozenset({"adapters:write"}),
+            source="api_key",
+        ),
+        "view-key": ForgeUser(
+            user_id="bob", role=Role.VIEWER, scopes=frozenset({"adapters:read"}), source="api_key"
+        ),
+        "admin-key": ForgeUser(
+            user_id="root", role=Role.ADMIN, scopes=frozenset({"*"}), source="api_key"
+        ),
+    }
+    configure_auth(AuthConfig(enabled=True, api_keys=keys))
+    app = FastAPI()
+    app.include_router(create_control_router(rt))
+    try:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://ot"
+        ) as client:
+            # No credentials: 401. Read scope only: 403.
+            r = await client.post("/api/v1/ot/control/writes/stage", json=write_body())
+            assert r.status_code == 401
+            r = await client.post(
+                "/api/v1/ot/control/writes/stage",
+                json=write_body(),
+                headers={"X-API-Key": "view-key"},
+            )
+            assert r.status_code == 403
+
+            # The hub user is the requestor, whatever the body says.
+            r = await client.post(
+                "/api/v1/ot/control/writes/stage",
+                json=write_body(requestor="someone-else"),
+                headers={"X-API-Key": "op-key"},
+            )
+            assert r.status_code == 200, r.text
+            assert r.json()["requestor"] == "alice"
+            token = r.json()["review_token"]
+
+            # A non-admin may not claim ENGINEER or ADMIN.
+            r = await client.post(
+                "/api/v1/ot/control/writes",
+                json=write_body(role="ENGINEER", review_token=token),
+                headers={"X-API-Key": "op-key"},
+            )
+            assert r.status_code == 403 and "needs a hub admin" in r.json()["detail"]
+
+            r = await client.post(
+                "/api/v1/ot/control/writes",
+                json=write_body(review_token=token),
+                headers={"X-API-Key": "op-key"},
+            )
+            assert r.json()["status"] == "CONFIRMED" and r.json()["requestor"] == "alice"
+
+            # An admin may name a higher role.
+            r = await client.post(
+                "/api/v1/ot/control/writes",
+                json=write_body(tag_path=RR, value=4, reason_code="", role="ENGINEER"),
+                headers={"X-API-Key": "admin-key"},
+            )
+            assert r.json()["status"] == "CONFIRMED" and r.json()["role"] == "ENGINEER"
+            assert r.json()["requestor"] == "root"
+
+            # Reads stay open to any caller, as the rest of the control API is.
+            assert (await client.get("/api/v1/ot/control/writes/pending")).status_code == 200
+    finally:
+        configure_auth(AuthConfig(enabled=False))
+
+
+async def test_system_writes_are_not_held_to_the_operator_policy() -> None:
+    """A recipe download writes a two-step tag without a token (origin SYSTEM)."""
+    rt, _mes, plc, _sink = runtime(review_document())
+    batch = await rt.recipes.execute_recipe_write("Cooker01", {"target_temp": 180, "ramp_rate": 2})
+    assert batch.confirmed == 2 and batch.failed == 0
+    assert plc.values[SP] == 180
+    journal = rt.engine.get_journal()
+    assert {row["origin"] for row in journal} == {"SYSTEM"}
+    assert all(row["review_passed"] for row in journal)

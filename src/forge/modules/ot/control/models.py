@@ -10,6 +10,12 @@ Design notes:
   authorization, and OPC-UA outcome — so the audit log has complete context.
 - WriteRole is deliberately simple (3 levels).  Complex RBAC is
   handled by WritePermission patterns, not by adding more roles.
+- WriteOrigin separates operator writes (a person, or an API client
+  acting as one) from system writes (recipe download, CIP) so the write
+  review policy (FB-074) can govern the former without blocking the latter.
+- ConfirmationMode mirrors the FVTS ``confirmation`` vocabulary for tag
+  writes: ``confirm`` (one step) or ``two_step_with_review`` (stage,
+  review old vs new, commit with the server-issued review token).
 """
 
 from __future__ import annotations
@@ -34,6 +40,7 @@ class WriteStatus(str, enum.Enum):
     REJECTED_VALIDATION = "REJECTED_VALIDATION"  # Type/range check failed
     REJECTED_INTERLOCK = "REJECTED_INTERLOCK"  # Safety interlock blocked
     REJECTED_AUTH = "REJECTED_AUTH"  # Role/permission check failed
+    REJECTED_REVIEW = "REJECTED_REVIEW"  # Two-step review or reason code missing/invalid
     FAILED_WRITE = "FAILED_WRITE"  # OPC-UA write error
     FAILED_READBACK = "FAILED_READBACK"  # Read-back attempt failed
     PENDING = "PENDING"  # Not yet processed
@@ -63,6 +70,28 @@ _ROLE_RANK: dict[WriteRole, int] = {
     WriteRole.ENGINEER: 1,
     WriteRole.ADMIN: 2,
 }
+
+
+class WriteOrigin(str, enum.Enum):
+    """Who is asking for the write (FB-074).
+
+    OPERATOR: a person, or an API client acting as one; held to the tag's
+    confirmation mode and reason-code policy.  The default, so an
+    unmarked request is always policed.
+    SYSTEM: core orchestration (recipe download, CIP start) whose
+    confirmation happened upstream (the changeover sequence, the MES
+    command); exempt from the two-step token and reason code.
+    """
+
+    OPERATOR = "OPERATOR"
+    SYSTEM = "SYSTEM"
+
+
+class ConfirmationMode(str, enum.Enum):
+    """How an operator write to a tag must be confirmed (FVTS ``confirmation``)."""
+
+    CONFIRM = "confirm"  # One step: the client confirms, the engine executes
+    TWO_STEP_WITH_REVIEW = "two_step_with_review"  # Stage, review old vs new, commit
 
 
 class DataType(str, enum.Enum):
@@ -110,6 +139,10 @@ class WriteRequest:
     area: str = ""
     equipment_id: str = ""
     batch_id: str = ""  # Non-empty for batch writes
+    # Write review (FB-074)
+    reason_code: str = ""  # Site vocabulary; required when the tag says so
+    review_token: str = ""  # Issued by ``ControlWriteEngine.stage``; consumed on commit
+    origin: WriteOrigin = WriteOrigin.OPERATOR
 
 
 # ---------------------------------------------------------------------------
@@ -136,10 +169,17 @@ class WriteResult:
     interlock_passed: bool = False
     interlock_error: str = ""
     interlock_rule_id: str = ""
+    review_passed: bool = False
+    review_error: str = ""
     auth_passed: bool = False
     auth_error: str = ""
     write_error: str = ""
     readback_error: str = ""
+    #: True for a ``stage`` that was rejected before a ticket was issued (FB-074);
+    #: a successful stage is not journaled because nothing was written.
+    stage_attempt: bool = False
+    #: When the committed write was staged (two-step review).
+    staged_at: datetime | None = None
 
     # Timing
     write_sent_at: datetime | None = None
@@ -160,6 +200,8 @@ class WriteResult:
             "area": req.area,
             "equipment_id": req.equipment_id,
             "batch_id": req.batch_id,
+            "reason_code": req.reason_code,
+            "origin": req.origin.value,
             "status": self.status.value,
             "old_value": self.old_value,
             "new_value": self.new_value,
@@ -169,6 +211,10 @@ class WriteResult:
             "interlock_passed": self.interlock_passed,
             "interlock_error": self.interlock_error,
             "interlock_rule_id": self.interlock_rule_id,
+            "review_passed": self.review_passed,
+            "review_error": self.review_error,
+            "stage_attempt": self.stage_attempt,
+            "staged_at": self.staged_at.isoformat() if self.staged_at else None,
             "auth_passed": self.auth_passed,
             "auth_error": self.auth_error,
             "write_error": self.write_error,
@@ -249,7 +295,9 @@ class TagWriteConfig:
     """Per-tag write configuration.
 
     Defines the validation rules for a specific tag — data type,
-    value range, and engineering units.  Used by WriteValidator.
+    value range, and engineering units — used by WriteValidator, and the
+    write review policy (FB-074) used by WriteReviewer: how an operator
+    write must be confirmed and whether it needs a reason code.
     """
 
     tag_path: str
@@ -259,6 +307,15 @@ class TagWriteConfig:
     engineering_units: str = ""
     writable: bool = True
     description: str = ""
+    #: ``confirm`` (default) or ``two_step_with_review``: an operator write
+    #: must then be staged, reviewed and committed with its review token.
+    confirmation: ConfirmationMode = ConfirmationMode.CONFIRM
+    #: Operator writes must carry ``WriteRequest.reason_code``.
+    reason_code_required: bool = False
+
+    def coerce(self, value: Any) -> Any:
+        """Coerce *value* to this tag's data type (raises TypeError/ValueError)."""
+        return _coerce_value(value, self.data_type)
 
     def validate_value(self, value: Any) -> tuple[bool, str]:
         """Check if a value is valid for this tag. Returns (ok, error)."""
