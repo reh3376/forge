@@ -38,12 +38,14 @@ class TestResolveShift:
     def test_utc_timestamp_converts(self):
         # 14:00 UTC on Apr 15 = 10:00 Louisville (EDT, UTC-4)
         from datetime import UTC
+
         ts = datetime(2026, 4, 15, 14, 0, 0, tzinfo=UTC)
         assert resolve_shift(self._schedule(), ts) == "Day"
 
     def test_empty_schedule_returns_none(self):
         schedule = ShiftSchedule(site="empty", shifts=[])
         from datetime import UTC
+
         ts = datetime(2026, 4, 15, 10, 0, 0, tzinfo=UTC)
         assert resolve_shift(schedule, ts) is None
 

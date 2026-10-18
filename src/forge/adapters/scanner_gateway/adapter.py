@@ -66,9 +66,7 @@ def _load_manifest() -> AdapterManifest:
         capabilities=AdapterCapabilities(**raw.get("capabilities", {})),
         data_contract=DataContract(**raw.get("data_contract", {})),
         health_check_interval_ms=raw.get("health_check_interval_ms", 10_000),
-        connection_params=[
-            ConnectionParam(**p) for p in raw.get("connection_params", [])
-        ],
+        connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
     )
@@ -290,9 +288,7 @@ class ScannerGatewayAdapter(
         if self._router:
             scan_type = scan_event.get("scan_type", "")
             targets = self._router.route(str(scan_type))
-            record.context.extra["_routed_to"] = [
-                t.adapter_id for t in targets
-            ]
+            record.context.extra["_routed_to"] = [t.adapter_id for t in targets]
 
         return record
 

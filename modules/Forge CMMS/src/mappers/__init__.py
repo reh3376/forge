@@ -14,30 +14,27 @@ from forge.adapters.whk_cmms.mappers.equipment import (
     map_work_order_type,
     map_work_request_type,
 )
-from forge.adapters.whk_cmms.mappers.maintenance import (
-    map_work_order,
-    map_work_request,
-)
 from forge.adapters.whk_cmms.mappers.inventory import (
-    map_inventory_location,
     map_inventory_investigation,
+    map_inventory_location,
     map_item,
     map_kit,
     map_vendor,
 )
+from forge.adapters.whk_cmms.mappers.maintenance import (
+    map_work_order,
+    map_work_request,
+)
 
 __all__ = [
-    # Equipment
     "map_asset",
-    "map_work_order_type",
-    "map_work_request_type",
-    # Maintenance
-    "map_work_order",
-    "map_work_request",
-    # Inventory
+    "map_inventory_investigation",
+    "map_inventory_location",
     "map_item",
     "map_kit",
     "map_vendor",
-    "map_inventory_location",
-    "map_inventory_investigation",
+    "map_work_order",
+    "map_work_order_type",
+    "map_work_request",
+    "map_work_request_type",
 ]

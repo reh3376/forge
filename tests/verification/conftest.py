@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -23,8 +23,8 @@ if str(SRC_ROOT) not in sys.path:
 # ── Python 3.10 compat shims ─────────────────────────────────────
 import forge._compat  # noqa: F401, E402 — registers StrEnum/UTC shims
 
-
 # ── Sample WMS barrel event ──────────────────────────────────────
+
 
 @pytest.fixture()
 def barrel_event() -> dict[str, Any]:
@@ -51,7 +51,7 @@ def barrel_event() -> dict[str, Any]:
         "entity_type": "barrel",
         "source_type": "graphql",
         "operating_mode": "PRODUCTION",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "operator_id": "jdoe",
     }
 
@@ -77,9 +77,7 @@ def barrel_events(barrel_event: dict) -> list[dict[str, Any]]:
 @pytest.fixture()
 def whk_wms_spec() -> dict[str, Any]:
     """Load the WHK WMS FACTS spec from the governance directory."""
-    spec_path = (
-        SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "whk-wms.facts.json"
-    )
+    spec_path = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "whk-wms.facts.json"
     return json.loads(spec_path.read_text())
 
 

@@ -17,7 +17,7 @@ from __future__ import annotations
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -30,7 +30,7 @@ class StructuredLogHandler(logging.Handler):
 
     def emit(self, record: logging.LogRecord) -> None:
         entry: dict[str, Any] = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
@@ -68,9 +68,7 @@ class ForgeLogger:
         return self._name
 
     def _log(self, level: int, msg: str, **kwargs: Any) -> None:
-        record = self._logger.makeRecord(
-            self._logger.name, level, "(script)", 0, msg, (), None
-        )
+        record = self._logger.makeRecord(self._logger.name, level, "(script)", 0, msg, (), None)
         record.forge_extra = kwargs  # type: ignore
         self._logger.handle(record)
 

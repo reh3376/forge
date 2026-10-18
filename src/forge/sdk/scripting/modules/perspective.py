@@ -23,8 +23,11 @@ Usage in scripts::
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
-from typing import Any, Callable
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger("forge.perspective")
 
@@ -70,7 +73,7 @@ class PerspectiveModule:
 
     def __init__(self) -> None:
         self._event_bus: Any = None  # Forge event bus, set via bind()
-        self._bridge: Any = None      # IgnitionBridgeAdapter for migration mode
+        self._bridge: Any = None  # IgnitionBridgeAdapter for migration mode
         self._sessions: list[SessionInfo] = []
         self._navigation_history: list[str] = []
 
@@ -83,8 +86,11 @@ class PerspectiveModule:
         """
         self._event_bus = event_bus
         self._bridge = bridge
-        logger.debug("forge.perspective bound (event_bus=%s, bridge=%s)",
-                      event_bus is not None, bridge is not None)
+        logger.debug(
+            "forge.perspective bound (event_bus=%s, bridge=%s)",
+            event_bus is not None,
+            bridge is not None,
+        )
 
     async def send_message(
         self,

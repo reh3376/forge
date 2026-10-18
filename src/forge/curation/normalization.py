@@ -19,6 +19,7 @@ from forge.core.models.contextual_record import ContextualRecord, RecordValue
 # Unit Conversion
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class UnitConversion:
     """A single unit conversion rule.
@@ -121,68 +122,100 @@ def build_whk_unit_registry() -> UnitRegistry:
     registry = UnitRegistry()
 
     # Temperature: canonical = °C
-    registry.register(UnitConversion(
-        from_unit="°F", to_unit="°C",
-        factor=5.0 / 9.0, pre_offset=32.0,
-        dimension="temperature",
-    ))
-    registry.register(UnitConversion(
-        from_unit="K", to_unit="°C",
-        factor=1.0, pre_offset=273.15,
-        dimension="temperature",
-    ))
+    registry.register(
+        UnitConversion(
+            from_unit="°F",
+            to_unit="°C",
+            factor=5.0 / 9.0,
+            pre_offset=32.0,
+            dimension="temperature",
+        )
+    )
+    registry.register(
+        UnitConversion(
+            from_unit="K",
+            to_unit="°C",
+            factor=1.0,
+            pre_offset=273.15,
+            dimension="temperature",
+        )
+    )
     registry.set_canonical("temperature", "°C")
 
     # Volume: canonical = liters
-    registry.register(UnitConversion(
-        from_unit="gal", to_unit="L",
-        factor=3.78541,
-        dimension="volume",
-    ))
-    registry.register(UnitConversion(
-        from_unit="bbl", to_unit="L",
-        factor=158.987,  # US barrel (petroleum)
-        dimension="volume",
-    ))
-    registry.register(UnitConversion(
-        from_unit="wine_bbl", to_unit="L",
-        factor=119.24,  # Wine/whiskey barrel (~31.5 US gal)
-        dimension="volume",
-    ))
+    registry.register(
+        UnitConversion(
+            from_unit="gal",
+            to_unit="L",
+            factor=3.78541,
+            dimension="volume",
+        )
+    )
+    registry.register(
+        UnitConversion(
+            from_unit="bbl",
+            to_unit="L",
+            factor=158.987,  # US barrel (petroleum)
+            dimension="volume",
+        )
+    )
+    registry.register(
+        UnitConversion(
+            from_unit="wine_bbl",
+            to_unit="L",
+            factor=119.24,  # Wine/whiskey barrel (~31.5 US gal)
+            dimension="volume",
+        )
+    )
     registry.set_canonical("volume", "L")
 
     # Concentration: canonical = ABV (percent)
-    registry.register(UnitConversion(
-        from_unit="proof", to_unit="ABV",
-        factor=0.5,
-        dimension="concentration",
-    ))
+    registry.register(
+        UnitConversion(
+            from_unit="proof",
+            to_unit="ABV",
+            factor=0.5,
+            dimension="concentration",
+        )
+    )
     registry.set_canonical("concentration", "ABV")
 
     # Mass: canonical = kg
-    registry.register(UnitConversion(
-        from_unit="lb", to_unit="kg",
-        factor=0.453592,
-        dimension="mass",
-    ))
-    registry.register(UnitConversion(
-        from_unit="oz", to_unit="kg",
-        factor=0.0283495,
-        dimension="mass",
-    ))
+    registry.register(
+        UnitConversion(
+            from_unit="lb",
+            to_unit="kg",
+            factor=0.453592,
+            dimension="mass",
+        )
+    )
+    registry.register(
+        UnitConversion(
+            from_unit="oz",
+            to_unit="kg",
+            factor=0.0283495,
+            dimension="mass",
+        )
+    )
     registry.set_canonical("mass", "kg")
 
     # Pressure: canonical = kPa
-    registry.register(UnitConversion(
-        from_unit="psi", to_unit="kPa",
-        factor=6.89476,
-        dimension="pressure",
-    ))
-    registry.register(UnitConversion(
-        from_unit="bar", to_unit="kPa",
-        factor=100.0,
-        dimension="pressure",
-    ))
+    registry.register(
+        UnitConversion(
+            from_unit="psi",
+            to_unit="kPa",
+            factor=6.89476,
+            dimension="pressure",
+        )
+    )
+    registry.register(
+        UnitConversion(
+            from_unit="bar",
+            to_unit="kPa",
+            factor=100.0,
+            dimension="pressure",
+        )
+    )
     registry.set_canonical("pressure", "kPa")
 
     return registry
@@ -239,7 +272,8 @@ class TimeBucketer:
         return epoch + timedelta(seconds=bucket_num * window_seconds)
 
     def bucket_records(
-        self, records: list[ContextualRecord],
+        self,
+        records: list[ContextualRecord],
     ) -> dict[datetime, list[ContextualRecord]]:
         """Group records by their bucketed source_time."""
         buckets: dict[datetime, list[ContextualRecord]] = {}
@@ -252,6 +286,7 @@ class TimeBucketer:
 # ---------------------------------------------------------------------------
 # Value Normalizer
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ValueNormalizer:
@@ -314,12 +349,16 @@ class ValueNormalizer:
         """
         new_value = self.normalize_value(record.value, target_unit)
         new_chain = [*record.lineage.transformation_chain, "normalize"]
-        return record.model_copy(update={
-            "value": new_value,
-            "lineage": record.lineage.model_copy(update={
-                "transformation_chain": new_chain,
-            }),
-        })
+        return record.model_copy(
+            update={
+                "value": new_value,
+                "lineage": record.lineage.model_copy(
+                    update={
+                        "transformation_chain": new_chain,
+                    }
+                ),
+            }
+        )
 
     def _find_canonical(self, unit: str) -> str | None:
         """Find the canonical unit for a given unit by scanning conversions."""

@@ -7,7 +7,7 @@ governed by FACTS specs.
 
 from __future__ import annotations
 
-from datetime import datetime  # noqa: TC003 — Pydantic needs runtime access
+from datetime import datetime
 from enum import StrEnum
 from typing import Any
 

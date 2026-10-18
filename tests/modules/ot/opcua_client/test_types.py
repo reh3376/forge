@@ -5,9 +5,10 @@ Covers all Pydantic models, enumerations, validators, and parsing logic.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
+from pydantic import ValidationError
 
 from forge.modules.ot.opcua_client.types import (
     AccessLevel,
@@ -23,7 +24,6 @@ from forge.modules.ot.opcua_client.types import (
     QualityCode,
     Subscription,
 )
-
 
 # ---------------------------------------------------------------------------
 # QualityCode
@@ -181,7 +181,7 @@ class TestNodeId:
         assert nid.namespace == 0
 
     def test_namespace_validation(self) -> None:
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             NodeId(namespace=-1, identifier="test")
 
 
@@ -217,12 +217,12 @@ class TestDataValue:
         """Naive timestamps should be forced to UTC by the validator."""
         naive_dt = datetime(2026, 1, 15, 12, 0, 0)
         dv = DataValue(source_timestamp=naive_dt, server_timestamp=naive_dt)
-        assert dv.source_timestamp.tzinfo == timezone.utc
-        assert dv.server_timestamp.tzinfo == timezone.utc
+        assert dv.source_timestamp.tzinfo == UTC
+        assert dv.server_timestamp.tzinfo == UTC
 
     def test_aware_timestamp_preserved(self) -> None:
         """Timestamps with tzinfo should be preserved as-is."""
-        aware_dt = datetime(2026, 1, 15, 12, 0, 0, tzinfo=timezone.utc)
+        aware_dt = datetime(2026, 1, 15, 12, 0, 0, tzinfo=UTC)
         dv = DataValue(source_timestamp=aware_dt, server_timestamp=aware_dt)
         assert dv.source_timestamp == aware_dt
 
@@ -359,7 +359,7 @@ class TestConnectionHealth:
             endpoint_url="opc.tcp://10.4.2.10:4840",
             connection_name="plc200",
             state=ConnectionState.CONNECTED,
-            connected_since=datetime.now(timezone.utc),
+            connected_since=datetime.now(UTC),
             reconnect_count=0,
             active_subscriptions=3,
             monitored_items_count=150,

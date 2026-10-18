@@ -13,7 +13,7 @@ Endpoints:
 
 from __future__ import annotations
 
-from datetime import datetime  # noqa: TC003
+from datetime import datetime
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
@@ -342,9 +342,7 @@ def create_registry_app(store: SchemaStore | None = None) -> FastAPI:
         "/v1/schemas/{schema_id:path}/diff/{from_version}/{to_version}",
         response_model=DiffResponse,
     )
-    async def version_diff(
-        schema_id: str, from_version: int, to_version: int
-    ) -> DiffResponse:
+    async def version_diff(schema_id: str, from_version: int, to_version: int) -> DiffResponse:
         metadata = await _store.get(schema_id)
         if metadata is None:
             raise HTTPException(404, f"Schema '{schema_id}' not found")

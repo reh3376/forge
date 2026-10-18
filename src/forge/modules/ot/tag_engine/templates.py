@@ -43,10 +43,8 @@ Example usage:
 
 from __future__ import annotations
 
-import copy
 import logging
 import re
-from datetime import datetime, timezone
 from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
@@ -56,19 +54,18 @@ from forge.modules.ot.tag_engine.models import (
     AlarmConfig,
     BaseTag,
     ClampConfig,
-    HistoryConfig,
-    ScaleConfig,
-    ScanClass,
-    TagType,
-    TagUnion,
-    StandardTag,
-    MemoryTag,
-    ExpressionTag,
     ComputedTag,
     DerivedTag,
-    ReferenceTag,
-    QueryTag,
     EventTag,
+    ExpressionTag,
+    HistoryConfig,
+    MemoryTag,
+    QueryTag,
+    ReferenceTag,
+    ScaleConfig,
+    ScanClass,
+    StandardTag,
+    TagUnion,
     VirtualTag,
 )
 
@@ -245,9 +242,7 @@ class TagTemplate(BaseModel):
             )
 
         if errors:
-            raise ValueError(
-                f"Template '{self.name}' parameter errors: {'; '.join(errors)}"
-            )
+            raise ValueError(f"Template '{self.name}' parameter errors: {'; '.join(errors)}")
         return resolved
 
     def instantiate(
@@ -298,7 +293,9 @@ class TagTemplate(BaseModel):
         path_prefix: str,
     ) -> TagUnion:
         """Build a single concrete tag from a template definition."""
-        resolve = lambda s: self._resolve_template(s, params) if s else ""
+
+        def resolve(s: str) -> str:
+            return self._resolve_template(s, params) if s else ""
 
         # Resolve path
         path = resolve(tag_def.path_template)
@@ -340,15 +337,11 @@ class TagTemplate(BaseModel):
             kwargs["expression"] = resolve(tag_def.expression_template or "")
         elif tag_type == "computed":
             if tag_def.sources_template:
-                kwargs["sources"] = {
-                    k: resolve(v) for k, v in tag_def.sources_template.items()
-                }
+                kwargs["sources"] = {k: resolve(v) for k, v in tag_def.sources_template.items()}
             kwargs["function_body"] = resolve(tag_def.function_body_template or "")
         elif tag_type == "event":
             kwargs["event_source"] = tag_def.event_source or ""
-            kwargs["topic_or_exchange"] = resolve(
-                tag_def.topic_or_exchange_template or ""
-            )
+            kwargs["topic_or_exchange"] = resolve(tag_def.topic_or_exchange_template or "")
 
         cls = _TAG_TYPE_TO_CLASS[tag_type]
         return cls(**kwargs)
@@ -394,8 +387,7 @@ class TemplateRegistry:
             raise ValueError(f"Template already registered: {template.name}")
         if template.extends and template.extends not in self._templates:
             raise ValueError(
-                f"Template '{template.name}' extends '{template.extends}' "
-                f"which is not registered"
+                f"Template '{template.name}' extends '{template.extends}' which is not registered"
             )
         self._templates[template.name] = template
 
@@ -428,9 +420,7 @@ class TemplateRegistry:
         visited: set[str] = set()
         while current is not None:
             if current.name in visited:
-                raise ValueError(
-                    f"Circular template inheritance: {current.name}"
-                )
+                raise ValueError(f"Circular template inheritance: {current.name}")
             visited.add(current.name)
             chain.append(current)
             current = self._templates.get(current.extends) if current.extends else None

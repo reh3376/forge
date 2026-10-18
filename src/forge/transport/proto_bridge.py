@@ -70,9 +70,7 @@ _ADAPTER_STATE_TO_PROTO: dict[str, int] = {
     "FAILED": enums.ADAPTER_STATE_FAILED,
     "STOPPED": enums.ADAPTER_STATE_STOPPED,
 }
-_PROTO_TO_ADAPTER_STATE: dict[int, str] = {
-    v: k for k, v in _ADAPTER_STATE_TO_PROTO.items()
-}
+_PROTO_TO_ADAPTER_STATE: dict[int, str] = {v: k for k, v in _ADAPTER_STATE_TO_PROTO.items()}
 
 _ADAPTER_TIER_TO_PROTO: dict[str, int] = {
     "OT": enums.ADAPTER_TIER_OT,
@@ -81,9 +79,7 @@ _ADAPTER_TIER_TO_PROTO: dict[str, int] = {
     "HISTORIAN": enums.ADAPTER_TIER_HISTORIAN,
     "DOCUMENT": enums.ADAPTER_TIER_DOCUMENT,
 }
-_PROTO_TO_ADAPTER_TIER: dict[int, str] = {
-    v: k for k, v in _ADAPTER_TIER_TO_PROTO.items()
-}
+_PROTO_TO_ADAPTER_TIER: dict[int, str] = {v: k for k, v in _ADAPTER_TIER_TO_PROTO.items()}
 
 
 # ---------------------------------------------------------------------------
@@ -322,7 +318,8 @@ def health_to_proto(health: AdapterHealth) -> adapter_msg.AdapterHealth:
     proto_health = adapter_msg.AdapterHealth(
         adapter_id=health.adapter_id,
         state=_ADAPTER_STATE_TO_PROTO.get(
-            health.state.value, enums.ADAPTER_STATE_UNSPECIFIED,
+            health.state.value,
+            enums.ADAPTER_STATE_UNSPECIFIED,
         ),
         error_message=health.error_message or "",
         records_collected=health.records_collected,

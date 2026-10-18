@@ -29,14 +29,18 @@ def manifest_dict() -> dict:
 
 class TestRegister:
     async def test_register_returns_session_id(
-        self, servicer: InMemoryServicer, manifest_dict: dict,
+        self,
+        servicer: InMemoryServicer,
+        manifest_dict: dict,
     ) -> None:
         result = await servicer.register(manifest_dict)
         assert result["accepted"] is True
         assert result["session_id"].startswith("session-test-adapter-")
 
     async def test_register_creates_session(
-        self, servicer: InMemoryServicer, manifest_dict: dict,
+        self,
+        servicer: InMemoryServicer,
+        manifest_dict: dict,
     ) -> None:
         result = await servicer.register(manifest_dict)
         session_id = result["session_id"]
@@ -44,7 +48,9 @@ class TestRegister:
         assert servicer._sessions[session_id].adapter_id == "test-adapter"
 
     async def test_register_creates_record_queue(
-        self, servicer: InMemoryServicer, manifest_dict: dict,
+        self,
+        servicer: InMemoryServicer,
+        manifest_dict: dict,
     ) -> None:
         result = await servicer.register(manifest_dict)
         session_id = result["session_id"]
@@ -53,7 +59,9 @@ class TestRegister:
 
 class TestLifecycle:
     async def test_configure(
-        self, servicer: InMemoryServicer, manifest_dict: dict,
+        self,
+        servicer: InMemoryServicer,
+        manifest_dict: dict,
     ) -> None:
         reg = await servicer.register(manifest_dict)
         sid = reg["session_id"]
@@ -63,7 +71,9 @@ class TestLifecycle:
         assert servicer._sessions[sid].state == AdapterState.CONNECTING
 
     async def test_start_after_configure(
-        self, servicer: InMemoryServicer, manifest_dict: dict,
+        self,
+        servicer: InMemoryServicer,
+        manifest_dict: dict,
     ) -> None:
         reg = await servicer.register(manifest_dict)
         sid = reg["session_id"]
@@ -73,7 +83,9 @@ class TestLifecycle:
         assert servicer._sessions[sid].state == AdapterState.HEALTHY
 
     async def test_start_without_configure_fails(
-        self, servicer: InMemoryServicer, manifest_dict: dict,
+        self,
+        servicer: InMemoryServicer,
+        manifest_dict: dict,
     ) -> None:
         reg = await servicer.register(manifest_dict)
         sid = reg["session_id"]
@@ -82,7 +94,9 @@ class TestLifecycle:
         assert "Not configured" in result["message"]
 
     async def test_stop(
-        self, servicer: InMemoryServicer, manifest_dict: dict,
+        self,
+        servicer: InMemoryServicer,
+        manifest_dict: dict,
     ) -> None:
         reg = await servicer.register(manifest_dict)
         sid = reg["session_id"]
@@ -93,7 +107,9 @@ class TestLifecycle:
         assert servicer._sessions[sid].state == AdapterState.STOPPED
 
     async def test_health_when_healthy(
-        self, servicer: InMemoryServicer, manifest_dict: dict,
+        self,
+        servicer: InMemoryServicer,
+        manifest_dict: dict,
     ) -> None:
         reg = await servicer.register(manifest_dict)
         sid = reg["session_id"]
@@ -109,7 +125,10 @@ class TestLifecycle:
 
 class TestRecordReceiving:
     async def test_receive_and_drain(
-        self, servicer: InMemoryServicer, manifest_dict: dict, sample_record,
+        self,
+        servicer: InMemoryServicer,
+        manifest_dict: dict,
+        sample_record,
     ) -> None:
         reg = await servicer.register(manifest_dict)
         sid = reg["session_id"]
@@ -121,7 +140,10 @@ class TestRecordReceiving:
         assert records[0].source.adapter_id == "whk-wms"
 
     async def test_receive_increments_counter(
-        self, servicer: InMemoryServicer, manifest_dict: dict, sample_record,
+        self,
+        servicer: InMemoryServicer,
+        manifest_dict: dict,
+        sample_record,
     ) -> None:
         reg = await servicer.register(manifest_dict)
         sid = reg["session_id"]
@@ -131,7 +153,10 @@ class TestRecordReceiving:
         assert servicer._sessions[sid].records_received == 2
 
     async def test_drain_with_max(
-        self, servicer: InMemoryServicer, manifest_dict: dict, sample_record,
+        self,
+        servicer: InMemoryServicer,
+        manifest_dict: dict,
+        sample_record,
     ) -> None:
         reg = await servicer.register(manifest_dict)
         sid = reg["session_id"]

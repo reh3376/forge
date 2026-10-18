@@ -18,9 +18,9 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, AsyncIterator
+from typing import TYPE_CHECKING, Any
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -44,7 +44,11 @@ from forge.core.models.adapter import (
     ConnectionParam,
     DataContract,
 )
-from forge.core.models.contextual_record import ContextualRecord
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from forge.core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 
@@ -63,9 +67,7 @@ def _load_manifest() -> AdapterManifest:
         capabilities=AdapterCapabilities(**raw.get("capabilities", {})),
         data_contract=DataContract(**raw.get("data_contract", {})),
         health_check_interval_ms=raw.get("health_check_interval_ms", 5000),
-        connection_params=[
-            ConnectionParam(**p) for p in raw.get("connection_params", [])
-        ],
+        connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
     )
@@ -126,17 +128,16 @@ class WhkCmmsAdapter(
         aio-httpx and aio-pika when the hub's event loop integration is ready.
         """
         if self._config is None:
-            raise RuntimeError(
-                "Adapter not configured — call configure() first"
-            )
+            raise RuntimeError("Adapter not configured — call configure() first")
         self._state = AdapterState.CONNECTING
         # Phase 1: no live GraphQL/RabbitMQ connections yet — records injected for testing
         # Phase 2 will add aio-httpx for GraphQL polling and aio-pika for RabbitMQ
         self._state = AdapterState.HEALTHY
-        self._last_healthy = datetime.now(tz=timezone.utc)
+        self._last_healthy = datetime.now(tz=UTC)
         self._startup_time = self._last_healthy
         logger.info(
-            "whk-cmms adapter started (phase 1: inject-only, %d graphql entities, %d rmq topics defined)",
+            "whk-cmms adapter started "
+            "(phase 1: inject-only, %d graphql entities, %d rmq topics defined)",
             len(CMMS_GRAPHQL_ENTITIES),
             len(CMMS_RABBITMQ_TOPICS),
         )
@@ -152,11 +153,11 @@ class WhkCmmsAdapter(
         """Return current health status and record counters."""
         uptime = 0.0
         if self._startup_time is not None:
-            uptime = (datetime.now(tz=timezone.utc) - self._startup_time).total_seconds()
+            uptime = (datetime.now(tz=UTC) - self._startup_time).total_seconds()
         return AdapterHealth(
             adapter_id=self.adapter_id,
             state=self._state,
-            last_check=datetime.now(tz=timezone.utc),
+            last_check=datetime.now(tz=UTC),
             last_healthy=self._last_healthy,
             records_collected=self._records_collected,
             records_failed=self._records_failed,
@@ -207,9 +208,7 @@ class WhkCmmsAdapter(
 
     # ── SubscriptionProvider ───────────────────────────────────
 
-    async def subscribe(
-        self, tags: list[str], callback: Any
-    ) -> str:
+    async def subscribe(self, tags: list[str], callback: Any) -> str:
         """Subscribe to RabbitMQ master data topics.
 
         Tags use the CMMS RabbitMQ format: wh.whk01.distillery01.<entity>

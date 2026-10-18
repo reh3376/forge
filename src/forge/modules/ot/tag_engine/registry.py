@@ -24,15 +24,14 @@ import asyncio
 import logging
 import re
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import (
-    BaseTag,
-    ExpressionTag,
     ComputedTag,
     DerivedTag,
+    ExpressionTag,
     ReferenceTag,
     ScanClass,
     TagType,
@@ -165,7 +164,7 @@ class TagRegistry:
         if tv is None:
             return False
 
-        now = timestamp or datetime.now(timezone.utc)
+        now = timestamp or datetime.now(UTC)
         changed = (value != tv.value) or (quality != tv.quality)
 
         tv.previous_value = tv.value
@@ -201,7 +200,6 @@ class TagRegistry:
         folder objects in the registry.
         """
         prefix = prefix.rstrip("/")
-        depth = len(prefix.split("/")) if prefix else 0
 
         children: dict[str, dict[str, Any]] = {}
 
@@ -221,7 +219,7 @@ class TagRegistry:
                 continue
 
             # Extract the next segment after the prefix
-            remaining = path[len(prefix) + 1:] if prefix else path
+            remaining = path[len(prefix) + 1 :] if prefix else path
             segments = remaining.split("/")
             next_segment = segments[0]
             child_path = f"{prefix}/{next_segment}" if prefix else next_segment
@@ -259,16 +257,12 @@ class TagRegistry:
     async def find_by_scan_class(self, scan_class: ScanClass) -> list[str]:
         """Find all tag paths in a given scan class."""
         return [
-            path for path, tag in self._tags.items()
-            if tag.scan_class == scan_class and tag.enabled
+            path for path, tag in self._tags.items() if tag.scan_class == scan_class and tag.enabled
         ]
 
     async def find_by_area(self, area: str) -> list[str]:
         """Find all tag paths in a given area."""
-        return [
-            path for path, tag in self._tags.items()
-            if tag.area == area
-        ]
+        return [path for path, tag in self._tags.items() if tag.area == area]
 
     # ------------------------------------------------------------------
     # Serialization

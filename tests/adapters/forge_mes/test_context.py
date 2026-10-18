@@ -71,37 +71,27 @@ class TestNormalizeEventType:
 
     def test_mqtt_topic_step_execution(self):
         raw = {}
-        result = normalize_event_type(
-            raw, mqtt_topic="production/StepExecution/step_completed"
-        )
+        result = normalize_event_type(raw, mqtt_topic="production/StepExecution/step_completed")
         assert result == "step.completed"
 
     def test_mqtt_topic_unknown_entity(self):
         raw = {}
-        result = normalize_event_type(
-            raw, mqtt_topic="production/NewEntity/some_action"
-        )
+        result = normalize_event_type(raw, mqtt_topic="production/NewEntity/some_action")
         assert result == "newentity.some_action"
 
     def test_rabbitmq_exchange_batch(self):
         raw = {}
-        result = normalize_event_type(
-            raw, exchange_name="wh.whk01.distillery01.batch"
-        )
+        result = normalize_event_type(raw, exchange_name="wh.whk01.distillery01.batch")
         assert result == "batch.event"
 
     def test_rabbitmq_exchange_recipe(self):
         raw = {}
-        result = normalize_event_type(
-            raw, exchange_name="wh.whk01.distillery01.recipe"
-        )
+        result = normalize_event_type(raw, exchange_name="wh.whk01.distillery01.recipe")
         assert result == "recipe.event"
 
     def test_rabbitmq_exchange_test(self):
         raw = {}
-        result = normalize_event_type(
-            raw, exchange_name="wh.whk01.distillery01.test"
-        )
+        result = normalize_event_type(raw, exchange_name="wh.whk01.distillery01.test")
         assert result == "quality.event"
 
     def test_unknown_fallback(self):

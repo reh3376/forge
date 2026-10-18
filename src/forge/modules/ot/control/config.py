@@ -45,7 +45,7 @@ from forge.modules.ot.control.changeover_orchestrator import (
     AreaChangeoverConfig,
     CipPolicy,
 )
-from forge.modules.ot.control.cip_runner import PlcCipSpec  # noqa: TC001 — pydantic field type
+from forge.modules.ot.control.cip_runner import PlcCipSpec
 from forge.modules.ot.control.models import (
     ConfirmationMode,
     InterlockRule,

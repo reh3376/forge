@@ -22,11 +22,12 @@ Usage::
 
 from __future__ import annotations
 
-import asyncio
 import logging
-from typing import Any, Callable, Awaitable, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
+
     from forge.core.broker.broker import ForgeMqttBroker
 
 logger = logging.getLogger(__name__)
@@ -90,12 +91,14 @@ class LocalMqttClient:
         )
 
         # Track for testing
-        self.published.append({
-            "topic": topic,
-            "payload": payload,
-            "qos": qos,
-            "retain": retain,
-        })
+        self.published.append(
+            {
+                "topic": topic,
+                "payload": payload,
+                "qos": qos,
+                "retain": retain,
+            }
+        )
 
     def subscribe(
         self,

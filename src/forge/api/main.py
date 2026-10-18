@@ -22,7 +22,7 @@ import logging
 import os
 import time
 from contextlib import asynccontextmanager
-from datetime import datetime  # noqa: TC003 — pydantic field type
+from datetime import datetime
 from functools import partial
 from typing import Any
 
@@ -276,8 +276,11 @@ def create_app(
             await ot_host.start()
             logger.info("OT module hosted in-process (config %s)", ot_host.config_path)
 
-        logger.info("Forge Hub API ready (REST port %s, gRPC port %s)",
-                     os.getenv("FORGE_API_PORT", "8000"), grpc_port)
+        logger.info(
+            "Forge Hub API ready (REST port %s, gRPC port %s)",
+            os.getenv("FORGE_API_PORT", "8000"),
+            grpc_port,
+        )
 
         yield
 
@@ -400,14 +403,10 @@ def create_app(
                 )
             except Exception as exc:
                 parse_errors.append(f"record {index}: {exc}")
-        outcome = await pipeline.ingest(
-            records, adapter_id=request.adapter_id, manifest=manifest
-        )
+        outcome = await pipeline.ingest(records, adapter_id=request.adapter_id, manifest=manifest)
         if outcome.received or parse_errors:
             await registry.log_batch(request.adapter_id, "rest", outcome)
-        logger.info(
-            "REST ingest from adapter '%s': %s", request.adapter_id, outcome.summary()
-        )
+        logger.info("REST ingest from adapter '%s': %s", request.adapter_id, outcome.summary())
         return IngestResponse(
             accepted=outcome.accepted,
             rejected=outcome.rejected + len(parse_errors),

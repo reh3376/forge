@@ -38,11 +38,9 @@ from __future__ import annotations
 import logging
 from collections import deque
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any, Protocol, runtime_checkable
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
-from forge.modules.ot.control.authorization import WriteAuthorizer
-from forge.modules.ot.control.interlock import InterlockEngine
 from forge.modules.ot.control.models import (
     DataType,
     WriteRequest,
@@ -50,7 +48,11 @@ from forge.modules.ot.control.models import (
     WriteStatus,
 )
 from forge.modules.ot.control.review import ReviewTicket, WriteReviewer
-from forge.modules.ot.control.validation import WriteValidator
+
+if TYPE_CHECKING:
+    from forge.modules.ot.control.authorization import WriteAuthorizer
+    from forge.modules.ot.control.interlock import InterlockEngine
+    from forge.modules.ot.control.validation import WriteValidator
 
 logger = logging.getLogger(__name__)
 
@@ -268,9 +270,7 @@ class ControlWriteEngine:
 
     # -- Layer 5: Write + Read-Back ------------------------------------------
 
-    async def _write_and_readback(
-        self, request: WriteRequest, result: WriteResult
-    ) -> None:
+    async def _write_and_readback(self, request: WriteRequest, result: WriteResult) -> None:
         """Perform the OPC-UA write and read-back confirmation."""
         # Read old value (best-effort)
         try:
@@ -279,23 +279,23 @@ class ControlWriteEngine:
             logger.warning("Pre-write read failed for %s: %s", request.tag_path, exc)
 
         # Write
-        result.write_sent_at = datetime.now(timezone.utc)
+        result.write_sent_at = datetime.now(UTC)
         try:
             await self._writer.write_tag(request.tag_path, request.value)
         except Exception as exc:
             result.status = WriteStatus.FAILED_WRITE
             result.write_error = str(exc)
-            result.completed_at = datetime.now(timezone.utc)
+            result.completed_at = datetime.now(UTC)
             return
 
         # Read-back
-        result.readback_at = datetime.now(timezone.utc)
+        result.readback_at = datetime.now(UTC)
         try:
             result.new_value = await self._writer.read_tag(request.tag_path)
         except Exception as exc:
             result.status = WriteStatus.FAILED_READBACK
             result.readback_error = str(exc)
-            result.completed_at = datetime.now(timezone.utc)
+            result.completed_at = datetime.now(UTC)
             return
 
         # Compare
@@ -308,11 +308,9 @@ class ControlWriteEngine:
         else:
             result.status = WriteStatus.UNCONFIRMED
 
-        result.completed_at = datetime.now(timezone.utc)
+        result.completed_at = datetime.now(UTC)
 
-    def _values_match(
-        self, requested: Any, readback: Any, data_type: DataType
-    ) -> bool:
+    def _values_match(self, requested: Any, readback: Any, data_type: DataType) -> bool:
         """Compare requested value to read-back value with type-aware
         tolerance."""
         if readback is None:
@@ -374,12 +372,8 @@ class ControlWriteEngine:
 
     def get_stats(self) -> dict[str, Any]:
         """Return write engine statistics."""
-        confirmed = sum(
-            1 for r in self._journal if r.status == WriteStatus.CONFIRMED
-        )
-        unconfirmed = sum(
-            1 for r in self._journal if r.status == WriteStatus.UNCONFIRMED
-        )
+        confirmed = sum(1 for r in self._journal if r.status == WriteStatus.CONFIRMED)
+        unconfirmed = sum(1 for r in self._journal if r.status == WriteStatus.UNCONFIRMED)
         rejected = sum(
             1
             for r in self._journal

@@ -39,9 +39,7 @@ class Neo4jMigrationRunner:
     def _get_applied(self) -> set[str]:
         """Get the set of already-applied migration IDs."""
         with self._driver.session() as session:
-            result = session.run(
-                "MATCH (m:_ForgeMigration) RETURN m.migration_id AS id"
-            )
+            result = session.run("MATCH (m:_ForgeMigration) RETURN m.migration_id AS id")
             return {record["id"] for record in result}
 
     def _get_available(self) -> list[tuple[str, Path]]:
@@ -109,9 +107,7 @@ class Neo4jMigrationRunner:
         """
         applied = self._get_applied()
         available = self._get_available()
-        applied_migrations = [
-            (mid, path) for mid, path in available if mid in applied
-        ]
+        applied_migrations = [(mid, path) for mid, path in available if mid in applied]
         to_rollback = applied_migrations[-steps:]
 
         for migration_id, path in reversed(to_rollback):

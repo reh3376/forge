@@ -1,13 +1,12 @@
 """Tests for the ScriptEngine — discovery, loading, dispatch, hot-reload."""
 
-import asyncio
-import pytest
 import time
 from pathlib import Path
 
-from forge.sdk.scripting.engine import ScriptEngine, ScriptInfo
-from forge.sdk.scripting.triggers import TriggerRegistry, TriggerType
+import pytest
 
+from forge.sdk.scripting.engine import ScriptEngine
+from forge.sdk.scripting.triggers import TriggerType
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -56,7 +55,6 @@ raise RuntimeError("Script load failure!")
 
 
 class TestDiscovery:
-
     def test_discover_finds_scripts(self, tmp_path):
         scripts = tmp_path / "scripts"
         scripts.mkdir()
@@ -97,7 +95,6 @@ class TestDiscovery:
 
 
 class TestLoading:
-
     def test_load_script_registers_handlers(self, tmp_path):
         scripts = tmp_path / "scripts"
         scripts.mkdir()
@@ -151,7 +148,6 @@ class TestLoading:
 
 
 class TestReload:
-
     def test_reload_replaces_handlers(self, tmp_path):
         scripts = tmp_path / "scripts"
         scripts.mkdir()
@@ -185,7 +181,6 @@ async def simplified(event):
 
 
 class TestDispatch:
-
     @pytest.mark.asyncio
     async def test_dispatch_tag_change(self, tmp_path):
         scripts = tmp_path / "scripts"
@@ -233,7 +228,10 @@ async def handler(event):
 
         count = await engine.dispatch_tag_change(
             tag_path="WH/WHK01/Granary01/FIT_1010/Out_PV",
-            old_value=0, new_value=1, quality="GOOD", timestamp="",
+            old_value=0,
+            new_value=1,
+            quality="GOOD",
+            timestamp="",
         )
         assert count == 0
         await engine.stop()
@@ -285,9 +283,13 @@ async def handler(event):
         await engine.start()
 
         count = await engine.dispatch_alarm_event(
-            alarm_id="a1", alarm_name="HIGH_TEMP",
-            state="ACTIVE_UNACK", priority="CRITICAL",
-            tag_path="WH/TIT/Out_PV", value=185.0, setpoint=180.0,
+            alarm_id="a1",
+            alarm_name="HIGH_TEMP",
+            state="ACTIVE_UNACK",
+            priority="CRITICAL",
+            tag_path="WH/TIT/Out_PV",
+            value=185.0,
+            setpoint=180.0,
             timestamp="2026-04-08T12:00:00Z",
         )
         assert count == 1
@@ -303,7 +305,6 @@ async def handler(event):
 
 
 class TestHotReload:
-
     @pytest.mark.asyncio
     async def test_check_for_changes_detects_modified(self, tmp_path):
         scripts = tmp_path / "scripts"
@@ -350,7 +351,6 @@ class TestHotReload:
 
 
 class TestStatus:
-
     @pytest.mark.asyncio
     async def test_get_status(self, tmp_path):
         scripts = tmp_path / "scripts"

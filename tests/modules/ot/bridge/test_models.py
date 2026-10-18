@@ -1,6 +1,6 @@
 """Tests for bridge adapter data models."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -14,7 +14,6 @@ from forge.modules.ot.bridge.models import (
     TagMapping,
     TagMappingRule,
 )
-
 
 # ---------------------------------------------------------------------------
 # IgnitionQuality
@@ -124,8 +123,8 @@ class TestIgnitionTagResponse:
         assert resp.bad_count == 2  # BAD and BAD_STALE
 
     def test_latency_calculation(self):
-        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=timezone.utc)
-        t2 = datetime(2026, 4, 9, 12, 0, 0, 500000, tzinfo=timezone.utc)  # +500ms
+        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=UTC)
+        t2 = datetime(2026, 4, 9, 12, 0, 0, 500000, tzinfo=UTC)  # +500ms
         resp = IgnitionTagResponse(values=(), request_time=t1, response_time=t2)
         assert abs(resp.latency_ms - 500.0) < 1.0
 

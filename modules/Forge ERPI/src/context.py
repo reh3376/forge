@@ -103,9 +103,7 @@ def build_record_context(
     # ── ERPI Transaction Fields ────────────────────────────────
     global_id = payload.get("globalId") or payload.get("global_id") or ""
     transaction_initiator = str(
-        payload.get("transactionInitiator")
-        or payload.get("transaction_initiator")
-        or "unknown"
+        payload.get("transactionInitiator") or payload.get("transaction_initiator") or "unknown"
     ).upper()
     # Normalize case variants (Wh → WH, Erp → ERP)
     if transaction_initiator in ("WH", "ERP"):
@@ -116,23 +114,17 @@ def build_record_context(
         transaction_initiator = "UNKNOWN"
 
     transaction_status = str(
-        payload.get("transactionStatus")
-        or payload.get("transaction_status")
-        or "UNKNOWN"
+        payload.get("transactionStatus") or payload.get("transaction_status") or "UNKNOWN"
     ).upper()
 
     transaction_type = str(
-        payload.get("transactionType")
-        or payload.get("transaction_type")
-        or "UNKNOWN"
+        payload.get("transactionType") or payload.get("transaction_type") or "UNKNOWN"
     ).upper()
 
     schema_version = payload.get("schemaVersion") or payload.get("schema_version")
 
     # ── Derived Fields ─────────────────────────────────────────
-    data_flow = _INITIATOR_TO_DIRECTION.get(
-        payload.get("transactionInitiator", ""), "unknown"
-    )
+    data_flow = _INITIATOR_TO_DIRECTION.get(payload.get("transactionInitiator", ""), "unknown")
     category = _ENTITY_CATEGORY.get(record_name, "unknown")
 
     # ── Relational Context (entity-dependent) ──────────────────
@@ -153,12 +145,8 @@ def build_record_context(
         or payload.get("barrelId")
         or payload.get("barrel_id")
     )
-    vendor_id = _str_or_none(
-        payload.get("vendorId") or payload.get("vendor_id")
-    )
-    customer_id = _str_or_none(
-        payload.get("customerId") or payload.get("customer_id")
-    )
+    vendor_id = _str_or_none(payload.get("vendorId") or payload.get("vendor_id"))
+    customer_id = _str_or_none(payload.get("customerId") or payload.get("customer_id"))
 
     # ── Build Extra Context Dict ───────────────────────────────
     extra: dict[str, Any] = {

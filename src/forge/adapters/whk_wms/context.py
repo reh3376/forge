@@ -165,9 +165,7 @@ def build_record_context(
             event_ts = event_ts_raw
         elif isinstance(event_ts_raw, str):
             try:
-                event_ts = datetime.fromisoformat(
-                    event_ts_raw.replace("Z", "+00:00")
-                )
+                event_ts = datetime.fromisoformat(event_ts_raw.replace("Z", "+00:00"))
             except (ValueError, TypeError):
                 logger.warning("Could not parse event_timestamp: %s", event_ts_raw)
         if event_ts:
@@ -186,10 +184,7 @@ def build_record_context(
         or raw_event.get("barrelId")
         or raw_event.get("manufacturing_unit_id")
     )
-    lot_id = (
-        raw_event.get("lot_id")
-        or raw_event.get("lotId")
-    )
+    lot_id = raw_event.get("lot_id") or raw_event.get("lotId")
     batch_id = raw_event.get("batch_id") or raw_event.get("batchId") or lot_id
     operator_id = (
         raw_event.get("operator_id")
@@ -252,10 +247,7 @@ def build_record_context(
     transfer_id = raw_event.get("transfer_id") or raw_event.get("transferId")
     if transfer_id:
         extra["transfer_id"] = transfer_id
-    production_run_id = (
-        raw_event.get("production_run_id")
-        or raw_event.get("productionRunId")
-    )
+    production_run_id = raw_event.get("production_run_id") or raw_event.get("productionRunId")
     if production_run_id:
         extra["production_run_id"] = production_run_id
 

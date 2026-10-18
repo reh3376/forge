@@ -1,4 +1,4 @@
-# ruff: noqa: E402, UP017, UP042
+# ruff: noqa: E402, UP017
 """Performance benchmark: JSON vs Protobuf-compatible serialization.
 
 Measures the throughput of converting ContextualRecords between
@@ -22,8 +22,10 @@ from uuid import uuid4
 if not hasattr(_dt_mod, "UTC"):
     _dt_mod.UTC = _dt_mod.timezone.utc
 if not hasattr(enum, "StrEnum"):
+
     class StrEnum(str, enum.Enum):
         pass
+
     enum.StrEnum = StrEnum
 
 # Ensure src/ is importable
@@ -154,16 +156,12 @@ def main() -> None:
     json_ser_ops = total_ops / json_ser
     proto_ser_ops = total_ops / proto_ser
 
-    print(
-        f"{'JSON round-trip':<35} {json_rt:>10.3f} {json_rt_ops:>12,.0f} {'baseline':>10}"
-    )
+    print(f"{'JSON round-trip':<35} {json_rt:>10.3f} {json_rt_ops:>12,.0f} {'baseline':>10}")
     print(
         f"{'Proto dict round-trip':<35} {proto_rt:>10.3f} {proto_rt_ops:>12,.0f}"
         f" {proto_rt_ops / json_rt_ops:>9.2f}x"
     )
-    print(
-        f"{'JSON serialize only':<35} {json_ser:>10.3f} {json_ser_ops:>12,.0f} {'baseline':>10}"
-    )
+    print(f"{'JSON serialize only':<35} {json_ser:>10.3f} {json_ser_ops:>12,.0f} {'baseline':>10}")
     print(
         f"{'Proto dict serialize only':<35} {proto_ser:>10.3f} {proto_ser_ops:>12,.0f}"
         f" {proto_ser_ops / json_ser_ops:>9.2f}x"

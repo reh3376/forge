@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
 from forge.adapters.whk_nms import WhkNmsAdapter
 from forge.core.models.adapter import AdapterState
@@ -61,7 +62,6 @@ _SAMPLE_ALERT_MESSAGE = {
 
 _SAMPLE_SECURITY_MESSAGE = {
     "entity_type": "security_event",
-    "event_type": "security_event",
     "id": "sec-001",
     "device_id": "firewall-01",
     "source_ip": "192.168.1.100",
@@ -167,7 +167,7 @@ class TestLifecycle:
     @pytest.mark.asyncio
     async def test_configure_missing_required_param(self):
         adapter = WhkNmsAdapter()
-        with pytest.raises(Exception):  # Pydantic validation error
+        with pytest.raises(ValidationError):  # Pydantic validation error
             await adapter.configure({"nms_ws_url": "ws://..."})
 
     @pytest.mark.asyncio
@@ -247,11 +247,13 @@ class TestCollect:
         adapter = WhkNmsAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
-        adapter.inject_records([
-            _SAMPLE_DEVICE_MESSAGE,
-            _SAMPLE_TRAP_MESSAGE,
-            _SAMPLE_ALERT_MESSAGE,
-        ])
+        adapter.inject_records(
+            [
+                _SAMPLE_DEVICE_MESSAGE,
+                _SAMPLE_TRAP_MESSAGE,
+                _SAMPLE_ALERT_MESSAGE,
+            ]
+        )
 
         records = []
         async for record in adapter.collect():

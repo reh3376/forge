@@ -16,6 +16,7 @@ because Forge's architecture isn't bound to a single gateway — data can
 arrive from MQTT, REST, RabbitMQ, external DBs, or other Forge modules.
 """
 
+from forge.modules.ot.tag_engine.engine import TagEngine
 from forge.modules.ot.tag_engine.models import (
     AlarmConfig,
     BaseTag,
@@ -37,42 +38,36 @@ from forge.modules.ot.tag_engine.models import (
     VirtualTag,
 )
 from forge.modules.ot.tag_engine.registry import TagRegistry
-from forge.modules.ot.tag_engine.engine import TagEngine
 from forge.modules.ot.tag_engine.templates import (
     TagTemplate,
     TemplateParam,
-    TemplateTagDef,
     TemplateRegistry,
+    TemplateTagDef,
 )
 
 __all__ = [
-    # Enums
-    "TagType",
-    "ScanClass",
-    # Config models
-    "ScaleConfig",
-    "ClampConfig",
     "AlarmConfig",
-    "HistoryConfig",
-    "DerivedSource",
-    # Tag models
     "BaseTag",
-    "StandardTag",
-    "MemoryTag",
-    "ExpressionTag",
-    "QueryTag",
-    "DerivedTag",
-    "ReferenceTag",
+    "ClampConfig",
     "ComputedTag",
+    "DerivedSource",
+    "DerivedTag",
     "EventTag",
-    "VirtualTag",
-    "TagUnion",
-    # Core classes
-    "TagRegistry",
+    "ExpressionTag",
+    "HistoryConfig",
+    "MemoryTag",
+    "QueryTag",
+    "ReferenceTag",
+    "ScaleConfig",
+    "ScanClass",
+    "StandardTag",
     "TagEngine",
-    # Templates
+    "TagRegistry",
     "TagTemplate",
+    "TagType",
+    "TagUnion",
     "TemplateParam",
-    "TemplateTagDef",
     "TemplateRegistry",
+    "TemplateTagDef",
+    "VirtualTag",
 ]

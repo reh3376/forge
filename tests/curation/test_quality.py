@@ -5,7 +5,6 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from tests.curation.conftest import make_record_batch
 
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -23,6 +22,7 @@ from forge.curation.quality import (
     QualityReport,
     RangeRule,
 )
+from tests.curation.conftest import make_record_batch
 
 
 class TestCompletenessRule:
@@ -37,9 +37,11 @@ class TestCompletenessRule:
         records = make_record_batch(count=10)
         # Remove lot_id from half
         for i in range(5):
-            records[i] = records[i].model_copy(update={
-                "context": records[i].context.model_copy(update={"lot_id": None}),
-            })
+            records[i] = records[i].model_copy(
+                update={
+                    "context": records[i].context.model_copy(update={"lot_id": None}),
+                }
+            )
         rule = CompletenessRule(["lot_id"], threshold=0.8)
         result = rule.evaluate(records)
         assert result.score == pytest.approx(0.5)
@@ -127,14 +129,18 @@ class TestRangeRule:
         assert not result.passed
 
     def test_no_numeric_records(self) -> None:
-        records = [ContextualRecord(
-            source=RecordSource(adapter_id="test", system="test"),
-            timestamp=RecordTimestamp(source_time=datetime.now(UTC)),
-            value=RecordValue(raw="string_value", data_type="string"),
-            lineage=RecordLineage(
-                schema_ref="x", adapter_id="test", adapter_version="0.1.0",
-            ),
-        )]
+        records = [
+            ContextualRecord(
+                source=RecordSource(adapter_id="test", system="test"),
+                timestamp=RecordTimestamp(source_time=datetime.now(UTC)),
+                value=RecordValue(raw="string_value", data_type="string"),
+                lineage=RecordLineage(
+                    schema_ref="x",
+                    adapter_id="test",
+                    adapter_version="0.1.0",
+                ),
+            )
+        ]
         rule = RangeRule(min_value=0.0, max_value=100.0)
         result = rule.evaluate(records)
         assert result.passed  # no numeric records → vacuously true
@@ -152,9 +158,11 @@ class TestConsistencyRule:
         records = make_record_batch(count=10)
         # Set batch_id but remove lot_id from half
         for i in range(5):
-            records[i] = records[i].model_copy(update={
-                "context": records[i].context.model_copy(update={"lot_id": None}),
-            })
+            records[i] = records[i].model_copy(
+                update={
+                    "context": records[i].context.model_copy(update={"lot_id": None}),
+                }
+            )
         rule = ConsistencyRule("batch_id", "lot_id", threshold=0.8)
         result = rule.evaluate(records)
         assert result.score == pytest.approx(0.5)
@@ -164,9 +172,11 @@ class TestConsistencyRule:
         records = make_record_batch(count=5)
         # Remove all batch_ids
         for i in range(5):
-            records[i] = records[i].model_copy(update={
-                "context": records[i].context.model_copy(update={"batch_id": None}),
-            })
+            records[i] = records[i].model_copy(
+                update={
+                    "context": records[i].context.model_copy(update={"batch_id": None}),
+                }
+            )
         rule = ConsistencyRule("batch_id", "lot_id")
         result = rule.evaluate(records)
         assert result.passed  # vacuously true
@@ -212,10 +222,13 @@ class TestQualityReport:
 class TestQualityMonitor:
     def test_register_and_evaluate(self) -> None:
         monitor = QualityMonitor()
-        monitor.register_rules("dp-1", [
-            CompletenessRule(["equipment_id"]),
-            RangeRule(min_value=0.0, max_value=200.0),
-        ])
+        monitor.register_rules(
+            "dp-1",
+            [
+                CompletenessRule(["equipment_id"]),
+                RangeRule(min_value=0.0, max_value=200.0),
+            ],
+        )
         records = make_record_batch(10)
         report = monitor.evaluate("dp-1", records)
         assert report.passed

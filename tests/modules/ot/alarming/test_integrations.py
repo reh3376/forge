@@ -12,23 +12,24 @@ Covers:
 """
 
 import json
-import pytest
-from datetime import datetime, timezone
-from unittest.mock import AsyncMock, MagicMock
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock
 
-from forge.modules.ot.alarming.models import AlarmEvent
+import pytest
+
 from forge.modules.ot.alarming.engine import AlarmEngine
 from forge.modules.ot.alarming.integrations import (
-    AlarmMqttPublisher,
-    AlarmMqttAckSubscriber,
-    AlarmRabbitMqPublisher,
     AlarmCmmsIntegration,
-    AlarmHistorianAnnotation,
-    AlarmScriptDispatch,
     AlarmContextualRecordWriter,
+    AlarmHistorianAnnotation,
     AlarmIntegrationHub,
+    AlarmMqttAckSubscriber,
+    AlarmMqttPublisher,
+    AlarmRabbitMqPublisher,
+    AlarmScriptDispatch,
     IntegrationConfig,
 )
+from forge.modules.ot.alarming.models import AlarmEvent
 
 
 def _make_event(**overrides) -> AlarmEvent:
@@ -44,7 +45,7 @@ def _make_event(**overrides) -> AlarmEvent:
         tag_path="WH/WHK01/Distillery01/TIT_2010/Out_PV",
         value=185.0,
         setpoint=180.0,
-        timestamp=datetime(2026, 4, 9, 12, 0, 0, tzinfo=timezone.utc),
+        timestamp=datetime(2026, 4, 9, 12, 0, 0, tzinfo=UTC),
         area="Distillery01",
         equipment_id="TIT_2010",
     )
@@ -124,14 +125,10 @@ class TestAlarmMqttAckSubscriber:
         sub = AlarmMqttAckSubscriber(engine, mqtt)
 
         # Create an alarm to acknowledge
-        alarm_id = await engine.trigger_alarm(
-            name="TEST", tag_path="t", priority="HIGH"
-        )
+        alarm_id = await engine.trigger_alarm(name="TEST", tag_path="t", priority="HIGH")
 
         payload = json.dumps({"operator": "remote_op"})
-        await sub._on_ack_message(
-            f"whk/whk01/area/ot/alarms/{alarm_id}/ack", payload
-        )
+        await sub._on_ack_message(f"whk/whk01/area/ot/alarms/{alarm_id}/ack", payload)
 
         active = await engine.get_active_alarms()
         assert active[0]["state"] == "ACTIVE_ACK"
@@ -247,7 +244,10 @@ class TestAlarmHistorianAnnotation:
         call_kwargs = historian.write_annotation.call_args[1]
         assert "TIT_2010" in call_kwargs["tag_path"]
         assert "HIGH" in historian.write_annotation.call_args[1].get(
-            "text", historian.write_annotation.call_args[0][2] if len(historian.write_annotation.call_args[0]) > 2 else ""
+            "text",
+            historian.write_annotation.call_args[0][2]
+            if len(historian.write_annotation.call_args[0]) > 2
+            else "",
         )
 
     @pytest.mark.asyncio
@@ -329,12 +329,15 @@ class TestAlarmIntegrationHub:
         dispatcher = AsyncMock()
         writer = AsyncMock()
 
-        hub = AlarmIntegrationHub(engine, IntegrationConfig(
-            mqtt_enabled=True,
-            mqtt_ack_enabled=False,
-            scripting_enabled=True,
-            contextual_record_enabled=True,
-        ))
+        hub = AlarmIntegrationHub(
+            engine,
+            IntegrationConfig(
+                mqtt_enabled=True,
+                mqtt_ack_enabled=False,
+                scripting_enabled=True,
+                contextual_record_enabled=True,
+            ),
+        )
         hub.set_mqtt(mqtt)
         hub.set_script_dispatcher(dispatcher)
         hub.set_contextual_record_writer(writer)
@@ -353,10 +356,13 @@ class TestAlarmIntegrationHub:
         engine = AlarmEngine()
         mqtt = AsyncMock()
 
-        hub = AlarmIntegrationHub(engine, IntegrationConfig(
-            mqtt_enabled=True,
-            mqtt_ack_enabled=False,
-        ))
+        hub = AlarmIntegrationHub(
+            engine,
+            IntegrationConfig(
+                mqtt_enabled=True,
+                mqtt_ack_enabled=False,
+            ),
+        )
         hub.set_mqtt(mqtt)
 
         await hub.start()
@@ -373,11 +379,14 @@ class TestAlarmIntegrationHub:
         engine = AlarmEngine()
         mqtt = AsyncMock()
 
-        hub = AlarmIntegrationHub(engine, IntegrationConfig(
-            mqtt_enabled=False,
-            scripting_enabled=False,
-            contextual_record_enabled=False,
-        ))
+        hub = AlarmIntegrationHub(
+            engine,
+            IntegrationConfig(
+                mqtt_enabled=False,
+                scripting_enabled=False,
+                contextual_record_enabled=False,
+            ),
+        )
         hub.set_mqtt(mqtt)
 
         await hub.start()

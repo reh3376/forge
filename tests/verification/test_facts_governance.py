@@ -12,19 +12,16 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 import pytest
 
 from forge.governance.facts.runners.facts_runner import FACTSRunner
 from forge.governance.shared.runner import (
-    FxTSVerdict,
     VerdictStatus,
     compute_spec_hash,
     verify_spec_hash,
     verify_spec_integrity,
 )
-
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. Spec Loading & Structure
@@ -71,8 +68,7 @@ class TestSpecLoading:
     def test_all_specs_loadable(self):
         """Every FACTS spec file in the specs dir should be valid JSON."""
         specs_dir = (
-            Path(__file__).resolve().parents[2]
-            / "src" / "forge" / "governance" / "facts" / "specs"
+            Path(__file__).resolve().parents[2] / "src" / "forge" / "governance" / "facts" / "specs"
         )
         for spec_path in specs_dir.glob("*.facts.json"):
             data = json.loads(spec_path.read_text())
@@ -94,31 +90,30 @@ class TestFACTSRunnerValidation:
 
     @pytest.mark.asyncio()
     async def test_whk_wms_passes_validation(
-        self, runner: FACTSRunner, whk_wms_spec: dict,
+        self,
+        runner: FACTSRunner,
+        whk_wms_spec: dict,
     ):
         """The WHK WMS spec should pass all static checks."""
         report = await runner.run(target="whk-wms", spec=whk_wms_spec)
         verdicts = report.verdicts if hasattr(report, "verdicts") else report
 
         # Extract just the list of FxTSVerdict objects
-        if isinstance(verdicts, list):
-            verdict_list = verdicts
-        else:
-            verdict_list = list(verdicts)
+        verdict_list = verdicts if isinstance(verdicts, list) else list(verdicts)
 
         # Every verdict should PASS (or at most SKIP for optional checks)
         failures = [
-            v for v in verdict_list
-            if v.status in (VerdictStatus.FAIL, VerdictStatus.ERROR)
+            v for v in verdict_list if v.status in (VerdictStatus.FAIL, VerdictStatus.ERROR)
         ]
-        assert len(failures) == 0, (
-            f"FACTS validation failures:\n"
-            + "\n".join(f"  {v.check_id}: {v.message}" for v in failures)
+        assert len(failures) == 0, "FACTS validation failures:\n" + "\n".join(
+            f"  {v.check_id}: {v.message}" for v in failures
         )
 
     @pytest.mark.asyncio()
     async def test_all_enforced_fields_checked(
-        self, runner: FACTSRunner, whk_wms_spec: dict,
+        self,
+        runner: FACTSRunner,
+        whk_wms_spec: dict,
     ):
         """Runner should produce verdicts covering all enforced fields."""
         report = await runner.run(target="whk-wms", spec=whk_wms_spec)
@@ -154,8 +149,7 @@ class TestFACTSRunnerValidation:
     async def test_every_production_spec_passes(self, runner: FACTSRunner):
         """All existing FACTS specs should pass static validation."""
         specs_dir = (
-            Path(__file__).resolve().parents[2]
-            / "src" / "forge" / "governance" / "facts" / "specs"
+            Path(__file__).resolve().parents[2] / "src" / "forge" / "governance" / "facts" / "specs"
         )
         for spec_path in specs_dir.glob("*.facts.json"):
             spec = json.loads(spec_path.read_text())
@@ -165,13 +159,9 @@ class TestFACTSRunnerValidation:
             if not isinstance(verdicts, list):
                 verdicts = list(verdicts)
 
-            failures = [
-                v for v in verdicts
-                if v.status == VerdictStatus.ERROR
-            ]
-            assert len(failures) == 0, (
-                f"Spec {spec_path.name} has errors:\n"
-                + "\n".join(f"  {v.check_id}: {v.message}" for v in failures)
+            failures = [v for v in verdicts if v.status == VerdictStatus.ERROR]
+            assert len(failures) == 0, f"Spec {spec_path.name} has errors:\n" + "\n".join(
+                f"  {v.check_id}: {v.message}" for v in failures
             )
 
 
@@ -251,8 +241,7 @@ class TestCrossSpecConsistency:
     def test_all_specs_have_unique_adapter_ids(self):
         """No two specs should declare the same adapter_id."""
         specs_dir = (
-            Path(__file__).resolve().parents[2]
-            / "src" / "forge" / "governance" / "facts" / "specs"
+            Path(__file__).resolve().parents[2] / "src" / "forge" / "governance" / "facts" / "specs"
         )
         ids = []
         for spec_path in specs_dir.glob("*.facts.json"):
@@ -263,8 +252,7 @@ class TestCrossSpecConsistency:
     def test_all_specs_have_same_spec_version(self):
         """All specs should use the same FACTS spec version."""
         specs_dir = (
-            Path(__file__).resolve().parents[2]
-            / "src" / "forge" / "governance" / "facts" / "specs"
+            Path(__file__).resolve().parents[2] / "src" / "forge" / "governance" / "facts" / "specs"
         )
         versions = set()
         for spec_path in specs_dir.glob("*.facts.json"):
@@ -275,8 +263,7 @@ class TestCrossSpecConsistency:
     def test_all_specs_have_integrity_blocks(self):
         """Every spec must include an integrity block."""
         specs_dir = (
-            Path(__file__).resolve().parents[2]
-            / "src" / "forge" / "governance" / "facts" / "specs"
+            Path(__file__).resolve().parents[2] / "src" / "forge" / "governance" / "facts" / "specs"
         )
         for spec_path in specs_dir.glob("*.facts.json"):
             spec = json.loads(spec_path.read_text())

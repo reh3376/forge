@@ -22,7 +22,9 @@ class TestDeviceContext:
             "network_role": "upstream",
         }
 
-        context = build_record_context(raw_device, entity_type="network_device", event_type="device_discovery")
+        context = build_record_context(
+            raw_device, entity_type="network_device", event_type="device_discovery"
+        )
 
         assert context.extra["cross_system_id"] == "dev-001"
         assert context.extra["source_system"] == "whk-nms"
@@ -45,7 +47,9 @@ class TestDeviceContext:
             "ip_address": "10.0.0.2",
         }
 
-        context = build_record_context(raw_device, entity_type="network_device", event_type="device_discovery")
+        context = build_record_context(
+            raw_device, entity_type="network_device", event_type="device_discovery"
+        )
 
         assert context.extra["cross_system_id"] == "dev-002"
         assert context.extra["device_ip"] == "10.0.0.2"
@@ -57,7 +61,9 @@ class TestDeviceContext:
             # No ip_address
         }
 
-        context = build_record_context(raw_device, entity_type="network_device", event_type="device_discovery")
+        context = build_record_context(
+            raw_device, entity_type="network_device", event_type="device_discovery"
+        )
 
         assert context.extra["cross_system_id"] == "dev-003"
         assert "device_ip" not in context.extra
@@ -70,7 +76,9 @@ class TestDeviceCategory:
             "category": "net_core",
         }
 
-        context = build_record_context(raw_device, entity_type="network_device", event_type="device_discovery")
+        context = build_record_context(
+            raw_device, entity_type="network_device", event_type="device_discovery"
+        )
 
         assert context.extra["device_category"] == "net_core"
 
@@ -81,7 +89,9 @@ class TestDeviceCategory:
             # no explicit category
         }
 
-        context = build_record_context(raw_device, entity_type="network_device", event_type="device_discovery")
+        context = build_record_context(
+            raw_device, entity_type="network_device", event_type="device_discovery"
+        )
 
         # Should be derived from type mapping
         assert context.extra["device_category"] == "ot_control"
@@ -92,7 +102,9 @@ class TestDeviceCategory:
             "type": "unknown_device_type",
         }
 
-        context = build_record_context(raw_device, entity_type="network_device", event_type="device_discovery")
+        context = build_record_context(
+            raw_device, entity_type="network_device", event_type="device_discovery"
+        )
 
         assert context.extra["device_category"] == "unknown"
 
@@ -108,7 +120,9 @@ class TestEventContext:
             "severity": "high",
         }
 
-        context = build_record_context(raw_trap, entity_type="network_device", event_type="snmp_trap")
+        context = build_record_context(
+            raw_trap, entity_type="network_device", event_type="snmp_trap"
+        )
 
         assert context.extra["entity_type"] == "network_device"
         assert context.extra["event_type"] == "snmp_trap"
@@ -124,7 +138,9 @@ class TestEventContext:
             "severity": "critical",
         }
 
-        context = build_record_context(raw_event, entity_type="security_event", event_type="security_event")
+        context = build_record_context(
+            raw_event, entity_type="security_event", event_type="security_event"
+        )
 
         assert context.extra["entity_type"] == "security_event"
         assert context.extra["event_type"] == "security_event"
@@ -137,7 +153,9 @@ class TestEventContext:
             "baseline_status": "suspicious",
         }
 
-        context = build_record_context(raw_device, entity_type="network_device", event_type="baseline_anomaly")
+        context = build_record_context(
+            raw_device, entity_type="network_device", event_type="baseline_anomaly"
+        )
 
         assert context.extra["baseline_status"] == "suspicious"
         assert context.extra["event_type"] == "baseline_anomaly"
@@ -150,7 +168,9 @@ class TestOperationContext:
             "ip_address": "10.0.0.1",
         }
 
-        context = build_record_context(raw_device, entity_type="network_device", event_type="device_discovery")
+        context = build_record_context(
+            raw_device, entity_type="network_device", event_type="device_discovery"
+        )
 
         assert context.extra["operation_context"] == "network_monitoring"
 
@@ -159,7 +179,9 @@ class TestOperationContext:
             "id": "dev-001",
         }
 
-        context = build_record_context(raw_device, entity_type="network_device", event_type="device_discovery")
+        context = build_record_context(
+            raw_device, entity_type="network_device", event_type="device_discovery"
+        )
 
         assert context.area == "network_infrastructure"
 
@@ -168,7 +190,9 @@ class TestOperationContext:
             "id": "dev-001",
         }
 
-        context = build_record_context(raw_device, entity_type="network_device", event_type="device_discovery")
+        context = build_record_context(
+            raw_device, entity_type="network_device", event_type="device_discovery"
+        )
 
         assert context.site == "whk01"
 
@@ -181,7 +205,9 @@ class TestBlastRadius:
             "blast_radius": 45,
         }
 
-        context = build_record_context(raw_spof, entity_type="network_device", event_type="spof_detection")
+        context = build_record_context(
+            raw_spof, entity_type="network_device", event_type="spof_detection"
+        )
 
         assert context.extra["blast_radius"] == 45
         assert isinstance(context.extra["blast_radius"], int)
@@ -193,7 +219,9 @@ class TestBlastRadius:
             "blastRadius": "25",  # camelCase, string
         }
 
-        context = build_record_context(raw_spof, entity_type="network_device", event_type="spof_detection")
+        context = build_record_context(
+            raw_spof, entity_type="network_device", event_type="spof_detection"
+        )
 
         assert context.extra["blast_radius"] == 25
         assert isinstance(context.extra["blast_radius"], int)
@@ -204,6 +232,8 @@ class TestBlastRadius:
             "device_id": "core-switch-01",
         }
 
-        context = build_record_context(raw_spof, entity_type="network_device", event_type="spof_detection")
+        context = build_record_context(
+            raw_spof, entity_type="network_device", event_type="spof_detection"
+        )
 
         assert "blast_radius" not in context.extra

@@ -21,8 +21,6 @@ from forge.core.models.adapter import (
     AdapterTier,
     DataContract,
 )
-from forge.storage.config import StorageConfig
-
 
 # ── Fixtures ─────────────────────────────────────────────────────
 
@@ -32,6 +30,7 @@ def hub_app():
     """Create the Hub API app with default (non-connecting) config."""
     # gRPC disabled to avoid port conflicts in tests
     import os
+
     os.environ["FORGE_GRPC_ENABLED"] = "false"
     app = create_app()
     yield app
@@ -93,7 +92,9 @@ class TestHealthEndpoints:
 
 class TestAdapterRegistration:
     def test_register_adapter(
-        self, client: TestClient, whk_wms_manifest: dict,
+        self,
+        client: TestClient,
+        whk_wms_manifest: dict,
     ):
         resp = client.post("/v1/adapters/register", json=whk_wms_manifest)
         assert resp.status_code == 200
@@ -102,7 +103,9 @@ class TestAdapterRegistration:
         assert data["adapter_id"] == "whk-wms"
 
     def test_list_after_register(
-        self, client: TestClient, whk_wms_manifest: dict,
+        self,
+        client: TestClient,
+        whk_wms_manifest: dict,
     ):
         client.post("/v1/adapters/register", json=whk_wms_manifest)
         resp = client.get("/v1/adapters")
@@ -113,7 +116,9 @@ class TestAdapterRegistration:
         assert "whk-wms" in ids
 
     def test_adapter_health_after_register(
-        self, client: TestClient, whk_wms_manifest: dict,
+        self,
+        client: TestClient,
+        whk_wms_manifest: dict,
     ):
         client.post("/v1/adapters/register", json=whk_wms_manifest)
         resp = client.get("/v1/adapters/whk-wms/health")
@@ -140,10 +145,13 @@ class TestRecordIngestion:
         barrel_event: dict[str, Any],
     ):
         client.post("/v1/adapters/register", json=whk_wms_manifest)
-        resp = client.post("/v1/records", json={
-            "adapter_id": "whk-wms",
-            "records": [barrel_event],
-        })
+        resp = client.post(
+            "/v1/records",
+            json={
+                "adapter_id": "whk-wms",
+                "records": [barrel_event],
+            },
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert data["accepted"] == 1
@@ -154,10 +162,13 @@ class TestRecordIngestion:
         client: TestClient,
         barrel_event: dict[str, Any],
     ):
-        resp = client.post("/v1/records", json={
-            "adapter_id": "unknown-adapter",
-            "records": [barrel_event],
-        })
+        resp = client.post(
+            "/v1/records",
+            json={
+                "adapter_id": "unknown-adapter",
+                "records": [barrel_event],
+            },
+        )
         assert resp.status_code == 404
 
     def test_ingest_batch(
@@ -167,10 +178,13 @@ class TestRecordIngestion:
         barrel_events: list[dict[str, Any]],
     ):
         client.post("/v1/adapters/register", json=whk_wms_manifest)
-        resp = client.post("/v1/records", json={
-            "adapter_id": "whk-wms",
-            "records": barrel_events,
-        })
+        resp = client.post(
+            "/v1/records",
+            json={
+                "adapter_id": "whk-wms",
+                "records": barrel_events,
+            },
+        )
         assert resp.status_code == 200
         assert resp.json()["accepted"] == len(barrel_events)
 
@@ -216,22 +230,28 @@ class TestMultiAdapterFlow:
     def test_ingestion_isolated_by_adapter(self, client: TestClient):
         """Records ingested for one adapter shouldn't affect another."""
         for aid in ("adapter-a", "adapter-b"):
-            client.post("/v1/adapters/register", json=AdapterManifest(
-                adapter_id=aid,
-                name=f"Test {aid}",
-                version="0.1.0",
-                protocol="rest",
-                tier=AdapterTier.MES_MOM,
-                data_contract=DataContract(
-                    schema_ref=f"forge://schemas/{aid}/v0.1.0",
-                ),
-            ).model_dump(mode="json"))
+            client.post(
+                "/v1/adapters/register",
+                json=AdapterManifest(
+                    adapter_id=aid,
+                    name=f"Test {aid}",
+                    version="0.1.0",
+                    protocol="rest",
+                    tier=AdapterTier.MES_MOM,
+                    data_contract=DataContract(
+                        schema_ref=f"forge://schemas/{aid}/v0.1.0",
+                    ),
+                ).model_dump(mode="json"),
+            )
 
         # Ingest for adapter-a
-        resp = client.post("/v1/records", json={
-            "adapter_id": "adapter-a",
-            "records": [{"data": "test"}],
-        })
+        resp = client.post(
+            "/v1/records",
+            json={
+                "adapter_id": "adapter-a",
+                "records": [{"data": "test"}],
+            },
+        )
         assert resp.json()["accepted"] == 1
 
         # adapter-b health should still be REGISTERED (unaffected)

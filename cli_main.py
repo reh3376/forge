@@ -35,6 +35,7 @@ app = typer.Typer(
 # Top-level commands
 # ---------------------------------------------------------------------------
 
+
 @app.command()
 def version() -> None:
     """Show Forge version."""
@@ -58,9 +59,7 @@ def health(
             for key, val in data.items():
                 typer.echo(f"  {key}: {val}")
         else:
-            typer.echo(
-                f"[WARN] Unexpected status {resp.status_code} from {base_url}"
-            )
+            typer.echo(f"[WARN] Unexpected status {resp.status_code} from {base_url}")
             raise typer.Exit(code=1)
     except httpx.ConnectError as exc:
         typer.echo(f"[ERROR] Cannot connect to {base_url}")
@@ -167,9 +166,7 @@ def adapter_status(
     import httpx
 
     try:
-        resp = httpx.get(
-            f"{base_url}/v1/adapters/{adapter_id}/health", timeout=5.0
-        )
+        resp = httpx.get(f"{base_url}/v1/adapters/{adapter_id}/health", timeout=5.0)
         if resp.status_code == 404:
             typer.echo(f"Adapter '{adapter_id}' not found.")
             raise typer.Exit(code=1)
@@ -255,9 +252,7 @@ def governance_run(
 
 @governance_app.command("validate-spec")
 def governance_validate_spec(
-    spec_file: Annotated[
-        Path, typer.Argument(help="Path to the spec file to validate")
-    ],
+    spec_file: Annotated[Path, typer.Argument(help="Path to the spec file to validate")],
 ) -> None:
     """Validate a spec file against its framework schema."""
     import json
@@ -304,6 +299,7 @@ def governance_validate_spec(
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _default_env() -> str:
     """Generate a default .env for Forge."""

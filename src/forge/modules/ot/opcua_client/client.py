@@ -17,10 +17,13 @@ The client is an async context manager that owns the full connection lifecycle:
 from __future__ import annotations
 
 import asyncio
+import builtins
+import contextlib
 import logging
 import time
-from datetime import datetime, timedelta, timezone
-from typing import Any, Callable
+from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from asyncua import Client as UaClient
 from asyncua import Node as UaNode
@@ -31,9 +34,8 @@ from forge.modules.ot.opcua_client.exceptions import (
     ConfigurationError,
     ConnectionError,
     CreateSubscriptionError,
-    EndpointUnreachable,
+    EndpointUnreachableError,
     HistoryReadError,
-    MonitoredItemError,
     OpcUaError,
     ReadError,
     SecurityNegotiationError,
@@ -164,28 +166,24 @@ def _convert_quality(status_code: ua.StatusCode) -> QualityCode:
 def _convert_data_value(ua_dv: ua.DataValue) -> DataValue:
     """Convert asyncua DataValue to Forge DataValue."""
     raw_status = (
-        ua_dv.StatusCode.value
-        if hasattr(ua_dv.StatusCode, "value")
-        else int(ua_dv.StatusCode or 0)
+        ua_dv.StatusCode.value if hasattr(ua_dv.StatusCode, "value") else int(ua_dv.StatusCode or 0)
     )
 
     # Determine data type from the variant
     data_type = DataType.VARIANT
     if ua_dv.Value is not None and hasattr(ua_dv.Value, "VariantType"):
-        data_type = _UA_VARIANT_TYPE_MAP.get(
-            ua_dv.Value.VariantType, DataType.VARIANT
-        )
+        data_type = _UA_VARIANT_TYPE_MAP.get(ua_dv.Value.VariantType, DataType.VARIANT)
 
     # Extract the actual Python value from the Variant
     value = ua_dv.Value.Value if ua_dv.Value is not None else None
 
     # Timestamps — asyncua gives datetime or None
-    source_ts = ua_dv.SourceTimestamp or datetime.now(timezone.utc)
-    server_ts = ua_dv.ServerTimestamp or datetime.now(timezone.utc)
+    source_ts = ua_dv.SourceTimestamp or datetime.now(UTC)
+    server_ts = ua_dv.ServerTimestamp or datetime.now(UTC)
     if source_ts.tzinfo is None:
-        source_ts = source_ts.replace(tzinfo=timezone.utc)
+        source_ts = source_ts.replace(tzinfo=UTC)
     if server_ts.tzinfo is None:
-        server_ts = server_ts.replace(tzinfo=timezone.utc)
+        server_ts = server_ts.replace(tzinfo=UTC)
 
     return DataValue(
         value=value,
@@ -257,26 +255,22 @@ class _ForgeSubHandler:
         try:
             node_id_str = node.nodeid.to_string()
             # data.monitored_item.Value is the full ua.DataValue
-            if hasattr(data, "monitored_item") and hasattr(
-                data.monitored_item, "Value"
-            ):
+            if hasattr(data, "monitored_item") and hasattr(data.monitored_item, "Value"):
                 forge_dv = _convert_data_value(data.monitored_item.Value)
             else:
                 # Fallback: construct from raw value
                 forge_dv = DataValue(
                     value=val,
                     quality=QualityCode.GOOD,
-                    source_timestamp=datetime.now(timezone.utc),
-                    server_timestamp=datetime.now(timezone.utc),
+                    source_timestamp=datetime.now(UTC),
+                    server_timestamp=datetime.now(UTC),
                 )
 
-            self._client_ref._last_data_received = datetime.now(timezone.utc)
+            self._client_ref._last_data_received = datetime.now(UTC)
             self._callback(node_id_str, forge_dv)
 
         except Exception:
-            logger.exception(
-                "Error in subscription callback for node %s", node.nodeid
-            )
+            logger.exception("Error in subscription callback for node %s", node.nodeid)
 
 
 # ---------------------------------------------------------------------------
@@ -337,8 +331,7 @@ class OpcUaClient:
         if isinstance(endpoint, str):
             if not endpoint.startswith("opc.tcp://"):
                 raise ConfigurationError(
-                    f"OPC-UA endpoint must start with 'opc.tcp://', "
-                    f"got: {endpoint!r}"
+                    f"OPC-UA endpoint must start with 'opc.tcp://', got: {endpoint!r}"
                 )
             self._endpoint = OpcUaEndpoint(
                 url=endpoint,
@@ -423,9 +416,7 @@ class OpcUaClient:
             reconnect_count=self._reconnect_count,
             consecutive_failures=self._consecutive_failures,
             active_subscriptions=len(self._subscriptions),
-            monitored_items_count=sum(
-                s.node_count for s in self._subscriptions.values()
-            ),
+            monitored_items_count=sum(s.node_count for s in self._subscriptions.values()),
             latency_ms=self._latency_ms,
         )
 
@@ -471,7 +462,7 @@ class OpcUaClient:
 
             url = self._endpoint.url
             if not url.startswith("opc.tcp://"):
-                raise EndpointUnreachable(
+                raise EndpointUnreachableError(
                     f"Invalid OPC-UA URL scheme: {url}",
                     endpoint_url=url,
                 )
@@ -492,7 +483,7 @@ class OpcUaClient:
 
             # Mark connected
             self._transition_state(ConnectionState.CONNECTED)
-            self._connected_since = datetime.now(timezone.utc)
+            self._connected_since = datetime.now(UTC)
             self._consecutive_failures = 0
 
             logger.info(
@@ -507,11 +498,11 @@ class OpcUaClient:
             self._transition_state(ConnectionState.FAILED)
             self._ua_client = None
             raise
-        except (OSError, asyncio.TimeoutError, ConnectionRefusedError) as exc:
+        except (OSError, TimeoutError, ConnectionRefusedError) as exc:
             self._consecutive_failures += 1
             self._transition_state(ConnectionState.FAILED)
             self._ua_client = None
-            raise EndpointUnreachable(
+            raise EndpointUnreachableError(
                 f"Cannot reach {self._endpoint.url}: {exc}",
                 endpoint_url=self._endpoint.url,
             ) from exc
@@ -543,10 +534,8 @@ class OpcUaClient:
         # Cancel reconnect task
         if self._reconnect_task and not self._reconnect_task.done():
             self._reconnect_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._reconnect_task
-            except asyncio.CancelledError:
-                pass
             self._reconnect_task = None
 
         # Cancel subscription tasks
@@ -562,20 +551,16 @@ class OpcUaClient:
 
         # Delete asyncua subscriptions
         for ua_sub in self._ua_subscriptions.values():
-            try:
+            with contextlib.suppress(Exception):  # best-effort cleanup during disconnect
                 await ua_sub.delete()
-            except Exception:
-                pass  # Best-effort cleanup during disconnect
         self._ua_subscriptions.clear()
         self._subscriptions.clear()
         self._callbacks.clear()
 
         # Disconnect asyncua client
         if self._ua_client is not None:
-            try:
+            with contextlib.suppress(Exception):  # best-effort cleanup
                 await self._ua_client.disconnect()
-            except Exception:
-                pass  # Best-effort cleanup
             self._ua_client = None
 
         # Update state
@@ -637,9 +622,7 @@ class OpcUaClient:
                     node_class_val = await child.read_node_class()
 
                     # Map asyncua NodeClass to Forge NodeClass
-                    forge_nc = _UA_NODE_CLASS_MAP.get(
-                        node_class_val, NodeClass.OBJECT
-                    )
+                    forge_nc = _UA_NODE_CLASS_MAP.get(node_class_val, NodeClass.OBJECT)
 
                     # Apply node class filter
                     if node_class_filter and forge_nc != node_class_filter:
@@ -670,9 +653,7 @@ class OpcUaClient:
                             forge_dt = DataType.VARIANT
 
                         try:
-                            al_val = await child.read_attribute(
-                                ua.AttributeIds.AccessLevel
-                            )
+                            al_val = await child.read_attribute(ua.AttributeIds.AccessLevel)
                             access_level_int = int(al_val.Value.Value or 1)
                         except Exception:
                             access_level_int = int(AccessLevel.CURRENT_READ)
@@ -719,7 +700,7 @@ class OpcUaClient:
 
         except OpcUaError:
             raise
-        except asyncio.TimeoutError as exc:
+        except builtins.TimeoutError as exc:
             raise TimeoutError(
                 f"Browse timed out for node {parsed}",
                 timeout_ms=self._endpoint.request_timeout_ms,
@@ -780,16 +761,14 @@ class OpcUaClient:
 
             elapsed_ms = (time.monotonic() - t0) * 1000.0
             self._latency_ms = elapsed_ms
-            self._last_data_received = datetime.now(timezone.utc)
+            self._last_data_received = datetime.now(UTC)
 
-            logger.debug(
-                "Read completed: %d values in %.1fms", len(results), elapsed_ms
-            )
+            logger.debug("Read completed: %d values in %.1fms", len(results), elapsed_ms)
             return results
 
         except OpcUaError:
             raise
-        except asyncio.TimeoutError as exc:
+        except builtins.TimeoutError as exc:
             raise TimeoutError(
                 f"Read timed out for {len(parsed)} nodes",
                 timeout_ms=self._endpoint.request_timeout_ms,
@@ -857,7 +836,7 @@ class OpcUaClient:
             ) from exc
         except OpcUaError:
             raise
-        except asyncio.TimeoutError as exc:
+        except builtins.TimeoutError as exc:
             raise TimeoutError(
                 f"Write timed out for {parsed}",
                 timeout_ms=self._endpoint.request_timeout_ms,
@@ -910,18 +889,11 @@ class OpcUaClient:
         try:
             # Create asyncua subscription with bridge handler
             handler = _ForgeSubHandler(callback, self)
-            ua_sub = await self._ua_client.create_subscription(
-                interval_ms, handler
-            )
+            ua_sub = await self._ua_client.create_subscription(interval_ms, handler)
 
             # Subscribe to data changes on all nodes
-            ua_nodes = [
-                self._ua_client.get_node(_forge_node_id_to_ua(nid))
-                for nid in parsed
-            ]
-            await ua_sub.subscribe_data_change(
-                ua_nodes, queuesize=queue_size
-            )
+            ua_nodes = [self._ua_client.get_node(_forge_node_id_to_ua(nid)) for nid in parsed]
+            await ua_sub.subscribe_data_change(ua_nodes, queuesize=queue_size)
 
             # Build monitored items for Forge tracking
             monitored = [
@@ -982,20 +954,16 @@ class OpcUaClient:
         # Delete asyncua subscription
         if subscription_id in self._ua_subscriptions:
             ua_sub = self._ua_subscriptions.pop(subscription_id)
-            try:
+            with contextlib.suppress(Exception):  # best-effort cleanup
                 await ua_sub.delete()
-            except Exception:
-                pass  # Best-effort cleanup
 
         # Cancel background task if running
         if subscription_id in self._subscription_tasks:
             task = self._subscription_tasks.pop(subscription_id)
             if not task.done():
                 task.cancel()
-                try:
+                with contextlib.suppress(asyncio.CancelledError):
                     await task
-                except asyncio.CancelledError:
-                    pass
 
         sub = self._subscriptions.pop(subscription_id)
         self._callbacks.pop(subscription_id, None)
@@ -1039,7 +1007,7 @@ class OpcUaClient:
         self._ensure_connected("history_read")
         parsed = self._parse_node_id(node_id)
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if end_time is None:
             end_time = now
         if start_time is None:
@@ -1065,9 +1033,7 @@ class OpcUaClient:
 
             results = [_convert_data_value(ua_dv) for ua_dv in history]
 
-            logger.debug(
-                "HistoryRead returned %d values for %s", len(results), parsed
-            )
+            logger.debug("HistoryRead returned %d values for %s", len(results), parsed)
             return results
 
         except ua.UaStatusCodeError as exc:
@@ -1078,7 +1044,7 @@ class OpcUaClient:
             ) from exc
         except OpcUaError:
             raise
-        except asyncio.TimeoutError as exc:
+        except builtins.TimeoutError as exc:
             raise TimeoutError(
                 f"HistoryRead timed out for {parsed}",
                 timeout_ms=self._endpoint.request_timeout_ms,

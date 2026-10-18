@@ -59,9 +59,7 @@ class FATSRunner(FxTSRunner):
     def implemented_fields(self) -> set[str]:
         return self._ENFORCED_FIELDS
 
-    async def _run_checks(
-        self, target: str, **kwargs: Any
-    ) -> list[FxTSVerdict]:
+    async def _run_checks(self, target: str, **kwargs: Any) -> list[FxTSVerdict]:
         """Run all FATS checks against an endpoint.
 
         Args:
@@ -140,9 +138,7 @@ class FATSRunner(FxTSRunner):
             ],
         )
 
-    def _check_endpoint(
-        self, spec: dict[str, Any], target: str
-    ) -> FxTSVerdict:
+    def _check_endpoint(self, spec: dict[str, Any], target: str) -> FxTSVerdict:
         endpoint = spec.get("endpoint", "")
         if not endpoint.startswith("/"):
             return FxTSVerdict(
@@ -236,11 +232,7 @@ class FATSRunner(FxTSRunner):
                 spec_ref="FATS/request",
                 status=VerdictStatus.FAIL,
                 message="Request section missing.",
-                violations=[
-                    SpecViolation(
-                        field="request", message="Request spec required."
-                    )
-                ],
+                violations=[SpecViolation(field="request", message="Request spec required.")],
             )
         return FxTSVerdict(
             check_id="fats:request",
@@ -305,9 +297,7 @@ class FATSRunner(FxTSRunner):
 
     # --- Live endpoint checks ---
 
-    async def _live_checks(
-        self, spec: dict[str, Any], target: str
-    ) -> list[FxTSVerdict]:
+    async def _live_checks(self, spec: dict[str, Any], target: str) -> list[FxTSVerdict]:
         """Hit the actual endpoint and verify response shape."""
         verdicts: list[FxTSVerdict] = []
         url = f"{self._base_url}{target}"
@@ -337,10 +327,7 @@ class FATSRunner(FxTSRunner):
                         check_id="fats:live-status",
                         spec_ref="FATS/response/success_status",
                         status=VerdictStatus.FAIL,
-                        message=(
-                            f"Expected {expected_status}, "
-                            f"got {resp.status_code}."
-                        ),
+                        message=(f"Expected {expected_status}, got {resp.status_code}."),
                         violations=[
                             SpecViolation(
                                 field="response.success_status",
@@ -355,11 +342,7 @@ class FATSRunner(FxTSRunner):
             # Latency check
             max_latency = spec.get("response", {}).get("max_latency_ms")
             if max_latency:
-                status = (
-                    VerdictStatus.PASS
-                    if elapsed_ms <= max_latency
-                    else VerdictStatus.FAIL
-                )
+                status = VerdictStatus.PASS if elapsed_ms <= max_latency else VerdictStatus.FAIL
                 verdicts.append(
                     FxTSVerdict(
                         check_id="fats:live-latency",

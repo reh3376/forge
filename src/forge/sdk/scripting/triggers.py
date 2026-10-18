@@ -20,13 +20,14 @@ Design decisions:
 from __future__ import annotations
 
 import enum
-import fnmatch
+import logging
 import re
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
 
-import logging
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -367,7 +368,9 @@ class TriggerRegistry:
                 matches.append(reg)
         return matches
 
-    def get_alarm_handlers(self, priority: str = "", area: str = "", name: str = "") -> list[HandlerRegistration]:
+    def get_alarm_handlers(
+        self, priority: str = "", area: str = "", name: str = ""
+    ) -> list[HandlerRegistration]:
         """Get alarm handlers matching the given alarm attributes."""
         matches = []
         for reg in self._registrations:

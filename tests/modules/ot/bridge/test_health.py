@@ -1,8 +1,6 @@
 """Tests for the bridge health dashboard model."""
 
-from datetime import datetime, timezone
-
-import pytest
+from datetime import UTC, datetime
 
 from forge.modules.ot.bridge.dual_write import ConsistencyReport
 from forge.modules.ot.bridge.health import (
@@ -12,7 +10,6 @@ from forge.modules.ot.bridge.health import (
     OperatorChecklistItem,
 )
 from forge.modules.ot.bridge.models import BridgeHealth, BridgeState
-
 
 # ---------------------------------------------------------------------------
 # LatencyComparison
@@ -45,9 +42,7 @@ class TestLatencyComparison:
         assert lc.latency_ratio == 1.0
 
     def test_to_dict(self):
-        lc = LatencyComparison(
-            ot_avg_ms=50.123, bridge_avg_ms=200.456, samples=1000
-        )
+        lc = LatencyComparison(ot_avg_ms=50.123, bridge_avg_ms=200.456, samples=1000)
         d = lc.to_dict()
         assert d["ot_avg_ms"] == 50.12
         assert d["bridge_avg_ms"] == 200.46
@@ -71,7 +66,7 @@ class TestOperatorChecklist:
     def test_check_item(self):
         item = OperatorChecklistItem(id="test", description="Test item")
         item.passed = True
-        item.checked_at = datetime.now(timezone.utc)
+        item.checked_at = datetime.now(UTC)
         item.checked_by = "engineer01"
         assert item.passed is True
 
@@ -103,7 +98,9 @@ class TestBridgeHealthDashboard:
             bridge_healthy=True,
             failover_state=FailoverState.READY,
             latest_report=ConsistencyReport(
-                total_compared=1000, matches=1000, mismatches=0,
+                total_compared=1000,
+                matches=1000,
+                mismatches=0,
                 missing_in_ot=0,
             ),
         )
@@ -119,7 +116,9 @@ class TestBridgeHealthDashboard:
             bridge_healthy=True,
             failover_state=FailoverState.READY,
             latest_report=ConsistencyReport(
-                total_compared=100, matches=80, mismatches=20,
+                total_compared=100,
+                matches=80,
+                mismatches=20,
             ),
         )
         for item in dashboard.checklist:
@@ -132,7 +131,9 @@ class TestBridgeHealthDashboard:
             bridge_healthy=True,
             failover_state=FailoverState.NOT_TESTED,
             latest_report=ConsistencyReport(
-                total_compared=100, matches=100, mismatches=0,
+                total_compared=100,
+                matches=100,
+                mismatches=0,
             ),
         )
         for item in dashboard.checklist:

@@ -82,17 +82,13 @@ def map_barrel_event(raw: dict[str, Any]) -> OperationalEvent | None:
         severity=EventSeverity.INFO,
         entity_type="manufacturing_unit",
         entity_id=str(barrel_id),
-        asset_id=_str_or_none(
-            raw.get("storageLocationId") or raw.get("storage_location_id")
-        ),
+        asset_id=_str_or_none(raw.get("storageLocationId") or raw.get("storage_location_id")),
         operator_id=_str_or_none(
             raw.get("createdById") or raw.get("created_by_id") or raw.get("userId")
         ),
         event_time=event_time,
         result=raw.get("result"),
-        work_order_id=_str_or_none(
-            raw.get("warehouseJobId") or raw.get("warehouse_job_id")
-        ),
+        work_order_id=_str_or_none(raw.get("warehouseJobId") or raw.get("warehouse_job_id")),
         metadata={
             k: v
             for k, v in {

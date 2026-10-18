@@ -102,9 +102,9 @@ class TagModule:
             try:
                 results.append(await self.read(path))
             except KeyError:
-                results.append(TagReadResult(
-                    path=path, value=None, quality="NOT_AVAILABLE", timestamp=""
-                ))
+                results.append(
+                    TagReadResult(path=path, value=None, quality="NOT_AVAILABLE", timestamp="")
+                )
         return results
 
     async def write(self, path: str, value: Any) -> bool:

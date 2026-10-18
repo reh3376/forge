@@ -66,16 +66,12 @@ def map_barrel(raw: dict[str, Any]) -> ManufacturingUnit | None:
         unit_type="barrel",
         serial_number=raw.get("serialNumber") or raw.get("serial_number"),
         lot_id=_str_or_none(raw.get("lotId") or raw.get("lot_id")),
-        location_id=_str_or_none(
-            raw.get("storageLocationId") or raw.get("storage_location_id")
-        ),
+        location_id=_str_or_none(raw.get("storageLocationId") or raw.get("storage_location_id")),
         owner_id=_str_or_none(raw.get("ownerId") or raw.get("owner_id")),
         recipe_id=_str_or_none(raw.get("mashbillId") or raw.get("mashbill_id")),
         status=_DISPOSITION_TO_STATUS.get(disposition, UnitStatus.PENDING),
         lifecycle_state=_DISPOSITION_TO_LIFECYCLE.get(disposition),
-        quantity=_float_or_none(
-            raw.get("proofGallons") or raw.get("proof_gallons")
-        ),
+        quantity=_float_or_none(raw.get("proofGallons") or raw.get("proof_gallons")),
         unit_of_measure="proof_gallons" if raw.get("proofGallons") else None,
         product_type=raw.get("whiskeyType") or raw.get("whiskey_type"),
         metadata={

@@ -47,12 +47,14 @@ def wms_spec():
 @pytest.fixture(scope="module")
 def validator(schema):
     from jsonschema import Draft202012Validator
+
     return Draft202012Validator(schema)
 
 
 # ---------------------------------------------------------------------------
 # Schema Conformance
 # ---------------------------------------------------------------------------
+
 
 class TestSchemaConformance:
     """MES spec validates against facts.schema.json."""
@@ -65,8 +67,16 @@ class TestSchemaConformance:
         assert spec["spec_version"] == "0.1.0"
 
     def test_all_required_sections_present(self, spec):
-        required = ["spec_version", "adapter_identity", "capabilities", "lifecycle",
-                     "connection", "data_contract", "context_mapping", "error_handling"]
+        required = [
+            "spec_version",
+            "adapter_identity",
+            "capabilities",
+            "lifecycle",
+            "connection",
+            "data_contract",
+            "context_mapping",
+            "error_handling",
+        ]
         for section in required:
             assert section in spec, f"Missing required section: {section}"
 
@@ -74,6 +84,7 @@ class TestSchemaConformance:
 # ---------------------------------------------------------------------------
 # Adapter Identity
 # ---------------------------------------------------------------------------
+
 
 class TestAdapterIdentity:
     """MES adapter correctly identifies as a Forge spoke adapter."""
@@ -106,6 +117,7 @@ class TestAdapterIdentity:
 # Capabilities
 # ---------------------------------------------------------------------------
 
+
 class TestCapabilities:
     """MES adapter capabilities include write (unlike WMS)."""
 
@@ -129,6 +141,7 @@ class TestCapabilities:
 # ---------------------------------------------------------------------------
 # Connection
 # ---------------------------------------------------------------------------
+
 
 class TestConnection:
     """Connection params cover GraphQL, RabbitMQ, MQTT, and Azure auth."""
@@ -173,8 +186,14 @@ class TestConnection:
         assert "mqtt_buffer_max_seconds" in names
 
     def test_secrets_are_flagged(self, spec):
-        secret_params = {"azure_client_secret", "mqtt_username", "mqtt_password",
-                         "mqtt_ca_cert", "mqtt_client_cert", "mqtt_client_key"}
+        secret_params = {
+            "azure_client_secret",
+            "mqtt_username",
+            "mqtt_password",
+            "mqtt_ca_cert",
+            "mqtt_client_cert",
+            "mqtt_client_key",
+        }
         for param in spec["connection"]["params"]:
             if param["name"] in secret_params:
                 assert param.get("secret") is True, f"{param['name']} should be secret"
@@ -188,13 +207,15 @@ class TestConnection:
 
     def test_all_param_names_are_snake_case(self, spec):
         for param in spec["connection"]["params"]:
-            assert re.match(r"^[a-z][a-z0-9_]*$", param["name"]), \
+            assert re.match(r"^[a-z][a-z0-9_]*$", param["name"]), (
                 f"Param name not snake_case: {param['name']}"
+            )
 
 
 # ---------------------------------------------------------------------------
 # Data Contract
 # ---------------------------------------------------------------------------
+
 
 class TestDataContract:
     """Data contract covers the MES spoke's complete data surface including MQTT."""
@@ -258,6 +279,7 @@ class TestDataContract:
 # Context Mapping
 # ---------------------------------------------------------------------------
 
+
 class TestContextMapping:
     """Context mappings cover all declared fields."""
 
@@ -265,15 +287,15 @@ class TestContextMapping:
         required = set(spec["data_contract"]["context_fields"])
         mapped = set(m["context_field"] for m in spec["context_mapping"]["mappings"])
         enriched = set(
-            r["target_field"]
-            for r in spec["context_mapping"].get("enrichment_rules", [])
+            r["target_field"] for r in spec["context_mapping"].get("enrichment_rules", [])
         )
         unmapped = required - (mapped | enriched)
         assert unmapped == set(), f"Unmapped required context fields: {unmapped}"
 
     def test_no_orphan_mappings(self, spec):
-        all_fields = set(spec["data_contract"]["context_fields"]) | \
-                     set(spec["data_contract"].get("optional_context_fields", []))
+        all_fields = set(spec["data_contract"]["context_fields"]) | set(
+            spec["data_contract"].get("optional_context_fields", [])
+        )
         mapped = set(m["context_field"] for m in spec["context_mapping"]["mappings"])
         orphans = mapped - all_fields
         assert orphans == set(), f"Orphan mappings: {orphans}"
@@ -306,6 +328,7 @@ class TestContextMapping:
 # Error Handling
 # ---------------------------------------------------------------------------
 
+
 class TestErrorHandling:
     """Error handling meets Forge adapter requirements."""
 
@@ -332,6 +355,7 @@ class TestErrorHandling:
 # ---------------------------------------------------------------------------
 # Integrity (FHTS)
 # ---------------------------------------------------------------------------
+
 
 class TestIntegrity:
     """FHTS hash governance is correctly applied."""
@@ -365,6 +389,7 @@ class TestIntegrity:
 # Cross-Reference with WMS Spec
 # ---------------------------------------------------------------------------
 
+
 class TestCrossReference:
     """Shared fields between WMS and MES specs are consistent."""
 
@@ -373,10 +398,12 @@ class TestCrossReference:
 
     def test_shared_context_fields_use_identical_names(self, spec, wms_spec):
         """Fields that appear in both specs must use the same name."""
-        mes_fields = set(spec["data_contract"]["context_fields"]) | \
-                     set(spec["data_contract"].get("optional_context_fields", []))
-        wms_fields = set(wms_spec["data_contract"]["context_fields"]) | \
-                     set(wms_spec["data_contract"].get("optional_context_fields", []))
+        mes_fields = set(spec["data_contract"]["context_fields"]) | set(
+            spec["data_contract"].get("optional_context_fields", [])
+        )
+        wms_fields = set(wms_spec["data_contract"]["context_fields"]) | set(
+            wms_spec["data_contract"].get("optional_context_fields", [])
+        )
         shared = mes_fields & wms_fields
         # Must have at least these shared fields for cross-spoke traceability
         assert "lot_id" in shared, "lot_id must be shared for cross-spoke traceability"
@@ -388,11 +415,13 @@ class TestCrossReference:
     def test_shift_definitions_match(self, spec, wms_spec):
         """Shift enrichment must use same definitions for cross-spoke consistency."""
         mes_shift = next(
-            r for r in spec["context_mapping"].get("enrichment_rules", [])
+            r
+            for r in spec["context_mapping"].get("enrichment_rules", [])
             if r["target_field"] == "shift_id"
         )
         wms_shift = next(
-            r for r in wms_spec["context_mapping"].get("enrichment_rules", [])
+            r
+            for r in wms_spec["context_mapping"].get("enrichment_rules", [])
             if r["target_field"] == "shift_id"
         )
         assert mes_shift["config"]["timezone"] == wms_shift["config"]["timezone"]
@@ -412,10 +441,16 @@ class TestCrossReference:
 
     def test_shared_rabbitmq_exchange_topology(self, spec, wms_spec):
         """Both spokes use wh.whk01.distillery01.* exchange pattern."""
-        mes_rmq = [ds["endpoint"] for ds in spec["data_contract"]["data_sources"]
-                   if ds["source_type"] == "rabbitmq"]
-        wms_rmq = [ds["endpoint"] for ds in wms_spec["data_contract"]["data_sources"]
-                   if ds["source_type"] == "rabbitmq"]
+        mes_rmq = [
+            ds["endpoint"]
+            for ds in spec["data_contract"]["data_sources"]
+            if ds["source_type"] == "rabbitmq"
+        ]
+        wms_rmq = [
+            ds["endpoint"]
+            for ds in wms_spec["data_contract"]["data_sources"]
+            if ds["source_type"] == "rabbitmq"
+        ]
         assert "wh.whk01.distillery01.*" in mes_rmq
         assert "wh.whk01.distillery01.*" in wms_rmq
 
@@ -423,6 +458,7 @@ class TestCrossReference:
 # ---------------------------------------------------------------------------
 # Metadata
 # ---------------------------------------------------------------------------
+
 
 class TestMetadata:
     """Metadata correctly identifies MES as a Forge spoke."""
@@ -439,5 +475,6 @@ class TestMetadata:
         assert "shift_id" in csf
 
     def test_mqtt_features_documented(self, spec):
-        assert "multi-broker" in spec["metadata"].get("mqtt_features", "").lower() or \
-               "Multi-broker" in spec["metadata"].get("mqtt_features", "")
+        assert "multi-broker" in spec["metadata"].get(
+            "mqtt_features", ""
+        ).lower() or "Multi-broker" in spec["metadata"].get("mqtt_features", "")

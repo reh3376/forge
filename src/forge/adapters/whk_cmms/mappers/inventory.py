@@ -154,16 +154,15 @@ def map_inventory_investigation(raw: dict[str, Any]) -> OperationalEvent | None:
         source_id=str(global_id),
         event_type="inventory_audit",
         description=f"Inventory Investigation {global_id}",
-        occurred_at=_parse_timestamp(
-            raw.get("createdAt") or raw.get("created_at")
-        ),
+        occurred_at=_parse_timestamp(raw.get("createdAt") or raw.get("created_at")),
         location=_str_or_none(raw.get("location")),
         metadata={
             **_build_metadata(raw),
             "physical_count": raw.get("physicalCount") or raw.get("physical_count"),
             "digital_count": raw.get("digitalCount") or raw.get("digital_count"),
             "location_id": raw.get("locationId") or raw.get("location_id"),
-            "work_order_associated": raw.get("workOrderAssociated") or raw.get("work_order_associated"),
+            "work_order_associated": raw.get("workOrderAssociated")
+            or raw.get("work_order_associated"),
             "discrepancy": _compute_discrepancy(
                 raw.get("physicalCount"),
                 raw.get("digitalCount"),
@@ -173,6 +172,7 @@ def map_inventory_investigation(raw: dict[str, Any]) -> OperationalEvent | None:
 
 
 # ── Helper Functions ──────────────────────────────────────────────────
+
 
 def _build_external_ids(raw: dict[str, Any]) -> dict[str, str]:
     ids: dict[str, str] = {}

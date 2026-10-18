@@ -13,9 +13,9 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, AsyncIterator
+from typing import TYPE_CHECKING, Any
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -26,7 +26,7 @@ from forge.adapters.base.interface import (
 from forge.adapters.whk_erpi.config import WhkErpiConfig
 from forge.adapters.whk_erpi.context import build_record_context
 from forge.adapters.whk_erpi.record_builder import build_contextual_record
-from forge.adapters.whk_erpi.topics import ERPI_ENTITY_TOPICS, ERPI_ACK_TOPICS
+from forge.adapters.whk_erpi.topics import ERPI_ACK_TOPICS, ERPI_ENTITY_TOPICS
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -36,7 +36,11 @@ from forge.core.models.adapter import (
     ConnectionParam,
     DataContract,
 )
-from forge.core.models.contextual_record import ContextualRecord
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from forge.core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 
@@ -55,9 +59,7 @@ def _load_manifest() -> AdapterManifest:
         capabilities=AdapterCapabilities(**raw.get("capabilities", {})),
         data_contract=DataContract(**raw.get("data_contract", {})),
         health_check_interval_ms=raw.get("health_check_interval_ms", 5000),
-        connection_params=[
-            ConnectionParam(**p) for p in raw.get("connection_params", [])
-        ],
+        connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
     )
@@ -112,14 +114,12 @@ class WhkErpiAdapter(
         hub's event loop integration is ready.
         """
         if self._config is None:
-            raise RuntimeError(
-                "Adapter not configured — call configure() first"
-            )
+            raise RuntimeError("Adapter not configured — call configure() first")
         self._state = AdapterState.CONNECTING
         # Phase 1: no live RabbitMQ connection yet — records injected for testing
         # Phase 2 will add aio-pika consumer here
         self._state = AdapterState.HEALTHY
-        self._last_healthy = datetime.now(tz=timezone.utc)
+        self._last_healthy = datetime.now(tz=UTC)
         self._startup_time = self._last_healthy
         logger.info(
             "whk-erpi adapter started (phase 1: inject-only, %d entity topics defined)",
@@ -137,11 +137,11 @@ class WhkErpiAdapter(
         """Return current health status and record counters."""
         uptime = 0.0
         if self._startup_time is not None:
-            uptime = (datetime.now(tz=timezone.utc) - self._startup_time).total_seconds()
+            uptime = (datetime.now(tz=UTC) - self._startup_time).total_seconds()
         return AdapterHealth(
             adapter_id=self.adapter_id,
             state=self._state,
-            last_check=datetime.now(tz=timezone.utc),
+            last_check=datetime.now(tz=UTC),
             last_healthy=self._last_healthy,
             records_collected=self._records_collected,
             records_failed=self._records_failed,
@@ -196,9 +196,7 @@ class WhkErpiAdapter(
 
     # ── SubscriptionProvider ───────────────────────────────────
 
-    async def subscribe(
-        self, tags: list[str], callback: Any
-    ) -> str:
+    async def subscribe(self, tags: list[str], callback: Any) -> str:
         """Subscribe to specific entity topic events.
 
         Tags use the ERPI topic format: wh.whk01.distillery01.<entity>

@@ -7,10 +7,8 @@ location_id for topology correlation.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-
+from forge.core.models.manufacturing.enums import LifecycleState, UnitStatus
 from forge.core.models.manufacturing.manufacturing_unit import ManufacturingUnit
-from forge.core.models.manufacturing.enums import UnitStatus, LifecycleState
 
 
 def map_device(raw_device: dict) -> ManufacturingUnit | None:
@@ -30,7 +28,6 @@ def map_device(raw_device: dict) -> ManufacturingUnit | None:
 
     # Extract basic info
     device_ip = raw_device.get("ip_address") or raw_device.get("ipAddress")
-    device_name = raw_device.get("name") or raw_device.get("hostname")
     device_type = raw_device.get("type") or raw_device.get("deviceType")
 
     # Extract metadata if present
@@ -63,10 +60,7 @@ def map_device(raw_device: dict) -> ManufacturingUnit | None:
 
     # Build product type with device_type if available
     if device_type:
-        if product_type:
-            product_type = f"{product_type} ({device_type})"
-        else:
-            product_type = device_type
+        product_type = f"{product_type} ({device_type})" if product_type else device_type
 
     # Build serial_number field: prefer mac_address, fall back to device_ip
     effective_serial = serial_number or mac_address or device_ip
@@ -111,13 +105,13 @@ def _map_lifecycle_state(raw_status: str) -> LifecycleState | None:
 
     lower = raw_status.lower().strip()
 
-    if lower in ("healthy", "up", "online", "active", "normal"):
+    if lower in ("healthy", "up", "online", "active", "normal") or lower in ("degraded", "warning"):
         return LifecycleState.IN_PROCESS
-    elif lower in ("degraded", "warning"):
-        return LifecycleState.IN_PROCESS
-    elif lower in ("down", "offline", "failed", "critical"):
-        return LifecycleState.WITHDRAWN
-    elif lower in ("quarantined", "blocked", "unauthorized"):
+    elif lower in ("down", "offline", "failed", "critical") or lower in (
+        "quarantined",
+        "blocked",
+        "unauthorized",
+    ):
         return LifecycleState.WITHDRAWN
     else:
         return None

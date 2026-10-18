@@ -93,17 +93,13 @@ CMMS_RABBITMQ_TOPICS: list[CmmsRabbitmqTopic] = [
 
 # ── Lookup Helpers ─────────────────────────────────────────────────
 
-_GRAPHQL_BY_NAME: dict[str, CmmsGraphqlEntity] = {
-    e.entity_name: e for e in CMMS_GRAPHQL_ENTITIES
-}
+_GRAPHQL_BY_NAME: dict[str, CmmsGraphqlEntity] = {e.entity_name: e for e in CMMS_GRAPHQL_ENTITIES}
 
 _GRAPHQL_BY_QUERY: dict[str, CmmsGraphqlEntity] = {
     e.graphql_query_name: e for e in CMMS_GRAPHQL_ENTITIES
 }
 
-_RABBITMQ_BY_TOPIC: dict[str, CmmsRabbitmqTopic] = {
-    t.entity_key: t for t in CMMS_RABBITMQ_TOPICS
-}
+_RABBITMQ_BY_TOPIC: dict[str, CmmsRabbitmqTopic] = {t.entity_key: t for t in CMMS_RABBITMQ_TOPICS}
 
 
 def graphql_entity_for_name(entity_name: str) -> CmmsGraphqlEntity | None:

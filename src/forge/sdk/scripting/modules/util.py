@@ -24,7 +24,10 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger("forge.util")
 
@@ -118,6 +121,7 @@ class UtilModule:
         Replaces: ``system.util.getProperty(name)``
         """
         import os
+
         return os.environ.get(name, default)
 
     # ------------------------------------------------------------------

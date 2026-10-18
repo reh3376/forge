@@ -20,9 +20,11 @@ from __future__ import annotations
 import inspect
 import json
 import logging
-from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +38,7 @@ logger = logging.getLogger(__name__)
 class Subscription:
     """A topic subscription with its handler."""
 
-    topic_filter: str          # MQTT topic filter (may include +/#)
+    topic_filter: str  # MQTT topic filter (may include +/#)
     handler: Callable[..., Awaitable | Any]
     name: str = ""
     qos: int = 0
@@ -141,17 +143,17 @@ class MqttSubscriber:
             async def handle_recipe(msg):
                 ...
         """
+
         def decorator(func: Callable) -> Callable:
             self.subscribe(topic_filter, func, name=func.__name__, qos=qos)
             return func
+
         return decorator
 
     def unsubscribe(self, topic_filter: str) -> int:
         """Remove all subscriptions matching a topic filter. Returns count removed."""
         before = len(self._subscriptions)
-        self._subscriptions = [
-            s for s in self._subscriptions if s.topic_filter != topic_filter
-        ]
+        self._subscriptions = [s for s in self._subscriptions if s.topic_filter != topic_filter]
         removed = before - len(self._subscriptions)
         if removed:
             logger.info("Unsubscribed from %s (%d handlers)", topic_filter, removed)
@@ -190,7 +192,9 @@ class MqttSubscriber:
                 self._error_count += 1
                 logger.error(
                     "Subscriber handler %s failed for topic %s: %s",
-                    sub.name, msg.topic, exc,
+                    sub.name,
+                    msg.topic,
+                    exc,
                 )
 
         return invoked

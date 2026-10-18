@@ -55,9 +55,7 @@ def _load_manifest() -> AdapterManifest:
         capabilities=AdapterCapabilities(**raw.get("capabilities", {})),
         data_contract=DataContract(**raw.get("data_contract", {})),
         health_check_interval_ms=raw.get("health_check_interval_ms", 30_000),
-        connection_params=[
-            ConnectionParam(**p) for p in raw.get("connection_params", [])
-        ],
+        connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
     )
@@ -189,7 +187,9 @@ class WhkWmsAdapter(
             "callback": callback,
         }
         logger.info(
-            "WHK-WMS subscription %s: tags=%s", sub_id, tags,
+            "WHK-WMS subscription %s: tags=%s",
+            sub_id,
+            tags,
         )
         return sub_id
 

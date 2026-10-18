@@ -101,7 +101,7 @@ class Dataset:
 
         Replaces: ``system.dataset.toPyDataSet(dataset)``
         """
-        return [dict(zip(self.columns, row)) for row in self.rows]
+        return [dict(zip(self.columns, row, strict=False)) for row in self.rows]
 
     def to_json(self) -> str:
         """Serialize the dataset to JSON."""

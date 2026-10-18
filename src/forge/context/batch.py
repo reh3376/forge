@@ -59,11 +59,7 @@ class InMemoryBatchStore(BatchStore):
         return None
 
     async def list_active(self) -> list[Batch]:
-        return [
-            deepcopy(b)
-            for b in self._entries.values()
-            if b.status == BatchStatus.ACTIVE
-        ]
+        return [deepcopy(b) for b in self._entries.values() if b.status == BatchStatus.ACTIVE]
 
     async def complete(self, batch_id: str) -> bool:
         batch = self._entries.get(batch_id)

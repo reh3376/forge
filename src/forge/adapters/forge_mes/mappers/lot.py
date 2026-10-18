@@ -60,8 +60,7 @@ def map_lot(raw: dict[str, Any]) -> Lot | None:
         metadata={
             k: v
             for k, v in {
-                "whiskey_type_id": raw.get("whiskeyTypeId")
-                or raw.get("whiskey_type_id"),
+                "whiskey_type_id": raw.get("whiskeyTypeId") or raw.get("whiskey_type_id"),
                 "external_id": raw.get("externalId") or raw.get("external_id"),
             }.items()
             if v is not None

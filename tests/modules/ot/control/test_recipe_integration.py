@@ -11,27 +11,25 @@ Covers:
 - Custom role and requestor overrides
 """
 
-import pytest
 from unittest.mock import AsyncMock
 
+import pytest
+
+from forge.modules.ot.control.authorization import WriteAuthorizer
+from forge.modules.ot.control.interlock import InterlockEngine
 from forge.modules.ot.control.models import (
     DataType,
-    InterlockCondition,
-    InterlockRule,
     TagWriteConfig,
     WritePermission,
     WriteRole,
 )
-from forge.modules.ot.control.validation import WriteValidator
-from forge.modules.ot.control.interlock import InterlockEngine
-from forge.modules.ot.control.authorization import WriteAuthorizer
-from forge.modules.ot.control.write_engine import ControlWriteEngine
 from forge.modules.ot.control.recipe_integration import (
     RecipeParameterMapping,
     RecipeWriteAdapter,
     RecipeWriteConfig,
 )
-
+from forge.modules.ot.control.validation import WriteValidator
+from forge.modules.ot.control.write_engine import ControlWriteEngine
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -45,20 +43,31 @@ def _build_engine(interlock_reader=None) -> ControlWriteEngine:
         ("WH/WHK01/Distillery01/TIT_2010/RampRate", 0.0, 10.0),
         ("WH/WHK01/Distillery01/FIC_3010/SP", 0.0, 500.0),
     ]:
-        validator.register_tag(TagWriteConfig(
-            tag_path=tag, data_type=DataType.FLOAT,
-            min_value=min_v, max_value=max_v,
-        ))
+        validator.register_tag(
+            TagWriteConfig(
+                tag_path=tag,
+                data_type=DataType.FLOAT,
+                min_value=min_v,
+                max_value=max_v,
+            )
+        )
 
-    il_engine = InterlockEngine(tag_reader=interlock_reader or AsyncMock(
-        read_tag=AsyncMock(return_value=None),
-    ))
+    il_engine = InterlockEngine(
+        tag_reader=interlock_reader
+        or AsyncMock(
+            read_tag=AsyncMock(return_value=None),
+        )
+    )
 
     authorizer = WriteAuthorizer()
-    authorizer.add_permission(WritePermission(
-        permission_id="all", area_pattern="*", tag_pattern="**",
-        min_role=WriteRole.OPERATOR,
-    ))
+    authorizer.add_permission(
+        WritePermission(
+            permission_id="all",
+            area_pattern="*",
+            tag_pattern="**",
+            min_role=WriteRole.OPERATOR,
+        )
+    )
 
     return ControlWriteEngine(
         validator=validator,
@@ -70,27 +79,29 @@ def _build_engine(interlock_reader=None) -> ControlWriteEngine:
 def _build_adapter(engine=None, interlock_reader=None) -> RecipeWriteAdapter:
     eng = engine or _build_engine(interlock_reader)
     adapter = RecipeWriteAdapter(eng)
-    adapter.register_config(RecipeWriteConfig(
-        equipment_id="Distillery01/TIT_2010",
-        area="Distillery01",
-        mappings=[
-            RecipeParameterMapping(
-                "target_temp",
-                "WH/WHK01/Distillery01/TIT_2010/SP",
-                engineering_units="°F",
-            ),
-            RecipeParameterMapping(
-                "ramp_rate",
-                "WH/WHK01/Distillery01/TIT_2010/RampRate",
-                engineering_units="°F/min",
-            ),
-            RecipeParameterMapping(
-                "flow_rate",
-                "WH/WHK01/Distillery01/FIC_3010/SP",
-                engineering_units="GPM",
-            ),
-        ],
-    ))
+    adapter.register_config(
+        RecipeWriteConfig(
+            equipment_id="Distillery01/TIT_2010",
+            area="Distillery01",
+            mappings=[
+                RecipeParameterMapping(
+                    "target_temp",
+                    "WH/WHK01/Distillery01/TIT_2010/SP",
+                    engineering_units="°F",
+                ),
+                RecipeParameterMapping(
+                    "ramp_rate",
+                    "WH/WHK01/Distillery01/TIT_2010/RampRate",
+                    engineering_units="°F/min",
+                ),
+                RecipeParameterMapping(
+                    "flow_rate",
+                    "WH/WHK01/Distillery01/FIC_3010/SP",
+                    engineering_units="GPM",
+                ),
+            ],
+        )
+    )
     return adapter
 
 
@@ -164,11 +175,13 @@ class TestBatchSuccess:
     async def test_batch_id_propagated(self):
         engine = _build_engine()
         adapter = RecipeWriteAdapter(engine)
-        adapter.register_config(RecipeWriteConfig(
-            equipment_id="test",
-            area="A",
-            mappings=[RecipeParameterMapping("temp", "WH/WHK01/Distillery01/TIT_2010/SP")],
-        ))
+        adapter.register_config(
+            RecipeWriteConfig(
+                equipment_id="test",
+                area="A",
+                mappings=[RecipeParameterMapping("temp", "WH/WHK01/Distillery01/TIT_2010/SP")],
+            )
+        )
 
         result = await adapter.execute_recipe_write(
             equipment_id="test",
@@ -262,11 +275,13 @@ class TestOverrides:
     async def test_custom_role(self):
         engine = _build_engine()
         adapter = RecipeWriteAdapter(engine)
-        adapter.register_config(RecipeWriteConfig(
-            equipment_id="test",
-            area="A",
-            mappings=[RecipeParameterMapping("temp", "WH/WHK01/Distillery01/TIT_2010/SP")],
-        ))
+        adapter.register_config(
+            RecipeWriteConfig(
+                equipment_id="test",
+                area="A",
+                mappings=[RecipeParameterMapping("temp", "WH/WHK01/Distillery01/TIT_2010/SP")],
+            )
+        )
 
         await adapter.execute_recipe_write(
             equipment_id="test",
@@ -283,12 +298,14 @@ class TestOverrides:
     async def test_default_requestor(self):
         engine = _build_engine()
         adapter = RecipeWriteAdapter(engine)
-        adapter.register_config(RecipeWriteConfig(
-            equipment_id="test",
-            area="A",
-            default_requestor="mes-v2",
-            mappings=[RecipeParameterMapping("temp", "WH/WHK01/Distillery01/TIT_2010/SP")],
-        ))
+        adapter.register_config(
+            RecipeWriteConfig(
+                equipment_id="test",
+                area="A",
+                default_requestor="mes-v2",
+                mappings=[RecipeParameterMapping("temp", "WH/WHK01/Distillery01/TIT_2010/SP")],
+            )
+        )
 
         await adapter.execute_recipe_write(
             equipment_id="test",

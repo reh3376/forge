@@ -284,10 +284,15 @@ class MockScannerServiceHandler(ScannerServiceHandler):
 
         logger.debug(
             "Batch from %s: accepted=%d rejected=%d (batch_id=%s)",
-            device_id, accepted, rejected, batch_id,
+            device_id,
+            accepted,
+            rejected,
+            batch_id,
         )
         return ScanBatchResponse(
-            accepted=accepted, rejected=rejected, errors=errors,
+            accepted=accepted,
+            rejected=rejected,
+            errors=errors,
         )
 
     async def heartbeat(

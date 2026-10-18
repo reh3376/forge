@@ -21,6 +21,7 @@ from forge.adapters.forge_mes.mappers.production_order import (
 # Batch (ManufacturingUnit)
 # ---------------------------------------------------------------------------
 
+
 class TestMapBatch:
     """Test map_batch() -> ManufacturingUnit."""
 
@@ -86,6 +87,7 @@ class TestMapBatch:
 # Lot
 # ---------------------------------------------------------------------------
 
+
 class TestMapLot:
     """Test map_lot() -> Lot."""
 
@@ -128,6 +130,7 @@ class TestMapLot:
 # ---------------------------------------------------------------------------
 # Physical Asset
 # ---------------------------------------------------------------------------
+
 
 class TestMapAsset:
     """Test map_asset() -> PhysicalAsset."""
@@ -183,6 +186,7 @@ class TestMapAsset:
 # ---------------------------------------------------------------------------
 # Operational Event: StepExecution
 # ---------------------------------------------------------------------------
+
 
 class TestMapStepEvent:
     """Test map_step_event() -> OperationalEvent."""
@@ -249,6 +253,7 @@ class TestMapStepEvent:
 # ---------------------------------------------------------------------------
 # Operational Event: ProductionEvent
 # ---------------------------------------------------------------------------
+
 
 class TestMapProductionEvent:
     """Test map_production_event() -> OperationalEvent."""
@@ -320,6 +325,7 @@ class TestMapProductionEvent:
 # Business Entity: Customer + Vendor
 # ---------------------------------------------------------------------------
 
+
 class TestMapCustomer:
     """Test map_customer() -> BusinessEntity."""
 
@@ -390,6 +396,7 @@ class TestMapVendor:
 # ---------------------------------------------------------------------------
 # Process Definition (Recipe)
 # ---------------------------------------------------------------------------
+
 
 class TestMapRecipe:
     """Test map_recipe() -> ProcessDefinition."""
@@ -508,6 +515,7 @@ class TestMapRecipe:
 # Production Order
 # ---------------------------------------------------------------------------
 
+
 class TestMapProductionOrder:
     """Test map_production_order() -> ProductionOrder."""
 
@@ -578,6 +586,7 @@ class TestMapProductionOrder:
 # Schedule Order (WorkOrder)
 # ---------------------------------------------------------------------------
 
+
 class TestMapScheduleOrder:
     """Test map_schedule_order() -> WorkOrder."""
 
@@ -633,6 +642,7 @@ class TestMapScheduleOrder:
 # ---------------------------------------------------------------------------
 # Material Item
 # ---------------------------------------------------------------------------
+
 
 class TestMapItem:
     """Test map_item() -> MaterialItem."""

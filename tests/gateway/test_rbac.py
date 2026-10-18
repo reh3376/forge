@@ -62,10 +62,14 @@ def _setup_auth():
                 "operator-key": ForgeUser(
                     user_id="operator",
                     role=Role.OPERATOR,
-                    scopes=frozenset({
-                        "records:read", "records:write",
-                        "adapters:read", "adapters:write",
-                    }),
+                    scopes=frozenset(
+                        {
+                            "records:read",
+                            "records:write",
+                            "adapters:read",
+                            "adapters:write",
+                        }
+                    ),
                     source="api_key",
                 ),
                 "viewer-key": ForgeUser(
@@ -118,16 +122,12 @@ class TestRequireRole:
 
     def test_operator_fails_admin_check(self, rbac_app: FastAPI):
         client = TestClient(rbac_app, raise_server_exceptions=False)
-        resp = client.post(
-            "/admin-only", headers={"X-API-Key": "operator-key"}
-        )
+        resp = client.post("/admin-only", headers={"X-API-Key": "operator-key"})
         assert resp.status_code == 403
 
     def test_viewer_fails_admin_check(self, rbac_app: FastAPI):
         client = TestClient(rbac_app, raise_server_exceptions=False)
-        resp = client.post(
-            "/admin-only", headers={"X-API-Key": "viewer-key"}
-        )
+        resp = client.post("/admin-only", headers={"X-API-Key": "viewer-key"})
         assert resp.status_code == 403
 
     def test_admin_passes_operator_check(self, rbac_app: FastAPI):
@@ -137,16 +137,12 @@ class TestRequireRole:
 
     def test_operator_passes_operator_check(self, rbac_app: FastAPI):
         client = TestClient(rbac_app)
-        resp = client.get(
-            "/operator-up", headers={"X-API-Key": "operator-key"}
-        )
+        resp = client.get("/operator-up", headers={"X-API-Key": "operator-key"})
         assert resp.status_code == 200
 
     def test_viewer_fails_operator_check(self, rbac_app: FastAPI):
         client = TestClient(rbac_app, raise_server_exceptions=False)
-        resp = client.get(
-            "/operator-up", headers={"X-API-Key": "viewer-key"}
-        )
+        resp = client.get("/operator-up", headers={"X-API-Key": "viewer-key"})
         assert resp.status_code == 403
 
 

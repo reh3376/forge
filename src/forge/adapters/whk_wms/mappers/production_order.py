@@ -72,22 +72,15 @@ def map_production_order(raw: dict[str, Any]) -> ProductionOrder | None:
     )
 
     status_raw = str(
-        raw.get("status")
-        or raw.get("barrelingStatus")
-        or data.get("status")
-        or "DRAFT"
+        raw.get("status") or raw.get("barrelingStatus") or data.get("status") or "DRAFT"
     ).upper()
 
     # Quantities — WMS uses minQuantity/maxQuantity for barrel count targets
     planned_qty = _float_or_none(
-        raw.get("maxQuantity")
-        or raw.get("max_quantity")
-        or data.get("targetQuantity")
+        raw.get("maxQuantity") or raw.get("max_quantity") or data.get("targetQuantity")
     )
     actual_qty = _float_or_none(
-        raw.get("actualQuantity")
-        or raw.get("actual_quantity")
-        or data.get("actualQuantity")
+        raw.get("actualQuantity") or raw.get("actual_quantity") or data.get("actualQuantity")
     )
 
     lot_ids_raw = raw.get("lotIds") or raw.get("lot_ids") or data.get("lotIds") or []
@@ -97,18 +90,12 @@ def map_production_order(raw: dict[str, Any]) -> ProductionOrder | None:
         source_system=_SOURCE_SYSTEM,
         source_id=str(order_id),
         order_number=str(order_number),
-        recipe_id=_str_or_none(
-            raw.get("recipeId") or raw.get("recipe_id") or data.get("recipeId")
-        ),
+        recipe_id=_str_or_none(raw.get("recipeId") or raw.get("recipe_id") or data.get("recipeId")),
         customer_id=_str_or_none(
             raw.get("customerId") or raw.get("customer_id") or data.get("customerId")
         ),
         status=_STATUS_MAP.get(status_raw, OrderStatus.DRAFT),
-        product_type=(
-            raw.get("productType")
-            or raw.get("product_type")
-            or data.get("productType")
-        ),
+        product_type=(raw.get("productType") or raw.get("product_type") or data.get("productType")),
         planned_quantity=planned_qty,
         actual_quantity=actual_qty,
         unit_of_measure="barrels",
@@ -118,12 +105,8 @@ def map_production_order(raw: dict[str, Any]) -> ProductionOrder | None:
         planned_end=_parse_datetime(
             raw.get("plannedEnd") or raw.get("planned_end") or data.get("endDate")
         ),
-        actual_start=_parse_datetime(
-            raw.get("actualStart") or raw.get("actual_start")
-        ),
-        actual_end=_parse_datetime(
-            raw.get("actualEnd") or raw.get("actual_end")
-        ),
+        actual_start=_parse_datetime(raw.get("actualStart") or raw.get("actual_start")),
+        actual_end=_parse_datetime(raw.get("actualEnd") or raw.get("actual_end")),
         lot_ids=lot_ids,
         priority=_int_or_none(raw.get("priority") or data.get("priority")),
         metadata={

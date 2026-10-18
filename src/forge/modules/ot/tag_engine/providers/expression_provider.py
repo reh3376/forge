@@ -17,18 +17,15 @@ The TagEngine's change propagation loop handles ongoing re-evaluation.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import (
-    ComputedTag,
-    DerivedTag,
-    ExpressionTag,
-    ReferenceTag,
     TagType,
 )
 from forge.modules.ot.tag_engine.providers.base import BaseProvider
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -64,9 +61,7 @@ class ExpressionProvider(BaseProvider):
             tags = await self._registry.find_by_type(tag_type)
             self._evaluable_count += len(tags)
 
-        logger.info(
-            "ExpressionProvider: found %d evaluable tags", self._evaluable_count
-        )
+        logger.info("ExpressionProvider: found %d evaluable tags", self._evaluable_count)
 
         # Run initial evaluation if engine is available
         if self._engine is not None:

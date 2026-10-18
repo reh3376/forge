@@ -1,9 +1,6 @@
 """Tests for the dual-write data consistency validator."""
 
-import math
-from datetime import datetime, timedelta, timezone
-
-import pytest
+from datetime import UTC, datetime, timedelta
 
 from forge.modules.ot.bridge.dual_write import (
     ComparisonResult,
@@ -12,7 +9,6 @@ from forge.modules.ot.bridge.dual_write import (
     DualWriteConfig,
     DualWriteValidator,
 )
-
 
 # ---------------------------------------------------------------------------
 # ComparisonResult
@@ -39,11 +35,13 @@ class TestComparisonResult:
         assert r.discrepancy_type == DiscrepancyType.VALUE_MISMATCH
 
     def test_timestamp_delta(self):
-        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=timezone.utc)
-        t2 = datetime(2026, 4, 9, 12, 0, 0, 500000, tzinfo=timezone.utc)
+        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=UTC)
+        t2 = datetime(2026, 4, 9, 12, 0, 0, 500000, tzinfo=UTC)
         r = ComparisonResult(
-            tag_path="tag", match=True,
-            ot_timestamp=t1, bridge_timestamp=t2,
+            tag_path="tag",
+            match=True,
+            ot_timestamp=t1,
+            bridge_timestamp=t2,
         )
         assert r.timestamp_delta_ms is not None
         assert abs(r.timestamp_delta_ms - 500.0) < 1.0
@@ -79,7 +77,9 @@ class TestConsistencyReport:
 
     def test_failing_report_missing_in_ot(self):
         r = ConsistencyReport(
-            total_compared=100, matches=100, mismatches=0,
+            total_compared=100,
+            matches=100,
+            mismatches=0,
             missing_in_ot=5,
         )
         assert r.passes_gate is False  # Missing tags fail gate
@@ -103,11 +103,15 @@ class TestConsistencyReport:
         assert r.coverage_rate == 900 / 1000
 
     def test_get_mismatches(self):
-        r = ConsistencyReport(results=[
-            ComparisonResult(tag_path="a", match=True),
-            ComparisonResult(tag_path="b", match=False, discrepancy_type=DiscrepancyType.VALUE_MISMATCH),
-            ComparisonResult(tag_path="c", match=True),
-        ])
+        r = ConsistencyReport(
+            results=[
+                ComparisonResult(tag_path="a", match=True),
+                ComparisonResult(
+                    tag_path="b", match=False, discrepancy_type=DiscrepancyType.VALUE_MISMATCH
+                ),
+                ComparisonResult(tag_path="c", match=True),
+            ]
+        )
         mismatches = r.get_mismatches()
         assert len(mismatches) == 1
         assert mismatches[0].tag_path == "b"
@@ -132,24 +136,33 @@ class TestSingleTagComparison:
     def test_matching_floats(self):
         v = DualWriteValidator()
         r = v.compare_tag(
-            "tag", ot_value=72.5, bridge_value=72.5,
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value=72.5,
+            bridge_value=72.5,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is True
 
     def test_float_within_tolerance(self):
         v = DualWriteValidator(DualWriteConfig(float_tolerance=0.01))
         r = v.compare_tag(
-            "tag", ot_value=72.500, bridge_value=72.505,
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value=72.500,
+            bridge_value=72.505,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is True
 
     def test_float_outside_tolerance(self):
         v = DualWriteValidator(DualWriteConfig(float_tolerance=0.001))
         r = v.compare_tag(
-            "tag", ot_value=72.5, bridge_value=73.0,
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value=72.5,
+            bridge_value=73.0,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is False
         assert r.discrepancy_type == DiscrepancyType.VALUE_MISMATCH
@@ -157,8 +170,11 @@ class TestSingleTagComparison:
     def test_quality_mismatch(self):
         v = DualWriteValidator()
         r = v.compare_tag(
-            "tag", ot_value=72.5, bridge_value=72.5,
-            ot_quality="GOOD", bridge_quality="BAD",
+            "tag",
+            ot_value=72.5,
+            bridge_value=72.5,
+            ot_quality="GOOD",
+            bridge_quality="BAD",
         )
         assert r.match is False
         assert r.discrepancy_type == DiscrepancyType.QUALITY_MISMATCH
@@ -166,30 +182,41 @@ class TestSingleTagComparison:
     def test_ignore_quality_mismatch(self):
         v = DualWriteValidator(DualWriteConfig(ignore_quality_mismatch=True))
         r = v.compare_tag(
-            "tag", ot_value=72.5, bridge_value=72.5,
-            ot_quality="GOOD", bridge_quality="BAD",
+            "tag",
+            ot_value=72.5,
+            bridge_value=72.5,
+            ot_quality="GOOD",
+            bridge_quality="BAD",
         )
         assert r.match is True
 
     def test_timestamp_drift_within_limit(self):
-        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=timezone.utc)
+        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=UTC)
         t2 = t1 + timedelta(milliseconds=1000)
         v = DualWriteValidator(DualWriteConfig(timestamp_max_drift_ms=5000))
         r = v.compare_tag(
-            "tag", ot_value=1, bridge_value=1,
-            ot_quality="GOOD", bridge_quality="GOOD",
-            ot_timestamp=t1, bridge_timestamp=t2,
+            "tag",
+            ot_value=1,
+            bridge_value=1,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
+            ot_timestamp=t1,
+            bridge_timestamp=t2,
         )
         assert r.match is True
 
     def test_timestamp_drift_exceeds_limit(self):
-        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=timezone.utc)
+        t1 = datetime(2026, 4, 9, 12, 0, 0, tzinfo=UTC)
         t2 = t1 + timedelta(seconds=10)
         v = DualWriteValidator(DualWriteConfig(timestamp_max_drift_ms=5000))
         r = v.compare_tag(
-            "tag", ot_value=1, bridge_value=1,
-            ot_quality="GOOD", bridge_quality="GOOD",
-            ot_timestamp=t1, bridge_timestamp=t2,
+            "tag",
+            ot_value=1,
+            bridge_value=1,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
+            ot_timestamp=t1,
+            bridge_timestamp=t2,
         )
         assert r.match is False
         assert r.discrepancy_type == DiscrepancyType.TIMESTAMP_DRIFT
@@ -197,83 +224,115 @@ class TestSingleTagComparison:
     def test_boolean_comparison(self):
         v = DualWriteValidator()
         r = v.compare_tag(
-            "tag", ot_value=True, bridge_value=True,
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value=True,
+            bridge_value=True,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is True
 
     def test_boolean_mismatch(self):
         v = DualWriteValidator()
         r = v.compare_tag(
-            "tag", ot_value=True, bridge_value=False,
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value=True,
+            bridge_value=False,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is False
 
     def test_string_exact_match(self):
         v = DualWriteValidator()
         r = v.compare_tag(
-            "tag", ot_value="RUNNING", bridge_value="RUNNING",
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value="RUNNING",
+            bridge_value="RUNNING",
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is True
 
     def test_string_mismatch(self):
         v = DualWriteValidator()
         r = v.compare_tag(
-            "tag", ot_value="RUNNING", bridge_value="STOPPED",
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value="RUNNING",
+            bridge_value="STOPPED",
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is False
 
     def test_none_both(self):
         v = DualWriteValidator()
         r = v.compare_tag(
-            "tag", ot_value=None, bridge_value=None,
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value=None,
+            bridge_value=None,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is True
 
     def test_none_one_side(self):
         v = DualWriteValidator()
         r = v.compare_tag(
-            "tag", ot_value=42, bridge_value=None,
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value=42,
+            bridge_value=None,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is False
 
     def test_nan_both(self):
         v = DualWriteValidator()
         r = v.compare_tag(
-            "tag", ot_value=float("nan"), bridge_value=float("nan"),
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value=float("nan"),
+            bridge_value=float("nan"),
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is True
 
     def test_nan_one_side(self):
         v = DualWriteValidator()
         r = v.compare_tag(
-            "tag", ot_value=float("nan"), bridge_value=42.0,
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value=float("nan"),
+            bridge_value=42.0,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is False
 
     def test_int_vs_float_within_tolerance(self):
         v = DualWriteValidator()
         r = v.compare_tag(
-            "tag", ot_value=42, bridge_value=42.0,
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value=42,
+            bridge_value=42.0,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is True
 
     def test_large_values_relative_tolerance(self):
-        v = DualWriteValidator(DualWriteConfig(
-            float_tolerance=0.001,
-            float_relative_tolerance=1e-6,
-        ))
+        v = DualWriteValidator(
+            DualWriteConfig(
+                float_tolerance=0.001,
+                float_relative_tolerance=1e-6,
+            )
+        )
         r = v.compare_tag(
-            "tag", ot_value=1000000.0, bridge_value=1000000.0000005,
-            ot_quality="GOOD", bridge_quality="GOOD",
+            "tag",
+            ot_value=1000000.0,
+            bridge_value=1000000.0000005,
+            ot_quality="GOOD",
+            bridge_quality="GOOD",
         )
         assert r.match is True
 

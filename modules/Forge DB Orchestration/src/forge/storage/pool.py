@@ -8,10 +8,11 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
-from forge.storage.config import StorageConfig
+if TYPE_CHECKING:
+    from forge.storage.config import StorageConfig
 
 logger = logging.getLogger(__name__)
 
@@ -147,12 +148,12 @@ class PoolManager:
                         engine=engine_name,
                         healthy=False,
                         error="Pool not initialized",
-                        last_check=datetime.now(tz=timezone.utc),
+                        last_check=datetime.now(tz=UTC),
                     )
                 )
                 continue
 
-            start = datetime.now(tz=timezone.utc)
+            start = datetime.now(tz=UTC)
             try:
                 if engine_name in ("postgres", "timescale"):
                     async with pool.acquire() as conn:
@@ -163,15 +164,13 @@ class PoolManager:
                 elif engine_name == "redis":
                     await pool.ping()
 
-                elapsed = (
-                    datetime.now(tz=timezone.utc) - start
-                ).total_seconds() * 1000
+                elapsed = (datetime.now(tz=UTC) - start).total_seconds() * 1000
                 results.append(
                     EngineHealth(
                         engine=engine_name,
                         healthy=True,
                         latency_ms=round(elapsed, 2),
-                        last_check=datetime.now(tz=timezone.utc),
+                        last_check=datetime.now(tz=UTC),
                     )
                 )
             except Exception as exc:
@@ -180,7 +179,7 @@ class PoolManager:
                         engine=engine_name,
                         healthy=False,
                         error=str(exc),
-                        last_check=datetime.now(tz=timezone.utc),
+                        last_check=datetime.now(tz=UTC),
                     )
                 )
 
@@ -192,11 +191,11 @@ class PoolManager:
             if pool is None:
                 continue
             try:
-                if engine_name in ("postgres", "timescale"):
-                    await pool.close()
-                elif engine_name == "neo4j":
-                    await pool.close()
-                elif engine_name == "redis":
+                if (
+                    engine_name in ("postgres", "timescale")
+                    or engine_name == "neo4j"
+                    or engine_name == "redis"
+                ):
                     await pool.close()
                 logger.info("Closed %s pool", engine_name)
             except Exception as exc:

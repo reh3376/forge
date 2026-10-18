@@ -19,11 +19,10 @@ Design decisions:
 
 from __future__ import annotations
 
-import fnmatch
 import logging
 import time
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 logger = logging.getLogger(__name__)

@@ -89,9 +89,7 @@ class TestApiKeyAuth:
     @pytest.mark.usefixtures("_auth_enabled")
     def test_valid_admin_key(self, auth_app: FastAPI):
         client = TestClient(auth_app)
-        resp = client.get(
-            "/protected", headers={"X-API-Key": "test-key-admin"}
-        )
+        resp = client.get("/protected", headers={"X-API-Key": "test-key-admin"})
         assert resp.status_code == 200
         body = resp.json()
         assert body["user_id"] == "admin-user"
@@ -101,18 +99,14 @@ class TestApiKeyAuth:
     @pytest.mark.usefixtures("_auth_enabled")
     def test_valid_viewer_key(self, auth_app: FastAPI):
         client = TestClient(auth_app)
-        resp = client.get(
-            "/protected", headers={"X-API-Key": "test-key-viewer"}
-        )
+        resp = client.get("/protected", headers={"X-API-Key": "test-key-viewer"})
         assert resp.status_code == 200
         assert resp.json()["role"] == "viewer"
 
     @pytest.mark.usefixtures("_auth_enabled")
     def test_invalid_key_returns_401(self, auth_app: FastAPI):
         client = TestClient(auth_app, raise_server_exceptions=False)
-        resp = client.get(
-            "/protected", headers={"X-API-Key": "bad-key"}
-        )
+        resp = client.get("/protected", headers={"X-API-Key": "bad-key"})
         assert resp.status_code == 401
 
     @pytest.mark.usefixtures("_auth_enabled")

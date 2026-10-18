@@ -86,9 +86,7 @@ class WriteValidator:
 
         if config is None:
             result.validation_passed = False
-            result.validation_error = (
-                f"No write config registered for tag: {request.tag_path}"
-            )
+            result.validation_error = f"No write config registered for tag: {request.tag_path}"
             result.status = WriteStatus.REJECTED_VALIDATION
             return result
 

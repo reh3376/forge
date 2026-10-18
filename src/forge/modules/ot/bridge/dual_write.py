@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
@@ -26,12 +26,12 @@ from typing import Any
 class DiscrepancyType(str, Enum):
     """Categories of dual-write discrepancy."""
 
-    VALUE_MISMATCH = "value_mismatch"           # Values differ beyond tolerance
-    QUALITY_MISMATCH = "quality_mismatch"       # Quality codes differ
-    TIMESTAMP_DRIFT = "timestamp_drift"         # Source timestamps too far apart
-    MISSING_IN_OT = "missing_in_ot"             # Tag in bridge but not OT Module
-    MISSING_IN_BRIDGE = "missing_in_bridge"     # Tag in OT Module but not bridge
-    TYPE_MISMATCH = "type_mismatch"             # Data types differ
+    VALUE_MISMATCH = "value_mismatch"  # Values differ beyond tolerance
+    QUALITY_MISMATCH = "quality_mismatch"  # Quality codes differ
+    TIMESTAMP_DRIFT = "timestamp_drift"  # Source timestamps too far apart
+    MISSING_IN_OT = "missing_in_ot"  # Tag in bridge but not OT Module
+    MISSING_IN_BRIDGE = "missing_in_bridge"  # Tag in OT Module but not bridge
+    TYPE_MISMATCH = "type_mismatch"  # Data types differ
 
 
 @dataclass(frozen=True)
@@ -57,9 +57,7 @@ class ComparisonResult:
     def timestamp_delta_ms(self) -> float | None:
         """Time difference between OT and bridge timestamps in ms."""
         if self.ot_timestamp and self.bridge_timestamp:
-            delta = abs(
-                (self.ot_timestamp - self.bridge_timestamp).total_seconds()
-            )
+            delta = abs((self.ot_timestamp - self.bridge_timestamp).total_seconds())
             return delta * 1000.0
         return None
 
@@ -71,7 +69,7 @@ class ConsistencyReport:
     This is the primary artifact for Gate 5 evaluation.
     """
 
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     total_compared: int = 0
     matches: int = 0
     mismatches: int = 0
@@ -132,11 +130,11 @@ class ConsistencyReport:
 class DualWriteConfig:
     """Configuration for dual-write comparison."""
 
-    float_tolerance: float = 0.001          # Absolute tolerance for float comparison
+    float_tolerance: float = 0.001  # Absolute tolerance for float comparison
     float_relative_tolerance: float = 1e-6  # Relative tolerance for large values
     timestamp_max_drift_ms: float = 5000.0  # Max acceptable timestamp difference
-    ignore_quality_mismatch: bool = False    # If True, quality differences don't count
-    ignore_missing_in_bridge: bool = True    # Bridge may not have all OT Module tags
+    ignore_quality_mismatch: bool = False  # If True, quality differences don't count
+    ignore_missing_in_bridge: bool = True  # Bridge may not have all OT Module tags
 
 
 # ---------------------------------------------------------------------------
@@ -272,28 +270,32 @@ class DualWriteValidator:
             if ot is None:
                 # Tag in bridge but not in OT Module
                 report.missing_in_ot += 1
-                report.results.append(ComparisonResult(
-                    tag_path=path,
-                    match=False,
-                    bridge_value=bridge.get("value") if bridge else None,
-                    bridge_quality=bridge.get("quality", "") if bridge else "",
-                    discrepancy_type=DiscrepancyType.MISSING_IN_OT,
-                    detail="Tag present in bridge but missing from OT Module",
-                ))
+                report.results.append(
+                    ComparisonResult(
+                        tag_path=path,
+                        match=False,
+                        bridge_value=bridge.get("value") if bridge else None,
+                        bridge_quality=bridge.get("quality", "") if bridge else "",
+                        discrepancy_type=DiscrepancyType.MISSING_IN_OT,
+                        detail="Tag present in bridge but missing from OT Module",
+                    )
+                )
                 continue
 
             if bridge is None:
                 # Tag in OT Module but not in bridge
                 report.missing_in_bridge += 1
                 if not self._config.ignore_missing_in_bridge:
-                    report.results.append(ComparisonResult(
-                        tag_path=path,
-                        match=False,
-                        ot_value=ot.get("value"),
-                        ot_quality=ot.get("quality", ""),
-                        discrepancy_type=DiscrepancyType.MISSING_IN_BRIDGE,
-                        detail="Tag present in OT Module but missing from bridge",
-                    ))
+                    report.results.append(
+                        ComparisonResult(
+                            tag_path=path,
+                            match=False,
+                            ot_value=ot.get("value"),
+                            ot_quality=ot.get("quality", ""),
+                            discrepancy_type=DiscrepancyType.MISSING_IN_BRIDGE,
+                            detail="Tag present in OT Module but missing from bridge",
+                        )
+                    )
                 continue
 
             # Both present — compare

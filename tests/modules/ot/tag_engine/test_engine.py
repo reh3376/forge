@@ -2,10 +2,10 @@
 
 import asyncio
 
-import pytest
 import pytest_asyncio
 
-from forge.modules.ot.opcua_client.types import DataType, QualityCode
+from forge.modules.ot.opcua_client.types import QualityCode
+from forge.modules.ot.tag_engine.engine import TagEngine, _quality_rank
 from forge.modules.ot.tag_engine.models import (
     ComputedTag,
     DerivedSource,
@@ -15,7 +15,6 @@ from forge.modules.ot.tag_engine.models import (
     ReferenceTag,
     StandardTag,
 )
-from forge.modules.ot.tag_engine.engine import TagEngine, _quality_rank
 from forge.modules.ot.tag_engine.registry import TagRegistry
 
 
@@ -35,6 +34,7 @@ async def engine(registry):
 # Quality rank helper
 # ---------------------------------------------------------------------------
 
+
 class TestQualityRank:
     def test_ordering(self):
         assert _quality_rank(QualityCode.GOOD) < _quality_rank(QualityCode.UNCERTAIN)
@@ -46,13 +46,16 @@ class TestQualityRank:
 # Expression evaluation
 # ---------------------------------------------------------------------------
 
+
 class TestExpressionEval:
     async def test_simple_arithmetic(self, registry, engine):
         await registry.register(MemoryTag(path="temp_c"))
-        await registry.register(ExpressionTag(
-            path="temp_f",
-            expression="{temp_c} * 1.8 + 32",
-        ))
+        await registry.register(
+            ExpressionTag(
+                path="temp_f",
+                expression="{temp_c} * 1.8 + 32",
+            )
+        )
         await registry.update_value("temp_c", 100.0, QualityCode.GOOD)
 
         result = await engine.evaluate("temp_f")
@@ -64,23 +67,27 @@ class TestExpressionEval:
     async def test_multi_source_expression(self, registry, engine):
         await registry.register(MemoryTag(path="a"))
         await registry.register(MemoryTag(path="b"))
-        await registry.register(ExpressionTag(
-            path="sum_ab",
-            expression="{a} + {b}",
-        ))
+        await registry.register(
+            ExpressionTag(
+                path="sum_ab",
+                expression="{a} + {b}",
+            )
+        )
         await registry.update_value("a", 10.0, QualityCode.GOOD)
         await registry.update_value("b", 20.0, QualityCode.GOOD)
 
         result = await engine.evaluate("sum_ab")
-        value, quality = result
+        value, _quality = result
         assert value == 30.0
 
     async def test_math_functions(self, registry, engine):
         await registry.register(MemoryTag(path="val"))
-        await registry.register(ExpressionTag(
-            path="result",
-            expression="sqrt({val})",
-        ))
+        await registry.register(
+            ExpressionTag(
+                path="result",
+                expression="sqrt({val})",
+            )
+        )
         await registry.update_value("val", 144.0, QualityCode.GOOD)
 
         result = await engine.evaluate("result")
@@ -88,10 +95,12 @@ class TestExpressionEval:
         assert abs(value - 12.0) < 0.01
 
     async def test_missing_source_gives_bad_quality(self, registry, engine):
-        await registry.register(ExpressionTag(
-            path="orphan",
-            expression="{nonexistent} + 1",
-        ))
+        await registry.register(
+            ExpressionTag(
+                path="orphan",
+                expression="{nonexistent} + 1",
+            )
+        )
 
         result = await engine.evaluate("orphan")
         _, quality = result
@@ -99,10 +108,12 @@ class TestExpressionEval:
 
     async def test_invalid_expression_gives_bad_quality(self, registry, engine):
         await registry.register(MemoryTag(path="x"))
-        await registry.register(ExpressionTag(
-            path="bad_expr",
-            expression="{x} / 0",
-        ))
+        await registry.register(
+            ExpressionTag(
+                path="bad_expr",
+                expression="{x} / 0",
+            )
+        )
         await registry.update_value("x", 1.0, QualityCode.GOOD)
 
         result = await engine.evaluate("bad_expr")
@@ -113,10 +124,12 @@ class TestExpressionEval:
         """Worst quality of all sources propagates to the expression result."""
         await registry.register(MemoryTag(path="good_src"))
         await registry.register(MemoryTag(path="uncertain_src"))
-        await registry.register(ExpressionTag(
-            path="combined",
-            expression="{good_src} + {uncertain_src}",
-        ))
+        await registry.register(
+            ExpressionTag(
+                path="combined",
+                expression="{good_src} + {uncertain_src}",
+            )
+        )
         await registry.update_value("good_src", 10, QualityCode.GOOD)
         await registry.update_value("uncertain_src", 20, QualityCode.UNCERTAIN)
 
@@ -130,18 +143,21 @@ class TestExpressionEval:
 # Derived evaluation
 # ---------------------------------------------------------------------------
 
+
 class TestDerivedEval:
     async def test_weighted_sum(self, registry, engine):
         await registry.register(MemoryTag(path="a"))
         await registry.register(MemoryTag(path="b"))
-        await registry.register(DerivedTag(
-            path="ws",
-            sources=[
-                DerivedSource(tag_path="a", weight=0.3),
-                DerivedSource(tag_path="b", weight=0.7),
-            ],
-            aggregation="weighted_sum",
-        ))
+        await registry.register(
+            DerivedTag(
+                path="ws",
+                sources=[
+                    DerivedSource(tag_path="a", weight=0.3),
+                    DerivedSource(tag_path="b", weight=0.7),
+                ],
+                aggregation="weighted_sum",
+            )
+        )
         await registry.update_value("a", 100.0, QualityCode.GOOD)
         await registry.update_value("b", 200.0, QualityCode.GOOD)
 
@@ -152,14 +168,16 @@ class TestDerivedEval:
     async def test_average(self, registry, engine):
         await registry.register(MemoryTag(path="a"))
         await registry.register(MemoryTag(path="b"))
-        await registry.register(DerivedTag(
-            path="avg",
-            sources=[
-                DerivedSource(tag_path="a", weight=1.0),
-                DerivedSource(tag_path="b", weight=1.0),
-            ],
-            aggregation="average",
-        ))
+        await registry.register(
+            DerivedTag(
+                path="avg",
+                sources=[
+                    DerivedSource(tag_path="a", weight=1.0),
+                    DerivedSource(tag_path="b", weight=1.0),
+                ],
+                aggregation="average",
+            )
+        )
         await registry.update_value("a", 10.0, QualityCode.GOOD)
         await registry.update_value("b", 20.0, QualityCode.GOOD)
 
@@ -170,12 +188,20 @@ class TestDerivedEval:
     async def test_min_max(self, registry, engine):
         await registry.register(MemoryTag(path="a"))
         await registry.register(MemoryTag(path="b"))
-        await registry.register(DerivedTag(
-            path="mn", sources=[DerivedSource(tag_path="a"), DerivedSource(tag_path="b")], aggregation="min",
-        ))
-        await registry.register(DerivedTag(
-            path="mx", sources=[DerivedSource(tag_path="a"), DerivedSource(tag_path="b")], aggregation="max",
-        ))
+        await registry.register(
+            DerivedTag(
+                path="mn",
+                sources=[DerivedSource(tag_path="a"), DerivedSource(tag_path="b")],
+                aggregation="min",
+            )
+        )
+        await registry.register(
+            DerivedTag(
+                path="mx",
+                sources=[DerivedSource(tag_path="a"), DerivedSource(tag_path="b")],
+                aggregation="max",
+            )
+        )
         await registry.update_value("a", 5.0, QualityCode.GOOD)
         await registry.update_value("b", 15.0, QualityCode.GOOD)
 
@@ -185,9 +211,13 @@ class TestDerivedEval:
         assert max_result[0] == 15.0
 
     async def test_all_sources_missing(self, registry, engine):
-        await registry.register(DerivedTag(
-            path="empty", sources=[DerivedSource(tag_path="missing")], aggregation="weighted_sum",
-        ))
+        await registry.register(
+            DerivedTag(
+                path="empty",
+                sources=[DerivedSource(tag_path="missing")],
+                aggregation="weighted_sum",
+            )
+        )
         result = await engine.evaluate("empty")
         _, quality = result
         assert quality == QualityCode.BAD
@@ -196,6 +226,7 @@ class TestDerivedEval:
 # ---------------------------------------------------------------------------
 # Reference evaluation
 # ---------------------------------------------------------------------------
+
 
 class TestReferenceEval:
     async def test_simple_reference(self, registry, engine):
@@ -210,11 +241,13 @@ class TestReferenceEval:
 
     async def test_reference_with_transform(self, registry, engine):
         await registry.register(MemoryTag(path="source"))
-        await registry.register(ReferenceTag(
-            path="doubled",
-            source_path="source",
-            transform="value * 2",
-        ))
+        await registry.register(
+            ReferenceTag(
+                path="doubled",
+                source_path="source",
+                transform="value * 2",
+            )
+        )
         await registry.update_value("source", 21, QualityCode.GOOD)
 
         result = await engine.evaluate("doubled")
@@ -231,16 +264,19 @@ class TestReferenceEval:
 # Computed evaluation
 # ---------------------------------------------------------------------------
 
+
 class TestComputedEval:
     async def test_oee_calculation(self, registry, engine):
         await registry.register(MemoryTag(path="avail"))
         await registry.register(MemoryTag(path="perf"))
         await registry.register(MemoryTag(path="qual"))
-        await registry.register(ComputedTag(
-            path="oee",
-            sources={"avail": "avail", "perf": "perf", "qual": "qual"},
-            function="(avail * perf * qual) / 1000000",
-        ))
+        await registry.register(
+            ComputedTag(
+                path="oee",
+                sources={"avail": "avail", "perf": "perf", "qual": "qual"},
+                function="(avail * perf * qual) / 1000000",
+            )
+        )
         await registry.update_value("avail", 90.0, QualityCode.GOOD)
         await registry.update_value("perf", 85.0, QualityCode.GOOD)
         await registry.update_value("qual", 95.0, QualityCode.GOOD)
@@ -251,11 +287,13 @@ class TestComputedEval:
         assert abs(value - expected) < 0.001
 
     async def test_computed_with_none_source(self, registry, engine):
-        await registry.register(ComputedTag(
-            path="broken",
-            sources={"x": "missing"},
-            function="x * 2 if x is not None else 0",
-        ))
+        await registry.register(
+            ComputedTag(
+                path="broken",
+                sources={"x": "missing"},
+                function="x * 2 if x is not None else 0",
+            )
+        )
         result = await engine.evaluate("broken")
         # Source is None, quality should be BAD
         _, quality = result
@@ -266,6 +304,7 @@ class TestComputedEval:
 # ---------------------------------------------------------------------------
 # Non-evaluable types return None
 # ---------------------------------------------------------------------------
+
 
 class TestNonEvaluable:
     async def test_standard_not_evaluated(self, registry, engine):
@@ -286,6 +325,7 @@ class TestNonEvaluable:
 # ---------------------------------------------------------------------------
 # Change propagation
 # ---------------------------------------------------------------------------
+
 
 class TestChangePropagation:
     async def test_expression_updates_on_source_change(self, registry, engine):
@@ -319,8 +359,8 @@ class TestChangePropagation:
 
             tv_b = await registry.get_value("b")
             tv_c = await registry.get_value("c")
-            assert tv_b.value == 11    # 10 + 1
-            assert tv_c.value == 22    # 11 * 2
+            assert tv_b.value == 11  # 10 + 1
+            assert tv_c.value == 22  # 11 * 2
         finally:
             await engine.stop()
 
@@ -338,6 +378,7 @@ class TestChangePropagation:
 # ---------------------------------------------------------------------------
 # Engine lifecycle
 # ---------------------------------------------------------------------------
+
 
 class TestEngineLifecycle:
     async def test_start_stop(self, registry, engine):

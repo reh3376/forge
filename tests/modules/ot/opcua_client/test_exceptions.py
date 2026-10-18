@@ -5,15 +5,13 @@ Validates exception inheritance, attribute preservation, and repr formatting.
 
 from __future__ import annotations
 
-import pytest
-
 from forge.modules.ot.opcua_client.exceptions import (
     BrowseError,
     CertificateError,
     ConfigurationError,
     ConnectionError,
     CreateSubscriptionError,
-    EndpointUnreachable,
+    EndpointUnreachableError,
     HistoryReadError,
     MonitoredItemError,
     OpcUaError,
@@ -27,7 +25,6 @@ from forge.modules.ot.opcua_client.exceptions import (
     TimeoutError,
     WriteError,
 )
-
 
 # ---------------------------------------------------------------------------
 # Base exception
@@ -71,16 +68,12 @@ class TestConnectionErrors:
     """ConnectionError hierarchy."""
 
     def test_connection_error_endpoint(self) -> None:
-        err = ConnectionError(
-            "failed", endpoint_url="opc.tcp://10.4.2.10:4840"
-        )
+        err = ConnectionError("failed", endpoint_url="opc.tcp://10.4.2.10:4840")
         assert err.endpoint_url == "opc.tcp://10.4.2.10:4840"
         assert isinstance(err, OpcUaError)
 
     def test_endpoint_unreachable(self) -> None:
-        err = EndpointUnreachable(
-            "host down", endpoint_url="opc.tcp://10.4.2.99:4840"
-        )
+        err = EndpointUnreachableError("host down", endpoint_url="opc.tcp://10.4.2.99:4840")
         assert isinstance(err, ConnectionError)
         assert isinstance(err, OpcUaError)
 
@@ -191,9 +184,7 @@ class TestSecurityErrors:
         assert isinstance(err, OpcUaError)
 
     def test_certificate_error(self) -> None:
-        err = CertificateError(
-            "not found", certificate_path="/certs/missing.pem"
-        )
+        err = CertificateError("not found", certificate_path="/certs/missing.pem")
         assert err.certificate_path == "/certs/missing.pem"
         assert isinstance(err, SecurityError)
 
@@ -227,7 +218,7 @@ class TestExceptionHierarchy:
         """All exceptions are catchable as OpcUaError."""
         exceptions = [
             ConnectionError("x"),
-            EndpointUnreachable("x"),
+            EndpointUnreachableError("x"),
             SecurityNegotiationError("x"),
             SessionActivationError("x"),
             TimeoutError("x"),
@@ -250,7 +241,7 @@ class TestExceptionHierarchy:
     def test_catch_connection_category(self) -> None:
         """All connection subtypes are catchable as ConnectionError."""
         for exc_cls in (
-            EndpointUnreachable,
+            EndpointUnreachableError,
             SecurityNegotiationError,
             SessionActivationError,
         ):

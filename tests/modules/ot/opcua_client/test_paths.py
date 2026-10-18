@@ -14,7 +14,6 @@ import pytest
 
 from forge.modules.ot.opcua_client.paths import NormalizedPath, PathNormalizer
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------

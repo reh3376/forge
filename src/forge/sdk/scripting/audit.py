@@ -26,8 +26,8 @@ from __future__ import annotations
 import json
 import logging
 from collections import deque
-from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger("forge.audit")
@@ -43,12 +43,12 @@ class AuditEntry:
     """A single audit log entry for a script operation."""
 
     timestamp: str
-    operation: str          # "tag_write", "tag_read", "db_query", "db_mutate"
+    operation: str  # "tag_write", "tag_read", "db_query", "db_mutate"
     script_name: str
     script_owner: str
     handler_name: str
-    trigger_type: str       # "tag_change", "timer", "event", "alarm", "api", "manual"
-    target: str             # tag path or SQL query (truncated)
+    trigger_type: str  # "tag_change", "timer", "event", "alarm", "api", "manual"
+    target: str  # tag path or SQL query (truncated)
     old_value: Any = None
     new_value: Any = None
     rbac_allowed: bool = True
@@ -150,7 +150,7 @@ class ScriptAuditTrail:
         """Record a tag write operation."""
         ctx = get_execution_context()
         entry = AuditEntry(
-            timestamp=datetime.now(tz=timezone.utc).isoformat(),
+            timestamp=datetime.now(tz=UTC).isoformat(),
             operation="tag_write",
             script_name=ctx.script_name,
             script_owner=ctx.script_owner,
@@ -186,7 +186,7 @@ class ScriptAuditTrail:
         """Record a database query or mutation."""
         ctx = get_execution_context()
         entry = AuditEntry(
-            timestamp=datetime.now(tz=timezone.utc).isoformat(),
+            timestamp=datetime.now(tz=UTC).isoformat(),
             operation="db_mutate" if is_mutation else "db_query",
             script_name=ctx.script_name,
             script_owner=ctx.script_owner,
@@ -213,7 +213,7 @@ class ScriptAuditTrail:
         """Record a tag read (optional — for high-audit environments)."""
         ctx = get_execution_context()
         entry = AuditEntry(
-            timestamp=datetime.now(tz=timezone.utc).isoformat(),
+            timestamp=datetime.now(tz=UTC).isoformat(),
             operation="tag_read",
             script_name=ctx.script_name,
             script_owner=ctx.script_owner,

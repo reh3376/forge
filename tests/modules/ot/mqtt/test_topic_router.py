@@ -6,11 +6,9 @@ from forge.modules.ot.mqtt.topic_router import (
     TopicRouter,
     TopicTemplate,
     TopicType,
-    ResolvedTopic,
-    _normalize_path,
     _match_tag_pattern,
+    _normalize_path,
 )
-
 
 # ---------------------------------------------------------------------------
 # Path normalization
@@ -18,7 +16,6 @@ from forge.modules.ot.mqtt.topic_router import (
 
 
 class TestNormalizePath:
-
     def test_strips_leading_slash(self):
         assert _normalize_path("/Distillery01/TIT/Out_PV") == "Distillery01/TIT/Out_PV"
 
@@ -38,7 +35,6 @@ class TestNormalizePath:
 
 
 class TestTagPatternMatch:
-
     def test_exact(self):
         assert _match_tag_pattern("a/b/c", "a/b/c") is True
         assert _match_tag_pattern("a/b/c", "a/b/d") is False
@@ -58,7 +54,6 @@ class TestTagPatternMatch:
 
 
 class TestDefaultTopicResolution:
-
     @pytest.fixture
     def router(self):
         return TopicRouter(site="whk01")
@@ -101,7 +96,6 @@ class TestDefaultTopicResolution:
 
 
 class TestCustomTemplates:
-
     def test_custom_template_with_priority(self):
         custom = TopicTemplate(
             topic_type=TopicType.TAG_VALUE,
@@ -122,10 +116,12 @@ class TestCustomTemplates:
     def test_add_template(self):
         router = TopicRouter(site="whk01")
         initial_count = router.template_count
-        router.add_template(TopicTemplate(
-            topic_type=TopicType.SCRIPT,
-            template="whk/{site}/scripts/{tag_path}",
-        ))
+        router.add_template(
+            TopicTemplate(
+                topic_type=TopicType.SCRIPT,
+                template="whk/{site}/scripts/{tag_path}",
+            )
+        )
         assert router.template_count == initial_count + 1
 
 
@@ -135,7 +131,6 @@ class TestCustomTemplates:
 
 
 class TestTopicPrefix:
-
     def test_prefix_prepended(self):
         router = TopicRouter(site="whk01", topic_prefix="v1")
         resolved = router.resolve_tag("TIT/Out_PV", area="Distillery01")
@@ -153,7 +148,6 @@ class TestTopicPrefix:
 
 
 class TestTemplateListing:
-
     def test_get_all_templates(self):
         router = TopicRouter(site="whk01")
         templates = router.get_templates()

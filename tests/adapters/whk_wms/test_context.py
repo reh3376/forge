@@ -102,9 +102,7 @@ class TestNormalizeEventType:
 
     def test_rabbitmq_exchange_lookup(self):
         raw = {}
-        result = normalize_event_type(
-            raw, exchange_name="wh.whk01.distillery01.barrel"
-        )
+        result = normalize_event_type(raw, exchange_name="wh.whk01.distillery01.barrel")
         assert result == "barrel.state_change"
 
     def test_unknown_fallback(self):

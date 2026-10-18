@@ -53,9 +53,7 @@ def map_customer(raw: dict[str, Any]) -> BusinessEntity | None:
         source_id=str(raw.get("id", global_id)),
         entity_type=EntityType.CUSTOMER,
         name=str(name),
-        parent_id=_str_or_none(
-            raw.get("parentCustomerId") or raw.get("parent_customer_id")
-        ),
+        parent_id=_str_or_none(raw.get("parentCustomerId") or raw.get("parent_customer_id")),
         external_ids=_build_external_ids(raw),
         is_active=True,
         metadata=_build_metadata(raw),

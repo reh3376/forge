@@ -1,32 +1,25 @@
 """Tests for MQTT 3.1.1 protocol codec — encoding and decoding."""
 
 import struct
-import pytest
 
 from forge.core.broker.protocol import (
-    PacketType,
     ConnectReturnCode,
-    ConnectPacket,
-    PublishPacket,
-    SubscribePacket,
-    SubscribeRequest,
-    UnsubscribePacket,
-    encode_remaining_length,
-    decode_remaining_length,
-    encode_utf8,
-    decode_utf8,
+    PacketType,
     decode_connect,
     decode_publish,
+    decode_remaining_length,
     decode_subscribe,
     decode_unsubscribe,
+    decode_utf8,
     encode_connack,
-    encode_publish,
+    encode_pingresp,
     encode_puback,
+    encode_publish,
+    encode_remaining_length,
     encode_suback,
     encode_unsuback,
-    encode_pingresp,
+    encode_utf8,
 )
-
 
 # ---------------------------------------------------------------------------
 # Remaining length encoding
@@ -34,7 +27,6 @@ from forge.core.broker.protocol import (
 
 
 class TestRemainingLength:
-
     def test_encode_zero(self):
         assert encode_remaining_length(0) == b"\x00"
 
@@ -56,8 +48,8 @@ class TestRemainingLength:
             assert consumed == len(encoded)
 
     def test_decode_offset(self):
-        data = b"\xFF" + encode_remaining_length(300)
-        val, consumed = decode_remaining_length(data, offset=1)
+        data = b"\xff" + encode_remaining_length(300)
+        val, _consumed = decode_remaining_length(data, offset=1)
         assert val == 300
 
 
@@ -67,7 +59,6 @@ class TestRemainingLength:
 
 
 class TestUtf8Encoding:
-
     def test_encode_empty(self):
         assert encode_utf8("") == b"\x00\x00"
 
@@ -83,9 +74,9 @@ class TestUtf8Encoding:
             assert consumed == len(encoded)
 
     def test_decode_offset(self):
-        prefix = b"\xFF\xFF"
+        prefix = b"\xff\xff"
         data = prefix + encode_utf8("test")
-        s, consumed = decode_utf8(data, offset=2)
+        s, _consumed = decode_utf8(data, offset=2)
         assert s == "test"
 
 
@@ -95,7 +86,6 @@ class TestUtf8Encoding:
 
 
 class TestDecodeConnect:
-
     def _build_connect(
         self,
         client_id: str = "test-client",
@@ -160,10 +150,9 @@ class TestDecodeConnect:
 
 
 class TestDecodePublish:
-
     def test_qos0_no_packet_id(self):
         data = encode_utf8("test/topic") + b"hello"
-        header = (PacketType.PUBLISH << 4)  # QoS 0, no retain
+        header = PacketType.PUBLISH << 4  # QoS 0, no retain
         pkt = decode_publish(header, data)
         assert pkt.topic == "test/topic"
         assert pkt.payload == b"hello"
@@ -192,7 +181,7 @@ class TestDecodePublish:
 
     def test_empty_payload(self):
         data = encode_utf8("test/topic")
-        header = (PacketType.PUBLISH << 4)
+        header = PacketType.PUBLISH << 4
         pkt = decode_publish(header, data)
         assert pkt.payload == b""
 
@@ -203,7 +192,6 @@ class TestDecodePublish:
 
 
 class TestDecodeSubscribe:
-
     def test_single_subscription(self):
         data = struct.pack("!H", 1) + encode_utf8("test/#") + b"\x01"
         pkt = decode_subscribe(data)
@@ -227,7 +215,6 @@ class TestDecodeSubscribe:
 
 
 class TestDecodeUnsubscribe:
-
     def test_unsubscribe(self):
         data = struct.pack("!H", 3) + encode_utf8("test/#") + encode_utf8("other/+")
         pkt = decode_unsubscribe(data)
@@ -241,7 +228,6 @@ class TestDecodeUnsubscribe:
 
 
 class TestEncoders:
-
     def test_connack_accepted(self):
         data = encode_connack(False, ConnectReturnCode.ACCEPTED)
         assert data[0] == (PacketType.CONNACK << 4)

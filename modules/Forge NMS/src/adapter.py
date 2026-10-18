@@ -24,9 +24,9 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, AsyncIterator
+from typing import TYPE_CHECKING, Any
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -37,14 +37,6 @@ from forge.adapters.base.interface import (
 from forge.adapters.whk_nms.config import WhkNmsConfig
 from forge.adapters.whk_nms.context import build_record_context
 from forge.adapters.whk_nms.endpoints import NMS_REST_ENDPOINTS, NMS_WEBSOCKET_ENDPOINTS
-from forge.adapters.whk_nms.mappers import (
-    map_device,
-    map_trap_event,
-    map_alert,
-    map_security_event,
-    map_baseline_anomaly,
-    map_spof_detection,
-)
 from forge.adapters.whk_nms.record_builder import build_contextual_record
 from forge.core.models.adapter import (
     AdapterCapabilities,
@@ -55,7 +47,11 @@ from forge.core.models.adapter import (
     ConnectionParam,
     DataContract,
 )
-from forge.core.models.contextual_record import ContextualRecord
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from forge.core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 
@@ -74,9 +70,7 @@ def _load_manifest() -> AdapterManifest:
         capabilities=AdapterCapabilities(**raw.get("capabilities", {})),
         data_contract=DataContract(**raw.get("data_contract", {})),
         health_check_interval_ms=raw.get("health_check_interval_ms", 5000),
-        connection_params=[
-            ConnectionParam(**p) for p in raw.get("connection_params", [])
-        ],
+        connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
     )
@@ -141,17 +135,16 @@ class WhkNmsAdapter(
         aio-httpx when the hub's event loop integration is ready.
         """
         if self._config is None:
-            raise RuntimeError(
-                "Adapter not configured — call configure() first"
-            )
+            raise RuntimeError("Adapter not configured — call configure() first")
         self._state = AdapterState.CONNECTING
         # Phase 1: no live REST/WebSocket connections yet — records injected for testing
         # Phase 2 will add aio-httpx for REST polling and websockets for streaming
         self._state = AdapterState.HEALTHY
-        self._last_healthy = datetime.now(tz=timezone.utc)
+        self._last_healthy = datetime.now(tz=UTC)
         self._startup_time = self._last_healthy
         logger.info(
-            "whk-nms adapter started (phase 1: inject-only, %d rest endpoints, %d ws subscriptions defined)",
+            "whk-nms adapter started "
+            "(phase 1: inject-only, %d rest endpoints, %d ws subscriptions defined)",
             len(NMS_REST_ENDPOINTS),
             len(NMS_WEBSOCKET_ENDPOINTS),
         )
@@ -167,11 +160,11 @@ class WhkNmsAdapter(
         """Return current health status and record counters."""
         uptime = 0.0
         if self._startup_time is not None:
-            uptime = (datetime.now(tz=timezone.utc) - self._startup_time).total_seconds()
+            uptime = (datetime.now(tz=UTC) - self._startup_time).total_seconds()
         return AdapterHealth(
             adapter_id=self.adapter_id,
             state=self._state,
-            last_check=datetime.now(tz=timezone.utc),
+            last_check=datetime.now(tz=UTC),
             last_healthy=self._last_healthy,
             records_collected=self._records_collected,
             records_failed=self._records_failed,

@@ -78,12 +78,8 @@ class TestInMemorySchemaStore:
     @pytest.mark.asyncio
     async def test_list_all_filter_by_schema_type(self):
         store = InMemorySchemaStore()
-        await store.save(
-            _make_metadata("s1", "Adapter", schema_type=SchemaType.ADAPTER_OUTPUT)
-        )
-        await store.save(
-            _make_metadata("s2", "API", schema_type=SchemaType.API)
-        )
+        await store.save(_make_metadata("s1", "Adapter", schema_type=SchemaType.ADAPTER_OUTPUT))
+        await store.save(_make_metadata("s2", "API", schema_type=SchemaType.API))
         results = await store.list_all(schema_type="adapter_output")
         assert len(results) == 1
         assert results[0].name == "Adapter"

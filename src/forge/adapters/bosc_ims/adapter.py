@@ -73,9 +73,7 @@ def _load_manifest() -> AdapterManifest:
         capabilities=AdapterCapabilities(**raw.get("capabilities", {})),
         data_contract=DataContract(**raw.get("data_contract", {})),
         health_check_interval_ms=raw.get("health_check_interval_ms", 15_000),
-        connection_params=[
-            ConnectionParam(**p) for p in raw.get("connection_params", [])
-        ],
+        connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
     )
@@ -232,12 +230,9 @@ class BoscImsAdapter(
                 # Track watermark for incremental collection
                 if record.timestamp.source_time and (
                     self._last_event_timestamp is None
-                    or record.timestamp.source_time
-                    > self._last_event_timestamp
+                    or record.timestamp.source_time > self._last_event_timestamp
                 ):
-                    self._last_event_timestamp = (
-                        record.timestamp.source_time
-                    )
+                    self._last_event_timestamp = record.timestamp.source_time
                 yield record
 
             if has_yielded:
@@ -396,6 +391,7 @@ class BoscImsAdapter(
                     from forge.adapters.bosc_ims.record_builder import (
                         _parse_timestamp,
                     )
+
                     return _parse_timestamp(raw_ts)
         return None
 
@@ -458,8 +454,7 @@ class BoscImsAdapter(
                 "tag_path": "bosc.asset.snapshot",
                 "data_type": "entity",
                 "description": (
-                    "Current asset state (three-dimensional:"
-                    " disposition + system + asset)"
+                    "Current asset state (three-dimensional: disposition + system + asset)"
                 ),
             },
             {

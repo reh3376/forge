@@ -1,10 +1,8 @@
 """Tests for ForgeMqttBroker — lifecycle, in-process pub/sub, routing."""
 
-import asyncio
 import pytest
 
-from forge.core.broker.broker import ForgeMqttBroker, BrokerConfig
-
+from forge.core.broker.broker import BrokerConfig, ForgeMqttBroker
 
 # ---------------------------------------------------------------------------
 # Lifecycle
@@ -12,7 +10,6 @@ from forge.core.broker.broker import ForgeMqttBroker, BrokerConfig
 
 
 class TestBrokerLifecycle:
-
     @pytest.mark.asyncio
     async def test_start_and_stop(self):
         broker = ForgeMqttBroker(BrokerConfig(port=0, sys_interval=0))
@@ -46,7 +43,6 @@ class TestBrokerLifecycle:
 
 
 class TestInProcessPubSub:
-
     @pytest.mark.asyncio
     async def test_local_subscribe_and_publish(self):
         broker = ForgeMqttBroker(BrokerConfig(port=0, sys_interval=0))
@@ -77,6 +73,7 @@ class TestInProcessPubSub:
 
         assert len(received) == 1
         import json
+
         data = json.loads(received[0])
         assert data["value"] == 78.4
 
@@ -102,10 +99,10 @@ class TestInProcessPubSub:
         received_a = []
         received_b = []
 
-        broker.subscribe_local("handler-a", "whk/#",
-                               lambda t, p, q, r: received_a.append(t))
-        broker.subscribe_local("handler-b", "whk/+/ot/tags/#",
-                               lambda t, p, q, r: received_b.append(t))
+        broker.subscribe_local("handler-a", "whk/#", lambda t, p, q, r: received_a.append(t))
+        broker.subscribe_local(
+            "handler-b", "whk/+/ot/tags/#", lambda t, p, q, r: received_b.append(t)
+        )
 
         await broker.publish("whk/whk01/ot/tags/TIT/Out_PV", b"78.4")
 
@@ -120,8 +117,7 @@ class TestInProcessPubSub:
         await broker.start()
 
         received = []
-        broker.subscribe_local("test", "other/topic",
-                               lambda t, p, q, r: received.append(t))
+        broker.subscribe_local("test", "other/topic", lambda t, p, q, r: received.append(t))
         await broker.publish("whk/whk01/ot/tags/TIT/Out_PV", b"78.4")
 
         assert len(received) == 0
@@ -133,8 +129,7 @@ class TestInProcessPubSub:
         await broker.start()
 
         received = []
-        broker.subscribe_local("test", "whk/#",
-                               lambda t, p, q, r: received.append(t))
+        broker.subscribe_local("test", "whk/#", lambda t, p, q, r: received.append(t))
         removed = broker.unsubscribe_local("test")
         assert removed == 1
 
@@ -150,7 +145,6 @@ class TestInProcessPubSub:
 
 
 class TestBrokerRetained:
-
     @pytest.mark.asyncio
     async def test_retain_stores_message(self):
         broker = ForgeMqttBroker(BrokerConfig(port=0, sys_interval=0))
@@ -184,27 +178,38 @@ class TestBrokerRetained:
 
 
 class TestBrokerAuth:
-
     def test_anonymous_allowed_by_default(self):
         broker = ForgeMqttBroker(BrokerConfig())
         assert broker.authenticate("", "") is True
 
     def test_anonymous_denied_when_disabled(self):
-        broker = ForgeMqttBroker(BrokerConfig(
-            allow_anonymous=False, username="admin", password="secret",
-        ))
+        broker = ForgeMqttBroker(
+            BrokerConfig(
+                allow_anonymous=False,
+                username="admin",
+                password="secret",
+            )
+        )
         assert broker.authenticate("", "") is False
 
     def test_correct_credentials(self):
-        broker = ForgeMqttBroker(BrokerConfig(
-            allow_anonymous=False, username="admin", password="secret",
-        ))
+        broker = ForgeMqttBroker(
+            BrokerConfig(
+                allow_anonymous=False,
+                username="admin",
+                password="secret",
+            )
+        )
         assert broker.authenticate("admin", "secret") is True
 
     def test_wrong_credentials(self):
-        broker = ForgeMqttBroker(BrokerConfig(
-            allow_anonymous=False, username="admin", password="secret",
-        ))
+        broker = ForgeMqttBroker(
+            BrokerConfig(
+                allow_anonymous=False,
+                username="admin",
+                password="secret",
+            )
+        )
         assert broker.authenticate("admin", "wrong") is False
 
 
@@ -214,7 +219,6 @@ class TestBrokerAuth:
 
 
 class TestBrokerResilience:
-
     @pytest.mark.asyncio
     async def test_handler_exception_does_not_crash_broker(self):
         broker = ForgeMqttBroker(BrokerConfig(port=0, sys_interval=0))
@@ -225,8 +229,7 @@ class TestBrokerResilience:
 
         received = []
         broker.subscribe_local("bad", "test/#", bad_handler)
-        broker.subscribe_local("good", "test/#",
-                               lambda t, p, q, r: received.append(t))
+        broker.subscribe_local("good", "test/#", lambda t, p, q, r: received.append(t))
 
         delivered = await broker.publish("test/topic", b"data")
         # good handler should still receive

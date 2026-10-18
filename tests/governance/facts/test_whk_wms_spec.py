@@ -39,12 +39,14 @@ def spec():
 @pytest.fixture(scope="module")
 def validator(schema):
     from jsonschema import Draft202012Validator
+
     return Draft202012Validator(schema)
 
 
 # ---------------------------------------------------------------------------
 # Schema Conformance
 # ---------------------------------------------------------------------------
+
 
 class TestSchemaConformance:
     """Spec validates against facts.schema.json."""
@@ -57,8 +59,16 @@ class TestSchemaConformance:
         assert spec["spec_version"] == "0.1.0"
 
     def test_all_required_sections_present(self, spec):
-        required = ["spec_version", "adapter_identity", "capabilities", "lifecycle",
-                     "connection", "data_contract", "context_mapping", "error_handling"]
+        required = [
+            "spec_version",
+            "adapter_identity",
+            "capabilities",
+            "lifecycle",
+            "connection",
+            "data_contract",
+            "context_mapping",
+            "error_handling",
+        ]
         for section in required:
             assert section in spec, f"Missing required section: {section}"
 
@@ -66,6 +76,7 @@ class TestSchemaConformance:
 # ---------------------------------------------------------------------------
 # Adapter Identity
 # ---------------------------------------------------------------------------
+
 
 class TestAdapterIdentity:
     """WMS adapter correctly identifies as a Forge spoke adapter."""
@@ -99,6 +110,7 @@ class TestAdapterIdentity:
 # Capabilities
 # ---------------------------------------------------------------------------
 
+
 class TestCapabilities:
     """WMS adapter capabilities match the spoke's data patterns."""
 
@@ -125,6 +137,7 @@ class TestCapabilities:
 # ---------------------------------------------------------------------------
 # Connection
 # ---------------------------------------------------------------------------
+
 
 class TestConnection:
     """Connection params cover all WMS system interfaces."""
@@ -157,13 +170,15 @@ class TestConnection:
 
     def test_all_param_names_are_snake_case(self, spec):
         for param in spec["connection"]["params"]:
-            assert re.match(r"^[a-z][a-z0-9_]*$", param["name"]), \
+            assert re.match(r"^[a-z][a-z0-9_]*$", param["name"]), (
                 f"Param name not snake_case: {param['name']}"
+            )
 
 
 # ---------------------------------------------------------------------------
 # Data Contract
 # ---------------------------------------------------------------------------
+
 
 class TestDataContract:
     """Data contract covers the WMS spoke's complete data surface."""
@@ -218,6 +233,7 @@ class TestDataContract:
 # Context Mapping
 # ---------------------------------------------------------------------------
 
+
 class TestContextMapping:
     """Context mappings cover all declared fields with no orphans."""
 
@@ -225,15 +241,15 @@ class TestContextMapping:
         required = set(spec["data_contract"]["context_fields"])
         mapped = set(m["context_field"] for m in spec["context_mapping"]["mappings"])
         enriched = set(
-            r["target_field"]
-            for r in spec["context_mapping"].get("enrichment_rules", [])
+            r["target_field"] for r in spec["context_mapping"].get("enrichment_rules", [])
         )
         unmapped = required - (mapped | enriched)
         assert unmapped == set(), f"Unmapped required context fields: {unmapped}"
 
     def test_no_orphan_mappings(self, spec):
-        all_fields = set(spec["data_contract"]["context_fields"]) | \
-                     set(spec["data_contract"].get("optional_context_fields", []))
+        all_fields = set(spec["data_contract"]["context_fields"]) | set(
+            spec["data_contract"].get("optional_context_fields", [])
+        )
         mapped = set(m["context_field"] for m in spec["context_mapping"]["mappings"])
         orphans = mapped - all_fields
         assert orphans == set(), f"Orphan mappings (target undeclared fields): {orphans}"
@@ -260,6 +276,7 @@ class TestContextMapping:
 # ---------------------------------------------------------------------------
 # Error Handling
 # ---------------------------------------------------------------------------
+
 
 class TestErrorHandling:
     """Error handling meets Forge adapter requirements."""
@@ -288,6 +305,7 @@ class TestErrorHandling:
 # ---------------------------------------------------------------------------
 # Integrity (FHTS)
 # ---------------------------------------------------------------------------
+
 
 class TestIntegrity:
     """FHTS hash governance is correctly applied."""
@@ -323,6 +341,7 @@ class TestIntegrity:
 # Metadata (Forge topology)
 # ---------------------------------------------------------------------------
 
+
 class TestMetadata:
     """Metadata correctly identifies WMS as a Forge spoke."""
 
@@ -333,5 +352,7 @@ class TestMetadata:
         assert spec["metadata"]["hub_module"] == "forge-adapters"
 
     def test_notes_mention_read_only(self, spec):
-        assert "read-only" in spec["metadata"]["notes"].lower() or \
-               "Read-only" in spec["metadata"]["notes"]
+        assert (
+            "read-only" in spec["metadata"]["notes"].lower()
+            or "Read-only" in spec["metadata"]["notes"]
+        )

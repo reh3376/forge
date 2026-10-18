@@ -46,9 +46,7 @@ def map_lot(raw: dict[str, Any]) -> Lot | None:
         status=str(raw.get("status", "CREATED")).upper(),
         quantity=_float_or_none(raw.get("totalPGs") or raw.get("total_pgs")),
         unit_of_measure="proof_gallons" if raw.get("totalPGs") else None,
-        parent_lot_id=_str_or_none(
-            raw.get("parentLotId") or raw.get("parent_lot_id")
-        ),
+        parent_lot_id=_str_or_none(raw.get("parentLotId") or raw.get("parent_lot_id")),
         unit_count=_int_or_none(raw.get("bblTotal") or raw.get("bbl_total")),
         metadata={
             k: v

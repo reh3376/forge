@@ -118,22 +118,14 @@ def map_production_order(raw: dict[str, Any]) -> ProductionOrder | None:
         planned_quantity=_float_or_none(
             raw.get("expectedQuantity") or raw.get("expected_quantity")
         ),
-        actual_quantity=_float_or_none(
-            raw.get("actualQuantity") or raw.get("actual_quantity")
-        ),
+        actual_quantity=_float_or_none(raw.get("actualQuantity") or raw.get("actual_quantity")),
         unit_of_measure=raw.get("containerType") or raw.get("container_type"),
         planned_start=_parse_time_str(
             raw.get("expectedStartDate") or raw.get("expected_start_date")
         ),
-        planned_end=_parse_time_str(
-            raw.get("expectedEndDate") or raw.get("expected_end_date")
-        ),
-        actual_start=_parse_time_str(
-            raw.get("startedAt") or raw.get("started_at")
-        ),
-        actual_end=_parse_time_str(
-            raw.get("completedAt") or raw.get("completed_at")
-        ),
+        planned_end=_parse_time_str(raw.get("expectedEndDate") or raw.get("expected_end_date")),
+        actual_start=_parse_time_str(raw.get("startedAt") or raw.get("started_at")),
+        actual_end=_parse_time_str(raw.get("completedAt") or raw.get("completed_at")),
         lot_ids=lot_ids,
         priority=_int_or_none(raw.get("priority")),
         metadata={
@@ -166,11 +158,7 @@ def map_schedule_order(raw: dict[str, Any]) -> WorkOrder | None:
     priority_raw = str(raw.get("priority") or "NORMAL").upper()
 
     # Title: use descriptive name if available
-    title = (
-        raw.get("title")
-        or raw.get("name")
-        or f"Schedule Order {so_id}"
-    )
+    title = raw.get("title") or raw.get("name") or f"Schedule Order {so_id}"
 
     return WorkOrder(
         source_system=_SOURCE_SYSTEM,
@@ -182,9 +170,7 @@ def map_schedule_order(raw: dict[str, Any]) -> WorkOrder | None:
         planned_start=_parse_time_str(
             raw.get("expectedStartDate") or raw.get("expected_start_date")
         ),
-        planned_end=_parse_time_str(
-            raw.get("expectedEndDate") or raw.get("expected_end_date")
-        ),
+        planned_end=_parse_time_str(raw.get("expectedEndDate") or raw.get("expected_end_date")),
         production_order_id=_str_or_none(
             raw.get("productionOrderId") or raw.get("production_order_id")
         ),

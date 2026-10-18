@@ -17,7 +17,6 @@ from forge.sdk.scripting.modules.tag import BrowseNode, TagModule, TagReadResult
 
 
 class TestTagModule:
-
     @pytest.fixture
     def mock_registry(self):
         reg = MagicMock()
@@ -117,7 +116,6 @@ class TestTagModule:
 
 
 class TestDbModule:
-
     def test_query_result_to_dicts(self):
         qr = QueryResult(
             columns=["name", "value"],
@@ -144,6 +142,7 @@ class TestDbModule:
     def test_named_query_registration(self):
         register_named_query("active_batches", "SELECT * FROM batches WHERE active = true")
         from forge.sdk.scripting.modules.db import _named_queries
+
         assert "active_batches" in _named_queries
 
 
@@ -153,7 +152,6 @@ class TestDbModule:
 
 
 class TestNetModule:
-
     def test_http_response_ok(self):
         resp = HttpResponse(status_code=200, headers={}, body='{"key": "value"}')
         assert resp.ok is True
@@ -168,7 +166,9 @@ class TestNetModule:
 
     def test_http_response_json_data_cached(self):
         resp = HttpResponse(
-            status_code=200, headers={}, body="",
+            status_code=200,
+            headers={},
+            body="",
             json_data={"already": "parsed"},
         )
         assert resp.json() == {"already": "parsed"}
@@ -180,7 +180,6 @@ class TestNetModule:
 
 
 class TestLogModule:
-
     def test_get_creates_logger(self):
         mod = LogModule()
         log = mod.get("my_script")
@@ -226,20 +225,27 @@ class TestLogModule:
 
 
 class TestAlarmModule:
-
     def test_unbound_raises(self):
         mod = AlarmModule()
         with pytest.raises(RuntimeError, match="not bound"):
             import asyncio
+
             asyncio.run(mod.get_active())
 
     @pytest.mark.asyncio
     async def test_get_active(self):
         mock_engine = MagicMock()
-        mock_engine.get_active_alarms = AsyncMock(return_value=[
-            {"alarm_id": "a1", "name": "HIGH_TEMP", "state": "ACTIVE_UNACK",
-             "priority": "HIGH", "tag_path": "WH/TIT/Out_PV"},
-        ])
+        mock_engine.get_active_alarms = AsyncMock(
+            return_value=[
+                {
+                    "alarm_id": "a1",
+                    "name": "HIGH_TEMP",
+                    "state": "ACTIVE_UNACK",
+                    "priority": "HIGH",
+                    "tag_path": "WH/TIT/Out_PV",
+                },
+            ]
+        )
         mod = AlarmModule()
         mod.bind(mock_engine)
 
@@ -268,7 +274,10 @@ class TestAlarmModule:
         mod.bind(mock_engine)
 
         alarm_id = await mod.trigger(
-            "HIGH_TEMP", tag_path="WH/TIT/Out_PV", priority="HIGH",
-            value=185.0, setpoint=180.0,
+            "HIGH_TEMP",
+            tag_path="WH/TIT/Out_PV",
+            priority="HIGH",
+            value=185.0,
+            setpoint=180.0,
         )
         assert alarm_id == "alarm-uuid-123"

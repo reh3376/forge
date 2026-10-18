@@ -11,10 +11,12 @@ The engine is designed for single-process operation inside the Forge OT Module.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 from collections import defaultdict, deque
-from datetime import datetime, timezone
-from typing import Any, Callable, Awaitable
+from collections.abc import Awaitable, Callable
+from datetime import UTC, datetime
+from typing import Any
 
 from forge.modules.ot.alarming.models import (
     AlarmAction,
@@ -28,7 +30,7 @@ from forge.modules.ot.alarming.models import (
 )
 from forge.modules.ot.alarming.state_machine import (
     AlarmStateMachine,
-    InvalidTransition,
+    InvalidTransitionError,
     TransitionResult,
 )
 
@@ -107,8 +109,11 @@ class AlarmEngine:
         """Register or update alarm configuration for a tag."""
         async with self._lock:
             self._configs[config.tag_path] = config
-            logger.debug("Registered alarm config for %s (%d thresholds)",
-                         config.tag_path, len(config.thresholds))
+            logger.debug(
+                "Registered alarm config for %s (%d thresholds)",
+                config.tag_path,
+                len(config.thresholds),
+            )
 
     async def unregister_config(self, tag_path: str) -> bool:
         """Remove alarm configuration for a tag. Returns True if found."""
@@ -133,10 +138,8 @@ class AlarmEngine:
 
     def remove_listener(self, callback: AlarmCallback) -> None:
         """Remove a previously registered callback."""
-        try:
+        with contextlib.suppress(ValueError):
             self._listeners.remove(callback)
-        except ValueError:
-            pass
 
     # ------------------------------------------------------------------
     # SDK API (called by AlarmModule)
@@ -168,15 +171,15 @@ class AlarmEngine:
             results.append(inst.to_dict())
 
         # Sort by priority rank (most severe first), then by timestamp
-        results.sort(key=lambda d: (
-            AlarmPriority(d["priority"]).rank,
-            d["timestamp"],
-        ))
+        results.sort(
+            key=lambda d: (
+                AlarmPriority(d["priority"]).rank,
+                d["timestamp"],
+            )
+        )
         return results[:limit]
 
-    async def acknowledge_alarm(
-        self, alarm_id: str, *, operator: str = ""
-    ) -> bool:
+    async def acknowledge_alarm(self, alarm_id: str, *, operator: str = "") -> bool:
         """Acknowledge an alarm. Returns True on success."""
         async with self._lock:
             inst = self._instances.get(alarm_id)
@@ -185,13 +188,14 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.ACKNOWLEDGE)
-            except InvalidTransition:
-                logger.warning("Cannot acknowledge alarm %s in state %s",
-                               alarm_id, inst.state.value)
+            except InvalidTransitionError:
+                logger.warning(
+                    "Cannot acknowledge alarm %s in state %s", alarm_id, inst.state.value
+                )
                 return False
 
             inst.ack_operator = operator
-            inst.ack_time = datetime.now(timezone.utc)
+            inst.ack_time = datetime.now(UTC)
             self._total_acknowledged += 1
 
             event = self._make_event(inst, result, operator=operator)
@@ -240,7 +244,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.CLEAR)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             self._total_cleared += 1
@@ -268,12 +272,14 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.SHELVE)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             inst.shelve_reason = reason
-            inst.shelved_until = datetime.now(timezone.utc)  # Simplified — real impl uses timedelta
-            event = self._make_event(inst, result, detail=f"shelved for {duration_minutes}m: {reason}")
+            inst.shelved_until = datetime.now(UTC)  # Simplified — real impl uses timedelta
+            event = self._make_event(
+                inst, result, detail=f"shelved for {duration_minutes}m: {reason}"
+            )
             self._record_event(event)
             await self._notify(event)
             return True
@@ -287,7 +293,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.UNSHELVE)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             inst.shelved_until = None
@@ -310,7 +316,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.SUPPRESS)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             inst.suppress_reason = reason
@@ -328,7 +334,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.DISABLE)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             event = self._make_event(inst, result, detail="out of service")
@@ -345,7 +351,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.ENABLE)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             event = self._make_event(inst, result, detail="returned to service")
@@ -366,7 +372,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.RESET)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             event = self._make_event(inst, result, operator=operator, detail="admin reset")
@@ -419,9 +425,7 @@ class AlarmEngine:
 
         async with self._lock:
             for threshold in config.thresholds:
-                evt = await self._evaluate_threshold(
-                    config, threshold, value, quality
-                )
+                evt = await self._evaluate_threshold(config, threshold, value, quality)
                 if evt is not None:
                     events.append(evt)
 
@@ -476,13 +480,13 @@ class AlarmEngine:
                 try:
                     result = self._sm.transition(inst, AlarmAction.TRIGGER)
                     inst.value = value
-                    inst.timestamp = datetime.now(timezone.utc)
+                    inst.timestamp = datetime.now(UTC)
                     self._total_triggered += 1
                     event = self._make_event(inst, result)
                     self._record_event(event)
                     await self._notify(event)
                     return inst.alarm_id
-                except InvalidTransition:
+                except InvalidTransitionError:
                     pass
             elif inst.state in (AlarmState.ACTIVE_UNACK, AlarmState.ACTIVE_ACK):
                 # Already active — update value but don't re-trigger
@@ -594,9 +598,7 @@ class AlarmEngine:
 
         return None
 
-    async def _try_clear_by_type(
-        self, tag_path: str, alarm_type: AlarmType
-    ) -> AlarmEvent | None:
+    async def _try_clear_by_type(self, tag_path: str, alarm_type: AlarmType) -> AlarmEvent | None:
         """Try to clear an alarm by tag_path and type. Must hold self._lock."""
         dedup_key = f"{tag_path}:{alarm_type.value}"
         alarm_id = self._tag_alarm_index.get(dedup_key)
@@ -606,7 +608,7 @@ class AlarmEngine:
         inst = self._instances[alarm_id]
         try:
             result = self._sm.transition(inst, AlarmAction.CLEAR)
-        except InvalidTransition:
+        except InvalidTransitionError:
             return None
 
         self._total_cleared += 1

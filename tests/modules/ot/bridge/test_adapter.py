@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import asyncio
-from datetime import datetime, timezone
 from typing import Any
 
 import pytest
 
 from forge.core.models.adapter import AdapterState
+from forge.core.models.contextual_record import QualityCode as CoreQualityCode
 from forge.modules.ot.bridge.adapter import IgnitionBridgeAdapter, _map_ignition_quality
 from forge.modules.ot.bridge.client import IgnitionRestClient
 from forge.modules.ot.bridge.models import (
@@ -18,8 +17,6 @@ from forge.modules.ot.bridge.models import (
 )
 from forge.modules.ot.bridge.tag_mapper import TagMapper
 from forge.modules.ot.opcua_client.paths import PathNormalizer
-from forge.core.models.contextual_record import QualityCode as CoreQualityCode
-
 
 # ---------------------------------------------------------------------------
 # Mock transport (shared with test_client.py pattern)
@@ -203,11 +200,18 @@ class TestCollect:
         adapter.add_tags(["[WHK01]Distillery01/TIT_2010/Out_PV"])
 
         # Set up tag read response
-        transport.set_post_response({
-            "results": [
-                {"value": 72.5, "quality": "Good", "timestamp": 1712678400000, "dataType": "Float8"},
-            ]
-        })
+        transport.set_post_response(
+            {
+                "results": [
+                    {
+                        "value": 72.5,
+                        "quality": "Good",
+                        "timestamp": 1712678400000,
+                        "dataType": "Float8",
+                    },
+                ]
+            }
+        )
 
         records = []
         async for record in adapter.collect():
@@ -229,9 +233,7 @@ class TestCollect:
         await adapter.start()
 
         adapter.add_tags(["[WHK01]tag1"])
-        transport.set_post_response({
-            "results": [{"value": 1, "quality": "Good"}]
-        })
+        transport.set_post_response({"results": [{"value": 1, "quality": "Good"}]})
 
         async for _ in adapter.collect():
             pass
@@ -248,19 +250,23 @@ class TestCollect:
         await adapter.configure({})
         await adapter.start()
 
-        adapter.add_tags([
-            "[WHK01]tag1",
-            "[WHK01]tag2",
-            "[WHK01]tag3",
-        ])
-
-        transport.set_post_response({
-            "results": [
-                {"value": 1.0, "quality": "Good"},
-                {"value": 2.0, "quality": "Good"},
-                {"value": 3.0, "quality": "Bad"},
+        adapter.add_tags(
+            [
+                "[WHK01]tag1",
+                "[WHK01]tag2",
+                "[WHK01]tag3",
             ]
-        })
+        )
+
+        transport.set_post_response(
+            {
+                "results": [
+                    {"value": 1.0, "quality": "Good"},
+                    {"value": 2.0, "quality": "Good"},
+                    {"value": 3.0, "quality": "Bad"},
+                ]
+            }
+        )
 
         records = []
         async for record in adapter.collect():
@@ -279,9 +285,7 @@ class TestCollect:
         await adapter.start()
 
         adapter.add_tags(["[WHK01]tag1"])
-        transport.set_post_response({
-            "results": [{"value": 42, "quality": "Good"}]
-        })
+        transport.set_post_response({"results": [{"value": 42, "quality": "Good"}]})
 
         async for record in adapter.collect():
             assert record.lineage.adapter_id == "ignition-bridge"
@@ -300,10 +304,12 @@ class TestTagManagement:
     @pytest.mark.asyncio
     async def test_add_tags(self):
         adapter, _ = _make_adapter()
-        added = adapter.add_tags([
-            "[WHK01]tag1",
-            "[WHK01]tag2",
-        ])
+        added = adapter.add_tags(
+            [
+                "[WHK01]tag1",
+                "[WHK01]tag2",
+            ]
+        )
         assert added == 2
         assert adapter.active_tag_count == 2
 
@@ -348,17 +354,19 @@ class TestDiscovery:
     async def test_discover_returns_tag_metadata(self):
         adapter, transport = _make_adapter()
         transport.set_post_response({})
-        transport.set_get_response({
-            "nodes": [
-                {
-                    "name": "TIT_2010",
-                    "path": "[WHK01]TIT_2010",
-                    "tagType": "AtomicTag",
-                    "hasChildren": False,
-                    "dataType": "Float8",
-                },
-            ]
-        })
+        transport.set_get_response(
+            {
+                "nodes": [
+                    {
+                        "name": "TIT_2010",
+                        "path": "[WHK01]TIT_2010",
+                        "tagType": "AtomicTag",
+                        "hasChildren": False,
+                        "dataType": "Float8",
+                    },
+                ]
+            }
+        )
 
         await adapter.configure({})
         await adapter.start()

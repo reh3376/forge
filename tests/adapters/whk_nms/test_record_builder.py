@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from forge.adapters.whk_nms.context import build_record_context
 from forge.adapters.whk_nms.record_builder import build_contextual_record
@@ -19,7 +19,9 @@ class TestRecordBuilder:
             "health_status": "healthy",
         }
 
-        context = build_record_context(raw_device, entity_type="network_device", event_type="device_discovery")
+        context = build_record_context(
+            raw_device, entity_type="network_device", event_type="device_discovery"
+        )
         record = build_contextual_record(
             raw_event=raw_device,
             context=context,
@@ -43,7 +45,9 @@ class TestRecordBuilder:
             "trap_time": "2026-04-07T14:30:00Z",
         }
 
-        context = build_record_context(raw_event, entity_type="network_device", event_type="snmp_trap")
+        context = build_record_context(
+            raw_event, entity_type="network_device", event_type="snmp_trap"
+        )
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
@@ -65,7 +69,9 @@ class TestRecordBuilder:
             "device_id": "switch-01",
         }
 
-        context = build_record_context(raw_event, entity_type="network_device", event_type="infrastructure_alert")
+        context = build_record_context(
+            raw_event, entity_type="network_device", event_type="infrastructure_alert"
+        )
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
@@ -85,7 +91,9 @@ class TestRecordBuilder:
             "id": "sec-001",
         }
 
-        context = build_record_context(raw_event, entity_type="security_event", event_type="security_event")
+        context = build_record_context(
+            raw_event, entity_type="security_event", event_type="security_event"
+        )
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
@@ -103,7 +111,9 @@ class TestRecordBuilder:
             "id": "spof-001",
         }
 
-        context = build_record_context(raw_event, entity_type="network_device", event_type="spof_detection")
+        context = build_record_context(
+            raw_event, entity_type="network_device", event_type="spof_detection"
+        )
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
@@ -122,7 +132,9 @@ class TestRecordBuilder:
     def test_record_schema_ref(self):
         raw_event = {"id": "test-001"}
 
-        context = build_record_context(raw_event, entity_type="network_device", event_type="unknown")
+        context = build_record_context(
+            raw_event, entity_type="network_device", event_type="unknown"
+        )
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
@@ -142,7 +154,9 @@ class TestRecordBuilder:
             "is_critical": True,
         }
 
-        context = build_record_context(raw_event, entity_type="network_device", event_type="device_discovery")
+        context = build_record_context(
+            raw_event, entity_type="network_device", event_type="device_discovery"
+        )
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
@@ -163,7 +177,9 @@ class TestRecordBuilder:
             "complex": {"nested": "value"},
         }
 
-        context = build_record_context(raw_event, entity_type="network_device", event_type="unknown")
+        context = build_record_context(
+            raw_event, entity_type="network_device", event_type="unknown"
+        )
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
@@ -184,7 +200,9 @@ class TestRecordBuilder:
             "ip_address": "10.0.0.1",
         }
 
-        context = build_record_context(raw_event, entity_type="network_device", event_type="unknown")
+        context = build_record_context(
+            raw_event, entity_type="network_device", event_type="unknown"
+        )
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
@@ -200,7 +218,9 @@ class TestRecordBuilder:
         raw_event = {"id": "test-001"}
         # no timestamp field
 
-        context = build_record_context(raw_event, entity_type="network_device", event_type="unknown")
+        context = build_record_context(
+            raw_event, entity_type="network_device", event_type="unknown"
+        )
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
@@ -212,7 +232,7 @@ class TestRecordBuilder:
 
         # Should have current timestamp
         assert record.timestamp.source_time is not None
-        now = datetime.now(tz=timezone.utc)
+        now = datetime.now(tz=UTC)
         # Allow some time difference
         time_diff = abs((now - record.timestamp.source_time).total_seconds())
         assert time_diff < 5  # within 5 seconds

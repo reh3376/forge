@@ -233,7 +233,8 @@ async def check_kafka(bootstrap_servers: str) -> ComponentHealth:
 
     loop = asyncio.get_running_loop()
     details = await loop.run_in_executor(
-        None, functools.partial(_probe),
+        None,
+        functools.partial(_probe),
     )
     return ComponentHealth(
         name="kafka",
@@ -252,7 +253,9 @@ async def check_rabbitmq(url: str) -> ComponentHealth:
         channel = await connection.channel()
         # Declare a passive check on the default exchange
         await channel.declare_exchange(
-            "", aio_pika.ExchangeType.DIRECT, passive=True,
+            "",
+            aio_pika.ExchangeType.DIRECT,
+            passive=True,
         )
         return ComponentHealth(
             name="rabbitmq",
@@ -264,7 +267,10 @@ async def check_rabbitmq(url: str) -> ComponentHealth:
 
 
 async def check_minio(
-    endpoint: str, access_key: str, secret_key: str, secure: bool = False,
+    endpoint: str,
+    access_key: str,
+    secret_key: str,
+    secure: bool = False,
 ) -> ComponentHealth:
     """Check MinIO connectivity.
 
@@ -277,14 +283,18 @@ async def check_minio(
 
     def _probe() -> dict[str, Any]:
         client = Minio(
-            endpoint, access_key=access_key, secret_key=secret_key, secure=secure,
+            endpoint,
+            access_key=access_key,
+            secret_key=secret_key,
+            secure=secure,
         )
         buckets = client.list_buckets()
         return {"bucket_count": len(buckets)}
 
     loop = asyncio.get_running_loop()
     details = await loop.run_in_executor(
-        None, functools.partial(_probe),
+        None,
+        functools.partial(_probe),
     )
     return ComponentHealth(
         name="minio",

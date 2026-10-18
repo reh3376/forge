@@ -38,9 +38,7 @@ class TestManifest:
         assert len(WhkWmsAdapter.manifest.connection_params) == 9
 
     def test_required_params(self):
-        required = [
-            p.name for p in WhkWmsAdapter.manifest.connection_params if p.required
-        ]
+        required = [p.name for p in WhkWmsAdapter.manifest.connection_params if p.required]
         assert sorted(required) == [
             "azure_client_id",
             "azure_client_secret",
@@ -141,16 +139,18 @@ class TestCollect:
     @pytest.mark.asyncio()
     async def test_collect_yields_records(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "id": "BRL-001",
-                "barrel_id": "BRL-001",
-                "lot_id": "LOT-001",
-                "event_timestamp": "2026-04-06T14:30:00+00:00",
-                "event_type": "fill",
-                "warehouse": "WH01",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "id": "BRL-001",
+                    "barrel_id": "BRL-001",
+                    "lot_id": "LOT-001",
+                    "event_timestamp": "2026-04-06T14:30:00+00:00",
+                    "event_type": "fill",
+                    "warehouse": "WH01",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         assert len(records) == 1
         assert records[0].source.adapter_id == "whk-wms"
@@ -159,10 +159,12 @@ class TestCollect:
     @pytest.mark.asyncio()
     async def test_collect_increments_counter(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {"id": "B1", "barrel_id": "B1", "event_timestamp": "2026-04-06T10:00:00+00:00"},
-            {"id": "B2", "barrel_id": "B2", "event_timestamp": "2026-04-06T11:00:00+00:00"},
-        ])
+        adapter.inject_records(
+            [
+                {"id": "B1", "barrel_id": "B1", "event_timestamp": "2026-04-06T10:00:00+00:00"},
+                {"id": "B2", "barrel_id": "B2", "event_timestamp": "2026-04-06T11:00:00+00:00"},
+            ]
+        )
         _ = [r async for r in adapter.collect()]
         health = await adapter.health()
         assert health.records_collected == 2

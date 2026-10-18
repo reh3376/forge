@@ -24,7 +24,7 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import IntEnum
 from typing import Any
 
@@ -63,14 +63,14 @@ class SparkplugDataType(IntEnum):
 
 
 class SparkplugMessageType(str):
-    NBIRTH = "NBIRTH"   # Node birth (edge node online)
-    NDEATH = "NDEATH"   # Node death (edge node offline)
-    DBIRTH = "DBIRTH"   # Device birth (device online)
-    DDEATH = "DDEATH"   # Device death (device offline)
-    NDATA = "NDATA"     # Node data (metrics from edge node)
-    DDATA = "DDATA"     # Device data (metrics from device)
-    NCMD = "NCMD"       # Node command (to edge node)
-    DCMD = "DCMD"       # Device command (to device)
+    NBIRTH = "NBIRTH"  # Node birth (edge node online)
+    NDEATH = "NDEATH"  # Node death (edge node offline)
+    DBIRTH = "DBIRTH"  # Device birth (device online)
+    DDEATH = "DDEATH"  # Device death (device offline)
+    NDATA = "NDATA"  # Node data (metrics from edge node)
+    DDATA = "DDATA"  # Device data (metrics from device)
+    NCMD = "NCMD"  # Node command (to edge node)
+    DCMD = "DCMD"  # Device command (to device)
 
 
 # ---------------------------------------------------------------------------
@@ -116,7 +116,7 @@ class SparkplugPayload:
     """A SparkplugB payload containing metrics."""
 
     timestamp: int = 0  # milliseconds since epoch
-    seq: int = 0        # sequence number (0-255, wraps)
+    seq: int = 0  # sequence number (0-255, wraps)
     metrics: list[SparkplugMetric] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:

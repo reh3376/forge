@@ -24,6 +24,7 @@ Architecture::
                          └─────────┘     └──────────┘  └──────────┘
 """
 
+from forge.modules.ot.alarming.engine import AlarmEngine
 from forge.modules.ot.alarming.models import (
     AlarmAction,
     AlarmConfig,
@@ -35,7 +36,6 @@ from forge.modules.ot.alarming.models import (
     ThresholdConfig,
 )
 from forge.modules.ot.alarming.state_machine import AlarmStateMachine
-from forge.modules.ot.alarming.engine import AlarmEngine
 
 __all__ = [
     "AlarmAction",

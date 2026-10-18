@@ -56,9 +56,7 @@ class ModulePermission:
     module_id: str
     schema_name: str
     access_level: AccessLevel
-    granted_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=UTC)
-    )
+    granted_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
     granted_by: str = "forge-core"
     expires_at: datetime | None = None
     active: bool = True
@@ -82,9 +80,7 @@ class ConnectionGrant:
     connection_string: str
     schemas_accessible: list[str]
     access_level: AccessLevel
-    issued_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=UTC)
-    )
+    issued_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
     role: str = ""
     search_path: str = ""
     password: str = field(default="", repr=False)
@@ -111,18 +107,18 @@ class AccessAuditEntry:
     schema_name: str
     access_level: AccessLevel | None = None
     reason: str = ""
-    timestamp: datetime = field(
-        default_factory=lambda: datetime.now(tz=UTC)
-    )
+    timestamp: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
 
 
 # Protected schemas that modules cannot be granted write access to
-_PROTECTED_SCHEMAS = frozenset({
-    "forge_core",
-    "forge_canonical",
-    "curated",
-    "lineage",
-})
+_PROTECTED_SCHEMAS = frozenset(
+    {
+        "forge_core",
+        "forge_canonical",
+        "curated",
+        "lineage",
+    }
+)
 
 # Module id → schema naming, shared with migration 002 (BACKLOG FB-004)
 _MODULE_PREFIXES = ("forge-", "whk-")
@@ -134,7 +130,7 @@ def module_schema(module_id: str) -> str:
     name = module_id.strip().lower()
     for prefix in _MODULE_PREFIXES:
         if name.startswith(prefix):
-            name = name[len(prefix):]
+            name = name[len(prefix) :]
             break
     name = re.sub(r"[^a-z0-9]+", "_", name).strip("_")
     if not name:
@@ -213,12 +209,8 @@ class AccessController:
         conn = ac.issue_connection("whk-wms", pg_host="forge-pg", pg_port=5432)
     """
 
-    _permissions: list[ModulePermission] = field(
-        default_factory=list, init=False
-    )
-    _audit_log: list[AccessAuditEntry] = field(
-        default_factory=list, init=False
-    )
+    _permissions: list[ModulePermission] = field(default_factory=list, init=False)
+    _audit_log: list[AccessAuditEntry] = field(default_factory=list, init=False)
 
     @classmethod
     def restore(cls, permissions: Iterable[ModulePermission]) -> AccessController:
@@ -261,18 +253,12 @@ class AccessController:
 
         # Check for existing grant and update if found
         for perm in self._permissions:
-            if (
-                perm.module_id == module_id
-                and perm.schema_name == schema_name
-                and perm.active
-            ):
+            if perm.module_id == module_id and perm.schema_name == schema_name and perm.active:
                 perm.access_level = access_level
                 perm.granted_at = datetime.now(tz=UTC)
                 perm.granted_by = granted_by
                 perm.expires_at = expires_at
-                self._audit(
-                    "grant", module_id, schema_name, access_level, "updated"
-                )
+                self._audit("grant", module_id, schema_name, access_level, "updated")
                 logger.info(
                     "Updated grant: %s → %s [%s]",
                     module_id,
@@ -302,11 +288,7 @@ class AccessController:
     def revoke(self, module_id: str, schema_name: str) -> bool:
         """Revoke a module's access to a schema. Returns True if found."""
         for perm in self._permissions:
-            if (
-                perm.module_id == module_id
-                and perm.schema_name == schema_name
-                and perm.active
-            ):
+            if perm.module_id == module_id and perm.schema_name == schema_name and perm.active:
                 perm.active = False
                 self._audit(
                     "revoke",
@@ -355,11 +337,13 @@ class AccessController:
 
     def list_modules_for_schema(self, schema_name: str) -> list[str]:
         """List all modules with active access to a schema."""
-        return list({
-            p.module_id
-            for p in self._permissions
-            if p.schema_name == schema_name and p.is_effective
-        })
+        return list(
+            {
+                p.module_id
+                for p in self._permissions
+                if p.schema_name == schema_name and p.is_effective
+            }
+        )
 
     def issue_connection(
         self,
@@ -449,12 +433,8 @@ class AccessController:
 
         grants = []
         for module_id, schema_name in defaults:
-            grants.append(
-                self.grant(module_id, schema_name, AccessLevel.WRITE)
-            )
-            grants.append(
-                self.grant(module_id, "forge_canonical", AccessLevel.READ)
-            )
+            grants.append(self.grant(module_id, schema_name, AccessLevel.WRITE))
+            grants.append(self.grant(module_id, "forge_canonical", AccessLevel.READ))
 
         return grants
 

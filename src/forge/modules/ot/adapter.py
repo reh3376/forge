@@ -18,21 +18,16 @@ with :class:`~forge.modules.ot.control.runtime.ControlDependencies`, it
 composes a :class:`~forge.modules.ot.control.runtime.ControlRuntime`
 (write engine, recipe adapter, PLC CIP runner, changeover orchestrator and
 MQTT ingress). ``start``/``stop`` drive it, and hub writes to Standard
-tags go through its write engine (validation, review, interlocks, authorisation, write with read-back).
+tags go through its write engine (validation, review, interlocks, authorisation, write with
+read-back).
 """
 
 from __future__ import annotations
 
-import asyncio
 import inspect
 import logging
-from collections.abc import AsyncIterator
-from datetime import datetime, timezone
-from typing import Any, Callable
-
-from forge.modules.ot.control.config import load_control_config, parse_control_config
-from forge.modules.ot.control.models import DataType, WriteRequest, WriteRole, WriteStatus
-from forge.modules.ot.control.runtime import ControlDependencies, ControlRuntime
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -49,12 +44,18 @@ from forge.core.models.adapter import (
     AdapterTier,
     DataContract,
 )
-from forge.core.models.contextual_record import ContextualRecord
 from forge.modules.ot.context.record_builder import build_ot_record
 from forge.modules.ot.context.resolvers import AreaResolver, AreaRule, EnrichmentPipeline
 from forge.modules.ot.context.store_forward import StoreForwardBuffer
-from forge.modules.ot.tag_engine.models import BaseTag, TagValue
-from forge.modules.ot.tag_engine.registry import TagRegistry
+from forge.modules.ot.control.config import load_control_config, parse_control_config
+from forge.modules.ot.control.models import DataType, WriteRequest, WriteRole, WriteStatus
+from forge.modules.ot.control.runtime import ControlDependencies, ControlRuntime
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator, Callable
+
+    from forge.core.models.contextual_record import ContextualRecord
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -183,7 +184,7 @@ class OTModuleAdapter(
             await self._control.start()
 
         self._state = AdapterState.HEALTHY
-        self._started_at = datetime.now(timezone.utc)
+        self._started_at = datetime.now(UTC)
         logger.info("OTModuleAdapter started")
 
     async def stop(self) -> None:
@@ -205,12 +206,12 @@ class OTModuleAdapter(
         """Return current health status."""
         uptime = 0.0
         if self._started_at:
-            uptime = (datetime.now(timezone.utc) - self._started_at).total_seconds()
+            uptime = (datetime.now(UTC) - self._started_at).total_seconds()
 
         return AdapterHealth(
             adapter_id=self.manifest.adapter_id,
             state=self._state,
-            last_check=datetime.now(timezone.utc),
+            last_check=datetime.now(UTC),
             last_healthy=self._started_at if self._state == AdapterState.HEALTHY else None,
             records_collected=self._records_collected,
             records_failed=self._records_failed,
@@ -368,7 +369,9 @@ class OTModuleAdapter(
         # Stub — NextTrend integration in Phase 2B
         logger.info(
             "Backfill requested for %d tags [%s → %s] — delegating to NextTrend",
-            len(tags), start, end,
+            len(tags),
+            start,
+            end,
         )
         return
         yield  # pragma: no cover — makes this an async generator
@@ -388,13 +391,15 @@ class OTModuleAdapter(
         for path in paths:
             tag = await self._registry.get_definition(path)
             if tag:
-                results.append({
-                    "tag_path": tag.path,
-                    "data_type": tag.data_type.value,
-                    "description": tag.description,
-                    "engineering_units": tag.engineering_units,
-                    "tag_type": tag.tag_type.value if hasattr(tag, "tag_type") else "unknown",
-                })
+                results.append(
+                    {
+                        "tag_path": tag.path,
+                        "data_type": tag.data_type.value,
+                        "description": tag.description,
+                        "engineering_units": tag.engineering_units,
+                        "tag_type": tag.tag_type.value if hasattr(tag, "tag_type") else "unknown",
+                    }
+                )
         return results
 
     # ------------------------------------------------------------------
@@ -467,7 +472,7 @@ class OTModuleAdapter(
 class _Subscription:
     """Internal subscription tracking."""
 
-    __slots__ = ("id", "tags", "callback")
+    __slots__ = ("callback", "id", "tags")
 
     def __init__(self, id: str, tags: set[str], callback: Any) -> None:
         self.id = id

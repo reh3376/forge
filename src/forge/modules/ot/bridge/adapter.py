@@ -17,11 +17,9 @@ Architecture:
 
 from __future__ import annotations
 
-import asyncio
 import logging
-from collections.abc import AsyncIterator
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
 from forge.adapters.base.interface import AdapterBase, DiscoveryProvider
 from forge.core.models.adapter import (
@@ -34,24 +32,29 @@ from forge.core.models.adapter import (
 )
 from forge.core.models.contextual_record import (
     ContextualRecord,
-    QualityCode as CoreQualityCode,
     RecordContext,
     RecordLineage,
     RecordSource,
     RecordTimestamp,
     RecordValue,
 )
-from forge.modules.ot.bridge.client import IgnitionRestClient
+from forge.core.models.contextual_record import (
+    QualityCode as CoreQualityCode,
+)
 from forge.modules.ot.bridge.models import (
     BridgeConfig,
     BridgeHealth,
     BridgeState,
     IgnitionQuality,
-    IgnitionTagResponse,
     IgnitionTagValue,
 )
-from forge.modules.ot.bridge.tag_mapper import TagMapper
-from forge.modules.ot.context.resolvers import EnrichmentContext, EnrichmentPipeline
+from forge.modules.ot.context.resolvers import EnrichmentPipeline
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from forge.modules.ot.bridge.client import IgnitionRestClient
+    from forge.modules.ot.bridge.tag_mapper import TagMapper
 
 logger = logging.getLogger(__name__)
 
@@ -89,8 +92,8 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
         tier=AdapterTier.OT,
         capabilities=AdapterCapabilities(
             read=True,
-            write=False,     # Read-only — writes go through OT Module
-            subscribe=False, # Poll-based, not subscription
+            write=False,  # Read-only — writes go through OT Module
+            subscribe=False,  # Poll-based, not subscription
             backfill=False,  # History stays in Ignition/Canary
             discover=True,
         ),
@@ -153,7 +156,7 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
 
         self._state = AdapterState.HEALTHY
         self._bridge_health.state = BridgeState.HEALTHY
-        self._started_at = datetime.now(timezone.utc)
+        self._started_at = datetime.now(UTC)
         logger.info(
             "Bridge adapter started — %d tags mapped from Ignition",
             len(self._active_tags),
@@ -170,12 +173,12 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
         """Return combined adapter + bridge health."""
         uptime = 0.0
         if self._started_at:
-            uptime = (datetime.now(timezone.utc) - self._started_at).total_seconds()
+            uptime = (datetime.now(UTC) - self._started_at).total_seconds()
 
         return AdapterHealth(
             adapter_id=self.manifest.adapter_id,
             state=self._state,
-            last_check=datetime.now(timezone.utc),
+            last_check=datetime.now(UTC),
             last_healthy=self._started_at if self._state == AdapterState.HEALTHY else None,
             records_collected=self._records_collected,
             records_failed=self._records_failed,
@@ -201,11 +204,11 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
         # Track latency
         self._latencies.append(response.latency_ms)
         if len(self._latencies) > self._max_latency_window:
-            self._latencies = self._latencies[-self._max_latency_window:]
+            self._latencies = self._latencies[-self._max_latency_window :]
 
         # Update health
         self._bridge_health.total_polls += 1
-        self._bridge_health.last_poll_time = datetime.now(timezone.utc)
+        self._bridge_health.last_poll_time = datetime.now(UTC)
         self._bridge_health.tags_polled = len(response.values)
         self._bridge_health.tags_good = response.good_count
         self._bridge_health.tags_bad = response.bad_count
@@ -214,7 +217,7 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
         )
 
         if response.values:
-            self._bridge_health.last_success_time = datetime.now(timezone.utc)
+            self._bridge_health.last_success_time = datetime.now(UTC)
             self._bridge_health.consecutive_failures = 0
             self._bridge_health.state = BridgeState.HEALTHY
         else:
@@ -234,7 +237,8 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
             except Exception:
                 self._records_failed += 1
                 logger.debug(
-                    "Failed to build bridge record for %s", tag_value.path,
+                    "Failed to build bridge record for %s",
+                    tag_value.path,
                     exc_info=True,
                 )
 
@@ -257,15 +261,17 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
             ign_path = node.get("path", "")
             mapping = self._mapper.map(ign_path)
             if mapping:
-                discovered.append({
-                    "tag_path": mapping.forge_path,
-                    "data_type": node.get("data_type", "Unknown"),
-                    "description": "",
-                    "engineering_units": "",
-                    "tag_type": "standard",  # All Ignition tags are treated as standard
-                    "source": "ignition-bridge",
-                    "ignition_path": ign_path,
-                })
+                discovered.append(
+                    {
+                        "tag_path": mapping.forge_path,
+                        "data_type": node.get("data_type", "Unknown"),
+                        "description": "",
+                        "engineering_units": "",
+                        "tag_type": "standard",  # All Ignition tags are treated as standard
+                        "source": "ignition-bridge",
+                        "ignition_path": ign_path,
+                    }
+                )
 
         return discovered
 
@@ -330,7 +336,7 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
             return None
 
         forge_path = mapping.forge_path
-        now = datetime.now(tz=timezone.utc)
+        now = datetime.now(tz=UTC)
 
         # Map Ignition quality to core quality
         core_quality = _map_ignition_quality(tag_value.quality)

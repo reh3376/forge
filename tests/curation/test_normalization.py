@@ -23,6 +23,7 @@ from forge.curation.normalization import (
 # UnitConversion
 # ---------------------------------------------------------------------------
 
+
 class TestUnitConversion:
     def test_linear_conversion(self) -> None:
         conv = UnitConversion(from_unit="gal", to_unit="L", factor=3.78541)
@@ -30,8 +31,10 @@ class TestUnitConversion:
 
     def test_affine_conversion_f_to_c(self) -> None:
         conv = UnitConversion(
-            from_unit="°F", to_unit="°C",
-            factor=5.0 / 9.0, pre_offset=32.0,
+            from_unit="°F",
+            to_unit="°C",
+            factor=5.0 / 9.0,
+            pre_offset=32.0,
         )
         assert conv.convert(32.0) == pytest.approx(0.0)
         assert conv.convert(212.0) == pytest.approx(100.0)
@@ -46,8 +49,10 @@ class TestUnitConversion:
 
     def test_inverse_affine(self) -> None:
         conv = UnitConversion(
-            from_unit="°F", to_unit="°C",
-            factor=5.0 / 9.0, pre_offset=32.0,
+            from_unit="°F",
+            to_unit="°C",
+            factor=5.0 / 9.0,
+            pre_offset=32.0,
         )
         inv = conv.inverse
         assert inv.convert(0.0) == pytest.approx(32.0, rel=1e-4)
@@ -59,8 +64,10 @@ class TestUnitConversion:
 
     def test_negative_value(self) -> None:
         conv = UnitConversion(
-            from_unit="°F", to_unit="°C",
-            factor=5.0 / 9.0, pre_offset=32.0,
+            from_unit="°F",
+            to_unit="°C",
+            factor=5.0 / 9.0,
+            pre_offset=32.0,
         )
         assert conv.convert(-40.0) == pytest.approx(-40.0)  # F and C meet at -40
 
@@ -68,6 +75,7 @@ class TestUnitConversion:
 # ---------------------------------------------------------------------------
 # UnitRegistry
 # ---------------------------------------------------------------------------
+
 
 class TestUnitRegistry:
     def test_register_and_lookup(self) -> None:
@@ -115,6 +123,7 @@ class TestUnitRegistry:
 # TimeBucketer
 # ---------------------------------------------------------------------------
 
+
 class TestTimeBucketer:
     def test_5min_bucket(self) -> None:
         bucketer = TimeBucketer.from_name("5min")
@@ -156,6 +165,7 @@ class TestTimeBucketer:
 
     def test_multiple_buckets(self) -> None:
         from tests.curation.conftest import make_record_batch
+
         bucketer = TimeBucketer.from_name("5min")
         records = make_record_batch(
             count=15,
@@ -168,6 +178,7 @@ class TestTimeBucketer:
 # ---------------------------------------------------------------------------
 # ValueNormalizer
 # ---------------------------------------------------------------------------
+
 
 class TestValueNormalizer:
     def test_normalize_f_to_c(self, unit_registry: UnitRegistry) -> None:
@@ -214,7 +225,9 @@ class TestValueNormalizer:
         assert result.raw == pytest.approx(25.7778, rel=1e-3)
 
     def test_normalize_record_updates_lineage(
-        self, unit_registry: UnitRegistry, sample_record: ContextualRecord,
+        self,
+        unit_registry: UnitRegistry,
+        sample_record: ContextualRecord,
     ) -> None:
         normalizer = ValueNormalizer(unit_registry=unit_registry)
         result = normalizer.normalize_record(sample_record)
@@ -224,8 +237,10 @@ class TestValueNormalizer:
     def test_normalize_preserves_quality(self, unit_registry: UnitRegistry) -> None:
         normalizer = ValueNormalizer(unit_registry=unit_registry)
         value = RecordValue(
-            raw=78.4, engineering_units="°F",
-            quality=QualityCode.UNCERTAIN, data_type="float64",
+            raw=78.4,
+            engineering_units="°F",
+            quality=QualityCode.UNCERTAIN,
+            data_type="float64",
         )
         result = normalizer.normalize_value(value)
         assert result.quality == QualityCode.UNCERTAIN

@@ -41,24 +41,28 @@ logger = logging.getLogger(__name__)
 # These are the 6 TransactionTypes the Go core's DefaultEgressPolicy
 # allows for outbound publication. Must stay in sync with
 # internal/infrastructure/hub/egress.go:DefaultEgressPolicy().
-ALLOWED_EGRESS_TYPES: frozenset[str] = frozenset({
-    "TRANSACTION_TYPE_ASSET_RECEIVED",
-    "TRANSACTION_TYPE_SHIPPED",
-    "TRANSACTION_TYPE_DISPOSITION_CHANGED",
-    "TRANSACTION_TYPE_DERIVED",
-    "TRANSACTION_TYPE_INSTALLED",
-    "TRANSACTION_TYPE_REMOVED",
-})
+ALLOWED_EGRESS_TYPES: frozenset[str] = frozenset(
+    {
+        "TRANSACTION_TYPE_ASSET_RECEIVED",
+        "TRANSACTION_TYPE_SHIPPED",
+        "TRANSACTION_TYPE_DISPOSITION_CHANGED",
+        "TRANSACTION_TYPE_DERIVED",
+        "TRANSACTION_TYPE_INSTALLED",
+        "TRANSACTION_TYPE_REMOVED",
+    }
+)
 
 # Forge-normalized versions of the allowed types (for tag matching)
-ALLOWED_EGRESS_TAGS: frozenset[str] = frozenset({
-    "asset.received",
-    "asset.shipped",
-    "state.disposition_changed",
-    "asset.derived",
-    "asset.installed",
-    "asset.removed",
-})
+ALLOWED_EGRESS_TAGS: frozenset[str] = frozenset(
+    {
+        "asset.received",
+        "asset.shipped",
+        "state.disposition_changed",
+        "asset.derived",
+        "asset.installed",
+        "asset.removed",
+    }
+)
 
 
 def should_egress(event_type: str | int | None) -> bool:
@@ -237,7 +241,8 @@ def build_intelligence_event(
     type_value = INTELLIGENCE_TYPES.get(intelligence_type, 0)
     if type_value == 0:
         logger.warning(
-            "Unknown intelligence type: %s", intelligence_type,
+            "Unknown intelligence type: %s",
+            intelligence_type,
         )
 
     return {

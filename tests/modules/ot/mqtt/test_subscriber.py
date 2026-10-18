@@ -9,14 +9,12 @@ from forge.modules.ot.mqtt.subscriber import (
     _mqtt_topic_matches,
 )
 
-
 # ---------------------------------------------------------------------------
 # MQTT topic matching
 # ---------------------------------------------------------------------------
 
 
 class TestMqttTopicMatching:
-
     def test_exact_match(self):
         assert _mqtt_topic_matches("a/b/c", "a/b/c") is True
         assert _mqtt_topic_matches("a/b/c", "a/b/d") is False
@@ -54,7 +52,6 @@ class TestMqttTopicMatching:
 
 
 class TestIncomingMessage:
-
     def test_payload_str(self):
         msg = IncomingMessage(topic="t", payload=b"hello")
         assert msg.payload_str() == "hello"
@@ -65,7 +62,7 @@ class TestIncomingMessage:
 
     def test_payload_json_invalid_raises(self):
         msg = IncomingMessage(topic="t", payload=b"not json")
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             msg.payload_json()
 
 
@@ -75,7 +72,6 @@ class TestIncomingMessage:
 
 
 class TestSubscription:
-
     def test_matches(self):
         sub = Subscription(topic_filter="whk/+/ot/tags/#", handler=lambda m: None)
         assert sub.matches("whk/whk01/ot/tags/TIT/Out_PV") is True
@@ -88,7 +84,6 @@ class TestSubscription:
 
 
 class TestSubscriberRegistration:
-
     def test_subscribe(self):
         sub = MqttSubscriber()
         sub.subscribe("test/topic", lambda m: None, name="handler1")
@@ -126,7 +121,6 @@ class TestSubscriberRegistration:
 
 
 class TestMessageDispatch:
-
     @pytest.mark.asyncio
     async def test_dispatch_to_matching_handler(self):
         received = []
@@ -176,7 +170,7 @@ class TestMessageDispatch:
         sub.subscribe("test/#", lambda m: (_ for _ in ()).throw(ValueError("boom")))
 
         # Should not raise
-        count = await sub.process_message(
+        await sub.process_message(
             IncomingMessage(topic="test/x", payload=b""),
         )
         # Handler raised, so invoked=0 (exception caught before increment)

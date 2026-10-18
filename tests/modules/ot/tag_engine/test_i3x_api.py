@@ -81,9 +81,7 @@ def _populate_registry(registry: TagRegistry):
             await registry.register(tag)
 
         # Set some values
-        await registry.update_value(
-            "WH/WHK01/Distillery01/TIT_2010/Out_PV", 72.5, QualityCode.GOOD
-        )
+        await registry.update_value("WH/WHK01/Distillery01/TIT_2010/Out_PV", 72.5, QualityCode.GOOD)
         await registry.update_value(
             "WH/WHK01/Distillery01/LIT_6050B/Out_PV", 45.2, QualityCode.GOOD
         )
@@ -97,7 +95,6 @@ def _populate_registry(registry: TagRegistry):
 
 
 class TestNamespacesEndpoint:
-
     def test_list_namespaces_empty(self, client):
         resp = client.get("/api/v1/ot/namespaces")
         assert resp.status_code == 200
@@ -120,7 +117,6 @@ class TestNamespacesEndpoint:
 
 
 class TestObjectTypesEndpoint:
-
     def test_list_object_types(self, client):
         resp = client.get("/api/v1/ot/objecttypes")
         assert resp.status_code == 200
@@ -152,7 +148,6 @@ class TestObjectTypesEndpoint:
 
 
 class TestBrowseEndpoint:
-
     def test_browse_root(self, client, registry):
         _populate_registry(registry)
         resp = client.get("/api/v1/ot/objects?path=")
@@ -183,9 +178,7 @@ class TestBrowseEndpoint:
 
     def test_browse_leaf_has_tag_type(self, client, registry):
         _populate_registry(registry)
-        resp = client.get(
-            "/api/v1/ot/objects?path=WH/WHK01/Distillery01/TIT_2010"
-        )
+        resp = client.get("/api/v1/ot/objects?path=WH/WHK01/Distillery01/TIT_2010")
         assert resp.status_code == 200
         data = resp.json()
         children = data["children"]
@@ -208,12 +201,9 @@ class TestBrowseEndpoint:
 
 
 class TestValueEndpoint:
-
     def test_get_value(self, client, registry):
         _populate_registry(registry)
-        resp = client.get(
-            "/api/v1/ot/objects/value?path=WH/WHK01/Distillery01/TIT_2010/Out_PV"
-        )
+        resp = client.get("/api/v1/ot/objects/value?path=WH/WHK01/Distillery01/TIT_2010/Out_PV")
         assert resp.status_code == 200
         data = resp.json()
         assert data["value"] == 72.5
@@ -241,7 +231,6 @@ class TestValueEndpoint:
 
 
 class TestStubEndpoints:
-
     def test_subscriptions_returns_501(self, client):
         resp = client.get("/api/v1/ot/subscriptions")
         assert resp.status_code == 501
@@ -257,7 +246,6 @@ class TestStubEndpoints:
 
 
 class TestStatsEndpoint:
-
     def test_stats(self, client, registry):
         _populate_registry(registry)
         resp = client.get("/api/v1/ot/stats")

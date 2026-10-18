@@ -19,8 +19,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Protocol
 
 from forge.modules.ot.bridge.models import (
@@ -181,7 +180,7 @@ class IgnitionRestClient:
         if not paths:
             return IgnitionTagResponse(values=())
 
-        request_time = datetime.now(timezone.utc)
+        request_time = datetime.now(UTC)
         all_values: list[IgnitionTagValue] = []
 
         # Split into batches
@@ -203,7 +202,7 @@ class IgnitionRestClient:
                 continue
             all_values.extend(result)
 
-        response_time = datetime.now(timezone.utc)
+        response_time = datetime.now(UTC)
 
         return IgnitionTagResponse(
             values=tuple(all_values),
@@ -211,9 +210,7 @@ class IgnitionRestClient:
             response_time=response_time,
         )
 
-    async def _read_batch_inner(
-        self, paths: list[str]
-    ) -> list[IgnitionTagValue]:
+    async def _read_batch_inner(self, paths: list[str]) -> list[IgnitionTagValue]:
         """Execute a single batch tag read with retry."""
         payload = {"paths": paths}
 
@@ -228,10 +225,12 @@ class IgnitionRestClient:
                 return _parse_tag_response(paths, response)
             except Exception as e:
                 if attempt < self._max_retries - 1:
-                    delay = self._base_delay_ms * (2 ** attempt) / 1000.0
+                    delay = self._base_delay_ms * (2**attempt) / 1000.0
                     logger.debug(
                         "Tag read attempt %d failed, retrying in %.1fs: %s",
-                        attempt + 1, delay, e,
+                        attempt + 1,
+                        delay,
+                        e,
                     )
                     await asyncio.sleep(delay)
                 else:
@@ -347,6 +346,7 @@ def _parse_tag_response(
         else:
             # Missing entry — mark as BAD
             from forge.modules.ot.bridge.models import IgnitionQuality
+
             values.append(
                 IgnitionTagValue(
                     path=path,

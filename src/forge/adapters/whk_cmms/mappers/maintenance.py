@@ -78,7 +78,8 @@ def map_work_order(raw: dict[str, Any]) -> WorkOrder | None:
             "estimated_duration": raw.get("estimatedDuration") or raw.get("estimated_duration"),
             "actual_duration": raw.get("actualDuration") or raw.get("actual_duration"),
             "cost_calculation": raw.get("costCalculation") or raw.get("cost_calculation"),
-            "maintenance_tech_assigned": raw.get("maintenanceTechAssigned") or raw.get("maintenance_tech_assigned"),
+            "maintenance_tech_assigned": raw.get("maintenanceTechAssigned")
+            or raw.get("maintenance_tech_assigned"),
             "cron_schedule": raw.get("cronSchedule") or raw.get("cron_schedule"),
             "backflushed": raw.get("backflushed", False),
         },
@@ -119,8 +120,10 @@ def map_work_request(raw: dict[str, Any]) -> WorkOrder | None:
             "cron_schedule": raw.get("cronSchedule") or raw.get("cron_schedule"),
             "period": raw.get("period"),
             "periodic_frequency": raw.get("periodicFrequency") or raw.get("periodic_frequency"),
-            "maintenance_role_approval": raw.get("maintenanceRoleApproval") or raw.get("maintenance_role_approval"),
-            "operations_supervisor_approval": raw.get("operationsSupervisorApproval") or raw.get("operations_supervisor_approval"),
+            "maintenance_role_approval": raw.get("maintenanceRoleApproval")
+            or raw.get("maintenance_role_approval"),
+            "operations_supervisor_approval": raw.get("operationsSupervisorApproval")
+            or raw.get("operations_supervisor_approval"),
         },
     )
 

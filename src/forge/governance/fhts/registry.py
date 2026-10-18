@@ -47,9 +47,17 @@ REVERTED = "reverted"
 VALID_STATUSES = frozenset({VERIFIED, MISMATCH, UNKNOWN, REVERTED})
 
 # Sources that can trigger a hash change
-VALID_SOURCES = frozenset({
-    "manifest", "spec", "revert", "manual", "ci", "agent", "spec_update",
-})
+VALID_SOURCES = frozenset(
+    {
+        "manifest",
+        "spec",
+        "revert",
+        "manual",
+        "ci",
+        "agent",
+        "spec_update",
+    }
+)
 
 
 # ---------------------------------------------------------------------------
@@ -389,10 +397,7 @@ class FHTSRegistry:
 
     def verify_all(self, framework: str = "") -> list[dict[str, Any]]:
         """Verify all tracked files (optionally filtered by framework)."""
-        paths = [
-            f.path for f in self._files.values()
-            if not framework or f.framework == framework
-        ]
+        paths = [f.path for f in self._files.values() if not framework or f.framework == framework]
         return [self.verify(p) for p in paths]
 
     # -- Scanning -----------------------------------------------------------

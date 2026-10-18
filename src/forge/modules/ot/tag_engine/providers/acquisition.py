@@ -23,7 +23,6 @@ Design decisions:
 
 from __future__ import annotations
 
-import asyncio
 import logging
 from typing import Any
 
@@ -104,9 +103,7 @@ class AcquisitionEngine:
                 logger.exception("Provider %s failed to start", name)
                 # Don't re-raise — other providers should still start
 
-        running = sum(
-            1 for p in self._providers.values() if p.state == ProviderState.RUNNING
-        )
+        running = sum(1 for p in self._providers.values() if p.state == ProviderState.RUNNING)
         logger.info(
             "AcquisitionEngine started: %d/%d providers running",
             running,
@@ -151,9 +148,7 @@ class AcquisitionEngine:
             "running": self._running,
             "providers": provider_health,
             "total_providers": len(self._providers),
-            "running_providers": sum(
-                1 for s in states if s == ProviderState.RUNNING
-            ),
+            "running_providers": sum(1 for s in states if s == ProviderState.RUNNING),
         }
 
     async def restart_provider(self, name: str) -> bool:

@@ -14,10 +14,11 @@ from __future__ import annotations
 import enum
 import logging
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
-from forge.modules.ot.tag_engine.registry import TagRegistry
+if TYPE_CHECKING:
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -25,12 +26,12 @@ logger = logging.getLogger(__name__)
 class ProviderState(str, enum.Enum):
     """Operational state of a tag provider."""
 
-    IDLE = "idle"           # Constructed but not started
-    STARTING = "starting"   # In the process of connecting/subscribing
-    RUNNING = "running"     # Actively providing data
-    STOPPING = "stopping"   # Graceful shutdown in progress
-    STOPPED = "stopped"     # Clean shutdown complete
-    FAILED = "failed"       # Unrecoverable error
+    IDLE = "idle"  # Constructed but not started
+    STARTING = "starting"  # In the process of connecting/subscribing
+    RUNNING = "running"  # Actively providing data
+    STOPPING = "stopping"  # Graceful shutdown in progress
+    STOPPED = "stopped"  # Clean shutdown complete
+    FAILED = "failed"  # Unrecoverable error
 
 
 class BaseProvider(ABC):
@@ -70,7 +71,7 @@ class BaseProvider(ABC):
         try:
             await self._start()
             self._state = ProviderState.RUNNING
-            self._started_at = datetime.now(timezone.utc)
+            self._started_at = datetime.now(UTC)
             logger.info("Provider %s started", self.name)
         except Exception as e:
             self._state = ProviderState.FAILED

@@ -31,26 +31,26 @@ Security note:
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import math
 import re
 import statistics
-from collections import defaultdict
-from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import (
+    SCAN_CLASS_INTERVALS_MS,
     ComputedTag,
     DerivedTag,
     ExpressionTag,
     ReferenceTag,
     ScanClass,
     TagType,
-    TagUnion,
-    SCAN_CLASS_INTERVALS_MS,
 )
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +102,8 @@ _DERIVED_AGGREGATIONS: dict[str, Any] = {
     "weighted_sum": lambda pairs: sum(v * w for v, w in pairs),
     "average": lambda pairs: (
         sum(v * w for v, w in pairs) / sum(w for _, w in pairs)
-        if sum(w for _, w in pairs) != 0 else 0.0
+        if sum(w for _, w in pairs) != 0
+        else 0.0
     ),
     "min": lambda pairs: min(v for v, _ in pairs) if pairs else 0.0,
     "max": lambda pairs: max(v for v, _ in pairs) if pairs else 0.0,
@@ -121,7 +122,7 @@ def _restricted_eval(expression: str, extra_vars: dict[str, Any] | None = None) 
     scope = dict(_SAFE_BUILTINS)
     if extra_vars:
         scope.update(extra_vars)
-    return eval(expression, scope)  # noqa: S307
+    return eval(expression, scope)
 
 
 class TagEngine:
@@ -185,19 +186,15 @@ class TagEngine:
         for task in self._scan_tasks.values():
             task.cancel()
         for task in self._scan_tasks.values():
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
         self._scan_tasks.clear()
 
         # Cancel propagation task
         if self._propagation_task:
             self._propagation_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._propagation_task
-            except asyncio.CancelledError:
-                pass
             self._propagation_task = None
 
         logger.info("Tag engine stopped")
@@ -218,11 +215,9 @@ class TagEngine:
         """Consumer loop — processes tag change events and propagates."""
         while self._running:
             try:
-                path = await asyncio.wait_for(
-                    self._propagation_queue.get(), timeout=1.0
-                )
+                path = await asyncio.wait_for(self._propagation_queue.get(), timeout=1.0)
                 await self._propagate(path, visited=set())
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 continue
             except asyncio.CancelledError:
                 break
@@ -245,17 +240,13 @@ class TagEngine:
                 result = await self.evaluate(dep_path)
                 if result is not None:
                     value, quality = result
-                    changed = await self._registry.update_value(
-                        dep_path, value, quality
-                    )
+                    changed = await self._registry.update_value(dep_path, value, quality)
                     if changed:
                         # Recurse for chained dependencies
                         await self._propagate(dep_path, visited)
             except Exception:
                 logger.exception("Failed to evaluate dependent %s", dep_path)
-                await self._registry.update_value(
-                    dep_path, None, QualityCode.BAD
-                )
+                await self._registry.update_value(dep_path, None, QualityCode.BAD)
 
     # ------------------------------------------------------------------
     # Tag evaluation

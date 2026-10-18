@@ -1,7 +1,5 @@
 """Tests for Forge Storage configuration."""
 
-import os
-
 from forge.storage.config import (
     KafkaConfig,
     MinioConfig,
@@ -32,7 +30,7 @@ class TestPostgresConfig:
         cfg = PostgresConfig()
         try:
             cfg.host = "other"
-            assert False, "Should not allow mutation"
+            raise AssertionError("Should not allow mutation")
         except AttributeError:
             pass
 

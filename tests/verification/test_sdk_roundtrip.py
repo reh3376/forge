@@ -13,10 +13,8 @@ from __future__ import annotations
 import importlib
 import importlib.util
 import json
-import sys
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -28,8 +26,9 @@ from forge.storage.registry import (
     SchemaStatus,
     StorageEngine,
 )
-from forge.storage.router import DataRouter
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. Scaffold → Import Round-Trip
@@ -70,8 +69,14 @@ class TestScaffoldImport:
 
     def test_all_core_files_exist(self, scaffold_dir: Path):
         mod_dir = scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip"
-        for f in ("__init__.py", "manifest.json", "adapter.py", "config.py",
-                   "context.py", "record_builder.py"):
+        for f in (
+            "__init__.py",
+            "manifest.json",
+            "adapter.py",
+            "config.py",
+            "context.py",
+            "record_builder.py",
+        ):
             assert (mod_dir / f).exists(), f"Missing: {f}"
 
     def test_manifest_json_valid(self, scaffold_dir: Path):
@@ -83,11 +88,10 @@ class TestScaffoldImport:
 
     def test_adapter_module_importable(self, scaffold_dir: Path):
         """The scaffolded adapter.py should be importable as a Python module."""
-        adapter_py = (
-            scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "adapter.py"
-        )
+        adapter_py = scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "adapter.py"
         spec = importlib.util.spec_from_file_location(
-            "test_roundtrip_adapter", adapter_py,
+            "test_roundtrip_adapter",
+            adapter_py,
         )
         assert spec is not None
         # Verify it compiles
@@ -95,9 +99,7 @@ class TestScaffoldImport:
         compile(source, str(adapter_py), "exec")
 
     def test_config_module_importable(self, scaffold_dir: Path):
-        config_py = (
-            scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "config.py"
-        )
+        config_py = scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "config.py"
         source = config_py.read_text()
         compile(source, str(config_py), "exec")
         # Should have Pydantic BaseModel
@@ -106,18 +108,14 @@ class TestScaffoldImport:
         assert "api_key" in source
 
     def test_context_module_has_builder(self, scaffold_dir: Path):
-        context_py = (
-            scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "context.py"
-        )
+        context_py = scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "context.py"
         source = context_py.read_text()
         compile(source, str(context_py), "exec")
         assert "build_record_context" in source
         assert "equipment_id" in source
 
     def test_record_builder_has_assembler(self, scaffold_dir: Path):
-        rb_py = (
-            scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "record_builder.py"
-        )
+        rb_py = scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "record_builder.py"
         source = rb_py.read_text()
         compile(source, str(rb_py), "exec")
         assert "build_contextual_record" in source
@@ -159,8 +157,12 @@ class TestScaffoldedFactsSpec:
 
     def test_scaffolded_spec_has_required_sections(self, scaffolded_spec: dict):
         required = {
-            "spec_version", "adapter_identity", "capabilities",
-            "lifecycle", "connection_params", "integrity",
+            "spec_version",
+            "adapter_identity",
+            "capabilities",
+            "lifecycle",
+            "connection_params",
+            "integrity",
         }
         assert required.issubset(scaffolded_spec.keys())
 
@@ -177,7 +179,9 @@ class TestScaffoldedFactsSpec:
 
     @pytest.mark.asyncio()
     async def test_scaffolded_spec_passes_facts_runner(
-        self, scaffolded_spec: dict, facts_schema_path: Path,
+        self,
+        scaffolded_spec: dict,
+        facts_schema_path: Path,
     ):
         """The SDK-generated spec should survive FACTSRunner validation."""
         from forge.governance.facts.runners.facts_runner import FACTSRunner
@@ -192,9 +196,8 @@ class TestScaffoldedFactsSpec:
         errors = [v for v in verdicts if v.status == VerdictStatus.ERROR]
         # SDK-generated specs may have some FAIL verdicts for fields
         # that need manual population, but should have ZERO errors
-        assert len(errors) == 0, (
-            f"SDK-generated spec has errors:\n"
-            + "\n".join(f"  {v.check_id}: {v.message}" for v in errors)
+        assert len(errors) == 0, "SDK-generated spec has errors:\n" + "\n".join(
+            f"  {v.check_id}: {v.message}" for v in errors
         )
 
 
@@ -277,19 +280,21 @@ class TestSDKPipelineIntegration:
 
         # 2. Register schema
         registry = SchemaRegistry()
-        registry.register(SchemaEntry(
-            schema_id=manifest.data_contract.schema_ref,
-            spoke_id=manifest.adapter_id,
-            entity_name="historian_data",
-            version=manifest.version,
-            schema_json={"type": "object"},
-            authoritative_spoke=manifest.adapter_id,
-            storage_engine=StorageEngine.TIMESCALEDB,
-            storage_namespace=f"{manifest.adapter_id.replace('-', '_')}",
-            status=SchemaStatus.ACTIVE,
-            registered_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
-        ))
+        registry.register(
+            SchemaEntry(
+                schema_id=manifest.data_contract.schema_ref,
+                spoke_id=manifest.adapter_id,
+                entity_name="historian_data",
+                version=manifest.version,
+                schema_json={"type": "object"},
+                authoritative_spoke=manifest.adapter_id,
+                storage_engine=StorageEngine.TIMESCALEDB,
+                storage_namespace=f"{manifest.adapter_id.replace('-', '_')}",
+                status=SchemaStatus.ACTIVE,
+                registered_at=datetime.now(UTC),
+                updated_at=datetime.now(UTC),
+            )
+        )
 
         # 3. Verify schema is queryable
         entry = registry.get(manifest.data_contract.schema_ref)

@@ -10,10 +10,10 @@ Maps various NMS event types to Forge OperationalEvent:
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from forge.core.models.manufacturing.operational_event import OperationalEvent
 from forge.core.models.manufacturing.enums import EventCategory, EventSeverity
+from forge.core.models.manufacturing.operational_event import OperationalEvent
 
 
 def map_trap_event(raw_trap: dict) -> OperationalEvent | None:
@@ -142,9 +142,7 @@ def map_security_event(raw_event: dict) -> OperationalEvent | None:
 
     # Timestamp
     event_time = _parse_timestamp(
-        raw_event.get("event_time")
-        or raw_event.get("eventTime")
-        or raw_event.get("timestamp")
+        raw_event.get("event_time") or raw_event.get("eventTime") or raw_event.get("timestamp")
     )
 
     # Severity (defaults to HIGH for security events)
@@ -180,7 +178,6 @@ def map_baseline_anomaly(raw_device: dict) -> OperationalEvent | None:
     if not device_id:
         return None
 
-    device_ip = raw_device.get("ip_address") or raw_device.get("ipAddress")
     baseline_status = raw_device.get("baseline_status") or raw_device.get("baselineStatus")
 
     # If not anomalous, skip
@@ -258,9 +255,7 @@ def map_spof_detection(raw_spof: dict) -> OperationalEvent | None:
 
     # Timestamp
     event_time = _parse_timestamp(
-        raw_spof.get("detected_at")
-        or raw_spof.get("detectedAt")
-        or raw_spof.get("timestamp")
+        raw_spof.get("detected_at") or raw_spof.get("detectedAt") or raw_spof.get("timestamp")
     )
 
     # Severity based on blast radius
@@ -294,18 +289,19 @@ def map_spof_detection(raw_spof: dict) -> OperationalEvent | None:
 
 # ── Helper Functions ───────────────────────────────────────────
 
+
 def _parse_timestamp(value: any) -> datetime:
     """Parse an ISO timestamp string, falling back to now(utc)."""
     if value is None:
-        return datetime.now(tz=timezone.utc)
+        return datetime.now(tz=UTC)
     if isinstance(value, datetime):
-        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+        return value if value.tzinfo else value.replace(tzinfo=UTC)
     try:
         s = str(value)
         dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
-        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+        return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
     except (ValueError, TypeError):
-        return datetime.now(tz=timezone.utc)
+        return datetime.now(tz=UTC)
 
 
 def _map_severity(raw_severity: str) -> EventSeverity:
@@ -338,7 +334,9 @@ def _build_result(trap_type: str | None, oid: str | None) -> str | None:
     return None
 
 
-def _build_alert_result(name: str | None, description: str | None, condition: str | None) -> str | None:
+def _build_alert_result(
+    name: str | None, description: str | None, condition: str | None
+) -> str | None:
     """Build result string for alert event."""
     parts = []
     if name:

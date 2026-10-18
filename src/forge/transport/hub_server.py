@@ -73,7 +73,8 @@ class AdapterServiceServicer(ABC):
     # ── Control plane ─────────────────────────────────────────────────────
 
     async def register(
-        self, manifest_dict: dict[str, Any],
+        self,
+        manifest_dict: dict[str, Any],
     ) -> dict[str, Any]:
         """Register a new adapter with the hub.
 
@@ -92,7 +93,9 @@ class AdapterServiceServicer(ABC):
         await self.on_adapter_registered(session)
 
         logger.info(
-            "Adapter registered: %s (session: %s)", manifest.adapter_id, session_id,
+            "Adapter registered: %s (session: %s)",
+            manifest.adapter_id,
+            session_id,
         )
         return {"accepted": True, "message": "OK", "session_id": session_id}
 
@@ -110,7 +113,9 @@ class AdapterServiceServicer(ABC):
         return {"success": True, "message": "Configured"}
 
     async def start(
-        self, adapter_id: str, session_id: str,
+        self,
+        adapter_id: str,
+        session_id: str,
     ) -> dict[str, Any]:
         """Begin active operation."""
         session = self._get_session(adapter_id, session_id)
@@ -140,7 +145,9 @@ class AdapterServiceServicer(ABC):
         return {"success": True, "message": "Stopped", "records_flushed": flushed}
 
     async def health(
-        self, adapter_id: str, session_id: str,
+        self,
+        adapter_id: str,
+        session_id: str,
     ) -> dict[str, Any]:
         """Return current health status."""
         session = self._get_session(adapter_id, session_id)
@@ -149,9 +156,7 @@ class AdapterServiceServicer(ABC):
             state=session.state,
             last_check=datetime.now(timezone.utc),
             last_healthy=(
-                datetime.now(timezone.utc)
-                if session.state == AdapterState.HEALTHY
-                else None
+                datetime.now(timezone.utc) if session.state == AdapterState.HEALTHY else None
             ),
             records_collected=session.records_received,
         )
@@ -160,7 +165,9 @@ class AdapterServiceServicer(ABC):
     # ── Data plane ────────────────────────────────────────────────────────
 
     async def receive_record(
-        self, session_id: str, record_dict: dict[str, Any],
+        self,
+        session_id: str,
+        record_dict: dict[str, Any],
     ) -> None:
         """Receive a single ContextualRecord from a spoke sidecar.
 
@@ -179,7 +186,9 @@ class AdapterServiceServicer(ABC):
         await self.on_record_received(record)
 
     async def drain_records(
-        self, session_id: str, max_records: int = 0,
+        self,
+        session_id: str,
+        max_records: int = 0,
     ) -> list[ContextualRecord]:
         """Drain received records from the queue.
 

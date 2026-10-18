@@ -22,22 +22,21 @@ Design decisions:
 
 from __future__ import annotations
 
-import asyncio
 import logging
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
-from forge.modules.ot.opcua_client.client import OpcUaClient
-from forge.modules.ot.opcua_client.paths import PathNormalizer
-from forge.modules.ot.opcua_client.types import (
-    ConnectionState,
-    DataType,
-    DataValue,
-    QualityCode,
-)
 from forge.modules.ot.tag_engine.models import StandardTag, TagType
 from forge.modules.ot.tag_engine.providers.base import BaseProvider
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.opcua_client.client import OpcUaClient
+    from forge.modules.ot.opcua_client.paths import PathNormalizer
+    from forge.modules.ot.opcua_client.types import (
+        DataType,
+        DataValue,
+    )
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -118,9 +117,7 @@ class OpcUaProvider(BaseProvider):
             "endpoint_url": client_health.endpoint_url,
             "subscribed_tags": len(self._subscribed_tags),
             "values_received": self._values_received,
-            "last_value_at": (
-                self._last_value_at.isoformat() if self._last_value_at else None
-            ),
+            "last_value_at": (self._last_value_at.isoformat() if self._last_value_at else None),
             "subscription_errors": self._subscription_errors,
             "reconnect_count": client_health.reconnect_count,
             "latency_ms": client_health.latency_ms,
@@ -184,13 +181,13 @@ class OpcUaProvider(BaseProvider):
             return
 
         self._values_received += 1
-        self._last_value_at = datetime.now(timezone.utc)
+        self._last_value_at = datetime.now(UTC)
 
         await self._registry.update_value(
             path=tag_path,
             value=data_value.value,
             quality=data_value.quality,
-            timestamp=data_value.server_timestamp or datetime.now(timezone.utc),
+            timestamp=data_value.server_timestamp or datetime.now(UTC),
             source_timestamp=data_value.source_timestamp,
         )
 
@@ -225,7 +222,9 @@ class OpcUaProvider(BaseProvider):
         if values:
             dv = values[0]
             await self._registry.update_value(
-                tag_path, dv.value, dv.quality,
+                tag_path,
+                dv.value,
+                dv.quality,
                 source_timestamp=dv.source_timestamp,
             )
             return dv

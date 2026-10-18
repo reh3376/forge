@@ -30,6 +30,7 @@ if TYPE_CHECKING:
 # Lifecycle mixin
 # ---------------------------------------------------------------------------
 
+
 class AdapterLifecycle(abc.ABC):
     """Lifecycle hooks the hub calls on every adapter."""
 
@@ -61,6 +62,7 @@ class AdapterLifecycle(abc.ABC):
 # ---------------------------------------------------------------------------
 # Core read interface — every adapter must implement this
 # ---------------------------------------------------------------------------
+
 
 class AdapterBase(AdapterLifecycle):
     """Base class for all Forge adapters.
@@ -117,6 +119,7 @@ class AdapterBase(AdapterLifecycle):
 # ---------------------------------------------------------------------------
 # Capability mixins — implement only what the manifest declares
 # ---------------------------------------------------------------------------
+
 
 class SubscriptionProvider(abc.ABC):
     """Adapter that can push records via subscription/callback."""

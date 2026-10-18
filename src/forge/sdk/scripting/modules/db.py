@@ -21,7 +21,7 @@ Usage in scripts::
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 logger = logging.getLogger("forge.db")
@@ -38,7 +38,7 @@ class QueryResult:
 
     def to_dicts(self) -> list[dict[str, Any]]:
         """Convert rows to list of dicts keyed by column name."""
-        return [dict(zip(self.columns, row)) for row in self.rows]
+        return [dict(zip(self.columns, row, strict=False)) for row in self.rows]
 
     def scalar(self) -> Any:
         """Return the first column of the first row, or None."""
@@ -141,12 +141,13 @@ class DbModule:
         pool = self._pools.get(name)
         if pool is None:
             raise RuntimeError(
-                f"No database pool bound for '{name}'. "
-                f"Available: {list(self._pools.keys())}"
+                f"No database pool bound for '{name}'. Available: {list(self._pools.keys())}"
             )
         return pool
 
-    async def query(self, sql: str, params: list[Any] | None = None, db: str | None = None) -> QueryResult:
+    async def query(
+        self, sql: str, params: list[Any] | None = None, db: str | None = None
+    ) -> QueryResult:
         """Run a parameterized SQL query.
 
         Args:
@@ -164,7 +165,9 @@ class DbModule:
         finally:
             await pool.release(conn)
 
-    async def named_query(self, name: str, params: dict[str, Any] | None = None, db: str | None = None) -> QueryResult:
+    async def named_query(
+        self, name: str, params: dict[str, Any] | None = None, db: str | None = None
+    ) -> QueryResult:
         """Run a named query (registered via config or register_named_query).
 
         Named queries are pre-defined SQL templates stored by name.

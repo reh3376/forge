@@ -16,7 +16,6 @@ from forge.modules.ot.mqtt.publisher import (
 
 
 class TestMqttConfig:
-
     def test_defaults(self):
         config = MqttConfig()
         assert config.host == "localhost"
@@ -37,7 +36,6 @@ class TestMqttConfig:
 
 
 class TestStubClient:
-
     @pytest.mark.asyncio
     async def test_connect_disconnect(self):
         client = _StubMqttClient()
@@ -68,7 +66,6 @@ class TestStubClient:
 
 
 class TestPublisherLifecycle:
-
     @pytest.mark.asyncio
     async def test_start_connects(self):
         pub = OTMqttPublisher(MqttConfig(reconnect_enabled=False))
@@ -101,7 +98,6 @@ class TestPublisherLifecycle:
 
 
 class TestPublish:
-
     @pytest.mark.asyncio
     async def test_publish_string(self):
         pub = OTMqttPublisher(MqttConfig(reconnect_enabled=False))
@@ -149,7 +145,6 @@ class TestPublish:
 
 
 class TestBuffering:
-
     @pytest.mark.asyncio
     async def test_publish_when_disconnected_buffers(self):
         pub = OTMqttPublisher(MqttConfig(reconnect_enabled=False))
@@ -186,7 +181,6 @@ class TestBuffering:
 
 
 class TestCallbacks:
-
     @pytest.mark.asyncio
     async def test_on_connect_callback(self):
         called = []
@@ -212,7 +206,6 @@ class TestCallbacks:
 
 
 class TestPublisherStatus:
-
     @pytest.mark.asyncio
     async def test_status_fields(self):
         pub = OTMqttPublisher(MqttConfig(reconnect_enabled=False))
@@ -265,8 +258,12 @@ class TestExternalMode:
 
         pub = OTMqttPublisher(
             MqttConfig(
-                host="broker.local", port=8883, client_id="ot-pub", broker_mode="external",
-                reconnect_enabled=False, _client_factory=factory,
+                host="broker.local",
+                port=8883,
+                client_id="ot-pub",
+                broker_mode="external",
+                reconnect_enabled=False,
+                _client_factory=factory,
             )
         )
         await pub.start()
@@ -328,13 +325,21 @@ class TestExternalMode:
                 calls["will"] = (topic, payload, qos, retain)
 
         monkeypatch.setitem(
-            sys.modules, "aiomqtt",
+            sys.modules,
+            "aiomqtt",
             types.SimpleNamespace(Client=FakeClient, TLSParameters=TLSParameters, Will=Will),
         )
         config = MqttConfig(
-            host="broker.local", port=8883, username="ot", password="pw", client_id="ot-pub",
-            use_tls=True, ca_certs="/ca.pem", will_topic="whk/whk01/ot/status",
-            will_payload="offline", broker_mode="external",
+            host="broker.local",
+            port=8883,
+            username="ot",
+            password="pw",
+            client_id="ot-pub",
+            use_tls=True,
+            ca_certs="/ca.pem",
+            will_topic="whk/whk01/ot/status",
+            will_payload="offline",
+            broker_mode="external",
         )
         client = _create_mqtt_client(config)
         assert isinstance(client, _AiomqttClient) and not client.is_connected

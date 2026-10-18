@@ -11,7 +11,7 @@ before being sent to NetSuite.
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.core.models.manufacturing.lot import Lot
@@ -246,7 +246,7 @@ def _parse_datetime(val: Any) -> datetime:
     Accepts ISO 8601 strings or datetime objects.
     """
     if val is None:
-        return datetime.now(timezone.utc)
+        return datetime.now(UTC)
 
     if isinstance(val, datetime):
         return val
@@ -259,4 +259,4 @@ def _parse_datetime(val: Any) -> datetime:
             pass
 
     # Fallback to current time if parsing fails
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)

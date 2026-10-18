@@ -22,28 +22,32 @@ Design decisions:
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import importlib.util
 import logging
 import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from types import ModuleType
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from forge.sdk.scripting.audit import (
     ScriptAuditTrail,
     ScriptExecutionContext,
-    set_execution_context,
     clear_execution_context,
+    set_execution_context,
 )
 from forge.sdk.scripting.rbac import ScriptRBAC
-from forge.sdk.scripting.sandbox import ScriptSandbox, SandboxConfig
+from forge.sdk.scripting.sandbox import SandboxConfig, ScriptSandbox
 from forge.sdk.scripting.triggers import (
     HandlerRegistration,
     TriggerRegistry,
     TriggerType,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from types import ModuleType
 
 logger = logging.getLogger(__name__)
 
@@ -189,9 +193,7 @@ class ScriptEngine:
                 )
             discovered.append(name)
 
-        logger.info(
-            "Discovered %d scripts in %s", len(discovered), self._scripts_dir
-        )
+        logger.info("Discovered %d scripts in %s", len(discovered), self._scripts_dir)
         return discovered
 
     # ------------------------------------------------------------------
@@ -246,7 +248,9 @@ class ScriptEngine:
 
         logger.info(
             "Loaded script %s (%d handlers, %.1fms)",
-            name, handler_count, elapsed * 1000,
+            name,
+            handler_count,
+            elapsed * 1000,
         )
         return info
 
@@ -293,10 +297,8 @@ class ScriptEngine:
         self._stop_timers()
         if self._watcher_task and not self._watcher_task.done():
             self._watcher_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._watcher_task
-            except asyncio.CancelledError:
-                pass
         self._started = False
         logger.info("ScriptEngine stopped")
 
@@ -312,9 +314,7 @@ class ScriptEngine:
             task_key = f"{reg.script_name}:{reg.handler_name}"
             if task_key in self._timer_tasks:
                 self._timer_tasks[task_key].cancel()
-            task = asyncio.create_task(
-                self._run_timer(reg), name=f"forge-timer-{task_key}"
-            )
+            task = asyncio.create_task(self._run_timer(reg), name=f"forge-timer-{task_key}")
             self._timer_tasks[task_key] = task
 
     def _stop_timers(self) -> None:
@@ -351,7 +351,9 @@ class ScriptEngine:
             except Exception as exc:
                 logger.error(
                     "Timer handler %s.%s failed: %s",
-                    reg.script_name, reg.handler_name, exc,
+                    reg.script_name,
+                    reg.handler_name,
+                    exc,
                 )
 
     # ------------------------------------------------------------------
@@ -465,13 +467,18 @@ class ScriptEngine:
             except Exception as exc:
                 logger.error(
                     "Tag change handler %s.%s failed for %s: %s",
-                    reg.script_name, reg.handler_name, tag_path, exc,
+                    reg.script_name,
+                    reg.handler_name,
+                    tag_path,
+                    exc,
                 )
             finally:
                 clear_execution_context()
         return invoked
 
-    async def dispatch_lifecycle_event(self, event_type: str, detail: dict[str, Any] | None = None) -> int:
+    async def dispatch_lifecycle_event(
+        self, event_type: str, detail: dict[str, Any] | None = None
+    ) -> int:
         """Dispatch a lifecycle event to matching handlers.
 
         Returns the number of handlers invoked.
@@ -503,7 +510,10 @@ class ScriptEngine:
             except Exception as exc:
                 logger.error(
                     "Lifecycle handler %s.%s failed for %s: %s",
-                    reg.script_name, reg.handler_name, event_type, exc,
+                    reg.script_name,
+                    reg.handler_name,
+                    event_type,
+                    exc,
                 )
             finally:
                 clear_execution_context()
@@ -565,7 +575,10 @@ class ScriptEngine:
             except Exception as exc:
                 logger.error(
                     "Alarm handler %s.%s failed for %s: %s",
-                    reg.script_name, reg.handler_name, alarm_name, exc,
+                    reg.script_name,
+                    reg.handler_name,
+                    alarm_name,
+                    exc,
                 )
             finally:
                 clear_execution_context()

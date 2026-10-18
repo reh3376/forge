@@ -1,4 +1,4 @@
-# ruff: noqa: E402, UP017, UP042
+# ruff: noqa: E402, UP017
 """Shared fixtures for transport layer tests."""
 
 from __future__ import annotations
@@ -15,8 +15,10 @@ if not hasattr(_dt_mod, "UTC"):
     _dt_mod.UTC = _dt_mod.timezone.utc
 
 if not hasattr(enum, "StrEnum"):
+
     class StrEnum(str, enum.Enum):
         pass
+
     enum.StrEnum = StrEnum
 
 import pytest
@@ -103,7 +105,11 @@ def sample_manifest() -> AdapterManifest:
         protocol="graphql+amqp",
         tier=AdapterTier.MES_MOM,
         capabilities=AdapterCapabilities(
-            read=True, write=False, subscribe=True, backfill=True, discover=True,
+            read=True,
+            write=False,
+            subscribe=True,
+            backfill=True,
+            discover=True,
         ),
         data_contract=DataContract(
             schema_ref="forge://schemas/whk-wms/v0.1.0",

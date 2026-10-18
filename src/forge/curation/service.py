@@ -1,4 +1,3 @@
-# ruff: noqa: TC001
 """forge-curation FastAPI service — HTTP endpoints for the curation layer.
 
 Provides REST API for:
@@ -154,12 +153,14 @@ def create_curation_app(
             steps=[
                 NormalizationStep(units),
                 TimeBucketStep("5min"),
-                AggregationStep(AggregationSpec(
-                    group_by=["equipment_id"],
-                    time_window="5min",
-                    functions=[AggregationFunction.AVG],
-                    product_id=request.product_id,
-                )),
+                AggregationStep(
+                    AggregationSpec(
+                        group_by=["equipment_id"],
+                        time_window="5min",
+                        functions=[AggregationFunction.AVG],
+                        product_id=request.product_id,
+                    )
+                ),
             ],
             lineage_tracker=lineage,
             quality_monitor=quality,
@@ -194,12 +195,8 @@ def create_curation_app(
             input_count=result.input_count,
             output_count=result.output_count,
             steps_applied=result.steps_applied,
-            quality_passed=(
-                result.quality_report.passed if result.quality_report else None
-            ),
-            quality_score=(
-                result.quality_report.score if result.quality_report else None
-            ),
+            quality_passed=(result.quality_report.passed if result.quality_report else None),
+            quality_score=(result.quality_report.score if result.quality_report else None),
         )
 
     # ------------------------------------------------------------------

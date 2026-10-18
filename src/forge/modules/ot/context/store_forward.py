@@ -18,16 +18,16 @@ Design decisions:
 
 from __future__ import annotations
 
-import json
 import logging
-import os
 import sqlite3
 import time
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from forge.core.models.contextual_record import ContextualRecord
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -134,10 +134,7 @@ class StoreForwardBuffer:
             raise RuntimeError("Buffer not open — call open() first")
 
         now = time.time()
-        rows = [
-            (str(r.record_id), now, r.model_dump_json())
-            for r in records
-        ]
+        rows = [(str(r.record_id), now, r.model_dump_json()) for r in records]
         self._conn.executemany(
             "INSERT INTO buffer (record_id, created_at, payload) VALUES (?, ?, ?)",
             rows,
@@ -150,9 +147,7 @@ class StoreForwardBuffer:
         """Count of unsent records in the buffer."""
         if not self._conn:
             return 0
-        cursor = self._conn.execute(
-            "SELECT COUNT(*) FROM buffer WHERE sent = 0"
-        )
+        cursor = self._conn.execute("SELECT COUNT(*) FROM buffer WHERE sent = 0")
         return cursor.fetchone()[0]
 
     def peek(self, limit: int = 10) -> list[ContextualRecord]:
@@ -193,8 +188,7 @@ class StoreForwardBuffer:
         while True:
             # Fetch a batch of unsent records
             cursor = self._conn.execute(
-                "SELECT id, payload FROM buffer WHERE sent = 0 "
-                "ORDER BY created_at LIMIT ?",
+                "SELECT id, payload FROM buffer WHERE sent = 0 ORDER BY created_at LIMIT ?",
                 (self._batch_size,),
             )
             rows = cursor.fetchall()
@@ -211,9 +205,7 @@ class StoreForwardBuffer:
                 except Exception:
                     # Corrupt record — mark as sent to skip it
                     logger.warning("Skipping corrupt buffer record id=%d", row_id)
-                    self._conn.execute(
-                        "UPDATE buffer SET sent = 1 WHERE id = ?", (row_id,)
-                    )
+                    self._conn.execute("UPDATE buffer SET sent = 1 WHERE id = ?", (row_id,))
 
             if not records:
                 self._conn.commit()
@@ -223,9 +215,7 @@ class StoreForwardBuffer:
             try:
                 await send_fn(records)
             except Exception:
-                logger.warning(
-                    "Flush failed — %d records remain buffered", len(records)
-                )
+                logger.warning("Flush failed — %d records remain buffered", len(records))
                 self._conn.commit()
                 break
 
@@ -278,9 +268,7 @@ class StoreForwardBuffer:
         db_size_mb = self._get_db_size_mb()
         if db_size_mb > self._max_size_mb:
             # Delete oldest 10% of remaining records
-            total = self._conn.execute(
-                "SELECT COUNT(*) FROM buffer"
-            ).fetchone()[0]
+            total = self._conn.execute("SELECT COUNT(*) FROM buffer").fetchone()[0]
             delete_count = max(1, total // 10)
             cursor = self._conn.execute(
                 "DELETE FROM buffer WHERE id IN ("

@@ -82,6 +82,7 @@ class QualityReport:
 # Quality Rules
 # ---------------------------------------------------------------------------
 
+
 class QualityRule(ABC):
     """Abstract quality rule that can be evaluated against records."""
 
@@ -135,10 +136,7 @@ class CompletenessRule(QualityRule):
         complete_count = 0
         for record in records:
             context_dict = record.context.model_dump()
-            all_present = all(
-                context_dict.get(f) is not None
-                for f in self._required_fields
-            )
+            all_present = all(context_dict.get(f) is not None for f in self._required_fields)
             if all_present:
                 complete_count += 1
 
@@ -256,10 +254,7 @@ class RangeRule(QualityRule):
                 measurement="No records to evaluate",
             )
 
-        numeric_records = [
-            r for r in records
-            if isinstance(r.value.raw, (int, float))
-        ]
+        numeric_records = [r for r in records if isinstance(r.value.raw, (int, float))]
         if not numeric_records:
             return QualityResult(
                 rule_name=self.name,
@@ -357,9 +352,7 @@ class ConsistencyRule(QualityRule):
             dimension=self.dimension,
             passed=score >= self._threshold,
             score=score,
-            measurement=(
-                f"{consistent}/{applicable} records consistent ({score:.1%})"
-            ),
+            measurement=(f"{consistent}/{applicable} records consistent ({score:.1%})"),
             details={
                 "field_a": self._field_a,
                 "field_b": self._field_b,
@@ -373,6 +366,7 @@ class ConsistencyRule(QualityRule):
 # ---------------------------------------------------------------------------
 # Quality Monitor
 # ---------------------------------------------------------------------------
+
 
 class QualityMonitor:
     """Evaluates all quality rules for a data product against a record batch.

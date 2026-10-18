@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from forge.core.models.contextual_record import (
@@ -66,7 +66,7 @@ def build_contextual_record(
         or raw_event.get("event_time")
         or raw_event.get("eventTime")
     )
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
 
     # ── Tag Path ───────────────────────────────────────────────
     # Format: nms.<entity_type>.<event_type>.<entity_id>
@@ -114,14 +114,14 @@ def build_contextual_record(
 def _parse_timestamp(value: Any) -> datetime:
     """Parse an ISO timestamp string, falling back to now(utc)."""
     if value is None:
-        return datetime.now(tz=timezone.utc)
+        return datetime.now(tz=UTC)
     if isinstance(value, datetime):
-        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+        return value if value.tzinfo else value.replace(tzinfo=UTC)
     try:
         s = str(value)
         # Handle common ISO formats
         dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
-        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+        return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
     except (ValueError, TypeError):
         logger.warning("Could not parse timestamp %r — using now(utc)", value)
-        return datetime.now(tz=timezone.utc)
+        return datetime.now(tz=UTC)

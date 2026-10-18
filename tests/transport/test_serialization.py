@@ -54,8 +54,7 @@ class TestContextualRecordRoundTrip:
 
         # Timestamps should be within 1ms (nanosecond rounding)
         src_delta = abs(
-            (restored.timestamp.source_time - sample_record.timestamp.source_time)
-            .total_seconds()
+            (restored.timestamp.source_time - sample_record.timestamp.source_time).total_seconds()
         )
         assert src_delta < 0.001
 
@@ -298,7 +297,9 @@ class TestManifestRoundTrip:
 
         assert restored.data_contract.schema_ref == "forge://schemas/whk-wms/v0.1.0"
         assert restored.data_contract.context_fields == [
-            "equipment_id", "lot_id", "batch_id",
+            "equipment_id",
+            "lot_id",
+            "batch_id",
         ]
 
     def test_auth_methods_round_trip(self, sample_manifest: AdapterManifest) -> None:

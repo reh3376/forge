@@ -38,21 +38,14 @@ class TestManifest:
         assert len(BoscImsAdapter.manifest.connection_params) == 9
 
     def test_required_params(self):
-        required = [
-            p.name
-            for p in BoscImsAdapter.manifest.connection_params
-            if p.required
-        ]
+        required = [p.name for p in BoscImsAdapter.manifest.connection_params if p.required]
         assert sorted(required) == ["grpc_host", "grpc_port", "spoke_id"]
 
     def test_auth_methods(self):
         assert "mtls" in BoscImsAdapter.manifest.auth_methods
 
     def test_data_contract_schema_ref(self):
-        assert (
-            BoscImsAdapter.manifest.data_contract.schema_ref
-            == "forge://schemas/bosc-ims/v0.1.0"
-        )
+        assert BoscImsAdapter.manifest.data_contract.schema_ref == "forge://schemas/bosc-ims/v0.1.0"
 
     def test_data_contract_context_fields(self):
         fields = BoscImsAdapter.manifest.data_contract.context_fields
@@ -155,27 +148,29 @@ class TestCollect:
     @pytest.mark.asyncio()
     async def test_collect_yields_records(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "event_id": "evt-001",
-                "asset_id": "clxyz123abc456def789",
-                "actor_id": "USR-RECV-01",
-                "event_type": "TRANSACTION_TYPE_ASSET_RECEIVED",
-                "occurred_at": "2026-04-06T14:30:00+00:00",
-                "schema_version": "1.0",
-                "security_context": {
-                    "actor_role": "receiving_technician",
-                    "source_station_id": "RECV-01",
-                    "source_spoke_id": "bosc_ims_primary",
+        adapter.inject_records(
+            [
+                {
+                    "event_id": "evt-001",
+                    "asset_id": "clxyz123abc456def789",
+                    "actor_id": "USR-RECV-01",
+                    "event_type": "TRANSACTION_TYPE_ASSET_RECEIVED",
+                    "occurred_at": "2026-04-06T14:30:00+00:00",
+                    "schema_version": "1.0",
+                    "security_context": {
+                        "actor_role": "receiving_technician",
+                        "source_station_id": "RECV-01",
+                        "source_spoke_id": "bosc_ims_primary",
+                    },
+                    "payload": {
+                        "part_id": "PART-001",
+                        "supplier_id": "SUP-001",
+                        "quantity": 50,
+                        "unit_of_measure": "EA",
+                    },
                 },
-                "payload": {
-                    "part_id": "PART-001",
-                    "supplier_id": "SUP-001",
-                    "quantity": 50,
-                    "unit_of_measure": "EA",
-                },
-            },
-        ])
+            ]
+        )
         records = [r async for r in adapter.collect()]
         assert len(records) == 1
         assert records[0].source.adapter_id == "bosc-ims"
@@ -184,37 +179,41 @@ class TestCollect:
     @pytest.mark.asyncio()
     async def test_collect_tag_path_from_event_type(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "event_id": "evt-002",
-                "asset_id": "asset-002",
-                "actor_id": "USR-01",
-                "event_type": "TRANSACTION_TYPE_SHIPPED",
-                "occurred_at": "2026-04-06T15:00:00+00:00",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "event_id": "evt-002",
+                    "asset_id": "asset-002",
+                    "actor_id": "USR-01",
+                    "event_type": "TRANSACTION_TYPE_SHIPPED",
+                    "occurred_at": "2026-04-06T15:00:00+00:00",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         assert records[0].source.tag_path == "bosc.event.shipped"
 
     @pytest.mark.asyncio()
     async def test_collect_increments_counter(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "event_id": "evt-01",
-                "asset_id": "a1",
-                "actor_id": "u1",
-                "event_type": "TRANSACTION_TYPE_ASSET_RECEIVED",
-                "occurred_at": "2026-04-06T10:00:00+00:00",
-            },
-            {
-                "event_id": "evt-02",
-                "asset_id": "a2",
-                "actor_id": "u2",
-                "event_type": "TRANSACTION_TYPE_SHIPPED",
-                "occurred_at": "2026-04-06T11:00:00+00:00",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "event_id": "evt-01",
+                    "asset_id": "a1",
+                    "actor_id": "u1",
+                    "event_type": "TRANSACTION_TYPE_ASSET_RECEIVED",
+                    "occurred_at": "2026-04-06T10:00:00+00:00",
+                },
+                {
+                    "event_id": "evt-02",
+                    "asset_id": "a2",
+                    "actor_id": "u2",
+                    "event_type": "TRANSACTION_TYPE_SHIPPED",
+                    "occurred_at": "2026-04-06T11:00:00+00:00",
+                },
+            ]
+        )
         _ = [r async for r in adapter.collect()]
         health = await adapter.health()
         assert health.records_collected == 2
@@ -222,15 +221,17 @@ class TestCollect:
     @pytest.mark.asyncio()
     async def test_collect_record_lineage(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "event_id": "evt-03",
-                "asset_id": "a3",
-                "actor_id": "u3",
-                "event_type": "TRANSACTION_TYPE_DISPOSITION_CHANGED",
-                "occurred_at": "2026-04-06T12:00:00+00:00",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "event_id": "evt-03",
+                    "asset_id": "a3",
+                    "actor_id": "u3",
+                    "event_type": "TRANSACTION_TYPE_DISPOSITION_CHANGED",
+                    "occurred_at": "2026-04-06T12:00:00+00:00",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         lineage = records[0].lineage
         assert lineage.adapter_id == "bosc-ims"
@@ -241,23 +242,25 @@ class TestCollect:
     @pytest.mark.asyncio()
     async def test_collect_with_asset_enrichment(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "event_id": "evt-04",
-                "asset_id": "a4",
-                "actor_id": "u4",
-                "event_type": "TRANSACTION_TYPE_ASSET_RECEIVED",
-                "occurred_at": "2026-04-06T13:00:00+00:00",
-                "_asset": {
-                    "id": "a4",
-                    "current_location_id": "LOC-RECV-01",
-                    "part_id": "PART-BOLT-001",
-                    "disposition": "QUARANTINED",
-                    "system_state": "ACTIVE",
-                    "asset_state": "NEW",
+        adapter.inject_records(
+            [
+                {
+                    "event_id": "evt-04",
+                    "asset_id": "a4",
+                    "actor_id": "u4",
+                    "event_type": "TRANSACTION_TYPE_ASSET_RECEIVED",
+                    "occurred_at": "2026-04-06T13:00:00+00:00",
+                    "_asset": {
+                        "id": "a4",
+                        "current_location_id": "LOC-RECV-01",
+                        "part_id": "PART-BOLT-001",
+                        "disposition": "QUARANTINED",
+                        "system_state": "ACTIVE",
+                        "asset_state": "NEW",
+                    },
                 },
-            },
-        ])
+            ]
+        )
         records = [r async for r in adapter.collect()]
         ctx = records[0].context
         assert ctx.area == "LOC-RECV-01"

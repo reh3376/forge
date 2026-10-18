@@ -14,14 +14,17 @@ in single-site Forge deployments.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
-from dataclasses import dataclass, field
-from typing import Any, Callable, Awaitable
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any
 
-from forge.core.broker.protocol import encode_publish
-from forge.core.broker.topic_engine import TopicEngine
 from forge.core.broker.session import MqttSession, SessionState
+from forge.core.broker.topic_engine import TopicEngine
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
 
 logger = logging.getLogger(__name__)
 
@@ -160,7 +163,9 @@ class ForgeMqttBroker:
 
         logger.info(
             "Forge MQTT broker started on %s:%d (max_connections=%d)",
-            self._config.host, self._config.port, self._config.max_connections,
+            self._config.host,
+            self._config.port,
+            self._config.max_connections,
         )
 
     async def stop(self) -> None:
@@ -170,10 +175,8 @@ class ForgeMqttBroker:
         # Stop $SYS publisher
         if self._sys_task and not self._sys_task.done():
             self._sys_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._sys_task
-            except asyncio.CancelledError:
-                pass
 
         # Disconnect all sessions
         for session in list(self._sessions.values()):
@@ -249,10 +252,7 @@ class ForgeMqttBroker:
         if not self._config.username:
             return True  # No credentials configured = accept all
 
-        return (
-            username == self._config.username
-            and password == self._config.password
-        )
+        return username == self._config.username and password == self._config.password
 
     # ------------------------------------------------------------------
     # Message routing (called by session PUBLISH handler)
@@ -278,7 +278,11 @@ class ForgeMqttBroker:
         if self._config.log_publishes:
             logger.debug(
                 "PUBLISH %s (qos=%d, retain=%s, from=%s, %d bytes)",
-                topic, qos, retain, sender_id, len(payload),
+                topic,
+                qos,
+                retain,
+                sender_id,
+                len(payload),
             )
 
         # Store/clear retained message
@@ -304,6 +308,7 @@ class ForgeMqttBroker:
         # Deliver to local (in-process) subscribers
         for local_sub in self._local_subs:
             from forge.core.broker.topic_engine import mqtt_topic_matches
+
             if mqtt_topic_matches(local_sub.topic_filter, topic):
                 try:
                     result = local_sub.callback(topic, payload, qos, retain)
@@ -313,7 +318,8 @@ class ForgeMqttBroker:
                 except Exception as exc:
                     logger.error(
                         "Local subscriber %s failed: %s",
-                        local_sub.name, exc,
+                        local_sub.name,
+                        exc,
                     )
 
         return delivered
@@ -363,11 +369,13 @@ class ForgeMqttBroker:
 
         The callback receives (topic, payload, qos, retain).
         """
-        self._local_subs.append(LocalSubscription(
-            name=name,
-            topic_filter=topic_filter,
-            callback=callback,
-        ))
+        self._local_subs.append(
+            LocalSubscription(
+                name=name,
+                topic_filter=topic_filter,
+                callback=callback,
+            )
+        )
         logger.debug("Local subscriber %s registered for %s", name, topic_filter)
 
     def unsubscribe_local(self, name: str) -> int:
@@ -415,8 +423,11 @@ class ForgeMqttBroker:
     async def _publish_sys(self, topic: str, payload: bytes) -> None:
         """Publish a $SYS topic (retained, QoS 0)."""
         await self.handle_publish(
-            topic=topic, payload=payload,
-            qos=0, retain=True, sender_id="$SYS",
+            topic=topic,
+            payload=payload,
+            qos=0,
+            retain=True,
+            sender_id="$SYS",
         )
 
     # ------------------------------------------------------------------

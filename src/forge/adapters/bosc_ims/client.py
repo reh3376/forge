@@ -80,7 +80,8 @@ class BoscImsClient(ABC):
 
     @abstractmethod
     async def get_asset_compliance(
-        self, asset_id: str,
+        self,
+        asset_id: str,
     ) -> dict[str, Any] | None:
         """Fetch compliance status for an asset.
 
@@ -90,7 +91,8 @@ class BoscImsClient(ABC):
 
     @abstractmethod
     async def get_compliance_gaps(
-        self, asset_id: str,
+        self,
+        asset_id: str,
     ) -> list[dict[str, Any]]:
         """Fetch compliance gaps for an asset.
 
@@ -134,7 +136,8 @@ class BoscImsClient(ABC):
 
     @abstractmethod
     async def send_intelligence(
-        self, event: dict[str, Any],
+        self,
+        event: dict[str, Any],
     ) -> bool:
         """Send a HubIntelligenceEvent to the BOSC IMS Go core.
 
@@ -202,7 +205,8 @@ class MockBoscImsClient(BoscImsClient):
         self._suppliers = list(suppliers)
 
     def seed_compliance(
-        self, compliance: dict[str, dict[str, Any]],
+        self,
+        compliance: dict[str, dict[str, Any]],
     ) -> None:
         """Seed compliance records keyed by asset_id."""
         self._compliance = dict(compliance)
@@ -212,7 +216,8 @@ class MockBoscImsClient(BoscImsClient):
         self._parts = {p["id"]: p for p in parts}
 
     def seed_egress_events(
-        self, events: list[dict[str, Any]],
+        self,
+        events: list[dict[str, Any]],
     ) -> None:
         """Seed egress events (HubEgressEvent-shaped dicts)."""
         self._egress_events = list(events)
@@ -230,10 +235,7 @@ class MockBoscImsClient(BoscImsClient):
     ) -> list[dict[str, Any]]:
         events = self._events
         if since is not None:
-            events = [
-                e for e in events
-                if _event_timestamp(e) > since
-            ]
+            events = [e for e in events if _event_timestamp(e) > since]
         return events[:limit]
 
     # ── InventoryService ─────────────────────────────────────────
@@ -248,12 +250,14 @@ class MockBoscImsClient(BoscImsClient):
     # ── ComplianceService ────────────────────────────────────────
 
     async def get_asset_compliance(
-        self, asset_id: str,
+        self,
+        asset_id: str,
     ) -> dict[str, Any] | None:
         return self._compliance.get(asset_id)
 
     async def get_compliance_gaps(
-        self, asset_id: str,
+        self,
+        asset_id: str,
     ) -> list[dict[str, Any]]:
         comp = self._compliance.get(asset_id, {})
         return comp.get("gaps", [])
@@ -278,15 +282,15 @@ class MockBoscImsClient(BoscImsClient):
         events = list(self._egress_events)
         if event_types:
             events = [
-                e for e in events
-                if e.get("inner_event", {}).get("event_type") in event_types
+                e for e in events if e.get("inner_event", {}).get("event_type") in event_types
             ]
         # Drain after reading (simulates streaming consumption)
         self._egress_events.clear()
         return events
 
     async def send_intelligence(
-        self, event: dict[str, Any],
+        self,
+        event: dict[str, Any],
     ) -> bool:
         self._intelligence_inbox.append(event)
         return True

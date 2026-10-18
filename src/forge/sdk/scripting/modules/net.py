@@ -15,6 +15,7 @@ Usage in scripts::
 
 from __future__ import annotations
 
+import contextlib
 import logging
 from dataclasses import dataclass
 from typing import Any
@@ -41,6 +42,7 @@ class HttpResponse:
         if self.json_data is not None:
             return self.json_data
         import json
+
         return json.loads(self.body)
 
 
@@ -64,12 +66,12 @@ class NetModule:
         if self._client is None:
             try:
                 import httpx
+
                 self._client = httpx.AsyncClient(timeout=self._default_timeout)
             except ImportError:
                 raise RuntimeError(
-                    "httpx is required for forge.net. "
-                    "Install with: pip install httpx"
-                )
+                    "httpx is required for forge.net. Install with: pip install httpx"
+                ) from None
         return self._client
 
     async def _request(
@@ -105,10 +107,8 @@ class NetModule:
                 json_data = None
                 content_type = resp.headers.get("content-type", "")
                 if "json" in content_type:
-                    try:
+                    with contextlib.suppress(Exception):
                         json_data = resp.json()
-                    except Exception:
-                        pass
 
                 return HttpResponse(
                     status_code=resp.status_code,
@@ -121,10 +121,14 @@ class NetModule:
                 last_exc = exc
                 if attempt < self._max_retries - 1:
                     import asyncio
+
                     await asyncio.sleep(0.5 * (attempt + 1))
                     logger.warning(
                         "HTTP %s %s attempt %d failed: %s",
-                        method, url, attempt + 1, exc,
+                        method,
+                        url,
+                        attempt + 1,
+                        exc,
                     )
 
         raise ConnectionError(
@@ -152,7 +156,9 @@ class NetModule:
         timeout: float | None = None,
     ) -> HttpResponse:
         """Perform an HTTP POST request."""
-        return await self._request("POST", url, json=json, data=data, headers=headers, timeout=timeout)
+        return await self._request(
+            "POST", url, json=json, data=data, headers=headers, timeout=timeout
+        )
 
     async def http_put(
         self,
@@ -164,7 +170,9 @@ class NetModule:
         timeout: float | None = None,
     ) -> HttpResponse:
         """Perform an HTTP PUT request."""
-        return await self._request("PUT", url, json=json, data=data, headers=headers, timeout=timeout)
+        return await self._request(
+            "PUT", url, json=json, data=data, headers=headers, timeout=timeout
+        )
 
     async def http_delete(
         self,

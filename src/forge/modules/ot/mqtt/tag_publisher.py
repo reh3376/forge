@@ -18,15 +18,13 @@ Design decisions:
 
 from __future__ import annotations
 
-import json
 import logging
-import time
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
-from forge.modules.ot.mqtt.publisher import OTMqttPublisher
-from forge.modules.ot.mqtt.topic_router import TopicRouter, TopicType
+if TYPE_CHECKING:
+    from forge.modules.ot.mqtt.publisher import OTMqttPublisher
+    from forge.modules.ot.mqtt.topic_router import TopicRouter
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +72,7 @@ def build_health_payload(
         "connected": connected,
         "latency_ms": round(latency_ms, 1),
         "scan_class": scan_class,
-        "ts": datetime.now(tz=timezone.utc).isoformat(),
+        "ts": datetime.now(tz=UTC).isoformat(),
         "error": error,
     }
 
@@ -91,7 +89,7 @@ def build_equipment_payload(
         "field": field_name,
         "v": value,
         "area": area,
-        "ts": datetime.now(tz=timezone.utc).isoformat(),
+        "ts": datetime.now(tz=UTC).isoformat(),
     }
 
 
@@ -190,8 +188,10 @@ class TagPublisher:
 
         try:
             await self._publisher.publish(
-                resolved.topic, payload,
-                qos=resolved.qos, retain=resolved.retain,
+                resolved.topic,
+                payload,
+                qos=resolved.qos,
+                retain=resolved.retain,
             )
             self._tag_publish_count += 1
             return True
@@ -229,8 +229,10 @@ class TagPublisher:
 
         try:
             await self._publisher.publish(
-                resolved.topic, payload,
-                qos=resolved.qos, retain=resolved.retain,
+                resolved.topic,
+                payload,
+                qos=resolved.qos,
+                retain=resolved.retain,
             )
             self._health_publish_count += 1
             return True
@@ -256,7 +258,9 @@ class TagPublisher:
         selective subscription by downstream consumers.
         """
         resolved = self._router.resolve_equipment(
-            equipment_id, field_name, area=area,
+            equipment_id,
+            field_name,
+            area=area,
         )
         payload = build_equipment_payload(
             equipment_id=equipment_id,
@@ -267,8 +271,10 @@ class TagPublisher:
 
         try:
             await self._publisher.publish(
-                resolved.topic, payload,
-                qos=resolved.qos, retain=resolved.retain,
+                resolved.topic,
+                payload,
+                qos=resolved.qos,
+                retain=resolved.retain,
             )
             self._equipment_publish_count += 1
             return True
@@ -276,7 +282,9 @@ class TagPublisher:
             self._error_count += 1
             logger.error(
                 "Failed to publish equipment %s.%s: %s",
-                equipment_id, field_name, exc,
+                equipment_id,
+                field_name,
+                exc,
             )
             return False
 
@@ -312,8 +320,10 @@ class TagPublisher:
 
         try:
             await self._publisher.publish(
-                resolved.topic, payload,
-                qos=resolved.qos, retain=resolved.retain,
+                resolved.topic,
+                payload,
+                qos=resolved.qos,
+                retain=resolved.retain,
             )
             self._alarm_publish_count += 1
             return True

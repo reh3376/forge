@@ -37,14 +37,13 @@ from forge.modules.ot.opcua_client._compat import patch_asyncua_binary as _patch
 _patch_asyncua()
 
 from forge.modules.ot.opcua_client.client import OpcUaClient
-from forge.modules.ot.opcua_client.paths import NormalizedPath, PathNormalizer
 from forge.modules.ot.opcua_client.exceptions import (
     BrowseError,
     CertificateError,
     ConfigurationError,
     ConnectionError,
     CreateSubscriptionError,
-    EndpointUnreachable,
+    EndpointUnreachableError,
     HistoryReadError,
     MonitoredItemError,
     OpcUaError,
@@ -58,6 +57,7 @@ from forge.modules.ot.opcua_client.exceptions import (
     TimeoutError,
     WriteError,
 )
+from forge.modules.ot.opcua_client.paths import NormalizedPath, PathNormalizer
 from forge.modules.ot.opcua_client.security import (
     MessageSecurityMode,
     SecurityConfig,
@@ -79,44 +79,39 @@ from forge.modules.ot.opcua_client.types import (
 )
 
 __all__ = [
-    # Client
-    "OpcUaClient",
-    # Paths
-    "NormalizedPath",
-    "PathNormalizer",
-    # Types
     "AccessLevel",
-    "BrowseResult",
-    "ConnectionHealth",
-    "ConnectionState",
-    "DataType",
-    "DataValue",
-    "MonitoredItem",
-    "NodeClass",
-    "NodeId",
-    "OpcUaEndpoint",
-    "QualityCode",
-    "Subscription",
-    # Security
-    "MessageSecurityMode",
-    "SecurityConfig",
-    "SecurityPolicy",
-    # Exceptions
     "BrowseError",
+    "BrowseResult",
     "CertificateError",
     "ConfigurationError",
     "ConnectionError",
+    "ConnectionHealth",
+    "ConnectionState",
     "CreateSubscriptionError",
-    "EndpointUnreachable",
+    "DataType",
+    "DataValue",
+    "EndpointUnreachableError",
     "HistoryReadError",
+    "MessageSecurityMode",
+    "MonitoredItem",
     "MonitoredItemError",
+    "NodeClass",
+    "NodeId",
+    "NormalizedPath",
+    "OpcUaClient",
+    "OpcUaEndpoint",
     "OpcUaError",
+    "PathNormalizer",
     "PolicyViolationError",
+    "QualityCode",
     "ReadError",
+    "SecurityConfig",
     "SecurityError",
     "SecurityNegotiationError",
+    "SecurityPolicy",
     "ServiceError",
     "SessionActivationError",
+    "Subscription",
     "SubscriptionError",
     "TimeoutError",
     "WriteError",

@@ -19,13 +19,12 @@ Design decisions:
 from __future__ import annotations
 
 import enum
-from datetime import datetime, timezone
-from typing import Annotated, Any, Literal, Union
+from datetime import UTC, datetime
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
 from forge.modules.ot.opcua_client.types import DataType, QualityCode
-
 
 # ---------------------------------------------------------------------------
 # Enumerations
@@ -35,15 +34,15 @@ from forge.modules.ot.opcua_client.types import DataType, QualityCode
 class TagType(str, enum.Enum):
     """All 9 tag types — 6 standard + 3 Forge-exclusive."""
 
-    STANDARD = "standard"       # Live OPC-UA subscription
-    MEMORY = "memory"           # In-memory read/write store
-    EXPRESSION = "expression"   # Python expression referencing other tags
-    QUERY = "query"             # SQL query on poll interval
-    DERIVED = "derived"         # Weighted combination of N source tags
-    REFERENCE = "reference"     # Alias to another tag
-    COMPUTED = "computed"       # Multi-source custom function (★ Forge-exclusive)
-    EVENT = "event"             # Value set by external event (★ Forge-exclusive)
-    VIRTUAL = "virtual"         # Federated read from external system (★ Forge-exclusive)
+    STANDARD = "standard"  # Live OPC-UA subscription
+    MEMORY = "memory"  # In-memory read/write store
+    EXPRESSION = "expression"  # Python expression referencing other tags
+    QUERY = "query"  # SQL query on poll interval
+    DERIVED = "derived"  # Weighted combination of N source tags
+    REFERENCE = "reference"  # Alias to another tag
+    COMPUTED = "computed"  # Multi-source custom function (★ Forge-exclusive)
+    EVENT = "event"  # Value set by external event (★ Forge-exclusive)
+    VIRTUAL = "virtual"  # Federated read from external system (★ Forge-exclusive)
 
 
 class ScanClass(str, enum.Enum):
@@ -55,10 +54,10 @@ class ScanClass(str, enum.Enum):
     doesn't support natively.
     """
 
-    CRITICAL = "critical"   # 100ms — safety interlocks, active alarms
-    HIGH = "high"           # 500ms — active process values
-    STANDARD = "standard"   # 1000ms — normal monitoring (default)
-    SLOW = "slow"           # 5000ms — ambient, utility, rarely-changing
+    CRITICAL = "critical"  # 100ms — safety interlocks, active alarms
+    HIGH = "high"  # 500ms — active process values
+    STANDARD = "standard"  # 1000ms — normal monitoring (default)
+    SLOW = "slow"  # 5000ms — ambient, utility, rarely-changing
 
 
 # Default intervals per scan class (milliseconds)
@@ -151,9 +150,9 @@ class HistoryConfig(BaseModel):
 
     enabled: bool = True
     sample_mode: str = "on_change"  # "on_change", "periodic"
-    deadband: float = 0.0           # absolute value change threshold
-    max_interval_ms: int = 60000    # max time between samples even if no change
-    min_interval_ms: int = 0        # minimum time between samples (throttle)
+    deadband: float = 0.0  # absolute value change threshold
+    max_interval_ms: int = 60000  # max time between samples even if no change
+    min_interval_ms: int = 0  # minimum time between samples (throttle)
 
 
 # ---------------------------------------------------------------------------
@@ -170,7 +169,7 @@ class TagValue(BaseModel):
 
     value: Any = None
     quality: QualityCode = QualityCode.NOT_AVAILABLE
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     source_timestamp: datetime | None = None
     previous_value: Any = None
     previous_quality: QualityCode | None = None
@@ -180,7 +179,7 @@ class TagValue(BaseModel):
     @classmethod
     def _ensure_utc(cls, v: Any) -> Any:
         if isinstance(v, datetime) and v.tzinfo is None:
-            return v.replace(tzinfo=timezone.utc)
+            return v.replace(tzinfo=UTC)
         return v
 
     def has_changed(self) -> bool:
@@ -207,16 +206,13 @@ class BaseTag(BaseModel):
     """
 
     path: str = Field(
-        description="Forge-normalized tag path (slash-separated, e.g., WH/WHK01/Distillery01/TIT_2010/Out_PV)"
+        description=(
+            "Forge-normalized tag path "
+            "(slash-separated, e.g., WH/WHK01/Distillery01/TIT_2010/Out_PV)"
+        )
     )
-    data_type: DataType = Field(
-        default=DataType.DOUBLE,
-        description="Expected value data type"
-    )
-    scan_class: ScanClass = Field(
-        default=ScanClass.STANDARD,
-        description="Evaluation rate group"
-    )
+    data_type: DataType = Field(default=DataType.DOUBLE, description="Expected value data type")
+    scan_class: ScanClass = Field(default=ScanClass.STANDARD, description="Evaluation rate group")
     description: str = ""
     engineering_units: str = ""
     area: str = ""
@@ -253,8 +249,7 @@ class StandardTag(BaseTag):
         description="OPC-UA node ID (e.g., ns=2;s=Distillery01.Utility01.LIT_6050B.Out_PV)"
     )
     connection_name: str = Field(
-        default="",
-        description="PLC connection name (resolved from namespace_map if empty)"
+        default="", description="PLC connection name (resolved from namespace_map if empty)"
     )
 
 
@@ -271,8 +266,7 @@ class MemoryTag(BaseTag):
     tag_type: Literal[TagType.MEMORY] = TagType.MEMORY
     default_value: Any = None
     persist: bool = Field(
-        default=False,
-        description="If True, value survives restarts via DB persistence"
+        default=False, description="If True, value survives restarts via DB persistence"
     )
 
 
@@ -290,12 +284,12 @@ class ExpressionTag(BaseTag):
     """
 
     tag_type: Literal[TagType.EXPRESSION] = TagType.EXPRESSION
-    expression: str = Field(
-        description="Python expression with {tag_path} placeholders"
-    )
+    expression: str = Field(description="Python expression with {tag_path} placeholders")
     dependencies: list[str] = Field(
         default_factory=list,
-        description="Resolved list of tag paths this expression reads (auto-populated from expression)"
+        description=(
+            "Resolved list of tag paths this expression reads (auto-populated from expression)"
+        ),
     )
 
 
@@ -315,21 +309,14 @@ class QueryTag(BaseTag):
     tag_type: Literal[TagType.QUERY] = TagType.QUERY
     query: str = Field(description="SQL query string (parameterized)")
     params: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Query parameters (e.g., {tag_path} substitutions)"
+        default_factory=dict, description="Query parameters (e.g., {tag_path} substitutions)"
     )
-    connection_name: str = Field(
-        default="default",
-        description="Database connection pool name"
-    )
+    connection_name: str = Field(default="default", description="Database connection pool name")
     poll_interval_ms: int = Field(
-        default=5000,
-        ge=500,
-        description="How often to execute the query"
+        default=5000, ge=500, description="How often to execute the query"
     )
     scalar: bool = Field(
-        default=True,
-        description="If True, extract first column of first row as scalar value"
+        default=True, description="If True, extract first column of first row as scalar value"
     )
 
 
@@ -350,13 +337,10 @@ class DerivedTag(BaseTag):
     """
 
     tag_type: Literal[TagType.DERIVED] = TagType.DERIVED
-    sources: list[DerivedSource] = Field(
-        min_length=1,
-        description="Source tags and their weights"
-    )
+    sources: list[DerivedSource] = Field(min_length=1, description="Source tags and their weights")
     aggregation: str = Field(
         default="weighted_sum",
-        description="Aggregation function: weighted_sum, average, min, max, first, last"
+        description="Aggregation function: weighted_sum, average, min, max, first, last",
     )
 
 
@@ -371,12 +355,10 @@ class ReferenceTag(BaseTag):
     """
 
     tag_type: Literal[TagType.REFERENCE] = TagType.REFERENCE
-    source_path: str = Field(
-        description="Path of the tag to reference"
-    )
+    source_path: str = Field(description="Path of the tag to reference")
     transform: str | None = Field(
         default=None,
-        description="Optional Python expression applied to source value (e.g., 'value * 2.0')"
+        description="Optional Python expression applied to source value (e.g., 'value * 2.0')",
     )
 
 
@@ -395,14 +377,20 @@ class ComputedTag(BaseTag):
 
     tag_type: Literal[TagType.COMPUTED] = TagType.COMPUTED
     sources: dict[str, str] = Field(
-        description="Map of parameter name → source tag path (e.g., {'temp': 'WH/WHK01/.../TIT_2010/Out_PV'})"
+        description=(
+            "Map of parameter name → source tag path "
+            "(e.g., {'temp': 'WH/WHK01/.../TIT_2010/Out_PV'})"
+        )
     )
     function: str = Field(
-        description="Python function body receiving source values as keyword args. Must return a single value."
+        description=(
+            "Python function body receiving source values as keyword args. "
+            "Must return a single value."
+        )
     )
     imports: list[str] = Field(
         default_factory=list,
-        description="Allowed module imports for the function (e.g., ['math', 'statistics'])"
+        description="Allowed module imports for the function (e.g., ['math', 'statistics'])",
     )
 
 
@@ -428,15 +416,16 @@ class EventTag(BaseTag):
     )
     value_path: str = Field(
         default="",
-        description="JSONPath or dot-path to extract value from event payload (empty = entire payload)"
+        description=(
+            "JSONPath or dot-path to extract value from event payload (empty = entire payload)"
+        ),
     )
     retain_last: bool = Field(
         default=True,
-        description="If True, tag holds last event value; if False, reverts to None after TTL"
+        description="If True, tag holds last event value; if False, reverts to None after TTL",
     )
     ttl_ms: int | None = Field(
-        default=None,
-        description="Time-to-live for event value in milliseconds (None = forever)"
+        default=None, description="Time-to-live for event value in milliseconds (None = forever)"
     )
 
 
@@ -462,13 +451,10 @@ class VirtualTag(BaseTag):
         description="Source-specific configuration (URL, query, module_id, etc.)"
     )
     cache_ttl_ms: int = Field(
-        default=10000,
-        ge=0,
-        description="How long to cache the fetched value before refreshing"
+        default=10000, ge=0, description="How long to cache the fetched value before refreshing"
     )
     fallback_value: Any = Field(
-        default=None,
-        description="Value to return if source is unreachable and cache is expired"
+        default=None, description="Value to return if source is unreachable and cache is expired"
     )
 
 
@@ -477,17 +463,15 @@ class VirtualTag(BaseTag):
 # ---------------------------------------------------------------------------
 
 TagUnion = Annotated[
-    Union[
-        StandardTag,
-        MemoryTag,
-        ExpressionTag,
-        QueryTag,
-        DerivedTag,
-        ReferenceTag,
-        ComputedTag,
-        EventTag,
-        VirtualTag,
-    ],
+    StandardTag
+    | MemoryTag
+    | ExpressionTag
+    | QueryTag
+    | DerivedTag
+    | ReferenceTag
+    | ComputedTag
+    | EventTag
+    | VirtualTag,
     Field(discriminator="tag_type"),
 ]
 """Discriminated union of all 9 tag types.

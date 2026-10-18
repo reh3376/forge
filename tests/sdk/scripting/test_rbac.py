@@ -9,14 +9,12 @@ from forge.sdk.scripting.rbac import (
     _match_tag_pattern_simple,
 )
 
-
 # ---------------------------------------------------------------------------
 # Pattern matching
 # ---------------------------------------------------------------------------
 
 
 class TestTagPatternMatching:
-
     def test_double_star_matches_everything(self):
         assert _match_tag_pattern_simple("**", "WH/WHK01/Distillery01/TIT/Out_PV") is True
 
@@ -54,7 +52,6 @@ class TestTagPatternMatching:
 
 
 class TestDefaultDeny:
-
     def test_no_grants_denies_tag_write(self):
         rbac = ScriptRBAC()
         result = rbac.check_tag_write("unknown_owner", "WH/WHK01/TIT/Out_PV")
@@ -79,7 +76,6 @@ class TestDefaultDeny:
 
 
 class TestDefaultAllow:
-
     def test_allow_policy_permits_without_grants(self):
         rbac = ScriptRBAC(default_policy="allow")
         result = rbac.check_tag_write("anyone", "WH/WHK01/TIT/Out_PV")
@@ -98,24 +94,28 @@ class TestDefaultAllow:
 
 
 class TestTagWriteGrants:
-
     @pytest.fixture
     def rbac(self):
         r = ScriptRBAC()
-        r.grant(ScriptPermission(
-            owner="commissioning",
-            area_pattern="Distillery01",
-            tag_pattern="WH/WHK01/Distillery01/**",
-        ))
-        r.grant(ScriptPermission(
-            owner="monitoring",
-            can_write_tags=False,  # read-only
-        ))
+        r.grant(
+            ScriptPermission(
+                owner="commissioning",
+                area_pattern="Distillery01",
+                tag_pattern="WH/WHK01/Distillery01/**",
+            )
+        )
+        r.grant(
+            ScriptPermission(
+                owner="monitoring",
+                can_write_tags=False,  # read-only
+            )
+        )
         return r
 
     def test_matching_grant_allows(self, rbac):
         result = rbac.check_tag_write(
-            "commissioning", "WH/WHK01/Distillery01/TIT/Out_PV",
+            "commissioning",
+            "WH/WHK01/Distillery01/TIT/Out_PV",
             area="Distillery01",
         )
         assert result.allowed is True
@@ -124,21 +124,24 @@ class TestTagWriteGrants:
 
     def test_wrong_area_denies(self, rbac):
         result = rbac.check_tag_write(
-            "commissioning", "WH/WHK01/Granary01/TIT/Out_PV",
+            "commissioning",
+            "WH/WHK01/Granary01/TIT/Out_PV",
             area="Granary01",
         )
         assert result.allowed is False
 
     def test_wrong_tag_pattern_denies(self, rbac):
         result = rbac.check_tag_write(
-            "commissioning", "WH/WHK02/Distillery01/TIT/Out_PV",
+            "commissioning",
+            "WH/WHK02/Distillery01/TIT/Out_PV",
             area="Distillery01",
         )
         assert result.allowed is False
 
     def test_read_only_owner_denied(self, rbac):
         result = rbac.check_tag_write(
-            "monitoring", "WH/WHK01/Distillery01/TIT/Out_PV",
+            "monitoring",
+            "WH/WHK01/Distillery01/TIT/Out_PV",
             area="Distillery01",
         )
         assert result.allowed is False
@@ -163,7 +166,6 @@ class TestTagWriteGrants:
 
 
 class TestDbWriteGrants:
-
     def test_db_write_allowed(self):
         rbac = ScriptRBAC()
         rbac.grant(ScriptPermission(owner="etl", can_write_db=True))
@@ -183,7 +185,6 @@ class TestDbWriteGrants:
 
 
 class TestPermissionManagement:
-
     def test_grant_increments_count(self):
         rbac = ScriptRBAC()
         assert rbac.permission_count == 0
@@ -220,8 +221,11 @@ class TestPermissionManagement:
 
     def test_permission_check_result_fields(self):
         result = PermissionCheckResult(
-            allowed=False, owner="test", operation="tag_write",
-            target="some/tag", reason="denied",
+            allowed=False,
+            owner="test",
+            operation="tag_write",
+            target="some/tag",
+            reason="denied",
         )
         assert result.allowed is False
         assert result.matching_permission is None

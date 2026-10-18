@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
-
-import pytest
+from datetime import datetime
 
 from forge.adapters.whk_cmms.context import build_record_context
 from forge.adapters.whk_cmms.record_builder import build_contextual_record

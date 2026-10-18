@@ -83,12 +83,15 @@ class TestHealthEndpoint:
 
 class TestProductEndpoints:
     async def test_create_product(self, client: AsyncClient) -> None:
-        response = await client.post("/products", json={
-            "name": "Production Context",
-            "description": "Test product",
-            "owner": "reh3376",
-            "schema_ref": "forge://schemas/production-context/v1",
-        })
+        response = await client.post(
+            "/products",
+            json={
+                "name": "Production Context",
+                "description": "Test product",
+                "owner": "reh3376",
+                "schema_ref": "forge://schemas/production-context/v1",
+            },
+        )
         assert response.status_code == 201
         data = response.json()
         assert data["name"] == "Production Context"
@@ -96,23 +99,38 @@ class TestProductEndpoints:
         assert data["product_id"].startswith("dp-")
 
     async def test_list_products(self, client: AsyncClient) -> None:
-        await client.post("/products", json={
-            "name": "A", "description": "...", "owner": "o",
-            "schema_ref": "x",
-        })
-        await client.post("/products", json={
-            "name": "B", "description": "...", "owner": "o",
-            "schema_ref": "x",
-        })
+        await client.post(
+            "/products",
+            json={
+                "name": "A",
+                "description": "...",
+                "owner": "o",
+                "schema_ref": "x",
+            },
+        )
+        await client.post(
+            "/products",
+            json={
+                "name": "B",
+                "description": "...",
+                "owner": "o",
+                "schema_ref": "x",
+            },
+        )
         response = await client.get("/products")
         assert response.status_code == 200
         assert len(response.json()) == 2
 
     async def test_get_product(self, client: AsyncClient) -> None:
-        create = await client.post("/products", json={
-            "name": "Test", "description": "...", "owner": "o",
-            "schema_ref": "x",
-        })
+        create = await client.post(
+            "/products",
+            json={
+                "name": "Test",
+                "description": "...",
+                "owner": "o",
+                "schema_ref": "x",
+            },
+        )
         pid = create.json()["product_id"]
         response = await client.get(f"/products/{pid}")
         assert response.status_code == 200
@@ -123,20 +141,30 @@ class TestProductEndpoints:
         assert response.status_code == 404
 
     async def test_publish_product(self, client: AsyncClient) -> None:
-        create = await client.post("/products", json={
-            "name": "Test", "description": "...", "owner": "o",
-            "schema_ref": "x",
-        })
+        create = await client.post(
+            "/products",
+            json={
+                "name": "Test",
+                "description": "...",
+                "owner": "o",
+                "schema_ref": "x",
+            },
+        )
         pid = create.json()["product_id"]
         response = await client.put(f"/products/{pid}/publish")
         assert response.status_code == 200
         assert response.json()["status"] == "PUBLISHED"
 
     async def test_publish_non_draft_fails(self, client: AsyncClient) -> None:
-        create = await client.post("/products", json={
-            "name": "Test", "description": "...", "owner": "o",
-            "schema_ref": "x",
-        })
+        create = await client.post(
+            "/products",
+            json={
+                "name": "Test",
+                "description": "...",
+                "owner": "o",
+                "schema_ref": "x",
+            },
+        )
         pid = create.json()["product_id"]
         await client.put(f"/products/{pid}/publish")
         response = await client.put(f"/products/{pid}/publish")
@@ -146,18 +174,26 @@ class TestProductEndpoints:
 class TestCurateEndpoint:
     async def test_curate_records(self, client: AsyncClient) -> None:
         # Create product first
-        create = await client.post("/products", json={
-            "name": "Test", "description": "...", "owner": "o",
-            "schema_ref": "x",
-        })
+        create = await client.post(
+            "/products",
+            json={
+                "name": "Test",
+                "description": "...",
+                "owner": "o",
+                "schema_ref": "x",
+            },
+        )
         pid = create.json()["product_id"]
 
         # Curate records
         records = [_make_record_dict() for _ in range(5)]
-        response = await client.post("/curate", json={
-            "product_id": pid,
-            "records": records,
-        })
+        response = await client.post(
+            "/curate",
+            json={
+                "product_id": pid,
+                "records": records,
+            },
+        )
         assert response.status_code == 200
         data = response.json()
         assert data["input_count"] == 5
@@ -165,27 +201,38 @@ class TestCurateEndpoint:
         assert "normalize" in data["steps_applied"]
 
     async def test_curate_unknown_product(self, client: AsyncClient) -> None:
-        response = await client.post("/curate", json={
-            "product_id": "dp-nonexistent",
-            "records": [_make_record_dict()],
-        })
+        response = await client.post(
+            "/curate",
+            json={
+                "product_id": "dp-nonexistent",
+                "records": [_make_record_dict()],
+            },
+        )
         assert response.status_code == 404
 
 
 class TestLineageEndpoint:
     async def test_get_lineage(self, client: AsyncClient) -> None:
         # Create product and curate
-        create = await client.post("/products", json={
-            "name": "Test", "description": "...", "owner": "o",
-            "schema_ref": "x",
-        })
+        create = await client.post(
+            "/products",
+            json={
+                "name": "Test",
+                "description": "...",
+                "owner": "o",
+                "schema_ref": "x",
+            },
+        )
         pid = create.json()["product_id"]
 
         records = [_make_record_dict() for _ in range(3)]
-        await client.post("/curate", json={
-            "product_id": pid,
-            "records": records,
-        })
+        await client.post(
+            "/curate",
+            json={
+                "product_id": pid,
+                "records": records,
+            },
+        )
 
         response = await client.get(f"/products/{pid}/lineage")
         assert response.status_code == 200

@@ -1,7 +1,6 @@
 """Tests for SparkplugB encoding — topic/payload generation."""
 
-import pytest
-from datetime import datetime, timezone
+from datetime import datetime
 
 from forge.modules.ot.mqtt.sparkplug import (
     SparkplugDataType,
@@ -11,14 +10,12 @@ from forge.modules.ot.mqtt.sparkplug import (
     infer_sparkplug_type,
 )
 
-
 # ---------------------------------------------------------------------------
 # Data type inference
 # ---------------------------------------------------------------------------
 
 
 class TestDataTypeInference:
-
     def test_bool(self):
         assert infer_sparkplug_type(True) == SparkplugDataType.BOOLEAN
         assert infer_sparkplug_type(False) == SparkplugDataType.BOOLEAN
@@ -57,7 +54,6 @@ class TestDataTypeInference:
 
 
 class TestSparkplugMetric:
-
     def test_to_dict(self):
         m = SparkplugMetric(name="temp", value=78.4, timestamp=1000)
         d = m.to_dict()
@@ -77,10 +73,10 @@ class TestSparkplugMetric:
 
 
 class TestSparkplugPayload:
-
     def test_to_dict(self):
         p = SparkplugPayload(
-            timestamp=1000, seq=5,
+            timestamp=1000,
+            seq=5,
             metrics=[SparkplugMetric(name="temp", value=78.4)],
         )
         d = p.to_dict()
@@ -95,7 +91,6 @@ class TestSparkplugPayload:
 
 
 class TestEncoderTopics:
-
     def test_node_birth_topic(self):
         enc = SparkplugEncoder(group_id="WHK", edge_node_id="OT-Module-01")
         topic, _ = enc.build_node_birth()
@@ -128,7 +123,6 @@ class TestEncoderTopics:
 
 
 class TestEncoderPayloads:
-
     def test_node_birth_resets_seq(self):
         enc = SparkplugEncoder()
         # Burn some sequences
@@ -172,8 +166,11 @@ class TestEncoderPayloads:
 
     def test_device_data_has_timestamp(self):
         enc = SparkplugEncoder()
-        _, payload = enc.build_device_data("dev", [
-            SparkplugMetric(name="temp", value=78.4),
-        ])
+        _, payload = enc.build_device_data(
+            "dev",
+            [
+                SparkplugMetric(name="temp", value=78.4),
+            ],
+        )
         assert payload["timestamp"] > 0
         assert payload["metrics"][0]["timestamp"] > 0

@@ -7,6 +7,7 @@ verify ContextualRecords with CMMS-specific maintenance context fields.
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
 from forge.adapters.whk_cmms import WhkCmmsAdapter
 from forge.core.models.adapter import AdapterState
@@ -260,7 +261,7 @@ class TestLifecycle:
     @pytest.mark.asyncio
     async def test_configure_validates_required(self):
         adapter = WhkCmmsAdapter()
-        with pytest.raises(Exception):  # pydantic ValidationError
+        with pytest.raises(ValidationError):  # pydantic ValidationError
             await adapter.configure({"cmms_graphql_url": "http://localhost:3000/graphql"})
             # missing cmms_rest_url
 
@@ -524,12 +525,14 @@ class TestCollect:
         adapter = WhkCmmsAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
-        adapter.inject_records([
-            _SAMPLE_ASSET_MESSAGE,
-            _SAMPLE_WORK_ORDER_MESSAGE,
-            _SAMPLE_WORK_REQUEST_MESSAGE,
-            _SAMPLE_ITEM_MESSAGE,
-        ])
+        adapter.inject_records(
+            [
+                _SAMPLE_ASSET_MESSAGE,
+                _SAMPLE_WORK_ORDER_MESSAGE,
+                _SAMPLE_WORK_REQUEST_MESSAGE,
+                _SAMPLE_ITEM_MESSAGE,
+            ]
+        )
         records = [r async for r in adapter.collect()]
         assert len(records) == 4
         entity_types = {r.context.extra["entity_type"] for r in records}
@@ -550,10 +553,12 @@ class TestCollect:
         adapter = WhkCmmsAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
-        adapter.inject_records([
-            _SAMPLE_ASSET_MESSAGE,
-            _SAMPLE_WORK_ORDER_MESSAGE,
-        ])
+        adapter.inject_records(
+            [
+                _SAMPLE_ASSET_MESSAGE,
+                _SAMPLE_WORK_ORDER_MESSAGE,
+            ]
+        )
         _ = [r async for r in adapter.collect()]
         assert adapter._records_collected == 2
 
@@ -623,14 +628,20 @@ class TestDiscover:
     async def test_discover_includes_item_topic(self):
         adapter = WhkCmmsAdapter()
         items = await adapter.discover()
-        item_topics = [i for i in items if "item" in i["tag_path"].lower() and i["data_type"] == "entity_event"]
+        item_topics = [
+            i for i in items if "item" in i["tag_path"].lower() and i["data_type"] == "entity_event"
+        ]
         assert len(item_topics) >= 1
 
     @pytest.mark.asyncio
     async def test_discover_includes_vendor_topic(self):
         adapter = WhkCmmsAdapter()
         items = await adapter.discover()
-        vendor_topics = [i for i in items if "vendor" in i["tag_path"].lower() and i["data_type"] == "entity_event"]
+        vendor_topics = [
+            i
+            for i in items
+            if "vendor" in i["tag_path"].lower() and i["data_type"] == "entity_event"
+        ]
         assert len(vendor_topics) >= 1
 
 
@@ -641,20 +652,14 @@ class TestSubscription:
     @pytest.mark.asyncio
     async def test_subscribe_returns_id(self):
         adapter = WhkCmmsAdapter()
-        sub_id = await adapter.subscribe(
-            ["wh.whk01.distillery01.item"],
-            callback=lambda x: x
-        )
+        sub_id = await adapter.subscribe(["wh.whk01.distillery01.item"], callback=lambda x: x)
         assert sub_id is not None
         assert len(sub_id) > 0
 
     @pytest.mark.asyncio
     async def test_unsubscribe(self):
         adapter = WhkCmmsAdapter()
-        sub_id = await adapter.subscribe(
-            ["wh.whk01.distillery01.item"],
-            callback=lambda x: x
-        )
+        sub_id = await adapter.subscribe(["wh.whk01.distillery01.item"], callback=lambda x: x)
         await adapter.unsubscribe(sub_id)
         assert sub_id not in adapter._subscriptions
 

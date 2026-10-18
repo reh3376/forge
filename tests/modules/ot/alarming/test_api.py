@@ -11,8 +11,8 @@ Covers:
 
 import pytest
 
-from forge.modules.ot.alarming.engine import AlarmEngine
 from forge.modules.ot.alarming.api import AlarmApiHandler
+from forge.modules.ot.alarming.engine import AlarmEngine
 
 
 @pytest.fixture

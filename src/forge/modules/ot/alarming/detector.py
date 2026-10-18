@@ -12,12 +12,11 @@ Sits between the Tag Engine (source of live values) and the AlarmEngine
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import time
 from collections import defaultdict
-from dataclasses import dataclass, field
-from typing import Any
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any
 
 from forge.modules.ot.alarming.models import (
     AlarmConfig,
@@ -25,7 +24,9 @@ from forge.modules.ot.alarming.models import (
     AlarmType,
     ThresholdConfig,
 )
-from forge.modules.ot.alarming.engine import AlarmEngine
+
+if TYPE_CHECKING:
+    from forge.modules.ot.alarming.engine import AlarmEngine
 
 logger = logging.getLogger("forge.alarm.detector")
 
@@ -132,25 +133,19 @@ class AlarmDetector:
             if threshold.alarm_type == AlarmType.RATE_OF_CHANGE:
                 continue  # Already handled above
             if threshold.delay_seconds > 0:
-                delay_events = await self._check_with_delay(
-                    config, threshold, value, quality
-                )
+                delay_events = await self._check_with_delay(config, threshold, value, quality)
                 events.extend(delay_events)
             else:
                 non_delayed.append(threshold)
 
         # Non-delayed thresholds — delegate to engine's built-in evaluation
         if non_delayed:
-            engine_events = await self._engine.process_tag_value(
-                tag_path, value, quality
-            )
+            engine_events = await self._engine.process_tag_value(tag_path, value, quality)
             events.extend(engine_events)
 
         return events
 
-    async def report_comm_failure(
-        self, device_id: str, detail: str = ""
-    ) -> AlarmEvent | None:
+    async def report_comm_failure(self, device_id: str, detail: str = "") -> AlarmEvent | None:
         """Report a communication failure (PLC connection loss).
 
         Creates a COMMUNICATION alarm if one isn't already active for this device.
@@ -174,10 +169,9 @@ class AlarmDetector:
             self._comm_alarms[device_id] = alarm_id
             journal = await self._engine.get_alarm_history(limit=1)
             if journal:
-                return AlarmEvent(**{
-                    k: v for k, v in journal[0].items()
-                    if k in AlarmEvent.__dataclass_fields__
-                })
+                return AlarmEvent(
+                    **{k: v for k, v in journal[0].items() if k in AlarmEvent.__dataclass_fields__}
+                )
         return None
 
     async def report_comm_restore(self, device_id: str) -> bool:
@@ -218,7 +212,8 @@ class AlarmDetector:
                         priority=threshold.priority.value,
                         value=roc,
                         setpoint=threshold.setpoint,
-                        description=threshold.description or f"Rate of change {roc:.2f}/s exceeds {threshold.setpoint}/s",
+                        description=threshold.description
+                        or f"Rate of change {roc:.2f}/s exceeds {threshold.setpoint}/s",
                         area=config.area,
                         equipment_id=config.equipment_id,
                         alarm_type=AlarmType.RATE_OF_CHANGE,
@@ -226,10 +221,15 @@ class AlarmDetector:
                     if alarm_id:
                         journal = await self._engine.get_alarm_history(limit=1)
                         if journal:
-                            events.append(AlarmEvent(**{
-                                k: v for k, v in journal[0].items()
-                                if k in AlarmEvent.__dataclass_fields__
-                            }))
+                            events.append(
+                                AlarmEvent(
+                                    **{
+                                        k: v
+                                        for k, v in journal[0].items()
+                                        if k in AlarmEvent.__dataclass_fields__
+                                    }
+                                )
+                            )
 
         state.last_value = fval
         state.last_time = now
@@ -262,9 +262,7 @@ class AlarmDetector:
             if elapsed >= threshold.delay_seconds and not state.fired:
                 state.fired = True
                 # Condition persisted long enough — trigger via engine
-                events = await self._engine.process_tag_value(
-                    config.tag_path, value, quality
-                )
+                events = await self._engine.process_tag_value(config.tag_path, value, quality)
                 return events
         else:
             # Condition no longer met — reset timer
@@ -272,17 +270,13 @@ class AlarmDetector:
                 state.first_true_at = None
                 state.fired = False
                 # Also try to clear via engine
-                events = await self._engine.process_tag_value(
-                    config.tag_path, value, quality
-                )
+                events = await self._engine.process_tag_value(config.tag_path, value, quality)
                 return events
 
         return []
 
     @staticmethod
-    def _is_condition_met(
-        threshold: ThresholdConfig, value: Any, quality: str
-    ) -> bool:
+    def _is_condition_met(threshold: ThresholdConfig, value: Any, quality: str) -> bool:
         """Check if the raw threshold condition is met (ignoring delay)."""
         if threshold.alarm_type == AlarmType.QUALITY:
             return quality != "GOOD"

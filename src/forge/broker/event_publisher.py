@@ -52,14 +52,20 @@ class ForgeEventPublisher:
     # ------------------------------------------------------------------
 
     async def adapter_registered(
-        self, adapter_id: str, name: str, **extra: Any,
+        self,
+        adapter_id: str,
+        name: str,
+        **extra: Any,
     ) -> None:
         """Publish an adapter registration event."""
-        event = self._envelope("adapter.registered", {
-            "adapter_id": adapter_id,
-            "name": name,
-            **extra,
-        })
+        event = self._envelope(
+            "adapter.registered",
+            {
+                "adapter_id": adapter_id,
+                "name": name,
+                **extra,
+            },
+        )
         exchange = FORGE_EXCHANGES["adapter.lifecycle"]
         await self._producer.publish(exchange, event)
         logger.info("Published adapter.registered: %s", adapter_id)
@@ -70,18 +76,24 @@ class ForgeEventPublisher:
         await self._producer.publish(exchange, event)
 
     async def adapter_stopped(self, adapter_id: str, reason: str = "") -> None:
-        event = self._envelope("adapter.stopped", {
-            "adapter_id": adapter_id,
-            "reason": reason,
-        })
+        event = self._envelope(
+            "adapter.stopped",
+            {
+                "adapter_id": adapter_id,
+                "reason": reason,
+            },
+        )
         exchange = FORGE_EXCHANGES["adapter.lifecycle"]
         await self._producer.publish(exchange, event)
 
     async def adapter_errored(self, adapter_id: str, error: str) -> None:
-        event = self._envelope("adapter.errored", {
-            "adapter_id": adapter_id,
-            "error": error,
-        })
+        event = self._envelope(
+            "adapter.errored",
+            {
+                "adapter_id": adapter_id,
+                "error": error,
+            },
+        )
         exchange = FORGE_EXCHANGES["adapter.lifecycle"]
         await self._producer.publish(exchange, event)
 
@@ -90,14 +102,21 @@ class ForgeEventPublisher:
     # ------------------------------------------------------------------
 
     async def record_ingested(
-        self, adapter_id: str, *, count: int, batch_id: str = "",
+        self,
+        adapter_id: str,
+        *,
+        count: int,
+        batch_id: str = "",
     ) -> None:
         """Publish a record-ingestion summary event."""
-        event = self._envelope("ingestion.batch", {
-            "adapter_id": adapter_id,
-            "count": count,
-            "batch_id": batch_id,
-        })
+        event = self._envelope(
+            "ingestion.batch",
+            {
+                "adapter_id": adapter_id,
+                "count": count,
+                "batch_id": batch_id,
+            },
+        )
         exchange = FORGE_EXCHANGES["ingestion.raw"]
         await self._producer.publish(exchange, event)
 
@@ -114,15 +133,20 @@ class ForgeEventPublisher:
         entity_id: str = "",
     ) -> None:
         """Publish a governance violation event."""
-        event = self._envelope("governance.violation", {
-            "rule_name": rule_name,
-            "severity": severity,
-            "detail": detail,
-            "entity_id": entity_id,
-        })
+        event = self._envelope(
+            "governance.violation",
+            {
+                "rule_name": rule_name,
+                "severity": severity,
+                "detail": detail,
+                "entity_id": entity_id,
+            },
+        )
         exchange = FORGE_EXCHANGES["governance.events"]
         await self._producer.publish(
-            exchange, event, routing_key=f"governance.{severity}",
+            exchange,
+            event,
+            routing_key=f"governance.{severity}",
         )
 
     # ------------------------------------------------------------------
@@ -130,24 +154,35 @@ class ForgeEventPublisher:
     # ------------------------------------------------------------------
 
     async def product_published(
-        self, product_id: str, name: str, owner: str,
+        self,
+        product_id: str,
+        name: str,
+        owner: str,
     ) -> None:
         """Publish a data-product publication event."""
-        event = self._envelope("curation.product.published", {
-            "product_id": product_id,
-            "name": name,
-            "owner": owner,
-        })
+        event = self._envelope(
+            "curation.product.published",
+            {
+                "product_id": product_id,
+                "name": name,
+                "owner": owner,
+            },
+        )
         exchange = FORGE_EXCHANGES["curation.products"]
         await self._producer.publish(exchange, event)
 
     async def product_deprecated(
-        self, product_id: str, reason: str = "",
+        self,
+        product_id: str,
+        reason: str = "",
     ) -> None:
-        event = self._envelope("curation.product.deprecated", {
-            "product_id": product_id,
-            "reason": reason,
-        })
+        event = self._envelope(
+            "curation.product.deprecated",
+            {
+                "product_id": product_id,
+                "reason": reason,
+            },
+        )
         exchange = FORGE_EXCHANGES["curation.products"]
         await self._producer.publish(exchange, event)
 

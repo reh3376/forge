@@ -32,9 +32,7 @@ class TestTraceMiddleware:
         assert "X-Trace-ID" in resp.headers
 
     def test_preserves_incoming_trace_id(self, client: TestClient):
-        resp = client.get(
-            "/healthz", headers={"X-Trace-ID": "my-trace-123"}
-        )
+        resp = client.get("/healthz", headers={"X-Trace-ID": "my-trace-123"})
         assert resp.headers["X-Trace-ID"] == "my-trace-123"
 
     def test_adds_response_time(self, client: TestClient):

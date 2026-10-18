@@ -88,10 +88,7 @@ def build_contextual_record(
     now = datetime.now(tz=UTC)
 
     # The scan event payload is the full event minus internal fields
-    payload = {
-        k: v for k, v in scan_event.items()
-        if k not in ("_routed_to",) and v is not None
-    }
+    payload = {k: v for k, v in scan_event.items() if k not in ("_routed_to",) and v is not None}
 
     return ContextualRecord(
         source=RecordSource(

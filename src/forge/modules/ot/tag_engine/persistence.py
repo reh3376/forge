@@ -25,17 +25,19 @@ from __future__ import annotations
 
 import json
 import logging
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import TypeAdapter
 
 from forge.modules.ot.tag_engine.models import (
     MemoryTag,
     TagUnion,
-    TagValue,
 )
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 

@@ -9,16 +9,16 @@ from forge.adapters.whk_cmms.mappers.equipment import (
     map_work_order_type,
     map_work_request_type,
 )
-from forge.adapters.whk_cmms.mappers.maintenance import (
-    map_work_order,
-    map_work_request,
-)
 from forge.adapters.whk_cmms.mappers.inventory import (
+    map_inventory_investigation,
+    map_inventory_location,
     map_item,
     map_kit,
     map_vendor,
-    map_inventory_location,
-    map_inventory_investigation,
+)
+from forge.adapters.whk_cmms.mappers.maintenance import (
+    map_work_order,
+    map_work_request,
 )
 
 
@@ -317,7 +317,10 @@ class TestMapVendor:
             "contactInformation": {"phone": "555-1234", "email": "support@tanks.com"},
         }
         vendor = map_vendor(raw)
-        assert vendor.metadata["contact_information"] == {"phone": "555-1234", "email": "support@tanks.com"}
+        assert vendor.metadata["contact_information"] == {
+            "phone": "555-1234",
+            "email": "support@tanks.com",
+        }
 
 
 class TestMapInventoryLocation:
@@ -358,7 +361,12 @@ class TestMapInventoryLocation:
 class TestMapInventoryInvestigation:
     """Test InventoryInvestigation → OperationalEvent mapping."""
 
-    @pytest.mark.skip(reason="OperationalEvent requires entity_type, entity_id, event_time - mapper needs enhancement")
+    @pytest.mark.skip(
+        reason=(
+            "OperationalEvent requires entity_type, entity_id, event_time - "
+            "mapper needs enhancement"
+        )
+    )
     def test_basic_mapping(self):
         raw = {
             "globalId": "INVEST-2026-001",
@@ -381,7 +389,12 @@ class TestMapInventoryInvestigation:
         event = map_inventory_investigation(raw)
         assert event is None
 
-    @pytest.mark.skip(reason="OperationalEvent requires entity_type, entity_id, event_time - mapper needs enhancement")
+    @pytest.mark.skip(
+        reason=(
+            "OperationalEvent requires entity_type, entity_id, event_time - "
+            "mapper needs enhancement"
+        )
+    )
     def test_investigation_discrepancy(self):
         raw = {
             "globalId": "INVEST-2026-001",
@@ -391,7 +404,12 @@ class TestMapInventoryInvestigation:
         event = map_inventory_investigation(raw)
         assert event.metadata["discrepancy"] == 4
 
-    @pytest.mark.skip(reason="OperationalEvent requires entity_type, entity_id, event_time - mapper needs enhancement")
+    @pytest.mark.skip(
+        reason=(
+            "OperationalEvent requires entity_type, entity_id, event_time - "
+            "mapper needs enhancement"
+        )
+    )
     def test_investigation_discrepancy_zero(self):
         raw = {
             "globalId": "INVEST-2026-001",
@@ -401,7 +419,12 @@ class TestMapInventoryInvestigation:
         event = map_inventory_investigation(raw)
         assert event.metadata["discrepancy"] == 0
 
-    @pytest.mark.skip(reason="OperationalEvent requires entity_type, entity_id, event_time - mapper needs enhancement")
+    @pytest.mark.skip(
+        reason=(
+            "OperationalEvent requires entity_type, entity_id, event_time - "
+            "mapper needs enhancement"
+        )
+    )
     def test_investigation_discrepancy_missing_counts(self):
         raw = {
             "globalId": "INVEST-2026-001",

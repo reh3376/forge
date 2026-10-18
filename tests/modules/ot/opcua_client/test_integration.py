@@ -21,7 +21,6 @@ Requirements:
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
 
 import pytest
 import pytest_asyncio
@@ -36,7 +35,7 @@ from forge.modules.ot.opcua_client import (
     QualityCode,
 )
 from forge.modules.ot.opcua_client.exceptions import (
-    EndpointUnreachable,
+    EndpointUnreachableError,
     WriteError,
 )
 
@@ -171,12 +170,12 @@ class TestConnectionLifecycle:
 
     @pytest.mark.asyncio
     async def test_connect_to_unreachable_endpoint(self):
-        """Connecting to a dead endpoint raises EndpointUnreachable."""
+        """Connecting to a dead endpoint raises EndpointUnreachableError."""
         c = OpcUaClient(
             endpoint="opc.tcp://127.0.0.1:19999/nonexistent",
             request_timeout_ms=2_000,
         )
-        with pytest.raises(EndpointUnreachable):
+        with pytest.raises(EndpointUnreachableError):
             await c.connect()
         assert c.state == ConnectionState.FAILED
 
@@ -214,7 +213,13 @@ class TestBrowseService:
         results = await client.browse(folder_nid)
 
         for r in results:
-            if r.browse_name in {"Temperature", "Pressure", "MotorRunning", "Counter", "StatusMessage"}:
+            if r.browse_name in {
+                "Temperature",
+                "Pressure",
+                "MotorRunning",
+                "Counter",
+                "StatusMessage",
+            }:
                 assert r.node_class == NodeClass.VARIABLE, (
                     f"{r.browse_name} should be VARIABLE, got {r.node_class}"
                 )
@@ -226,10 +231,14 @@ class TestBrowseService:
         results = await client.browse(folder_nid)
 
         for r in results:
-            if r.browse_name in {"Temperature", "Pressure", "MotorRunning", "Counter", "StatusMessage"}:
-                assert r.data_type is not None, (
-                    f"{r.browse_name} should have a data_type"
-                )
+            if r.browse_name in {
+                "Temperature",
+                "Pressure",
+                "MotorRunning",
+                "Counter",
+                "StatusMessage",
+            }:
+                assert r.data_type is not None, f"{r.browse_name} should have a data_type"
 
     @pytest.mark.asyncio
     async def test_browse_with_node_class_filter(self, client, opcua_server):

@@ -6,7 +6,7 @@ and trust store management.
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -22,6 +22,8 @@ from forge.modules.ot.opcua_client.security import (
     load_certificate_pair,
 )
 
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # SecurityPolicy

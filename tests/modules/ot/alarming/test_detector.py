@@ -9,18 +9,18 @@ Covers:
 - Static condition checker
 """
 
-import pytest
 import time
-from unittest.mock import AsyncMock, patch
 
+import pytest
+
+from forge.modules.ot.alarming.detector import AlarmDetector
+from forge.modules.ot.alarming.engine import AlarmEngine
 from forge.modules.ot.alarming.models import (
     AlarmConfig,
     AlarmPriority,
     AlarmType,
     ThresholdConfig,
 )
-from forge.modules.ot.alarming.engine import AlarmEngine
-from forge.modules.ot.alarming.detector import AlarmDetector
 
 
 @pytest.fixture
@@ -164,9 +164,7 @@ class TestRateOfChange:
         assert len(events) >= 1
 
     @pytest.mark.asyncio
-    async def test_roc_no_alarm_below_threshold(
-        self, engine: AlarmEngine, detector: AlarmDetector
-    ):
+    async def test_roc_no_alarm_below_threshold(self, engine: AlarmEngine, detector: AlarmDetector):
         config = AlarmConfig(
             tag_path="test/roc",
             thresholds=[
@@ -189,9 +187,7 @@ class TestRateOfChange:
         assert len(events) == 0
 
     @pytest.mark.asyncio
-    async def test_roc_non_numeric_ignored(
-        self, engine: AlarmEngine, detector: AlarmDetector
-    ):
+    async def test_roc_non_numeric_ignored(self, engine: AlarmEngine, detector: AlarmDetector):
         config = AlarmConfig(
             tag_path="test/roc",
             thresholds=[
@@ -214,9 +210,7 @@ class TestRateOfChange:
 
 class TestCommAlarms:
     @pytest.mark.asyncio
-    async def test_comm_failure_creates_alarm(
-        self, engine: AlarmEngine, detector: AlarmDetector
-    ):
+    async def test_comm_failure_creates_alarm(self, engine: AlarmEngine, detector: AlarmDetector):
         event = await detector.report_comm_failure("PLC-01", "Timeout")
         assert event is not None or "PLC-01" in detector._comm_alarms
 
@@ -224,9 +218,7 @@ class TestCommAlarms:
         assert len(active) == 1
 
     @pytest.mark.asyncio
-    async def test_comm_failure_dedup(
-        self, engine: AlarmEngine, detector: AlarmDetector
-    ):
+    async def test_comm_failure_dedup(self, engine: AlarmEngine, detector: AlarmDetector):
         await detector.report_comm_failure("PLC-01", "Timeout")
         await detector.report_comm_failure("PLC-01", "Timeout again")
 
@@ -234,9 +226,7 @@ class TestCommAlarms:
         assert len(active) == 1  # Not duplicated
 
     @pytest.mark.asyncio
-    async def test_comm_restore_clears(
-        self, engine: AlarmEngine, detector: AlarmDetector
-    ):
+    async def test_comm_restore_clears(self, engine: AlarmEngine, detector: AlarmDetector):
         await detector.report_comm_failure("PLC-01", "Timeout")
         result = await detector.report_comm_restore("PLC-01")
         assert result is True
@@ -259,9 +249,7 @@ class TestCommAlarms:
 
 class TestDelayTimer:
     @pytest.mark.asyncio
-    async def test_delayed_alarm_not_immediate(
-        self, engine: AlarmEngine, detector: AlarmDetector
-    ):
+    async def test_delayed_alarm_not_immediate(self, engine: AlarmEngine, detector: AlarmDetector):
         config = AlarmConfig(
             tag_path="test/delayed",
             thresholds=[

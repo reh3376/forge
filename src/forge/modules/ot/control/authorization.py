@@ -76,9 +76,7 @@ class WriteAuthorizer:
 
     # -- Authorization -------------------------------------------------------
 
-    def authorize(
-        self, request: WriteRequest, result: WriteResult
-    ) -> WriteResult:
+    def authorize(self, request: WriteRequest, result: WriteResult) -> WriteResult:
         """Check write authorization.  Mutates and returns *result*.
 
         Iterates all permissions — if any match, the write is authorized.
@@ -112,7 +110,4 @@ class WriteAuthorizer:
             return False
 
         # Requestor's role must be ≥ the permission's minimum role
-        if not request.role.has_authority_over(perm.min_role):
-            return False
-
-        return True
+        return request.role.has_authority_over(perm.min_role)

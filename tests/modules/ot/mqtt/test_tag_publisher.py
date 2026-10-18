@@ -3,15 +3,14 @@
 import pytest
 
 from forge.modules.ot.mqtt.publisher import MqttConfig, OTMqttPublisher
-from forge.modules.ot.mqtt.topic_router import TopicRouter
 from forge.modules.ot.mqtt.tag_publisher import (
     TagPublisher,
-    build_tag_payload,
-    build_health_payload,
-    build_equipment_payload,
     build_alarm_payload,
+    build_equipment_payload,
+    build_health_payload,
+    build_tag_payload,
 )
-
+from forge.modules.ot.mqtt.topic_router import TopicRouter
 
 # ---------------------------------------------------------------------------
 # Payload builders
@@ -19,7 +18,6 @@ from forge.modules.ot.mqtt.tag_publisher import (
 
 
 class TestPayloadBuilders:
-
     def test_tag_payload_minimal(self):
         p = build_tag_payload("TIT/Out_PV", 78.4, "GOOD", "2026-04-08T12:00:00Z")
         assert p["tag"] == "TIT/Out_PV"
@@ -30,8 +28,13 @@ class TestPayloadBuilders:
 
     def test_tag_payload_full(self):
         p = build_tag_payload(
-            "TIT/Out_PV", 78.4, "GOOD", "2026-04-08T12:00:00Z",
-            engineering_units="degF", equipment_id="EQ001", area="Distillery01",
+            "TIT/Out_PV",
+            78.4,
+            "GOOD",
+            "2026-04-08T12:00:00Z",
+            engineering_units="degF",
+            equipment_id="EQ001",
+            area="Distillery01",
         )
         assert p["eu"] == "degF"
         assert p["eid"] == "EQ001"
@@ -52,8 +55,14 @@ class TestPayloadBuilders:
 
     def test_alarm_payload(self):
         p = build_alarm_payload(
-            "a1", "HIGH_TEMP", "ACTIVE", "CRITICAL",
-            "TIT/Out_PV", 185.0, 180.0, "2026-04-08T12:00:00Z",
+            "a1",
+            "HIGH_TEMP",
+            "ACTIVE",
+            "CRITICAL",
+            "TIT/Out_PV",
+            185.0,
+            180.0,
+            "2026-04-08T12:00:00Z",
         )
         assert p["name"] == "HIGH_TEMP"
         assert p["priority"] == "CRITICAL"
@@ -67,7 +76,6 @@ class TestPayloadBuilders:
 
 
 class TestTagPublisher:
-
     @pytest.fixture
     async def setup(self):
         pub = OTMqttPublisher(MqttConfig(reconnect_enabled=False))
@@ -82,7 +90,8 @@ class TestTagPublisher:
         tag_pub, mqtt_pub = setup
         result = await tag_pub.publish_tag_change(
             tag_path="Distillery01/TIT_2010/Out_PV",
-            value=78.4, quality="GOOD",
+            value=78.4,
+            quality="GOOD",
             timestamp="2026-04-08T12:00:00Z",
             area="Distillery01",
         )
@@ -92,31 +101,39 @@ class TestTagPublisher:
 
     @pytest.mark.asyncio
     async def test_publish_health(self, setup):
-        tag_pub, mqtt_pub = setup
+        tag_pub, _mqtt_pub = setup
         result = await tag_pub.publish_health(
-            plc_id="PLC_001", connected=True,
-            area="Distillery01", latency_ms=5.2,
+            plc_id="PLC_001",
+            connected=True,
+            area="Distillery01",
+            latency_ms=5.2,
         )
         assert result is True
         assert tag_pub.get_stats()["health_publishes"] == 1
 
     @pytest.mark.asyncio
     async def test_publish_equipment_status(self, setup):
-        tag_pub, mqtt_pub = setup
+        tag_pub, _mqtt_pub = setup
         result = await tag_pub.publish_equipment_status(
-            equipment_id="CIP_001", field_name="cipState",
-            value="RUNNING", area="Distillery01",
+            equipment_id="CIP_001",
+            field_name="cipState",
+            value="RUNNING",
+            area="Distillery01",
         )
         assert result is True
         assert tag_pub.get_stats()["equipment_publishes"] == 1
 
     @pytest.mark.asyncio
     async def test_publish_alarm(self, setup):
-        tag_pub, mqtt_pub = setup
+        tag_pub, _mqtt_pub = setup
         result = await tag_pub.publish_alarm(
-            alarm_id="a1", alarm_name="HIGH_TEMP",
-            state="ACTIVE", priority="CRITICAL",
-            tag_path="TIT/Out_PV", value=185.0, setpoint=180.0,
+            alarm_id="a1",
+            alarm_name="HIGH_TEMP",
+            state="ACTIVE",
+            priority="CRITICAL",
+            tag_path="TIT/Out_PV",
+            value=185.0,
+            setpoint=180.0,
             timestamp="2026-04-08T12:00:00Z",
         )
         assert result is True
@@ -127,7 +144,10 @@ class TestTagPublisher:
         tag_pub, mqtt_pub = setup
         for i in range(5):
             await tag_pub.publish_tag_change(
-                f"tag/{i}", float(i), "GOOD", "2026-04-08T12:00:00Z",
+                f"tag/{i}",
+                float(i),
+                "GOOD",
+                "2026-04-08T12:00:00Z",
             )
         stats = tag_pub.get_stats()
         assert stats["tag_publishes"] == 5

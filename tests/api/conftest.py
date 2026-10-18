@@ -1,4 +1,4 @@
-# ruff: noqa: E402, UP017, UP042
+# ruff: noqa: UP017
 """Shared fixtures for Hub API tests."""
 
 from __future__ import annotations
@@ -13,8 +13,10 @@ if not hasattr(_dt_mod, "UTC"):
     _dt_mod.UTC = _dt_mod.timezone.utc
 
 if not hasattr(enum, "StrEnum"):
+
     class StrEnum(str, enum.Enum):
         pass
+
     enum.StrEnum = StrEnum
 
 # Ensure src/ is importable

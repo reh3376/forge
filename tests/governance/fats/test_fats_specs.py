@@ -68,9 +68,7 @@ class TestFatsSpecsExist:
         assert len(SPEC_FILES) >= 21
 
 
-@pytest.mark.parametrize(
-    "spec_file", SPEC_FILES, ids=[f.stem for f in SPEC_FILES]
-)
+@pytest.mark.parametrize("spec_file", SPEC_FILES, ids=[f.stem for f in SPEC_FILES])
 class TestFatsSpecValidation:
     """Validate each spec file against the FATS JSON schema."""
 
@@ -83,9 +81,8 @@ class TestFatsSpecValidation:
         """Spec file must conform to fats.schema.json."""
         data = json.loads(spec_file.read_text())
         errors = list(validator.iter_errors(data))
-        assert errors == [], (
-            f"{spec_file.name} schema violations: "
-            + "; ".join(e.message for e in errors)
+        assert errors == [], f"{spec_file.name} schema violations: " + "; ".join(
+            e.message for e in errors
         )
 
     def test_spec_version(self, spec_file: Path):

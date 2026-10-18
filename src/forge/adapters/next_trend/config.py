@@ -4,6 +4,7 @@ The adapter connects to NextTrend's REST API for tag metadata,
 history queries, and live SSE streaming. Auth is either API key
 (preferred for machine-to-machine) or JWT (username/password).
 """
+
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -70,14 +71,13 @@ class NextTrendConfig(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     @model_validator(mode="after")
-    def _check_auth(self) -> "NextTrendConfig":
+    def _check_auth(self) -> NextTrendConfig:
         """Ensure at least one authentication method is provided."""
         has_api_key = bool(self.api_key)
         has_jwt = bool(self.username and self.password)
         if not has_api_key and not has_jwt:
             msg = (
-                "NextTrend adapter requires either api_key or "
-                "username+password for authentication."
+                "NextTrend adapter requires either api_key or username+password for authentication."
             )
             raise ValueError(msg)
         return self

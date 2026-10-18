@@ -65,9 +65,7 @@ class TestContextEnricher:
 
     @pytest.mark.asyncio
     async def test_does_not_overwrite_existing_site(self, enricher, equipment_store):
-        await equipment_store.save(
-            Equipment(equipment_id="E1", name="E1", site="Other-Site")
-        )
+        await equipment_store.save(Equipment(equipment_id="E1", name="E1", site="Other-Site"))
         ctx = RecordContext(equipment_id="E1", site="Original-Site")
         result = await enricher.enrich(ctx)
         assert result.context.site == "Original-Site"
@@ -82,9 +80,7 @@ class TestContextEnricher:
 
     @pytest.mark.asyncio
     async def test_enriches_batch(self, enricher, equipment_store, batch_store):
-        await equipment_store.save(
-            Equipment(equipment_id="E1", name="E1", site="S")
-        )
+        await equipment_store.save(Equipment(equipment_id="E1", name="E1", site="S"))
         await batch_store.save(
             Batch(
                 batch_id="B001",
@@ -133,9 +129,7 @@ class TestContextEnricher:
 
     @pytest.mark.asyncio
     async def test_enriches_mode_from_store(self, enricher, mode_store):
-        await mode_store.set_mode(
-            ModeState(equipment_id="E1", mode=OperatingMode.CIP)
-        )
+        await mode_store.set_mode(ModeState(equipment_id="E1", mode=OperatingMode.CIP))
         ctx = RecordContext(equipment_id="E1")
         result = await enricher.enrich(ctx)
         assert result.context.operating_mode == "CIP"
@@ -143,9 +137,7 @@ class TestContextEnricher:
 
     @pytest.mark.asyncio
     async def test_infers_mode_from_batch(self, enricher, equipment_store, batch_store):
-        await equipment_store.save(
-            Equipment(equipment_id="E1", name="E1", site="S")
-        )
+        await equipment_store.save(Equipment(equipment_id="E1", name="E1", site="S"))
         await batch_store.save(Batch(batch_id="B1", equipment_id="E1"))
         ctx = RecordContext(equipment_id="E1")
         result = await enricher.enrich(ctx)
@@ -153,9 +145,7 @@ class TestContextEnricher:
 
     @pytest.mark.asyncio
     async def test_infers_idle_no_batch(self, enricher, equipment_store):
-        await equipment_store.save(
-            Equipment(equipment_id="E1", name="E1", site="S")
-        )
+        await equipment_store.save(Equipment(equipment_id="E1", name="E1", site="S"))
         ctx = RecordContext(equipment_id="E1")
         result = await enricher.enrich(ctx)
         assert result.context.operating_mode == "IDLE"
@@ -171,15 +161,9 @@ class TestContextEnricher:
         from zoneinfo import ZoneInfo
 
         lou = ZoneInfo("America/Kentucky/Louisville")
-        await equipment_store.save(
-            Equipment(equipment_id="E1", name="E1", site="S", area="A")
-        )
-        await batch_store.save(
-            Batch(batch_id="B1", equipment_id="E1", lot_id="L1", recipe_id="R1")
-        )
-        await mode_store.set_mode(
-            ModeState(equipment_id="E1", mode=OperatingMode.PRODUCTION)
-        )
+        await equipment_store.save(Equipment(equipment_id="E1", name="E1", site="S", area="A"))
+        await batch_store.save(Batch(batch_id="B1", equipment_id="E1", lot_id="L1", recipe_id="R1"))
+        await mode_store.set_mode(ModeState(equipment_id="E1", mode=OperatingMode.PRODUCTION))
         ctx = RecordContext(equipment_id="E1")
         ts = datetime(2026, 4, 15, 10, 0, 0, tzinfo=lou)
         result = await enricher.enrich(ctx, source_time=ts)

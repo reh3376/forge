@@ -1,11 +1,8 @@
 """Tests for the forge.util SDK module."""
 
-import asyncio
-
 import pytest
 
 from forge.sdk.scripting.modules.util import UtilModule
-
 
 # ---------------------------------------------------------------------------
 # JSON
@@ -32,7 +29,7 @@ class TestJSON:
         assert result == {"key": "value"}
 
     def test_json_decode_array(self):
-        result = self.um.json_decode('[1, 2, 3]')
+        result = self.um.json_decode("[1, 2, 3]")
         assert result == [1, 2, 3]
 
     def test_json_roundtrip(self):
@@ -75,6 +72,7 @@ class TestEnvironment:
 
     def test_get_property_from_env(self):
         import os
+
         os.environ["FORGE_TEST_VAR"] = "test_value"
         um = UtilModule()
         assert um.get_property("FORGE_TEST_VAR") == "test_value"

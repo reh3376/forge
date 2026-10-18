@@ -2,15 +2,12 @@
 
 from __future__ import annotations
 
-import asyncio
-from datetime import datetime, timezone
 from typing import Any
 
 import pytest
 
 from forge.modules.ot.bridge.client import IgnitionRestClient, _chunk, _parse_tag_response
 from forge.modules.ot.bridge.models import BridgeConfig, IgnitionQuality
-
 
 # ---------------------------------------------------------------------------
 # Mock HTTP transport
@@ -118,8 +115,18 @@ class TestParseTagResponse:
         paths = ["[WHK01]tag1", "[WHK01]tag2"]
         response = {
             "results": [
-                {"value": 72.5, "quality": "Good", "timestamp": 1712678400000, "dataType": "Float8"},
-                {"value": True, "quality": "Good", "timestamp": 1712678400000, "dataType": "Boolean"},
+                {
+                    "value": 72.5,
+                    "quality": "Good",
+                    "timestamp": 1712678400000,
+                    "dataType": "Float8",
+                },
+                {
+                    "value": True,
+                    "quality": "Good",
+                    "timestamp": 1712678400000,
+                    "dataType": "Boolean",
+                },
             ]
         }
         values = _parse_tag_response(paths, response)
@@ -170,7 +177,7 @@ class TestIgnitionRestClient:
     @pytest.mark.asyncio
     async def test_connect_anonymous(self):
         """Anonymous connection (no username) succeeds immediately."""
-        client, transport = self._make_client(username="", password="")
+        client, _transport = self._make_client(username="", password="")
         result = await client.connect()
         assert result is True
         assert client.is_connected
@@ -178,9 +185,7 @@ class TestIgnitionRestClient:
     @pytest.mark.asyncio
     async def test_connect_with_auth(self):
         """Authenticated connection stores session token."""
-        client, transport = self._make_client(
-            username="admin", password="secret"
-        )
+        client, transport = self._make_client(username="admin", password="secret")
         transport.set_post_response({"token": "test-session-123"})
         result = await client.connect()
         assert result is True
@@ -190,9 +195,7 @@ class TestIgnitionRestClient:
     @pytest.mark.asyncio
     async def test_connect_failure(self):
         """Connection failure returns False."""
-        client, transport = self._make_client(
-            username="admin", password="secret"
-        )
+        client, transport = self._make_client(username="admin", password="secret")
         transport.set_fail_after(0)  # Fail immediately
         result = await client.connect()
         assert result is False
@@ -215,12 +218,14 @@ class TestIgnitionRestClient:
         transport.set_post_response({})
         await client.connect()
 
-        transport.set_post_response({
-            "results": [
-                {"value": 72.5, "quality": "Good", "timestamp": 1712678400000},
-                {"value": 23.1, "quality": "Good", "timestamp": 1712678400000},
-            ]
-        })
+        transport.set_post_response(
+            {
+                "results": [
+                    {"value": 72.5, "quality": "Good", "timestamp": 1712678400000},
+                    {"value": 23.1, "quality": "Good", "timestamp": 1712678400000},
+                ]
+            }
+        )
         response = await client.read_tags(["[WHK01]tag1", "[WHK01]tag2"])
         assert len(response.values) == 2
         assert response.values[0].value == 72.5
@@ -242,9 +247,9 @@ class TestIgnitionRestClient:
         transport.set_post_response({})
         await client.connect()
 
-        transport.set_post_response({
-            "results": [{"value": i, "quality": "Good"} for i in range(2)]
-        })
+        transport.set_post_response(
+            {"results": [{"value": i, "quality": "Good"} for i in range(2)]}
+        )
         response = await client.read_tags(["tag1", "tag2", "tag3"])
         # Should have made 2 batch requests (2 + 1)
         assert len(response.values) >= 2
@@ -256,12 +261,24 @@ class TestIgnitionRestClient:
         transport.set_post_response({})
         await client.connect()
 
-        transport.set_get_response({
-            "nodes": [
-                {"name": "Distillery01", "path": "[WHK01]Distillery01", "tagType": "Folder", "hasChildren": True},
-                {"name": "TIT_2010", "path": "[WHK01]TIT_2010", "tagType": "AtomicTag", "hasChildren": False},
-            ]
-        })
+        transport.set_get_response(
+            {
+                "nodes": [
+                    {
+                        "name": "Distillery01",
+                        "path": "[WHK01]Distillery01",
+                        "tagType": "Folder",
+                        "hasChildren": True,
+                    },
+                    {
+                        "name": "TIT_2010",
+                        "path": "[WHK01]TIT_2010",
+                        "tagType": "AtomicTag",
+                        "hasChildren": False,
+                    },
+                ]
+            }
+        )
         results = await client.browse("[WHK01]", recursive=False)
         assert len(results) == 2
         assert results[0]["name"] == "Distillery01"
@@ -274,11 +291,13 @@ class TestIgnitionRestClient:
         transport.set_post_response({})
         await client.connect()
 
-        transport.set_get_response({
-            "gatewayName": "WHK01-Gateway",
-            "version": "8.1.33",
-            "uptime": 86400,
-        })
+        transport.set_get_response(
+            {
+                "gatewayName": "WHK01-Gateway",
+                "version": "8.1.33",
+                "uptime": 86400,
+            }
+        )
         status = await client.get_status()
         assert status["version"] == "8.1.33"
 
@@ -296,9 +315,7 @@ class TestIgnitionRestClient:
     @pytest.mark.asyncio
     async def test_auth_headers_included(self):
         """Session token included in request headers."""
-        client, transport = self._make_client(
-            username="admin", password="secret"
-        )
+        client, transport = self._make_client(username="admin", password="secret")
         transport.set_post_response({"token": "my-token"})
         await client.connect()
 

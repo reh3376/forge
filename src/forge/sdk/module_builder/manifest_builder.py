@@ -31,7 +31,6 @@ import json
 from pathlib import Path
 from typing import Any
 
-
 # Valid tiers and capability names from the proven adapter pattern
 _VALID_TIERS = {"OT", "MES_MOM", "ERP_BUSINESS", "HISTORIAN", "DOCUMENT"}
 _VALID_CAPABILITIES = {"read", "write", "subscribe", "backfill", "discover"}

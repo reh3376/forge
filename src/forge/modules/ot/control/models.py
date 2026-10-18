@@ -23,9 +23,8 @@ from __future__ import annotations
 import enum
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
-
 
 # ---------------------------------------------------------------------------
 # Enums
@@ -112,7 +111,7 @@ class DataType(str, enum.Enum):
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _new_id() -> str:
@@ -326,19 +325,34 @@ class TagWriteConfig:
         try:
             coerced = _coerce_value(value, self.data_type)
         except (TypeError, ValueError) as e:
-            return False, f"Type error: cannot coerce {type(value).__name__} to {self.data_type.value}: {e}"
+            return (
+                False,
+                f"Type error: cannot coerce {type(value).__name__} to {self.data_type.value}: {e}",
+            )
 
         # Range check (numeric types only)
-        if self.data_type in (DataType.FLOAT, DataType.DOUBLE, DataType.INT16, DataType.INT32, DataType.INT64):
+        if self.data_type in (
+            DataType.FLOAT,
+            DataType.DOUBLE,
+            DataType.INT16,
+            DataType.INT32,
+            DataType.INT64,
+        ):
             try:
                 fval = float(coerced)
             except (TypeError, ValueError):
                 return True, ""  # Non-numeric after coercion — skip range check
 
             if self.min_value is not None and fval < self.min_value:
-                return False, f"Value {fval} below minimum {self.min_value} {self.engineering_units}".strip()
+                return (
+                    False,
+                    f"Value {fval} below minimum {self.min_value} {self.engineering_units}".strip(),
+                )
             if self.max_value is not None and fval > self.max_value:
-                return False, f"Value {fval} above maximum {self.max_value} {self.engineering_units}".strip()
+                return (
+                    False,
+                    f"Value {fval} above maximum {self.max_value} {self.engineering_units}".strip(),
+                )
 
         return True, ""
 

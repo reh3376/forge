@@ -53,9 +53,7 @@ def install_error_handlers(app: FastAPI) -> None:
     """Register global exception handlers that return RFC 7807 responses."""
 
     @app.exception_handler(StarletteHTTPException)
-    async def _http_exception(
-        request: Request, exc: StarletteHTTPException
-    ) -> JSONResponse:
+    async def _http_exception(request: Request, exc: StarletteHTTPException) -> JSONResponse:
         detail = exc.detail if isinstance(exc.detail, str) else str(exc.detail)
         return problem_response(
             status=exc.status_code,
@@ -65,9 +63,7 @@ def install_error_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(RequestValidationError)
-    async def _validation_error(
-        request: Request, exc: RequestValidationError
-    ) -> JSONResponse:
+    async def _validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
         # Sanitize errors: convert any bytes values to strings for JSON safety
         errors = _sanitize_for_json(exc.errors())
         return problem_response(
@@ -80,9 +76,7 @@ def install_error_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(Exception)
-    async def _unhandled(
-        request: Request, exc: Exception
-    ) -> JSONResponse:
+    async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
         logger.exception("Unhandled exception on %s", request.url.path)
         return problem_response(
             status=500,

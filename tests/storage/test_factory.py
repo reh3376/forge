@@ -15,7 +15,10 @@ from forge.storage.pool import PoolManager
 
 
 def _make_pool_manager(
-    postgres=None, timescale=None, neo4j=None, redis=None,
+    postgres=None,
+    timescale=None,
+    neo4j=None,
+    redis=None,
 ) -> PoolManager:
     """Create a PoolManager with specific pools pre-set."""
     pm = MagicMock(spec=PoolManager)

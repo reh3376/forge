@@ -85,13 +85,17 @@ class TransportChannel(ABC):
 
     @abstractmethod
     async def send_unary(
-        self, method: str, request: dict[str, Any],
+        self,
+        method: str,
+        request: dict[str, Any],
     ) -> dict[str, Any]:
         """Send a unary RPC and return the response dict."""
 
     @abstractmethod
     async def send_stream(
-        self, method: str, records: AsyncIterator[dict[str, Any]],
+        self,
+        method: str,
+        records: AsyncIterator[dict[str, Any]],
     ) -> None:
         """Send a client-streaming RPC with a stream of record dicts."""
 
@@ -100,7 +104,9 @@ class TransportChannel(ABC):
         """Close the channel."""
 
     def receive_stream(
-        self, method: str, request: dict[str, Any],
+        self,
+        method: str,
+        request: dict[str, Any],
     ) -> AsyncIterator[dict[str, Any]]:
         """Open a server-streaming RPC (``Backfill``, ``Subscribe``, ``Collect``)
         and yield response dicts (FB-061, FB-071).
@@ -146,7 +152,8 @@ class SpokeClient:
         """
         manifest_dict = pydantic_to_proto(manifest)
         response = await self.channel.send_unary(
-            "Register", {"manifest": manifest_dict},
+            "Register",
+            {"manifest": manifest_dict},
         )
         if not response.get("accepted"):
             msg = f"Registration rejected: {response.get('message')}"
@@ -155,7 +162,8 @@ class SpokeClient:
         self._adapter_id = manifest.adapter_id
         logger.info(
             "Registered with hub: adapter=%s session=%s",
-            manifest.adapter_id, self._session_id,
+            manifest.adapter_id,
+            self._session_id,
         )
         return self._session_id
 
@@ -164,11 +172,14 @@ class SpokeClient:
         if self._session_id is None:
             msg = "Not registered — call register() first"
             raise RuntimeError(msg)
-        response = await self.channel.send_unary("Configure", {
-            "adapter_id": self._adapter_id,
-            "session_id": self._session_id,
-            "params": params,
-        })
+        response = await self.channel.send_unary(
+            "Configure",
+            {
+                "adapter_id": self._adapter_id,
+                "session_id": self._session_id,
+                "params": params,
+            },
+        )
         if not response.get("success"):
             msg = f"Configure failed: {response.get('message')}"
             raise RuntimeError(msg)
@@ -178,10 +189,13 @@ class SpokeClient:
         if self._session_id is None:
             msg = "Not registered — call register() first"
             raise RuntimeError(msg)
-        response = await self.channel.send_unary("Start", {
-            "adapter_id": self._adapter_id,
-            "session_id": self._session_id,
-        })
+        response = await self.channel.send_unary(
+            "Start",
+            {
+                "adapter_id": self._adapter_id,
+                "session_id": self._session_id,
+            },
+        )
         if not response.get("success"):
             msg = f"Start failed: {response.get('message')}"
             raise RuntimeError(msg)
@@ -190,11 +204,14 @@ class SpokeClient:
         """Stop the adapter. Returns number of records flushed."""
         if self._session_id is None:
             return 0
-        response = await self.channel.send_unary("Stop", {
-            "adapter_id": self._adapter_id,
-            "session_id": self._session_id,
-            "graceful": graceful,
-        })
+        response = await self.channel.send_unary(
+            "Stop",
+            {
+                "adapter_id": self._adapter_id,
+                "session_id": self._session_id,
+                "graceful": graceful,
+            },
+        )
         return response.get("records_flushed", 0)
 
     async def health(self) -> dict[str, Any]:
@@ -202,13 +219,17 @@ class SpokeClient:
         if self._session_id is None:
             msg = "Not registered"
             raise RuntimeError(msg)
-        return await self.channel.send_unary("Health", {
-            "adapter_id": self._adapter_id,
-            "session_id": self._session_id,
-        })
+        return await self.channel.send_unary(
+            "Health",
+            {
+                "adapter_id": self._adapter_id,
+                "session_id": self._session_id,
+            },
+        )
 
     async def stream_records(
-        self, records: AsyncIterator[ContextualRecord],
+        self,
+        records: AsyncIterator[ContextualRecord],
     ) -> int:
         """Stream ContextualRecords to the hub.
 
@@ -254,7 +275,9 @@ class InMemoryChannel(TransportChannel):
         self.metadata = []
 
     async def send_unary(
-        self, method: str, request: dict[str, Any],
+        self,
+        method: str,
+        request: dict[str, Any],
     ) -> dict[str, Any]:
         if self._closed:
             msg = "Channel is closed"
@@ -270,7 +293,8 @@ class InMemoryChannel(TransportChannel):
             )
         if method == "Start":
             return await self._servicer.start(
-                request["adapter_id"], request["session_id"],
+                request["adapter_id"],
+                request["session_id"],
             )
         if method == "Stop":
             return await self._servicer.stop(
@@ -280,7 +304,8 @@ class InMemoryChannel(TransportChannel):
             )
         if method == "Health":
             return await self._servicer.health(
-                request["adapter_id"], request["session_id"],
+                request["adapter_id"],
+                request["session_id"],
             )
         if method == "Unsubscribe":
             handler = getattr(self._servicer, "unsubscribe", None)
@@ -310,7 +335,9 @@ class InMemoryChannel(TransportChannel):
         raise ValueError(msg)
 
     async def send_stream(
-        self, method: str, records: AsyncIterator[dict[str, Any]],
+        self,
+        method: str,
+        records: AsyncIterator[dict[str, Any]],
     ) -> None:
         if self._closed:
             msg = "Channel is closed"
@@ -331,7 +358,9 @@ class InMemoryChannel(TransportChannel):
             raise ValueError(msg)
 
     async def receive_stream(
-        self, method: str, request: dict[str, Any],
+        self,
+        method: str,
+        request: dict[str, Any],
     ) -> AsyncIterator[dict[str, Any]]:
         """Backfill / Subscribe / Collect against a fake spoke exposing
         ``backfill()`` / ``subscribe()`` / ``collect()`` async generators."""

@@ -23,9 +23,8 @@ from __future__ import annotations
 import fnmatch
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -42,8 +41,8 @@ class TopicType(str, Enum):
     HEALTH = "health"
     EQUIPMENT = "equipment"
     ALARM = "alarm"
-    SCRIPT = "script"       # Script-originated publishes
-    SYSTEM = "system"       # Module lifecycle, status
+    SCRIPT = "script"  # Script-originated publishes
+    SYSTEM = "system"  # Module lifecycle, status
 
 
 # ---------------------------------------------------------------------------
@@ -269,15 +268,20 @@ class TopicRouter:
                 continue
             if not fnmatch.fnmatch(area, tmpl.area_pattern):
                 continue
-            if tag_path and tmpl.tag_pattern != "**":
-                if not _match_tag_pattern(tmpl.tag_pattern, tag_path):
-                    continue
+            if (
+                tag_path
+                and tmpl.tag_pattern != "**"
+                and not _match_tag_pattern(tmpl.tag_pattern, tag_path)
+            ):
+                continue
 
             try:
                 topic = tmpl.template.format_map(context)
             except KeyError as exc:
                 logger.warning(
-                    "Topic template missing key %s: %s", exc, tmpl.template,
+                    "Topic template missing key %s: %s",
+                    exc,
+                    tmpl.template,
                 )
                 continue
 

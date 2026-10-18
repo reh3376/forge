@@ -12,13 +12,15 @@ will be wired in when the forge.db SDK module is built (Phase 2B.1.4).
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from forge.modules.ot.opcua_client.types import QualityCode
-from forge.modules.ot.tag_engine.models import QueryTag, TagType
+from forge.modules.ot.tag_engine.models import TagType
 from forge.modules.ot.tag_engine.providers.base import BaseProvider
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +48,10 @@ class QueryProvider(BaseProvider):
             logger.info("QueryProvider: no Query tags found")
             return
 
-        logger.info("QueryProvider: found %d Query tags (poll loops deferred to Phase 2B)", self._query_count)
+        logger.info(
+            "QueryProvider: found %d Query tags (poll loops deferred to Phase 2B)",
+            self._query_count,
+        )
         # Phase 2B: start asyncio.create_task per query tag with poll_interval_ms
 
     async def _stop(self) -> None:
@@ -54,10 +59,8 @@ class QueryProvider(BaseProvider):
         for task in self._poll_tasks.values():
             task.cancel()
         for task in self._poll_tasks.values():
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
         self._poll_tasks.clear()
 
     async def _health(self) -> dict[str, Any]:

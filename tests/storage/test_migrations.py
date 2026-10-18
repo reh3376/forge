@@ -26,6 +26,7 @@ class TestMigrationStructure:
     def test_migration_chain(self):
         """Verify each migration points to the correct predecessor."""
         import sys
+
         sys.path.insert(0, str(VERSIONS_DIR))
 
         chain = {
@@ -39,8 +40,7 @@ class TestMigrationStructure:
         for module_name, expected_down in chain.items():
             mod = importlib.import_module(f"forge.storage.migrations.versions.{module_name}")
             assert mod.down_revision == expected_down, (
-                f"{module_name}: expected down_revision={expected_down}, "
-                f"got {mod.down_revision}"
+                f"{module_name}: expected down_revision={expected_down}, got {mod.down_revision}"
             )
 
     def test_all_have_upgrade_and_downgrade(self):
@@ -49,9 +49,7 @@ class TestMigrationStructure:
             if f.name == "__init__.py":
                 continue
             module_name = f.stem
-            mod = importlib.import_module(
-                f"forge.storage.migrations.versions.{module_name}"
-            )
+            mod = importlib.import_module(f"forge.storage.migrations.versions.{module_name}")
             assert hasattr(mod, "upgrade"), f"{module_name} missing upgrade()"
             assert hasattr(mod, "downgrade"), f"{module_name} missing downgrade()"
             assert callable(mod.upgrade)
@@ -63,9 +61,7 @@ class TestMigrationColumnAlignment:
 
     def test_001_adapters_columns(self):
         """forge_core.adapters should have key adapter columns."""
-        mod = importlib.import_module(
-            "forge.storage.migrations.versions.001_forge_core_schema"
-        )
+        mod = importlib.import_module("forge.storage.migrations.versions.001_forge_core_schema")
         # Verify the migration defines expected tables by checking revision
         assert mod.revision == "001"
         assert mod.down_revision is None
@@ -84,6 +80,7 @@ class TestMigrationColumnAlignment:
         import dataclasses
 
         from forge.curation.lineage import LineageEntry
+
         entry_fields = {f.name for f in dataclasses.fields(LineageEntry)}
         # Key fields that must be in the migration
         required = {"lineage_id", "source_record_ids", "output_record_id", "product_id"}

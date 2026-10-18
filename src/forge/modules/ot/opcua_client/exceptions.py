@@ -5,7 +5,7 @@ reaching for raw logs.  The hierarchy is intentionally shallow:
 
     OpcUaError (base)
     ├── ConnectionError       — TCP/TLS/session establishment
-    │   ├── EndpointUnreachable
+    │   ├── EndpointUnreachableError
     │   ├── SecurityNegotiationError
     │   └── SessionActivationError
     ├── TimeoutError          — Any operation exceeding its deadline
@@ -59,7 +59,7 @@ class OpcUaError(Exception):
 # ---------------------------------------------------------------------------
 
 
-class ConnectionError(OpcUaError):  # noqa: A001 — shadows builtin intentionally
+class ConnectionError(OpcUaError):
     """Failed to establish or maintain an OPC-UA connection.
 
     This shadows the Python builtin ConnectionError on purpose:
@@ -82,7 +82,7 @@ class ConnectionError(OpcUaError):  # noqa: A001 — shadows builtin intentional
         super().__init__(message, detail=detail)
 
 
-class EndpointUnreachable(ConnectionError):
+class EndpointUnreachableError(ConnectionError):
     """TCP connection to the OPC-UA server could not be established.
 
     Common causes: wrong IP/port, firewall rules, PLC powered off,
@@ -111,7 +111,7 @@ class SessionActivationError(ConnectionError):
 # ---------------------------------------------------------------------------
 
 
-class TimeoutError(OpcUaError):  # noqa: A001 — shadows builtin intentionally
+class TimeoutError(OpcUaError):
     """An OPC-UA operation exceeded its configured deadline.
 
     Attributes:
@@ -232,9 +232,7 @@ class MonitoredItemError(SubscriptionError):
     ) -> None:
         self.node_id = node_id
         self.status_code = status_code
-        super().__init__(
-            message, subscription_id=subscription_id, detail=detail
-        )
+        super().__init__(message, subscription_id=subscription_id, detail=detail)
 
 
 # ---------------------------------------------------------------------------

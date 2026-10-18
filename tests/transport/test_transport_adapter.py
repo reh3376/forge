@@ -56,27 +56,33 @@ class TestWmsTransportAdapter:
         assert transport.adapter_id == "whk-wms"
 
     async def test_full_lifecycle_wms(
-        self, servicer: InMemoryServicer, sample_record: ContextualRecord,
+        self,
+        servicer: InMemoryServicer,
+        sample_record: ContextualRecord,
     ) -> None:
         adapter = WhkWmsAdapter()
         channel = InMemoryChannel(servicer)
         transport = GrpcTransportAdapter(adapter=adapter, channel=channel)
 
         await transport.register()
-        await transport.configure({
-            "graphql_url": "http://localhost:3020/graphql",
-            "rabbitmq_url": "amqp://localhost:5672",
-            "azure_tenant_id": "test-tenant",
-            "azure_client_id": "test-client",
-            "azure_client_secret": "test-secret",
-        })
+        await transport.configure(
+            {
+                "graphql_url": "http://localhost:3020/graphql",
+                "rabbitmq_url": "amqp://localhost:5672",
+                "azure_tenant_id": "test-tenant",
+                "azure_client_id": "test-client",
+                "azure_client_secret": "test-secret",
+            }
+        )
         await transport.start()
 
         # Inject test records into the WMS adapter
-        adapter.inject_records([
-            {"id": "test-1", "type": "barrel_event"},
-            {"id": "test-2", "type": "barrel_event"},
-        ])
+        adapter.inject_records(
+            [
+                {"id": "test-1", "type": "barrel_event"},
+                {"id": "test-2", "type": "barrel_event"},
+            ]
+        )
 
         sent = await transport.collect_and_stream()
         assert sent >= 0  # May be 0 if mapper rejects test data
@@ -91,13 +97,15 @@ class TestWmsTransportAdapter:
         transport = GrpcTransportAdapter(adapter=adapter, channel=channel)
 
         await transport.register()
-        await transport.configure({
-            "graphql_url": "http://localhost:3020/graphql",
-            "rabbitmq_url": "amqp://localhost:5672",
-            "azure_tenant_id": "test-tenant",
-            "azure_client_id": "test-client",
-            "azure_client_secret": "test-secret",
-        })
+        await transport.configure(
+            {
+                "graphql_url": "http://localhost:3020/graphql",
+                "rabbitmq_url": "amqp://localhost:5672",
+                "azure_tenant_id": "test-tenant",
+                "azure_client_id": "test-client",
+                "azure_client_secret": "test-secret",
+            }
+        )
         await transport.start()
 
         health = await transport.health()
@@ -126,19 +134,23 @@ class TestMesTransportAdapter:
         transport = GrpcTransportAdapter(adapter=adapter, channel=channel)
 
         await transport.register()
-        await transport.configure({
-            "graphql_url": "http://localhost:3000/graphql",
-            "rabbitmq_url": "amqp://localhost:5672",
-            "azure_tenant_id": "test-tenant",
-            "azure_client_id": "test-client",
-            "azure_client_secret": "test-secret",
-        })
+        await transport.configure(
+            {
+                "graphql_url": "http://localhost:3000/graphql",
+                "rabbitmq_url": "amqp://localhost:5672",
+                "azure_tenant_id": "test-tenant",
+                "azure_client_id": "test-client",
+                "azure_client_secret": "test-secret",
+            }
+        )
         await transport.start()
 
         # Inject test records
-        adapter.inject_records([
-            {"id": "batch-1", "type": "batch_event"},
-        ])
+        adapter.inject_records(
+            [
+                {"id": "batch-1", "type": "batch_event"},
+            ]
+        )
 
         sent = await transport.collect_and_stream()
         assert sent >= 0

@@ -18,7 +18,6 @@ import pytest
 
 from forge.sdk.module_builder.manifest_builder import ManifestBuilder
 
-
 # ---------------------------------------------------------------------------
 # Basic Construction
 # ---------------------------------------------------------------------------
@@ -90,11 +89,7 @@ class TestManifestBuilderFluent:
         assert manifest["data_contract"]["schema_ref"] == "forge://schemas/test/v2.0.0"
 
     def test_schema_ref_override(self):
-        manifest = (
-            ManifestBuilder("test")
-            .schema_ref("forge://custom/schema")
-            .build()
-        )
+        manifest = ManifestBuilder("test").schema_ref("forge://custom/schema").build()
         assert manifest["data_contract"]["schema_ref"] == "forge://custom/schema"
 
 
@@ -191,12 +186,7 @@ class TestManifestBuilderParams:
         assert "bearer_token" in manifest["auth_methods"]
 
     def test_no_duplicate_auth(self):
-        manifest = (
-            ManifestBuilder("test")
-            .auth_method("api_key")
-            .auth_method("api_key")
-            .build()
-        )
+        manifest = ManifestBuilder("test").auth_method("api_key").auth_method("api_key").build()
         assert manifest["auth_methods"].count("api_key") == 1
 
     def test_no_duplicate_context_field(self):

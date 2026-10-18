@@ -14,12 +14,14 @@ This is equivalent to Ignition's Memory tag type.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import MemoryTag, TagType
 from forge.modules.ot.tag_engine.providers.base import BaseProvider
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -38,20 +40,14 @@ class MemoryProvider(BaseProvider):
             if not isinstance(tag, MemoryTag):
                 continue
             if tag.default_value is not None:
-                await self._registry.update_value(
-                    tag.path, tag.default_value, QualityCode.GOOD
-                )
+                await self._registry.update_value(tag.path, tag.default_value, QualityCode.GOOD)
                 self._initialized_count += 1
             else:
                 # Set quality to GOOD with None value (ready to receive writes)
-                await self._registry.update_value(
-                    tag.path, None, QualityCode.GOOD
-                )
+                await self._registry.update_value(tag.path, None, QualityCode.GOOD)
                 self._initialized_count += 1
 
-        logger.info(
-            "MemoryProvider: initialized %d Memory tags", self._initialized_count
-        )
+        logger.info("MemoryProvider: initialized %d Memory tags", self._initialized_count)
 
     async def _stop(self) -> None:
         """Nothing to clean up — values stay in registry until registry is dropped."""
@@ -77,8 +73,6 @@ class MemoryProvider(BaseProvider):
         if tag is None:
             return False
         if not isinstance(tag, MemoryTag):
-            raise ValueError(
-                f"Cannot write to non-Memory tag: {path} (type={tag.tag_type.value})"
-            )
+            raise ValueError(f"Cannot write to non-Memory tag: {path} (type={tag.tag_type.value})")
         await self._registry.update_value(path, value, quality)
         return True

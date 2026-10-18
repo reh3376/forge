@@ -16,9 +16,8 @@ import json
 import subprocess
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-
 
 ROOT = Path(__file__).resolve().parents[1]
 VERIFICATION_DIR = ROOT / "tests" / "verification"
@@ -32,7 +31,9 @@ def run_pytest(
 ) -> dict:
     """Run pytest and return structured results."""
     cmd = [
-        sys.executable, "-m", "pytest",
+        sys.executable,
+        "-m",
+        "pytest",
         str(test_dir),
         "--tb=short",
         "-q",
@@ -75,7 +76,7 @@ def run_verification(args: argparse.Namespace) -> dict:
     """Run the full D3.12 verification suite."""
     report = {
         "title": "D3.12 Production Verification Report",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "python_version": sys.version,
         "suites": {},
         "summary": {},
@@ -129,9 +130,11 @@ def run_verification(args: argparse.Namespace) -> dict:
         if result["exit_code"] != 0:
             all_green = False
 
-        print(f"  {symbol} {result['passed']} passed, "
-              f"{result['failed']} failed "
-              f"({result['elapsed_seconds']}s)")
+        print(
+            f"  {symbol} {result['passed']} passed, "
+            f"{result['failed']} failed "
+            f"({result['elapsed_seconds']}s)"
+        )
         print()
 
         report["suites"][suite_id] = {
@@ -146,10 +149,12 @@ def run_verification(args: argparse.Namespace) -> dict:
         print("  All tests across the entire codebase")
         result = run_pytest(ROOT / "tests", verbose=False)
         symbol = "✓" if result["failed"] <= 1 else "✗"  # 1 pre-existing failure allowed
-        print(f"  {symbol} {result['passed']} passed, "
-              f"{result['failed']} failed, "
-              f"{result['skipped']} skipped "
-              f"({result['elapsed_seconds']}s)")
+        print(
+            f"  {symbol} {result['passed']} passed, "
+            f"{result['failed']} failed, "
+            f"{result['skipped']} skipped "
+            f"({result['elapsed_seconds']}s)"
+        )
         report["suites"]["full_regression"] = {
             "name": "Full Regression",
             "status": "PASS" if result["failed"] <= 1 else "FAIL",

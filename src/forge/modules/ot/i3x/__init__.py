@@ -9,20 +9,20 @@ Implements the CESMII i3X REST API pattern adapted to FxTS governance:
     /discover       — Auto-create tags from PLC address space
 """
 
-from forge.modules.ot.i3x.router import create_i3x_router
 from forge.modules.ot.i3x.models import (
-    I3xNamespace,
-    I3xObjectType,
-    I3xObject,
-    I3xValue,
     I3xBrowseResponse,
+    I3xNamespace,
+    I3xObject,
+    I3xObjectType,
+    I3xValue,
 )
+from forge.modules.ot.i3x.router import create_i3x_router
 
 __all__ = [
-    "create_i3x_router",
-    "I3xNamespace",
-    "I3xObjectType",
-    "I3xObject",
-    "I3xValue",
     "I3xBrowseResponse",
+    "I3xNamespace",
+    "I3xObject",
+    "I3xObjectType",
+    "I3xValue",
+    "create_i3x_router",
 ]

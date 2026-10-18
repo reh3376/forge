@@ -21,9 +21,7 @@ Usage in scripts::
 from __future__ import annotations
 
 import logging
-import re
-from datetime import datetime, timedelta, timezone
-from typing import Any
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 logger = logging.getLogger("forge.date")
@@ -118,10 +116,7 @@ class DateModule:
 
         Replaces: ``system.date.format(date, formatString)``
         """
-        if fmt.startswith("%"):
-            py_fmt = fmt
-        else:
-            py_fmt = _java_to_strftime(fmt)
+        py_fmt = fmt if fmt.startswith("%") else _java_to_strftime(fmt)
         return dt.strftime(py_fmt)
 
     def parse(self, text: str, fmt: str = "yyyy-MM-dd HH:mm:ss", tz: str | None = None) -> datetime:
@@ -137,10 +132,7 @@ class DateModule:
 
         Replaces: ``system.date.parse(dateString, formatString)``
         """
-        if fmt.startswith("%"):
-            py_fmt = fmt
-        else:
-            py_fmt = _java_to_strftime(fmt)
+        py_fmt = fmt if fmt.startswith("%") else _java_to_strftime(fmt)
 
         dt = datetime.strptime(text, py_fmt)
         if dt.tzinfo is None:

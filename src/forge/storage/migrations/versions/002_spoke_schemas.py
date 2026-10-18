@@ -43,9 +43,7 @@ def upgrade() -> None:
         )
         # Grant read-only on forge_core
         op.execute(f"GRANT USAGE ON SCHEMA forge_core TO {role_name}")
-        op.execute(
-            f"GRANT SELECT ON ALL TABLES IN SCHEMA forge_core TO {role_name}"
-        )
+        op.execute(f"GRANT SELECT ON ALL TABLES IN SCHEMA forge_core TO {role_name}")
 
 
 def downgrade() -> None:

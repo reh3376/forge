@@ -11,20 +11,24 @@ It is the universal data unit that enters the Forge governance pipeline.
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from forge.core.models.contextual_record import (
     ContextualRecord,
-    QualityCode as CoreQualityCode,
     RecordContext,
     RecordLineage,
     RecordSource,
     RecordTimestamp,
     RecordValue,
 )
-from forge.modules.ot.context.resolvers import EnrichmentContext
-from forge.modules.ot.tag_engine.models import BaseTag, TagValue
+from forge.core.models.contextual_record import (
+    QualityCode as CoreQualityCode,
+)
+
+if TYPE_CHECKING:
+    from forge.modules.ot.context.resolvers import EnrichmentContext
+    from forge.modules.ot.tag_engine.models import BaseTag, TagValue
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +59,7 @@ def build_ot_record(
     Returns:
         A fully-formed ContextualRecord ready for governance pipeline.
     """
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
 
     # ── Source ─────────────────────────────────────────────
     source = RecordSource(

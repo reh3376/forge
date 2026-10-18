@@ -1,11 +1,8 @@
 """Tests for the bridge tag mapper."""
 
-import pytest
-
 from forge.modules.ot.bridge.models import BridgeConfig, TagMappingRule
 from forge.modules.ot.bridge.tag_mapper import TagMapper
 from forge.modules.ot.opcua_client.paths import PathNormalizer
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -105,8 +102,8 @@ class TestFiltering:
         m2 = mapper.map("[WHK01]Distillery01/Debug_Counter")
         m3 = mapper.map("[WHK01]Granary01/TIT_3010")
         assert m1 is not None
-        assert m2 is None   # Excluded by pattern
-        assert m3 is None   # Not included
+        assert m2 is None  # Excluded by pattern
+        assert m3 is None  # Not included
 
     def test_empty_include_means_all(self):
         mapper = _make_mapper(include_patterns=[])
@@ -226,9 +223,11 @@ class TestRegistry:
 
     def test_map_batch(self):
         mapper = _make_mapper()
-        results = mapper.map_batch([
-            "[WHK01]tag1",
-            "[OTHER]tag2",  # Wrong provider — excluded
-            "[WHK01]tag3",
-        ])
+        results = mapper.map_batch(
+            [
+                "[WHK01]tag1",
+                "[OTHER]tag2",  # Wrong provider — excluded
+                "[WHK01]tag3",
+            ]
+        )
         assert len(results) == 2

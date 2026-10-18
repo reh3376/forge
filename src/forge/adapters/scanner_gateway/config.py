@@ -4,6 +4,7 @@ The gateway serves two roles:
   1. gRPC server (ScannerService) — accepts scans from Android devices
   2. Forge adapter — translates and routes scans to the hub
 """
+
 from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field

@@ -42,21 +42,27 @@ def manifest() -> AdapterManifest:
 
 class TestSpokeClientLifecycle:
     async def test_register(
-        self, client: SpokeClient, manifest: AdapterManifest,
+        self,
+        client: SpokeClient,
+        manifest: AdapterManifest,
     ) -> None:
         session_id = await client.register(manifest)
         assert session_id.startswith("session-test-spoke-")
         assert client.session_id == session_id
 
     async def test_configure(
-        self, client: SpokeClient, manifest: AdapterManifest,
+        self,
+        client: SpokeClient,
+        manifest: AdapterManifest,
     ) -> None:
         await client.register(manifest)
         await client.configure({"url": "http://test"})
         # Should not raise
 
     async def test_start(
-        self, client: SpokeClient, manifest: AdapterManifest,
+        self,
+        client: SpokeClient,
+        manifest: AdapterManifest,
     ) -> None:
         await client.register(manifest)
         await client.configure({})
@@ -64,7 +70,9 @@ class TestSpokeClientLifecycle:
         # Should not raise
 
     async def test_stop(
-        self, client: SpokeClient, manifest: AdapterManifest,
+        self,
+        client: SpokeClient,
+        manifest: AdapterManifest,
     ) -> None:
         await client.register(manifest)
         await client.configure({})
@@ -73,7 +81,9 @@ class TestSpokeClientLifecycle:
         assert isinstance(flushed, int)
 
     async def test_health(
-        self, client: SpokeClient, manifest: AdapterManifest,
+        self,
+        client: SpokeClient,
+        manifest: AdapterManifest,
     ) -> None:
         await client.register(manifest)
         await client.configure({})
@@ -82,13 +92,15 @@ class TestSpokeClientLifecycle:
         assert health["state"] == 3  # HEALTHY
 
     async def test_configure_before_register_raises(
-        self, client: SpokeClient,
+        self,
+        client: SpokeClient,
     ) -> None:
         with pytest.raises(RuntimeError, match="Not registered"):
             await client.configure({})
 
     async def test_start_before_register_raises(
-        self, client: SpokeClient,
+        self,
+        client: SpokeClient,
     ) -> None:
         with pytest.raises(RuntimeError, match="Not registered"):
             await client.start()
@@ -166,7 +178,8 @@ class TestSpokeClientStreaming:
 
 class TestInMemoryChannel:
     async def test_closed_channel_raises(
-        self, servicer: InMemoryServicer,
+        self,
+        servicer: InMemoryServicer,
     ) -> None:
         channel = InMemoryChannel(servicer)
         await channel.close()
@@ -174,7 +187,8 @@ class TestInMemoryChannel:
             await channel.send_unary("Health", {})
 
     async def test_unknown_method_raises(
-        self, servicer: InMemoryServicer,
+        self,
+        servicer: InMemoryServicer,
     ) -> None:
         channel = InMemoryChannel(servicer)
         with pytest.raises(ValueError, match="Unknown RPC method"):

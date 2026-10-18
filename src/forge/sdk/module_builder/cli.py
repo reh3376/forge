@@ -68,7 +68,9 @@ def module_init(
     ] = None,
     protocol: Annotated[
         str,
-        typer.Option("--protocol", help="Communication protocol (e.g. rest, graphql, grpc, opcua, mqtt)"),
+        typer.Option(
+            "--protocol", help="Communication protocol (e.g. rest, graphql, grpc, opcua, mqtt)"
+        ),
     ] = "rest",
     tier: Annotated[
         str,
@@ -76,12 +78,17 @@ def module_init(
     ] = "MES_MOM",
     capability: Annotated[
         list[str] | None,
-        typer.Option("--capability", "-c", help="Enable capability (read, write, subscribe, backfill, discover). Repeatable."),
+        typer.Option(
+            "--capability",
+            "-c",
+            help="Enable capability (read, write, subscribe, backfill, discover). Repeatable.",
+        ),
     ] = None,
     param: Annotated[
         list[str] | None,
         typer.Option(
-            "--param", "-p",
+            "--param",
+            "-p",
             help="Connection param as 'name:description:required|optional[:default]'. Repeatable.",
         ),
     ] = None,
@@ -91,7 +98,9 @@ def module_init(
     ] = None,
     auth: Annotated[
         list[str] | None,
-        typer.Option("--auth", help="Auth method (e.g. bearer_token, api_key, certificate). Repeatable."),
+        typer.Option(
+            "--auth", help="Auth method (e.g. bearer_token, api_key, certificate). Repeatable."
+        ),
     ] = None,
     output: Annotated[
         Path,
@@ -160,14 +169,21 @@ def module_init(
         for p_str in param:
             parts = p_str.split(":")
             if len(parts) < 2:
-                typer.echo(f"[ERROR] Invalid param format: '{p_str}'. Use 'name:description:required|optional[:default]'")
+                typer.echo(
+                    f"[ERROR] Invalid param format: '{p_str}'. "
+                    "Use 'name:description:required|optional[:default]'"
+                )
                 raise typer.Exit(code=1)
 
             p_name = parts[0]
             p_desc = parts[1] if len(parts) > 1 else ""
             p_required = parts[2].lower() != "optional" if len(parts) > 2 else True
             p_default = parts[3] if len(parts) > 3 else None
-            p_secret = "secret" in p_name.lower() or "password" in p_name.lower() or "key" in p_name.lower()
+            p_secret = (
+                "secret" in p_name.lower()
+                or "password" in p_name.lower()
+                or "key" in p_name.lower()
+            )
 
             builder.connection_param(
                 p_name,
@@ -345,7 +361,10 @@ def module_validate(
             # Validate tier
             valid_tiers = {"OT", "MES_MOM", "ERP_BUSINESS", "HISTORIAN", "DOCUMENT"}
             if manifest.get("tier") not in valid_tiers:
-                errors.append(f"manifest.json: invalid tier '{manifest.get('tier')}'. Must be one of {valid_tiers}")
+                errors.append(
+                    f"manifest.json: invalid tier '{manifest.get('tier')}'. "
+                    f"Must be one of {valid_tiers}"
+                )
 
             # Check data_contract
             dc = manifest.get("data_contract", {})

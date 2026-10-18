@@ -52,6 +52,7 @@ class LineageEntry:
 # Lineage Store abstraction
 # ---------------------------------------------------------------------------
 
+
 class LineageStore(ABC):
     """Abstract storage backend for lineage entries."""
 
@@ -87,16 +88,10 @@ class InMemoryLineageStore(LineageStore):
         return self._entries.get(lineage_id)
 
     def get_by_output(self, output_record_id: str) -> list[LineageEntry]:
-        return [
-            e for e in self._entries.values()
-            if e.output_record_id == output_record_id
-        ]
+        return [e for e in self._entries.values() if e.output_record_id == output_record_id]
 
     def get_by_source(self, source_record_id: str) -> list[LineageEntry]:
-        return [
-            e for e in self._entries.values()
-            if source_record_id in e.source_record_ids
-        ]
+        return [e for e in self._entries.values() if source_record_id in e.source_record_ids]
 
     def get_by_product(self, product_id: str) -> list[LineageEntry]:
         return sorted(
@@ -114,6 +109,7 @@ class InMemoryLineageStore(LineageStore):
 # ---------------------------------------------------------------------------
 # Lineage Tracker
 # ---------------------------------------------------------------------------
+
 
 class LineageTracker:
     """High-level API for recording and querying lineage.

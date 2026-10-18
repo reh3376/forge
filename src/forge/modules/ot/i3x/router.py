@@ -10,8 +10,7 @@ template_registry, acquisition_engine) via the factory function.
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, HTTPException, Query
 
@@ -22,10 +21,11 @@ from forge.modules.ot.i3x.models import (
     I3xObjectType,
     I3xValue,
 )
-from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
-from forge.modules.ot.tag_engine.providers.opcua_provider import OpcUaProvider
-from forge.modules.ot.tag_engine.registry import TagRegistry
-from forge.modules.ot.tag_engine.templates import TemplateRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
+    from forge.modules.ot.tag_engine.registry import TagRegistry
+    from forge.modules.ot.tag_engine.templates import TemplateRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -81,18 +81,14 @@ def create_i3x_router(
                 namespaces.append(ns)
         else:
             # Infer from tag definitions
-            stats = await registry.get_stats()
             seen_connections: set[str] = set()
-            all_tags = stats.get("total_tags", 0)
             # Browse root to find connection-level folders
             root_items = await registry.browse("")
             for item in root_items:
                 ns_id = item["name"]
                 if ns_id not in seen_connections:
                     seen_connections.add(ns_id)
-                    namespaces.append(
-                        I3xNamespace(id=ns_id, name=ns_id)
-                    )
+                    namespaces.append(I3xNamespace(id=ns_id, name=ns_id))
 
         return namespaces
 
@@ -116,9 +112,7 @@ def create_i3x_router(
             if tmpl is None:
                 continue
             required_params = [
-                p_name
-                for p_name, p_def in tmpl.parameters.items()
-                if p_def.required
+                p_name for p_name, p_def in tmpl.parameters.items() if p_def.required
             ]
             types.append(
                 I3xObjectType(
@@ -230,17 +224,11 @@ def create_i3x_router(
                 I3xValue(
                     path=path,
                     value=tag_value.value if tag_value else None,
-                    quality=(
-                        tag_value.quality.value if tag_value else "NOT_AVAILABLE"
-                    ),
+                    quality=(tag_value.quality.value if tag_value else "NOT_AVAILABLE"),
                     timestamp=tag_value.timestamp if tag_value else None,
-                    source_timestamp=(
-                        tag_value.source_timestamp if tag_value else None
-                    ),
+                    source_timestamp=(tag_value.source_timestamp if tag_value else None),
                     data_type=tag_def.data_type.value if tag_def else None,
-                    engineering_units=(
-                        tag_def.engineering_units if tag_def else ""
-                    ),
+                    engineering_units=(tag_def.engineering_units if tag_def else ""),
                 )
             )
 
@@ -292,8 +280,8 @@ def create_i3x_router(
     @router.get("/stats")
     async def get_ot_stats() -> dict[str, Any]:
         """OT module statistics — tag counts, provider health, templates."""
-        stats = await registry.get_stats()
 
+        stats = await registry.get_stats()
         engine_health: dict[str, Any] = {}
         if acquisition_engine is not None:
             engine_health = await acquisition_engine.health()
