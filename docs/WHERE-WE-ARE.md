@@ -22,7 +22,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 347 files, ~66,000 lines |
-| Python tests | 249 files, ~52,100 lines, 3,998 test functions; full suite green on 2026-10-18 |
+| Python tests | 249 files, ~52,200 lines, 4,003 test functions; full suite green on 2026-10-18 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | forge-mes bridge (`modules/Forge MES`) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
@@ -150,7 +150,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | FVTS | schema + runner + reference renderer + 1 spec |
 | FQTS, FSTS | stubs |
 | FDTS, FLTS, FNTS, FOTS, FPTS | planned (doc pages only) |
-| Spec integrity CLI (`forge governance specs`, `stamp`, `approve`) | ✅ FB-021 (2026-10-18); `run` covers FATS only (FB-083) |
+| Spec integrity CLI (`forge governance specs`, `stamp`, `approve`) and `forge governance run` for FATS, FACTS, FVTS, FTTS | ✅ FB-021, FB-083 (2026-10-18) |
 
 ### 3.10 Security, identity, topology
 

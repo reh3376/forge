@@ -166,7 +166,7 @@ A golden message may carry `"profiles": [...]` to apply to some renderers only (
 
 ### CI gate
 
-`tests/governance/fvts/test_ot_module_views.py` is the suite the reference spec declares in `conformance_tests.suite_path`. It runs the full runner and allows exactly one failure, `fvts:hash-approved`, until the owner approves the hash under FB-078. Every other FAIL, ERROR or NOT_IMPLEMENTED verdict blocks the merge.
+`forge governance run fvts ot-module-views` runs the 19 checks from the CLI (exit 1 while `fvts:hash-approved` fails). `tests/governance/fvts/test_ot_module_views.py` is the suite the reference spec declares in `conformance_tests.suite_path`. It runs the full runner and allows exactly one failure, `fvts:hash-approved`, until the owner approves the hash under FB-078. Every other FAIL, ERROR or NOT_IMPLEMENTED verdict blocks the merge.
 
 ## Specs
 

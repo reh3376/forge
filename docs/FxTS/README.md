@@ -116,8 +116,12 @@ forge governance approve src/forge/governance/facts/specs/whk-wms.facts.json --b
 # Validate a spec file against its framework schema (framework taken from the file name)
 forge governance validate-spec src/forge/governance/fvts/specs/ot-module.fvts.json
 
-# Run a framework runner from the CLI: FATS today; FACTS/FVTS/FTTS run under pytest (FB-083)
-forge governance run fats /healthz
+# Run one framework's checks on one spec: a spec file, or its id looked up in the
+# framework's spec directory (endpoint path, adapter_id, view_id, transport_id)
+forge governance run facts whk-wms
+forge governance run fvts ot-module-views --format json --output reports/fvts-ot-module.json
+forge governance run ftts grpc-hardened-transport
+forge governance run fats /v1/health --live        # live checks: FATS, FACTS, FTTS
 ```
 
 Every runner verifies the hash of the spec it runs; `stamp` and `approve` rewrite only the
@@ -207,7 +211,7 @@ src/forge/governance/
 2. Read the framework's documentation (linked above) and JSON Schema
 3. Create a new spec file in the framework's `specs/` directory
 4. Validate against the schema: `forge governance validate-spec <path>`
-5. Run the conformance check: FATS with `forge governance run fats <target>`; FACTS, FVTS and FTTS through their pytest suites (`forge governance run` for them is FB-083)
+5. Run the conformance check: `forge governance run <framework> <path or id>` (exit 1 on any failed check)
 6. Add to CI: include in the framework's test suite
 7. Stamp it (`forge governance stamp <path> --by <you> --reason <why>`); the owner approves it with `forge governance approve <path> --by <owner>`
 
