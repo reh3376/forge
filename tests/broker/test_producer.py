@@ -25,9 +25,7 @@ class TestInMemoryProducer:
         assert body["key"] == "value"
 
     async def test_publish_with_routing_key(self, producer, test_exchange):
-        exchange = ExchangeSpec(
-            name="forge.test.topic", type=ExchangeType.TOPIC
-        )
+        exchange = ExchangeSpec(name="forge.test.topic", type=ExchangeType.TOPIC)
         await producer.publish(exchange, {"data": 1}, routing_key="test.key")
         messages = producer.get_messages("forge.test.topic")
         assert messages[0]["routing_key"] == "test.key"

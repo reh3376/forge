@@ -32,6 +32,7 @@ from forge.modules.ot.tag_engine.models import (
 # TagType enum
 # ---------------------------------------------------------------------------
 
+
 class TestTagType:
     def test_all_nine_types(self):
         assert len(TagType) == 9
@@ -56,6 +57,7 @@ class TestTagType:
 # ScanClass enum
 # ---------------------------------------------------------------------------
 
+
 class TestScanClass:
     def test_four_classes(self):
         assert len(ScanClass) == 4
@@ -70,6 +72,7 @@ class TestScanClass:
 # ---------------------------------------------------------------------------
 # ScaleConfig
 # ---------------------------------------------------------------------------
+
 
 class TestScaleConfig:
     def test_default_scaling(self):
@@ -97,6 +100,7 @@ class TestScaleConfig:
 # ---------------------------------------------------------------------------
 # ClampConfig
 # ---------------------------------------------------------------------------
+
 
 class TestClampConfig:
     def test_no_clamp(self):
@@ -128,6 +132,7 @@ class TestClampConfig:
 # AlarmConfig
 # ---------------------------------------------------------------------------
 
+
 class TestAlarmConfig:
     def test_defaults(self):
         a = AlarmConfig()
@@ -149,6 +154,7 @@ class TestAlarmConfig:
 # HistoryConfig
 # ---------------------------------------------------------------------------
 
+
 class TestHistoryConfig:
     def test_defaults(self):
         h = HistoryConfig()
@@ -161,6 +167,7 @@ class TestHistoryConfig:
 # ---------------------------------------------------------------------------
 # TagValue
 # ---------------------------------------------------------------------------
+
 
 class TestTagValue:
     def test_defaults(self):
@@ -175,15 +182,20 @@ class TestTagValue:
         assert tv.has_changed()
 
     def test_has_changed_false(self):
-        tv = TagValue(value=42, previous_value=42, quality=QualityCode.GOOD, previous_quality=QualityCode.GOOD)
+        tv = TagValue(
+            value=42, previous_value=42, quality=QualityCode.GOOD, previous_quality=QualityCode.GOOD
+        )
         assert not tv.has_changed()
 
     def test_quality_change_counts(self):
-        tv = TagValue(value=42, previous_value=42, quality=QualityCode.GOOD, previous_quality=QualityCode.BAD)
+        tv = TagValue(
+            value=42, previous_value=42, quality=QualityCode.GOOD, previous_quality=QualityCode.BAD
+        )
         assert tv.has_changed()
 
     def test_naive_timestamp_gets_utc(self):
         from datetime import datetime
+
         tv = TagValue(timestamp=datetime(2026, 1, 1, 12, 0))
         assert tv.timestamp.tzinfo is not None
 
@@ -191,6 +203,7 @@ class TestTagValue:
 # ---------------------------------------------------------------------------
 # Tag type models
 # ---------------------------------------------------------------------------
+
 
 class TestStandardTag:
     def test_creation(self):
@@ -311,57 +324,70 @@ class TestVirtualTag:
 # Discriminated union deserialization
 # ---------------------------------------------------------------------------
 
+
 class TestTagUnion:
     adapter = TypeAdapter(TagUnion)
 
     def test_standard_tag_from_dict(self):
-        tag = self.adapter.validate_python({
-            "tag_type": "standard",
-            "path": "WH/test",
-            "opcua_node_id": "ns=2;s=test",
-        })
+        tag = self.adapter.validate_python(
+            {
+                "tag_type": "standard",
+                "path": "WH/test",
+                "opcua_node_id": "ns=2;s=test",
+            }
+        )
         assert isinstance(tag, StandardTag)
 
     def test_memory_tag_from_dict(self):
-        tag = self.adapter.validate_python({
-            "tag_type": "memory",
-            "path": "WH/test",
-        })
+        tag = self.adapter.validate_python(
+            {
+                "tag_type": "memory",
+                "path": "WH/test",
+            }
+        )
         assert isinstance(tag, MemoryTag)
 
     def test_expression_tag_from_dict(self):
-        tag = self.adapter.validate_python({
-            "tag_type": "expression",
-            "path": "WH/expr",
-            "expression": "{WH/temp} + 10",
-        })
+        tag = self.adapter.validate_python(
+            {
+                "tag_type": "expression",
+                "path": "WH/expr",
+                "expression": "{WH/temp} + 10",
+            }
+        )
         assert isinstance(tag, ExpressionTag)
 
     def test_computed_tag_from_dict(self):
-        tag = self.adapter.validate_python({
-            "tag_type": "computed",
-            "path": "WH/oee",
-            "sources": {"avail": "WH/avail", "perf": "WH/perf"},
-            "function": "avail * perf / 100",
-        })
+        tag = self.adapter.validate_python(
+            {
+                "tag_type": "computed",
+                "path": "WH/oee",
+                "sources": {"avail": "WH/avail", "perf": "WH/perf"},
+                "function": "avail * perf / 100",
+            }
+        )
         assert isinstance(tag, ComputedTag)
 
     def test_event_tag_from_dict(self):
-        tag = self.adapter.validate_python({
-            "tag_type": "event",
-            "path": "WH/recipe",
-            "event_source": "rabbitmq",
-            "topic_or_exchange": "recipe.next",
-        })
+        tag = self.adapter.validate_python(
+            {
+                "tag_type": "event",
+                "path": "WH/recipe",
+                "event_source": "rabbitmq",
+                "topic_or_exchange": "recipe.next",
+            }
+        )
         assert isinstance(tag, EventTag)
 
     def test_virtual_tag_from_dict(self):
-        tag = self.adapter.validate_python({
-            "tag_type": "virtual",
-            "path": "WH/avg",
-            "source_type": "nexttrend",
-            "source_config": {"tag": "WH/temp"},
-        })
+        tag = self.adapter.validate_python(
+            {
+                "tag_type": "virtual",
+                "path": "WH/avg",
+                "source_type": "nexttrend",
+                "source_config": {"tag": "WH/temp"},
+            }
+        )
         assert isinstance(tag, VirtualTag)
 
     def test_all_nine_types_deserialize(self):
@@ -385,10 +411,12 @@ class TestTagUnion:
 
     def test_invalid_tag_type_raises(self):
         with pytest.raises(ValidationError):
-            self.adapter.validate_python({
-                "tag_type": "nonexistent",
-                "path": "test",
-            })
+            self.adapter.validate_python(
+                {
+                    "tag_type": "nonexistent",
+                    "path": "test",
+                }
+            )
 
     def test_json_round_trip(self):
         tag = StandardTag(

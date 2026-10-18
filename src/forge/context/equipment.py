@@ -59,18 +59,10 @@ class InMemoryEquipmentStore(EquipmentStore):
         return [deepcopy(e) for e in self._entries.values() if e.site == site]
 
     async def list_by_area(self, site: str, area: str) -> list[Equipment]:
-        return [
-            deepcopy(e)
-            for e in self._entries.values()
-            if e.site == site and e.area == area
-        ]
+        return [deepcopy(e) for e in self._entries.values() if e.site == site and e.area == area]
 
     async def get_children(self, parent_id: str) -> list[Equipment]:
-        return [
-            deepcopy(e)
-            for e in self._entries.values()
-            if e.parent_id == parent_id
-        ]
+        return [deepcopy(e) for e in self._entries.values() if e.parent_id == parent_id]
 
     async def delete(self, equipment_id: str) -> bool:
         return self._entries.pop(equipment_id, None) is not None

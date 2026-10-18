@@ -28,13 +28,28 @@ async def populated_registry():
     """Registry with a realistic set of tags for browse testing."""
     reg = TagRegistry()
     tags = [
-        StandardTag(path="WH/WHK01/Distillery01/TIT_2010/Out_PV", opcua_node_id="ns=2;s=TIT_2010.Out_PV"),
-        StandardTag(path="WH/WHK01/Distillery01/TIT_2010/Out_Alarm", opcua_node_id="ns=2;s=TIT_2010.Out_Alarm", data_type=DataType.BOOLEAN),
-        StandardTag(path="WH/WHK01/Distillery01/LIT_6050B/Out_PV", opcua_node_id="ns=2;s=LIT_6050B.Out_PV"),
-        StandardTag(path="WH/WHK01/Distillery01/PIT_3020/Out_PV", opcua_node_id="ns=2;s=PIT_3020.Out_PV"),
-        StandardTag(path="WH/WHK01/Granary/TIT_1010/Out_PV", opcua_node_id="ns=3;s=TIT_1010.Out_PV"),
+        StandardTag(
+            path="WH/WHK01/Distillery01/TIT_2010/Out_PV", opcua_node_id="ns=2;s=TIT_2010.Out_PV"
+        ),
+        StandardTag(
+            path="WH/WHK01/Distillery01/TIT_2010/Out_Alarm",
+            opcua_node_id="ns=2;s=TIT_2010.Out_Alarm",
+            data_type=DataType.BOOLEAN,
+        ),
+        StandardTag(
+            path="WH/WHK01/Distillery01/LIT_6050B/Out_PV", opcua_node_id="ns=2;s=LIT_6050B.Out_PV"
+        ),
+        StandardTag(
+            path="WH/WHK01/Distillery01/PIT_3020/Out_PV", opcua_node_id="ns=2;s=PIT_3020.Out_PV"
+        ),
+        StandardTag(
+            path="WH/WHK01/Granary/TIT_1010/Out_PV", opcua_node_id="ns=3;s=TIT_1010.Out_PV"
+        ),
         MemoryTag(path="WH/WHK01/System/Mode"),
-        ExpressionTag(path="WH/WHK01/Distillery01/TIT_2010/Out_PV_F", expression="{WH/WHK01/Distillery01/TIT_2010/Out_PV} * 1.8 + 32"),
+        ExpressionTag(
+            path="WH/WHK01/Distillery01/TIT_2010/Out_PV_F",
+            expression="{WH/WHK01/Distillery01/TIT_2010/Out_PV} * 1.8 + 32",
+        ),
     ]
     await reg.register_many(tags)
     return reg
@@ -43,6 +58,7 @@ async def populated_registry():
 # ---------------------------------------------------------------------------
 # CRUD
 # ---------------------------------------------------------------------------
+
 
 class TestRegister:
     async def test_register_tag(self, registry):
@@ -98,6 +114,7 @@ class TestUnregister:
 # Get operations
 # ---------------------------------------------------------------------------
 
+
 class TestGetOperations:
     async def test_get_definition(self, registry):
         tag = MemoryTag(path="test/a", default_value=42)
@@ -128,6 +145,7 @@ class TestGetOperations:
 # ---------------------------------------------------------------------------
 # Update value
 # ---------------------------------------------------------------------------
+
 
 class TestUpdateValue:
     async def test_update_value(self, registry):
@@ -163,6 +181,7 @@ class TestUpdateValue:
 # ---------------------------------------------------------------------------
 # Browse
 # ---------------------------------------------------------------------------
+
 
 class TestBrowse:
     async def test_browse_root(self, populated_registry):
@@ -211,6 +230,7 @@ class TestBrowse:
 # Find operations
 # ---------------------------------------------------------------------------
 
+
 class TestFindOperations:
     async def test_find_by_type(self, populated_registry):
         memory_tags = await populated_registry.find_by_type(TagType.MEMORY)
@@ -232,6 +252,7 @@ class TestFindOperations:
 # Dependency tracking
 # ---------------------------------------------------------------------------
 
+
 class TestDependencyTracking:
     async def test_expression_dependencies(self, registry):
         source = MemoryTag(path="temp")
@@ -247,7 +268,10 @@ class TestDependencyTracking:
         await registry.register(MemoryTag(path="b"))
         derived = DerivedTag(
             path="avg",
-            sources=[DerivedSource(tag_path="a", weight=0.5), DerivedSource(tag_path="b", weight=0.5)],
+            sources=[
+                DerivedSource(tag_path="a", weight=0.5),
+                DerivedSource(tag_path="b", weight=0.5),
+            ],
         )
         await registry.register(derived)
 
@@ -270,6 +294,7 @@ class TestDependencyTracking:
 # ---------------------------------------------------------------------------
 # Change notification
 # ---------------------------------------------------------------------------
+
 
 class TestChangeNotification:
     async def test_callback_fires_on_change(self, registry):
@@ -311,6 +336,7 @@ class TestChangeNotification:
 # ---------------------------------------------------------------------------
 # Stats
 # ---------------------------------------------------------------------------
+
 
 class TestStats:
     async def test_stats(self, populated_registry):

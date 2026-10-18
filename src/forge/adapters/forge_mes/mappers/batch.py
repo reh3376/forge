@@ -76,16 +76,13 @@ def map_batch(raw: dict[str, Any]) -> ManufacturingUnit | None:
         recipe_id=_str_or_none(raw.get("recipeId") or raw.get("recipe_id")),
         status=_STATUS_TO_UNIT_STATUS.get(status_raw, UnitStatus.PENDING),
         lifecycle_state=_STATUS_TO_LIFECYCLE.get(status_raw),
-        quantity=_float_or_none(
-            raw.get("expectedQuantity") or raw.get("expected_quantity")
-        ),
+        quantity=_float_or_none(raw.get("expectedQuantity") or raw.get("expected_quantity")),
         unit_of_measure=raw.get("unit") or raw.get("unitOfMeasure"),
         product_type=raw.get("whiskeyType") or raw.get("whiskey_type"),
         metadata={
             k: v
             for k, v in {
-                "current_step_index": raw.get("currentStepIndex")
-                or raw.get("current_step_index"),
+                "current_step_index": raw.get("currentStepIndex") or raw.get("current_step_index"),
                 "production_order_id": raw.get("productionOrderId")
                 or raw.get("production_order_id"),
                 "started_at": raw.get("startedAt") or raw.get("started_at"),

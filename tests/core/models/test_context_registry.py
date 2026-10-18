@@ -17,7 +17,8 @@ class TestContextField:
 
     def test_create_field(self) -> None:
         f = ContextField(
-            name="test_field", field_type="str",
+            name="test_field",
+            field_type="str",
             description="A test field.",
         )
         assert f.name == "test_field"
@@ -25,14 +26,17 @@ class TestContextField:
 
     def test_field_is_frozen(self) -> None:
         f = ContextField(
-            name="x", field_type="str", description="x",
+            name="x",
+            field_type="str",
+            description="x",
         )
         with pytest.raises(AttributeError):
             f.name = "y"  # type: ignore[misc]
 
     def test_provenance_fields(self) -> None:
         f = ContextField(
-            name="lot_id", field_type="str",
+            name="lot_id",
+            field_type="str",
             description="Lot reference",
             wms_provenance="Lot.id",
             mes_provenance="Lot.id",
@@ -47,7 +51,9 @@ class TestContextFieldRegistry:
     def test_register_and_get(self) -> None:
         reg = ContextFieldRegistry()
         f = ContextField(
-            name="test", field_type="str", description="test",
+            name="test",
+            field_type="str",
+            description="test",
         )
         reg.register(f)
         assert reg.get_field("test") is f
@@ -58,48 +64,76 @@ class TestContextFieldRegistry:
 
     def test_list_fields_sorted(self) -> None:
         reg = ContextFieldRegistry()
-        reg.register(ContextField(
-            name="z_field", field_type="str", description="z",
-        ))
-        reg.register(ContextField(
-            name="a_field", field_type="str", description="a",
-        ))
+        reg.register(
+            ContextField(
+                name="z_field",
+                field_type="str",
+                description="z",
+            )
+        )
+        reg.register(
+            ContextField(
+                name="a_field",
+                field_type="str",
+                description="a",
+            )
+        )
         names = [f.name for f in reg.list_fields()]
         assert names == ["a_field", "z_field"]
 
     def test_list_field_names(self) -> None:
         reg = ContextFieldRegistry()
-        reg.register(ContextField(
-            name="b", field_type="str", description="b",
-        ))
-        reg.register(ContextField(
-            name="a", field_type="str", description="a",
-        ))
+        reg.register(
+            ContextField(
+                name="b",
+                field_type="str",
+                description="b",
+            )
+        )
+        reg.register(
+            ContextField(
+                name="a",
+                field_type="str",
+                description="a",
+            )
+        )
         assert reg.list_field_names() == ["a", "b"]
 
     def test_len(self) -> None:
         reg = ContextFieldRegistry()
         assert len(reg) == 0
-        reg.register(ContextField(
-            name="x", field_type="str", description="x",
-        ))
+        reg.register(
+            ContextField(
+                name="x",
+                field_type="str",
+                description="x",
+            )
+        )
         assert len(reg) == 1
 
     def test_contains(self) -> None:
         reg = ContextFieldRegistry()
-        reg.register(ContextField(
-            name="x", field_type="str", description="x",
-        ))
+        reg.register(
+            ContextField(
+                name="x",
+                field_type="str",
+                description="x",
+            )
+        )
         assert "x" in reg
         assert "y" not in reg
 
     def test_overwrite_on_reregister(self) -> None:
         reg = ContextFieldRegistry()
         f1 = ContextField(
-            name="x", field_type="str", description="first",
+            name="x",
+            field_type="str",
+            description="first",
         )
         f2 = ContextField(
-            name="x", field_type="int", description="second",
+            name="x",
+            field_type="int",
+            description="second",
         )
         reg.register(f1)
         reg.register(f2)
@@ -111,14 +145,22 @@ class TestValidation:
 
     def _reg(self) -> ContextFieldRegistry:
         reg = ContextFieldRegistry()
-        reg.register(ContextField(
-            name="lot_id", field_type="str",
-            description="Lot", required=True,
-        ))
-        reg.register(ContextField(
-            name="shift_id", field_type="str",
-            description="Shift", required=False,
-        ))
+        reg.register(
+            ContextField(
+                name="lot_id",
+                field_type="str",
+                description="Lot",
+                required=True,
+            )
+        )
+        reg.register(
+            ContextField(
+                name="shift_id",
+                field_type="str",
+                description="Shift",
+                required=False,
+            )
+        )
         return reg
 
     def test_valid_context_no_errors(self) -> None:
@@ -158,25 +200,39 @@ class TestProvenance:
 
     def test_wms_provenance(self) -> None:
         reg = ContextFieldRegistry()
-        reg.register(ContextField(
-            name="lot_id", field_type="str", description="lot",
-            wms_provenance="Lot.id", mes_provenance="Lot.globalId",
-        ))
+        reg.register(
+            ContextField(
+                name="lot_id",
+                field_type="str",
+                description="lot",
+                wms_provenance="Lot.id",
+                mes_provenance="Lot.globalId",
+            )
+        )
         assert reg.get_provenance("lot_id", "whk-wms") == "Lot.id"
 
     def test_mes_provenance(self) -> None:
         reg = ContextFieldRegistry()
-        reg.register(ContextField(
-            name="lot_id", field_type="str", description="lot",
-            wms_provenance="Lot.id", mes_provenance="Lot.globalId",
-        ))
+        reg.register(
+            ContextField(
+                name="lot_id",
+                field_type="str",
+                description="lot",
+                wms_provenance="Lot.id",
+                mes_provenance="Lot.globalId",
+            )
+        )
         assert reg.get_provenance("lot_id", "forge-mes") == "Lot.globalId"
 
     def test_unknown_system_returns_none(self) -> None:
         reg = ContextFieldRegistry()
-        reg.register(ContextField(
-            name="lot_id", field_type="str", description="lot",
-        ))
+        reg.register(
+            ContextField(
+                name="lot_id",
+                field_type="str",
+                description="lot",
+            )
+        )
         assert reg.get_provenance("lot_id", "unknown-sys") is None
 
     def test_unknown_field_returns_none(self) -> None:
@@ -194,8 +250,12 @@ class TestDefaultRegistry:
     def test_cross_spoke_fields_present(self) -> None:
         reg = get_default_registry()
         cross_spoke = [
-            "lot_id", "shift_id", "operator_id",
-            "event_timestamp", "event_type", "work_order_id",
+            "lot_id",
+            "shift_id",
+            "operator_id",
+            "event_timestamp",
+            "event_type",
+            "work_order_id",
         ]
         for name in cross_spoke:
             assert name in reg, f"Missing cross-spoke field: {name}"
@@ -203,30 +263,26 @@ class TestDefaultRegistry:
     def test_context_record_fields_present(self) -> None:
         reg = get_default_registry()
         cr_fields = [
-            "equipment_id", "batch_id", "recipe_id",
-            "operating_mode", "area", "site",
+            "equipment_id",
+            "batch_id",
+            "recipe_id",
+            "operating_mode",
+            "area",
+            "site",
         ]
         for name in cr_fields:
-            assert name in reg, (
-                f"Missing ContextualRecord field: {name}"
-            )
+            assert name in reg, f"Missing ContextualRecord field: {name}"
 
     def test_all_fields_have_descriptions(self) -> None:
         reg = get_default_registry()
         for f in reg.list_fields():
-            assert f.description, (
-                f"Field {f.name} has no description"
-            )
+            assert f.description, f"Field {f.name} has no description"
 
     def test_all_fields_have_provenance(self) -> None:
         reg = get_default_registry()
         for f in reg.list_fields():
-            assert f.wms_provenance is not None, (
-                f"Field {f.name} missing WMS provenance"
-            )
-            assert f.mes_provenance is not None, (
-                f"Field {f.name} missing MES provenance"
-            )
+            assert f.wms_provenance is not None, f"Field {f.name} missing WMS provenance"
+            assert f.mes_provenance is not None, f"Field {f.name} missing MES provenance"
 
     def test_singleton_behavior(self) -> None:
         r1 = get_default_registry()

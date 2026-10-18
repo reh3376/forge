@@ -85,20 +85,32 @@ def build_record_context(
     asset_path = _str_or_none(
         payload.get("assetPath")
         or payload.get("asset_path")
-        or (payload.get("asset", {}).get("assetPath") if isinstance(payload.get("asset"), dict) else None)
+        or (
+            payload.get("asset", {}).get("assetPath")
+            if isinstance(payload.get("asset"), dict)
+            else None
+        )
     )
 
     # Work order type / classification
     work_order_type = _str_or_none(payload.get("workOrderType") or payload.get("work_order_type"))
-    work_request_type = _str_or_none(payload.get("workRequestType") or payload.get("work_request_type"))
+    work_request_type = _str_or_none(
+        payload.get("workRequestType") or payload.get("work_request_type")
+    )
 
     # Priority and maintenance status
-    priority_level = _str_or_none(payload.get("priority") or payload.get("priorityLevel") or payload.get("priority_level"))
+    priority_level = _str_or_none(
+        payload.get("priority") or payload.get("priorityLevel") or payload.get("priority_level")
+    )
     maintenance_status = _str_or_none(payload.get("status") or "pending")
 
     # Approval states (maintenance-role + operations-supervisor approval)
-    maintenance_role_approval = payload.get("maintenanceRoleApproval") or payload.get("maintenance_role_approval")
-    operations_supervisor_approval = payload.get("operationsSupervisorApproval") or payload.get("operations_supervisor_approval")
+    maintenance_role_approval = payload.get("maintenanceRoleApproval") or payload.get(
+        "maintenance_role_approval"
+    )
+    operations_supervisor_approval = payload.get("operationsSupervisorApproval") or payload.get(
+        "operations_supervisor_approval"
+    )
 
     # Kit association (for work orders that use maintenance kits)
     kit_id = _str_or_none(payload.get("kitId") or payload.get("kit_id"))
@@ -121,7 +133,9 @@ def build_record_context(
 
     # Maintenance window: extract scheduled times for production impact analysis
     scheduled_start = _str_or_none(payload.get("scheduledStart") or payload.get("scheduled_start"))
-    estimated_duration_str = _str_or_none(payload.get("estimatedDuration") or payload.get("estimated_duration"))
+    estimated_duration_str = _str_or_none(
+        payload.get("estimatedDuration") or payload.get("estimated_duration")
+    )
 
     # ── Build Extra Context Dict ───────────────────────────────────
     extra: dict[str, Any] = {

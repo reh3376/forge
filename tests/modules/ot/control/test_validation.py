@@ -26,28 +26,36 @@ from forge.modules.ot.control.validation import WriteValidator
 @pytest.fixture
 def validator() -> WriteValidator:
     v = WriteValidator()
-    v.register_tag(TagWriteConfig(
-        tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
-        data_type=DataType.FLOAT,
-        min_value=0.0,
-        max_value=200.0,
-        engineering_units="°F",
-    ))
-    v.register_tag(TagWriteConfig(
-        tag_path="WH/WHK01/Distillery01/Valve01/Open",
-        data_type=DataType.BOOLEAN,
-    ))
-    v.register_tag(TagWriteConfig(
-        tag_path="WH/WHK01/Distillery01/Counter/Value",
-        data_type=DataType.INT32,
-        min_value=-1000,
-        max_value=1000,
-    ))
-    v.register_tag(TagWriteConfig(
-        tag_path="WH/WHK01/Readonly/Tag",
-        data_type=DataType.FLOAT,
-        writable=False,
-    ))
+    v.register_tag(
+        TagWriteConfig(
+            tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
+            data_type=DataType.FLOAT,
+            min_value=0.0,
+            max_value=200.0,
+            engineering_units="°F",
+        )
+    )
+    v.register_tag(
+        TagWriteConfig(
+            tag_path="WH/WHK01/Distillery01/Valve01/Open",
+            data_type=DataType.BOOLEAN,
+        )
+    )
+    v.register_tag(
+        TagWriteConfig(
+            tag_path="WH/WHK01/Distillery01/Counter/Value",
+            data_type=DataType.INT32,
+            min_value=-1000,
+            max_value=1000,
+        )
+    )
+    v.register_tag(
+        TagWriteConfig(
+            tag_path="WH/WHK01/Readonly/Tag",
+            data_type=DataType.FLOAT,
+            writable=False,
+        )
+    )
     return v
 
 
@@ -190,10 +198,12 @@ class TestRejections:
     def test_int16_overflow(self):
         """INT16 can't hold values > 32767."""
         v = WriteValidator()
-        v.register_tag(TagWriteConfig(
-            tag_path="t/int16",
-            data_type=DataType.INT16,
-        ))
+        v.register_tag(
+            TagWriteConfig(
+                tag_path="t/int16",
+                data_type=DataType.INT16,
+            )
+        )
         req = WriteRequest(tag_path="t/int16", value=40000, data_type=DataType.INT16)
         result = v.validate(req, WriteResult(request=req))
         assert result.validation_passed is False

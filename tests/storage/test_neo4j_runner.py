@@ -9,12 +9,7 @@ import re
 from pathlib import Path
 
 MIGRATIONS_DIR = (
-    Path(__file__).parent.parent.parent
-    / "src"
-    / "forge"
-    / "storage"
-    / "migrations"
-    / "neo4j"
+    Path(__file__).parent.parent.parent / "src" / "forge" / "storage" / "migrations" / "neo4j"
 )
 
 _MIGRATION_PATTERN = re.compile(r"^(\d{3})_(.+)\.cypher$")
@@ -30,15 +25,11 @@ class TestCypherMigrationFiles:
         expected = ["001", "002", "003"]
         files = sorted(f.name for f in MIGRATIONS_DIR.glob("*.cypher"))
         for version in expected:
-            assert any(f.startswith(version) for f in files), (
-                f"Missing Neo4j migration {version}"
-            )
+            assert any(f.startswith(version) for f in files), f"Missing Neo4j migration {version}"
 
     def test_filenames_match_pattern(self):
         for f in MIGRATIONS_DIR.glob("*.cypher"):
-            assert _MIGRATION_PATTERN.match(f.name), (
-                f"Invalid migration filename: {f.name}"
-            )
+            assert _MIGRATION_PATTERN.match(f.name), f"Invalid migration filename: {f.name}"
 
     def test_files_are_non_empty(self):
         for f in MIGRATIONS_DIR.glob("*.cypher"):

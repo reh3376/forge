@@ -126,9 +126,7 @@ class AlarmStateMachine:
         except InvalidTransition:
             return False
 
-    def transition(
-        self, alarm: AlarmInstance, action: AlarmAction
-    ) -> TransitionResult:
+    def transition(self, alarm: AlarmInstance, action: AlarmAction) -> TransitionResult:
         """Apply a state transition to an alarm instance.
 
         Raises InvalidTransition if the action is not valid for the current state.

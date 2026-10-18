@@ -107,8 +107,11 @@ class AlarmEngine:
         """Register or update alarm configuration for a tag."""
         async with self._lock:
             self._configs[config.tag_path] = config
-            logger.debug("Registered alarm config for %s (%d thresholds)",
-                         config.tag_path, len(config.thresholds))
+            logger.debug(
+                "Registered alarm config for %s (%d thresholds)",
+                config.tag_path,
+                len(config.thresholds),
+            )
 
     async def unregister_config(self, tag_path: str) -> bool:
         """Remove alarm configuration for a tag. Returns True if found."""
@@ -168,15 +171,15 @@ class AlarmEngine:
             results.append(inst.to_dict())
 
         # Sort by priority rank (most severe first), then by timestamp
-        results.sort(key=lambda d: (
-            AlarmPriority(d["priority"]).rank,
-            d["timestamp"],
-        ))
+        results.sort(
+            key=lambda d: (
+                AlarmPriority(d["priority"]).rank,
+                d["timestamp"],
+            )
+        )
         return results[:limit]
 
-    async def acknowledge_alarm(
-        self, alarm_id: str, *, operator: str = ""
-    ) -> bool:
+    async def acknowledge_alarm(self, alarm_id: str, *, operator: str = "") -> bool:
         """Acknowledge an alarm. Returns True on success."""
         async with self._lock:
             inst = self._instances.get(alarm_id)
@@ -186,8 +189,9 @@ class AlarmEngine:
             try:
                 result = self._sm.transition(inst, AlarmAction.ACKNOWLEDGE)
             except InvalidTransition:
-                logger.warning("Cannot acknowledge alarm %s in state %s",
-                               alarm_id, inst.state.value)
+                logger.warning(
+                    "Cannot acknowledge alarm %s in state %s", alarm_id, inst.state.value
+                )
                 return False
 
             inst.ack_operator = operator
@@ -273,7 +277,9 @@ class AlarmEngine:
 
             inst.shelve_reason = reason
             inst.shelved_until = datetime.now(timezone.utc)  # Simplified — real impl uses timedelta
-            event = self._make_event(inst, result, detail=f"shelved for {duration_minutes}m: {reason}")
+            event = self._make_event(
+                inst, result, detail=f"shelved for {duration_minutes}m: {reason}"
+            )
             self._record_event(event)
             await self._notify(event)
             return True
@@ -419,9 +425,7 @@ class AlarmEngine:
 
         async with self._lock:
             for threshold in config.thresholds:
-                evt = await self._evaluate_threshold(
-                    config, threshold, value, quality
-                )
+                evt = await self._evaluate_threshold(config, threshold, value, quality)
                 if evt is not None:
                     events.append(evt)
 
@@ -594,9 +598,7 @@ class AlarmEngine:
 
         return None
 
-    async def _try_clear_by_type(
-        self, tag_path: str, alarm_type: AlarmType
-    ) -> AlarmEvent | None:
+    async def _try_clear_by_type(self, tag_path: str, alarm_type: AlarmType) -> AlarmEvent | None:
         """Try to clear an alarm by tag_path and type. Must hold self._lock."""
         dedup_key = f"{tag_path}:{alarm_type.value}"
         alarm_id = self._tag_alarm_index.get(dedup_key)

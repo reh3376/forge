@@ -16,7 +16,6 @@ from forge.core.broker.topic_engine import (
 
 
 class TestMqttTopicMatches:
-
     # Exact match
     def test_exact_match(self):
         assert mqtt_topic_matches("a/b/c", "a/b/c") is True
@@ -81,7 +80,6 @@ class TestMqttTopicMatches:
 
 
 class TestSubscriptions:
-
     def test_subscribe_returns_granted_qos(self):
         engine = TopicEngine()
         assert engine.subscribe("c1", "test/#", qos=0) == 0
@@ -133,7 +131,6 @@ class TestSubscriptions:
 
 
 class TestMatching:
-
     def test_exact_match(self):
         engine = TopicEngine()
         engine.subscribe("c1", "whk/whk01/ot/tags/TIT/Out_PV")
@@ -190,7 +187,6 @@ class TestMatching:
 
 
 class TestRetainedMessages:
-
     def test_set_and_get_retained(self):
         engine = TopicEngine()
         engine.set_retained("whk/health/PLC_001", b'{"connected": true}', qos=1)
@@ -236,7 +232,6 @@ class TestRetainedMessages:
 
 
 class TestTopicEngineStats:
-
     def test_stats(self):
         engine = TopicEngine()
         engine.subscribe("c1", "test/#")

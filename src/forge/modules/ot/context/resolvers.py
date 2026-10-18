@@ -62,6 +62,7 @@ class EnrichmentContext(BaseModel):
 
 class AreaRule(BaseModel):
     """A path pattern → area mapping rule."""
+
     pattern: str  # regex or prefix pattern
     area: str
     site: str = ""
@@ -84,7 +85,7 @@ class AreaResolver:
 
     def __init__(self, rules: list[AreaRule] | None = None) -> None:
         self._rules: list[tuple[re.Pattern, str, str]] = []
-        for rule in (rules or []):
+        for rule in rules or []:
             self._rules.append((re.compile(rule.pattern), rule.area, rule.site))
 
         # Default rule: extract area from 3rd path segment
@@ -127,6 +128,7 @@ class AreaResolver:
 
 class EquipmentRule(BaseModel):
     """A path pattern → equipment_id mapping rule."""
+
     pattern: str  # regex with named group 'equip' or direct mapping
     equipment_id: str = ""  # Static ID; empty means extract from path
 
@@ -147,7 +149,7 @@ class EquipmentResolver:
 
     def __init__(self, rules: list[EquipmentRule] | None = None) -> None:
         self._rules: list[tuple[re.Pattern, str]] = []
-        for rule in (rules or []):
+        for rule in rules or []:
             self._rules.append((re.compile(rule.pattern), rule.equipment_id))
         self._use_default_extraction = len(self._rules) == 0
 
@@ -190,6 +192,7 @@ class EquipmentResolver:
 
 class BatchContext(BaseModel):
     """Batch/recipe context for an area or equipment."""
+
     batch_id: str | None = None
     lot_id: str | None = None
     recipe_id: str | None = None

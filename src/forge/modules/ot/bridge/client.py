@@ -211,9 +211,7 @@ class IgnitionRestClient:
             response_time=response_time,
         )
 
-    async def _read_batch_inner(
-        self, paths: list[str]
-    ) -> list[IgnitionTagValue]:
+    async def _read_batch_inner(self, paths: list[str]) -> list[IgnitionTagValue]:
         """Execute a single batch tag read with retry."""
         payload = {"paths": paths}
 
@@ -228,10 +226,12 @@ class IgnitionRestClient:
                 return _parse_tag_response(paths, response)
             except Exception as e:
                 if attempt < self._max_retries - 1:
-                    delay = self._base_delay_ms * (2 ** attempt) / 1000.0
+                    delay = self._base_delay_ms * (2**attempt) / 1000.0
                     logger.debug(
                         "Tag read attempt %d failed, retrying in %.1fs: %s",
-                        attempt + 1, delay, e,
+                        attempt + 1,
+                        delay,
+                        e,
                     )
                     await asyncio.sleep(delay)
                 else:
@@ -347,6 +347,7 @@ def _parse_tag_response(
         else:
             # Missing entry — mark as BAD
             from forge.modules.ot.bridge.models import IgnitionQuality
+
             values.append(
                 IgnitionTagValue(
                     path=path,

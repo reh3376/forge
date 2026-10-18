@@ -64,9 +64,7 @@ class ExpressionProvider(BaseProvider):
             tags = await self._registry.find_by_type(tag_type)
             self._evaluable_count += len(tags)
 
-        logger.info(
-            "ExpressionProvider: found %d evaluable tags", self._evaluable_count
-        )
+        logger.info("ExpressionProvider: found %d evaluable tags", self._evaluable_count)
 
         # Run initial evaluation if engine is available
         if self._engine is not None:

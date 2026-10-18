@@ -179,8 +179,10 @@ class TestTagWriteConfigValidation:
 class TestInterlockRule:
     def test_frozen(self):
         rule = InterlockRule(
-            rule_id="r1", name="test",
-            target_tag_pattern="*", check_tag="t",
+            rule_id="r1",
+            name="test",
+            target_tag_pattern="*",
+            check_tag="t",
             condition=InterlockCondition.IS_TRUE,
         )
         with pytest.raises(AttributeError):
@@ -223,9 +225,15 @@ class TestDataType:
 class TestWriteStatus:
     def test_all_values(self):
         expected = {
-            "CONFIRMED", "UNCONFIRMED", "REJECTED_VALIDATION",
-            "REJECTED_INTERLOCK", "REJECTED_AUTH", "REJECTED_REVIEW",
-            "FAILED_WRITE", "FAILED_READBACK", "PENDING",
+            "CONFIRMED",
+            "UNCONFIRMED",
+            "REJECTED_VALIDATION",
+            "REJECTED_INTERLOCK",
+            "REJECTED_AUTH",
+            "REJECTED_REVIEW",
+            "FAILED_WRITE",
+            "FAILED_READBACK",
+            "PENDING",
         }
         assert {ws.value for ws in WriteStatus} == expected
 

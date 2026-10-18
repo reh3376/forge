@@ -79,9 +79,7 @@ def test_missing_spec_warns_unless_required(mes_manifest: AdapterManifest) -> No
     assert not strict.ok
 
 
-def test_tampered_spec_file_fails_integrity(
-    mes_manifest: AdapterManifest, tmp_path: Path
-) -> None:
+def test_tampered_spec_file_fails_integrity(mes_manifest: AdapterManifest, tmp_path: Path) -> None:
     spec, _ = load_facts_spec("forge-mes")
     assert spec is not None
     spec["capabilities"]["write"] = False  # edit without re-hashing

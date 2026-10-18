@@ -41,12 +41,12 @@ class BackfillStatus(StrEnum):
 class BackfillStrategy(StrEnum):
     """Data transfer strategies for backfill."""
 
-    PG_COPY = "pg_copy"           # PostgreSQL COPY (fastest for PG→PG)
-    PG_DUMP_RESTORE = "pg_dump"   # pg_dump + pg_restore (schema-aware)
-    ROW_STREAM = "row_stream"     # Row-by-row with transforms (flexible)
-    NEO4J_EXPORT = "neo4j_export" # Cypher EXPORT → IMPORT
-    REDIS_DUMP = "redis_dump"     # Redis DUMP/RESTORE per key pattern
-    EVENT_REPLAY = "event_replay" # Replay event log (for event-sourced spokes)
+    PG_COPY = "pg_copy"  # PostgreSQL COPY (fastest for PG→PG)
+    PG_DUMP_RESTORE = "pg_dump"  # pg_dump + pg_restore (schema-aware)
+    ROW_STREAM = "row_stream"  # Row-by-row with transforms (flexible)
+    NEO4J_EXPORT = "neo4j_export"  # Cypher EXPORT → IMPORT
+    REDIS_DUMP = "redis_dump"  # Redis DUMP/RESTORE per key pattern
+    EVENT_REPLAY = "event_replay"  # Replay event log (for event-sourced spokes)
 
 
 @dataclass
@@ -54,15 +54,15 @@ class BackfillTablePlan:
     """Plan for backfilling a single table/entity from spoke to Forge."""
 
     spoke_id: str
-    source_table: str            # e.g., "public.Barrel" (spoke-local)
-    target_schema: str           # e.g., "mod_wms"
-    target_table: str            # e.g., "barrels" (Forge pod)
+    source_table: str  # e.g., "public.Barrel" (spoke-local)
+    target_schema: str  # e.g., "mod_wms"
+    target_table: str  # e.g., "barrels" (Forge pod)
     strategy: BackfillStrategy
     estimated_rows: int | None = None
     id_mapping: str = "cuid_passthrough"  # How to handle IDs
     transforms: list[str] = field(default_factory=list)  # Column transforms
     depends_on: list[str] = field(default_factory=list)  # FK dependencies
-    priority: int = 0            # Lower = run first
+    priority: int = 0  # Lower = run first
 
 
 @dataclass
@@ -127,21 +127,15 @@ class BackfillEngine:
         engine.validate_spoke("whk-cmms")
     """
 
-    _plans: dict[str, list[BackfillTablePlan]] = field(
-        default_factory=dict, init=False
-    )
-    _progress: dict[str, dict[str, BackfillProgress]] = field(
-        default_factory=dict, init=False
-    )
+    _plans: dict[str, list[BackfillTablePlan]] = field(default_factory=dict, init=False)
+    _progress: dict[str, dict[str, BackfillProgress]] = field(default_factory=dict, init=False)
 
     def add_table_plan(self, plan: BackfillTablePlan) -> None:
         """Add a table backfill plan for a spoke."""
         self._plans.setdefault(plan.spoke_id, []).append(plan)
-        self._progress.setdefault(plan.spoke_id, {})[plan.source_table] = (
-            BackfillProgress(
-                spoke_id=plan.spoke_id,
-                table_name=plan.source_table,
-            )
+        self._progress.setdefault(plan.spoke_id, {})[plan.source_table] = BackfillProgress(
+            spoke_id=plan.spoke_id,
+            table_name=plan.source_table,
         )
         logger.info(
             "Planned backfill: %s.%s → %s.%s (%s)",
@@ -188,9 +182,7 @@ class BackfillEngine:
 
         return summary
 
-    async def run_table(
-        self, spoke_id: str, source_table: str
-    ) -> BackfillProgress:
+    async def run_table(self, spoke_id: str, source_table: str) -> BackfillProgress:
         """Execute backfill for a single table.
 
         Phase 1: Simulates completion (updates progress tracking).
@@ -198,15 +190,11 @@ class BackfillEngine:
         """
         progress = self._progress.get(spoke_id, {}).get(source_table)
         if progress is None:
-            raise ValueError(
-                f"No backfill plan for {spoke_id}.{source_table}"
-            )
+            raise ValueError(f"No backfill plan for {spoke_id}.{source_table}")
 
         plan = self._find_plan(spoke_id, source_table)
         if plan is None:
-            raise ValueError(
-                f"No backfill plan for {spoke_id}.{source_table}"
-            )
+            raise ValueError(f"No backfill plan for {spoke_id}.{source_table}")
 
         progress.status = BackfillStatus.IN_PROGRESS
         progress.started_at = datetime.now(tz=timezone.utc)
@@ -252,18 +240,14 @@ class BackfillEngine:
             raise ValueError(f"No backfill plans for spoke '{spoke_id}'")
 
         # Sort by priority (lower first), then by dependency count
-        sorted_plans = sorted(
-            plans, key=lambda p: (p.priority, len(p.depends_on))
-        )
+        sorted_plans = sorted(plans, key=lambda p: (p.priority, len(p.depends_on)))
 
         for plan in sorted_plans:
             await self.run_table(spoke_id, plan.source_table)
 
         return self.plan_spoke(spoke_id)
 
-    def validate_table(
-        self, spoke_id: str, source_table: str
-    ) -> BackfillProgress:
+    def validate_table(self, spoke_id: str, source_table: str) -> BackfillProgress:
         """Validate a backfilled table by checking row counts.
 
         Phase 1: Checks that rows_transferred > 0 and status is COMPLETE.
@@ -271,15 +255,11 @@ class BackfillEngine:
         """
         progress = self._progress.get(spoke_id, {}).get(source_table)
         if progress is None:
-            raise ValueError(
-                f"No backfill progress for {spoke_id}.{source_table}"
-            )
+            raise ValueError(f"No backfill progress for {spoke_id}.{source_table}")
 
         if progress.status != BackfillStatus.COMPLETE:
             progress.status = BackfillStatus.FAILED
-            progress.error = (
-                f"Cannot validate — status is {progress.status.value}"
-            )
+            progress.error = f"Cannot validate — status is {progress.status.value}"
             return progress
 
         # Phase 1: simple validation
@@ -300,9 +280,7 @@ class BackfillEngine:
         if source_table:
             progress = self._progress.get(spoke_id, {}).get(source_table)
             if progress is None:
-                raise ValueError(
-                    f"No backfill progress for {spoke_id}.{source_table}"
-                )
+                raise ValueError(f"No backfill progress for {spoke_id}.{source_table}")
             return progress
         return self.plan_spoke(spoke_id)
 
@@ -323,9 +301,7 @@ class BackfillEngine:
             if prog.status == BackfillStatus.COMPLETE
         )
 
-    def _find_plan(
-        self, spoke_id: str, source_table: str
-    ) -> BackfillTablePlan | None:
+    def _find_plan(self, spoke_id: str, source_table: str) -> BackfillTablePlan | None:
         for plan in self._plans.get(spoke_id, []):
             if plan.source_table == source_table:
                 return plan

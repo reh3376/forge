@@ -51,30 +51,34 @@ class TestMockClientEvents:
     @pytest.mark.asyncio()
     async def test_list_recent_events_seeded(self):
         client = MockBoscImsClient()
-        client.seed_events([
-            {
-                "event_id": "evt-001",
-                "asset_id": "a1",
-                "event_type": "TRANSACTION_TYPE_ASSET_RECEIVED",
-                "occurred_at": "2026-04-06T14:00:00+00:00",
-            },
-            {
-                "event_id": "evt-002",
-                "asset_id": "a2",
-                "event_type": "TRANSACTION_TYPE_SHIPPED",
-                "occurred_at": "2026-04-06T15:00:00+00:00",
-            },
-        ])
+        client.seed_events(
+            [
+                {
+                    "event_id": "evt-001",
+                    "asset_id": "a1",
+                    "event_type": "TRANSACTION_TYPE_ASSET_RECEIVED",
+                    "occurred_at": "2026-04-06T14:00:00+00:00",
+                },
+                {
+                    "event_id": "evt-002",
+                    "asset_id": "a2",
+                    "event_type": "TRANSACTION_TYPE_SHIPPED",
+                    "occurred_at": "2026-04-06T15:00:00+00:00",
+                },
+            ]
+        )
         events = await client.list_recent_events()
         assert len(events) == 2
 
     @pytest.mark.asyncio()
     async def test_list_recent_events_with_limit(self):
         client = MockBoscImsClient()
-        client.seed_events([
-            {"event_id": f"evt-{i}", "occurred_at": f"2026-04-06T{i:02d}:00:00+00:00"}
-            for i in range(10)
-        ])
+        client.seed_events(
+            [
+                {"event_id": f"evt-{i}", "occurred_at": f"2026-04-06T{i:02d}:00:00+00:00"}
+                for i in range(10)
+            ]
+        )
         events = await client.list_recent_events(limit=3)
         assert len(events) == 3
 
@@ -83,16 +87,18 @@ class TestMockClientEvents:
         from datetime import UTC, datetime
 
         client = MockBoscImsClient()
-        client.seed_events([
-            {
-                "event_id": "evt-old",
-                "occurred_at": "2026-04-05T10:00:00+00:00",
-            },
-            {
-                "event_id": "evt-new",
-                "occurred_at": "2026-04-06T15:00:00+00:00",
-            },
-        ])
+        client.seed_events(
+            [
+                {
+                    "event_id": "evt-old",
+                    "occurred_at": "2026-04-05T10:00:00+00:00",
+                },
+                {
+                    "event_id": "evt-new",
+                    "occurred_at": "2026-04-06T15:00:00+00:00",
+                },
+            ]
+        )
         since = datetime(2026, 4, 6, 0, 0, tzinfo=UTC)
         events = await client.list_recent_events(since=since)
         assert len(events) == 1
@@ -113,15 +119,17 @@ class TestMockClientAssets:
     @pytest.mark.asyncio()
     async def test_get_asset_found(self):
         client = MockBoscImsClient()
-        client.seed_assets([
-            {
-                "id": "asset-001",
-                "part_id": "PART-BOLT",
-                "disposition": "SERVICEABLE",
-                "system_state": "ACTIVE",
-                "asset_state": "NEW",
-            },
-        ])
+        client.seed_assets(
+            [
+                {
+                    "id": "asset-001",
+                    "part_id": "PART-BOLT",
+                    "disposition": "SERVICEABLE",
+                    "system_state": "ACTIVE",
+                    "asset_state": "NEW",
+                },
+            ]
+        )
         asset = await client.get_asset("asset-001")
         assert asset is not None
         assert asset["disposition"] == "SERVICEABLE"
@@ -141,19 +149,23 @@ class TestMockClientEntities:
     @pytest.mark.asyncio()
     async def test_list_locations_seeded(self):
         client = MockBoscImsClient()
-        client.seed_locations([
-            {"id": "loc-1", "name": "Warehouse-A"},
-            {"id": "loc-2", "name": "Warehouse-B"},
-        ])
+        client.seed_locations(
+            [
+                {"id": "loc-1", "name": "Warehouse-A"},
+                {"id": "loc-2", "name": "Warehouse-B"},
+            ]
+        )
         locations = await client.list_locations()
         assert len(locations) == 2
 
     @pytest.mark.asyncio()
     async def test_list_suppliers_seeded(self):
         client = MockBoscImsClient()
-        client.seed_suppliers([
-            {"id": "sup-1", "name": "Precision Cast"},
-        ])
+        client.seed_suppliers(
+            [
+                {"id": "sup-1", "name": "Precision Cast"},
+            ]
+        )
         suppliers = await client.list_suppliers()
         assert len(suppliers) == 1
         assert suppliers[0]["name"] == "Precision Cast"
@@ -161,9 +173,11 @@ class TestMockClientEntities:
     @pytest.mark.asyncio()
     async def test_get_part_found(self):
         client = MockBoscImsClient()
-        client.seed_parts([
-            {"id": "part-1", "part_number": "BOLT-A286-001"},
-        ])
+        client.seed_parts(
+            [
+                {"id": "part-1", "part_number": "BOLT-A286-001"},
+            ]
+        )
         part = await client.get_part("part-1")
         assert part is not None
         assert part["part_number"] == "BOLT-A286-001"
@@ -171,13 +185,15 @@ class TestMockClientEntities:
     @pytest.mark.asyncio()
     async def test_get_asset_compliance(self):
         client = MockBoscImsClient()
-        client.seed_compliance({
-            "asset-001": {
-                "tests": [{"test_id": "t1", "result": "PASS"}],
-                "documents": [{"doc_id": "d1"}],
-                "gaps": [],
-            },
-        })
+        client.seed_compliance(
+            {
+                "asset-001": {
+                    "tests": [{"test_id": "t1", "result": "PASS"}],
+                    "documents": [{"doc_id": "d1"}],
+                    "gaps": [],
+                },
+            }
+        )
         comp = await client.get_asset_compliance("asset-001")
         assert comp is not None
         assert len(comp["tests"]) == 1
@@ -185,13 +201,15 @@ class TestMockClientEntities:
     @pytest.mark.asyncio()
     async def test_get_compliance_gaps(self):
         client = MockBoscImsClient()
-        client.seed_compliance({
-            "asset-002": {
-                "tests": [],
-                "documents": [],
-                "gaps": [{"gap_id": "g1", "severity": "HIGH"}],
-            },
-        })
+        client.seed_compliance(
+            {
+                "asset-002": {
+                    "tests": [],
+                    "documents": [],
+                    "gaps": [{"gap_id": "g1", "severity": "HIGH"}],
+                },
+            }
+        )
         gaps = await client.get_compliance_gaps("asset-002")
         assert len(gaps) == 1
         assert gaps[0]["severity"] == "HIGH"

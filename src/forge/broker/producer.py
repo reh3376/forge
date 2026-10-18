@@ -52,9 +52,7 @@ class InMemoryProducer(ForgeProducer):
     what was published during tests.
     """
 
-    messages: dict[str, list[dict[str, Any]]] = field(
-        default_factory=lambda: defaultdict(list)
-    )
+    messages: dict[str, list[dict[str, Any]]] = field(default_factory=lambda: defaultdict(list))
 
     async def publish(
         self,
@@ -63,11 +61,13 @@ class InMemoryProducer(ForgeProducer):
         routing_key: str = "",
     ) -> None:
         body = serialize_record(payload)
-        self.messages[exchange.name].append({
-            "routing_key": routing_key,
-            "body": body,
-            "exchange": exchange.name,
-        })
+        self.messages[exchange.name].append(
+            {
+                "routing_key": routing_key,
+                "body": body,
+                "exchange": exchange.name,
+            }
+        )
 
     async def close(self) -> None:
         pass

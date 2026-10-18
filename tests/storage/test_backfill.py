@@ -305,9 +305,7 @@ class TestBackfillEngineAsync:
                 estimated_rows=10_000,
             )
         )
-        progress = asyncio.run(
-            engine.run_table("whk-wms", "public.Barrel")
-        )
+        progress = asyncio.run(engine.run_table("whk-wms", "public.Barrel"))
         assert progress.status == BackfillStatus.COMPLETE
         assert progress.rows_transferred == 10_000
         assert progress.completed_at is not None
@@ -315,9 +313,7 @@ class TestBackfillEngineAsync:
     def test_run_table_nonexistent_raises(self):
         engine = BackfillEngine()
         with pytest.raises(ValueError, match="No backfill plan"):
-            asyncio.run(
-                engine.run_table("whk-wms", "nonexistent")
-            )
+            asyncio.run(engine.run_table("whk-wms", "nonexistent"))
 
     def test_run_spoke(self):
         engine = BackfillEngine()
@@ -341,9 +337,7 @@ class TestBackfillEngineAsync:
                 estimated_rows=5_000,
             )
         )
-        summary = asyncio.run(
-            engine.run_spoke("whk-wms")
-        )
+        summary = asyncio.run(engine.run_spoke("whk-wms"))
         assert summary.overall_status == BackfillStatus.COMPLETE
         assert summary.tables_complete == 2
         assert summary.rows_transferred == 15_000
@@ -351,9 +345,7 @@ class TestBackfillEngineAsync:
     def test_run_spoke_nonexistent_raises(self):
         engine = BackfillEngine()
         with pytest.raises(ValueError, match="No backfill plans"):
-            asyncio.run(
-                engine.run_spoke("nonexistent")
-            )
+            asyncio.run(engine.run_spoke("nonexistent"))
 
     def test_run_spoke_respects_priority(self):
         engine = BackfillEngine()
@@ -381,9 +373,7 @@ class TestBackfillEngineAsync:
                 depends_on=["public.Customer"],
             )
         )
-        summary = asyncio.run(
-            engine.run_spoke("whk-wms")
-        )
+        summary = asyncio.run(engine.run_spoke("whk-wms"))
         assert summary.tables_complete == 2
 
 
@@ -405,9 +395,7 @@ class TestBackfillEngineValidation:
                 estimated_rows=10_000,
             )
         )
-        asyncio.run(
-            engine.run_table("whk-wms", "public.Barrel")
-        )
+        asyncio.run(engine.run_table("whk-wms", "public.Barrel"))
         progress = engine.validate_table("whk-wms", "public.Barrel")
         assert progress.status == BackfillStatus.COMPLETE
         assert progress.rows_validated == 10_000

@@ -16,7 +16,6 @@ from forge.sdk.scripting.sandbox import (
 
 
 class TestModuleAllowlist:
-
     def test_stdlib_allowed(self):
         sandbox = ScriptSandbox()
         assert sandbox.is_module_allowed("json")
@@ -78,7 +77,6 @@ class TestModuleAllowlist:
 
 
 class TestSandboxLifecycle:
-
     def test_not_active_by_default(self):
         sandbox = ScriptSandbox()
         assert not sandbox.is_active
@@ -123,7 +121,6 @@ class TestSandboxLifecycle:
 
 
 class TestImportBlocking:
-
     def test_blocked_import_raises(self):
         """When sandbox is active, importing a blocked module fails."""
         sandbox = ScriptSandbox()
@@ -159,7 +156,6 @@ class TestImportBlocking:
 
 
 class TestSandboxConfig:
-
     def test_defaults(self):
         config = SandboxConfig()
         assert config.enabled is True
@@ -185,7 +181,6 @@ class TestSandboxConfig:
 
 
 class TestScriptGlobals:
-
     def test_globals_include_builtins(self):
         sandbox = ScriptSandbox()
         g = sandbox.create_script_globals()
@@ -198,6 +193,7 @@ class TestScriptGlobals:
 
     def test_globals_with_forge_module(self):
         import types
+
         fake_forge = types.ModuleType("forge")
         sandbox = ScriptSandbox()
         g = sandbox.create_script_globals(forge_module=fake_forge)

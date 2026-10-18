@@ -49,8 +49,8 @@ class ScriptPermission:
     """
 
     owner: str
-    area_pattern: str = "*"       # fnmatch pattern for area names
-    tag_pattern: str = "**"       # tag path pattern (same as trigger patterns)
+    area_pattern: str = "*"  # fnmatch pattern for area names
+    tag_pattern: str = "**"  # tag path pattern (same as trigger patterns)
     can_write_tags: bool = True
     can_write_db: bool = False
     granted_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
@@ -104,8 +104,11 @@ class ScriptRBAC:
         self._permissions.append(permission)
         logger.info(
             "RBAC grant: owner=%s area=%s tags=%s write_tags=%s write_db=%s",
-            permission.owner, permission.area_pattern, permission.tag_pattern,
-            permission.can_write_tags, permission.can_write_db,
+            permission.owner,
+            permission.area_pattern,
+            permission.tag_pattern,
+            permission.can_write_tags,
+            permission.can_write_db,
         )
 
     def revoke(self, owner: str) -> int:
@@ -154,12 +157,17 @@ class ScriptRBAC:
         # No matching grant found
         if self._default_policy == "allow":
             return PermissionCheckResult(
-                allowed=True, owner=owner, operation="tag_write",
-                target=tag_path, reason="Default policy: allow",
+                allowed=True,
+                owner=owner,
+                operation="tag_write",
+                target=tag_path,
+                reason="Default policy: allow",
             )
 
         return PermissionCheckResult(
-            allowed=False, owner=owner, operation="tag_write",
+            allowed=False,
+            owner=owner,
+            operation="tag_write",
             target=tag_path,
             reason=f"No matching permission for owner={owner!r} on tag={tag_path!r} area={area!r}",
         )
@@ -172,19 +180,27 @@ class ScriptRBAC:
             if not perm.can_write_db:
                 continue
             return PermissionCheckResult(
-                allowed=True, owner=owner, operation="db_write",
-                target=db_name, matching_permission=perm,
+                allowed=True,
+                owner=owner,
+                operation="db_write",
+                target=db_name,
+                matching_permission=perm,
                 reason=f"Matched grant: owner={perm.owner} can_write_db=True",
             )
 
         if self._default_policy == "allow":
             return PermissionCheckResult(
-                allowed=True, owner=owner, operation="db_write",
-                target=db_name, reason="Default policy: allow",
+                allowed=True,
+                owner=owner,
+                operation="db_write",
+                target=db_name,
+                reason="Default policy: allow",
             )
 
         return PermissionCheckResult(
-            allowed=False, owner=owner, operation="db_write",
+            allowed=False,
+            owner=owner,
+            operation="db_write",
             target=db_name,
             reason=f"No db_write permission for owner={owner!r}",
         )

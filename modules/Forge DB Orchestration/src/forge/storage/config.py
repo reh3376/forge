@@ -129,8 +129,6 @@ class StorageConfig:
                 secret_key=os.getenv("MINIO_SECRET_KEY", "changeme"),
             ),
             kafka=KafkaConfig(
-                bootstrap_servers=os.getenv(
-                    "KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"
-                ),
+                bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"),
             ),
         )

@@ -217,9 +217,7 @@ class DataValue(BaseModel):
     """
 
     value: Any = Field(default=None, description="The actual value")
-    data_type: DataType = Field(
-        default=DataType.VARIANT, description="OPC-UA data type"
-    )
+    data_type: DataType = Field(default=DataType.VARIANT, description="OPC-UA data type")
     quality: QualityCode = Field(
         default=QualityCode.NOT_AVAILABLE,
         description="Forge quality code (mapped from StatusCode)",
@@ -263,9 +261,7 @@ class BrowseResult(BaseModel):
         description="Read/write permissions (AccessLevel flag combination)",
     )
     description: str = Field(default="", description="Node description (if available)")
-    has_children: bool = Field(
-        default=False, description="Whether this node has child nodes"
-    )
+    has_children: bool = Field(default=False, description="Whether this node has child nodes")
 
     @property
     def is_readable(self) -> bool:
@@ -297,9 +293,7 @@ class MonitoredItem(BaseModel):
     sampling_interval_ms: float = Field(
         default=500.0, description="Requested sampling interval in milliseconds"
     )
-    queue_size: int = Field(
-        default=10, description="Server-side queue for buffering changes"
-    )
+    queue_size: int = Field(default=10, description="Server-side queue for buffering changes")
     discard_oldest: bool = Field(
         default=True,
         description="Discard oldest queued value when buffer full",
@@ -349,12 +343,8 @@ class OpcUaEndpoint(BaseModel):
     which exposes a native OPC-UA server on port 4840.
     """
 
-    url: str = Field(
-        description="OPC-UA endpoint URL (e.g., opc.tcp://10.4.2.10:4840)"
-    )
-    name: str = Field(
-        default="", description="Human-readable connection name (e.g., 'plc200')"
-    )
+    url: str = Field(description="OPC-UA endpoint URL (e.g., opc.tcp://10.4.2.10:4840)")
+    name: str = Field(default="", description="Human-readable connection name (e.g., 'plc200')")
     security_policy: str = Field(
         default="None",
         description="Security policy: None, Basic256Sha256, Aes128Sha256RsaOaep",
@@ -369,9 +359,7 @@ class OpcUaEndpoint(BaseModel):
         default=None,
         description="Path to trusted server certificate (PEM) for validation",
     )
-    session_timeout_ms: int = Field(
-        default=60_000, description="Session timeout in milliseconds"
-    )
+    session_timeout_ms: int = Field(default=60_000, description="Session timeout in milliseconds")
     request_timeout_ms: int = Field(
         default=10_000, description="Individual request timeout in milliseconds"
     )

@@ -54,9 +54,7 @@ class DeviceRecord:
         """
         if self.last_heartbeat is None:
             return False
-        elapsed = (
-            datetime.now(tz=UTC) - self.last_heartbeat
-        ).total_seconds()
+        elapsed = (datetime.now(tz=UTC) - self.last_heartbeat).total_seconds()
         return elapsed < self.heartbeat_interval_s * 3
 
     def to_dict(self) -> dict[str, Any]:
@@ -69,11 +67,7 @@ class DeviceRecord:
             "operator_id": self.operator_id,
             "site_id": self.site_id,
             "registered_at": self.registered_at.isoformat(),
-            "last_heartbeat": (
-                self.last_heartbeat.isoformat()
-                if self.last_heartbeat
-                else None
-            ),
+            "last_heartbeat": (self.last_heartbeat.isoformat() if self.last_heartbeat else None),
             "is_online": self.is_online,
         }
 

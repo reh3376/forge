@@ -25,20 +25,24 @@ from forge.modules.ot.control.authorization import WriteAuthorizer
 @pytest.fixture
 def authorizer() -> WriteAuthorizer:
     auth = WriteAuthorizer()
-    auth.add_permission(WritePermission(
-        permission_id="perm-op-dist",
-        area_pattern="Distillery*",
-        tag_pattern="WH/WHK01/Distillery01/**",
-        min_role=WriteRole.OPERATOR,
-        description="Operators can write to Distillery01 tags",
-    ))
-    auth.add_permission(WritePermission(
-        permission_id="perm-eng-all",
-        area_pattern="*",
-        tag_pattern="**",
-        min_role=WriteRole.ENGINEER,
-        description="Engineers can write anywhere",
-    ))
+    auth.add_permission(
+        WritePermission(
+            permission_id="perm-op-dist",
+            area_pattern="Distillery*",
+            tag_pattern="WH/WHK01/Distillery01/**",
+            min_role=WriteRole.OPERATOR,
+            description="Operators can write to Distillery01 tags",
+        )
+    )
+    auth.add_permission(
+        WritePermission(
+            permission_id="perm-eng-all",
+            area_pattern="*",
+            tag_pattern="**",
+            min_role=WriteRole.ENGINEER,
+            description="Engineers can write anywhere",
+        )
+    )
     return auth
 
 
@@ -141,12 +145,14 @@ class TestRoleHierarchy:
     def test_operator_cannot_use_engineer_permission(self):
         """Engineer-only permission doesn't grant operator access."""
         auth = WriteAuthorizer()
-        auth.add_permission(WritePermission(
-            permission_id="eng-only",
-            area_pattern="*",
-            tag_pattern="**",
-            min_role=WriteRole.ENGINEER,
-        ))
+        auth.add_permission(
+            WritePermission(
+                permission_id="eng-only",
+                area_pattern="*",
+                tag_pattern="**",
+                min_role=WriteRole.ENGINEER,
+            )
+        )
 
         req = _make_request(role=WriteRole.OPERATOR)
         result = auth.authorize(req, WriteResult(request=req))
@@ -155,12 +161,14 @@ class TestRoleHierarchy:
     def test_admin_can_use_operator_permission(self):
         """Admin has authority over OPERATOR min_role."""
         auth = WriteAuthorizer()
-        auth.add_permission(WritePermission(
-            permission_id="op-perm",
-            area_pattern="*",
-            tag_pattern="**",
-            min_role=WriteRole.OPERATOR,
-        ))
+        auth.add_permission(
+            WritePermission(
+                permission_id="op-perm",
+                area_pattern="*",
+                tag_pattern="**",
+                min_role=WriteRole.OPERATOR,
+            )
+        )
 
         req = _make_request(role=WriteRole.ADMIN)
         result = auth.authorize(req, WriteResult(request=req))
@@ -175,12 +183,14 @@ class TestRoleHierarchy:
 class TestPatternMatching:
     def test_wildcard_area(self):
         auth = WriteAuthorizer()
-        auth.add_permission(WritePermission(
-            permission_id="all-areas",
-            area_pattern="*",
-            tag_pattern="t/**",
-            min_role=WriteRole.OPERATOR,
-        ))
+        auth.add_permission(
+            WritePermission(
+                permission_id="all-areas",
+                area_pattern="*",
+                tag_pattern="t/**",
+                min_role=WriteRole.OPERATOR,
+            )
+        )
 
         for area in ["Distillery01", "Granary", "Bottling"]:
             req = _make_request(tag_path="t/some/tag", area=area)
@@ -189,12 +199,14 @@ class TestPatternMatching:
 
     def test_specific_area_pattern(self):
         auth = WriteAuthorizer()
-        auth.add_permission(WritePermission(
-            permission_id="dist-only",
-            area_pattern="Distillery*",
-            tag_pattern="**",
-            min_role=WriteRole.OPERATOR,
-        ))
+        auth.add_permission(
+            WritePermission(
+                permission_id="dist-only",
+                area_pattern="Distillery*",
+                tag_pattern="**",
+                min_role=WriteRole.OPERATOR,
+            )
+        )
 
         req_ok = _make_request(area="Distillery01")
         assert auth.authorize(req_ok, WriteResult(request=req_ok)).auth_passed is True
@@ -204,12 +216,14 @@ class TestPatternMatching:
 
     def test_empty_area_matches_star(self):
         auth = WriteAuthorizer()
-        auth.add_permission(WritePermission(
-            permission_id="star",
-            area_pattern="*",
-            tag_pattern="**",
-            min_role=WriteRole.OPERATOR,
-        ))
+        auth.add_permission(
+            WritePermission(
+                permission_id="star",
+                area_pattern="*",
+                tag_pattern="**",
+                min_role=WriteRole.OPERATOR,
+            )
+        )
 
         req = _make_request(area="")
         result = auth.authorize(req, WriteResult(request=req))

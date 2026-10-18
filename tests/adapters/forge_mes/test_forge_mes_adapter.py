@@ -148,13 +148,17 @@ class TestLifecycle:
         adapter = ForgeMesAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
-        adapter.inject_records([{
-            "id": "batch-001",
-            "batch_id": "batch-001",
-            "timestamp": "2026-04-06T14:30:00Z",
-            "source_type": "graphql",
-            "entity_type": "Batch",
-        }])
+        adapter.inject_records(
+            [
+                {
+                    "id": "batch-001",
+                    "batch_id": "batch-001",
+                    "timestamp": "2026-04-06T14:30:00Z",
+                    "source_type": "graphql",
+                    "entity_type": "Batch",
+                }
+            ]
+        )
         async for _ in adapter.collect():
             pass
         health = await adapter.health()
@@ -175,22 +179,24 @@ class TestCollect:
         adapter = ForgeMesAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
-        adapter.inject_records([
-            {
-                "id": "batch-001",
-                "batch_id": "batch-001",
-                "timestamp": "2026-04-06T14:30:00Z",
-                "source_type": "graphql",
-                "entity_type": "Batch",
-            },
-            {
-                "id": "batch-002",
-                "batch_id": "batch-002",
-                "timestamp": "2026-04-06T15:00:00Z",
-                "source_type": "graphql",
-                "entity_type": "Batch",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "id": "batch-001",
+                    "batch_id": "batch-001",
+                    "timestamp": "2026-04-06T14:30:00Z",
+                    "source_type": "graphql",
+                    "entity_type": "Batch",
+                },
+                {
+                    "id": "batch-002",
+                    "batch_id": "batch-002",
+                    "timestamp": "2026-04-06T15:00:00Z",
+                    "source_type": "graphql",
+                    "entity_type": "Batch",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         assert len(records) == 2
 
@@ -199,13 +205,17 @@ class TestCollect:
         adapter = ForgeMesAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
-        adapter.inject_records([{
-            "id": "batch-001",
-            "batch_id": "batch-001",
-            "timestamp": "2026-04-06T14:30:00Z",
-            "source_type": "graphql",
-            "entity_type": "Batch",
-        }])
+        adapter.inject_records(
+            [
+                {
+                    "id": "batch-001",
+                    "batch_id": "batch-001",
+                    "timestamp": "2026-04-06T14:30:00Z",
+                    "source_type": "graphql",
+                    "entity_type": "Batch",
+                }
+            ]
+        )
         async for _ in adapter.collect():
             pass
         assert adapter._records_collected == 1

@@ -187,18 +187,12 @@ class TagMapper:
 
         # Include filter (empty = include all)
         if self._config.include_patterns:
-            if not any(
-                fnmatch.fnmatch(bare_path, pat)
-                for pat in self._config.include_patterns
-            ):
+            if not any(fnmatch.fnmatch(bare_path, pat) for pat in self._config.include_patterns):
                 return False
 
         # Exclude filter
         if self._config.exclude_patterns:
-            if any(
-                fnmatch.fnmatch(bare_path, pat)
-                for pat in self._config.exclude_patterns
-            ):
+            if any(fnmatch.fnmatch(bare_path, pat) for pat in self._config.exclude_patterns):
                 return False
 
         return True
@@ -227,7 +221,7 @@ class TagMapper:
             # Rule-based normalization
             stripped = bare_path
             if rule.strip_prefix and stripped.startswith(rule.strip_prefix):
-                stripped = stripped[len(rule.strip_prefix):]
+                stripped = stripped[len(rule.strip_prefix) :]
             return f"{rule.forge_prefix}{stripped}".rstrip("/")
 
         # Default: use PathNormalizer

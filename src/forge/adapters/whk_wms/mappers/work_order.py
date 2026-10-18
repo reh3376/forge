@@ -73,12 +73,8 @@ def map_warehouse_job(raw: dict[str, Any]) -> WorkOrder | None:
         status=_STATUS_MAP.get(status_raw, WorkOrderStatus.PENDING),
         priority=_PRIORITY_MAP.get(priority_raw, WorkOrderPriority.NORMAL),
         parent_id=_str_or_none(raw.get("parentJobId") or raw.get("parent_job_id")),
-        assigned_asset_id=_str_or_none(
-            raw.get("warehouseId") or raw.get("warehouse_id")
-        ),
-        assigned_operator_id=_str_or_none(
-            raw.get("assignedToId") or raw.get("assigned_to_id")
-        ),
+        assigned_asset_id=_str_or_none(raw.get("warehouseId") or raw.get("warehouse_id")),
+        assigned_operator_id=_str_or_none(raw.get("assignedToId") or raw.get("assigned_to_id")),
         planned_start=_parse_datetime(raw.get("startDate") or raw.get("start_date")),
         planned_end=_parse_datetime(raw.get("endDate") or raw.get("end_date")),
         actual_start=_parse_datetime(raw.get("actualStart") or raw.get("actual_start")),
@@ -92,8 +88,7 @@ def map_warehouse_job(raw: dict[str, Any]) -> WorkOrder | None:
             for k, v in {
                 "template_id": raw.get("templateId") or raw.get("template_id"),
                 "decomposition_strategy": (
-                    raw.get("decompositionStrategy")
-                    or raw.get("decomposition_strategy")
+                    raw.get("decompositionStrategy") or raw.get("decomposition_strategy")
                 ),
                 "hierarchy_level": raw.get("hierarchyLevel") or raw.get("hierarchy_level"),
             }.items()

@@ -60,26 +60,32 @@ def _make_result(
 
 def _build_engine() -> ControlWriteEngine:
     validator = WriteValidator()
-    validator.register_tag(TagWriteConfig(
-        tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
-        data_type=DataType.FLOAT,
-        min_value=0.0,
-        max_value=200.0,
-    ))
-    validator.register_tag(TagWriteConfig(
-        tag_path="WH/WHK01/Granary/T01/SP",
-        data_type=DataType.FLOAT,
-        min_value=0.0,
-        max_value=100.0,
-    ))
+    validator.register_tag(
+        TagWriteConfig(
+            tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
+            data_type=DataType.FLOAT,
+            min_value=0.0,
+            max_value=200.0,
+        )
+    )
+    validator.register_tag(
+        TagWriteConfig(
+            tag_path="WH/WHK01/Granary/T01/SP",
+            data_type=DataType.FLOAT,
+            min_value=0.0,
+            max_value=100.0,
+        )
+    )
 
     authorizer = WriteAuthorizer()
-    authorizer.add_permission(WritePermission(
-        permission_id="all",
-        area_pattern="*",
-        tag_pattern="**",
-        min_role=WriteRole.OPERATOR,
-    ))
+    authorizer.add_permission(
+        WritePermission(
+            permission_id="all",
+            area_pattern="*",
+            tag_pattern="**",
+            min_role=WriteRole.OPERATOR,
+        )
+    )
 
     return ControlWriteEngine(
         validator=validator,
@@ -305,16 +311,24 @@ class TestWriteAuditQuery:
     @pytest.mark.asyncio
     async def test_query_all(self):
         engine = _build_engine()
-        await engine.execute(WriteRequest(
-            tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
-            value=100.0, requestor="op1", role=WriteRole.OPERATOR,
-            area="Distillery01",
-        ))
-        await engine.execute(WriteRequest(
-            tag_path="WH/WHK01/Granary/T01/SP",
-            value=50.0, requestor="op2", role=WriteRole.ENGINEER,
-            area="Granary",
-        ))
+        await engine.execute(
+            WriteRequest(
+                tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
+                value=100.0,
+                requestor="op1",
+                role=WriteRole.OPERATOR,
+                area="Distillery01",
+            )
+        )
+        await engine.execute(
+            WriteRequest(
+                tag_path="WH/WHK01/Granary/T01/SP",
+                value=50.0,
+                requestor="op2",
+                role=WriteRole.ENGINEER,
+                area="Granary",
+            )
+        )
 
         query = WriteAuditQuery(engine)
         results = query.query()
@@ -323,16 +337,24 @@ class TestWriteAuditQuery:
     @pytest.mark.asyncio
     async def test_filter_by_tag(self):
         engine = _build_engine()
-        await engine.execute(WriteRequest(
-            tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
-            value=100.0, requestor="op1", role=WriteRole.OPERATOR,
-            area="Distillery01",
-        ))
-        await engine.execute(WriteRequest(
-            tag_path="WH/WHK01/Granary/T01/SP",
-            value=50.0, requestor="op2", role=WriteRole.ENGINEER,
-            area="Granary",
-        ))
+        await engine.execute(
+            WriteRequest(
+                tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
+                value=100.0,
+                requestor="op1",
+                role=WriteRole.OPERATOR,
+                area="Distillery01",
+            )
+        )
+        await engine.execute(
+            WriteRequest(
+                tag_path="WH/WHK01/Granary/T01/SP",
+                value=50.0,
+                requestor="op2",
+                role=WriteRole.ENGINEER,
+                area="Granary",
+            )
+        )
 
         query = WriteAuditQuery(engine)
         results = query.query(tag_path="WH/WHK01/Distillery01/TIT_2010/SP")
@@ -342,16 +364,24 @@ class TestWriteAuditQuery:
     @pytest.mark.asyncio
     async def test_filter_by_requestor(self):
         engine = _build_engine()
-        await engine.execute(WriteRequest(
-            tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
-            value=100.0, requestor="op1", role=WriteRole.OPERATOR,
-            area="Distillery01",
-        ))
-        await engine.execute(WriteRequest(
-            tag_path="WH/WHK01/Granary/T01/SP",
-            value=50.0, requestor="op2", role=WriteRole.ENGINEER,
-            area="Granary",
-        ))
+        await engine.execute(
+            WriteRequest(
+                tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
+                value=100.0,
+                requestor="op1",
+                role=WriteRole.OPERATOR,
+                area="Distillery01",
+            )
+        )
+        await engine.execute(
+            WriteRequest(
+                tag_path="WH/WHK01/Granary/T01/SP",
+                value=50.0,
+                requestor="op2",
+                role=WriteRole.ENGINEER,
+                area="Granary",
+            )
+        )
 
         query = WriteAuditQuery(engine)
         results = query.query(requestor="op2")
@@ -362,17 +392,25 @@ class TestWriteAuditQuery:
     async def test_filter_by_status(self):
         engine = _build_engine()
         # Confirmed
-        await engine.execute(WriteRequest(
-            tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
-            value=100.0, requestor="op1", role=WriteRole.OPERATOR,
-            area="Distillery01",
-        ))
+        await engine.execute(
+            WriteRequest(
+                tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
+                value=100.0,
+                requestor="op1",
+                role=WriteRole.OPERATOR,
+                area="Distillery01",
+            )
+        )
         # Rejected (out of range)
-        await engine.execute(WriteRequest(
-            tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
-            value=999.0, requestor="op1", role=WriteRole.OPERATOR,
-            area="Distillery01",
-        ))
+        await engine.execute(
+            WriteRequest(
+                tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
+                value=999.0,
+                requestor="op1",
+                role=WriteRole.OPERATOR,
+                area="Distillery01",
+            )
+        )
 
         query = WriteAuditQuery(engine)
         rejected = query.query(status="REJECTED_VALIDATION")
@@ -381,16 +419,24 @@ class TestWriteAuditQuery:
     @pytest.mark.asyncio
     async def test_filter_by_area(self):
         engine = _build_engine()
-        await engine.execute(WriteRequest(
-            tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
-            value=100.0, requestor="op1", role=WriteRole.OPERATOR,
-            area="Distillery01",
-        ))
-        await engine.execute(WriteRequest(
-            tag_path="WH/WHK01/Granary/T01/SP",
-            value=50.0, requestor="op2", role=WriteRole.ENGINEER,
-            area="Granary",
-        ))
+        await engine.execute(
+            WriteRequest(
+                tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
+                value=100.0,
+                requestor="op1",
+                role=WriteRole.OPERATOR,
+                area="Distillery01",
+            )
+        )
+        await engine.execute(
+            WriteRequest(
+                tag_path="WH/WHK01/Granary/T01/SP",
+                value=50.0,
+                requestor="op2",
+                role=WriteRole.ENGINEER,
+                area="Granary",
+            )
+        )
 
         query = WriteAuditQuery(engine)
         results = query.query(area="Granary")
@@ -399,11 +445,15 @@ class TestWriteAuditQuery:
     @pytest.mark.asyncio
     async def test_stats(self):
         engine = _build_engine()
-        await engine.execute(WriteRequest(
-            tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
-            value=100.0, requestor="op1", role=WriteRole.OPERATOR,
-            area="Distillery01",
-        ))
+        await engine.execute(
+            WriteRequest(
+                tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
+                value=100.0,
+                requestor="op1",
+                role=WriteRole.OPERATOR,
+                area="Distillery01",
+            )
+        )
 
         query = WriteAuditQuery(engine)
         stats = query.get_stats()

@@ -56,9 +56,7 @@ class InMemoryConsumer(ForgeConsumer):
     """
 
     _callbacks: dict[str, MessageCallback] = field(default_factory=dict)
-    _queues: dict[str, list[dict[str, Any]]] = field(
-        default_factory=lambda: {}
-    )
+    _queues: dict[str, list[dict[str, Any]]] = field(default_factory=lambda: {})
 
     async def consume(
         self,
@@ -146,9 +144,7 @@ class AmqpConsumer(ForgeConsumer):
                     data = deserialize_record(message.body)
                     await callback(data)
                 except Exception:
-                    logger.exception(
-                        "Error processing message from %s", exchange.name
-                    )
+                    logger.exception("Error processing message from %s", exchange.name)
 
         tag = await queue.consume(_on_message)
         self._consumer_tags.append(tag)

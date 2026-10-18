@@ -55,9 +55,7 @@ def _load_manifest() -> AdapterManifest:
         capabilities=AdapterCapabilities(**raw.get("capabilities", {})),
         data_contract=DataContract(**raw.get("data_contract", {})),
         health_check_interval_ms=raw.get("health_check_interval_ms", 5000),
-        connection_params=[
-            ConnectionParam(**p) for p in raw.get("connection_params", [])
-        ],
+        connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
     )
@@ -112,9 +110,7 @@ class WhkErpiAdapter(
         hub's event loop integration is ready.
         """
         if self._config is None:
-            raise RuntimeError(
-                "Adapter not configured — call configure() first"
-            )
+            raise RuntimeError("Adapter not configured — call configure() first")
         self._state = AdapterState.CONNECTING
         # Phase 1: no live RabbitMQ connection yet — records injected for testing
         # Phase 2 will add aio-pika consumer here
@@ -196,9 +192,7 @@ class WhkErpiAdapter(
 
     # ── SubscriptionProvider ───────────────────────────────────
 
-    async def subscribe(
-        self, tags: list[str], callback: Any
-    ) -> str:
+    async def subscribe(self, tags: list[str], callback: Any) -> str:
         """Subscribe to specific entity topic events.
 
         Tags use the ERPI topic format: wh.whk01.distillery01.<entity>

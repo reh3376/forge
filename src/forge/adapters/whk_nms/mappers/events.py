@@ -142,9 +142,7 @@ def map_security_event(raw_event: dict) -> OperationalEvent | None:
 
     # Timestamp
     event_time = _parse_timestamp(
-        raw_event.get("event_time")
-        or raw_event.get("eventTime")
-        or raw_event.get("timestamp")
+        raw_event.get("event_time") or raw_event.get("eventTime") or raw_event.get("timestamp")
     )
 
     # Severity (defaults to HIGH for security events)
@@ -258,9 +256,7 @@ def map_spof_detection(raw_spof: dict) -> OperationalEvent | None:
 
     # Timestamp
     event_time = _parse_timestamp(
-        raw_spof.get("detected_at")
-        or raw_spof.get("detectedAt")
-        or raw_spof.get("timestamp")
+        raw_spof.get("detected_at") or raw_spof.get("detectedAt") or raw_spof.get("timestamp")
     )
 
     # Severity based on blast radius
@@ -293,6 +289,7 @@ def map_spof_detection(raw_spof: dict) -> OperationalEvent | None:
 
 
 # ── Helper Functions ───────────────────────────────────────────
+
 
 def _parse_timestamp(value: any) -> datetime:
     """Parse an ISO timestamp string, falling back to now(utc)."""
@@ -338,7 +335,9 @@ def _build_result(trap_type: str | None, oid: str | None) -> str | None:
     return None
 
 
-def _build_alert_result(name: str | None, description: str | None, condition: str | None) -> str | None:
+def _build_alert_result(
+    name: str | None, description: str | None, condition: str | None
+) -> str | None:
     """Build result string for alert event."""
     parts = []
     if name:

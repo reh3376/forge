@@ -161,7 +161,10 @@ class TestBuildContextualRecord:
         raw = {"batch_id": "B-001", "timestamp": "2026-04-06T14:30:00Z"}
         ctx = self._make_context()
         record = build_contextual_record(
-            raw_event=raw, context=ctx, adapter_id="forge-mes", adapter_version="0.1.0",
+            raw_event=raw,
+            context=ctx,
+            adapter_id="forge-mes",
+            adapter_version="0.1.0",
         )
         assert record.source.adapter_id == "forge-mes"
         assert record.source.system == "forge-mes"
@@ -170,7 +173,10 @@ class TestBuildContextualRecord:
         raw = {"batch_id": "B-001", "timestamp": "2026-04-06T14:30:00Z"}
         ctx = self._make_context()
         record = build_contextual_record(
-            raw_event=raw, context=ctx, adapter_id="forge-mes", adapter_version="0.1.0",
+            raw_event=raw,
+            context=ctx,
+            adapter_id="forge-mes",
+            adapter_version="0.1.0",
         )
         assert record.lineage.schema_ref == "forge://schemas/forge-mes/v0.1.0"
         assert record.lineage.adapter_version == "0.1.0"
@@ -179,7 +185,10 @@ class TestBuildContextualRecord:
         raw = {"batch_id": "B-001", "timestamp": "2026-04-06T14:30:00Z"}
         ctx = self._make_context()
         record = build_contextual_record(
-            raw_event=raw, context=ctx, adapter_id="forge-mes", adapter_version="0.1.0",
+            raw_event=raw,
+            context=ctx,
+            adapter_id="forge-mes",
+            adapter_version="0.1.0",
         )
         assert record.timestamp.source_time is not None
         assert record.timestamp.ingestion_time is not None
@@ -188,7 +197,10 @@ class TestBuildContextualRecord:
         raw = {"batch_id": "B-001", "timestamp": "2026-04-06T14:30:00Z"}
         ctx = self._make_context()
         record = build_contextual_record(
-            raw_event=raw, context=ctx, adapter_id="forge-mes", adapter_version="0.1.0",
+            raw_event=raw,
+            context=ctx,
+            adapter_id="forge-mes",
+            adapter_version="0.1.0",
         )
         assert record.value.raw == raw
         assert record.value.data_type == "object"
@@ -197,7 +209,10 @@ class TestBuildContextualRecord:
         raw = {"batch_id": "B-001", "timestamp": "2026-04-06T14:30:00Z"}
         ctx = self._make_context()
         record = build_contextual_record(
-            raw_event=raw, context=ctx, adapter_id="forge-mes", adapter_version="0.1.0",
+            raw_event=raw,
+            context=ctx,
+            adapter_id="forge-mes",
+            adapter_version="0.1.0",
         )
         assert record.value.quality == QualityCode.GOOD
 
@@ -205,7 +220,10 @@ class TestBuildContextualRecord:
         raw = {"batch_id": "B-001", "timestamp": "2026-04-06T14:30:00Z"}
         ctx = self._make_context(lot_id="LOT-001")
         record = build_contextual_record(
-            raw_event=raw, context=ctx, adapter_id="forge-mes", adapter_version="0.1.0",
+            raw_event=raw,
+            context=ctx,
+            adapter_id="forge-mes",
+            adapter_version="0.1.0",
         )
         assert record.context.lot_id == "LOT-001"
 
@@ -218,7 +236,10 @@ class TestBuildContextualRecord:
         }
         ctx = self._make_context()
         record = build_contextual_record(
-            raw_event=raw, context=ctx, adapter_id="forge-mes", adapter_version="0.1.0",
+            raw_event=raw,
+            context=ctx,
+            adapter_id="forge-mes",
+            adapter_version="0.1.0",
         )
         assert record.source.tag_path == "mes.graphql.batch"
 
@@ -230,6 +251,9 @@ class TestBuildContextualRecord:
         }
         ctx = self._make_context()
         record = build_contextual_record(
-            raw_event=raw, context=ctx, adapter_id="forge-mes", adapter_version="0.1.0",
+            raw_event=raw,
+            context=ctx,
+            adapter_id="forge-mes",
+            adapter_version="0.1.0",
         )
         assert record.timestamp.server_time is not None

@@ -247,11 +247,13 @@ class TestCollect:
         adapter = WhkNmsAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
-        adapter.inject_records([
-            _SAMPLE_DEVICE_MESSAGE,
-            _SAMPLE_TRAP_MESSAGE,
-            _SAMPLE_ALERT_MESSAGE,
-        ])
+        adapter.inject_records(
+            [
+                _SAMPLE_DEVICE_MESSAGE,
+                _SAMPLE_TRAP_MESSAGE,
+                _SAMPLE_ALERT_MESSAGE,
+            ]
+        )
 
         records = []
         async for record in adapter.collect():

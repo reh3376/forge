@@ -110,8 +110,7 @@ def map_warehouse(raw: dict[str, Any]) -> PhysicalAsset | None:
         parent_id=None,
         location_path=str(name),
         operational_state=(
-            AssetOperationalState.IDLE if is_active
-            else AssetOperationalState.OFFLINE
+            AssetOperationalState.IDLE if is_active else AssetOperationalState.OFFLINE
         ),
         capacity=_float_or_none(raw.get("totalCapacity") or raw.get("total_capacity")),
         capacity_unit="barrels" if raw.get("totalCapacity") else None,

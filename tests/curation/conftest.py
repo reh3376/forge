@@ -15,8 +15,10 @@ if not hasattr(_dt_mod, "UTC"):
     _dt_mod.UTC = _dt_mod.timezone.utc
 
 if not hasattr(enum, "StrEnum"):
+
     class StrEnum(str, enum.Enum):
         pass
+
     enum.StrEnum = StrEnum
 
 import pytest
@@ -157,35 +159,37 @@ def make_record_batch(
 
     records = []
     for i in range(count):
-        records.append(ContextualRecord(
-            record_id=uuid4(),
-            source=RecordSource(
-                adapter_id=adapter,
-                system=f"{adapter}-prod",
-                tag_path=f"Area1/{equipment_id}/Temperature",
-            ),
-            timestamp=RecordTimestamp(
-                source_time=base + step * i,
-                ingestion_time=base + step * i + timedelta(milliseconds=200),
-            ),
-            value=RecordValue(
-                raw=base_value + (i * 0.1),
-                engineering_units=unit,
-                quality=QualityCode.GOOD,
-                data_type="float64",
-            ),
-            context=RecordContext(
-                equipment_id=equipment_id,
-                batch_id="B2026-0405-003",
-                lot_id="L2026-0405",
-                operating_mode="PRODUCTION",
-                shift="B",
-            ),
-            lineage=RecordLineage(
-                schema_ref=f"forge://schemas/{adapter}/v0.1.0",
-                adapter_id=adapter,
-                adapter_version="0.1.0",
-                transformation_chain=["collect"],
-            ),
-        ))
+        records.append(
+            ContextualRecord(
+                record_id=uuid4(),
+                source=RecordSource(
+                    adapter_id=adapter,
+                    system=f"{adapter}-prod",
+                    tag_path=f"Area1/{equipment_id}/Temperature",
+                ),
+                timestamp=RecordTimestamp(
+                    source_time=base + step * i,
+                    ingestion_time=base + step * i + timedelta(milliseconds=200),
+                ),
+                value=RecordValue(
+                    raw=base_value + (i * 0.1),
+                    engineering_units=unit,
+                    quality=QualityCode.GOOD,
+                    data_type="float64",
+                ),
+                context=RecordContext(
+                    equipment_id=equipment_id,
+                    batch_id="B2026-0405-003",
+                    lot_id="L2026-0405",
+                    operating_mode="PRODUCTION",
+                    shift="B",
+                ),
+                lineage=RecordLineage(
+                    schema_ref=f"forge://schemas/{adapter}/v0.1.0",
+                    adapter_id=adapter,
+                    adapter_version="0.1.0",
+                    transformation_chain=["collect"],
+                ),
+            )
+        )
     return records

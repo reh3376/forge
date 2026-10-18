@@ -102,7 +102,8 @@ _DERIVED_AGGREGATIONS: dict[str, Any] = {
     "weighted_sum": lambda pairs: sum(v * w for v, w in pairs),
     "average": lambda pairs: (
         sum(v * w for v, w in pairs) / sum(w for _, w in pairs)
-        if sum(w for _, w in pairs) != 0 else 0.0
+        if sum(w for _, w in pairs) != 0
+        else 0.0
     ),
     "min": lambda pairs: min(v for v, _ in pairs) if pairs else 0.0,
     "max": lambda pairs: max(v for v, _ in pairs) if pairs else 0.0,
@@ -218,9 +219,7 @@ class TagEngine:
         """Consumer loop — processes tag change events and propagates."""
         while self._running:
             try:
-                path = await asyncio.wait_for(
-                    self._propagation_queue.get(), timeout=1.0
-                )
+                path = await asyncio.wait_for(self._propagation_queue.get(), timeout=1.0)
                 await self._propagate(path, visited=set())
             except asyncio.TimeoutError:
                 continue
@@ -245,17 +244,13 @@ class TagEngine:
                 result = await self.evaluate(dep_path)
                 if result is not None:
                     value, quality = result
-                    changed = await self._registry.update_value(
-                        dep_path, value, quality
-                    )
+                    changed = await self._registry.update_value(dep_path, value, quality)
                     if changed:
                         # Recurse for chained dependencies
                         await self._propagate(dep_path, visited)
             except Exception:
                 logger.exception("Failed to evaluate dependent %s", dep_path)
-                await self._registry.update_value(
-                    dep_path, None, QualityCode.BAD
-                )
+                await self._registry.update_value(dep_path, None, QualityCode.BAD)
 
     # ------------------------------------------------------------------
     # Tag evaluation

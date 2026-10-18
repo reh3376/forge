@@ -31,6 +31,7 @@ from forge.curation.quality import QualityMonitor, QualityReport, QualityRule
 # CurationResult — the output of a pipeline run
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class CurationResult:
     """Output of running a curation pipeline."""
@@ -50,6 +51,7 @@ class CurationResult:
 # CurationStep ABC
 # ---------------------------------------------------------------------------
 
+
 class CurationStep(ABC):
     """A single composable transformation step in the curation pipeline."""
 
@@ -68,6 +70,7 @@ class CurationStep(ABC):
 # ---------------------------------------------------------------------------
 # Concrete steps
 # ---------------------------------------------------------------------------
+
 
 class NormalizationStep(CurationStep):
     """Apply unit conversion and value normalization."""
@@ -100,13 +103,19 @@ class TimeBucketStep(CurationStep):
             bucketed_time = self._bucketer.bucket(record.timestamp.source_time)
             new_ts = record.timestamp.model_copy(update={"source_time": bucketed_time})
             new_chain = [*record.lineage.transformation_chain, self.name]
-            new_lineage = record.lineage.model_copy(update={
-                "transformation_chain": new_chain,
-            })
-            output.append(record.model_copy(update={
-                "timestamp": new_ts,
-                "lineage": new_lineage,
-            }))
+            new_lineage = record.lineage.model_copy(
+                update={
+                    "transformation_chain": new_chain,
+                }
+            )
+            output.append(
+                record.model_copy(
+                    update={
+                        "timestamp": new_ts,
+                        "lineage": new_lineage,
+                    }
+                )
+            )
         return output
 
 
@@ -154,9 +163,11 @@ class EnrichmentStep(CurationStep):
                 enriched = rule(enriched)
             # Tag lineage
             new_chain = [*enriched.lineage.transformation_chain, "enrich"]
-            new_lineage = enriched.lineage.model_copy(update={
-                "transformation_chain": new_chain,
-            })
+            new_lineage = enriched.lineage.model_copy(
+                update={
+                    "transformation_chain": new_chain,
+                }
+            )
             output.append(enriched.model_copy(update={"lineage": new_lineage}))
         return output
 
@@ -184,6 +195,7 @@ class ValidationStep(CurationStep):
 # ---------------------------------------------------------------------------
 # CurationPipeline — orchestrates steps
 # ---------------------------------------------------------------------------
+
 
 class CurationPipeline:
     """Orchestrates an ordered sequence of CurationSteps.

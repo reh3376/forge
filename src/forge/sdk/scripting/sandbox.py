@@ -43,61 +43,100 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 # Standard library modules safe for scripting
-_STDLIB_ALLOWED: frozenset[str] = frozenset({
-    # Data structures & types
-    "collections", "dataclasses", "enum", "typing", "types",
-    "abc", "copy", "functools", "itertools", "operator",
-    # Strings & text
-    "string", "re", "textwrap", "unicodedata",
-    # Numbers & math
-    "math", "statistics", "decimal", "fractions", "random",
-    # Date & time
-    "datetime", "time", "calendar", "zoneinfo",
-    # Data formats
-    "json", "csv", "xml", "html", "base64", "binascii",
-    "struct", "hashlib", "hmac",
-    # I/O (limited)
-    "io", "pathlib",
-    # Async
-    "asyncio", "concurrent",
-    # Logging
-    "logging",
-    # Misc
-    "uuid", "contextlib", "warnings", "traceback",
-    "pprint", "inspect",
-})
+_STDLIB_ALLOWED: frozenset[str] = frozenset(
+    {
+        # Data structures & types
+        "collections",
+        "dataclasses",
+        "enum",
+        "typing",
+        "types",
+        "abc",
+        "copy",
+        "functools",
+        "itertools",
+        "operator",
+        # Strings & text
+        "string",
+        "re",
+        "textwrap",
+        "unicodedata",
+        # Numbers & math
+        "math",
+        "statistics",
+        "decimal",
+        "fractions",
+        "random",
+        # Date & time
+        "datetime",
+        "time",
+        "calendar",
+        "zoneinfo",
+        # Data formats
+        "json",
+        "csv",
+        "xml",
+        "html",
+        "base64",
+        "binascii",
+        "struct",
+        "hashlib",
+        "hmac",
+        # I/O (limited)
+        "io",
+        "pathlib",
+        # Async
+        "asyncio",
+        "concurrent",
+        # Logging
+        "logging",
+        # Misc
+        "uuid",
+        "contextlib",
+        "warnings",
+        "traceback",
+        "pprint",
+        "inspect",
+    }
+)
 
 # Third-party packages allowed by default
-_THIRD_PARTY_ALLOWED: frozenset[str] = frozenset({
-    "pydantic",
-    "httpx",
-    "aiohttp",
-})
+_THIRD_PARTY_ALLOWED: frozenset[str] = frozenset(
+    {
+        "pydantic",
+        "httpx",
+        "aiohttp",
+    }
+)
 
 # Forge SDK modules — always allowed
-_FORGE_ALLOWED: frozenset[str] = frozenset({
-    "forge",
-})
+_FORGE_ALLOWED: frozenset[str] = frozenset(
+    {
+        "forge",
+    }
+)
 
 # Explicitly blocked — dangerous system-level modules.
 # These are blocked even if their top-level package is in the allowed set.
-_BLOCKED: frozenset[str] = frozenset({
-    "subprocess",
-    "ctypes",
-    "cffi",
-    "socket",
-    "socketserver",
-    "multiprocessing",
-    "signal",
-    "importlib",
-    "runpy",
-    "code",
-    "codeop",
-    "compileall",
-    "webbrowser",
-    "antigravity",
-    "turtle",
-})
+_BLOCKED: frozenset[str] = frozenset(
+    {
+        "subprocess",
+        "ctypes",
+        "cffi",
+        "socket",
+        "socketserver",
+        "multiprocessing",
+        "signal",
+        "importlib",
+        "runpy",
+        "code",
+        "codeop",
+        "compileall",
+        "webbrowser",
+        "antigravity",
+        "turtle",
+    }
+)
 
 
 # ---------------------------------------------------------------------------

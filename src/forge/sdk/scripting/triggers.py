@@ -367,7 +367,9 @@ class TriggerRegistry:
                 matches.append(reg)
         return matches
 
-    def get_alarm_handlers(self, priority: str = "", area: str = "", name: str = "") -> list[HandlerRegistration]:
+    def get_alarm_handlers(
+        self, priority: str = "", area: str = "", name: str = ""
+    ) -> list[HandlerRegistration]:
         """Get alarm handlers matching the given alarm attributes."""
         matches = []
         for reg in self._registrations:

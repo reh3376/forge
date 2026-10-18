@@ -42,8 +42,7 @@ class MaterialItem(ManufacturingModelBase):
     category: str | None = Field(
         default=None,
         description=(
-            "Item classification or class"
-            " (e.g. 'raw_material', 'barrel', 'finished_good')."
+            "Item classification or class (e.g. 'raw_material', 'barrel', 'finished_good')."
         ),
     )
     unit_of_measure: str | None = Field(

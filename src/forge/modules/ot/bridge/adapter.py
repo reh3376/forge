@@ -89,8 +89,8 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
         tier=AdapterTier.OT,
         capabilities=AdapterCapabilities(
             read=True,
-            write=False,     # Read-only — writes go through OT Module
-            subscribe=False, # Poll-based, not subscription
+            write=False,  # Read-only — writes go through OT Module
+            subscribe=False,  # Poll-based, not subscription
             backfill=False,  # History stays in Ignition/Canary
             discover=True,
         ),
@@ -201,7 +201,7 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
         # Track latency
         self._latencies.append(response.latency_ms)
         if len(self._latencies) > self._max_latency_window:
-            self._latencies = self._latencies[-self._max_latency_window:]
+            self._latencies = self._latencies[-self._max_latency_window :]
 
         # Update health
         self._bridge_health.total_polls += 1
@@ -234,7 +234,8 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
             except Exception:
                 self._records_failed += 1
                 logger.debug(
-                    "Failed to build bridge record for %s", tag_value.path,
+                    "Failed to build bridge record for %s",
+                    tag_value.path,
                     exc_info=True,
                 )
 
@@ -257,15 +258,17 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
             ign_path = node.get("path", "")
             mapping = self._mapper.map(ign_path)
             if mapping:
-                discovered.append({
-                    "tag_path": mapping.forge_path,
-                    "data_type": node.get("data_type", "Unknown"),
-                    "description": "",
-                    "engineering_units": "",
-                    "tag_type": "standard",  # All Ignition tags are treated as standard
-                    "source": "ignition-bridge",
-                    "ignition_path": ign_path,
-                })
+                discovered.append(
+                    {
+                        "tag_path": mapping.forge_path,
+                        "data_type": node.get("data_type", "Unknown"),
+                        "description": "",
+                        "engineering_units": "",
+                        "tag_type": "standard",  # All Ignition tags are treated as standard
+                        "source": "ignition-bridge",
+                        "ignition_path": ign_path,
+                    }
+                )
 
         return discovered
 

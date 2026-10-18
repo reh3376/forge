@@ -79,7 +79,9 @@ class TestMqttFanoutPipeline:
         tag_pub, mqtt_pub = pipeline
 
         # Publish multiple fields for the same equipment
-        await tag_pub.publish_equipment_status("CIP_001", "cipState", "RUNNING", area="Distillery01")
+        await tag_pub.publish_equipment_status(
+            "CIP_001", "cipState", "RUNNING", area="Distillery01"
+        )
         await tag_pub.publish_equipment_status("CIP_001", "mode", "AUTO", area="Distillery01")
         await tag_pub.publish_equipment_status("CIP_001", "faultActive", False, area="Distillery01")
 
@@ -122,9 +124,12 @@ class TestMqttFanoutWithRateLimiter:
         await pub.start()
         router = TopicRouter(site="whk01")
         tag_pub = TagPublisher(pub, router)
-        limiter = MqttRateLimiter(RateLimiterConfig(
-            default_rate=0.001, default_burst=2.0,
-        ))
+        limiter = MqttRateLimiter(
+            RateLimiterConfig(
+                default_rate=0.001,
+                default_burst=2.0,
+            )
+        )
 
         published = 0
         throttled = 0
@@ -132,8 +137,11 @@ class TestMqttFanoutWithRateLimiter:
             tag_path = "Distillery01/TIT_2010/Out_PV"
             if limiter.should_publish(tag_path):
                 await tag_pub.publish_tag_change(
-                    tag_path, value=float(i), quality="GOOD",
-                    timestamp="2026-04-08T12:00:00Z", area="Distillery01",
+                    tag_path,
+                    value=float(i),
+                    quality="GOOD",
+                    timestamp="2026-04-08T12:00:00Z",
+                    area="Distillery01",
                 )
                 published += 1
             else:
@@ -154,7 +162,10 @@ class TestMqttFanoutWithRateLimiter:
 
         # Publish while disconnected — should buffer
         await tag_pub.publish_tag_change(
-            "TIT/Out_PV", 78.4, "GOOD", "2026-04-08T12:00:00Z",
+            "TIT/Out_PV",
+            78.4,
+            "GOOD",
+            "2026-04-08T12:00:00Z",
         )
         assert pub.buffer_size == 1
 

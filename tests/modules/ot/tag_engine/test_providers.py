@@ -225,7 +225,9 @@ class TestOpcUaProvider:
         client.subscribe.assert_called_once()
         # Should subscribe to 2 tags (WHK01 only, not WHK02)
         call_args = client.subscribe.call_args
-        node_ids = call_args.kwargs.get("node_ids") or call_args[1].get("node_ids") or call_args[0][0]
+        node_ids = (
+            call_args.kwargs.get("node_ids") or call_args[1].get("node_ids") or call_args[0][0]
+        )
         assert len(node_ids) == 2
         assert provider.subscribed_tag_count == 2
         assert provider.state == ProviderState.RUNNING
@@ -243,9 +245,7 @@ class TestOpcUaProvider:
             server_timestamp=datetime.now(timezone.utc),
             source_timestamp=datetime.now(timezone.utc),
         )
-        await provider._on_data_change(
-            "ns=2;s=Distillery01.TIT_2010.Out_PV", dv
-        )
+        await provider._on_data_change("ns=2;s=Distillery01.TIT_2010.Out_PV", dv)
 
         tv = await registry.get_value("WH/WHK01/Distillery01/TIT_2010/Out_PV")
         assert tv is not None

@@ -308,9 +308,7 @@ class TestVersionDiff:
                 },
             },
         )
-        resp = await client.get(
-            "/v1/schemas/forge://schemas/test/Widget/diff/1/2"
-        )
+        resp = await client.get("/v1/schemas/forge://schemas/test/Widget/diff/1/2")
         assert resp.status_code == 200
         data = resp.json()
         assert data["from_version"] == 1
@@ -322,7 +320,5 @@ class TestVersionDiff:
     @pytest.mark.asyncio
     async def test_diff_version_not_found(self, client):
         await client.post("/v1/schemas", json=_register_payload())
-        resp = await client.get(
-            "/v1/schemas/forge://schemas/test/Widget/diff/1/99"
-        )
+        resp = await client.get("/v1/schemas/forge://schemas/test/Widget/diff/1/99")
         assert resp.status_code == 404

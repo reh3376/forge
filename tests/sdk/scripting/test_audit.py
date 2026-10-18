@@ -22,7 +22,6 @@ from forge.sdk.scripting.audit import (
 
 
 class TestExecutionContext:
-
     def test_default_context_is_empty(self):
         clear_execution_context()
         ctx = get_execution_context()
@@ -57,7 +56,6 @@ class TestExecutionContext:
 
 
 class TestAuditEntry:
-
     def test_frozen(self):
         entry = AuditEntry(
             timestamp="2026-04-08T12:00:00Z",
@@ -90,8 +88,12 @@ class TestAuditEntry:
 
     def test_defaults(self):
         entry = AuditEntry(
-            timestamp="t", operation="op", script_name="s",
-            script_owner="o", handler_name="h", trigger_type="tt",
+            timestamp="t",
+            operation="op",
+            script_name="s",
+            script_owner="o",
+            handler_name="h",
+            trigger_type="tt",
             target="tgt",
         )
         assert entry.rbac_allowed is True
@@ -106,22 +108,25 @@ class TestAuditEntry:
 
 
 class TestAuditTrailRecording:
-
     @pytest.fixture(autouse=True)
     def setup_context(self):
-        set_execution_context(ScriptExecutionContext(
-            script_name="temp_monitor",
-            script_owner="commissioning",
-            handler_name="on_temp_change",
-            trigger_type="tag_change",
-        ))
+        set_execution_context(
+            ScriptExecutionContext(
+                script_name="temp_monitor",
+                script_owner="commissioning",
+                handler_name="on_temp_change",
+                trigger_type="tag_change",
+            )
+        )
         yield
         clear_execution_context()
 
     def test_record_tag_write(self):
         trail = ScriptAuditTrail()
         entry = trail.record_tag_write(
-            "WH/TIT/Out_PV", old_value=77.0, new_value=78.4,
+            "WH/TIT/Out_PV",
+            old_value=77.0,
+            new_value=78.4,
             area="Distillery01",
         )
         assert entry.operation == "tag_write"
@@ -136,8 +141,11 @@ class TestAuditTrailRecording:
     def test_record_tag_write_denied(self):
         trail = ScriptAuditTrail()
         entry = trail.record_tag_write(
-            "WH/TIT/Out_PV", old_value=77.0, new_value=78.4,
-            rbac_allowed=False, rbac_reason="No permission",
+            "WH/TIT/Out_PV",
+            old_value=77.0,
+            new_value=78.4,
+            rbac_allowed=False,
+            rbac_reason="No permission",
         )
         assert entry.rbac_allowed is False
         assert trail.total_denied == 1
@@ -145,7 +153,8 @@ class TestAuditTrailRecording:
     def test_record_db_query(self):
         trail = ScriptAuditTrail()
         entry = trail.record_db_query(
-            "SELECT * FROM batches", row_count=42,
+            "SELECT * FROM batches",
+            row_count=42,
         )
         assert entry.operation == "db_query"
         assert entry.target == "SELECT * FROM batches"
@@ -154,7 +163,8 @@ class TestAuditTrailRecording:
     def test_record_db_mutate(self):
         trail = ScriptAuditTrail()
         entry = trail.record_db_query(
-            "UPDATE batches SET status='done'", is_mutation=True,
+            "UPDATE batches SET status='done'",
+            is_mutation=True,
         )
         assert entry.operation == "db_mutate"
 
@@ -179,13 +189,16 @@ class TestAuditTrailRecording:
 
 
 class TestRingBuffer:
-
     @pytest.fixture(autouse=True)
     def setup_context(self):
-        set_execution_context(ScriptExecutionContext(
-            script_name="test", script_owner="owner",
-            handler_name="handler", trigger_type="timer",
-        ))
+        set_execution_context(
+            ScriptExecutionContext(
+                script_name="test",
+                script_owner="owner",
+                handler_name="handler",
+                trigger_type="timer",
+            )
+        )
         yield
         clear_execution_context()
 
@@ -215,22 +228,29 @@ class TestRingBuffer:
 
 
 class TestAuditQuery:
-
     @pytest.fixture
     def populated_trail(self):
         trail = ScriptAuditTrail()
 
-        set_execution_context(ScriptExecutionContext(
-            script_name="script_a", script_owner="owner_a",
-            handler_name="h1", trigger_type="tag_change",
-        ))
+        set_execution_context(
+            ScriptExecutionContext(
+                script_name="script_a",
+                script_owner="owner_a",
+                handler_name="h1",
+                trigger_type="tag_change",
+            )
+        )
         trail.record_tag_write("tag/1", 0, 1)
         trail.record_tag_write("tag/2", 0, 1, rbac_allowed=False, rbac_reason="denied")
 
-        set_execution_context(ScriptExecutionContext(
-            script_name="script_b", script_owner="owner_b",
-            handler_name="h2", trigger_type="timer",
-        ))
+        set_execution_context(
+            ScriptExecutionContext(
+                script_name="script_b",
+                script_owner="owner_b",
+                handler_name="h2",
+                trigger_type="timer",
+            )
+        )
         trail.record_db_query("SELECT 1")
         trail.record_tag_read("tag/3", 42)
 
@@ -275,21 +295,28 @@ class TestAuditQuery:
 
 
 class TestAuditStats:
-
     def test_get_stats(self):
         trail = ScriptAuditTrail()
 
-        set_execution_context(ScriptExecutionContext(
-            script_name="s1", script_owner="o", handler_name="h",
-            trigger_type="tag_change",
-        ))
+        set_execution_context(
+            ScriptExecutionContext(
+                script_name="s1",
+                script_owner="o",
+                handler_name="h",
+                trigger_type="tag_change",
+            )
+        )
         trail.record_tag_write("t1", 0, 1)
         trail.record_tag_write("t2", 0, 1, rbac_allowed=False, rbac_reason="no")
 
-        set_execution_context(ScriptExecutionContext(
-            script_name="s2", script_owner="o", handler_name="h",
-            trigger_type="timer",
-        ))
+        set_execution_context(
+            ScriptExecutionContext(
+                script_name="s2",
+                script_owner="o",
+                handler_name="h",
+                trigger_type="timer",
+            )
+        )
         trail.record_db_query("SELECT 1")
 
         clear_execution_context()
@@ -309,7 +336,6 @@ class TestAuditStats:
 
 
 class TestHelpers:
-
     def test_safe_serialize_primitives(self):
         assert _safe_serialize(None) is None
         assert _safe_serialize(True) is True
@@ -342,13 +368,37 @@ class TestHelpers:
 
     def test_count_by_field(self):
         from collections import deque
-        entries = deque([
-            AuditEntry(timestamp="t", operation="tag_write", script_name="a",
-                       script_owner="o", handler_name="h", trigger_type="tt", target="t"),
-            AuditEntry(timestamp="t", operation="db_query", script_name="a",
-                       script_owner="o", handler_name="h", trigger_type="tt", target="t"),
-            AuditEntry(timestamp="t", operation="tag_write", script_name="b",
-                       script_owner="o", handler_name="h", trigger_type="tt", target="t"),
-        ])
+
+        entries = deque(
+            [
+                AuditEntry(
+                    timestamp="t",
+                    operation="tag_write",
+                    script_name="a",
+                    script_owner="o",
+                    handler_name="h",
+                    trigger_type="tt",
+                    target="t",
+                ),
+                AuditEntry(
+                    timestamp="t",
+                    operation="db_query",
+                    script_name="a",
+                    script_owner="o",
+                    handler_name="h",
+                    trigger_type="tt",
+                    target="t",
+                ),
+                AuditEntry(
+                    timestamp="t",
+                    operation="tag_write",
+                    script_name="b",
+                    script_owner="o",
+                    handler_name="h",
+                    trigger_type="tt",
+                    target="t",
+                ),
+            ]
+        )
         counts = _count_by_field(entries, "operation")
         assert counts == {"tag_write": 2, "db_query": 1}

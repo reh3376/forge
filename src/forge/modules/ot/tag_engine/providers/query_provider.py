@@ -46,7 +46,10 @@ class QueryProvider(BaseProvider):
             logger.info("QueryProvider: no Query tags found")
             return
 
-        logger.info("QueryProvider: found %d Query tags (poll loops deferred to Phase 2B)", self._query_count)
+        logger.info(
+            "QueryProvider: found %d Query tags (poll loops deferred to Phase 2B)",
+            self._query_count,
+        )
         # Phase 2B: start asyncio.create_task per query tag with poll_interval_ms
 
     async def _stop(self) -> None:

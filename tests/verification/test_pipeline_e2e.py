@@ -52,25 +52,29 @@ class TestAdapterLifecycle:
     @pytest.mark.asyncio()
     async def test_configure_stays_registered(self, adapter: WhkWmsAdapter):
         """configure() validates params but doesn't connect — stays REGISTERED."""
-        await adapter.configure({
-            "graphql_url": "http://localhost:3020/graphql",
-            "rabbitmq_url": "amqp://guest:guest@localhost:5672",
-            "azure_tenant_id": "test-tenant",
-            "azure_client_id": "test-client",
-            "azure_client_secret": "test-secret",
-        })
+        await adapter.configure(
+            {
+                "graphql_url": "http://localhost:3020/graphql",
+                "rabbitmq_url": "amqp://guest:guest@localhost:5672",
+                "azure_tenant_id": "test-tenant",
+                "azure_client_id": "test-client",
+                "azure_client_secret": "test-secret",
+            }
+        )
         assert adapter.state == AdapterState.REGISTERED
 
     @pytest.mark.asyncio()
     async def test_full_lifecycle(self, adapter: WhkWmsAdapter):
         """configure → start → health → stop exercises all transitions."""
-        await adapter.configure({
-            "graphql_url": "http://localhost:3020/graphql",
-            "rabbitmq_url": "amqp://guest:guest@localhost:5672",
-            "azure_tenant_id": "test-tenant",
-            "azure_client_id": "test-client",
-            "azure_client_secret": "test-secret",
-        })
+        await adapter.configure(
+            {
+                "graphql_url": "http://localhost:3020/graphql",
+                "rabbitmq_url": "amqp://guest:guest@localhost:5672",
+                "azure_tenant_id": "test-tenant",
+                "azure_client_id": "test-client",
+                "azure_client_secret": "test-secret",
+            }
+        )
         await adapter.start()
         assert adapter.state in (AdapterState.HEALTHY, AdapterState.CONNECTING)
 
@@ -91,22 +95,26 @@ class TestCollectionPipeline:
 
     @pytest.fixture()
     async def configured_adapter(
-        self, barrel_events: list[dict[str, Any]],
+        self,
+        barrel_events: list[dict[str, Any]],
     ) -> WhkWmsAdapter:
         adapter = WhkWmsAdapter()
-        await adapter.configure({
-            "graphql_url": "http://localhost:3020/graphql",
-            "rabbitmq_url": "amqp://guest:guest@localhost:5672",
-            "azure_tenant_id": "test-tenant",
-            "azure_client_id": "test-client",
-            "azure_client_secret": "test-secret",
-        })
+        await adapter.configure(
+            {
+                "graphql_url": "http://localhost:3020/graphql",
+                "rabbitmq_url": "amqp://guest:guest@localhost:5672",
+                "azure_tenant_id": "test-tenant",
+                "azure_client_id": "test-client",
+                "azure_client_secret": "test-secret",
+            }
+        )
         adapter.inject_records(barrel_events)
         return adapter
 
     @pytest.mark.asyncio()
     async def test_collect_yields_contextual_records(
-        self, configured_adapter: WhkWmsAdapter,
+        self,
+        configured_adapter: WhkWmsAdapter,
     ):
         records: list[ContextualRecord] = []
         async for record in configured_adapter.collect():
@@ -117,7 +125,8 @@ class TestCollectionPipeline:
 
     @pytest.mark.asyncio()
     async def test_records_have_source_metadata(
-        self, configured_adapter: WhkWmsAdapter,
+        self,
+        configured_adapter: WhkWmsAdapter,
     ):
         async for record in configured_adapter.collect():
             assert record.source.adapter_id == "whk-wms"
@@ -126,7 +135,8 @@ class TestCollectionPipeline:
 
     @pytest.mark.asyncio()
     async def test_records_have_timestamps(
-        self, configured_adapter: WhkWmsAdapter,
+        self,
+        configured_adapter: WhkWmsAdapter,
     ):
         async for record in configured_adapter.collect():
             assert record.timestamp.source_time is not None
@@ -135,7 +145,8 @@ class TestCollectionPipeline:
 
     @pytest.mark.asyncio()
     async def test_records_have_context(
-        self, configured_adapter: WhkWmsAdapter,
+        self,
+        configured_adapter: WhkWmsAdapter,
     ):
         """Context fields from the WMS event should be mapped."""
         async for record in configured_adapter.collect():
@@ -146,7 +157,8 @@ class TestCollectionPipeline:
 
     @pytest.mark.asyncio()
     async def test_records_have_lineage(
-        self, configured_adapter: WhkWmsAdapter,
+        self,
+        configured_adapter: WhkWmsAdapter,
     ):
         async for record in configured_adapter.collect():
             assert record.lineage.adapter_id == "whk-wms"
@@ -155,7 +167,8 @@ class TestCollectionPipeline:
 
     @pytest.mark.asyncio()
     async def test_records_have_quality(
-        self, configured_adapter: WhkWmsAdapter,
+        self,
+        configured_adapter: WhkWmsAdapter,
     ):
         async for record in configured_adapter.collect():
             assert record.value.quality in (
@@ -166,7 +179,8 @@ class TestCollectionPipeline:
 
     @pytest.mark.asyncio()
     async def test_validate_record_passes(
-        self, configured_adapter: WhkWmsAdapter,
+        self,
+        configured_adapter: WhkWmsAdapter,
     ):
         """Records produced by collect() should pass the adapter's own validation."""
         async for record in configured_adapter.collect():
@@ -188,19 +202,21 @@ class TestStorageRouting:
         reg = SchemaRegistry()
         from datetime import datetime, timezone
 
-        reg.register(SchemaEntry(
-            schema_id="forge://schemas/whk-wms/v0.1.0",
-            spoke_id="whk-wms",
-            entity_name="graphql",
-            version="0.1.0",
-            schema_json={"type": "object"},
-            authoritative_spoke="whk-wms",
-            storage_engine=StorageEngine.TIMESCALEDB,
-            storage_namespace="whk_wms",
-            status=SchemaStatus.ACTIVE,
-            registered_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
-        ))
+        reg.register(
+            SchemaEntry(
+                schema_id="forge://schemas/whk-wms/v0.1.0",
+                spoke_id="whk-wms",
+                entity_name="graphql",
+                version="0.1.0",
+                schema_json={"type": "object"},
+                authoritative_spoke="whk-wms",
+                storage_engine=StorageEngine.TIMESCALEDB,
+                storage_namespace="whk_wms",
+                status=SchemaStatus.ACTIVE,
+                registered_at=datetime.now(timezone.utc),
+                updated_at=datetime.now(timezone.utc),
+            )
+        )
         return reg
 
     @pytest.fixture()
@@ -209,16 +225,19 @@ class TestStorageRouting:
 
     @pytest.fixture()
     async def sample_records(
-        self, barrel_events: list[dict[str, Any]],
+        self,
+        barrel_events: list[dict[str, Any]],
     ) -> list[ContextualRecord]:
         adapter = WhkWmsAdapter()
-        await adapter.configure({
-            "graphql_url": "http://localhost:3020/graphql",
-            "rabbitmq_url": "amqp://guest:guest@localhost:5672",
-            "azure_tenant_id": "t",
-            "azure_client_id": "c",
-            "azure_client_secret": "s",
-        })
+        await adapter.configure(
+            {
+                "graphql_url": "http://localhost:3020/graphql",
+                "rabbitmq_url": "amqp://guest:guest@localhost:5672",
+                "azure_tenant_id": "t",
+                "azure_client_id": "c",
+                "azure_client_secret": "s",
+            }
+        )
         adapter.inject_records(barrel_events)
         records = []
         async for r in adapter.collect():
@@ -343,11 +362,15 @@ class TestCurationPipeline:
             adapter_ids=["whk-wms"],
         )
         lineage_tracker.add_step(
-            entry, step_name="normalize", component="curation",
+            entry,
+            step_name="normalize",
+            component="curation",
             description="Unit normalization",
         )
         lineage_tracker.complete_entry(
-            entry, output_record_id="out1", product_id="whk-wms-barrels",
+            entry,
+            output_record_id="out1",
+            product_id="whk-wms-barrels",
         )
         results = lineage_tracker.get_lineage("out1")
         assert len(results) >= 1
@@ -369,13 +392,15 @@ class TestFullPipelineIntegration:
 
         # 1. Create and configure adapter
         adapter = WhkWmsAdapter()
-        await adapter.configure({
-            "graphql_url": "http://localhost:3020/graphql",
-            "rabbitmq_url": "amqp://guest:guest@localhost:5672",
-            "azure_tenant_id": "t",
-            "azure_client_id": "c",
-            "azure_client_secret": "s",
-        })
+        await adapter.configure(
+            {
+                "graphql_url": "http://localhost:3020/graphql",
+                "rabbitmq_url": "amqp://guest:guest@localhost:5672",
+                "azure_tenant_id": "t",
+                "azure_client_id": "c",
+                "azure_client_secret": "s",
+            }
+        )
         adapter.inject_records(barrel_events)
 
         # 2. Collect records through the adapter pipeline
@@ -392,19 +417,21 @@ class TestFullPipelineIntegration:
 
         # 4. Set up storage routing with schema registry
         registry = SchemaRegistry()
-        registry.register(SchemaEntry(
-            schema_id="forge://schemas/whk-wms/v0.1.0",
-            spoke_id="whk-wms",
-            entity_name="graphql",
-            version="0.1.0",
-            schema_json={"type": "object"},
-            authoritative_spoke="whk-wms",
-            storage_engine=StorageEngine.TIMESCALEDB,
-            storage_namespace="whk_wms",
-            status=SchemaStatus.ACTIVE,
-            registered_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
-        ))
+        registry.register(
+            SchemaEntry(
+                schema_id="forge://schemas/whk-wms/v0.1.0",
+                spoke_id="whk-wms",
+                entity_name="graphql",
+                version="0.1.0",
+                schema_json={"type": "object"},
+                authoritative_spoke="whk-wms",
+                storage_engine=StorageEngine.TIMESCALEDB,
+                storage_namespace="whk_wms",
+                status=SchemaStatus.ACTIVE,
+                registered_at=datetime.now(timezone.utc),
+                updated_at=datetime.now(timezone.utc),
+            )
+        )
         router = DataRouter(registry=registry)
 
         # 5. Route all records

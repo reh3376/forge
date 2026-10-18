@@ -44,9 +44,7 @@ def _common_params() -> dict[str, TemplateParam]:
         "area": TemplateParam(
             type="str", default="", description="Area name for context enrichment"
         ),
-        "equipment_id": TemplateParam(
-            type="str", default="", description="CMMS equipment ID"
-        ),
+        "equipment_id": TemplateParam(type="str", default="", description="CMMS equipment ID"),
     }
 
 
@@ -65,11 +63,17 @@ ANALOG_INSTRUMENT = TagTemplate(
     version="1.0.0",
     parameters={
         **_common_params(),
-        "units": TemplateParam(type="str", default="", description="Engineering units (°F, PSI, %, GPM)"),
+        "units": TemplateParam(
+            type="str", default="", description="Engineering units (°F, PSI, %, GPM)"
+        ),
         "hi_alarm": TemplateParam(type="float", default=None, description="High alarm threshold"),
         "lo_alarm": TemplateParam(type="float", default=None, description="Low alarm threshold"),
-        "hihi_alarm": TemplateParam(type="float", default=None, description="High-high alarm threshold"),
-        "lolo_alarm": TemplateParam(type="float", default=None, description="Low-low alarm threshold"),
+        "hihi_alarm": TemplateParam(
+            type="float", default=None, description="High-high alarm threshold"
+        ),
+        "lolo_alarm": TemplateParam(
+            type="float", default=None, description="Low-low alarm threshold"
+        ),
         "raw_min": TemplateParam(type="float", default=0.0, description="Raw PLC minimum"),
         "raw_max": TemplateParam(type="float", default=65535.0, description="Raw PLC maximum"),
         "scaled_min": TemplateParam(type="float", default=0.0, description="Scaled minimum"),

@@ -27,8 +27,10 @@ if not hasattr(_dt_mod, "UTC"):
     _dt_mod.UTC = _dt_mod.timezone.utc
 
 if not hasattr(enum, "StrEnum"):
+
     class StrEnum(str, enum.Enum):
         pass
+
     enum.StrEnum = StrEnum
 
 import pytest
@@ -67,6 +69,7 @@ from forge.transport.spoke_client import SpokeClient
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture()
 def servicer() -> InMemoryServicer:
     """Create a fresh in-memory servicer."""
@@ -102,8 +105,11 @@ def manifest() -> AdapterManifest:
         protocol="test",
         tier=AdapterTier.MES_MOM,
         capabilities=AdapterCapabilities(
-            read=True, write=False, subscribe=True,
-            backfill=False, discover=False,
+            read=True,
+            write=False,
+            subscribe=True,
+            backfill=False,
+            discover=False,
         ),
         data_contract=DataContract(
             schema_ref="forge://schemas/test/v0.1.0",
@@ -112,8 +118,10 @@ def manifest() -> AdapterManifest:
         ),
         connection_params=[
             ConnectionParam(
-                name="url", description="Test endpoint",
-                required=True, secret=False,
+                name="url",
+                description="Test endpoint",
+                required=True,
+                secret=False,
             ),
         ],
     )
@@ -129,10 +137,23 @@ def _make_record(index: int = 0) -> ContextualRecord:
         ),
         timestamp=RecordTimestamp(
             source_time=datetime(
-                2026, 4, 6, 10, index // 60, index % 60, tzinfo=timezone.utc,
+                2026,
+                4,
+                6,
+                10,
+                index // 60,
+                index % 60,
+                tzinfo=timezone.utc,
             ),
             ingestion_time=datetime(
-                2026, 4, 6, 10, index // 60, index % 60, 200000, tzinfo=timezone.utc,
+                2026,
+                4,
+                6,
+                10,
+                index // 60,
+                index % 60,
+                200000,
+                tzinfo=timezone.utc,
             ),
         ),
         value=RecordValue(
@@ -158,12 +179,15 @@ def _make_record(index: int = 0) -> ContextualRecord:
 # Tests: Control plane over hardened gRPC (binary protobuf)
 # ---------------------------------------------------------------------------
 
+
 class TestGrpcControlPlane:
     """Test control-plane RPCs (Register, Configure, Start, Stop, Health)
     over a real gRPC connection with compiled protobuf serialization."""
 
     async def test_register(
-        self, channel: GrpcChannel, manifest: AdapterManifest,
+        self,
+        channel: GrpcChannel,
+        manifest: AdapterManifest,
     ) -> None:
         """Register an adapter over real gRPC with binary protobuf."""
         client = SpokeClient(channel=channel)
@@ -171,7 +195,9 @@ class TestGrpcControlPlane:
         assert session_id.startswith("session-test-adapter-")
 
     async def test_full_lifecycle(
-        self, channel: GrpcChannel, manifest: AdapterManifest,
+        self,
+        channel: GrpcChannel,
+        manifest: AdapterManifest,
     ) -> None:
         """Full control-plane lifecycle over real gRPC."""
         client = SpokeClient(channel=channel)
@@ -197,7 +223,8 @@ class TestGrpcControlPlane:
         assert isinstance(flushed, int)
 
     async def test_configure_before_register_fails(
-        self, channel: GrpcChannel,
+        self,
+        channel: GrpcChannel,
     ) -> None:
         """Calling configure without register should fail."""
         client = SpokeClient(channel=channel)
@@ -208,6 +235,7 @@ class TestGrpcControlPlane:
 # ---------------------------------------------------------------------------
 # Tests: Data plane (record streaming) over hardened gRPC
 # ---------------------------------------------------------------------------
+
 
 class TestGrpcDataPlane:
     """Test record streaming over real gRPC with binary protobuf."""
@@ -310,7 +338,9 @@ class TestGrpcDataPlane:
                 source=r.source,
                 timestamp=r.timestamp,
                 value=RecordValue(
-                    raw=raw, engineering_units="", quality=QualityCode.GOOD,
+                    raw=raw,
+                    engineering_units="",
+                    quality=QualityCode.GOOD,
                     data_type=dtype,
                 ),
                 context=r.context,
@@ -338,6 +368,7 @@ class TestGrpcDataPlane:
 # ---------------------------------------------------------------------------
 # Tests: End-to-end with GrpcTransportAdapter
 # ---------------------------------------------------------------------------
+
 
 class TestGrpcTransportAdapter:
     """Test the full transport adapter wrapping over hardened gRPC."""
@@ -417,6 +448,7 @@ class TestGrpcTransportAdapter:
 # ---------------------------------------------------------------------------
 # Tests: Proto wire format verification
 # ---------------------------------------------------------------------------
+
 
 class TestProtoWireFormat:
     """Verify that data actually uses binary protobuf on the wire,

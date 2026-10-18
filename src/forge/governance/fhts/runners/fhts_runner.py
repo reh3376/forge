@@ -126,17 +126,19 @@ class FHTSRunner(FxTSRunner):
         # fhts:hash-present — spec has an integrity block with hash
         integrity = spec.get("integrity")
         has_hash = integrity is not None and bool(integrity.get("spec_hash"))
-        verdicts.append(FxTSVerdict(
-            check_id="fhts:hash-present",
-            spec_ref=spec_path,
-            status=VerdictStatus.PASS if has_hash else VerdictStatus.FAIL,
-            message=(
-                "Integrity block with hash found."
-                if has_hash else
-                "Missing integrity block or spec_hash — spec is not hash-protected."
-            ),
-            evidence={"has_integrity_block": integrity is not None, "has_hash": has_hash},
-        ))
+        verdicts.append(
+            FxTSVerdict(
+                check_id="fhts:hash-present",
+                spec_ref=spec_path,
+                status=VerdictStatus.PASS if has_hash else VerdictStatus.FAIL,
+                message=(
+                    "Integrity block with hash found."
+                    if has_hash
+                    else "Missing integrity block or spec_hash — spec is not hash-protected."
+                ),
+                evidence={"has_integrity_block": integrity is not None, "has_hash": has_hash},
+            )
+        )
 
         if not has_hash:
             # Remaining checks require a hash
@@ -146,115 +148,132 @@ class FHTSRunner(FxTSRunner):
         start = time.monotonic()
         hash_verified, hash_msg = verify_spec_hash(spec)
         duration = (time.monotonic() - start) * 1000
-        verdicts.append(FxTSVerdict(
-            check_id="fhts:hash-verified",
-            spec_ref=spec_path,
-            status=VerdictStatus.PASS if hash_verified else VerdictStatus.FAIL,
-            message=hash_msg,
-            duration_ms=duration,
-            evidence={
-                "hash_verified": hash_verified,
-                "stored_hash": integrity.get("spec_hash", "")[:16] + "…",
-            },
-            violations=[] if hash_verified else [SpecViolation(
-                field="integrity.spec_hash",
+        verdicts.append(
+            FxTSVerdict(
+                check_id="fhts:hash-verified",
+                spec_ref=spec_path,
+                status=VerdictStatus.PASS if hash_verified else VerdictStatus.FAIL,
                 message=hash_msg,
-                expected=integrity.get("spec_hash", "")[:16] + "…",
-                actual="(recomputed, differs)",
-            )],
-        ))
+                duration_ms=duration,
+                evidence={
+                    "hash_verified": hash_verified,
+                    "stored_hash": integrity.get("spec_hash", "")[:16] + "…",
+                },
+                violations=[]
+                if hash_verified
+                else [
+                    SpecViolation(
+                        field="integrity.spec_hash",
+                        message=hash_msg,
+                        expected=integrity.get("spec_hash", "")[:16] + "…",
+                        actual="(recomputed, differs)",
+                    )
+                ],
+            )
+        )
 
         # fhts:hash-approved — hash state is approved
         full_result = verify_spec_integrity(spec)
         hash_state = full_result["hash_state"]
         state_approved = full_result["state_approved"]
-        verdicts.append(FxTSVerdict(
-            check_id="fhts:hash-approved",
-            spec_ref=spec_path,
-            status=VerdictStatus.PASS if state_approved else VerdictStatus.FAIL,
-            message=(
-                f"Hash state is '{hash_state}', approved by "
+        verdicts.append(
+            FxTSVerdict(
+                check_id="fhts:hash-approved",
+                spec_ref=spec_path,
+                status=VerdictStatus.PASS if state_approved else VerdictStatus.FAIL,
+                message=(
+                    f"Hash state is '{hash_state}', approved by "
                     f"{integrity.get('approved_by', '(none)')}."
-                if state_approved else
-                f"Hash state is '{hash_state}' — not approved."
-            ),
-            evidence={
-                "hash_state": hash_state,
-                "approved_by": integrity.get("approved_by", ""),
-                "approved_at": integrity.get("approved_at", ""),
-            },
-        ))
+                    if state_approved
+                    else f"Hash state is '{hash_state}' — not approved."
+                ),
+                evidence={
+                    "hash_state": hash_state,
+                    "approved_by": integrity.get("approved_by", ""),
+                    "approved_at": integrity.get("approved_at", ""),
+                },
+            )
+        )
 
         # fhts:no-agent-pending — no unapproved agent changes
         change_history = integrity.get("change_history", [])
         agent_changes = [h for h in change_history if h.get("source") == "agent"]
         has_pending_agent = bool(agent_changes) and hash_state != "approved"
-        verdicts.append(FxTSVerdict(
-            check_id="fhts:no-agent-pending",
-            spec_ref=spec_path,
-            status=VerdictStatus.FAIL if has_pending_agent else VerdictStatus.PASS,
-            message=(
-                f"{len(agent_changes)} agent change(s) pending review."
-                if has_pending_agent else
-                "No unapproved agent changes."
-            ),
-            evidence={
-                "agent_changes_count": len(agent_changes),
-                "hash_state": hash_state,
-            },
-        ))
+        verdicts.append(
+            FxTSVerdict(
+                check_id="fhts:no-agent-pending",
+                spec_ref=spec_path,
+                status=VerdictStatus.FAIL if has_pending_agent else VerdictStatus.PASS,
+                message=(
+                    f"{len(agent_changes)} agent change(s) pending review."
+                    if has_pending_agent
+                    else "No unapproved agent changes."
+                ),
+                evidence={
+                    "agent_changes_count": len(agent_changes),
+                    "hash_state": hash_state,
+                },
+            )
+        )
 
         # fhts:history-healthy — no excessive churn
         from forge.governance.shared.runner import MAX_HASH_HISTORY
+
         is_churning = len(change_history) >= MAX_HASH_HISTORY
-        verdicts.append(FxTSVerdict(
-            check_id="fhts:history-healthy",
-            spec_ref=spec_path,
-            status=VerdictStatus.FAIL if is_churning else VerdictStatus.PASS,
-            message=(
-                f"Change history at capacity ({len(change_history)}/{MAX_HASH_HISTORY}). "
-                "Possible thrashing — investigate agent behavior."
-                if is_churning else
-                f"Change history healthy ({len(change_history)}/{MAX_HASH_HISTORY} entries)."
-            ),
-            evidence={
-                "history_depth": len(change_history),
-                "max_history": MAX_HASH_HISTORY,
-            },
-        ))
+        verdicts.append(
+            FxTSVerdict(
+                check_id="fhts:history-healthy",
+                spec_ref=spec_path,
+                status=VerdictStatus.FAIL if is_churning else VerdictStatus.PASS,
+                message=(
+                    f"Change history at capacity ({len(change_history)}/{MAX_HASH_HISTORY}). "
+                    "Possible thrashing — investigate agent behavior."
+                    if is_churning
+                    else f"Change history healthy ({len(change_history)}/{MAX_HASH_HISTORY} entries)."
+                ),
+                evidence={
+                    "history_depth": len(change_history),
+                    "max_history": MAX_HASH_HISTORY,
+                },
+            )
+        )
 
         # fhts:registry-tracked — spec is in FHTS registry (if registry available)
         if self._registry is not None:
             record = self._registry.get(spec_path)
-            verdicts.append(FxTSVerdict(
-                check_id="fhts:registry-tracked",
-                spec_ref=spec_path,
-                status=VerdictStatus.PASS if record else VerdictStatus.FAIL,
-                message=(
-                    f"Spec registered in FHTS registry (framework: {record.framework})."
-                    if record else
-                    "Spec not found in FHTS registry — register it for cross-cutting governance."
-                ),
-            ))
+            verdicts.append(
+                FxTSVerdict(
+                    check_id="fhts:registry-tracked",
+                    spec_ref=spec_path,
+                    status=VerdictStatus.PASS if record else VerdictStatus.FAIL,
+                    message=(
+                        f"Spec registered in FHTS registry (framework: {record.framework})."
+                        if record
+                        else "Spec not found in FHTS registry — register it for cross-cutting governance."
+                    ),
+                )
+            )
 
             # fhts:registry-match — registry hash matches spec hash
             if record:
                 spec_hash = integrity.get("spec_hash", "")
                 matches = record.current_hash == spec_hash
-                verdicts.append(FxTSVerdict(
-                    check_id="fhts:registry-match",
-                    spec_ref=spec_path,
-                    status=VerdictStatus.PASS if matches else VerdictStatus.FAIL,
-                    message=(
-                        "Registry hash matches spec's self-contained hash."
-                        if matches else
-                        "Registry hash does NOT match spec — registry is out of sync."
-                    ),
-                    evidence={
-                        "registry_hash": record.current_hash[:16] + "…",
-                        "spec_hash": spec_hash[:16] + "…",
-                    },
-                ))
+                verdicts.append(
+                    FxTSVerdict(
+                        check_id="fhts:registry-match",
+                        spec_ref=spec_path,
+                        status=VerdictStatus.PASS if matches else VerdictStatus.FAIL,
+                        message=(
+                            "Registry hash matches spec's self-contained hash."
+                            if matches
+                            else "Registry hash does NOT match spec — registry is out of sync."
+                        ),
+                        evidence={
+                            "registry_hash": record.current_hash[:16] + "…",
+                            "spec_hash": spec_hash[:16] + "…",
+                        },
+                    )
+                )
 
         return verdicts
 

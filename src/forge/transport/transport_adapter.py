@@ -60,7 +60,8 @@ class GrpcTransportAdapter:
         session_id = await self._client.register(self.adapter.manifest)
         logger.info(
             "Transport registered adapter %s (session: %s)",
-            self.adapter_id, session_id,
+            self.adapter_id,
+            session_id,
         )
         return session_id
 
@@ -97,7 +98,8 @@ class GrpcTransportAdapter:
         self._total_sent += sent
         logger.info(
             "Collect cycle: %d records streamed (total: %d)",
-            sent, self._total_sent,
+            sent,
+            self._total_sent,
         )
         return sent
 

@@ -84,9 +84,11 @@ class TestEnrichmentStep:
     def test_applies_rules(self) -> None:
         def add_tag(record: ContextualRecord) -> ContextualRecord:
             extra = {**record.context.extra, "enriched": "true"}
-            return record.model_copy(update={
-                "context": record.context.model_copy(update={"extra": extra}),
-            })
+            return record.model_copy(
+                update={
+                    "context": record.context.model_copy(update={"extra": extra}),
+                }
+            )
 
         step = EnrichmentStep(rules=[add_tag])
         records = make_record_batch(count=2)
@@ -119,9 +121,11 @@ class TestCurationPipeline:
         assert result.steps_applied == []
 
     def test_normalization_only(self) -> None:
-        pipeline = CurationPipeline(steps=[
-            NormalizationStep(build_whk_unit_registry()),
-        ])
+        pipeline = CurationPipeline(
+            steps=[
+                NormalizationStep(build_whk_unit_registry()),
+            ]
+        )
         records = make_record_batch(count=3, base_value=78.4, unit="°F")
         result = pipeline.execute(records)
         assert result.output_count == 3
@@ -133,11 +137,13 @@ class TestCurationPipeline:
             steps=[
                 NormalizationStep(build_whk_unit_registry()),
                 TimeBucketStep("5min"),
-                AggregationStep(AggregationSpec(
-                    group_by=["equipment_id"],
-                    time_window="5min",
-                    functions=[AggregationFunction.AVG],
-                )),
+                AggregationStep(
+                    AggregationSpec(
+                        group_by=["equipment_id"],
+                        time_window="5min",
+                        functions=[AggregationFunction.AVG],
+                    )
+                ),
             ],
             product_id="dp-test",
         )
@@ -150,10 +156,13 @@ class TestCurationPipeline:
 
     def test_pipeline_with_quality(self) -> None:
         monitor = QualityMonitor()
-        monitor.register_rules("dp-test", [
-            CompletenessRule(["equipment_id"]),
-            RangeRule(min_value=0.0, max_value=100.0),
-        ])
+        monitor.register_rules(
+            "dp-test",
+            [
+                CompletenessRule(["equipment_id"]),
+                RangeRule(min_value=0.0, max_value=100.0),
+            ],
+        )
         pipeline = CurationPipeline(
             steps=[NormalizationStep(build_whk_unit_registry())],
             quality_monitor=monitor,
@@ -188,7 +197,9 @@ class TestCurationPipeline:
         assert len(pipeline.steps) == 1
 
     def test_cross_adapter_records(
-        self, sample_record: ContextualRecord, mes_record: ContextualRecord,
+        self,
+        sample_record: ContextualRecord,
+        mes_record: ContextualRecord,
     ) -> None:
         """Test pipeline with records from both WMS and MES adapters."""
         pipeline = CurationPipeline(

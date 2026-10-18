@@ -190,8 +190,10 @@ class TagPublisher:
 
         try:
             await self._publisher.publish(
-                resolved.topic, payload,
-                qos=resolved.qos, retain=resolved.retain,
+                resolved.topic,
+                payload,
+                qos=resolved.qos,
+                retain=resolved.retain,
             )
             self._tag_publish_count += 1
             return True
@@ -229,8 +231,10 @@ class TagPublisher:
 
         try:
             await self._publisher.publish(
-                resolved.topic, payload,
-                qos=resolved.qos, retain=resolved.retain,
+                resolved.topic,
+                payload,
+                qos=resolved.qos,
+                retain=resolved.retain,
             )
             self._health_publish_count += 1
             return True
@@ -256,7 +260,9 @@ class TagPublisher:
         selective subscription by downstream consumers.
         """
         resolved = self._router.resolve_equipment(
-            equipment_id, field_name, area=area,
+            equipment_id,
+            field_name,
+            area=area,
         )
         payload = build_equipment_payload(
             equipment_id=equipment_id,
@@ -267,8 +273,10 @@ class TagPublisher:
 
         try:
             await self._publisher.publish(
-                resolved.topic, payload,
-                qos=resolved.qos, retain=resolved.retain,
+                resolved.topic,
+                payload,
+                qos=resolved.qos,
+                retain=resolved.retain,
             )
             self._equipment_publish_count += 1
             return True
@@ -276,7 +284,9 @@ class TagPublisher:
             self._error_count += 1
             logger.error(
                 "Failed to publish equipment %s.%s: %s",
-                equipment_id, field_name, exc,
+                equipment_id,
+                field_name,
+                exc,
             )
             return False
 
@@ -312,8 +322,10 @@ class TagPublisher:
 
         try:
             await self._publisher.publish(
-                resolved.topic, payload,
-                qos=resolved.qos, retain=resolved.retain,
+                resolved.topic,
+                payload,
+                qos=resolved.qos,
+                retain=resolved.retain,
             )
             self._alarm_publish_count += 1
             return True

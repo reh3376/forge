@@ -163,9 +163,7 @@ class PoolManager:
                 elif engine_name == "redis":
                     await pool.ping()
 
-                elapsed = (
-                    datetime.now(tz=timezone.utc) - start
-                ).total_seconds() * 1000
+                elapsed = (datetime.now(tz=timezone.utc) - start).total_seconds() * 1000
                 results.append(
                     EngineHealth(
                         engine=engine_name,

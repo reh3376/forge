@@ -24,9 +24,7 @@ else:
         """Minimal backport of enum.StrEnum for Python 3.10."""
 
         @staticmethod
-        def _generate_next_value_(
-            name: str, start: int, count: int, last_values: list
-        ) -> str:
+        def _generate_next_value_(name: str, start: int, count: int, last_values: list) -> str:
             return name
 
 # ── UTC alias ─────────────────────────────────────────────────

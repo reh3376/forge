@@ -118,9 +118,7 @@ class OpcUaProvider(BaseProvider):
             "endpoint_url": client_health.endpoint_url,
             "subscribed_tags": len(self._subscribed_tags),
             "values_received": self._values_received,
-            "last_value_at": (
-                self._last_value_at.isoformat() if self._last_value_at else None
-            ),
+            "last_value_at": (self._last_value_at.isoformat() if self._last_value_at else None),
             "subscription_errors": self._subscription_errors,
             "reconnect_count": client_health.reconnect_count,
             "latency_ms": client_health.latency_ms,
@@ -225,7 +223,9 @@ class OpcUaProvider(BaseProvider):
         if values:
             dv = values[0]
             await self._registry.update_value(
-                tag_path, dv.value, dv.quality,
+                tag_path,
+                dv.value,
+                dv.quality,
                 source_timestamp=dv.source_timestamp,
             )
             return dv

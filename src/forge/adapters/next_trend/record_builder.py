@@ -127,9 +127,7 @@ def _parse_timestamp(ts_value: Any) -> datetime:
     return datetime.now(tz=timezone.utc)
 
 
-def _normalize_value(
-    raw: Any, data_type: str | None
-) -> float | int | str | bool | None:
+def _normalize_value(raw: Any, data_type: str | None) -> float | int | str | bool | None:
     """Normalize a tag value based on declared data type."""
     if raw is None:
         return None

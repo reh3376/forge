@@ -29,10 +29,10 @@ class FailoverState(str, Enum):
     """Current failover readiness."""
 
     NOT_TESTED = "not_tested"
-    READY = "ready"             # Failover tested and confirmed
-    ACTIVE = "active"           # Currently failed over to bridge
-    FAILED = "failed"           # Failover test failed
-    DISABLED = "disabled"       # Failover not configured
+    READY = "ready"  # Failover tested and confirmed
+    ACTIVE = "active"  # Currently failed over to bridge
+    FAILED = "failed"  # Failover test failed
+    DISABLED = "disabled"  # Failover not configured
 
 
 @dataclass
@@ -132,18 +132,12 @@ class BridgeHealthDashboard:
         """Evaluate all Gate 5 criteria and return pass/fail for each."""
         report = self.latest_report
         return {
-            "data_discrepancy_below_1pct": (
-                report.discrepancy_rate < 0.01 if report else False
-            ),
-            "all_tag_paths_covered": (
-                report.missing_in_ot == 0 if report else False
-            ),
+            "data_discrepancy_below_1pct": (report.discrepancy_rate < 0.01 if report else False),
+            "all_tag_paths_covered": (report.missing_in_ot == 0 if report else False),
             "failover_confirmed": self.failover_state == FailoverState.READY,
             "ot_module_healthy": self.ot_module_healthy,
             "bridge_healthy": self.bridge_healthy,
-            "operator_checklist_complete": all(
-                item.passed for item in self.checklist
-            ),
+            "operator_checklist_complete": all(item.passed for item in self.checklist),
         }
 
     @property
@@ -194,16 +188,12 @@ class BridgeHealthDashboard:
                 "state": self.bridge_health.state.value,
                 "ignition_version": self.bridge_health.ignition_version,
             },
-            "consistency": (
-                self.latest_report.summary() if self.latest_report else None
-            ),
+            "consistency": (self.latest_report.summary() if self.latest_report else None),
             "latency": self.latency.to_dict(),
             "failover": {
                 "state": self.failover_state.value,
                 "last_test": (
-                    self.last_failover_test.isoformat()
-                    if self.last_failover_test
-                    else None
+                    self.last_failover_test.isoformat() if self.last_failover_test else None
                 ),
                 "switch_time_ms": self.failover_switch_time_ms,
             },

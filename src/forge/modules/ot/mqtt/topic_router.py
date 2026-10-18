@@ -42,8 +42,8 @@ class TopicType(str, Enum):
     HEALTH = "health"
     EQUIPMENT = "equipment"
     ALARM = "alarm"
-    SCRIPT = "script"       # Script-originated publishes
-    SYSTEM = "system"       # Module lifecycle, status
+    SCRIPT = "script"  # Script-originated publishes
+    SYSTEM = "system"  # Module lifecycle, status
 
 
 # ---------------------------------------------------------------------------
@@ -277,7 +277,9 @@ class TopicRouter:
                 topic = tmpl.template.format_map(context)
             except KeyError as exc:
                 logger.warning(
-                    "Topic template missing key %s: %s", exc, tmpl.template,
+                    "Topic template missing key %s: %s",
+                    exc,
+                    tmpl.template,
                 )
                 continue
 

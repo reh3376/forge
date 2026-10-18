@@ -43,12 +43,12 @@ class AuditEntry:
     """A single audit log entry for a script operation."""
 
     timestamp: str
-    operation: str          # "tag_write", "tag_read", "db_query", "db_mutate"
+    operation: str  # "tag_write", "tag_read", "db_query", "db_mutate"
     script_name: str
     script_owner: str
     handler_name: str
-    trigger_type: str       # "tag_change", "timer", "event", "alarm", "api", "manual"
-    target: str             # tag path or SQL query (truncated)
+    trigger_type: str  # "tag_change", "timer", "event", "alarm", "api", "manual"
+    target: str  # tag path or SQL query (truncated)
     old_value: Any = None
     new_value: Any = None
     rbac_allowed: bool = True

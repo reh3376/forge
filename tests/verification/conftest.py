@@ -26,6 +26,7 @@ import forge._compat  # noqa: F401, E402 — registers StrEnum/UTC shims
 
 # ── Sample WMS barrel event ──────────────────────────────────────
 
+
 @pytest.fixture()
 def barrel_event() -> dict[str, Any]:
     """A realistic WMS barrel transfer event."""
@@ -77,9 +78,7 @@ def barrel_events(barrel_event: dict) -> list[dict[str, Any]]:
 @pytest.fixture()
 def whk_wms_spec() -> dict[str, Any]:
     """Load the WHK WMS FACTS spec from the governance directory."""
-    spec_path = (
-        SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "whk-wms.facts.json"
-    )
+    spec_path = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "whk-wms.facts.json"
     return json.loads(spec_path.read_text())
 
 

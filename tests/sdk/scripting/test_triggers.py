@@ -28,7 +28,6 @@ from forge.sdk.scripting.triggers import (
 
 
 class TestParseInterval:
-
     def test_seconds(self):
         assert _parse_interval("5s") == timedelta(seconds=5)
 
@@ -58,35 +57,33 @@ class TestParseInterval:
 
 
 class TestMatchTagPattern:
-
     def test_exact_match(self):
-        assert _match_tag_pattern("WH/WHK01/Distillery01/TIT_2010/Out_PV",
-                                  "WH/WHK01/Distillery01/TIT_2010/Out_PV")
+        assert _match_tag_pattern(
+            "WH/WHK01/Distillery01/TIT_2010/Out_PV", "WH/WHK01/Distillery01/TIT_2010/Out_PV"
+        )
 
     def test_single_wildcard(self):
-        assert _match_tag_pattern("WH/WHK01/*/TIT_2010/Out_PV",
-                                  "WH/WHK01/Distillery01/TIT_2010/Out_PV")
+        assert _match_tag_pattern(
+            "WH/WHK01/*/TIT_2010/Out_PV", "WH/WHK01/Distillery01/TIT_2010/Out_PV"
+        )
 
     def test_single_wildcard_no_deep_match(self):
         """Single * should NOT match across slashes."""
-        assert not _match_tag_pattern("WH/*/Out_PV",
-                                       "WH/WHK01/Distillery01/TIT_2010/Out_PV")
+        assert not _match_tag_pattern("WH/*/Out_PV", "WH/WHK01/Distillery01/TIT_2010/Out_PV")
 
     def test_double_wildcard(self):
-        assert _match_tag_pattern("WH/**",
-                                  "WH/WHK01/Distillery01/TIT_2010/Out_PV")
+        assert _match_tag_pattern("WH/**", "WH/WHK01/Distillery01/TIT_2010/Out_PV")
 
     def test_double_wildcard_middle(self):
-        assert _match_tag_pattern("WH/**/Out_PV",
-                                  "WH/WHK01/Distillery01/TIT_2010/Out_PV")
+        assert _match_tag_pattern("WH/**/Out_PV", "WH/WHK01/Distillery01/TIT_2010/Out_PV")
 
     def test_combined_wildcards(self):
-        assert _match_tag_pattern("WH/*/Distillery01/**",
-                                  "WH/WHK01/Distillery01/TIT_2010/Out_PV")
+        assert _match_tag_pattern("WH/*/Distillery01/**", "WH/WHK01/Distillery01/TIT_2010/Out_PV")
 
     def test_no_match(self):
-        assert not _match_tag_pattern("WH/WHK01/Granary01/**",
-                                       "WH/WHK01/Distillery01/TIT_2010/Out_PV")
+        assert not _match_tag_pattern(
+            "WH/WHK01/Granary01/**", "WH/WHK01/Distillery01/TIT_2010/Out_PV"
+        )
 
     def test_empty_pattern_no_match(self):
         assert not _match_tag_pattern("", "WH/WHK01/TIT_2010/Out_PV")
@@ -98,7 +95,6 @@ class TestMatchTagPattern:
 
 
 class TestDecorators:
-
     def test_on_tag_change_marks_function(self):
         @on_tag_change("WH/**")
         async def handler(event):
@@ -173,7 +169,6 @@ class TestDecorators:
 
 
 class TestTriggerRegistry:
-
     def _make_module_with_handlers(self):
         """Create a mock module with decorated functions."""
         mod = ModuleType("test_script")
@@ -292,7 +287,6 @@ class TestTriggerRegistry:
 
 
 class TestEventModels:
-
     def test_tag_change_event_frozen(self):
         event = TagChangeEvent(
             tag_path="WH/WHK01/TIT/Out_PV",

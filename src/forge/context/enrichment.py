@@ -101,15 +101,11 @@ class ContextEnricher:
                     context.area = eq.area
                     added.append("area")
             else:
-                warnings.append(
-                    f"Equipment '{context.equipment_id}' not found in registry"
-                )
+                warnings.append(f"Equipment '{context.equipment_id}' not found in registry")
 
         # 2. Batch / lot
         if context.equipment_id and not context.batch_id:
-            batch = await self._batches.get_active_for_equipment(
-                context.equipment_id
-            )
+            batch = await self._batches.get_active_for_equipment(context.equipment_id)
             if batch:
                 context.batch_id = batch.batch_id
                 added.append("batch_id")
@@ -139,9 +135,7 @@ class ContextEnricher:
             else:
                 # Infer from batch state + equipment status
                 eq = await self._equipment.get(context.equipment_id)
-                batch = await self._batches.get_active_for_equipment(
-                    context.equipment_id
-                )
+                batch = await self._batches.get_active_for_equipment(context.equipment_id)
                 eq_status = eq.status.value if eq else "active"
                 inferred = infer_mode(
                     batch_active=batch is not None,

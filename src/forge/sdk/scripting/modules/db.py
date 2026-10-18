@@ -141,12 +141,13 @@ class DbModule:
         pool = self._pools.get(name)
         if pool is None:
             raise RuntimeError(
-                f"No database pool bound for '{name}'. "
-                f"Available: {list(self._pools.keys())}"
+                f"No database pool bound for '{name}'. Available: {list(self._pools.keys())}"
             )
         return pool
 
-    async def query(self, sql: str, params: list[Any] | None = None, db: str | None = None) -> QueryResult:
+    async def query(
+        self, sql: str, params: list[Any] | None = None, db: str | None = None
+    ) -> QueryResult:
         """Run a parameterized SQL query.
 
         Args:
@@ -164,7 +165,9 @@ class DbModule:
         finally:
             await pool.release(conn)
 
-    async def named_query(self, name: str, params: dict[str, Any] | None = None, db: str | None = None) -> QueryResult:
+    async def named_query(
+        self, name: str, params: dict[str, Any] | None = None, db: str | None = None
+    ) -> QueryResult:
         """Run a named query (registered via config or register_named_query).
 
         Named queries are pre-defined SQL templates stored by name.

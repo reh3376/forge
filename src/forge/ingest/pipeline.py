@@ -140,9 +140,7 @@ class IngestStats:
             "failed": self.failed,
             "missing_context": self.missing_context,
             "by_engine": dict(self.by_engine),
-            "last_ingest_at": (
-                self.last_ingest_at.isoformat() if self.last_ingest_at else None
-            ),
+            "last_ingest_at": (self.last_ingest_at.isoformat() if self.last_ingest_at else None),
             "last_error": self.last_error,
         }
 
@@ -264,15 +262,11 @@ class IngestPipeline:
                     outcome.errors.append(f"{engine.value}: {exc}")
                 outcome.persisted += written
                 outcome.failed += len(batch) - written
-                outcome.by_engine[engine.value] = (
-                    outcome.by_engine.get(engine.value, 0) + written
-                )
+                outcome.by_engine[engine.value] = outcome.by_engine.get(engine.value, 0) + written
 
         self.stats.add(outcome)
         if outcome.rejected or outcome.failed:
-            logger.warning(
-                "Ingest from %s: %s", adapter_id or "unknown", outcome.summary()
-            )
+            logger.warning("Ingest from %s: %s", adapter_id or "unknown", outcome.summary())
         else:
             logger.debug("Ingest from %s: %s", adapter_id or "unknown", outcome.summary())
         return outcome

@@ -30,7 +30,6 @@ from forge.modules.ot.tag_engine.builtin_templates import (
 
 
 class TestTemplateParam:
-
     def test_string_coercion(self):
         p = TemplateParam(type="str")
         assert p.coerce(42) == "42"
@@ -65,7 +64,6 @@ class TestTemplateParam:
 
 
 class TestTagTemplate:
-
     @pytest.fixture
     def simple_template(self):
         return TagTemplate(
@@ -97,9 +95,7 @@ class TestTagTemplate:
         )
 
     def test_validate_params_fills_defaults(self, simple_template):
-        resolved = simple_template.validate_params(
-            {"connection": "WHK01", "tag_id": "TIT_2010"}
-        )
+        resolved = simple_template.validate_params({"connection": "WHK01", "tag_id": "TIT_2010"})
         assert resolved["connection"] == "WHK01"
         assert resolved["tag_id"] == "TIT_2010"
         assert resolved["units"] == "°F"  # Default filled in
@@ -186,7 +182,6 @@ class TestTagTemplate:
 
 
 class TestTemplateRegistry:
-
     def test_register_and_list(self):
         reg = TemplateRegistry()
         tmpl = TagTemplate(name="TestTemplate")
@@ -253,7 +248,7 @@ class TestTemplateRegistry:
         tags = reg.instantiate("Child", "inst1", {"tag_id": "M001"})
         paths = [t.path for t in tags]
         assert "M001/ParentTag" in paths  # From parent
-        assert "M001/ChildTag" in paths   # From child
+        assert "M001/ChildTag" in paths  # From child
         assert len(tags) == 2
 
     def test_child_overrides_parent_tag(self):
@@ -298,7 +293,6 @@ class TestTemplateRegistry:
 
 
 class TestBuiltinTemplates:
-
     @pytest.fixture
     def builtin_reg(self):
         return create_builtin_registry()

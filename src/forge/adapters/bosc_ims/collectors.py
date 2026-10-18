@@ -200,7 +200,9 @@ async def collect_suppliers(
                 ),
                 value=RecordValue(
                     raw=json.dumps(
-                        supplier, default=str, ensure_ascii=False,
+                        supplier,
+                        default=str,
+                        ensure_ascii=False,
                     ),
                     quality=QualityCode.GOOD,
                     data_type="json",
@@ -265,7 +267,8 @@ async def collect_asset_snapshots(
 
         except Exception:
             logger.exception(
-                "Failed to collect asset snapshot: %s", asset_id,
+                "Failed to collect asset snapshot: %s",
+                asset_id,
             )
 
 
@@ -312,7 +315,9 @@ async def collect_compliance(
                 ),
                 value=RecordValue(
                     raw=json.dumps(
-                        compliance, default=str, ensure_ascii=False,
+                        compliance,
+                        default=str,
+                        ensure_ascii=False,
                     ),
                     quality=QualityCode.GOOD,
                     data_type="json",
@@ -342,5 +347,6 @@ async def collect_compliance(
 
         except Exception:
             logger.exception(
-                "Failed to collect compliance for asset: %s", asset_id,
+                "Failed to collect compliance for asset: %s",
+                asset_id,
             )

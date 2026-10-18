@@ -40,6 +40,7 @@ app = typer.Typer(
 # Top-level commands
 # ---------------------------------------------------------------------------
 
+
 @app.command()
 def version() -> None:
     """Show Forge version."""
@@ -63,9 +64,7 @@ def health(
             for key, val in data.items():
                 typer.echo(f"  {key}: {val}")
         else:
-            typer.echo(
-                f"[WARN] Unexpected status {resp.status_code} from {base_url}"
-            )
+            typer.echo(f"[WARN] Unexpected status {resp.status_code} from {base_url}")
             raise typer.Exit(code=1)
     except httpx.ConnectError as exc:
         typer.echo(f"[ERROR] Cannot connect to {base_url}")
@@ -182,9 +181,7 @@ def adapter_status(
     import httpx
 
     try:
-        resp = httpx.get(
-            f"{base_url}/v1/adapters/{adapter_id}/health", timeout=5.0
-        )
+        resp = httpx.get(f"{base_url}/v1/adapters/{adapter_id}/health", timeout=5.0)
         if resp.status_code == 404:
             typer.echo(f"Adapter '{adapter_id}' not found.")
             raise typer.Exit(code=1)
@@ -368,11 +365,10 @@ def migrate_down(
 # Governance subcommand group (continued)
 # ---------------------------------------------------------------------------
 
+
 @governance_app.command("validate-spec")
 def governance_validate_spec(
-    spec_file: Annotated[
-        Path, typer.Argument(help="Path to the spec file to validate")
-    ],
+    spec_file: Annotated[Path, typer.Argument(help="Path to the spec file to validate")],
 ) -> None:
     """Validate a spec file against its framework schema."""
     import json
@@ -481,6 +477,7 @@ def _scan_free_ports() -> dict[str, int]:
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _default_env(ports: dict[str, int] | None = None) -> str:
     """Generate a default .env for Forge."""
     p = ports or _DEFAULT_PORTS
@@ -490,41 +487,41 @@ def _default_env(ports: dict[str, int] | None = None) -> str:
 
 # --- Storage ---
 POSTGRES_HOST=localhost
-POSTGRES_PORT={p.get('POSTGRES_PORT', 5432)}
+POSTGRES_PORT={p.get("POSTGRES_PORT", 5432)}
 POSTGRES_DB=forge
 POSTGRES_USER=forge
 POSTGRES_PASSWORD=changeme
 
 TIMESCALE_HOST=localhost
-TIMESCALE_PORT={p.get('TIMESCALE_PORT', 5433)}
+TIMESCALE_PORT={p.get("TIMESCALE_PORT", 5433)}
 TIMESCALE_DB=forge_ts
 TIMESCALE_USER=forge
 TIMESCALE_PASSWORD=changeme
 
-NEO4J_URI=bolt://localhost:{p.get('NEO4J_BOLT_PORT', 7687)}
+NEO4J_URI=bolt://localhost:{p.get("NEO4J_BOLT_PORT", 7687)}
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=changeme
 
-REDIS_URL=redis://localhost:{p.get('REDIS_PORT', 6379)}/0
+REDIS_URL=redis://localhost:{p.get("REDIS_PORT", 6379)}/0
 
-MINIO_ENDPOINT=localhost:{p.get('MINIO_API_PORT', 9000)}
+MINIO_ENDPOINT=localhost:{p.get("MINIO_API_PORT", 9000)}
 MINIO_ACCESS_KEY=forge
 MINIO_SECRET_KEY=changeme
 
 # --- Kafka ---
-KAFKA_BOOTSTRAP_SERVERS=localhost:{p.get('KAFKA_PORT', 9092)}
+KAFKA_BOOTSTRAP_SERVERS=localhost:{p.get("KAFKA_PORT", 9092)}
 
 # --- RabbitMQ ---
-RABBITMQ_URL=amqp://forge:changeme@localhost:{p.get('RABBITMQ_PORT', 5672)}/
+RABBITMQ_URL=amqp://forge:changeme@localhost:{p.get("RABBITMQ_PORT", 5672)}/
 RABBITMQ_USER=forge
 RABBITMQ_PASS=changeme
 RABBITMQ_VHOST=/
-RABBITMQ_PORT={p.get('RABBITMQ_PORT', 5672)}
-RABBITMQ_MGMT_PORT={p.get('RABBITMQ_MGMT_PORT', 15672)}
+RABBITMQ_PORT={p.get("RABBITMQ_PORT", 5672)}
+RABBITMQ_MGMT_PORT={p.get("RABBITMQ_MGMT_PORT", 15672)}
 
 # --- API ---
 FORGE_API_HOST=0.0.0.0
-FORGE_API_PORT={p.get('FORGE_API_PORT', 8000)}
+FORGE_API_PORT={p.get("FORGE_API_PORT", 8000)}
 
 # --- Features ---
 FORGE_AUTH_ENABLED=false

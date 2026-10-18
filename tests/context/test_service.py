@@ -23,13 +23,16 @@ async def client(app):
 class TestEquipmentEndpoints:
     @pytest.mark.asyncio
     async def test_register_equipment(self, client):
-        resp = await client.post("/v1/context/equipment", json={
-            "equipment_id": "FERM-001",
-            "name": "Fermenter 1",
-            "site": "WHK-Main",
-            "area": "Fermentation",
-            "equipment_type": "fermenter",
-        })
+        resp = await client.post(
+            "/v1/context/equipment",
+            json={
+                "equipment_id": "FERM-001",
+                "name": "Fermenter 1",
+                "site": "WHK-Main",
+                "area": "Fermentation",
+                "equipment_type": "fermenter",
+            },
+        )
         assert resp.status_code == 201
         data = resp.json()
         assert data["equipment_id"] == "FERM-001"
@@ -37,9 +40,14 @@ class TestEquipmentEndpoints:
 
     @pytest.mark.asyncio
     async def test_get_equipment(self, client):
-        await client.post("/v1/context/equipment", json={
-            "equipment_id": "E1", "name": "E1", "site": "S",
-        })
+        await client.post(
+            "/v1/context/equipment",
+            json={
+                "equipment_id": "E1",
+                "name": "E1",
+                "site": "S",
+            },
+        )
         resp = await client.get("/v1/context/equipment/E1")
         assert resp.status_code == 200
         assert resp.json()["equipment_id"] == "E1"
@@ -51,21 +59,36 @@ class TestEquipmentEndpoints:
 
     @pytest.mark.asyncio
     async def test_list_equipment_by_site(self, client):
-        await client.post("/v1/context/equipment", json={
-            "equipment_id": "E1", "name": "E1", "site": "S",
-        })
-        await client.post("/v1/context/equipment", json={
-            "equipment_id": "E2", "name": "E2", "site": "S",
-        })
+        await client.post(
+            "/v1/context/equipment",
+            json={
+                "equipment_id": "E1",
+                "name": "E1",
+                "site": "S",
+            },
+        )
+        await client.post(
+            "/v1/context/equipment",
+            json={
+                "equipment_id": "E2",
+                "name": "E2",
+                "site": "S",
+            },
+        )
         resp = await client.get("/v1/context/equipment", params={"site": "S"})
         assert resp.status_code == 200
         assert len(resp.json()) == 2
 
     @pytest.mark.asyncio
     async def test_delete_equipment(self, client):
-        await client.post("/v1/context/equipment", json={
-            "equipment_id": "E1", "name": "E1", "site": "S",
-        })
+        await client.post(
+            "/v1/context/equipment",
+            json={
+                "equipment_id": "E1",
+                "name": "E1",
+                "site": "S",
+            },
+        )
         resp = await client.delete("/v1/context/equipment/E1")
         assert resp.status_code == 204
 
@@ -76,12 +99,23 @@ class TestEquipmentEndpoints:
 
     @pytest.mark.asyncio
     async def test_get_children(self, client):
-        await client.post("/v1/context/equipment", json={
-            "equipment_id": "AREA-1", "name": "Area 1", "site": "S",
-        })
-        await client.post("/v1/context/equipment", json={
-            "equipment_id": "E1", "name": "E1", "site": "S", "parent_id": "AREA-1",
-        })
+        await client.post(
+            "/v1/context/equipment",
+            json={
+                "equipment_id": "AREA-1",
+                "name": "Area 1",
+                "site": "S",
+            },
+        )
+        await client.post(
+            "/v1/context/equipment",
+            json={
+                "equipment_id": "E1",
+                "name": "E1",
+                "site": "S",
+                "parent_id": "AREA-1",
+            },
+        )
         resp = await client.get("/v1/context/equipment/AREA-1/children")
         assert resp.status_code == 200
         assert len(resp.json()) == 1
@@ -90,29 +124,40 @@ class TestEquipmentEndpoints:
 class TestBatchEndpoints:
     @pytest.mark.asyncio
     async def test_register_batch(self, client):
-        resp = await client.post("/v1/context/batches", json={
-            "batch_id": "B001",
-            "equipment_id": "FERM-001",
-            "recipe_id": "R001",
-            "lot_id": "L001",
-        })
+        resp = await client.post(
+            "/v1/context/batches",
+            json={
+                "batch_id": "B001",
+                "equipment_id": "FERM-001",
+                "recipe_id": "R001",
+                "lot_id": "L001",
+            },
+        )
         assert resp.status_code == 201
         assert resp.json()["batch_id"] == "B001"
 
     @pytest.mark.asyncio
     async def test_list_active_batches(self, client):
-        await client.post("/v1/context/batches", json={
-            "batch_id": "B001", "equipment_id": "E1",
-        })
+        await client.post(
+            "/v1/context/batches",
+            json={
+                "batch_id": "B001",
+                "equipment_id": "E1",
+            },
+        )
         resp = await client.get("/v1/context/batches/active")
         assert resp.status_code == 200
         assert len(resp.json()) == 1
 
     @pytest.mark.asyncio
     async def test_complete_batch(self, client):
-        await client.post("/v1/context/batches", json={
-            "batch_id": "B001", "equipment_id": "E1",
-        })
+        await client.post(
+            "/v1/context/batches",
+            json={
+                "batch_id": "B001",
+                "equipment_id": "E1",
+            },
+        )
         resp = await client.post("/v1/context/batches/B001/complete")
         assert resp.status_code == 200
         data = resp.json()
@@ -128,19 +173,26 @@ class TestBatchEndpoints:
 class TestModeEndpoints:
     @pytest.mark.asyncio
     async def test_set_mode(self, client):
-        resp = await client.post("/v1/context/modes", json={
-            "equipment_id": "E1",
-            "mode": "PRODUCTION",
-            "source": "plc-signal",
-        })
+        resp = await client.post(
+            "/v1/context/modes",
+            json={
+                "equipment_id": "E1",
+                "mode": "PRODUCTION",
+                "source": "plc-signal",
+            },
+        )
         assert resp.status_code == 201
         assert resp.json()["mode"] == "PRODUCTION"
 
     @pytest.mark.asyncio
     async def test_get_mode(self, client):
-        await client.post("/v1/context/modes", json={
-            "equipment_id": "E1", "mode": "CIP",
-        })
+        await client.post(
+            "/v1/context/modes",
+            json={
+                "equipment_id": "E1",
+                "mode": "CIP",
+            },
+        )
         resp = await client.get("/v1/context/modes/E1")
         assert resp.status_code == 200
         assert resp.json()["mode"] == "CIP"
@@ -154,19 +206,25 @@ class TestModeEndpoints:
 class TestShiftEndpoint:
     @pytest.mark.asyncio
     async def test_resolve_day_shift(self, client):
-        resp = await client.post("/v1/context/shifts/resolve", json={
-            "timestamp": "2026-04-15T14:00:00Z",
-            "site": "WHK-Main",
-        })
+        resp = await client.post(
+            "/v1/context/shifts/resolve",
+            json={
+                "timestamp": "2026-04-15T14:00:00Z",
+                "site": "WHK-Main",
+            },
+        )
         assert resp.status_code == 200
         assert resp.json()["shift"] == "Day"
 
     @pytest.mark.asyncio
     async def test_resolve_night_shift(self, client):
-        resp = await client.post("/v1/context/shifts/resolve", json={
-            "timestamp": "2026-04-15T23:00:00Z",
-            "site": "WHK-Main",
-        })
+        resp = await client.post(
+            "/v1/context/shifts/resolve",
+            json={
+                "timestamp": "2026-04-15T23:00:00Z",
+                "site": "WHK-Main",
+            },
+        )
         assert resp.status_code == 200
         assert resp.json()["shift"] == "Night"
 
@@ -175,16 +233,22 @@ class TestEnrichEndpoint:
     @pytest.mark.asyncio
     async def test_enrich_with_equipment(self, client):
         # Register equipment first
-        await client.post("/v1/context/equipment", json={
-            "equipment_id": "FERM-001",
-            "name": "Fermenter 1",
-            "site": "WHK-Main",
-            "area": "Fermentation",
-        })
-        resp = await client.post("/v1/context/enrich", json={
-            "equipment_id": "FERM-001",
-            "source_time": "2026-04-15T14:00:00Z",
-        })
+        await client.post(
+            "/v1/context/equipment",
+            json={
+                "equipment_id": "FERM-001",
+                "name": "Fermenter 1",
+                "site": "WHK-Main",
+                "area": "Fermentation",
+            },
+        )
+        resp = await client.post(
+            "/v1/context/enrich",
+            json={
+                "equipment_id": "FERM-001",
+                "source_time": "2026-04-15T14:00:00Z",
+            },
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert data["site"] == "WHK-Main"
@@ -199,16 +263,29 @@ class TestEnrichEndpoint:
 
     @pytest.mark.asyncio
     async def test_enrich_with_batch_and_mode(self, client):
-        await client.post("/v1/context/equipment", json={
-            "equipment_id": "E1", "name": "E1", "site": "S",
-        })
-        await client.post("/v1/context/batches", json={
-            "batch_id": "B1", "equipment_id": "E1",
-            "lot_id": "L1", "recipe_id": "R1",
-        })
-        resp = await client.post("/v1/context/enrich", json={
-            "equipment_id": "E1",
-        })
+        await client.post(
+            "/v1/context/equipment",
+            json={
+                "equipment_id": "E1",
+                "name": "E1",
+                "site": "S",
+            },
+        )
+        await client.post(
+            "/v1/context/batches",
+            json={
+                "batch_id": "B1",
+                "equipment_id": "E1",
+                "lot_id": "L1",
+                "recipe_id": "R1",
+            },
+        )
+        resp = await client.post(
+            "/v1/context/enrich",
+            json={
+                "equipment_id": "E1",
+            },
+        )
         data = resp.json()
         assert data["batch_id"] == "B1"
         assert data["operating_mode"] == "PRODUCTION"

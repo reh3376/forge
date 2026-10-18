@@ -29,9 +29,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_SPECS_DIR = (
-    Path(__file__).resolve().parent.parent / "governance" / "facts" / "specs"
-)
+DEFAULT_SPECS_DIR = Path(__file__).resolve().parent.parent / "governance" / "facts" / "specs"
 
 _CAPABILITY_NAMES = ("read", "write", "subscribe", "backfill", "discover")
 
@@ -160,8 +158,7 @@ def check_manifest_against_facts(
     spec_fmt = contract.get("output_format")
     if spec_fmt and spec_fmt != manifest.data_contract.output_format:
         result.warnings.append(
-            f"output_format: spec '{spec_fmt}' != manifest "
-            f"'{manifest.data_contract.output_format}'"
+            f"output_format: spec '{spec_fmt}' != manifest '{manifest.data_contract.output_format}'"
         )
     spec_fields = set(contract.get("context_fields") or [])
     man_fields = set(manifest.data_contract.context_fields)

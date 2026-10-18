@@ -21,7 +21,6 @@ from forge.modules.ot.context.resolvers import (
 
 
 class TestAreaResolver:
-
     def test_default_extraction_from_path(self):
         """Default heuristic: {site}/{connection}/{area}/..."""
         resolver = AreaResolver()
@@ -36,26 +35,32 @@ class TestAreaResolver:
         assert site == "WH"
 
     def test_explicit_rule_match(self):
-        resolver = AreaResolver(rules=[
-            AreaRule(pattern="WH/WHK01/Distillery01/.*", area="Distillery", site="WHK"),
-            AreaRule(pattern="WH/WHK01/Granary01/.*", area="Granary", site="WHK"),
-        ])
+        resolver = AreaResolver(
+            rules=[
+                AreaRule(pattern="WH/WHK01/Distillery01/.*", area="Distillery", site="WHK"),
+                AreaRule(pattern="WH/WHK01/Granary01/.*", area="Granary", site="WHK"),
+            ]
+        )
         area, site = resolver.resolve("WH/WHK01/Distillery01/TIT_2010/Out_PV")
         assert area == "Distillery"
         assert site == "WHK"
 
     def test_explicit_rule_second_match(self):
-        resolver = AreaResolver(rules=[
-            AreaRule(pattern="WH/WHK01/Distillery01/.*", area="Distillery", site="WHK"),
-            AreaRule(pattern="WH/WHK01/Granary01/.*", area="Granary", site="WHK"),
-        ])
+        resolver = AreaResolver(
+            rules=[
+                AreaRule(pattern="WH/WHK01/Distillery01/.*", area="Distillery", site="WHK"),
+                AreaRule(pattern="WH/WHK01/Granary01/.*", area="Granary", site="WHK"),
+            ]
+        )
         area, site = resolver.resolve("WH/WHK01/Granary01/TIT_1010/Out_PV")
         assert area == "Granary"
 
     def test_explicit_rule_no_match(self):
-        resolver = AreaResolver(rules=[
-            AreaRule(pattern="WH/WHK01/Distillery01/.*", area="Distillery", site="WHK"),
-        ])
+        resolver = AreaResolver(
+            rules=[
+                AreaRule(pattern="WH/WHK01/Distillery01/.*", area="Distillery", site="WHK"),
+            ]
+        )
         area, site = resolver.resolve("WH/WHK02/Unknown/Tag")
         assert area is None
         assert site is None
@@ -72,7 +77,6 @@ class TestAreaResolver:
 
 
 class TestEquipmentResolver:
-
     def test_default_extraction(self):
         """Default: equipment is second-to-last segment."""
         resolver = EquipmentResolver()
@@ -85,16 +89,20 @@ class TestEquipmentResolver:
         assert equip is None
 
     def test_explicit_rule_with_named_group(self):
-        resolver = EquipmentResolver(rules=[
-            EquipmentRule(pattern=r".*/(?P<equip>[A-Z]+_\d+)/Out_.*"),
-        ])
+        resolver = EquipmentResolver(
+            rules=[
+                EquipmentRule(pattern=r".*/(?P<equip>[A-Z]+_\d+)/Out_.*"),
+            ]
+        )
         equip = resolver.resolve("WH/WHK01/Distillery01/TIT_2010/Out_PV")
         assert equip == "TIT_2010"
 
     def test_explicit_rule_static_id(self):
-        resolver = EquipmentResolver(rules=[
-            EquipmentRule(pattern="WH/WHK01/Utility/.*", equipment_id="UTILITY-SYSTEM"),
-        ])
+        resolver = EquipmentResolver(
+            rules=[
+                EquipmentRule(pattern="WH/WHK01/Utility/.*", equipment_id="UTILITY-SYSTEM"),
+            ]
+        )
         equip = resolver.resolve("WH/WHK01/Utility/Boiler/Temp")
         assert equip == "UTILITY-SYSTEM"
 
@@ -105,7 +113,6 @@ class TestEquipmentResolver:
 
 
 class TestBatchContextResolver:
-
     def test_no_active_batch(self):
         resolver = BatchContextResolver()
         ctx = resolver.resolve("Distillery01")
@@ -114,8 +121,7 @@ class TestBatchContextResolver:
     def test_set_and_resolve(self):
         resolver = BatchContextResolver()
         resolver.set_active_batch(
-            "Distillery", batch_id="B2026-0408-001",
-            lot_id="L-001", recipe_id="R-BOURBON-01"
+            "Distillery", batch_id="B2026-0408-001", lot_id="L-001", recipe_id="R-BOURBON-01"
         )
         ctx = resolver.resolve("Distillery")
         assert ctx.batch_id == "B2026-0408-001"
@@ -147,7 +153,6 @@ class TestBatchContextResolver:
 
 
 class TestOperatingModeResolver:
-
     def test_no_mode_set(self):
         resolver = OperatingModeResolver()
         assert resolver.resolve("Distillery") is None
@@ -175,13 +180,11 @@ class TestOperatingModeResolver:
 
 
 class TestEnrichmentPipeline:
-
     def test_full_enrichment(self):
         """Pipeline resolves all context fields from a single tag path."""
         batch_resolver = BatchContextResolver()
         batch_resolver.set_active_batch(
-            "Distillery01", batch_id="B2026-0408-001",
-            lot_id="L-001", recipe_id="R-BOURBON-01"
+            "Distillery01", batch_id="B2026-0408-001", lot_id="L-001", recipe_id="R-BOURBON-01"
         )
         mode_resolver = OperatingModeResolver()
         mode_resolver.set_mode("Distillery01", "PRODUCTION", source="plc")

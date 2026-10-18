@@ -134,7 +134,10 @@ class PathNormalizer:
         original = raw_path
 
         # Already normalized? (starts with site prefix and contains slashes)
-        if raw_path.startswith(f"{self.site_prefix}/") and "/" in raw_path[len(self.site_prefix) + 1 :]:
+        if (
+            raw_path.startswith(f"{self.site_prefix}/")
+            and "/" in raw_path[len(self.site_prefix) + 1 :]
+        ):
             parts = raw_path.split("/")
             conn = parts[1] if len(parts) > 1 else ""
             return NormalizedPath(

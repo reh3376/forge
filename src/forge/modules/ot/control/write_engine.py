@@ -268,9 +268,7 @@ class ControlWriteEngine:
 
     # -- Layer 5: Write + Read-Back ------------------------------------------
 
-    async def _write_and_readback(
-        self, request: WriteRequest, result: WriteResult
-    ) -> None:
+    async def _write_and_readback(self, request: WriteRequest, result: WriteResult) -> None:
         """Perform the OPC-UA write and read-back confirmation."""
         # Read old value (best-effort)
         try:
@@ -310,9 +308,7 @@ class ControlWriteEngine:
 
         result.completed_at = datetime.now(timezone.utc)
 
-    def _values_match(
-        self, requested: Any, readback: Any, data_type: DataType
-    ) -> bool:
+    def _values_match(self, requested: Any, readback: Any, data_type: DataType) -> bool:
         """Compare requested value to read-back value with type-aware
         tolerance."""
         if readback is None:
@@ -374,12 +370,8 @@ class ControlWriteEngine:
 
     def get_stats(self) -> dict[str, Any]:
         """Return write engine statistics."""
-        confirmed = sum(
-            1 for r in self._journal if r.status == WriteStatus.CONFIRMED
-        )
-        unconfirmed = sum(
-            1 for r in self._journal if r.status == WriteStatus.UNCONFIRMED
-        )
+        confirmed = sum(1 for r in self._journal if r.status == WriteStatus.CONFIRMED)
+        unconfirmed = sum(1 for r in self._journal if r.status == WriteStatus.UNCONFIRMED)
         rejected = sum(
             1
             for r in self._journal

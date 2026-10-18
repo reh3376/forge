@@ -100,9 +100,7 @@ class AlarmApiHandler:
         priority: str | None = None,
         limit: int = 100,
     ) -> dict:
-        alarms = await self._engine.get_active_alarms(
-            area=area, priority=priority, limit=limit
-        )
+        alarms = await self._engine.get_active_alarms(area=area, priority=priority, limit=limit)
         return ApiResponse(success=True, data=alarms).to_dict()
 
     async def get_history(
@@ -112,9 +110,7 @@ class AlarmApiHandler:
         area: str | None = None,
         limit: int = 100,
     ) -> dict:
-        events = await self._engine.get_alarm_history(
-            start=start, end=end, area=area, limit=limit
-        )
+        events = await self._engine.get_alarm_history(start=start, end=end, area=area, limit=limit)
         return ApiResponse(success=True, data=events).to_dict()
 
     async def get_all_configs(self) -> dict:
@@ -148,29 +144,35 @@ class AlarmApiHandler:
     async def acknowledge(self, alarm_id: str, operator: str = "") -> dict:
         result = await self._engine.acknowledge_alarm(alarm_id, operator=operator)
         if not result:
-            return ApiResponse(success=False, error="Alarm not found or cannot be acknowledged").to_dict()
+            return ApiResponse(
+                success=False, error="Alarm not found or cannot be acknowledged"
+            ).to_dict()
         return ApiResponse(success=True).to_dict()
 
-    async def shelve(
-        self, alarm_id: str, duration_minutes: int = 60, reason: str = ""
-    ) -> dict:
+    async def shelve(self, alarm_id: str, duration_minutes: int = 60, reason: str = "") -> dict:
         result = await self._engine.shelve_alarm(
             alarm_id, duration_minutes=duration_minutes, reason=reason
         )
         if not result:
-            return ApiResponse(success=False, error="Alarm not found or cannot be shelved").to_dict()
+            return ApiResponse(
+                success=False, error="Alarm not found or cannot be shelved"
+            ).to_dict()
         return ApiResponse(success=True).to_dict()
 
     async def unshelve(self, alarm_id: str) -> dict:
         result = await self._engine.unshelve_alarm(alarm_id)
         if not result:
-            return ApiResponse(success=False, error="Alarm not found or cannot be unshelved").to_dict()
+            return ApiResponse(
+                success=False, error="Alarm not found or cannot be unshelved"
+            ).to_dict()
         return ApiResponse(success=True).to_dict()
 
     async def suppress(self, alarm_id: str, reason: str = "") -> dict:
         result = await self._engine.suppress_alarm(alarm_id, reason=reason)
         if not result:
-            return ApiResponse(success=False, error="Alarm not found or cannot be suppressed").to_dict()
+            return ApiResponse(
+                success=False, error="Alarm not found or cannot be suppressed"
+            ).to_dict()
         return ApiResponse(success=True).to_dict()
 
     async def reset(self, alarm_id: str, operator: str = "") -> dict:

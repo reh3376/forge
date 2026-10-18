@@ -88,9 +88,7 @@ class RecipeWriteConfig:
 
     def add_mapping(self, mapping: RecipeParameterMapping) -> None:
         """Add or replace a parameter mapping."""
-        self.mappings = [
-            m for m in self.mappings if m.parameter_name != mapping.parameter_name
-        ]
+        self.mappings = [m for m in self.mappings if m.parameter_name != mapping.parameter_name]
         self.mappings.append(mapping)
 
 
@@ -217,17 +215,17 @@ class RecipeWriteAdapter:
         )
 
         if config is None:
-            logger.warning(
-                "No recipe write config for equipment %s", equipment_id
-            )
+            logger.warning("No recipe write config for equipment %s", equipment_id)
             batch_result.skipped = len(parameters)
             for param_name, param_value in parameters.items():
-                batch_result.results.append({
-                    "parameter": param_name,
-                    "value": param_value,
-                    "status": "SKIPPED",
-                    "error": f"No config for equipment {equipment_id}",
-                })
+                batch_result.results.append(
+                    {
+                        "parameter": param_name,
+                        "value": param_value,
+                        "status": "SKIPPED",
+                        "error": f"No config for equipment {equipment_id}",
+                    }
+                )
             batch_result.completed_at = datetime.now(timezone.utc)
             return batch_result
 
@@ -240,12 +238,14 @@ class RecipeWriteAdapter:
 
             if mapping is None:
                 batch_result.skipped += 1
-                batch_result.results.append({
-                    "parameter": param_name,
-                    "value": param_value,
-                    "status": "SKIPPED",
-                    "error": f"No mapping for parameter '{param_name}'",
-                })
+                batch_result.results.append(
+                    {
+                        "parameter": param_name,
+                        "value": param_value,
+                        "status": "SKIPPED",
+                        "error": f"No mapping for parameter '{param_name}'",
+                    }
+                )
                 continue
 
             request = WriteRequest(
@@ -269,30 +269,34 @@ class RecipeWriteAdapter:
                 else:
                     batch_result.failed += 1
 
-                batch_result.results.append({
-                    "parameter": param_name,
-                    "value": param_value,
-                    "tag_path": mapping.tag_path,
-                    "status": result.status.value,
-                    "request_id": result.request.request_id,
-                    "error": (
-                        result.validation_error
-                        or result.interlock_error
-                        or result.auth_error
-                        or result.write_error
-                        or result.readback_error
-                        or ""
-                    ),
-                })
+                batch_result.results.append(
+                    {
+                        "parameter": param_name,
+                        "value": param_value,
+                        "tag_path": mapping.tag_path,
+                        "status": result.status.value,
+                        "request_id": result.request.request_id,
+                        "error": (
+                            result.validation_error
+                            or result.interlock_error
+                            or result.auth_error
+                            or result.write_error
+                            or result.readback_error
+                            or ""
+                        ),
+                    }
+                )
             except Exception as exc:
                 batch_result.failed += 1
-                batch_result.results.append({
-                    "parameter": param_name,
-                    "value": param_value,
-                    "tag_path": mapping.tag_path,
-                    "status": "ERROR",
-                    "error": str(exc),
-                })
+                batch_result.results.append(
+                    {
+                        "parameter": param_name,
+                        "value": param_value,
+                        "tag_path": mapping.tag_path,
+                        "status": "ERROR",
+                        "error": str(exc),
+                    }
+                )
 
         batch_result.completed_at = datetime.now(timezone.utc)
         return batch_result

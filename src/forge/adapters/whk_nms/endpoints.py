@@ -182,9 +182,7 @@ NMS_WEBSOCKET_ENDPOINTS: list[NmsWebSocketEndpoint] = [
 
 # ── Lookup Helpers ────────────────────────────────────────────
 
-_ENDPOINT_BY_NAME: dict[str, NmsRestEndpoint] = {
-    e.entity_name: e for e in NMS_REST_ENDPOINTS
-}
+_ENDPOINT_BY_NAME: dict[str, NmsRestEndpoint] = {e.entity_name: e for e in NMS_REST_ENDPOINTS}
 
 
 def rest_endpoint_for_name(entity_name: str) -> NmsRestEndpoint | None:

@@ -122,17 +122,13 @@ class TestAccessControllerGrant:
 
     def test_grant_custom_granted_by(self):
         ac = AccessController()
-        perm = ac.grant(
-            "whk-wms", "mod_wms", AccessLevel.WRITE, granted_by="admin-user"
-        )
+        perm = ac.grant("whk-wms", "mod_wms", AccessLevel.WRITE, granted_by="admin-user")
         assert perm.granted_by == "admin-user"
 
     def test_grant_with_expiry(self):
         ac = AccessController()
         future = datetime.now(tz=timezone.utc) + timedelta(hours=24)
-        perm = ac.grant(
-            "whk-wms", "mod_wms", AccessLevel.WRITE, expires_at=future
-        )
+        perm = ac.grant("whk-wms", "mod_wms", AccessLevel.WRITE, expires_at=future)
         assert perm.expires_at == future
         assert perm.is_effective is True
 
@@ -315,9 +311,7 @@ class TestAccessControllerIssueConnection:
     def test_issue_connection_custom_host_port(self):
         ac = AccessController()
         ac.grant("whk-wms", "mod_wms", AccessLevel.WRITE)
-        conn = ac.issue_connection(
-            "whk-wms", pg_host="db.forge.internal", pg_port=5433
-        )
+        conn = ac.issue_connection("whk-wms", pg_host="db.forge.internal", pg_port=5433)
         assert "db.forge.internal:5433" in conn.connection_string
 
 

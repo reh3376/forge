@@ -102,7 +102,9 @@ class TestPostgresProductStore:
 
     @pytest.mark.asyncio
     async def test_save_async_executes_upsert(
-        self, mock_pool, sample_product: DataProduct,
+        self,
+        mock_pool,
+        sample_product: DataProduct,
     ):
         pool, conn = mock_pool
         store = PostgresProductStore(pool)
@@ -264,13 +266,17 @@ class TestPostgresLineageStore:
             "output_record_id": "out-1",
             "product_id": "dp-001",
             "adapter_ids": json.dumps(["whk-wms"]),
-            "steps": json.dumps([{
-                "step_name": "normalize",
-                "component": "NormalizationStep",
-                "description": "",
-                "parameters": {},
-                "timestamp": datetime.now(UTC).isoformat(),
-            }]),
+            "steps": json.dumps(
+                [
+                    {
+                        "step_name": "normalize",
+                        "component": "NormalizationStep",
+                        "description": "",
+                        "parameters": {},
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    }
+                ]
+            ),
             "created_at": datetime.now(UTC),
         }
         store = PostgresLineageStore(pool)

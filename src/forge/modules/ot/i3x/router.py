@@ -90,9 +90,7 @@ def create_i3x_router(
                 ns_id = item["name"]
                 if ns_id not in seen_connections:
                     seen_connections.add(ns_id)
-                    namespaces.append(
-                        I3xNamespace(id=ns_id, name=ns_id)
-                    )
+                    namespaces.append(I3xNamespace(id=ns_id, name=ns_id))
 
         return namespaces
 
@@ -116,9 +114,7 @@ def create_i3x_router(
             if tmpl is None:
                 continue
             required_params = [
-                p_name
-                for p_name, p_def in tmpl.parameters.items()
-                if p_def.required
+                p_name for p_name, p_def in tmpl.parameters.items() if p_def.required
             ]
             types.append(
                 I3xObjectType(
@@ -230,17 +226,11 @@ def create_i3x_router(
                 I3xValue(
                     path=path,
                     value=tag_value.value if tag_value else None,
-                    quality=(
-                        tag_value.quality.value if tag_value else "NOT_AVAILABLE"
-                    ),
+                    quality=(tag_value.quality.value if tag_value else "NOT_AVAILABLE"),
                     timestamp=tag_value.timestamp if tag_value else None,
-                    source_timestamp=(
-                        tag_value.source_timestamp if tag_value else None
-                    ),
+                    source_timestamp=(tag_value.source_timestamp if tag_value else None),
                     data_type=tag_def.data_type.value if tag_def else None,
-                    engineering_units=(
-                        tag_def.engineering_units if tag_def else ""
-                    ),
+                    engineering_units=(tag_def.engineering_units if tag_def else ""),
                 )
             )
 

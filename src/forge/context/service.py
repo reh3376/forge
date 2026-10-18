@@ -371,9 +371,7 @@ def create_context_app(
     async def get_mode(equipment_id: str) -> ModeResponse:
         state = await _modes.get_mode(equipment_id)
         if state is None:
-            raise HTTPException(
-                404, f"No mode set for equipment '{equipment_id}'"
-            )
+            raise HTTPException(404, f"No mode set for equipment '{equipment_id}'")
         return ModeResponse(
             equipment_id=state.equipment_id,
             mode=state.mode.value,

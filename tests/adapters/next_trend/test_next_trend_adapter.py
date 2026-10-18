@@ -61,9 +61,7 @@ def value_point() -> dict[str, Any]:
 
 
 @pytest.fixture()
-def tag_value_record(
-    tag_meta: dict[str, Any], value_point: dict[str, Any]
-) -> dict[str, Any]:
+def tag_value_record(tag_meta: dict[str, Any], value_point: dict[str, Any]) -> dict[str, Any]:
     """Combined tag_meta + value_point for inject_records()."""
     return {
         "tag_meta": tag_meta,
@@ -113,11 +111,7 @@ class TestManifest:
         assert len(NextTrendAdapter.manifest.connection_params) == 9
 
     def test_required_params(self):
-        required = [
-            p.name
-            for p in NextTrendAdapter.manifest.connection_params
-            if p.required
-        ]
+        required = [p.name for p in NextTrendAdapter.manifest.connection_params if p.required]
         assert required == ["api_base_url"]
 
     def test_auth_methods(self):
@@ -377,18 +371,14 @@ class TestLifecycle:
             await adapter.start()
 
     @pytest.mark.asyncio()
-    async def test_start_with_injected_records(
-        self, adapter, adapter_params, tag_value_record
-    ):
+    async def test_start_with_injected_records(self, adapter, adapter_params, tag_value_record):
         await adapter.configure(adapter_params)
         adapter.inject_records([tag_value_record])
         await adapter.start()
         assert adapter.state == AdapterState.HEALTHY
 
     @pytest.mark.asyncio()
-    async def test_stop_clears_state(
-        self, adapter, adapter_params, tag_value_record
-    ):
+    async def test_stop_clears_state(self, adapter, adapter_params, tag_value_record):
         await adapter.configure(adapter_params)
         adapter.inject_records([tag_value_record])
         await adapter.start()
@@ -396,9 +386,7 @@ class TestLifecycle:
         assert adapter.state == AdapterState.STOPPED
 
     @pytest.mark.asyncio()
-    async def test_health_returns_status(
-        self, adapter, adapter_params, tag_value_record
-    ):
+    async def test_health_returns_status(self, adapter, adapter_params, tag_value_record):
         await adapter.configure(adapter_params)
         adapter.inject_records([tag_value_record])
         await adapter.start()
@@ -431,9 +419,7 @@ class TestCollection:
         assert len(records) == 1
 
     @pytest.mark.asyncio()
-    async def test_collect_record_structure(
-        self, started_adapter, tag_meta
-    ):
+    async def test_collect_record_structure(self, started_adapter, tag_meta):
         records = [r async for r in started_adapter.collect()]
         record = records[0]
         assert record.source.adapter_id == "next-trend"
@@ -485,9 +471,7 @@ class TestBackfill:
     """Verify historical data backfill."""
 
     @pytest.mark.asyncio()
-    async def test_backfill_yields_records(
-        self, adapter_params, tag_value_record
-    ):
+    async def test_backfill_yields_records(self, adapter_params, tag_value_record):
         adapter = NextTrendAdapter()
         await adapter.configure(adapter_params)
         adapter.inject_backfill_records([tag_value_record])
@@ -501,9 +485,7 @@ class TestBackfill:
         assert records[0].source.adapter_id == "next-trend"
 
     @pytest.mark.asyncio()
-    async def test_backfill_increments_counter(
-        self, adapter_params, tag_value_record
-    ):
+    async def test_backfill_increments_counter(self, adapter_params, tag_value_record):
         adapter = NextTrendAdapter()
         await adapter.configure(adapter_params)
         adapter.inject_backfill_records([tag_value_record])
@@ -637,9 +619,8 @@ class TestFACTSSpec:
             for v in report.verdicts
             if v.status == VerdictStatus.FAIL and v.check_id != "facts:integrity-hash-state"
         ]
-        assert len(errors) == 0, (
-            f"FACTS runner failed: "
-            + "; ".join(f"[{e.check_id}] {e.message}" for e in errors)
+        assert len(errors) == 0, f"FACTS runner failed: " + "; ".join(
+            f"[{e.check_id}] {e.message}" for e in errors
         )
 
     @pytest.mark.asyncio()

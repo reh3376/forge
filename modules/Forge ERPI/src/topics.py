@@ -82,13 +82,9 @@ ERPI_ACK_TOPICS: list[str] = [
 
 # ── Lookup Helpers ─────────────────────────────────────────────
 
-_TOPIC_BY_KEY: dict[str, ErpiEntityTopic] = {
-    t.entity_key: t for t in ERPI_ENTITY_TOPICS
-}
+_TOPIC_BY_KEY: dict[str, ErpiEntityTopic] = {t.entity_key: t for t in ERPI_ENTITY_TOPICS}
 
-_TOPIC_BY_FULL: dict[str, ErpiEntityTopic] = {
-    t.full_topic: t for t in ERPI_ENTITY_TOPICS
-}
+_TOPIC_BY_FULL: dict[str, ErpiEntityTopic] = {t.full_topic: t for t in ERPI_ENTITY_TOPICS}
 
 
 def topic_for_entity_key(entity_key: str) -> ErpiEntityTopic | None:

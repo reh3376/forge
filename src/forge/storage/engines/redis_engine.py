@@ -48,17 +48,19 @@ class RedisStateCache:
         try:
             record_id = str(record.record_id)
             key = f"forge:record:{record_id}"
-            value = json.dumps({
-                "record_id": record_id,
-                "adapter_id": record.source.adapter_id,
-                "system": record.source.system,
-                "tag_path": record.source.tag_path,
-                "raw": record.value.raw,
-                "quality": record.value.quality.value,
-                "data_type": record.value.data_type,
-                "engineering_units": record.value.engineering_units,
-                "timestamp": record.timestamp.source_time.isoformat(),
-            })
+            value = json.dumps(
+                {
+                    "record_id": record_id,
+                    "adapter_id": record.source.adapter_id,
+                    "system": record.source.system,
+                    "tag_path": record.source.tag_path,
+                    "raw": record.value.raw,
+                    "quality": record.value.quality.value,
+                    "data_type": record.value.data_type,
+                    "engineering_units": record.value.engineering_units,
+                    "timestamp": record.timestamp.source_time.isoformat(),
+                }
+            )
             await self._client.set(key, value, ex=self._ttl)
 
             # Also update equipment hash if context available
@@ -106,7 +108,9 @@ class RedisStateCache:
             return {}
 
     async def set_adapter_health(
-        self, adapter_id: str, health: dict[str, Any],
+        self,
+        adapter_id: str,
+        health: dict[str, Any],
     ) -> bool:
         """Cache adapter health snapshot."""
         if not self._client_ok():

@@ -118,6 +118,7 @@ class UtilModule:
         Replaces: ``system.util.getProperty(name)``
         """
         import os
+
         return os.environ.get(name, default)
 
     # ------------------------------------------------------------------

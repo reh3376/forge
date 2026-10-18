@@ -27,9 +27,7 @@ class RoutingDecision:
     target_engine: StorageEngine
     target_namespace: str
     entity_name: str
-    decided_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=timezone.utc)
-    )
+    decided_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
     reason: str = ""
 
 
@@ -137,7 +135,5 @@ class DataRouter:
         grouped: dict[StorageEngine, list[tuple[ContextualRecord, RoutingDecision]]] = {}
         for record in records:
             decision = self.route(record)
-            grouped.setdefault(decision.target_engine, []).append(
-                (record, decision)
-            )
+            grouped.setdefault(decision.target_engine, []).append((record, decision))
         return grouped

@@ -353,12 +353,14 @@ class TestCollect:
         adapter = WhkErpiAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
-        adapter.inject_records([
-            _SAMPLE_ITEM_MESSAGE,
-            _SAMPLE_BARREL_MESSAGE,
-            _SAMPLE_RECIPE_MESSAGE,
-            _SAMPLE_PRODUCTION_ORDER_MESSAGE,
-        ])
+        adapter.inject_records(
+            [
+                _SAMPLE_ITEM_MESSAGE,
+                _SAMPLE_BARREL_MESSAGE,
+                _SAMPLE_RECIPE_MESSAGE,
+                _SAMPLE_PRODUCTION_ORDER_MESSAGE,
+            ]
+        )
         records = [r async for r in adapter.collect()]
         assert len(records) == 4
         entity_types = {r.context.extra["entity_type"] for r in records}
@@ -424,18 +426,14 @@ class TestSubscription:
     @pytest.mark.asyncio
     async def test_subscribe_returns_id(self):
         adapter = WhkErpiAdapter()
-        sub_id = await adapter.subscribe(
-            ["wh.whk01.distillery01.item"], callback=lambda x: x
-        )
+        sub_id = await adapter.subscribe(["wh.whk01.distillery01.item"], callback=lambda x: x)
         assert sub_id is not None
         assert len(sub_id) > 0
 
     @pytest.mark.asyncio
     async def test_unsubscribe(self):
         adapter = WhkErpiAdapter()
-        sub_id = await adapter.subscribe(
-            ["wh.whk01.distillery01.item"], callback=lambda x: x
-        )
+        sub_id = await adapter.subscribe(["wh.whk01.distillery01.item"], callback=lambda x: x)
         await adapter.unsubscribe(sub_id)
         assert sub_id not in adapter._subscriptions
 

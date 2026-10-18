@@ -75,6 +75,7 @@ class TestShiftDefinition:
         sd = ShiftDefinition(name="Day", start_time=time(6, 0), end_time=time(18, 0))
         assert sd.timezone == "America/Kentucky/Louisville"
         import pytest
+
         with pytest.raises(AttributeError):
             sd.name = "Night"  # type: ignore[misc]
 

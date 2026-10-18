@@ -77,9 +77,13 @@ def _scopes_for_role(role: Role) -> frozenset[str]:
     """Default scopes for each role."""
     base = frozenset({"records:read", "adapters:read", "health:read"})
     if role == Role.OPERATOR:
-        return base | frozenset({
-            "records:write", "adapters:write", "adapters:register",
-        })
+        return base | frozenset(
+            {
+                "records:write",
+                "adapters:write",
+                "adapters:register",
+            }
+        )
     if role == Role.ADMIN:
         return frozenset({"*"})
     return base
@@ -124,11 +128,7 @@ async def get_current_user(
             user_id = claims.get("sub", "unknown")
             role = Role(claims.get("role", "viewer"))
             scope_str = claims.get("scopes", "")
-            scopes = (
-                frozenset(scope_str.split(","))
-                if scope_str
-                else _scopes_for_role(role)
-            )
+            scopes = frozenset(scope_str.split(",")) if scope_str else _scopes_for_role(role)
             return ForgeUser(
                 user_id=user_id,
                 role=role,

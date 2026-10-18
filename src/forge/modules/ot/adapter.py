@@ -368,7 +368,9 @@ class OTModuleAdapter(
         # Stub — NextTrend integration in Phase 2B
         logger.info(
             "Backfill requested for %d tags [%s → %s] — delegating to NextTrend",
-            len(tags), start, end,
+            len(tags),
+            start,
+            end,
         )
         return
         yield  # pragma: no cover — makes this an async generator
@@ -388,13 +390,15 @@ class OTModuleAdapter(
         for path in paths:
             tag = await self._registry.get_definition(path)
             if tag:
-                results.append({
-                    "tag_path": tag.path,
-                    "data_type": tag.data_type.value,
-                    "description": tag.description,
-                    "engineering_units": tag.engineering_units,
-                    "tag_type": tag.tag_type.value if hasattr(tag, "tag_type") else "unknown",
-                })
+                results.append(
+                    {
+                        "tag_path": tag.path,
+                        "data_type": tag.data_type.value,
+                        "description": tag.description,
+                        "engineering_units": tag.engineering_units,
+                        "tag_type": tag.tag_type.value if hasattr(tag, "tag_type") else "unknown",
+                    }
+                )
         return results
 
     # ------------------------------------------------------------------

@@ -93,12 +93,10 @@ class TestSubmitScanBatch:
     async def test_batch_size_exceeded(self, handler):
         """Batch larger than max_batch_size is fully rejected."""
         await handler.start()
-        scans = [
-            {"scan_id": f"s{i}", "barcode_value": f"BC{i}"}
-            for i in range(15)
-        ]
+        scans = [{"scan_id": f"s{i}", "barcode_value": f"BC{i}"} for i in range(15)]
         resp = await handler.submit_scan_batch(
-            device_id="dev-001", scans=scans,
+            device_id="dev-001",
+            scans=scans,
         )
         assert resp.rejected == 15
         assert "exceeds max" in resp.errors[0].lower()
@@ -168,16 +166,15 @@ class TestSubmitScanBatch:
         """When the queue is full, remaining events are rejected."""
         # Create handler with tiny queue
         small_handler = MockScannerServiceHandler(
-            handler._registry, max_queue_size=2, max_batch_size=10,
+            handler._registry,
+            max_queue_size=2,
+            max_batch_size=10,
         )
         await small_handler.start()
 
         resp = await small_handler.submit_scan_batch(
             device_id="dev-001",
-            scans=[
-                {"scan_id": f"s{i}", "barcode_value": f"BC{i}"}
-                for i in range(5)
-            ],
+            scans=[{"scan_id": f"s{i}", "barcode_value": f"BC{i}"} for i in range(5)],
         )
         # 2 accepted (queue fills), 3rd triggers QueueFull → break
         # The break stops processing, so remaining scans are rejected
@@ -247,20 +244,25 @@ class TestInjectScans:
     """Verify the test helper for direct queue injection."""
 
     def test_inject_scans_queues_events(self, handler):
-        count = handler.inject_scans([
-            {"scan_id": "s1", "barcode_value": "BC001"},
-            {"scan_id": "s2", "barcode_value": "BC002"},
-        ])
+        count = handler.inject_scans(
+            [
+                {"scan_id": "s1", "barcode_value": "BC001"},
+                {"scan_id": "s2", "barcode_value": "BC002"},
+            ]
+        )
         assert count == 2
         assert handler.queue.qsize() == 2
 
     def test_inject_scans_respects_queue_limit(self):
         reg = DeviceRegistry()
         small_handler = MockScannerServiceHandler(
-            reg, max_queue_size=1,
+            reg,
+            max_queue_size=1,
         )
-        count = small_handler.inject_scans([
-            {"scan_id": "s1", "barcode_value": "BC001"},
-            {"scan_id": "s2", "barcode_value": "BC002"},
-        ])
+        count = small_handler.inject_scans(
+            [
+                {"scan_id": "s1", "barcode_value": "BC001"},
+                {"scan_id": "s2", "barcode_value": "BC002"},
+            ]
+        )
         assert count == 1

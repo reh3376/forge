@@ -17,7 +17,6 @@ from forge.modules.ot.mqtt.rate_limiter import (
 
 
 class TestTokenBucket:
-
     def test_initial_tokens(self):
         bucket = TokenBucket(rate=10.0, capacity=5.0, tokens=5.0)
         assert bucket.tokens == 5.0
@@ -60,7 +59,6 @@ class TestTokenBucket:
 
 
 class TestRateLimiterDisabled:
-
     def test_disabled_always_allows(self):
         limiter = MqttRateLimiter(RateLimiterConfig(enabled=False))
         for _ in range(100):
@@ -75,36 +73,47 @@ class TestRateLimiterDisabled:
 
 
 class TestRateLimiterEnabled:
-
     def test_allows_within_burst(self):
-        limiter = MqttRateLimiter(RateLimiterConfig(
-            default_rate=10.0, default_burst=3.0,
-        ))
+        limiter = MqttRateLimiter(
+            RateLimiterConfig(
+                default_rate=10.0,
+                default_burst=3.0,
+            )
+        )
         results = [limiter.should_publish("tag/a") for _ in range(3)]
         assert all(results)
 
     def test_throttles_after_burst(self):
-        limiter = MqttRateLimiter(RateLimiterConfig(
-            default_rate=0.001, default_burst=2.0,  # Very slow refill
-        ))
+        limiter = MqttRateLimiter(
+            RateLimiterConfig(
+                default_rate=0.001,
+                default_burst=2.0,  # Very slow refill
+            )
+        )
         limiter.should_publish("tag/a")
         limiter.should_publish("tag/a")
         assert limiter.should_publish("tag/a") is False
         assert limiter.throttled_count == 1
 
     def test_separate_buckets_per_tag(self):
-        limiter = MqttRateLimiter(RateLimiterConfig(
-            default_rate=10.0, default_burst=1.0,
-        ))
+        limiter = MqttRateLimiter(
+            RateLimiterConfig(
+                default_rate=10.0,
+                default_burst=1.0,
+            )
+        )
         assert limiter.should_publish("tag/a") is True
         assert limiter.should_publish("tag/b") is True
         assert limiter.bucket_count == 2
 
     def test_exempt_patterns(self):
-        limiter = MqttRateLimiter(RateLimiterConfig(
-            default_rate=0.001, default_burst=1.0,  # Very slow refill
-            exempt_patterns=["alarm/*", "health/*"],
-        ))
+        limiter = MqttRateLimiter(
+            RateLimiterConfig(
+                default_rate=0.001,
+                default_burst=1.0,  # Very slow refill
+                exempt_patterns=["alarm/*", "health/*"],
+            )
+        )
         # Exhaust the normal bucket
         limiter.should_publish("tag/a")
         assert limiter.should_publish("tag/a") is False
@@ -119,7 +128,6 @@ class TestRateLimiterEnabled:
 
 
 class TestPendingValues:
-
     def test_set_and_get_pending(self):
         limiter = MqttRateLimiter()
         limiter.set_pending("tag/a", {"v": 78.4})
@@ -149,11 +157,13 @@ class TestPendingValues:
 
 
 class TestRateLimiterStats:
-
     def test_stats(self):
-        limiter = MqttRateLimiter(RateLimiterConfig(
-            default_rate=0.001, default_burst=2.0,  # Very slow refill
-        ))
+        limiter = MqttRateLimiter(
+            RateLimiterConfig(
+                default_rate=0.001,
+                default_burst=2.0,  # Very slow refill
+            )
+        )
         limiter.should_publish("tag/a")
         limiter.should_publish("tag/a")
         limiter.should_publish("tag/a")  # Throttled

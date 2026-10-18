@@ -17,8 +17,10 @@ if not hasattr(datetime, "UTC"):
 
 # Monkey-patch enum.StrEnum for Python < 3.11
 if not hasattr(enum, "StrEnum"):
+
     class StrEnum(str, enum.Enum):
         pass
+
     enum.StrEnum = StrEnum
 
 # Ensure src/ is on sys.path for all test modules

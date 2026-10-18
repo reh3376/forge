@@ -14,6 +14,7 @@ import pytest
 # Skip all integration tests unless FORGE_INTEGRATION is set or -m integration is used
 integration = pytest.mark.integration
 
+
 # Register the custom marker
 def pytest_configure(config):
     config.addinivalue_line(

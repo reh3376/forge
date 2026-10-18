@@ -62,9 +62,7 @@ def _load_manifest() -> AdapterManifest:
         capabilities=AdapterCapabilities(**raw.get("capabilities", {})),
         data_contract=DataContract(**raw.get("data_contract", {})),
         health_check_interval_ms=raw.get("health_check_interval_ms", 15_000),
-        connection_params=[
-            ConnectionParam(**p) for p in raw.get("connection_params", [])
-        ],
+        connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["api_key"]),
         metadata=raw.get("metadata", {}),
     )
@@ -161,10 +159,7 @@ class NextTrendAdapter(
         except Exception:
             # Allow degraded start — the API might come up later
             self._state = AdapterState.DEGRADED
-            logger.warning(
-                "NextTrend adapter started in degraded state "
-                "(API unreachable)"
-            )
+            logger.warning("NextTrend adapter started in degraded state (API unreachable)")
 
     async def stop(self) -> None:
         """Graceful shutdown — clear caches and subscriptions."""
@@ -224,11 +219,14 @@ class NextTrendAdapter(
         for record_data in self._pending_records:
             try:
                 tag_meta = record_data.get("tag_meta", record_data)
-                value_point = record_data.get("value_point", {
-                    "ts": record_data.get("ts"),
-                    "value": record_data.get("value"),
-                    "quality": record_data.get("quality", 192),
-                })
+                value_point = record_data.get(
+                    "value_point",
+                    {
+                        "ts": record_data.get("ts"),
+                        "value": record_data.get("value"),
+                        "quality": record_data.get("quality", 192),
+                    },
+                )
 
                 context = build_record_context(tag_meta, value_point)
                 record = build_contextual_record(
@@ -279,11 +277,14 @@ class NextTrendAdapter(
         for record_data in self._backfill_records:
             try:
                 tag_meta = record_data.get("tag_meta", record_data)
-                value_point = record_data.get("value_point", {
-                    "ts": record_data.get("ts"),
-                    "value": record_data.get("value"),
-                    "quality": record_data.get("quality", 192),
-                })
+                value_point = record_data.get(
+                    "value_point",
+                    {
+                        "ts": record_data.get("ts"),
+                        "value": record_data.get("value"),
+                        "quality": record_data.get("quality", 192),
+                    },
+                )
 
                 context = build_record_context(tag_meta, value_point)
                 record = build_contextual_record(
@@ -299,9 +300,7 @@ class NextTrendAdapter(
                 self._records_failed += 1
                 logger.exception("Failed to map backfill tag value")
 
-    def inject_backfill_records(
-        self, records: list[dict[str, Any]]
-    ) -> None:
+    def inject_backfill_records(self, records: list[dict[str, Any]]) -> None:
         """Inject backfill data for testing."""
         self._backfill_records = list(records)
 
@@ -335,9 +334,7 @@ class NextTrendAdapter(
             "tags": tags,
             "callback": callback,
         }
-        logger.info(
-            "NextTrend subscription %s: tags=%s", sub_id, tags
-        )
+        logger.info("NextTrend subscription %s: tags=%s", sub_id, tags)
         return sub_id
 
     async def unsubscribe(self, subscription_id: str) -> None:

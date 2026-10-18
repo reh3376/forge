@@ -37,9 +37,7 @@ def map_item(raw: dict[str, Any]) -> MaterialItem | None:
         name=str(name),
         description=_str_or_none(raw.get("description")),
         category=_str_or_none(raw.get("category") or raw.get("type")),
-        unit_of_measure=_str_or_none(
-            raw.get("unitOfMeasure") or raw.get("unit_of_measure")
-        ),
+        unit_of_measure=_str_or_none(raw.get("unitOfMeasure") or raw.get("unit_of_measure")),
         vendor_id=_str_or_none(raw.get("vendorId") or raw.get("vendor_id")),
         external_ids=_build_external_ids(raw),
         is_active=raw.get("active", True),

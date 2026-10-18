@@ -64,15 +64,19 @@ class TestScriptWithRBAC:
         _write_script(scripts, "temp_monitor", OWNER_SCRIPT)
 
         rbac = ScriptRBAC()
-        rbac.grant(ScriptPermission(
-            owner="commissioning",
-            area_pattern="Distillery01",
-            tag_pattern="WH/WHK01/Distillery01/**",
-        ))
+        rbac.grant(
+            ScriptPermission(
+                owner="commissioning",
+                area_pattern="Distillery01",
+                tag_pattern="WH/WHK01/Distillery01/**",
+            )
+        )
 
         engine = ScriptEngine(
-            scripts_dir=scripts, module_name="test",
-            rbac=rbac, default_owner="system",
+            scripts_dir=scripts,
+            module_name="test",
+            rbac=rbac,
+            default_owner="system",
         )
         await engine.start()
 
@@ -96,7 +100,8 @@ class TestScriptWithRBAC:
         _write_script(scripts, "startup_handler", DEFAULT_OWNER_SCRIPT)
 
         engine = ScriptEngine(
-            scripts_dir=scripts, module_name="test",
+            scripts_dir=scripts,
+            module_name="test",
             default_owner="system",
         )
         await engine.start()
@@ -117,7 +122,8 @@ class TestScriptExecutionContext:
         _write_script(scripts, "temp_monitor", OWNER_SCRIPT)
 
         engine = ScriptEngine(
-            scripts_dir=scripts, module_name="test",
+            scripts_dir=scripts,
+            module_name="test",
             default_owner="system",
         )
         await engine.start()
@@ -200,9 +206,13 @@ async def on_critical(event):
         await engine.start()
 
         await engine.dispatch_alarm_event(
-            alarm_id="a1", alarm_name="HIGH_TEMP",
-            state="ACTIVE_UNACK", priority="CRITICAL",
-            tag_path="WH/TIT/Out_PV", value=185.0, setpoint=180.0,
+            alarm_id="a1",
+            alarm_name="HIGH_TEMP",
+            state="ACTIVE_UNACK",
+            priority="CRITICAL",
+            tag_path="WH/TIT/Out_PV",
+            value=185.0,
+            setpoint=180.0,
             timestamp="2026-04-08T12:00:00Z",
         )
 
@@ -239,15 +249,19 @@ async def handler(event):
 
         audit = ScriptAuditTrail()
         engine = ScriptEngine(
-            scripts_dir=scripts, module_name="test",
-            audit=audit, default_owner="system",
+            scripts_dir=scripts,
+            module_name="test",
+            audit=audit,
+            default_owner="system",
         )
         await engine.start()
 
         await engine.dispatch_tag_change(
             tag_path="WH/WHK01/TIT/Out_PV",
-            old_value=77.0, new_value=78.4,
-            quality="GOOD", timestamp="2026-04-08T12:00:00Z",
+            old_value=77.0,
+            new_value=78.4,
+            quality="GOOD",
+            timestamp="2026-04-08T12:00:00Z",
         )
 
         # The handler stored the context; now simulate what forge.tag.write() would do
@@ -256,9 +270,12 @@ async def handler(event):
 
         # Record an audit entry as if forge.tag.write() was called
         from forge.sdk.scripting.audit import set_execution_context, clear_execution_context
+
         set_execution_context(ctx)
         entry = audit.record_tag_write(
-            "WH/WHK01/TIT/Setpoint", old_value=80.0, new_value=82.0,
+            "WH/WHK01/TIT/Setpoint",
+            old_value=80.0,
+            new_value=82.0,
         )
         clear_execution_context()
 

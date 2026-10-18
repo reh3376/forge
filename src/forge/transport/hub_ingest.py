@@ -124,9 +124,7 @@ class HubIngestServicer(AdapterServiceServicer):
             self.write_dispatcher.register_callback(adapter_id, session_id, params)
         return result
 
-    async def stop(
-        self, adapter_id: str, session_id: str, graceful: bool = True
-    ) -> dict[str, Any]:
+    async def stop(self, adapter_id: str, session_id: str, graceful: bool = True) -> dict[str, Any]:
         flushed = 0
         if graceful and session_id in self._state:
             outcome = await self._flush(session_id)

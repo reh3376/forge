@@ -67,7 +67,6 @@ def adapter(mock_registry):
 
 
 class TestManifest:
-
     def test_manifest_id(self, adapter):
         assert adapter.manifest.adapter_id == "forge-ot-module"
 
@@ -86,7 +85,6 @@ class TestManifest:
 
 
 class TestLifecycle:
-
     @pytest.mark.asyncio
     async def test_configure_sets_connecting(self, adapter):
         await adapter.configure({})
@@ -121,7 +119,6 @@ class TestLifecycle:
 
 
 class TestCollect:
-
     @pytest.mark.asyncio
     async def test_collect_yields_records(self, adapter):
         records = []
@@ -151,7 +148,6 @@ class TestCollect:
 
 
 class TestSubscribe:
-
     @pytest.mark.asyncio
     async def test_subscribe_returns_id(self, adapter):
         sub_id = await adapter.subscribe(
@@ -177,7 +173,6 @@ class TestSubscribe:
 
 
 class TestWrite:
-
     @pytest.mark.asyncio
     async def test_write_to_memory_tag(self, adapter, mock_registry):
         mem_tag = MemoryTag(
@@ -208,7 +203,6 @@ class TestWrite:
 
 
 class TestDiscover:
-
     @pytest.mark.asyncio
     async def test_discover_returns_tag_list(self, adapter):
         tags = await adapter.discover()
@@ -229,7 +223,6 @@ class TestDiscover:
 
 
 class TestTagChangeDispatch:
-
     @pytest.mark.asyncio
     async def test_dispatch_to_subscription(self, adapter, mock_registry):
         callback = AsyncMock()
@@ -262,7 +255,6 @@ class TestTagChangeDispatch:
 
 
 class TestHubConnectivity:
-
     def test_default_hub_connected(self, adapter):
         assert adapter._hub_connected is True
 
@@ -423,7 +415,11 @@ class TestControlComposition:
     async def test_area_rules_configure_the_area_resolver(self, mock_registry):
         adapter = OTModuleAdapter(registry=mock_registry)
         await adapter.configure(
-            {"area_rules": [{"pattern": r"WH/WHK01/Cooker01/.*", "area": "Cookhouse", "site": "WH"}]}
+            {
+                "area_rules": [
+                    {"pattern": r"WH/WHK01/Cooker01/.*", "area": "Cookhouse", "site": "WH"}
+                ]
+            }
         )
         ctx = adapter._enrichment.enrich("WH/WHK01/Cooker01/TIT_2010/SP")
         assert ctx.area == "Cookhouse" and ctx.site == "WH"

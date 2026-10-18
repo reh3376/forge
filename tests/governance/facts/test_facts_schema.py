@@ -26,6 +26,7 @@ try:
     from jsonschema import Draft202012Validator, ValidationError
 except ImportError:
     import sys
+
     sys.path.insert(0, str(Path.home() / ".local/lib/python3.10/site-packages"))
     from jsonschema import Draft202012Validator, ValidationError
 
@@ -36,7 +37,12 @@ except ImportError:
 
 SCHEMA_PATH = (
     Path(__file__).resolve().parents[3]
-    / "src" / "forge" / "governance" / "facts" / "schema" / "facts.schema.json"
+    / "src"
+    / "forge"
+    / "governance"
+    / "facts"
+    / "schema"
+    / "facts.schema.json"
 )
 
 
@@ -160,11 +166,9 @@ class TestMinimalValidSpec:
         validator.validate(minimal_spec)
 
     def test_minimal_spec_with_all_optional_fields(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         """Spec with all optional fields populated should still be valid."""
         minimal_spec["metadata"] = {"author": "test", "notes": "full spec"}
@@ -221,20 +225,24 @@ class TestMinimalValidSpec:
 class TestMissingRequiredFields:
     """Every required top-level field must be enforced."""
 
-    @pytest.mark.parametrize("field", [
-        "spec_version",
-        "adapter_identity",
-        "capabilities",
-        "lifecycle",
-        "connection",
-        "data_contract",
-        "context_mapping",
-        "error_handling",
-    ])
+    @pytest.mark.parametrize(
+        "field",
+        [
+            "spec_version",
+            "adapter_identity",
+            "capabilities",
+            "lifecycle",
+            "connection",
+            "data_contract",
+            "context_mapping",
+            "error_handling",
+        ],
+    )
     def test_missing_required_top_level_field(
-
-        self, validator: Draft202012Validator, minimal_spec: dict, field: str,
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
+        field: str,
     ):
         del minimal_spec[field]
         with pytest.raises(ValidationError, match=field):
@@ -256,11 +264,9 @@ class TestMissingRequiredFields:
             validator.validate(minimal_spec)
 
     def test_missing_data_contract_schema_ref(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         del minimal_spec["data_contract"]["schema_ref"]
         with pytest.raises(ValidationError):
@@ -343,11 +349,9 @@ class TestInvalidEnums:
             validator.validate(minimal_spec)
 
     def test_invalid_change_history_source(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         minimal_spec["integrity"] = {
             "hash_method": "sha256-c14n-v1",
@@ -374,22 +378,18 @@ class TestPatternValidation:
     """Regex patterns and format constraints are enforced."""
 
     def test_adapter_id_must_be_kebab_case(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         minimal_spec["adapter_identity"]["adapter_id"] = "WhkWMS"
         with pytest.raises(ValidationError):
             validator.validate(minimal_spec)
 
     def test_adapter_id_cannot_start_with_number(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         minimal_spec["adapter_identity"]["adapter_id"] = "1-bad"
         with pytest.raises(ValidationError):
@@ -406,33 +406,27 @@ class TestPatternValidation:
             validator.validate(minimal_spec)
 
     def test_schema_ref_must_start_with_forge(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         minimal_spec["data_contract"]["schema_ref"] = "http://example.com/schema"
         with pytest.raises(ValidationError):
             validator.validate(minimal_spec)
 
     def test_connection_param_name_snake_case(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         minimal_spec["connection"]["params"][0]["name"] = "apiUrl"
         with pytest.raises(ValidationError):
             validator.validate(minimal_spec)
 
     def test_spec_hash_must_be_64_hex_chars(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         minimal_spec["integrity"] = {
             "hash_method": "sha256-c14n-v1",
@@ -451,11 +445,9 @@ class TestNestedObjectValidation:
     """Complex nested structures are validated correctly."""
 
     def test_connection_params_min_items(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         """At least one connection param required."""
         minimal_spec["connection"]["params"] = []
@@ -518,11 +510,9 @@ class TestNestedObjectValidation:
         validator.validate(minimal_spec)
 
     def test_data_sources_invalid_source_type(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         minimal_spec["data_contract"]["data_sources"] = [
             {
@@ -595,11 +585,9 @@ class TestAdditionalProperties:
             validator.validate(minimal_spec)
 
     def test_unknown_adapter_identity_field(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         minimal_spec["adapter_identity"]["vendor"] = "Acme Inc"
         with pytest.raises(ValidationError):
@@ -611,11 +599,9 @@ class TestAdditionalProperties:
             validator.validate(minimal_spec)
 
     def test_metadata_allows_additional_properties(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         """metadata is the exception — free-form is allowed."""
         minimal_spec["metadata"] = {"anything": "goes", "nested": {"deep": True}}
@@ -631,11 +617,9 @@ class TestIntegrityBlock:
     """FHTS governance fields in the integrity block."""
 
     def test_integrity_with_approved_state(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         minimal_spec["integrity"] = {
             "hash_method": "sha256-c14n-v1",
@@ -647,11 +631,9 @@ class TestIntegrityBlock:
         validator.validate(minimal_spec)
 
     def test_integrity_with_reverted_state(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         minimal_spec["integrity"] = {
             "hash_method": "sha256-c14n-v1",
@@ -662,11 +644,9 @@ class TestIntegrityBlock:
         validator.validate(minimal_spec)
 
     def test_integrity_with_null_previous_hash(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         """previous_hash accepts null (initial spec has no previous)."""
         minimal_spec["integrity"] = {
@@ -677,11 +657,9 @@ class TestIntegrityBlock:
         validator.validate(minimal_spec)
 
     def test_integrity_agent_change_history(
-
-
-        self, validator: Draft202012Validator, minimal_spec: dict,
-
-
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
     ):
         """Agent-sourced change with full metadata."""
         minimal_spec["integrity"] = {

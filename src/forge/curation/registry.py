@@ -27,6 +27,7 @@ from forge.core.models.data_product import (
 # Data Product Version tracking
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class DataProductVersion:
     """A snapshot of a data product at a specific version."""
@@ -55,6 +56,7 @@ class DataProductField:
 # ---------------------------------------------------------------------------
 # Product Store abstraction
 # ---------------------------------------------------------------------------
+
 
 class ProductStore(ABC):
     """Abstract storage backend for data products."""
@@ -100,6 +102,7 @@ class InMemoryProductStore(ProductStore):
 # ---------------------------------------------------------------------------
 # Data Product Registry
 # ---------------------------------------------------------------------------
+
 
 class DataProductRegistry:
     """Manages the lifecycle of data products.
@@ -165,7 +168,8 @@ class DataProductRegistry:
         return self._store.get(product_id)
 
     def list_products(
-        self, status: DataProductStatus | None = None,
+        self,
+        status: DataProductStatus | None = None,
     ) -> list[DataProduct]:
         """List all data products, optionally filtered by status."""
         return self._store.list_all(status)

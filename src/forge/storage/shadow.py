@@ -37,9 +37,7 @@ class WriteResult:
     engine: StorageEngine
     namespace: str
     success: bool
-    written_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=UTC)
-    )
+    written_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
     error: str | None = None
     latency_ms: float = 0.0
 
@@ -84,9 +82,7 @@ class ShadowWriter:
 
     router: DataRouter
     pools: PoolManager
-    _metrics: ShadowWriterMetrics = field(
-        default_factory=ShadowWriterMetrics, init=False
-    )
+    _metrics: ShadowWriterMetrics = field(default_factory=ShadowWriterMetrics, init=False)
     _buffer: list[tuple[ContextualRecord, RoutingDecision]] = field(
         default_factory=list, init=False
     )
@@ -119,18 +115,14 @@ class ShadowWriter:
 
         try:
             await self._persist(record, decision)
-            elapsed = (
-                datetime.now(tz=UTC) - start
-            ).total_seconds() * 1000
+            elapsed = (datetime.now(tz=UTC) - start).total_seconds() * 1000
 
             self._metrics.records_written += 1
             self._metrics.by_engine[decision.target_engine.value] = (
                 self._metrics.by_engine.get(decision.target_engine.value, 0) + 1
             )
             spoke_id = record.source.system if record.source else "unknown"
-            self._metrics.by_spoke[spoke_id] = (
-                self._metrics.by_spoke.get(spoke_id, 0) + 1
-            )
+            self._metrics.by_spoke[spoke_id] = self._metrics.by_spoke.get(spoke_id, 0) + 1
             self._metrics.last_write_at = datetime.now(tz=UTC)
 
             return WriteResult(
@@ -162,9 +154,7 @@ class ShadowWriter:
                 error=str(exc),
             )
 
-    async def write_batch(
-        self, records: list[ContextualRecord]
-    ) -> list[WriteResult]:
+    async def write_batch(self, records: list[ContextualRecord]) -> list[WriteResult]:
         """Write a batch of ContextualRecords, grouped by target engine.
 
         Groups records by engine first, then writes in bulk to each
@@ -180,9 +170,7 @@ class ShadowWriter:
 
         return results
 
-    async def _persist(
-        self, record: ContextualRecord, decision: RoutingDecision
-    ) -> None:
+    async def _persist(self, record: ContextualRecord, decision: RoutingDecision) -> None:
         """Persist a record to its target storage engine.
 
         Phase 1: Buffer in memory (no actual DB writes).
@@ -200,9 +188,7 @@ class ShadowWriter:
         elif decision.target_engine == StorageEngine.REDIS:
             await self._write_redis(record, decision)
 
-    async def _write_postgresql(
-        self, record: ContextualRecord, decision: RoutingDecision
-    ) -> None:
+    async def _write_postgresql(self, record: ContextualRecord, decision: RoutingDecision) -> None:
         """Write to PostgreSQL spoke projection schema via asyncpg.
 
         Uses the PostgreSQL pool to INSERT the record into the target
@@ -236,9 +222,7 @@ class ShadowWriter:
                 record.record_id,
             )
 
-    async def _write_timescaledb(
-        self, record: ContextualRecord, decision: RoutingDecision
-    ) -> None:
+    async def _write_timescaledb(self, record: ContextualRecord, decision: RoutingDecision) -> None:
         """Write time-series data to TimescaleDB hypertable."""
         if self._ts_writer is None:
             pool = self.pools.timescale
@@ -248,9 +232,7 @@ class ShadowWriter:
 
         await self._ts_writer.write_record(record)
 
-    async def _write_neo4j(
-        self, record: ContextualRecord, decision: RoutingDecision
-    ) -> None:
+    async def _write_neo4j(self, record: ContextualRecord, decision: RoutingDecision) -> None:
         """Write graph topology to Neo4j via MERGE."""
         if self._neo4j_writer is None:
             driver = self.pools.neo4j
@@ -260,9 +242,7 @@ class ShadowWriter:
 
         await self._neo4j_writer.write_record(record)
 
-    async def _write_redis(
-        self, record: ContextualRecord, decision: RoutingDecision
-    ) -> None:
+    async def _write_redis(self, record: ContextualRecord, decision: RoutingDecision) -> None:
         """Cache hot state in Redis (equipment readings, adapter health)."""
         if self._redis_cache is None:
             client = self.pools.redis

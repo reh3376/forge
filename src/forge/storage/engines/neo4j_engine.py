@@ -50,7 +50,8 @@ class Neo4jGraphWriter:
         try:
             async with self._driver.session() as session:
                 await session.execute_write(
-                    self._merge_record_tx, record,
+                    self._merge_record_tx,
+                    record,
                 )
             return True
         except Exception:
@@ -143,7 +144,10 @@ class Neo4jGraphWriter:
         return written
 
     async def query_equipment_topology(
-        self, equipment_id: str, *, depth: int = 2,
+        self,
+        equipment_id: str,
+        *,
+        depth: int = 2,
     ) -> list[dict[str, Any]]:
         """Query the neighborhood of an equipment node."""
         if not self._driver_ok():
@@ -226,10 +230,9 @@ class Neo4jLineageWriter:
 
         # Link source records
         for src_id in entry.source_record_ids:
-            steps_json = json.dumps([
-                {"step_name": s.step_name, "component": s.component}
-                for s in entry.steps
-            ])
+            steps_json = json.dumps(
+                [{"step_name": s.step_name, "component": s.component} for s in entry.steps]
+            )
             await tx.run(
                 """
                 MERGE (s:SourceRecord {record_id: $source_id})

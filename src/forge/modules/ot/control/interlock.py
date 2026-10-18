@@ -156,9 +156,7 @@ class InterlockEngine:
 
     # -- Evaluation ----------------------------------------------------------
 
-    async def check(
-        self, request: WriteRequest, result: WriteResult
-    ) -> WriteResult:
+    async def check(self, request: WriteRequest, result: WriteResult) -> WriteResult:
         """Evaluate all matching interlock rules.  Mutates *result*.
 
         Stops at the first blocking rule (unless bypassed).  On failure,

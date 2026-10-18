@@ -106,9 +106,7 @@ def map_step_event(raw: dict[str, Any]) -> OperationalEvent | None:
         operator_id=_str_or_none(raw.get("operatorId") or raw.get("operator_id")),
         event_time=event_time,
         result=raw.get("notes") or raw.get("result"),
-        work_order_id=_str_or_none(
-            raw.get("productionOrderId") or raw.get("production_order_id")
-        ),
+        work_order_id=_str_or_none(raw.get("productionOrderId") or raw.get("production_order_id")),
         metadata={
             k: v
             for k, v in {
@@ -131,15 +129,11 @@ def map_production_event(raw: dict[str, Any]) -> OperationalEvent | None:
         logger.warning("ProductionEvent dict missing id -- skipping: %s", raw)
         return None
 
-    event_type_raw = str(
-        raw.get("eventType") or raw.get("event_type") or "unknown"
-    )
+    event_type_raw = str(raw.get("eventType") or raw.get("event_type") or "unknown")
     category_raw = str(raw.get("category") or raw.get("phase") or "").upper()
     severity_raw = str(raw.get("severity") or "INFO").upper()
 
-    event_time = _parse_time(
-        raw.get("timestamp") or raw.get("createdAt") or raw.get("created_at")
-    )
+    event_time = _parse_time(raw.get("timestamp") or raw.get("createdAt") or raw.get("created_at"))
     if event_time is None:
         event_time = datetime.now(tz=UTC)
     # Entity association

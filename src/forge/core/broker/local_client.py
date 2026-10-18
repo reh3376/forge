@@ -90,12 +90,14 @@ class LocalMqttClient:
         )
 
         # Track for testing
-        self.published.append({
-            "topic": topic,
-            "payload": payload,
-            "qos": qos,
-            "retain": retain,
-        })
+        self.published.append(
+            {
+                "topic": topic,
+                "payload": payload,
+                "qos": qos,
+                "retain": retain,
+            }
+        )
 
     def subscribe(
         self,

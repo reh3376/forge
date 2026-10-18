@@ -40,11 +40,7 @@ class TestManifest:
         assert len(ScannerGatewayAdapter.manifest.connection_params) == 7
 
     def test_required_params(self):
-        required = [
-            p.name
-            for p in ScannerGatewayAdapter.manifest.connection_params
-            if p.required
-        ]
+        required = [p.name for p in ScannerGatewayAdapter.manifest.connection_params if p.required]
         assert sorted(required) == [
             "device_token_secret",
             "gateway_listen_port",
@@ -69,10 +65,7 @@ class TestManifest:
         assert "device_id" in fields
 
     def test_metadata_proto_package(self):
-        assert (
-            ScannerGatewayAdapter.manifest.metadata["proto_package"]
-            == "scanner.v1"
-        )
+        assert ScannerGatewayAdapter.manifest.metadata["proto_package"] == "scanner.v1"
 
     def test_metadata_scan_types(self):
         assert ScannerGatewayAdapter.manifest.metadata["scan_types"] == 12
@@ -213,17 +206,19 @@ class TestCollect:
     @pytest.mark.asyncio()
     async def test_collect_yields_records(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "scan_id": "scan-001",
-                "scan_type": "SCAN_TYPE_ENTRY",
-                "barcode_value": "WHK-BBL-12345",
-                "device_id": "DEV-001",
-                "operator_id": "OP-001",
-                "location_string": "Warehouse-A/Bay-3",
-                "scanned_at": "2026-04-06T14:30:00+00:00",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "scan_id": "scan-001",
+                    "scan_type": "SCAN_TYPE_ENTRY",
+                    "barcode_value": "WHK-BBL-12345",
+                    "device_id": "DEV-001",
+                    "operator_id": "OP-001",
+                    "location_string": "Warehouse-A/Bay-3",
+                    "scanned_at": "2026-04-06T14:30:00+00:00",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         assert len(records) == 1
         assert records[0].source.adapter_id == "scanner-gateway"
@@ -232,28 +227,32 @@ class TestCollect:
     @pytest.mark.asyncio()
     async def test_collect_tag_path(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "scan_id": "scan-002",
-                "scan_type": "SCAN_TYPE_DUMP",
-                "barcode_value": "WHK-BBL-99999",
-                "scanned_at": "2026-04-06T15:00:00+00:00",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "scan_id": "scan-002",
+                    "scan_type": "SCAN_TYPE_DUMP",
+                    "barcode_value": "WHK-BBL-99999",
+                    "scanned_at": "2026-04-06T15:00:00+00:00",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         assert records[0].source.tag_path == "scanner.scan.dump"
 
     @pytest.mark.asyncio()
     async def test_collect_routing_annotation(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "scan_id": "scan-003",
-                "scan_type": "SCAN_TYPE_INSPECTION",
-                "barcode_value": "WHK-BBL-55555",
-                "scanned_at": "2026-04-06T16:00:00+00:00",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "scan_id": "scan-003",
+                    "scan_type": "SCAN_TYPE_INSPECTION",
+                    "barcode_value": "WHK-BBL-55555",
+                    "scanned_at": "2026-04-06T16:00:00+00:00",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         routed_to = records[0].context.extra["_routed_to"]
         assert "whk-wms" in routed_to
@@ -262,20 +261,22 @@ class TestCollect:
     @pytest.mark.asyncio()
     async def test_collect_increments_counter(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "scan_id": "s1",
-                "scan_type": "SCAN_TYPE_ENTRY",
-                "barcode_value": "B1",
-                "scanned_at": "2026-04-06T10:00:00+00:00",
-            },
-            {
-                "scan_id": "s2",
-                "scan_type": "SCAN_TYPE_DUMP",
-                "barcode_value": "B2",
-                "scanned_at": "2026-04-06T11:00:00+00:00",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "scan_id": "s1",
+                    "scan_type": "SCAN_TYPE_ENTRY",
+                    "barcode_value": "B1",
+                    "scanned_at": "2026-04-06T10:00:00+00:00",
+                },
+                {
+                    "scan_id": "s2",
+                    "scan_type": "SCAN_TYPE_DUMP",
+                    "barcode_value": "B2",
+                    "scanned_at": "2026-04-06T11:00:00+00:00",
+                },
+            ]
+        )
         _ = [r async for r in adapter.collect()]
         health = await adapter.health()
         assert health.records_collected == 2
@@ -283,22 +284,21 @@ class TestCollect:
     @pytest.mark.asyncio()
     async def test_collect_record_lineage(self):
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "scan_id": "scan-lin",
-                "scan_type": "SCAN_TYPE_RELOCATION",
-                "barcode_value": "BBL-LIN",
-                "scanned_at": "2026-04-06T12:00:00+00:00",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "scan_id": "scan-lin",
+                    "scan_type": "SCAN_TYPE_RELOCATION",
+                    "barcode_value": "BBL-LIN",
+                    "scanned_at": "2026-04-06T12:00:00+00:00",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         lineage = records[0].lineage
         assert lineage.adapter_id == "scanner-gateway"
         assert lineage.adapter_version == "0.1.0"
-        assert (
-            lineage.schema_ref
-            == "forge://schemas/scanner-gateway/v0.1.0"
-        )
+        assert lineage.schema_ref == "forge://schemas/scanner-gateway/v0.1.0"
         assert "scanner.v1.ScanEvent" in lineage.transformation_chain
 
 
@@ -385,14 +385,16 @@ class TestQueueCollection:
         """collect() yields records from the handler queue."""
         adapter = await self._make_adapter()
         handler = adapter.handler
-        handler.inject_scans([
-            {
-                "scan_id": "q-001",
-                "scan_type": "SCAN_TYPE_ENTRY",
-                "barcode_value": "BBL-Q-001",
-                "scanned_at": "2026-04-06T14:00:00+00:00",
-            },
-        ])
+        handler.inject_scans(
+            [
+                {
+                    "scan_id": "q-001",
+                    "scan_type": "SCAN_TYPE_ENTRY",
+                    "barcode_value": "BBL-Q-001",
+                    "scanned_at": "2026-04-06T14:00:00+00:00",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         assert len(records) == 1
         assert records[0].source.tag_path == "scanner.scan.entry"
@@ -402,15 +404,17 @@ class TestQueueCollection:
         """collect() drains all queued events in one call."""
         adapter = await self._make_adapter()
         handler = adapter.handler
-        handler.inject_scans([
-            {
-                "scan_id": f"q-{i}",
-                "scan_type": "SCAN_TYPE_DUMP",
-                "barcode_value": f"BBL-{i}",
-                "scanned_at": "2026-04-06T15:00:00+00:00",
-            }
-            for i in range(5)
-        ])
+        handler.inject_scans(
+            [
+                {
+                    "scan_id": f"q-{i}",
+                    "scan_type": "SCAN_TYPE_DUMP",
+                    "barcode_value": f"BBL-{i}",
+                    "scanned_at": "2026-04-06T15:00:00+00:00",
+                }
+                for i in range(5)
+            ]
+        )
         records = [r async for r in adapter.collect()]
         assert len(records) == 5
 
@@ -419,14 +423,16 @@ class TestQueueCollection:
         """Queue-collected events get routing annotations."""
         adapter = await self._make_adapter()
         handler = adapter.handler
-        handler.inject_scans([
-            {
-                "scan_id": "q-route",
-                "scan_type": "SCAN_TYPE_INSPECTION",
-                "barcode_value": "BBL-R",
-                "scanned_at": "2026-04-06T16:00:00+00:00",
-            },
-        ])
+        handler.inject_scans(
+            [
+                {
+                    "scan_id": "q-route",
+                    "scan_type": "SCAN_TYPE_INSPECTION",
+                    "barcode_value": "BBL-R",
+                    "scanned_at": "2026-04-06T16:00:00+00:00",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         routed = records[0].context.extra["_routed_to"]
         assert "whk-wms" in routed
@@ -436,23 +442,27 @@ class TestQueueCollection:
     async def test_collect_queue_takes_priority_over_injected(self):
         """When queue has events, injected records are skipped."""
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "scan_id": "inj-1",
-                "scan_type": "SCAN_TYPE_ENTRY",
-                "barcode_value": "INJ-1",
-                "scanned_at": "2026-04-06T10:00:00+00:00",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "scan_id": "inj-1",
+                    "scan_type": "SCAN_TYPE_ENTRY",
+                    "barcode_value": "INJ-1",
+                    "scanned_at": "2026-04-06T10:00:00+00:00",
+                },
+            ]
+        )
         handler = adapter.handler
-        handler.inject_scans([
-            {
-                "scan_id": "queue-1",
-                "scan_type": "SCAN_TYPE_DUMP",
-                "barcode_value": "QUE-1",
-                "scanned_at": "2026-04-06T11:00:00+00:00",
-            },
-        ])
+        handler.inject_scans(
+            [
+                {
+                    "scan_id": "queue-1",
+                    "scan_type": "SCAN_TYPE_DUMP",
+                    "barcode_value": "QUE-1",
+                    "scanned_at": "2026-04-06T11:00:00+00:00",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         # Only queue events, not injected
         assert len(records) == 1
@@ -462,14 +472,16 @@ class TestQueueCollection:
     async def test_collect_falls_back_to_injected(self):
         """When queue is empty, falls back to injected records."""
         adapter = await self._make_adapter()
-        adapter.inject_records([
-            {
-                "scan_id": "fb-1",
-                "scan_type": "SCAN_TYPE_RELOCATION",
-                "barcode_value": "FB-1",
-                "scanned_at": "2026-04-06T12:00:00+00:00",
-            },
-        ])
+        adapter.inject_records(
+            [
+                {
+                    "scan_id": "fb-1",
+                    "scan_type": "SCAN_TYPE_RELOCATION",
+                    "barcode_value": "FB-1",
+                    "scanned_at": "2026-04-06T12:00:00+00:00",
+                },
+            ]
+        )
         records = [r async for r in adapter.collect()]
         assert len(records) == 1
         assert "FB-1" in records[0].value.raw

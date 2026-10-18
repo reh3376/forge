@@ -73,9 +73,7 @@ def create_gateway_app(
     )
 
     @app.middleware("http")
-    async def rate_limit_middleware(
-        request: Request, call_next: Any
-    ) -> JSONResponse:
+    async def rate_limit_middleware(request: Request, call_next: Any) -> JSONResponse:
         """Apply per-endpoint rate limiting."""
         path = request.url.path
         limit = _get_limit_for_path(path)
@@ -115,9 +113,7 @@ def create_gateway_app(
         return response
 
     @app.middleware("http")
-    async def trace_middleware(
-        request: Request, call_next: Any
-    ) -> JSONResponse:
+    async def trace_middleware(request: Request, call_next: Any) -> JSONResponse:
         """Add trace_id and timing headers."""
         import uuid
 

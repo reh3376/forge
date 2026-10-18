@@ -51,12 +51,14 @@ class TestSecurityModule:
     @pytest.mark.asyncio
     async def test_get_user_from_cache(self):
         sm = SecurityModule()
-        sm.register_user(UserInfo(
-            username="pmannion",
-            display_name="Patrick Mannion",
-            email="pmannion@whiskeyhouse.com",
-            roles=("admin", "engineer"),
-        ))
+        sm.register_user(
+            UserInfo(
+                username="pmannion",
+                display_name="Patrick Mannion",
+                email="pmannion@whiskeyhouse.com",
+                roles=("admin", "engineer"),
+            )
+        )
         user = await sm.get_user("pmannion")
         assert user is not None
         assert user.display_name == "Patrick Mannion"
@@ -119,10 +121,12 @@ class TestSecurityModule:
     async def test_get_current_user(self):
         sm = SecurityModule()
         sm.bind(current_username="pmannion")
-        sm.register_user(UserInfo(
-            username="pmannion",
-            display_name="Patrick Mannion",
-        ))
+        sm.register_user(
+            UserInfo(
+                username="pmannion",
+                display_name="Patrick Mannion",
+            )
+        )
         user = await sm.get_user()  # No arg → uses current user
         assert user is not None
         assert user.username == "pmannion"

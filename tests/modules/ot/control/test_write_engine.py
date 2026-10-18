@@ -38,7 +38,11 @@ from forge.modules.ot.control.write_engine import ControlWriteEngine
 # ---------------------------------------------------------------------------
 
 
-def _make_writer(values: dict | None = None, write_error: Exception | None = None, read_error: Exception | None = None):
+def _make_writer(
+    values: dict | None = None,
+    write_error: Exception | None = None,
+    read_error: Exception | None = None,
+):
     """Create a mock tag writer."""
     store = dict(values or {})
     writer = AsyncMock()
@@ -66,27 +70,35 @@ def _build_engine(
 ) -> ControlWriteEngine:
     """Build a fully wired engine with standard test config."""
     validator = WriteValidator()
-    validator.register_tag(TagWriteConfig(
-        tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
-        data_type=DataType.FLOAT,
-        min_value=0.0,
-        max_value=200.0,
-        engineering_units="°F",
-    ))
-    validator.register_tag(TagWriteConfig(
-        tag_path="WH/WHK01/Distillery01/Valve01/Open",
-        data_type=DataType.BOOLEAN,
-    ))
-    validator.register_tag(TagWriteConfig(
-        tag_path="WH/WHK01/Distillery01/Counter/Value",
-        data_type=DataType.INT32,
-        min_value=-1000,
-        max_value=1000,
-    ))
-    validator.register_tag(TagWriteConfig(
-        tag_path="WH/WHK01/Distillery01/Label/Text",
-        data_type=DataType.STRING,
-    ))
+    validator.register_tag(
+        TagWriteConfig(
+            tag_path="WH/WHK01/Distillery01/TIT_2010/SP",
+            data_type=DataType.FLOAT,
+            min_value=0.0,
+            max_value=200.0,
+            engineering_units="°F",
+        )
+    )
+    validator.register_tag(
+        TagWriteConfig(
+            tag_path="WH/WHK01/Distillery01/Valve01/Open",
+            data_type=DataType.BOOLEAN,
+        )
+    )
+    validator.register_tag(
+        TagWriteConfig(
+            tag_path="WH/WHK01/Distillery01/Counter/Value",
+            data_type=DataType.INT32,
+            min_value=-1000,
+            max_value=1000,
+        )
+    )
+    validator.register_tag(
+        TagWriteConfig(
+            tag_path="WH/WHK01/Distillery01/Label/Text",
+            data_type=DataType.STRING,
+        )
+    )
 
     # Interlock engine
     il_reader = AsyncMock()
@@ -95,22 +107,26 @@ def _build_engine(
     interlock_engine = InterlockEngine(tag_reader=tag_reader or il_reader)
 
     if add_interlock:
-        interlock_engine.add_rule(InterlockRule(
-            rule_id="IL-001",
-            name="Pump guard",
-            target_tag_pattern="WH/WHK01/Distillery01/*/SP",
-            check_tag="WH/WHK01/Distillery01/Pump01/Running",
-            condition=InterlockCondition.IS_TRUE,
-        ))
+        interlock_engine.add_rule(
+            InterlockRule(
+                rule_id="IL-001",
+                name="Pump guard",
+                target_tag_pattern="WH/WHK01/Distillery01/*/SP",
+                check_tag="WH/WHK01/Distillery01/Pump01/Running",
+                condition=InterlockCondition.IS_TRUE,
+            )
+        )
 
     # Authorizer
     authorizer = WriteAuthorizer()
-    authorizer.add_permission(WritePermission(
-        permission_id="perm-all",
-        area_pattern="*",
-        tag_pattern="**",
-        min_role=WriteRole.OPERATOR,
-    ))
+    authorizer.add_permission(
+        WritePermission(
+            permission_id="perm-all",
+            area_pattern="*",
+            tag_pattern="**",
+            min_role=WriteRole.OPERATOR,
+        )
+    )
 
     return ControlWriteEngine(
         validator=validator,

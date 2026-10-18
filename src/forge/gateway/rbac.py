@@ -59,10 +59,7 @@ def require_role(role: Role):
             return user
         raise HTTPException(
             status_code=403,
-            detail=(
-                f"Insufficient role. "
-                f"Required: '{role}', your role: '{user.role}'."
-            ),
+            detail=(f"Insufficient role. Required: '{role}', your role: '{user.role}'."),
         )
 
     return _check

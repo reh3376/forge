@@ -265,8 +265,7 @@ class SecurityConfig:
         if self.policy == SecurityPolicy.NONE:
             if self.mode != MessageSecurityMode.NONE:
                 raise ConfigurationError(
-                    f"SecurityPolicy None requires MessageSecurityMode None, "
-                    f"got {self.mode.value}"
+                    f"SecurityPolicy None requires MessageSecurityMode None, got {self.mode.value}"
                 )
 
     @classmethod
@@ -303,16 +302,8 @@ class SecurityConfig:
             Fully validated SecurityConfig.
         """
         client_cert = load_certificate_pair(certificate_path, private_key_path)
-        trust = (
-            TrustStore.from_directory(trust_dir)
-            if trust_dir
-            else TrustStore.empty()
-        )
-        server_cert = (
-            Path(server_certificate_path).resolve()
-            if server_certificate_path
-            else None
-        )
+        trust = TrustStore.from_directory(trust_dir) if trust_dir else TrustStore.empty()
+        server_cert = Path(server_certificate_path).resolve() if server_certificate_path else None
 
         return cls(
             policy=SecurityPolicy.BASIC256_SHA256,

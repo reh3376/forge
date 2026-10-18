@@ -74,9 +74,7 @@ def _load_manifest() -> AdapterManifest:
         capabilities=AdapterCapabilities(**raw.get("capabilities", {})),
         data_contract=DataContract(**raw.get("data_contract", {})),
         health_check_interval_ms=raw.get("health_check_interval_ms", 5000),
-        connection_params=[
-            ConnectionParam(**p) for p in raw.get("connection_params", [])
-        ],
+        connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
     )
@@ -141,9 +139,7 @@ class WhkNmsAdapter(
         aio-httpx when the hub's event loop integration is ready.
         """
         if self._config is None:
-            raise RuntimeError(
-                "Adapter not configured — call configure() first"
-            )
+            raise RuntimeError("Adapter not configured — call configure() first")
         self._state = AdapterState.CONNECTING
         # Phase 1: no live REST/WebSocket connections yet — records injected for testing
         # Phase 2 will add aio-httpx for REST polling and websockets for streaming

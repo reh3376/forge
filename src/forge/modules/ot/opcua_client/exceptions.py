@@ -232,9 +232,7 @@ class MonitoredItemError(SubscriptionError):
     ) -> None:
         self.node_id = node_id
         self.status_code = status_code
-        super().__init__(
-            message, subscription_id=subscription_id, detail=detail
-        )
+        super().__init__(message, subscription_id=subscription_id, detail=detail)
 
 
 # ---------------------------------------------------------------------------

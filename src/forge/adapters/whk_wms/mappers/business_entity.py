@@ -46,11 +46,7 @@ def map_customer(raw: dict[str, Any]) -> BusinessEntity | None:
         except (json.JSONDecodeError, TypeError):
             data = {}
 
-    name = (
-        data.get("name")
-        or raw.get("name")
-        or f"Customer-{cust_id}"
-    )
+    name = data.get("name") or raw.get("name") or f"Customer-{cust_id}"
 
     external_ids: dict[str, str] = {}
     global_id = raw.get("globalId") or raw.get("global_id")
@@ -71,9 +67,7 @@ def map_customer(raw: dict[str, Any]) -> BusinessEntity | None:
         source_id=str(cust_id),
         entity_type=EntityType.CUSTOMER,
         name=str(name),
-        parent_id=_str_or_none(
-            raw.get("parentCustomerId") or raw.get("parent_customer_id")
-        ),
+        parent_id=_str_or_none(raw.get("parentCustomerId") or raw.get("parent_customer_id")),
         external_ids=external_ids,
         contact_info=contact_info,
         location=data.get("location") or raw.get("location"),
@@ -100,11 +94,7 @@ def map_vendor(raw: dict[str, Any]) -> BusinessEntity | None:
         except (json.JSONDecodeError, TypeError):
             data = {}
 
-    name = (
-        data.get("name")
-        or raw.get("name")
-        or f"Vendor-{vendor_id}"
-    )
+    name = data.get("name") or raw.get("name") or f"Vendor-{vendor_id}"
 
     external_ids: dict[str, str] = {}
     global_id = raw.get("globalId") or raw.get("global_id")

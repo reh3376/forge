@@ -45,9 +45,7 @@ class InMemoryRateLimiter:
         # key -> list of timestamps
         self._windows: dict[str, list[float]] = {}
 
-    def check(
-        self, key: str, limit: EndpointLimit | None = None
-    ) -> RateLimitResult:
+    def check(self, key: str, limit: EndpointLimit | None = None) -> RateLimitResult:
         """Check and record a request against the rate limit."""
         lim = limit or EndpointLimit()
         now = time.monotonic()
@@ -136,19 +134,13 @@ class RedisRateLimiter:
 
                 self._client = from_url(self._redis_url)
                 # Load the Lua script
-                self._script_sha = await self._client.script_load(
-                    self._LUA_SCRIPT
-                )
+                self._script_sha = await self._client.script_load(self._LUA_SCRIPT)
             except Exception:
-                logger.warning(
-                    "Redis unavailable for rate limiting — using in-memory fallback"
-                )
+                logger.warning("Redis unavailable for rate limiting — using in-memory fallback")
                 self._client = None
         return self._client
 
-    async def check(
-        self, key: str, limit: EndpointLimit | None = None
-    ) -> RateLimitResult:
+    async def check(self, key: str, limit: EndpointLimit | None = None) -> RateLimitResult:
         """Check and record a request against the rate limit."""
         lim = limit or EndpointLimit()
         client = await self._get_client()

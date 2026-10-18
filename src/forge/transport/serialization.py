@@ -68,9 +68,7 @@ _ADAPTER_STATE_TO_INT: dict[str, int] = {
     "FAILED": 5,
     "STOPPED": 6,
 }
-_INT_TO_ADAPTER_STATE: dict[int, str] = {
-    v: k for k, v in _ADAPTER_STATE_TO_INT.items()
-}
+_INT_TO_ADAPTER_STATE: dict[int, str] = {v: k for k, v in _ADAPTER_STATE_TO_INT.items()}
 
 _ADAPTER_TIER_TO_INT: dict[str, int] = {
     "OT": 1,
@@ -79,9 +77,7 @@ _ADAPTER_TIER_TO_INT: dict[str, int] = {
     "HISTORIAN": 4,
     "DOCUMENT": 5,
 }
-_INT_TO_ADAPTER_TIER: dict[int, str] = {
-    v: k for k, v in _ADAPTER_TIER_TO_INT.items()
-}
+_INT_TO_ADAPTER_TIER: dict[int, str] = {v: k for k, v in _ADAPTER_TIER_TO_INT.items()}
 
 
 # ---------------------------------------------------------------------------
@@ -198,8 +194,15 @@ def _record_value_to_proto(value: RecordValue) -> dict[str, Any]:
 def _record_context_to_proto(ctx: RecordContext) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for field in (
-        "equipment_id", "area", "site", "batch_id", "lot_id",
-        "recipe_id", "operating_mode", "shift", "operator_id",
+        "equipment_id",
+        "area",
+        "site",
+        "batch_id",
+        "lot_id",
+        "recipe_id",
+        "operating_mode",
+        "shift",
+        "operator_id",
     ):
         val = getattr(ctx, field, None)
         result[field] = val or ""
@@ -276,9 +279,7 @@ def _manifest_to_proto(manifest: AdapterManifest) -> dict[str, Any]:
         "capabilities": _capabilities_to_proto(manifest.capabilities),
         "data_contract": _data_contract_to_proto(manifest.data_contract),
         "health_check_interval_ms": manifest.health_check_interval_ms,
-        "connection_params": [
-            _connection_param_to_proto(p) for p in manifest.connection_params
-        ],
+        "connection_params": [_connection_param_to_proto(p) for p in manifest.connection_params],
         "auth_methods": list(manifest.auth_methods),
         "metadata": manifest.metadata,
     }
@@ -322,8 +323,12 @@ def _proto_to_record_timestamp(d: dict[str, Any]) -> RecordTimestamp:
 def _proto_to_record_value(d: dict[str, Any]) -> RecordValue:
     # Extract the oneof typed_value
     typed_keys = {
-        "number_value", "integer_value", "string_value",
-        "bool_value", "bytes_value", "json_value",
+        "number_value",
+        "integer_value",
+        "string_value",
+        "bool_value",
+        "bytes_value",
+        "json_value",
     }
     typed = {k: v for k, v in d.items() if k in typed_keys}
     raw = _typed_value_to_raw(typed)
@@ -429,10 +434,7 @@ def _proto_to_manifest(d: dict[str, Any]) -> AdapterManifest:
         capabilities=_proto_to_capabilities(d.get("capabilities", {})),
         data_contract=_proto_to_data_contract(d["data_contract"]),
         health_check_interval_ms=d.get("health_check_interval_ms", 5000),
-        connection_params=[
-            _proto_to_connection_param(p)
-            for p in d.get("connection_params", [])
-        ],
+        connection_params=[_proto_to_connection_param(p) for p in d.get("connection_params", [])],
         auth_methods=list(d.get("auth_methods", ["none"])),
         metadata=d.get("metadata", {}),
     )

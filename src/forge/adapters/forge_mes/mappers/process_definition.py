@@ -85,12 +85,9 @@ def map_recipe(raw: dict[str, Any]) -> ProcessDefinition | None:
             for k, v in {
                 "is_class_definition": is_class,
                 "is_master": is_master,
-                "template_category": raw.get("templateCategory")
-                or raw.get("template_category"),
-                "whiskey_type_id": raw.get("whiskeyTypeId")
-                or raw.get("whiskey_type_id"),
-                "recipe_group_id": raw.get("recipeGroupId")
-                or raw.get("recipe_group_id"),
+                "template_category": raw.get("templateCategory") or raw.get("template_category"),
+                "whiskey_type_id": raw.get("whiskeyTypeId") or raw.get("whiskey_type_id"),
+                "recipe_group_id": raw.get("recipeGroupId") or raw.get("recipe_group_id"),
             }.items()
             if v is not None
         },
@@ -121,14 +118,9 @@ def _extract_steps(raw: dict[str, Any]) -> list[ProcessStep]:
                     step_number=op.get("stepIndex") or op.get("step_index") or idx + 1,
                     name=str(op_name),
                     step_type=(
-                        op.get("holdType")
-                        or op.get("hold_type")
-                        or op.get("type")
-                        or "operation"
+                        op.get("holdType") or op.get("hold_type") or op.get("type") or "operation"
                     ),
-                    parent_step_id=_str_or_none(
-                        op.get("parentId") or op.get("parent_id")
-                    ),
+                    parent_step_id=_str_or_none(op.get("parentId") or op.get("parent_id")),
                     duration_minutes=_float_or_none(
                         op.get("duration") or op.get("durationMinutes")
                     ),

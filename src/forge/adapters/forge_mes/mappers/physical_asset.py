@@ -69,9 +69,7 @@ def map_asset(raw: dict[str, Any]) -> PhysicalAsset | None:
         return None
 
     asset_type_raw = str(raw.get("assetType") or raw.get("asset_type") or "EQUIPMENT").upper()
-    op_state_raw = str(
-        raw.get("operationalState") or raw.get("operational_state") or ""
-    ).upper()
+    op_state_raw = str(raw.get("operationalState") or raw.get("operational_state") or "").upper()
 
     return PhysicalAsset(
         source_system=_SOURCE_SYSTEM,

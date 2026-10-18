@@ -214,7 +214,13 @@ class TestBrowseService:
         results = await client.browse(folder_nid)
 
         for r in results:
-            if r.browse_name in {"Temperature", "Pressure", "MotorRunning", "Counter", "StatusMessage"}:
+            if r.browse_name in {
+                "Temperature",
+                "Pressure",
+                "MotorRunning",
+                "Counter",
+                "StatusMessage",
+            }:
                 assert r.node_class == NodeClass.VARIABLE, (
                     f"{r.browse_name} should be VARIABLE, got {r.node_class}"
                 )
@@ -226,10 +232,14 @@ class TestBrowseService:
         results = await client.browse(folder_nid)
 
         for r in results:
-            if r.browse_name in {"Temperature", "Pressure", "MotorRunning", "Counter", "StatusMessage"}:
-                assert r.data_type is not None, (
-                    f"{r.browse_name} should have a data_type"
-                )
+            if r.browse_name in {
+                "Temperature",
+                "Pressure",
+                "MotorRunning",
+                "Counter",
+                "StatusMessage",
+            }:
+                assert r.data_type is not None, f"{r.browse_name} should have a data_type"
 
     @pytest.mark.asyncio
     async def test_browse_with_node_class_filter(self, client, opcua_server):

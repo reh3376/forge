@@ -114,9 +114,7 @@ class TestTriggerAckClear:
 
     @pytest.mark.asyncio
     async def test_acknowledge_alarm(self, engine: AlarmEngine):
-        alarm_id = await engine.trigger_alarm(
-            name="TEST", tag_path="t", priority="MEDIUM"
-        )
+        alarm_id = await engine.trigger_alarm(name="TEST", tag_path="t", priority="MEDIUM")
         result = await engine.acknowledge_alarm(alarm_id, operator="jsmith")
         assert result is True
 
@@ -126,9 +124,7 @@ class TestTriggerAckClear:
 
     @pytest.mark.asyncio
     async def test_clear_after_ack(self, engine: AlarmEngine):
-        alarm_id = await engine.trigger_alarm(
-            name="TEST", tag_path="t", priority="MEDIUM"
-        )
+        alarm_id = await engine.trigger_alarm(name="TEST", tag_path="t", priority="MEDIUM")
         await engine.acknowledge_alarm(alarm_id)
         result = await engine.clear_alarm(alarm_id)
         assert result is True
@@ -138,9 +134,7 @@ class TestTriggerAckClear:
 
     @pytest.mark.asyncio
     async def test_clear_before_ack_goes_to_clear_unack(self, engine: AlarmEngine):
-        alarm_id = await engine.trigger_alarm(
-            name="TEST", tag_path="t", priority="MEDIUM"
-        )
+        alarm_id = await engine.trigger_alarm(name="TEST", tag_path="t", priority="MEDIUM")
         await engine.clear_alarm(alarm_id)
 
         active = await engine.get_active_alarms()
@@ -149,9 +143,7 @@ class TestTriggerAckClear:
 
     @pytest.mark.asyncio
     async def test_late_ack_from_clear_unack(self, engine: AlarmEngine):
-        alarm_id = await engine.trigger_alarm(
-            name="TEST", tag_path="t", priority="MEDIUM"
-        )
+        alarm_id = await engine.trigger_alarm(name="TEST", tag_path="t", priority="MEDIUM")
         await engine.clear_alarm(alarm_id)
         await engine.acknowledge_alarm(alarm_id)
 
@@ -175,9 +167,7 @@ class TestTriggerAckClear:
 class TestShelving:
     @pytest.mark.asyncio
     async def test_shelve_and_unshelve(self, engine: AlarmEngine):
-        alarm_id = await engine.trigger_alarm(
-            name="TEST", tag_path="t", priority="HIGH"
-        )
+        alarm_id = await engine.trigger_alarm(name="TEST", tag_path="t", priority="HIGH")
         assert await engine.shelve_alarm(alarm_id, reason="maintenance")
 
         active = await engine.get_active_alarms()
@@ -200,9 +190,7 @@ class TestShelving:
 class TestSuppression:
     @pytest.mark.asyncio
     async def test_suppress_and_unsuppress(self, engine: AlarmEngine):
-        alarm_id = await engine.trigger_alarm(
-            name="TEST", tag_path="t", priority="MEDIUM"
-        )
+        alarm_id = await engine.trigger_alarm(name="TEST", tag_path="t", priority="MEDIUM")
         assert await engine.suppress_alarm(alarm_id, reason="flood")
 
         active = await engine.get_active_alarms()
@@ -221,9 +209,7 @@ class TestSuppression:
 class TestDisableEnable:
     @pytest.mark.asyncio
     async def test_disable_and_enable(self, engine: AlarmEngine):
-        alarm_id = await engine.trigger_alarm(
-            name="TEST", tag_path="t", priority="LOW"
-        )
+        alarm_id = await engine.trigger_alarm(name="TEST", tag_path="t", priority="LOW")
         assert await engine.disable_alarm(alarm_id)
         assert await engine.enable_alarm(alarm_id)
 
@@ -245,9 +231,7 @@ class TestDisableEnable:
 class TestReset:
     @pytest.mark.asyncio
     async def test_reset_clears_alarm(self, engine: AlarmEngine):
-        alarm_id = await engine.trigger_alarm(
-            name="TEST", tag_path="t", priority="HIGH"
-        )
+        alarm_id = await engine.trigger_alarm(name="TEST", tag_path="t", priority="HIGH")
         assert await engine.reset_alarm(alarm_id, operator="admin")
 
         active = await engine.get_active_alarms()
@@ -266,9 +250,7 @@ class TestReset:
 class TestJournal:
     @pytest.mark.asyncio
     async def test_events_recorded(self, engine: AlarmEngine):
-        alarm_id = await engine.trigger_alarm(
-            name="TEST", tag_path="t", priority="HIGH", area="A"
-        )
+        alarm_id = await engine.trigger_alarm(name="TEST", tag_path="t", priority="HIGH", area="A")
         await engine.acknowledge_alarm(alarm_id)
         await engine.clear_alarm(alarm_id)
 
@@ -437,6 +419,7 @@ class TestListeners:
     @pytest.mark.asyncio
     async def test_listener_receives_events(self, engine: AlarmEngine):
         received = []
+
         async def on_alarm(event):
             received.append(event)
 
@@ -458,6 +441,7 @@ class TestListeners:
     @pytest.mark.asyncio
     async def test_remove_listener(self, engine: AlarmEngine):
         received = []
+
         async def on_alarm(event):
             received.append(event)
 

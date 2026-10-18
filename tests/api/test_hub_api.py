@@ -62,8 +62,11 @@ def _make_manifest(adapter_id: str = "whk-wms") -> dict:
         tier="MES_MOM",
         protocol="grpc",
         capabilities=AdapterCapabilities(
-            read=True, write=False, subscribe=True,
-            backfill=True, discover=True,
+            read=True,
+            write=False,
+            subscribe=True,
+            backfill=True,
+            discover=True,
         ),
         data_contract=DataContract(
             schema_ref=f"forge://schemas/{adapter_id}/v1",
@@ -79,6 +82,7 @@ def _make_manifest(adapter_id: str = "whk-wms") -> dict:
 # ---------------------------------------------------------------------------
 # Health Endpoints
 # ---------------------------------------------------------------------------
+
 
 class TestHealthEndpoints:
     @pytest.mark.asyncio
@@ -109,6 +113,7 @@ class TestHealthEndpoints:
 # ---------------------------------------------------------------------------
 # Adapter Registry
 # ---------------------------------------------------------------------------
+
 
 class TestAdapterRegistry:
     @pytest.mark.asyncio
@@ -167,13 +172,17 @@ class TestAdapterRegistry:
 # Record Ingestion
 # ---------------------------------------------------------------------------
 
+
 class TestRecordIngestion:
     @pytest.mark.asyncio
     async def test_ingest_unknown_adapter_returns_404(self, client):
-        resp = await client.post("/v1/records", json={
-            "adapter_id": "unknown",
-            "records": [{"value": 42}],
-        })
+        resp = await client.post(
+            "/v1/records",
+            json={
+                "adapter_id": "unknown",
+                "records": [{"value": 42}],
+            },
+        )
         assert resp.status_code == 404
 
     @pytest.mark.asyncio
@@ -181,13 +190,16 @@ class TestRecordIngestion:
         # Register adapter first
         await client.post("/v1/adapters/register", json=_make_manifest("whk-wms"))
 
-        resp = await client.post("/v1/records", json={
-            "adapter_id": "whk-wms",
-            "records": [
-                {"tag": "temp", "value": 72.5},
-                {"tag": "pressure", "value": 14.7},
-            ],
-        })
+        resp = await client.post(
+            "/v1/records",
+            json={
+                "adapter_id": "whk-wms",
+                "records": [
+                    {"tag": "temp", "value": 72.5},
+                    {"tag": "pressure", "value": 14.7},
+                ],
+            },
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert data["accepted"] == 2
@@ -197,10 +209,13 @@ class TestRecordIngestion:
     async def test_ingest_empty_batch(self, client):
         await client.post("/v1/adapters/register", json=_make_manifest("whk-wms"))
 
-        resp = await client.post("/v1/records", json={
-            "adapter_id": "whk-wms",
-            "records": [],
-        })
+        resp = await client.post(
+            "/v1/records",
+            json={
+                "adapter_id": "whk-wms",
+                "records": [],
+            },
+        )
         assert resp.status_code == 200
         assert resp.json()["accepted"] == 0
 
@@ -208,6 +223,7 @@ class TestRecordIngestion:
 # ---------------------------------------------------------------------------
 # Platform Info
 # ---------------------------------------------------------------------------
+
 
 class TestPlatformInfo:
     @pytest.mark.asyncio
@@ -234,6 +250,7 @@ class TestPlatformInfo:
 # Curation Mount
 # ---------------------------------------------------------------------------
 
+
 class TestCurationMount:
     @pytest.mark.asyncio
     async def test_curation_healthz(self, client):
@@ -248,6 +265,7 @@ class TestCurationMount:
 # _AdapterRegistry (unit tests)
 # ---------------------------------------------------------------------------
 
+
 class TestAdapterRegistryUnit:
     def test_register_and_list(self):
         reg = _AdapterRegistry()
@@ -259,8 +277,11 @@ class TestAdapterRegistryUnit:
             tier="MES_MOM",
             protocol="grpc",
             capabilities=AdapterCapabilities(
-                read=True, write=False, subscribe=False,
-                backfill=False, discover=False,
+                read=True,
+                write=False,
+                subscribe=False,
+                backfill=False,
+                discover=False,
             ),
             data_contract=DataContract(
                 schema_ref="forge://schemas/test/v1",
@@ -295,8 +316,11 @@ class TestAdapterRegistryUnit:
             tier="MES_MOM",
             protocol="rest",
             capabilities=AdapterCapabilities(
-                read=True, write=False, subscribe=False,
-                backfill=False, discover=False,
+                read=True,
+                write=False,
+                subscribe=False,
+                backfill=False,
+                discover=False,
             ),
             data_contract=DataContract(
                 schema_ref="forge://schemas/test/v1",

@@ -221,7 +221,7 @@ class TagRegistry:
                 continue
 
             # Extract the next segment after the prefix
-            remaining = path[len(prefix) + 1:] if prefix else path
+            remaining = path[len(prefix) + 1 :] if prefix else path
             segments = remaining.split("/")
             next_segment = segments[0]
             child_path = f"{prefix}/{next_segment}" if prefix else next_segment
@@ -259,16 +259,12 @@ class TagRegistry:
     async def find_by_scan_class(self, scan_class: ScanClass) -> list[str]:
         """Find all tag paths in a given scan class."""
         return [
-            path for path, tag in self._tags.items()
-            if tag.scan_class == scan_class and tag.enabled
+            path for path, tag in self._tags.items() if tag.scan_class == scan_class and tag.enabled
         ]
 
     async def find_by_area(self, area: str) -> list[str]:
         """Find all tag paths in a given area."""
-        return [
-            path for path, tag in self._tags.items()
-            if tag.area == area
-        ]
+        return [path for path, tag in self._tags.items() if tag.area == area]
 
     # ------------------------------------------------------------------
     # Serialization

@@ -130,9 +130,7 @@ class OTMqttPublisher:
         self._connected = False
         self._started = False
         self._reconnect_task: asyncio.Task | None = None
-        self._buffer: deque[PendingMessage] = deque(
-            maxlen=self._config.buffer_max_size
-        )
+        self._buffer: deque[PendingMessage] = deque(maxlen=self._config.buffer_max_size)
 
         # Metrics
         self._publish_count: int = 0
@@ -193,7 +191,9 @@ class OTMqttPublisher:
 
         logger.info(
             "MQTT publisher started: %s:%d (client_id=%s)",
-            self._config.host, self._config.port, self._config.client_id,
+            self._config.host,
+            self._config.port,
+            self._config.client_id,
         )
 
     async def stop(self) -> None:
@@ -319,7 +319,10 @@ class OTMqttPublisher:
 
         # Buffer the message
         msg = PendingMessage(
-            topic=topic, payload=raw, qos=qos, retain=retain,
+            topic=topic,
+            payload=raw,
+            qos=qos,
+            retain=retain,
             timestamp=time.time(),
         )
         self._buffer.append(msg)
@@ -336,7 +339,10 @@ class OTMqttPublisher:
             msg = self._buffer[0]
             try:
                 await self._client.publish(
-                    msg.topic, msg.payload, qos=msg.qos, retain=msg.retain,
+                    msg.topic,
+                    msg.payload,
+                    qos=msg.qos,
+                    retain=msg.retain,
                 )
                 self._buffer.popleft()
                 self._publish_count += 1
@@ -409,12 +415,14 @@ class _StubMqttClient:
     ) -> None:
         if not self._connected:
             raise ConnectionError("Not connected")
-        self.published.append({
-            "topic": topic,
-            "payload": payload,
-            "qos": qos,
-            "retain": retain,
-        })
+        self.published.append(
+            {
+                "topic": topic,
+                "payload": payload,
+                "qos": qos,
+                "retain": retain,
+            }
+        )
 
 
 class _AiomqttClient:
@@ -500,6 +508,7 @@ def _create_mqtt_client(config: MqttConfig) -> Any:
     """
     if config.broker_mode == "local" and config._broker is not None:
         from forge.core.broker.local_client import LocalMqttClient
+
         logger.info("Using embedded broker (local mode)")
         return LocalMqttClient(config._broker, client_id=config.client_id)
 

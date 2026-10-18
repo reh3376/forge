@@ -41,6 +41,7 @@ class HttpResponse:
         if self.json_data is not None:
             return self.json_data
         import json
+
         return json.loads(self.body)
 
 
@@ -64,11 +65,11 @@ class NetModule:
         if self._client is None:
             try:
                 import httpx
+
                 self._client = httpx.AsyncClient(timeout=self._default_timeout)
             except ImportError:
                 raise RuntimeError(
-                    "httpx is required for forge.net. "
-                    "Install with: pip install httpx"
+                    "httpx is required for forge.net. Install with: pip install httpx"
                 )
         return self._client
 
@@ -121,10 +122,14 @@ class NetModule:
                 last_exc = exc
                 if attempt < self._max_retries - 1:
                     import asyncio
+
                     await asyncio.sleep(0.5 * (attempt + 1))
                     logger.warning(
                         "HTTP %s %s attempt %d failed: %s",
-                        method, url, attempt + 1, exc,
+                        method,
+                        url,
+                        attempt + 1,
+                        exc,
                     )
 
         raise ConnectionError(
@@ -152,7 +157,9 @@ class NetModule:
         timeout: float | None = None,
     ) -> HttpResponse:
         """Perform an HTTP POST request."""
-        return await self._request("POST", url, json=json, data=data, headers=headers, timeout=timeout)
+        return await self._request(
+            "POST", url, json=json, data=data, headers=headers, timeout=timeout
+        )
 
     async def http_put(
         self,
@@ -164,7 +171,9 @@ class NetModule:
         timeout: float | None = None,
     ) -> HttpResponse:
         """Perform an HTTP PUT request."""
-        return await self._request("PUT", url, json=json, data=data, headers=headers, timeout=timeout)
+        return await self._request(
+            "PUT", url, json=json, data=data, headers=headers, timeout=timeout
+        )
 
     async def http_delete(
         self,

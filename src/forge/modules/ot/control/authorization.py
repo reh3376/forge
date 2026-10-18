@@ -76,9 +76,7 @@ class WriteAuthorizer:
 
     # -- Authorization -------------------------------------------------------
 
-    def authorize(
-        self, request: WriteRequest, result: WriteResult
-    ) -> WriteResult:
+    def authorize(self, request: WriteRequest, result: WriteResult) -> WriteResult:
         """Check write authorization.  Mutates and returns *result*.
 
         Iterates all permissions — if any match, the write is authorized.

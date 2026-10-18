@@ -113,9 +113,11 @@ class TestRuleRegistry:
 class TestConditions:
     @pytest.mark.asyncio
     async def test_is_true_blocks(self):
-        reader = _make_reader({
-            "WH/WHK01/Distillery01/Pump01/Running": True,
-        })
+        reader = _make_reader(
+            {
+                "WH/WHK01/Distillery01/Pump01/Running": True,
+            }
+        )
         engine = InterlockEngine(tag_reader=reader)
         engine.add_rule(_pump_guard_rule())
 
@@ -128,9 +130,11 @@ class TestConditions:
 
     @pytest.mark.asyncio
     async def test_is_true_allows_when_false(self):
-        reader = _make_reader({
-            "WH/WHK01/Distillery01/Pump01/Running": False,
-        })
+        reader = _make_reader(
+            {
+                "WH/WHK01/Distillery01/Pump01/Running": False,
+            }
+        )
         engine = InterlockEngine(tag_reader=reader)
         engine.add_rule(_pump_guard_rule())
 
@@ -141,9 +145,11 @@ class TestConditions:
 
     @pytest.mark.asyncio
     async def test_greater_than_blocks(self):
-        reader = _make_reader({
-            "WH/WHK01/Distillery01/TIT_2010/PV": 185.0,
-        })
+        reader = _make_reader(
+            {
+                "WH/WHK01/Distillery01/TIT_2010/PV": 185.0,
+            }
+        )
         engine = InterlockEngine(tag_reader=reader)
         engine.add_rule(_temp_guard_rule())
 
@@ -154,9 +160,11 @@ class TestConditions:
 
     @pytest.mark.asyncio
     async def test_greater_than_allows_when_below(self):
-        reader = _make_reader({
-            "WH/WHK01/Distillery01/TIT_2010/PV": 170.0,
-        })
+        reader = _make_reader(
+            {
+                "WH/WHK01/Distillery01/TIT_2010/PV": 170.0,
+            }
+        )
         engine = InterlockEngine(tag_reader=reader)
         engine.add_rule(_temp_guard_rule())
 
@@ -373,9 +381,11 @@ class TestBypass:
 
     @pytest.mark.asyncio
     async def test_engineer_can_bypass_engineer_rule(self):
-        reader = _make_reader({
-            "WH/WHK01/Distillery01/TIT_2010/PV": 185.0,
-        })
+        reader = _make_reader(
+            {
+                "WH/WHK01/Distillery01/TIT_2010/PV": 185.0,
+            }
+        )
         engine = InterlockEngine(tag_reader=reader)
         engine.add_rule(_temp_guard_rule())  # bypass_min_role = ENGINEER
 

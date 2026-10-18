@@ -55,16 +55,20 @@ def mes_spec() -> dict[str, Any]:
 def runner():
     """Instantiate the FACTSRunner with schema loaded."""
     import sys
+
     sys.path.insert(0, str(SRC_ROOT))
     from forge.governance.facts.runners.facts_runner import FACTSRunner
+
     return FACTSRunner(schema_path=str(SCHEMA_PATH))
 
 
 @pytest.fixture(scope="module")
 def verdict_status():
     import sys
+
     sys.path.insert(0, str(SRC_ROOT))
     from forge.governance.shared.runner import VerdictStatus
+
     return VerdictStatus
 
 
@@ -105,9 +109,11 @@ def _minimal_spec(**overrides: Any) -> dict[str, Any]:
         "connection": {
             "params": [
                 {
-                    "name": "api_url", "type": "url",
+                    "name": "api_url",
+                    "type": "url",
                     "description": "API endpoint",
-                    "required": True, "secret": False,
+                    "required": True,
+                    "secret": False,
                 },
             ],
             "auth_methods": ["bearer_token"],
@@ -422,8 +428,11 @@ class TestCheckConnection:
         spec = _minimal_spec()
         spec["connection"]["params"] = [
             {
-                "name": "apiUrl", "type": "url",
-                "description": "bad", "required": True, "secret": False,
+                "name": "apiUrl",
+                "type": "url",
+                "description": "bad",
+                "required": True,
+                "secret": False,
             },
         ]
         verdicts = runner._check_connection(spec)
@@ -434,8 +443,11 @@ class TestCheckConnection:
         spec = _minimal_spec()
         spec["connection"]["params"] = [
             {
-                "name": "api_url", "type": "float",
-                "description": "bad", "required": True, "secret": False,
+                "name": "api_url",
+                "type": "float",
+                "description": "bad",
+                "required": True,
+                "secret": False,
             },
         ]
         verdicts = runner._check_connection(spec)
@@ -495,8 +507,13 @@ class TestCheckDataContract:
     def test_invalid_source_type(self, runner, verdict_status):
         spec = _minimal_spec()
         spec["data_contract"]["data_sources"] = [
-            {"source_type": "ftp", "endpoint": "/files", "description": "bad",
-             "entities": ["File"], "collection_mode": "poll"},
+            {
+                "source_type": "ftp",
+                "endpoint": "/files",
+                "description": "bad",
+                "entities": ["File"],
+                "collection_mode": "poll",
+            },
         ]
         verdicts = runner._check_data_contract(spec)
         src_check = [v for v in verdicts if "sources-valid" in v.check_id]
@@ -505,8 +522,13 @@ class TestCheckDataContract:
     def test_data_source_no_entities(self, runner, verdict_status):
         spec = _minimal_spec()
         spec["data_contract"]["data_sources"] = [
-            {"source_type": "graphql_query", "endpoint": "/gql", "description": "x",
-             "entities": [], "collection_mode": "poll"},
+            {
+                "source_type": "graphql_query",
+                "endpoint": "/gql",
+                "description": "x",
+                "entities": [],
+                "collection_mode": "poll",
+            },
         ]
         verdicts = runner._check_data_contract(spec)
         src_check = [v for v in verdicts if "sources-valid" in v.check_id]
@@ -568,8 +590,11 @@ class TestCheckContextMapping:
         spec["data_contract"]["context_fields"] = ["event_timestamp", "event_type", "shift_id"]
         # Only map two fields, enrich shift_id
         spec["context_mapping"]["enrichment_rules"] = [
-            {"target_field": "shift_id", "rule_type": "timestamp_to_shift",
-             "config": {"timezone": "UTC"}},
+            {
+                "target_field": "shift_id",
+                "rule_type": "timestamp_to_shift",
+                "config": {"timezone": "UTC"},
+            },
         ]
         verdicts = runner._check_context_mapping(spec)
         coverage_check = [v for v in verdicts if "mapping-coverage" in v.check_id]
@@ -673,6 +698,7 @@ class TestCheckIntegrity:
         spec = _minimal_spec()
         # Compute real hash for the spec
         import hashlib
+
         spec_for_hash = {k: v for k, v in spec.items() if k != "integrity"}
         canonical = json.dumps(spec_for_hash, sort_keys=True, separators=(",", ":"))
         real_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
@@ -722,13 +748,15 @@ class TestCheckCrossFieldConsistency:
     def test_write_cap_with_mutation_source(self, runner, verdict_status):
         spec = _minimal_spec()
         spec["capabilities"]["write"] = True
-        spec["data_contract"]["data_sources"].append({
-            "source_type": "graphql_mutation",
-            "endpoint": "/graphql",
-            "description": "Write endpoint",
-            "entities": ["Entity"],
-            "collection_mode": "write",
-        })
+        spec["data_contract"]["data_sources"].append(
+            {
+                "source_type": "graphql_mutation",
+                "endpoint": "/graphql",
+                "description": "Write endpoint",
+                "entities": ["Entity"],
+                "collection_mode": "write",
+            }
+        )
         verdicts = runner._check_cross_field_consistency(spec)
         write_check = [v for v in verdicts if "cross-write" in v.check_id]
         assert all(v.status == verdict_status.PASS for v in write_check)
@@ -744,13 +772,15 @@ class TestCheckCrossFieldConsistency:
     def test_subscribe_cap_with_subscribe_source(self, runner, verdict_status):
         spec = _minimal_spec()
         spec["capabilities"]["subscribe"] = True
-        spec["data_contract"]["data_sources"].append({
-            "source_type": "rabbitmq",
-            "endpoint": "amqp://host",
-            "description": "Events",
-            "entities": ["Event"],
-            "collection_mode": "subscribe",
-        })
+        spec["data_contract"]["data_sources"].append(
+            {
+                "source_type": "rabbitmq",
+                "endpoint": "amqp://host",
+                "description": "Events",
+                "entities": ["Event"],
+                "collection_mode": "subscribe",
+            }
+        )
         verdicts = runner._check_cross_field_consistency(spec)
         sub_check = [v for v in verdicts if "cross-subscribe" in v.check_id]
         assert all(v.status == verdict_status.PASS for v in sub_check)
@@ -800,12 +830,11 @@ class TestIntegrationWMS:
         fails = [v for v in report.verdicts if v.status == verdict_status.FAIL]
         errors = [v for v in report.verdicts if v.status == verdict_status.ERROR]
         not_impl = [v for v in report.verdicts if v.status == verdict_status.NOT_IMPLEMENTED]
-        assert not_impl == [], \
+        assert not_impl == [], (
             f"NOT_IMPLEMENTED (parity violation): {[v.check_id for v in not_impl]}"
-        assert errors == [], \
-            f"ERROR verdicts: {[v.message for v in errors]}"
-        assert fails == [], \
-            f"FAIL verdicts: {[(v.check_id, v.message) for v in fails]}"
+        )
+        assert errors == [], f"ERROR verdicts: {[v.message for v in errors]}"
+        assert fails == [], f"FAIL verdicts: {[(v.check_id, v.message) for v in fails]}"
         assert report.passed is True
 
     def test_wms_hash_verified(self, runner, wms_spec):
@@ -834,12 +863,11 @@ class TestIntegrationMES:
         fails = [v for v in report.verdicts if v.status == verdict_status.FAIL]
         errors = [v for v in report.verdicts if v.status == verdict_status.ERROR]
         not_impl = [v for v in report.verdicts if v.status == verdict_status.NOT_IMPLEMENTED]
-        assert not_impl == [], \
+        assert not_impl == [], (
             f"NOT_IMPLEMENTED (parity violation): {[v.check_id for v in not_impl]}"
-        assert errors == [], \
-            f"ERROR verdicts: {[v.message for v in errors]}"
-        assert fails == [], \
-            f"FAIL verdicts: {[(v.check_id, v.message) for v in fails]}"
+        )
+        assert errors == [], f"ERROR verdicts: {[v.message for v in errors]}"
+        assert fails == [], f"FAIL verdicts: {[(v.check_id, v.message) for v in fails]}"
         assert report.passed is True
 
     def test_mes_hash_verified(self, runner, mes_spec):

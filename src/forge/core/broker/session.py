@@ -231,7 +231,9 @@ class MqttSession:
 
         logger.info(
             "Client %s connected (keepalive=%ds, clean=%s)",
-            self.client_id, self.keepalive, self.clean_session,
+            self.client_id,
+            self.keepalive,
+            self.clean_session,
         )
         return True
 
@@ -265,6 +267,7 @@ class MqttSession:
         """Handle PUBACK (client acknowledges our QoS 1 publish)."""
         if len(data) >= 2:
             import struct
+
             packet_id = struct.unpack_from("!H", data)[0]
             self._pending_acks.pop(packet_id, None)
 
@@ -279,7 +282,9 @@ class MqttSession:
 
         for sub in pkt.subscriptions:
             qos = self._broker.topic_engine.subscribe(
-                self.client_id, sub.topic_filter, sub.qos,
+                self.client_id,
+                sub.topic_filter,
+                sub.qos,
             )
             granted.append(qos)
 

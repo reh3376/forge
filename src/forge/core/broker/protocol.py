@@ -163,7 +163,7 @@ def decode_utf8(data: bytes, offset: int = 0) -> tuple[str, int]:
     offset += 2
     if offset + length > len(data):
         raise ValueError("Incomplete string data")
-    return data[offset:offset + length].decode("utf-8"), 2 + length
+    return data[offset : offset + length].decode("utf-8"), 2 + length
 
 
 # ---------------------------------------------------------------------------
@@ -218,7 +218,7 @@ def decode_connect(data: bytes) -> ConnectPacket:
             raise ValueError("Incomplete will message")
         msg_len = struct.unpack_from("!H", data, offset)[0]
         offset += 2
-        pkt.will_message = data[offset:offset + msg_len]
+        pkt.will_message = data[offset : offset + msg_len]
         offset += msg_len
 
     # Username
@@ -306,7 +306,7 @@ def decode_unsubscribe(data: bytes) -> UnsubscribePacket:
 
 def encode_connack(session_present: bool, return_code: ConnectReturnCode) -> bytes:
     """Encode CONNACK packet."""
-    header = (PacketType.CONNACK << 4)
+    header = PacketType.CONNACK << 4
     flags = 0x01 if session_present else 0x00
     payload = bytes([flags, int(return_code)])
     return bytes([header]) + encode_remaining_length(len(payload)) + payload
@@ -321,7 +321,7 @@ def encode_publish(
     packet_id: int = 0,
 ) -> bytes:
     """Encode PUBLISH packet."""
-    header = (PacketType.PUBLISH << 4)
+    header = PacketType.PUBLISH << 4
     if dup:
         header |= 0x08
     header |= (qos & 0x03) << 1
@@ -338,14 +338,14 @@ def encode_publish(
 
 def encode_puback(packet_id: int) -> bytes:
     """Encode PUBACK packet."""
-    header = (PacketType.PUBACK << 4)
+    header = PacketType.PUBACK << 4
     body = struct.pack("!H", packet_id)
     return bytes([header]) + encode_remaining_length(len(body)) + body
 
 
 def encode_suback(packet_id: int, granted_qos: list[int]) -> bytes:
     """Encode SUBACK packet."""
-    header = (PacketType.SUBACK << 4)
+    header = PacketType.SUBACK << 4
     body = struct.pack("!H", packet_id)
     body += bytes(granted_qos)
     return bytes([header]) + encode_remaining_length(len(body)) + body
@@ -353,7 +353,7 @@ def encode_suback(packet_id: int, granted_qos: list[int]) -> bytes:
 
 def encode_unsuback(packet_id: int) -> bytes:
     """Encode UNSUBACK packet."""
-    header = (PacketType.UNSUBACK << 4)
+    header = PacketType.UNSUBACK << 4
     body = struct.pack("!H", packet_id)
     return bytes([header]) + encode_remaining_length(len(body)) + body
 

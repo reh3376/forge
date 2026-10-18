@@ -65,7 +65,6 @@ def empty_enrichment() -> EnrichmentContext:
 
 
 class TestBuildOtRecord:
-
     def test_produces_contextual_record(self, sample_tag, sample_value, full_enrichment):
         record = build_ot_record(tag=sample_tag, tag_value=sample_value, enrichment=full_enrichment)
         assert isinstance(record, ContextualRecord)
@@ -112,8 +111,12 @@ class TestBuildOtRecord:
         r2 = build_ot_record(tag=sample_tag, tag_value=sample_value, enrichment=full_enrichment)
         assert r1.record_id != r2.record_id
 
-    def test_empty_enrichment_produces_none_context(self, sample_tag, sample_value, empty_enrichment):
-        record = build_ot_record(tag=sample_tag, tag_value=sample_value, enrichment=empty_enrichment)
+    def test_empty_enrichment_produces_none_context(
+        self, sample_tag, sample_value, empty_enrichment
+    ):
+        record = build_ot_record(
+            tag=sample_tag, tag_value=sample_value, enrichment=empty_enrichment
+        )
         assert record.context.site is None
         assert record.context.area is None
         assert record.context.batch_id is None
@@ -156,7 +159,6 @@ class TestBuildOtRecord:
 
 
 class TestMapQuality:
-
     def test_good(self):
         assert _map_quality("GOOD") == CoreQualityCode.GOOD
 

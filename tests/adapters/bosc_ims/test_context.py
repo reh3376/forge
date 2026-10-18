@@ -1,6 +1,5 @@
 """Tests for the BOSC IMS context builder."""
 
-
 from forge.adapters.bosc_ims.context import (
     _normalize_event_type,
     build_record_context,

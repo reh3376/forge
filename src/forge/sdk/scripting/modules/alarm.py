@@ -99,9 +99,7 @@ class AlarmModule:
         """
         self._check_bound()
         # Delegate to alarm engine (Phase 3)
-        raw = await self._engine.get_active_alarms(
-            area=area, priority=priority, limit=limit
-        )
+        raw = await self._engine.get_active_alarms(area=area, priority=priority, limit=limit)
         return [
             AlarmInfo(
                 alarm_id=a.get("alarm_id", ""),
@@ -203,9 +201,7 @@ class AlarmModule:
             limit: Maximum results.
         """
         self._check_bound()
-        raw = await self._engine.get_alarm_history(
-            start=start, end=end, area=area, limit=limit
-        )
+        raw = await self._engine.get_alarm_history(start=start, end=end, area=area, limit=limit)
         return [
             AlarmInfo(
                 alarm_id=a.get("alarm_id", ""),

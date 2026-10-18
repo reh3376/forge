@@ -36,7 +36,8 @@ class SpokeRouter:
     ims_adapter_id: str | None = "bosc-ims"
     qms_adapter_id: str | None = None
     _routing_table: dict[str, list[RouteTarget]] = field(
-        default_factory=dict, init=False,
+        default_factory=dict,
+        init=False,
     )
 
     def __post_init__(self) -> None:
@@ -49,7 +50,10 @@ class SpokeRouter:
 
         # WMS barrel operations
         for scan_type in (
-            "ENTRY", "DUMP", "WITHDRAWAL", "RELOCATION",
+            "ENTRY",
+            "DUMP",
+            "WITHDRAWAL",
+            "RELOCATION",
             "LABEL_VERIFICATION",
         ):
             self._routing_table[scan_type] = [wms]

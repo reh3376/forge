@@ -187,9 +187,7 @@ class TestClientConstruction:
 
     def test_custom_security(self) -> None:
         sec = SecurityConfig.no_security()
-        client = OpcUaClient(
-            endpoint="opc.tcp://10.4.2.10:4840", security=sec
-        )
+        client = OpcUaClient(endpoint="opc.tcp://10.4.2.10:4840", security=sec)
         assert client.security is sec
 
     def test_name_fallback_to_url(self) -> None:
@@ -437,9 +435,7 @@ class TestWriteService:
         async with OpcUaClient(endpoint="opc.tcp://10.4.2.10:4840") as client:
             await client.write("ns=2;s=Counter", 42, data_type=DataType.INT32)
 
-        mock_node.write_value.assert_awaited_once_with(
-            42, varianttype=ua.VariantType.Int32
-        )
+        mock_node.write_value.assert_awaited_once_with(42, varianttype=ua.VariantType.Int32)
 
     @pytest.mark.asyncio
     async def test_write_rejected(self, mock_ua_client) -> None:
@@ -489,9 +485,7 @@ class TestSubscribeService:
         mock_ua_client.get_node.return_value = MagicMock()
 
         async with OpcUaClient(endpoint="opc.tcp://10.4.2.10:4840") as client:
-            sub_id = await client.subscribe(
-                ["ns=2;s=Tag1"], lambda n, d: None
-            )
+            sub_id = await client.subscribe(["ns=2;s=Tag1"], lambda n, d: None)
             await client.unsubscribe(sub_id)
             assert client.health.active_subscriptions == 0
             mock_sub.delete.assert_awaited_once()
@@ -543,9 +537,7 @@ class TestHealthMonitoring:
     """ConnectionHealth snapshot from client."""
 
     def test_health_disconnected(self) -> None:
-        client = OpcUaClient(
-            endpoint="opc.tcp://10.4.2.10:4840", name="plc200"
-        )
+        client = OpcUaClient(endpoint="opc.tcp://10.4.2.10:4840", name="plc200")
         health = client.health
         assert health.state == ConnectionState.DISCONNECTED
         assert health.connection_name == "plc200"
@@ -554,9 +546,7 @@ class TestHealthMonitoring:
 
     @pytest.mark.asyncio
     async def test_health_connected(self, mock_ua_client) -> None:
-        async with OpcUaClient(
-            endpoint="opc.tcp://10.4.2.10:4840", name="plc200"
-        ) as client:
+        async with OpcUaClient(endpoint="opc.tcp://10.4.2.10:4840", name="plc200") as client:
             health = client.health
             assert health.state == ConnectionState.CONNECTED
             assert health.connected_since is not None

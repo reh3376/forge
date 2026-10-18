@@ -42,7 +42,9 @@ logger = logging.getLogger("forge.alarm.integrations")
 class MqttPublisher(Protocol):
     """Protocol for MQTT publishing (matches OTMqttPublisher interface)."""
 
-    async def publish(self, topic: str, payload: str, *, qos: int = 0, retain: bool = False) -> None: ...
+    async def publish(
+        self, topic: str, payload: str, *, qos: int = 0, retain: bool = False
+    ) -> None: ...
     async def subscribe(self, topic: str, callback: Callable) -> None: ...
 
 
@@ -61,7 +63,9 @@ class CmmsAdapter(Protocol):
 class HistorianAnnotator(Protocol):
     """Protocol for NextTrend annotation writing."""
 
-    async def write_annotation(self, tag_path: str, timestamp: str, text: str, **kwargs: Any) -> None: ...
+    async def write_annotation(
+        self, tag_path: str, timestamp: str, text: str, **kwargs: Any
+    ) -> None: ...
 
 
 class ScriptDispatcher(Protocol):
@@ -114,20 +118,24 @@ class AlarmMqttPublisher:
         area = event.area or "global"
         topic = f"{self._prefix}/{area}/ot/alarms/{event.alarm_id}"
 
-        payload = json.dumps({
-            "alarm_id": event.alarm_id,
-            "name": event.name,
-            "state": event.new_state,
-            "previous_state": event.previous_state,
-            "action": event.action,
-            "priority": event.priority,
-            "tag_path": event.tag_path,
-            "value": _safe_value(event.value),
-            "setpoint": _safe_value(event.setpoint),
-            "timestamp": event.timestamp.isoformat() if isinstance(event.timestamp, datetime) else str(event.timestamp),
-            "equipment_id": event.equipment_id,
-            "area": event.area,
-        })
+        payload = json.dumps(
+            {
+                "alarm_id": event.alarm_id,
+                "name": event.name,
+                "state": event.new_state,
+                "previous_state": event.previous_state,
+                "action": event.action,
+                "priority": event.priority,
+                "tag_path": event.tag_path,
+                "value": _safe_value(event.value),
+                "setpoint": _safe_value(event.setpoint),
+                "timestamp": event.timestamp.isoformat()
+                if isinstance(event.timestamp, datetime)
+                else str(event.timestamp),
+                "equipment_id": event.equipment_id,
+                "area": event.area,
+            }
+        )
 
         # Clear retained message when alarm returns to NORMAL
         if event.new_state == "NORMAL":
@@ -246,16 +254,18 @@ class AlarmCmmsIntegration:
             "equipment_id": event.equipment_id,
             "area": event.area,
             "description": event.detail or f"Alarm triggered: {event.name}",
-            "timestamp": event.timestamp.isoformat() if isinstance(event.timestamp, datetime) else str(event.timestamp),
+            "timestamp": event.timestamp.isoformat()
+            if isinstance(event.timestamp, datetime)
+            else str(event.timestamp),
         }
 
         try:
             work_request_id = await self._cmms.create_work_request(payload)
-            logger.info("CMMS work request created: %s for alarm %s",
-                        work_request_id, event.alarm_id)
+            logger.info(
+                "CMMS work request created: %s for alarm %s", work_request_id, event.alarm_id
+            )
         except Exception:
-            logger.exception("Failed to create CMMS work request for alarm %s",
-                             event.alarm_id)
+            logger.exception("Failed to create CMMS work request for alarm %s", event.alarm_id)
 
 
 # ---------------------------------------------------------------------------
@@ -273,7 +283,11 @@ class AlarmHistorianAnnotation:
         if not event.tag_path:
             return
 
-        ts = event.timestamp.isoformat() if isinstance(event.timestamp, datetime) else str(event.timestamp)
+        ts = (
+            event.timestamp.isoformat()
+            if isinstance(event.timestamp, datetime)
+            else str(event.timestamp)
+        )
         text = f"[{event.priority}] {event.name}: {event.previous_state} → {event.new_state}"
 
         try:
@@ -286,8 +300,7 @@ class AlarmHistorianAnnotation:
                 action=event.action,
             )
         except Exception:
-            logger.exception("Failed to write historian annotation for alarm %s",
-                             event.alarm_id)
+            logger.exception("Failed to write historian annotation for alarm %s", event.alarm_id)
 
 
 # ---------------------------------------------------------------------------
@@ -302,7 +315,11 @@ class AlarmScriptDispatch:
         self._dispatcher = dispatcher
 
     async def on_alarm_event(self, event: AlarmEvent) -> None:
-        ts = event.timestamp.isoformat() if isinstance(event.timestamp, datetime) else str(event.timestamp)
+        ts = (
+            event.timestamp.isoformat()
+            if isinstance(event.timestamp, datetime)
+            else str(event.timestamp)
+        )
         try:
             await self._dispatcher.dispatch_alarm_event(
                 alarm_id=event.alarm_id,
@@ -317,8 +334,7 @@ class AlarmScriptDispatch:
                 equipment_id=event.equipment_id or "",
             )
         except Exception:
-            logger.exception("Failed to dispatch alarm script event for %s",
-                             event.alarm_id)
+            logger.exception("Failed to dispatch alarm script event for %s", event.alarm_id)
 
 
 # ---------------------------------------------------------------------------
@@ -337,7 +353,11 @@ class AlarmContextualRecordWriter:
         self._writer = writer
 
     async def on_alarm_event(self, event: AlarmEvent) -> None:
-        ts = event.timestamp.isoformat() if isinstance(event.timestamp, datetime) else str(event.timestamp)
+        ts = (
+            event.timestamp.isoformat()
+            if isinstance(event.timestamp, datetime)
+            else str(event.timestamp)
+        )
         record = {
             "record_type": "alarm_event",
             "source_module": "ot",
@@ -365,8 +385,7 @@ class AlarmContextualRecordWriter:
         try:
             await self._writer.write(record)
         except Exception:
-            logger.exception("Failed to write ContextualRecord for alarm %s",
-                             event.alarm_id)
+            logger.exception("Failed to write ContextualRecord for alarm %s", event.alarm_id)
 
 
 # ---------------------------------------------------------------------------
@@ -478,8 +497,7 @@ class AlarmIntegrationHub:
             self._register(cr.on_alarm_event)
             self._integrations.append(cr)
 
-        logger.info("Alarm integration hub started with %d integrations",
-                     len(self._integrations))
+        logger.info("Alarm integration hub started with %d integrations", len(self._integrations))
 
     async def stop(self) -> None:
         """Unregister all listeners."""

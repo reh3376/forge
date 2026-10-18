@@ -222,9 +222,7 @@ class ModuleScaffolder:
 
         # ── FACTS governance spec ──────────────────────────────
         if include_facts:
-            specs_dir = (
-                target.parent.parent / "governance" / "facts" / "specs"
-            )
+            specs_dir = target.parent.parent / "governance" / "facts" / "specs"
             specs_dir.mkdir(parents=True, exist_ok=True)
 
             facts_file = specs_dir / f"{self._adapter_id}.facts.json"

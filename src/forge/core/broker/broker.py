@@ -160,7 +160,9 @@ class ForgeMqttBroker:
 
         logger.info(
             "Forge MQTT broker started on %s:%d (max_connections=%d)",
-            self._config.host, self._config.port, self._config.max_connections,
+            self._config.host,
+            self._config.port,
+            self._config.max_connections,
         )
 
     async def stop(self) -> None:
@@ -249,10 +251,7 @@ class ForgeMqttBroker:
         if not self._config.username:
             return True  # No credentials configured = accept all
 
-        return (
-            username == self._config.username
-            and password == self._config.password
-        )
+        return username == self._config.username and password == self._config.password
 
     # ------------------------------------------------------------------
     # Message routing (called by session PUBLISH handler)
@@ -278,7 +277,11 @@ class ForgeMqttBroker:
         if self._config.log_publishes:
             logger.debug(
                 "PUBLISH %s (qos=%d, retain=%s, from=%s, %d bytes)",
-                topic, qos, retain, sender_id, len(payload),
+                topic,
+                qos,
+                retain,
+                sender_id,
+                len(payload),
             )
 
         # Store/clear retained message
@@ -304,6 +307,7 @@ class ForgeMqttBroker:
         # Deliver to local (in-process) subscribers
         for local_sub in self._local_subs:
             from forge.core.broker.topic_engine import mqtt_topic_matches
+
             if mqtt_topic_matches(local_sub.topic_filter, topic):
                 try:
                     result = local_sub.callback(topic, payload, qos, retain)
@@ -313,7 +317,8 @@ class ForgeMqttBroker:
                 except Exception as exc:
                     logger.error(
                         "Local subscriber %s failed: %s",
-                        local_sub.name, exc,
+                        local_sub.name,
+                        exc,
                     )
 
         return delivered
@@ -363,11 +368,13 @@ class ForgeMqttBroker:
 
         The callback receives (topic, payload, qos, retain).
         """
-        self._local_subs.append(LocalSubscription(
-            name=name,
-            topic_filter=topic_filter,
-            callback=callback,
-        ))
+        self._local_subs.append(
+            LocalSubscription(
+                name=name,
+                topic_filter=topic_filter,
+                callback=callback,
+            )
+        )
         logger.debug("Local subscriber %s registered for %s", name, topic_filter)
 
     def unsubscribe_local(self, name: str) -> int:
@@ -415,8 +422,11 @@ class ForgeMqttBroker:
     async def _publish_sys(self, topic: str, payload: bytes) -> None:
         """Publish a $SYS topic (retained, QoS 0)."""
         await self.handle_publish(
-            topic=topic, payload=payload,
-            qos=0, retain=True, sender_id="$SYS",
+            topic=topic,
+            payload=payload,
+            qos=0,
+            retain=True,
+            sender_id="$SYS",
         )
 
     # ------------------------------------------------------------------

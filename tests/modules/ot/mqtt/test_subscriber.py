@@ -16,7 +16,6 @@ from forge.modules.ot.mqtt.subscriber import (
 
 
 class TestMqttTopicMatching:
-
     def test_exact_match(self):
         assert _mqtt_topic_matches("a/b/c", "a/b/c") is True
         assert _mqtt_topic_matches("a/b/c", "a/b/d") is False
@@ -54,7 +53,6 @@ class TestMqttTopicMatching:
 
 
 class TestIncomingMessage:
-
     def test_payload_str(self):
         msg = IncomingMessage(topic="t", payload=b"hello")
         assert msg.payload_str() == "hello"
@@ -75,7 +73,6 @@ class TestIncomingMessage:
 
 
 class TestSubscription:
-
     def test_matches(self):
         sub = Subscription(topic_filter="whk/+/ot/tags/#", handler=lambda m: None)
         assert sub.matches("whk/whk01/ot/tags/TIT/Out_PV") is True
@@ -88,7 +85,6 @@ class TestSubscription:
 
 
 class TestSubscriberRegistration:
-
     def test_subscribe(self):
         sub = MqttSubscriber()
         sub.subscribe("test/topic", lambda m: None, name="handler1")
@@ -126,7 +122,6 @@ class TestSubscriberRegistration:
 
 
 class TestMessageDispatch:
-
     @pytest.mark.asyncio
     async def test_dispatch_to_matching_handler(self):
         received = []

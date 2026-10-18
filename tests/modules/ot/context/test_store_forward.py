@@ -51,7 +51,6 @@ def _make_record(tag_path: str = "WH/WHK01/Distillery01/TIT_2010/Out_PV") -> Con
 
 
 class TestBufferLifecycle:
-
     def test_open_creates_db_file(self, tmp_path):
         db = tmp_path / "buffer.db"
         buf = StoreForwardBuffer(db_path=db)
@@ -81,7 +80,6 @@ class TestBufferLifecycle:
 
 
 class TestEnqueue:
-
     def test_enqueue_single(self, tmp_path):
         buf = StoreForwardBuffer(db_path=tmp_path / "buffer.db")
         buf.open()
@@ -126,7 +124,6 @@ class TestEnqueue:
 
 
 class TestFlush:
-
     @pytest.mark.asyncio
     async def test_flush_sends_records(self, tmp_path):
         buf = StoreForwardBuffer(db_path=tmp_path / "buffer.db", batch_size=10)
@@ -212,7 +209,6 @@ class TestFlush:
 
 
 class TestPrune:
-
     def test_prune_removes_sent_records(self, tmp_path):
         buf = StoreForwardBuffer(db_path=tmp_path / "buffer.db", batch_size=100)
         buf.open()
@@ -241,7 +237,6 @@ class TestPrune:
 
 
 class TestHealth:
-
     def test_health_returns_metrics(self, tmp_path):
         buf = StoreForwardBuffer(db_path=tmp_path / "buffer.db")
         buf.open()

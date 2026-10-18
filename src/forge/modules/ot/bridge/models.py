@@ -52,11 +52,11 @@ class IgnitionTagValue:
     per tag path requested.
     """
 
-    path: str                               # Ignition bracket-notation path
-    value: Any = None                       # Raw value from Ignition
+    path: str  # Ignition bracket-notation path
+    value: Any = None  # Raw value from Ignition
     quality: IgnitionQuality = IgnitionQuality.GOOD
     timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    data_type: str = "Unknown"              # Ignition data type string
+    data_type: str = "Unknown"  # Ignition data type string
 
     @staticmethod
     def from_api_response(path: str, data: dict[str, Any]) -> IgnitionTagValue:
@@ -138,9 +138,9 @@ class TagMappingRule:
         )
     """
 
-    ignition_pattern: str       # fnmatch pattern on Ignition path (after bracket)
-    strip_prefix: str = ""      # Prefix to remove from Ignition path before normalization
-    forge_prefix: str = ""      # Explicit Forge prefix (overrides PathNormalizer if set)
+    ignition_pattern: str  # fnmatch pattern on Ignition path (after bracket)
+    strip_prefix: str = ""  # Prefix to remove from Ignition path before normalization
+    forge_prefix: str = ""  # Explicit Forge prefix (overrides PathNormalizer if set)
     enabled: bool = True
 
 
@@ -152,9 +152,9 @@ class TagMapping:
     matched, enabling audit and debugging of path translation.
     """
 
-    ignition_path: str          # Original Ignition bracket path
-    forge_path: str             # Forge-normalized slash path
-    connection_name: str        # Extracted from Ignition brackets (e.g., "WHK01")
+    ignition_path: str  # Original Ignition bracket path
+    forge_path: str  # Forge-normalized slash path
+    connection_name: str  # Extracted from Ignition brackets (e.g., "WHK01")
     rule: TagMappingRule | None = None  # The rule that produced this mapping
 
 
@@ -178,24 +178,24 @@ class BridgeConfig:
     verify_ssl: bool = False
 
     # Polling behavior
-    poll_interval_ms: int = 1000        # How often to poll Ignition (default 1s)
-    batch_size: int = 100               # Tags per REST API call
-    request_timeout_ms: int = 5000      # HTTP request timeout
-    max_concurrent_requests: int = 4    # Parallel batch requests
+    poll_interval_ms: int = 1000  # How often to poll Ignition (default 1s)
+    batch_size: int = 100  # Tags per REST API call
+    request_timeout_ms: int = 5000  # HTTP request timeout
+    max_concurrent_requests: int = 4  # Parallel batch requests
 
     # Tag selection
-    tag_provider: str = "WHK01"         # Ignition tag provider to bridge
-    include_patterns: list[str] = field(default_factory=list)   # fnmatch include
-    exclude_patterns: list[str] = field(default_factory=list)   # fnmatch exclude
+    tag_provider: str = "WHK01"  # Ignition tag provider to bridge
+    include_patterns: list[str] = field(default_factory=list)  # fnmatch include
+    exclude_patterns: list[str] = field(default_factory=list)  # fnmatch exclude
     mapping_rules: list[TagMappingRule] = field(default_factory=list)
 
     # Health
     health_check_interval_ms: int = 5000
-    max_consecutive_failures: int = 5   # Failures before DEGRADED state
+    max_consecutive_failures: int = 5  # Failures before DEGRADED state
 
     # Feature flags
-    dual_write_enabled: bool = True     # Enable dual-write validation
-    auto_discover: bool = True          # Auto-discover tags from Ignition browse
+    dual_write_enabled: bool = True  # Enable dual-write validation
+    auto_discover: bool = True  # Auto-discover tags from Ignition browse
 
 
 # ---------------------------------------------------------------------------
@@ -209,8 +209,8 @@ class BridgeState(str, enum.Enum):
     DISCONNECTED = "disconnected"
     CONNECTING = "connecting"
     HEALTHY = "healthy"
-    DEGRADED = "degraded"          # Ignition reachable but errors > threshold
-    FAILED = "failed"              # Ignition unreachable
+    DEGRADED = "degraded"  # Ignition reachable but errors > threshold
+    FAILED = "failed"  # Ignition unreachable
     STOPPED = "stopped"
 
 

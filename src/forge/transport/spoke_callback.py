@@ -130,9 +130,7 @@ class SpokeCallbackClient:
         self.adapter_id = adapter_id
         self.session_id = session_id
 
-    async def write(
-        self, tag_path: str, value: Any, *, confirm: bool = False
-    ) -> dict[str, Any]:
+    async def write(self, tag_path: str, value: Any, *, confirm: bool = False) -> dict[str, Any]:
         """``Write`` RPC. Returns ``{success, message, readback: dict | None}``."""
         return await self.channel.send_unary(
             "Write",
@@ -260,9 +258,7 @@ class WriteDispatcher:
         tls: ChannelTls | None = None,
     ) -> None:
         self._tls = tls
-        self._channel_factory = channel_factory or (
-            lambda url: _grpc_channel_factory(url, tls=tls)
-        )
+        self._channel_factory = channel_factory or (lambda url: _grpc_channel_factory(url, tls=tls))
         self._can_write = can_write
         self._targets: dict[str, CallbackTarget] = {}
         self._channels: dict[str, TransportChannel] = {}

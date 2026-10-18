@@ -164,17 +164,13 @@ def _convert_quality(status_code: ua.StatusCode) -> QualityCode:
 def _convert_data_value(ua_dv: ua.DataValue) -> DataValue:
     """Convert asyncua DataValue to Forge DataValue."""
     raw_status = (
-        ua_dv.StatusCode.value
-        if hasattr(ua_dv.StatusCode, "value")
-        else int(ua_dv.StatusCode or 0)
+        ua_dv.StatusCode.value if hasattr(ua_dv.StatusCode, "value") else int(ua_dv.StatusCode or 0)
     )
 
     # Determine data type from the variant
     data_type = DataType.VARIANT
     if ua_dv.Value is not None and hasattr(ua_dv.Value, "VariantType"):
-        data_type = _UA_VARIANT_TYPE_MAP.get(
-            ua_dv.Value.VariantType, DataType.VARIANT
-        )
+        data_type = _UA_VARIANT_TYPE_MAP.get(ua_dv.Value.VariantType, DataType.VARIANT)
 
     # Extract the actual Python value from the Variant
     value = ua_dv.Value.Value if ua_dv.Value is not None else None
@@ -257,9 +253,7 @@ class _ForgeSubHandler:
         try:
             node_id_str = node.nodeid.to_string()
             # data.monitored_item.Value is the full ua.DataValue
-            if hasattr(data, "monitored_item") and hasattr(
-                data.monitored_item, "Value"
-            ):
+            if hasattr(data, "monitored_item") and hasattr(data.monitored_item, "Value"):
                 forge_dv = _convert_data_value(data.monitored_item.Value)
             else:
                 # Fallback: construct from raw value
@@ -274,9 +268,7 @@ class _ForgeSubHandler:
             self._callback(node_id_str, forge_dv)
 
         except Exception:
-            logger.exception(
-                "Error in subscription callback for node %s", node.nodeid
-            )
+            logger.exception("Error in subscription callback for node %s", node.nodeid)
 
 
 # ---------------------------------------------------------------------------
@@ -337,8 +329,7 @@ class OpcUaClient:
         if isinstance(endpoint, str):
             if not endpoint.startswith("opc.tcp://"):
                 raise ConfigurationError(
-                    f"OPC-UA endpoint must start with 'opc.tcp://', "
-                    f"got: {endpoint!r}"
+                    f"OPC-UA endpoint must start with 'opc.tcp://', got: {endpoint!r}"
                 )
             self._endpoint = OpcUaEndpoint(
                 url=endpoint,
@@ -423,9 +414,7 @@ class OpcUaClient:
             reconnect_count=self._reconnect_count,
             consecutive_failures=self._consecutive_failures,
             active_subscriptions=len(self._subscriptions),
-            monitored_items_count=sum(
-                s.node_count for s in self._subscriptions.values()
-            ),
+            monitored_items_count=sum(s.node_count for s in self._subscriptions.values()),
             latency_ms=self._latency_ms,
         )
 
@@ -637,9 +626,7 @@ class OpcUaClient:
                     node_class_val = await child.read_node_class()
 
                     # Map asyncua NodeClass to Forge NodeClass
-                    forge_nc = _UA_NODE_CLASS_MAP.get(
-                        node_class_val, NodeClass.OBJECT
-                    )
+                    forge_nc = _UA_NODE_CLASS_MAP.get(node_class_val, NodeClass.OBJECT)
 
                     # Apply node class filter
                     if node_class_filter and forge_nc != node_class_filter:
@@ -670,9 +657,7 @@ class OpcUaClient:
                             forge_dt = DataType.VARIANT
 
                         try:
-                            al_val = await child.read_attribute(
-                                ua.AttributeIds.AccessLevel
-                            )
+                            al_val = await child.read_attribute(ua.AttributeIds.AccessLevel)
                             access_level_int = int(al_val.Value.Value or 1)
                         except Exception:
                             access_level_int = int(AccessLevel.CURRENT_READ)
@@ -782,9 +767,7 @@ class OpcUaClient:
             self._latency_ms = elapsed_ms
             self._last_data_received = datetime.now(timezone.utc)
 
-            logger.debug(
-                "Read completed: %d values in %.1fms", len(results), elapsed_ms
-            )
+            logger.debug("Read completed: %d values in %.1fms", len(results), elapsed_ms)
             return results
 
         except OpcUaError:
@@ -910,18 +893,11 @@ class OpcUaClient:
         try:
             # Create asyncua subscription with bridge handler
             handler = _ForgeSubHandler(callback, self)
-            ua_sub = await self._ua_client.create_subscription(
-                interval_ms, handler
-            )
+            ua_sub = await self._ua_client.create_subscription(interval_ms, handler)
 
             # Subscribe to data changes on all nodes
-            ua_nodes = [
-                self._ua_client.get_node(_forge_node_id_to_ua(nid))
-                for nid in parsed
-            ]
-            await ua_sub.subscribe_data_change(
-                ua_nodes, queuesize=queue_size
-            )
+            ua_nodes = [self._ua_client.get_node(_forge_node_id_to_ua(nid)) for nid in parsed]
+            await ua_sub.subscribe_data_change(ua_nodes, queuesize=queue_size)
 
             # Build monitored items for Forge tracking
             monitored = [
@@ -1065,9 +1041,7 @@ class OpcUaClient:
 
             results = [_convert_data_value(ua_dv) for ua_dv in history]
 
-            logger.debug(
-                "HistoryRead returned %d values for %s", len(results), parsed
-            )
+            logger.debug("HistoryRead returned %d values for %s", len(results), parsed)
             return results
 
         except ua.UaStatusCodeError as exc:

@@ -141,19 +141,13 @@ class StorageConfig:
                 secret_key=os.getenv("MINIO_SECRET_KEY", "changeme"),
             ),
             kafka=KafkaConfig(
-                bootstrap_servers=os.getenv(
-                    "KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"
-                ),
+                bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"),
             ),
             rabbitmq=RabbitMQConfig(
-                url=os.getenv(
-                    "RABBITMQ_URL", "amqp://forge:changeme@localhost:5672/"
-                ),
+                url=os.getenv("RABBITMQ_URL", "amqp://forge:changeme@localhost:5672/"),
                 vhost=os.getenv("RABBITMQ_VHOST", "/"),
                 consumer_group=os.getenv("RABBITMQ_CONSUMER_GROUP", "forge-hub"),
                 prefetch_count=int(os.getenv("RABBITMQ_PREFETCH_COUNT", "100")),
-                connection_timeout=float(
-                    os.getenv("RABBITMQ_CONNECTION_TIMEOUT", "10.0")
-                ),
+                connection_timeout=float(os.getenv("RABBITMQ_CONNECTION_TIMEOUT", "10.0")),
             ),
         )

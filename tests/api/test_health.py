@@ -24,6 +24,7 @@ from forge.api.health import (
 # ComponentHealth
 # ---------------------------------------------------------------------------
 
+
 class TestComponentHealth:
     def test_default_status_is_unreachable(self):
         h = ComponentHealth(name="test")
@@ -59,6 +60,7 @@ class TestComponentHealth:
 # PlatformHealth
 # ---------------------------------------------------------------------------
 
+
 class TestPlatformHealth:
     def test_healthy_to_dict(self):
         ph = PlatformHealth(status="healthy", uptime_seconds=42.123)
@@ -87,6 +89,7 @@ class TestPlatformHealth:
 # ---------------------------------------------------------------------------
 # HealthOrchestrator
 # ---------------------------------------------------------------------------
+
 
 class TestHealthOrchestrator:
     @pytest.mark.asyncio
@@ -191,6 +194,7 @@ class TestHealthOrchestrator:
     @pytest.mark.asyncio
     async def test_uptime_tracked(self):
         import time
+
         start = time.monotonic()
         orch = HealthOrchestrator(start_time=start)
 
@@ -216,6 +220,7 @@ class TestHealthOrchestrator:
             orch.register(f"check_{i}", slow_ok)
 
         import time
+
         t0 = time.monotonic()
         result = await orch.check_all()
         elapsed = time.monotonic() - t0

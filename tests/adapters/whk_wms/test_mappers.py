@@ -1,6 +1,5 @@
 """Tests for all WMS entity mappers."""
 
-
 from forge.adapters.whk_wms.mappers.business_entity import map_customer, map_vendor
 from forge.adapters.whk_wms.mappers.lot import map_lot
 from forge.adapters.whk_wms.mappers.manufacturing_unit import map_barrel
@@ -263,6 +262,7 @@ class TestMapCustomer:
 
     def test_json_string_data(self):
         import json
+
         raw = {"id": "C1", "data": json.dumps({"name": "JSON Corp"})}
         cust = map_customer(raw)
         assert cust.name == "JSON Corp"
@@ -376,6 +376,7 @@ class TestMapProductionOrder:
 
     def test_json_data_field(self):
         import json
+
         raw = {
             "id": "PO-002",
             "data": json.dumps({"orderNumber": "PO-DATA-001", "recipeId": "R1"}),

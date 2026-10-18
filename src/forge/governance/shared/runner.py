@@ -29,6 +29,7 @@ from pydantic import BaseModel, Field
 # Verdict model
 # ---------------------------------------------------------------------------
 
+
 class VerdictStatus(StrEnum):
     """Outcome of a single spec check."""
 
@@ -142,7 +143,10 @@ def canonical_json_bytes(obj: Any) -> bytes:
     identical across all Python builds and JSON parsers.
     """
     return json.dumps(
-        obj, sort_keys=True, separators=(",", ":"), ensure_ascii=True,
+        obj,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
     ).encode("utf-8")
 
 
@@ -289,9 +293,7 @@ def verify_spec_integrity(spec: dict[str, Any]) -> dict[str, Any]:
         )
 
     # Check for agent-sourced changes without approval
-    agent_changes = [
-        h for h in change_history if h.get("source") == "agent"
-    ]
+    agent_changes = [h for h in change_history if h.get("source") == "agent"]
     if agent_changes and hash_state != "approved":
         warnings.append(
             f"AGENT CHANGES PENDING REVIEW: {len(agent_changes)} change(s) "
@@ -469,13 +471,13 @@ class IntegrityReport(BaseModel):
     signals adapted from MDEMG UNTS.
     """
 
-    total_hashed: int = 0    # Specs with hash field defined
-    verified: int = 0        # Stored hash matches computed hash
-    mismatched: int = 0      # Stored hash does NOT match
-    no_hash: int = 0         # Specs with no integrity block
-    approved: int = 0        # Specs in "approved" hash state
+    total_hashed: int = 0  # Specs with hash field defined
+    verified: int = 0  # Stored hash matches computed hash
+    mismatched: int = 0  # Stored hash does NOT match
+    no_hash: int = 0  # Specs with no integrity block
+    approved: int = 0  # Specs in "approved" hash state
     modified_unapproved: int = 0  # Specs modified but not yet approved
-    reverted: int = 0        # Specs in "reverted" state
+    reverted: int = 0  # Specs in "reverted" state
     agent_changes_pending: int = 0  # Agent-sourced changes awaiting approval
     warnings: list[str] = Field(default_factory=list)  # Governance warnings
 
@@ -484,6 +486,7 @@ class IntegrityReport(BaseModel):
 # Report model
 # ---------------------------------------------------------------------------
 
+
 class FxTSReport(BaseModel):
     """Structured conformance report produced by a runner execution."""
 
@@ -491,9 +494,7 @@ class FxTSReport(BaseModel):
     framework: str  # e.g., "FATS", "FACTS", "FQTS"
     runner_version: str
     target: str  # what was checked (adapter_id, endpoint path, etc.)
-    started_at: datetime = Field(
-        default_factory=lambda: datetime.now(UTC)
-    )
+    started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     finished_at: datetime | None = None
     verdicts: list[FxTSVerdict] = Field(default_factory=list)
     hash_verified: bool | None = None  # True=match, False=mismatch, None=no hash
@@ -504,10 +505,7 @@ class FxTSReport(BaseModel):
     @property
     def passed(self) -> bool:
         """True only if every verdict is PASS or SKIP."""
-        return all(
-            v.status in (VerdictStatus.PASS, VerdictStatus.SKIP)
-            for v in self.verdicts
-        )
+        return all(v.status in (VerdictStatus.PASS, VerdictStatus.SKIP) for v in self.verdicts)
 
     @property
     def total(self) -> int:
@@ -527,10 +525,7 @@ class FxTSReport(BaseModel):
 
     @property
     def not_implemented_count(self) -> int:
-        return sum(
-            1 for v in self.verdicts
-            if v.status == VerdictStatus.NOT_IMPLEMENTED
-        )
+        return sum(1 for v in self.verdicts if v.status == VerdictStatus.NOT_IMPLEMENTED)
 
     def summary(self) -> str:
         """Human-readable one-line summary."""
@@ -553,6 +548,7 @@ class FxTSReport(BaseModel):
 # ---------------------------------------------------------------------------
 # Schema loader
 # ---------------------------------------------------------------------------
+
 
 def load_schema(schema_path: Path) -> dict[str, Any]:
     """Load and return a JSON schema file.
@@ -606,6 +602,7 @@ def check_schema_runner_parity(
 # Abstract runner base
 # ---------------------------------------------------------------------------
 
+
 class FxTSRunner(abc.ABC):
     """Base class for all FxTS framework runners.
 
@@ -637,9 +634,7 @@ class FxTSRunner(abc.ABC):
         return self._schema
 
     @abc.abstractmethod
-    async def _run_checks(
-        self, target: str, **kwargs: Any
-    ) -> list[FxTSVerdict]:
+    async def _run_checks(self, target: str, **kwargs: Any) -> list[FxTSVerdict]:
         """Execute framework-specific checks. Must be implemented by subclass."""
 
     @abc.abstractmethod
@@ -672,9 +667,7 @@ class FxTSRunner(abc.ABC):
 
         # Schema-runner parity check (hard requirement)
         if self.schema is not None:
-            parity_violations = check_schema_runner_parity(
-                self.schema, self.implemented_fields()
-            )
+            parity_violations = check_schema_runner_parity(self.schema, self.implemented_fields())
             if parity_violations:
                 for violation in parity_violations:
                     report.verdicts.append(

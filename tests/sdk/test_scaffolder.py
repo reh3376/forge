@@ -61,8 +61,14 @@ class TestModuleScaffolder:
         target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
         result = scaffolder.generate(target, include_tests=False, include_facts=False)
 
-        required = ["__init__.py", "manifest.json", "adapter.py", "config.py",
-                     "context.py", "record_builder.py"]
+        required = [
+            "__init__.py",
+            "manifest.json",
+            "adapter.py",
+            "config.py",
+            "context.py",
+            "record_builder.py",
+        ]
         for fname in required:
             assert (target / fname).exists(), f"Missing: {fname}"
 

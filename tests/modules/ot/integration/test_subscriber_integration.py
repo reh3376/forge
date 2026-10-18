@@ -23,12 +23,14 @@ class TestSubscriberCommandIngestion:
         # Simulate incoming message from MES
         msg = IncomingMessage(
             topic="whk/whk01/mes/recipe/next",
-            payload=json.dumps({
-                "recipe_id": "R-2026-042",
-                "name": "Bourbon Mash Bill #1",
-                "batch_size": 5000,
-                "parameters": {"mash_temp": 158, "rest_time_min": 45},
-            }).encode(),
+            payload=json.dumps(
+                {
+                    "recipe_id": "R-2026-042",
+                    "name": "Bourbon Mash Bill #1",
+                    "batch_size": 5000,
+                    "parameters": {"mash_temp": 158, "rest_time_min": 45},
+                }
+            ).encode(),
         )
         count = await subscriber.process_message(msg)
 

@@ -68,9 +68,7 @@ class ForgeLogger:
         return self._name
 
     def _log(self, level: int, msg: str, **kwargs: Any) -> None:
-        record = self._logger.makeRecord(
-            self._logger.name, level, "(script)", 0, msg, (), None
-        )
+        record = self._logger.makeRecord(self._logger.name, level, "(script)", 0, msg, (), None)
         record.forge_extra = kwargs  # type: ignore
         self._logger.handle(record)
 

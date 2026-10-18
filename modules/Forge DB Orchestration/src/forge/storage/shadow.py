@@ -35,9 +35,7 @@ class WriteResult:
     engine: StorageEngine
     namespace: str
     success: bool
-    written_at: datetime = field(
-        default_factory=lambda: datetime.now(tz=timezone.utc)
-    )
+    written_at: datetime = field(default_factory=lambda: datetime.now(tz=timezone.utc))
     error: str | None = None
     latency_ms: float = 0.0
 
@@ -82,9 +80,7 @@ class ShadowWriter:
 
     router: DataRouter
     pools: PoolManager
-    _metrics: ShadowWriterMetrics = field(
-        default_factory=ShadowWriterMetrics, init=False
-    )
+    _metrics: ShadowWriterMetrics = field(default_factory=ShadowWriterMetrics, init=False)
     _buffer: list[tuple[ContextualRecord, RoutingDecision]] = field(
         default_factory=list, init=False
     )
@@ -113,18 +109,14 @@ class ShadowWriter:
 
         try:
             await self._persist(record, decision)
-            elapsed = (
-                datetime.now(tz=timezone.utc) - start
-            ).total_seconds() * 1000
+            elapsed = (datetime.now(tz=timezone.utc) - start).total_seconds() * 1000
 
             self._metrics.records_written += 1
             self._metrics.by_engine[decision.target_engine.value] = (
                 self._metrics.by_engine.get(decision.target_engine.value, 0) + 1
             )
             spoke_id = record.source.system if record.source else "unknown"
-            self._metrics.by_spoke[spoke_id] = (
-                self._metrics.by_spoke.get(spoke_id, 0) + 1
-            )
+            self._metrics.by_spoke[spoke_id] = self._metrics.by_spoke.get(spoke_id, 0) + 1
             self._metrics.last_write_at = datetime.now(tz=timezone.utc)
 
             return WriteResult(
@@ -156,9 +148,7 @@ class ShadowWriter:
                 error=str(exc),
             )
 
-    async def write_batch(
-        self, records: list[ContextualRecord]
-    ) -> list[WriteResult]:
+    async def write_batch(self, records: list[ContextualRecord]) -> list[WriteResult]:
         """Write a batch of ContextualRecords, grouped by target engine.
 
         Groups records by engine first, then writes in bulk to each
@@ -174,9 +164,7 @@ class ShadowWriter:
 
         return results
 
-    async def _persist(
-        self, record: ContextualRecord, decision: RoutingDecision
-    ) -> None:
+    async def _persist(self, record: ContextualRecord, decision: RoutingDecision) -> None:
         """Persist a record to its target storage engine.
 
         Phase 1: Buffer in memory (no actual DB writes).
@@ -194,9 +182,7 @@ class ShadowWriter:
         elif decision.target_engine == StorageEngine.REDIS:
             await self._write_redis(record, decision)
 
-    async def _write_postgresql(
-        self, record: ContextualRecord, decision: RoutingDecision
-    ) -> None:
+    async def _write_postgresql(self, record: ContextualRecord, decision: RoutingDecision) -> None:
         """Write to PostgreSQL spoke projection schema.
 
         Phase 2: INSERT INTO spoke_<name>.<entity> using asyncpg.
@@ -204,27 +190,21 @@ class ShadowWriter:
         # Phase 1: no-op (buffered only)
         pass
 
-    async def _write_timescaledb(
-        self, record: ContextualRecord, decision: RoutingDecision
-    ) -> None:
+    async def _write_timescaledb(self, record: ContextualRecord, decision: RoutingDecision) -> None:
         """Write time-series data to TimescaleDB.
 
         Phase 2: INSERT INTO forge_ts.<hypertable> using asyncpg.
         """
         pass
 
-    async def _write_neo4j(
-        self, record: ContextualRecord, decision: RoutingDecision
-    ) -> None:
+    async def _write_neo4j(self, record: ContextualRecord, decision: RoutingDecision) -> None:
         """Write graph data to Neo4j.
 
         Phase 2: MERGE nodes/relationships using neo4j driver.
         """
         pass
 
-    async def _write_redis(
-        self, record: ContextualRecord, decision: RoutingDecision
-    ) -> None:
+    async def _write_redis(self, record: ContextualRecord, decision: RoutingDecision) -> None:
         """Write hot state to Redis.
 
         Phase 2: SET/HSET using redis-py.

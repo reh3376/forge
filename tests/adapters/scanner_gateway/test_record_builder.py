@@ -136,10 +136,7 @@ class TestBuildContextualRecord:
         )
         assert record.lineage.adapter_id == "scanner-gateway"
         assert record.lineage.adapter_version == "0.1.0"
-        assert (
-            record.lineage.schema_ref
-            == "forge://schemas/scanner-gateway/v0.1.0"
-        )
+        assert record.lineage.schema_ref == "forge://schemas/scanner-gateway/v0.1.0"
         assert "scanner.v1.ScanEvent" in record.lineage.transformation_chain
 
     def test_timestamps_populated(self):

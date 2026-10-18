@@ -71,16 +71,12 @@ class TestConnectionErrors:
     """ConnectionError hierarchy."""
 
     def test_connection_error_endpoint(self) -> None:
-        err = ConnectionError(
-            "failed", endpoint_url="opc.tcp://10.4.2.10:4840"
-        )
+        err = ConnectionError("failed", endpoint_url="opc.tcp://10.4.2.10:4840")
         assert err.endpoint_url == "opc.tcp://10.4.2.10:4840"
         assert isinstance(err, OpcUaError)
 
     def test_endpoint_unreachable(self) -> None:
-        err = EndpointUnreachable(
-            "host down", endpoint_url="opc.tcp://10.4.2.99:4840"
-        )
+        err = EndpointUnreachable("host down", endpoint_url="opc.tcp://10.4.2.99:4840")
         assert isinstance(err, ConnectionError)
         assert isinstance(err, OpcUaError)
 
@@ -191,9 +187,7 @@ class TestSecurityErrors:
         assert isinstance(err, OpcUaError)
 
     def test_certificate_error(self) -> None:
-        err = CertificateError(
-            "not found", certificate_path="/certs/missing.pem"
-        )
+        err = CertificateError("not found", certificate_path="/certs/missing.pem")
         assert err.certificate_path == "/certs/missing.pem"
         assert isinstance(err, SecurityError)
 

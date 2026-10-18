@@ -166,11 +166,7 @@ def normalize_event_type(
     maps to Forge's dot-separated convention.
     """
     # 1. Explicit event type from payload
-    explicit = (
-        raw.get("event_type")
-        or raw.get("eventType")
-        or raw.get("type")
-    )
+    explicit = raw.get("event_type") or raw.get("eventType") or raw.get("type")
     if explicit:
         key = str(explicit).lower().strip().replace("::", "_").replace(" ", "_")
         mapped = _MES_EVENT_TO_FORGE.get(key)
@@ -209,7 +205,7 @@ def normalize_event_type(
     if exchange_name:
         name = exchange_name.lower()
         if name.startswith(_MES_EXCHANGE_PREFIX):
-            entity_key = name[len(_MES_EXCHANGE_PREFIX):]
+            entity_key = name[len(_MES_EXCHANGE_PREFIX) :]
         else:
             entity_key = name
         category = _EXCHANGE_TO_ENTITY.get(entity_key)
@@ -266,9 +262,7 @@ def build_record_context(
             event_ts = event_ts_raw
         elif isinstance(event_ts_raw, str):
             try:
-                event_ts = datetime.fromisoformat(
-                    event_ts_raw.replace("Z", "+00:00")
-                )
+                event_ts = datetime.fromisoformat(event_ts_raw.replace("Z", "+00:00"))
             except (ValueError, TypeError):
                 logger.warning("Could not parse event_timestamp: %s", event_ts_raw)
         if event_ts:
@@ -304,16 +298,8 @@ def build_record_context(
         or raw_event.get("productionOrderId")
         or _nested("productionOrder", "id")
     )
-    batch_id = (
-        raw_event.get("batch_id")
-        or raw_event.get("batchId")
-        or _nested("batch", "id")
-    )
-    recipe_id = (
-        raw_event.get("recipe_id")
-        or raw_event.get("recipeId")
-        or _nested("recipe", "id")
-    )
+    batch_id = raw_event.get("batch_id") or raw_event.get("batchId") or _nested("batch", "id")
+    recipe_id = raw_event.get("recipe_id") or raw_event.get("recipeId") or _nested("recipe", "id")
     equipment_id = (
         mqtt_equipment_id
         or raw_event.get("equipment_id")
@@ -329,10 +315,7 @@ def build_record_context(
         or raw_event.get("userId")
         or raw_event.get("user_id")
     )
-    schedule_order_id = (
-        raw_event.get("schedule_order_id")
-        or raw_event.get("scheduleOrderId")
-    )
+    schedule_order_id = raw_event.get("schedule_order_id") or raw_event.get("scheduleOrderId")
     work_order_id = production_order_id  # aliases per FACTS spec
     whiskey_type = (
         raw_event.get("whiskey_type")
@@ -365,10 +348,7 @@ def build_record_context(
 
     # RecordContext named fields
     site = raw_event.get("site") or raw_event.get("facility") or "WHK-Distillery"
-    area = (
-        raw_event.get("area")
-        or equipment_phase
-    )
+    area = raw_event.get("area") or equipment_phase
 
     # -- Extra context fields (FACTS-specific, not in RecordContext) -----
     extra: dict[str, Any] = {}

@@ -25,12 +25,12 @@ logger = logging.getLogger(__name__)
 class ProviderState(str, enum.Enum):
     """Operational state of a tag provider."""
 
-    IDLE = "idle"           # Constructed but not started
-    STARTING = "starting"   # In the process of connecting/subscribing
-    RUNNING = "running"     # Actively providing data
-    STOPPING = "stopping"   # Graceful shutdown in progress
-    STOPPED = "stopped"     # Clean shutdown complete
-    FAILED = "failed"       # Unrecoverable error
+    IDLE = "idle"  # Constructed but not started
+    STARTING = "starting"  # In the process of connecting/subscribing
+    RUNNING = "running"  # Actively providing data
+    STOPPING = "stopping"  # Graceful shutdown in progress
+    STOPPED = "stopped"  # Clean shutdown complete
+    FAILED = "failed"  # Unrecoverable error
 
 
 class BaseProvider(ABC):

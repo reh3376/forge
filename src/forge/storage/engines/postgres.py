@@ -142,7 +142,8 @@ class PostgresProductStore(ProductStore):
         return asyncio.run(self._list_all_async(status))
 
     async def _list_all_async(
-        self, status: DataProductStatus | None = None,
+        self,
+        status: DataProductStatus | None = None,
     ) -> list[DataProduct]:
         try:
             async with self._pool.acquire() as conn:
@@ -237,16 +238,18 @@ class PostgresLineageStore(LineageStore):
 
     async def _save_async(self, entry: LineageEntry) -> None:
         try:
-            steps_json = json.dumps([
-                {
-                    "step_name": s.step_name,
-                    "component": s.component,
-                    "description": s.description,
-                    "parameters": s.parameters,
-                    "timestamp": s.timestamp.isoformat(),
-                }
-                for s in entry.steps
-            ])
+            steps_json = json.dumps(
+                [
+                    {
+                        "step_name": s.step_name,
+                        "component": s.component,
+                        "description": s.description,
+                        "parameters": s.parameters,
+                        "timestamp": s.timestamp.isoformat(),
+                    }
+                    for s in entry.steps
+                ]
+            )
             async with self._pool.acquire() as conn:
                 await conn.execute(
                     """
@@ -307,15 +310,13 @@ class PostgresLineageStore(LineageStore):
 
     def get_by_source(self, source_record_id: str) -> list[LineageEntry]:
         return self._sync_query(
-            "SELECT * FROM forge_core.lineage_entries "
-            "WHERE source_record_ids::jsonb @> $1::jsonb",
+            "SELECT * FROM forge_core.lineage_entries WHERE source_record_ids::jsonb @> $1::jsonb",
             json.dumps([source_record_id]),
         )
 
     def get_by_product(self, product_id: str) -> list[LineageEntry]:
         return self._sync_query(
-            "SELECT * FROM forge_core.lineage_entries "
-            "WHERE product_id = $1 ORDER BY created_at",
+            "SELECT * FROM forge_core.lineage_entries WHERE product_id = $1 ORDER BY created_at",
             product_id,
         )
 
