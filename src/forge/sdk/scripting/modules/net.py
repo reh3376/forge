@@ -15,6 +15,7 @@ Usage in scripts::
 
 from __future__ import annotations
 
+import contextlib
 import logging
 from dataclasses import dataclass
 from typing import Any
@@ -70,7 +71,7 @@ class NetModule:
             except ImportError:
                 raise RuntimeError(
                     "httpx is required for forge.net. Install with: pip install httpx"
-                )
+                ) from None
         return self._client
 
     async def _request(
@@ -106,10 +107,8 @@ class NetModule:
                 json_data = None
                 content_type = resp.headers.get("content-type", "")
                 if "json" in content_type:
-                    try:
+                    with contextlib.suppress(Exception):
                         json_data = resp.json()
-                    except Exception:
-                        pass
 
                 return HttpResponse(
                     status_code=resp.status_code,

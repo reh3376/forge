@@ -229,7 +229,10 @@ class FHTSRunner(FxTSRunner):
                     f"Change history at capacity ({len(change_history)}/{MAX_HASH_HISTORY}). "
                     "Possible thrashing — investigate agent behavior."
                     if is_churning
-                    else f"Change history healthy ({len(change_history)}/{MAX_HASH_HISTORY} entries)."
+                    else (
+                        "Change history healthy "
+                        f"({len(change_history)}/{MAX_HASH_HISTORY} entries)."
+                    )
                 ),
                 evidence={
                     "history_depth": len(change_history),
@@ -249,7 +252,10 @@ class FHTSRunner(FxTSRunner):
                     message=(
                         f"Spec registered in FHTS registry (framework: {record.framework})."
                         if record
-                        else "Spec not found in FHTS registry — register it for cross-cutting governance."
+                        else (
+                            "Spec not found in FHTS registry — "
+                            "register it for cross-cutting governance."
+                        )
                     ),
                 )
             )

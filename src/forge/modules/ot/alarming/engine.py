@@ -11,6 +11,7 @@ The engine is designed for single-process operation inside the Forge OT Module.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 from collections import defaultdict, deque
 from collections.abc import Awaitable, Callable
@@ -29,7 +30,7 @@ from forge.modules.ot.alarming.models import (
 )
 from forge.modules.ot.alarming.state_machine import (
     AlarmStateMachine,
-    InvalidTransition,
+    InvalidTransitionError,
     TransitionResult,
 )
 
@@ -137,10 +138,8 @@ class AlarmEngine:
 
     def remove_listener(self, callback: AlarmCallback) -> None:
         """Remove a previously registered callback."""
-        try:
+        with contextlib.suppress(ValueError):
             self._listeners.remove(callback)
-        except ValueError:
-            pass
 
     # ------------------------------------------------------------------
     # SDK API (called by AlarmModule)
@@ -189,7 +188,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.ACKNOWLEDGE)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 logger.warning(
                     "Cannot acknowledge alarm %s in state %s", alarm_id, inst.state.value
                 )
@@ -245,7 +244,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.CLEAR)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             self._total_cleared += 1
@@ -273,7 +272,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.SHELVE)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             inst.shelve_reason = reason
@@ -294,7 +293,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.UNSHELVE)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             inst.shelved_until = None
@@ -317,7 +316,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.SUPPRESS)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             inst.suppress_reason = reason
@@ -335,7 +334,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.DISABLE)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             event = self._make_event(inst, result, detail="out of service")
@@ -352,7 +351,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.ENABLE)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             event = self._make_event(inst, result, detail="returned to service")
@@ -373,7 +372,7 @@ class AlarmEngine:
 
             try:
                 result = self._sm.transition(inst, AlarmAction.RESET)
-            except InvalidTransition:
+            except InvalidTransitionError:
                 return False
 
             event = self._make_event(inst, result, operator=operator, detail="admin reset")
@@ -487,7 +486,7 @@ class AlarmEngine:
                     self._record_event(event)
                     await self._notify(event)
                     return inst.alarm_id
-                except InvalidTransition:
+                except InvalidTransitionError:
                     pass
             elif inst.state in (AlarmState.ACTIVE_UNACK, AlarmState.ACTIVE_ACK):
                 # Already active — update value but don't re-trigger
@@ -609,7 +608,7 @@ class AlarmEngine:
         inst = self._instances[alarm_id]
         try:
             result = self._sm.transition(inst, AlarmAction.CLEAR)
-        except InvalidTransition:
+        except InvalidTransitionError:
             return None
 
         self._total_cleared += 1

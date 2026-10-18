@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -24,11 +25,10 @@ from forge.core.models.contextual_record import (
 from forge.core.models.contextual_record import (
     QualityCode as CoreQualityCode,
 )
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from forge.modules.ot.tag_engine.models import BaseTag, TagValue
     from forge.modules.ot.context.resolvers import EnrichmentContext
+    from forge.modules.ot.tag_engine.models import BaseTag, TagValue
 
 logger = logging.getLogger(__name__)
 

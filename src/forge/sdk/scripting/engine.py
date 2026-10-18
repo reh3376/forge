@@ -22,13 +22,14 @@ Design decisions:
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import importlib.util
 import logging
 import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from forge.sdk.scripting.audit import (
     ScriptAuditTrail,
@@ -45,8 +46,8 @@ from forge.sdk.scripting.triggers import (
 )
 
 if TYPE_CHECKING:
-    from types import ModuleType
     from collections.abc import Callable
+    from types import ModuleType
 
 logger = logging.getLogger(__name__)
 
@@ -296,10 +297,8 @@ class ScriptEngine:
         self._stop_timers()
         if self._watcher_task and not self._watcher_task.done():
             self._watcher_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._watcher_task
-            except asyncio.CancelledError:
-                pass
         self._started = False
         logger.info("ScriptEngine stopped")
 

@@ -150,9 +150,8 @@ def generate_config(manifest: dict[str, Any]) -> str:
                     field_kwargs.extend(["ge=1_000", "le=60_000"])
 
                 lines.append(f"    {p['name']}: {ftype} = Field(")
-                for i, kw in enumerate(field_kwargs):
-                    comma = "," if i < len(field_kwargs) - 1 else ","
-                    lines.append(f"        {kw}{comma}")
+                for kw in field_kwargs:
+                    lines.append(f"        {kw},")
                 lines.append("    )")
 
     lines.extend(["", "    model_config = ConfigDict(frozen=True)", ""])
@@ -718,7 +717,11 @@ def generate_init(manifest: dict[str, Any]) -> str:
     snake = _to_snake(adapter_id)
     pascal = _to_pascal(adapter_id)
 
-    return f'"""{manifest["name"]}."""\n\nfrom forge.adapters.{snake}.adapter import {pascal}Adapter\n\n__all__ = ["{pascal}Adapter"]\n'
+    return (
+        f'"""{manifest["name"]}."""\n\n'
+        f"from forge.adapters.{snake}.adapter import {pascal}Adapter\n\n"
+        f'__all__ = ["{pascal}Adapter"]\n'
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -853,7 +856,12 @@ def generate_tests(manifest: dict[str, Any]) -> str:
         "    2. Configuration validation",
         "    3. Lifecycle (configure → start → stop)",
         "    4. Record collection pipeline",
-        f"    5. Capability-specific interfaces{' (subscribe, backfill, discover)' if any(caps.get(c) for c in ('subscribe', 'backfill', 'discover')) else ''}",
+        "    5. Capability-specific interfaces"
+        + (
+            " (subscribe, backfill, discover)"
+            if any(caps.get(c) for c in ("subscribe", "backfill", "discover"))
+            else ""
+        ),
         '"""',
         "",
         "from __future__ import annotations",

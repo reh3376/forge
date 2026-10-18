@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pydantic import TypeAdapter
 
@@ -35,8 +35,9 @@ from forge.modules.ot.tag_engine.models import (
 )
 
 if TYPE_CHECKING:
-    from forge.modules.ot.tag_engine.registry import TagRegistry
     from pathlib import Path
+
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 

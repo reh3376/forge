@@ -83,10 +83,14 @@ class ScriptRBAC:
         rbac.grant(ScriptPermission(owner="commissioning", area_pattern="Distillery01"))
         rbac.grant(ScriptPermission(owner="monitoring", can_write_tags=False))
 
-        result = rbac.check_tag_write("commissioning", "WH/WHK01/Distillery01/SP/Temp", area="Distillery01")
+        result = rbac.check_tag_write(
+            "commissioning", "WH/WHK01/Distillery01/SP/Temp", area="Distillery01"
+        )
         assert result.allowed is True
 
-        result = rbac.check_tag_write("monitoring", "WH/WHK01/Distillery01/SP/Temp", area="Distillery01")
+        result = rbac.check_tag_write(
+            "monitoring", "WH/WHK01/Distillery01/SP/Temp", area="Distillery01"
+        )
         assert result.allowed is False
     """
 

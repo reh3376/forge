@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from pydantic import ValidationError
 
 from forge.adapters.next_trend.adapter import NextTrendAdapter
 from forge.adapters.next_trend.config import NextTrendConfig
@@ -192,7 +193,7 @@ class TestConfig:
             api_base_url="http://localhost:3011/api/v1",
             api_key="ntv1_" + "c" * 64,
         )
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             config.api_base_url = "http://other"
 
     def test_defaults(self):
@@ -207,7 +208,7 @@ class TestConfig:
         assert config.request_timeout_ms == 30_000
 
     def test_poll_interval_bounds(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             NextTrendConfig(
                 api_key="ntv1_" + "e" * 64,
                 poll_interval_ms=100,  # below 500

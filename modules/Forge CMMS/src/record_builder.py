@@ -52,10 +52,7 @@ def build_contextual_record(
     """
     # Handle both GraphQL responses and RabbitMQ envelopes
     envelope = raw_event.get("data", raw_event)
-    if "data" in envelope:
-        payload = envelope.get("data", {})
-    else:
-        payload = envelope
+    payload = envelope.get("data", {}) if "data" in envelope else envelope
 
     entity_type = str(payload.get("entity_type") or payload.get("__typename") or "unknown")
     event_type = str(payload.get("event_type", "query"))

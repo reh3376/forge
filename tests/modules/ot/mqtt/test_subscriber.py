@@ -62,7 +62,7 @@ class TestIncomingMessage:
 
     def test_payload_json_invalid_raises(self):
         msg = IncomingMessage(topic="t", payload=b"not json")
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             msg.payload_json()
 
 

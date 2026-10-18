@@ -27,6 +27,7 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
+
     from forge.core.broker.broker import ForgeMqttBroker
 
 logger = logging.getLogger(__name__)

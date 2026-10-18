@@ -1,6 +1,5 @@
 """Tests for the forge.file SDK module."""
 
-
 import pytest
 
 from forge.sdk.scripting.modules.file import FileModule

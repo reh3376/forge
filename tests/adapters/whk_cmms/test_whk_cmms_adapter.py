@@ -7,6 +7,7 @@ verify ContextualRecords with CMMS-specific maintenance context fields.
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
 from forge.adapters.whk_cmms import WhkCmmsAdapter
 from forge.core.models.adapter import AdapterState
@@ -260,7 +261,7 @@ class TestLifecycle:
     @pytest.mark.asyncio
     async def test_configure_validates_required(self):
         adapter = WhkCmmsAdapter()
-        with pytest.raises(Exception):  # pydantic ValidationError
+        with pytest.raises(ValidationError):  # pydantic ValidationError
             await adapter.configure({"cmms_graphql_url": "http://localhost:3000/graphql"})
             # missing cmms_rest_url
 

@@ -1,6 +1,5 @@
 """Tests for the Forge Schema Registry."""
 
-
 from forge.storage.registry import (
     RetentionPolicy,
     SchemaEntry,

@@ -110,7 +110,4 @@ class WriteAuthorizer:
             return False
 
         # Requestor's role must be ≥ the permission's minimum role
-        if not request.role.has_authority_over(perm.min_role):
-            return False
-
-        return True
+        return request.role.has_authority_over(perm.min_role)

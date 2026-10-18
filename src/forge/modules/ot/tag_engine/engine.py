@@ -31,11 +31,12 @@ Security note:
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import math
 import re
 import statistics
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import (
@@ -185,19 +186,15 @@ class TagEngine:
         for task in self._scan_tasks.values():
             task.cancel()
         for task in self._scan_tasks.values():
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
         self._scan_tasks.clear()
 
         # Cancel propagation task
         if self._propagation_task:
             self._propagation_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._propagation_task
-            except asyncio.CancelledError:
-                pass
             self._propagation_task = None
 
         logger.info("Tag engine stopped")

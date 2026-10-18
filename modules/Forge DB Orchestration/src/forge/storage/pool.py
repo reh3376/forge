@@ -9,8 +9,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Any, TYPE_CHECKING
-
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from forge.storage.config import StorageConfig
@@ -192,7 +191,11 @@ class PoolManager:
             if pool is None:
                 continue
             try:
-                if engine_name in ("postgres", "timescale") or engine_name == "neo4j" or engine_name == "redis":
+                if (
+                    engine_name in ("postgres", "timescale")
+                    or engine_name == "neo4j"
+                    or engine_name == "redis"
+                ):
                     await pool.close()
                 logger.info("Closed %s pool", engine_name)
             except Exception as exc:

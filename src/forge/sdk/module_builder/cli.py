@@ -170,7 +170,8 @@ def module_init(
             parts = p_str.split(":")
             if len(parts) < 2:
                 typer.echo(
-                    f"[ERROR] Invalid param format: '{p_str}'. Use 'name:description:required|optional[:default]'"
+                    f"[ERROR] Invalid param format: '{p_str}'. "
+                    "Use 'name:description:required|optional[:default]'"
                 )
                 raise typer.Exit(code=1)
 
@@ -361,7 +362,8 @@ def module_validate(
             valid_tiers = {"OT", "MES_MOM", "ERP_BUSINESS", "HISTORIAN", "DOCUMENT"}
             if manifest.get("tier") not in valid_tiers:
                 errors.append(
-                    f"manifest.json: invalid tier '{manifest.get('tier')}'. Must be one of {valid_tiers}"
+                    f"manifest.json: invalid tier '{manifest.get('tier')}'. "
+                    f"Must be one of {valid_tiers}"
                 )
 
             # Check data_contract

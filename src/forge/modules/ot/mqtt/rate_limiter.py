@@ -1,6 +1,6 @@
 """Rate limiter — per-tag publish throttle for MQTT.
 
-With 1000+ tag subscriptions each updating at 100ms–1s scan rates,
+With 1000+ tag subscriptions each updating at 100ms-1s scan rates,
 the raw publish volume can overwhelm the MQTT broker.  The rate
 limiter provides configurable per-tag throttling to keep publish
 rates within broker capacity.
@@ -22,10 +22,11 @@ Design decisions:
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -208,10 +209,8 @@ class MqttRateLimiter:
     async def stop_flush_loop(self) -> None:
         if self._flush_task and not self._flush_task.done():
             self._flush_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._flush_task
-            except asyncio.CancelledError:
-                pass
 
     async def _flush_loop(
         self,
@@ -250,10 +249,7 @@ class MqttRateLimiter:
         """Check if a tag is exempt from rate limiting."""
         import fnmatch
 
-        for pattern in self._config.exempt_patterns:
-            if fnmatch.fnmatch(tag_path, pattern):
-                return True
-        return False
+        return any(fnmatch.fnmatch(tag_path, pattern) for pattern in self._config.exempt_patterns)
 
     # ------------------------------------------------------------------
     # Status

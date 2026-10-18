@@ -23,7 +23,7 @@ import json
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Protocol, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Protocol
 
 from forge.modules.ot.alarming.models import (
     AlarmEvent,
@@ -31,8 +31,9 @@ from forge.modules.ot.alarming.models import (
 )
 
 if TYPE_CHECKING:
-    from forge.modules.ot.alarming.engine import AlarmEngine
     from collections.abc import Callable
+
+    from forge.modules.ot.alarming.engine import AlarmEngine
 
 logger = logging.getLogger("forge.alarm.integrations")
 

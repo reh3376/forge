@@ -2,7 +2,7 @@
 
 The transition table encodes the full ISA-18.2 state diagram.  Each entry is
 ``(current_state, action) → new_state``.  Invalid transitions raise
-``InvalidTransition`` — they are never silently ignored.
+``InvalidTransitionError`` — they are never silently ignored.
 
 Administrative states (SUPPRESSED, SHELVED, OUT_OF_SERVICE) store the
 "return state" so that un-suppress / un-shelve / enable returns to the
@@ -76,7 +76,7 @@ _ADMIN_RETURN: dict[tuple[AlarmState, AlarmAction], bool] = {
 # ---------------------------------------------------------------------------
 
 
-class InvalidTransition(Exception):
+class InvalidTransitionError(Exception):
     """Raised when a state+action combination is not valid."""
 
     def __init__(self, state: AlarmState, action: AlarmAction, alarm_id: str = ""):
@@ -122,13 +122,13 @@ class AlarmStateMachine:
         try:
             self._resolve(alarm, action)
             return True
-        except InvalidTransition:
+        except InvalidTransitionError:
             return False
 
     def transition(self, alarm: AlarmInstance, action: AlarmAction) -> TransitionResult:
         """Apply a state transition to an alarm instance.
 
-        Raises InvalidTransition if the action is not valid for the current state.
+        Raises InvalidTransitionError if the action is not valid for the current state.
         Returns a TransitionResult describing what changed.
         """
         new_state = self._resolve(alarm, action)
@@ -202,7 +202,7 @@ class AlarmStateMachine:
         # RESET always returns to NORMAL (administrative override)
         if action == AlarmAction.RESET:
             if state == AlarmState.NORMAL:
-                raise InvalidTransition(state, action, alarm.alarm_id)
+                raise InvalidTransitionError(state, action, alarm.alarm_id)
             return AlarmState.NORMAL
 
         # Check core transition table first
@@ -231,4 +231,4 @@ class AlarmStateMachine:
                 alarm._state_before_admin = AlarmState.ACTIVE_UNACK
                 return state  # Stay in admin state
 
-        raise InvalidTransition(state, action, alarm.alarm_id)
+        raise InvalidTransitionError(state, action, alarm.alarm_id)

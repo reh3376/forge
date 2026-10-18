@@ -1,6 +1,5 @@
 """Tests for context resolvers — area, equipment, batch, mode, and pipeline."""
 
-
 from forge.modules.ot.context.resolvers import (
     AreaResolver,
     AreaRule,

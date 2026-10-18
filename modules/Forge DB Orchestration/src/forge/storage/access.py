@@ -222,9 +222,8 @@ class AccessController:
                 perm.module_id == module_id
                 and perm.schema_name == schema_name
                 and perm.is_effective
-            ):
-                if level_hierarchy[perm.access_level] >= level_hierarchy[required_level]:
-                    return True
+            ) and level_hierarchy[perm.access_level] >= level_hierarchy[required_level]:
+                return True
         return False
 
     def list_grants(self, module_id: str | None = None) -> list[ModulePermission]:
@@ -284,7 +283,8 @@ class AccessController:
         )
 
         # Role name derived from module_id
-        role = f"{module_id.replace('-', '_')}_{'rw' if max_level.access_level != AccessLevel.READ else 'ro'}"
+        suffix = "rw" if max_level.access_level != AccessLevel.READ else "ro"
+        role = f"{module_id.replace('-', '_')}_{suffix}"
         search_path = ",".join(schemas)
 
         conn_str = (

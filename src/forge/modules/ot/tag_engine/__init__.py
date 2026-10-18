@@ -46,33 +46,28 @@ from forge.modules.ot.tag_engine.templates import (
 )
 
 __all__ = [
-    # Enums
-    "TagType",
-    "ScanClass",
-    # Config models
-    "ScaleConfig",
-    "ClampConfig",
     "AlarmConfig",
-    "HistoryConfig",
-    "DerivedSource",
-    # Tag models
     "BaseTag",
-    "StandardTag",
-    "MemoryTag",
-    "ExpressionTag",
-    "QueryTag",
-    "DerivedTag",
-    "ReferenceTag",
+    "ClampConfig",
     "ComputedTag",
+    "DerivedSource",
+    "DerivedTag",
     "EventTag",
-    "VirtualTag",
-    "TagUnion",
-    # Core classes
-    "TagRegistry",
+    "ExpressionTag",
+    "HistoryConfig",
+    "MemoryTag",
+    "QueryTag",
+    "ReferenceTag",
+    "ScaleConfig",
+    "ScanClass",
+    "StandardTag",
     "TagEngine",
-    # Templates
+    "TagRegistry",
     "TagTemplate",
+    "TagType",
+    "TagUnion",
     "TemplateParam",
-    "TemplateTagDef",
     "TemplateRegistry",
+    "TemplateTagDef",
+    "VirtualTag",
 ]

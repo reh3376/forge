@@ -28,7 +28,7 @@ from forge.modules.ot.opcua_client.client import (
 from forge.modules.ot.opcua_client.exceptions import (
     ConfigurationError,
     ConnectionError,
-    EndpointUnreachable,
+    EndpointUnreachableError,
     ReadError,
     SubscriptionError,
     WriteError,
@@ -243,7 +243,7 @@ class TestConnectionLifecycle:
     async def test_connect_failure_sets_failed_state(self, mock_ua_client) -> None:
         mock_ua_client.connect.side_effect = OSError("Connection refused")
         client = OpcUaClient(endpoint="opc.tcp://10.4.2.10:4840")
-        with pytest.raises(EndpointUnreachable, match="Connection refused"):
+        with pytest.raises(EndpointUnreachableError, match="Connection refused"):
             await client.connect()
         assert client.state == ConnectionState.FAILED
         assert client.health.consecutive_failures == 1

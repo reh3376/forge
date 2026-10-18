@@ -110,7 +110,7 @@ class TestSparkplugPublishPipeline:
             SparkplugMetric(name="temp", value=78.4),
             SparkplugMetric(name="pressure", value=14.7),
         ]
-        _, birth_payload = encoder.build_node_birth(metrics)
+        _, _birth_payload = encoder.build_node_birth(metrics)
 
         # Data should use same aliases
         _, data_payload = encoder.build_device_data(

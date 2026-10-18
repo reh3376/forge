@@ -12,7 +12,7 @@ registration will be wired in Phase 2B.3 (MQTT Pub/Sub Engine).
 from __future__ import annotations
 
 import logging
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import EventTag, TagType

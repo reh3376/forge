@@ -7,6 +7,7 @@ test_forge_mes_adapter.py: inject raw message dicts, verify ContextualRecords.
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
 from forge.adapters.whk_erpi import WhkErpiAdapter
 from forge.core.models.adapter import AdapterState
@@ -174,7 +175,7 @@ class TestLifecycle:
     @pytest.mark.asyncio
     async def test_configure_validates_required(self):
         adapter = WhkErpiAdapter()
-        with pytest.raises(Exception):  # pydantic ValidationError
+        with pytest.raises(ValidationError):  # pydantic ValidationError
             await adapter.configure({"rabbitmq_url": "amqp://localhost"})
             # missing erpi_rest_url
 

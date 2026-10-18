@@ -8,6 +8,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pytest
+from pydantic import ValidationError
 
 from forge.modules.ot.opcua_client.types import (
     AccessLevel,
@@ -180,7 +181,7 @@ class TestNodeId:
         assert nid.namespace == 0
 
     def test_namespace_validation(self) -> None:
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             NodeId(namespace=-1, identifier="test")
 
 

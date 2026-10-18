@@ -1,6 +1,5 @@
 """Tests for ScriptAuditTrail — append-only audit logging for script operations."""
 
-
 import pytest
 
 from forge.sdk.scripting.audit import (

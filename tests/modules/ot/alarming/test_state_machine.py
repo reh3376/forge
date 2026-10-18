@@ -21,7 +21,7 @@ from forge.modules.ot.alarming.models import (
 )
 from forge.modules.ot.alarming.state_machine import (
     AlarmStateMachine,
-    InvalidTransition,
+    InvalidTransitionError,
 )
 
 
@@ -135,7 +135,7 @@ class TestSuppression:
 
     def test_cannot_suppress_from_normal(self, sm: AlarmStateMachine):
         alarm = _make_alarm(AlarmState.NORMAL)
-        with pytest.raises(InvalidTransition):
+        with pytest.raises(InvalidTransitionError):
             sm.transition(alarm, AlarmAction.SUPPRESS)
 
 
@@ -220,7 +220,7 @@ class TestReset:
 
     def test_reset_from_normal_is_invalid(self, sm: AlarmStateMachine):
         alarm = _make_alarm(AlarmState.NORMAL)
-        with pytest.raises(InvalidTransition):
+        with pytest.raises(InvalidTransitionError):
             sm.transition(alarm, AlarmAction.RESET)
 
 
@@ -232,23 +232,23 @@ class TestReset:
 class TestInvalidTransitions:
     def test_ack_from_normal(self, sm: AlarmStateMachine):
         alarm = _make_alarm(AlarmState.NORMAL)
-        with pytest.raises(InvalidTransition):
+        with pytest.raises(InvalidTransitionError):
             sm.transition(alarm, AlarmAction.ACKNOWLEDGE)
 
     def test_clear_from_normal(self, sm: AlarmStateMachine):
         alarm = _make_alarm(AlarmState.NORMAL)
-        with pytest.raises(InvalidTransition):
+        with pytest.raises(InvalidTransitionError):
             sm.transition(alarm, AlarmAction.CLEAR)
 
     def test_ack_from_active_ack(self, sm: AlarmStateMachine):
         alarm = _make_alarm(AlarmState.ACTIVE_ACK)
-        with pytest.raises(InvalidTransition):
+        with pytest.raises(InvalidTransitionError):
             sm.transition(alarm, AlarmAction.ACKNOWLEDGE)
 
     def test_trigger_from_active_unack(self, sm: AlarmStateMachine):
         """Can't trigger when already active (not from transition table)."""
         alarm = _make_alarm(AlarmState.ACTIVE_UNACK)
-        with pytest.raises(InvalidTransition):
+        with pytest.raises(InvalidTransitionError):
             sm.transition(alarm, AlarmAction.TRIGGER)
 
 

@@ -555,7 +555,9 @@ class FACTSRunner(FxTSRunner):
                         check_id=f"facts:capabilities-{cap_name}-type",
                         spec_ref=f"FACTS/capabilities/{cap_name}",
                         status=VerdictStatus.FAIL,
-                        message=f"capabilities.{cap_name} must be boolean, got {type(val).__name__}.",
+                        message=(
+                            f"capabilities.{cap_name} must be boolean, got {type(val).__name__}."
+                        ),
                         violations=[
                             SpecViolation(
                                 field=f"capabilities.{cap_name}",
@@ -975,7 +977,9 @@ class FACTSRunner(FxTSRunner):
                         check_id="facts:data-contract-sample-coverage",
                         spec_ref="FACTS/data_contract/sample_record",
                         status=VerdictStatus.FAIL,
-                        message=f"Sample record missing required context fields: {sorted(missing)}.",
+                        message=(
+                            f"Sample record missing required context fields: {sorted(missing)}."
+                        ),
                         violations=[
                             SpecViolation(
                                 field="data_contract.sample_record.context",

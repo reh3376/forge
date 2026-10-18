@@ -262,11 +262,10 @@ class SecurityConfig:
                     f"MessageSecurityMode Sign or SignAndEncrypt, got None"
                 )
 
-        if self.policy == SecurityPolicy.NONE:
-            if self.mode != MessageSecurityMode.NONE:
-                raise ConfigurationError(
-                    f"SecurityPolicy None requires MessageSecurityMode None, got {self.mode.value}"
-                )
+        if self.policy == SecurityPolicy.NONE and self.mode != MessageSecurityMode.NONE:
+            raise ConfigurationError(
+                f"SecurityPolicy None requires MessageSecurityMode None, got {self.mode.value}"
+            )
 
     @classmethod
     def no_security(cls) -> SecurityConfig:

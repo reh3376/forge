@@ -42,30 +42,25 @@ from forge.adapters.whk_erpi.mappers.production import (
 )
 
 __all__ = [
-    # Business entities
-    "map_customer",
-    "map_vendor",
-    # Material items
-    "map_item",
-    "map_item_group",
-    "map_bom_item",
-    # Process definitions
-    "map_recipe",
-    "map_recipe_parameter",
-    "map_recipe_group",
-    "map_bom",
-    # Production
-    "map_production_order",
-    "map_production_order_unit_procedure",
-    "map_unit_procedure",
-    "map_operation",
-    "map_equipment_phase",
-    # Inventory
     "map_barrel",
     "map_barrel_event",
     "map_barrel_receipt",
-    "map_lot",
-    "map_item_receipt",
+    "map_bom",
+    "map_bom_item",
+    "map_customer",
+    "map_equipment_phase",
     "map_inventory",
     "map_inventory_transfer",
+    "map_item",
+    "map_item_group",
+    "map_item_receipt",
+    "map_lot",
+    "map_operation",
+    "map_production_order",
+    "map_production_order_unit_procedure",
+    "map_recipe",
+    "map_recipe_group",
+    "map_recipe_parameter",
+    "map_unit_procedure",
+    "map_vendor",
 ]

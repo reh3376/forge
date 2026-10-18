@@ -26,13 +26,14 @@ Design decisions:
 
 from __future__ import annotations
 
+import contextlib
 import importlib
 import importlib.abc
 import importlib.machinery
 import logging
 import sys
 from dataclasses import dataclass, field
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -203,11 +204,8 @@ class _SandboxImportFinder(importlib.abc.MetaPathFinder):
 
         # Check allowlist (top-level package)
         top = fullname.split(".")[0]
-        if top in self._allowed:
-            return False
-
         # Not in allowlist -> block
-        return True
+        return top not in self._allowed
 
 
 # ---------------------------------------------------------------------------
@@ -284,10 +282,8 @@ class ScriptSandbox:
         """Remove the import hook from sys.meta_path."""
         if not self._active or self._finder is None:
             return
-        try:
+        with contextlib.suppress(ValueError):
             sys.meta_path.remove(self._finder)
-        except ValueError:
-            pass
         self._finder = None
         self._active = False
         logger.info("Script sandbox deactivated")

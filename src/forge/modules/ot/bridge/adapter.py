@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from forge.adapters.base.interface import AdapterBase, DiscoveryProvider
 from forge.core.models.adapter import (
@@ -51,9 +51,10 @@ from forge.modules.ot.bridge.models import (
 from forge.modules.ot.context.resolvers import EnrichmentPipeline
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
     from forge.modules.ot.bridge.client import IgnitionRestClient
     from forge.modules.ot.bridge.tag_mapper import TagMapper
-    from collections.abc import AsyncIterator
 
 logger = logging.getLogger(__name__)
 

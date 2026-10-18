@@ -11,7 +11,7 @@ from forge.modules.ot.opcua_client.exceptions import (
     ConfigurationError,
     ConnectionError,
     CreateSubscriptionError,
-    EndpointUnreachable,
+    EndpointUnreachableError,
     HistoryReadError,
     MonitoredItemError,
     OpcUaError,
@@ -73,7 +73,7 @@ class TestConnectionErrors:
         assert isinstance(err, OpcUaError)
 
     def test_endpoint_unreachable(self) -> None:
-        err = EndpointUnreachable("host down", endpoint_url="opc.tcp://10.4.2.99:4840")
+        err = EndpointUnreachableError("host down", endpoint_url="opc.tcp://10.4.2.99:4840")
         assert isinstance(err, ConnectionError)
         assert isinstance(err, OpcUaError)
 
@@ -218,7 +218,7 @@ class TestExceptionHierarchy:
         """All exceptions are catchable as OpcUaError."""
         exceptions = [
             ConnectionError("x"),
-            EndpointUnreachable("x"),
+            EndpointUnreachableError("x"),
             SecurityNegotiationError("x"),
             SessionActivationError("x"),
             TimeoutError("x"),
@@ -241,7 +241,7 @@ class TestExceptionHierarchy:
     def test_catch_connection_category(self) -> None:
         """All connection subtypes are catchable as ConnectionError."""
         for exc_cls in (
-            EndpointUnreachable,
+            EndpointUnreachableError,
             SecurityNegotiationError,
             SessionActivationError,
         ):

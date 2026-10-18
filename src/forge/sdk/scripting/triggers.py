@@ -24,7 +24,7 @@ import logging
 import re
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Callable

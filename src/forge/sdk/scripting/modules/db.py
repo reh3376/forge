@@ -38,7 +38,7 @@ class QueryResult:
 
     def to_dicts(self) -> list[dict[str, Any]]:
         """Convert rows to list of dicts keyed by column name."""
-        return [dict(zip(self.columns, row)) for row in self.rows]
+        return [dict(zip(self.columns, row, strict=False)) for row in self.rows]
 
     def scalar(self) -> Any:
         """Return the first column of the first row, or None."""

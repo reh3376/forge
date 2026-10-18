@@ -206,7 +206,10 @@ class BaseTag(BaseModel):
     """
 
     path: str = Field(
-        description="Forge-normalized tag path (slash-separated, e.g., WH/WHK01/Distillery01/TIT_2010/Out_PV)"
+        description=(
+            "Forge-normalized tag path "
+            "(slash-separated, e.g., WH/WHK01/Distillery01/TIT_2010/Out_PV)"
+        )
     )
     data_type: DataType = Field(default=DataType.DOUBLE, description="Expected value data type")
     scan_class: ScanClass = Field(default=ScanClass.STANDARD, description="Evaluation rate group")
@@ -284,7 +287,9 @@ class ExpressionTag(BaseTag):
     expression: str = Field(description="Python expression with {tag_path} placeholders")
     dependencies: list[str] = Field(
         default_factory=list,
-        description="Resolved list of tag paths this expression reads (auto-populated from expression)",
+        description=(
+            "Resolved list of tag paths this expression reads (auto-populated from expression)"
+        ),
     )
 
 
@@ -372,10 +377,16 @@ class ComputedTag(BaseTag):
 
     tag_type: Literal[TagType.COMPUTED] = TagType.COMPUTED
     sources: dict[str, str] = Field(
-        description="Map of parameter name → source tag path (e.g., {'temp': 'WH/WHK01/.../TIT_2010/Out_PV'})"
+        description=(
+            "Map of parameter name → source tag path "
+            "(e.g., {'temp': 'WH/WHK01/.../TIT_2010/Out_PV'})"
+        )
     )
     function: str = Field(
-        description="Python function body receiving source values as keyword args. Must return a single value."
+        description=(
+            "Python function body receiving source values as keyword args. "
+            "Must return a single value."
+        )
     )
     imports: list[str] = Field(
         default_factory=list,
@@ -405,7 +416,9 @@ class EventTag(BaseTag):
     )
     value_path: str = Field(
         default="",
-        description="JSONPath or dot-path to extract value from event payload (empty = entire payload)",
+        description=(
+            "JSONPath or dot-path to extract value from event payload (empty = entire payload)"
+        ),
     )
     retain_last: bool = Field(
         default=True,
@@ -450,7 +463,15 @@ class VirtualTag(BaseTag):
 # ---------------------------------------------------------------------------
 
 TagUnion = Annotated[
-    StandardTag | MemoryTag | ExpressionTag | QueryTag | DerivedTag | ReferenceTag | ComputedTag | EventTag | VirtualTag,
+    StandardTag
+    | MemoryTag
+    | ExpressionTag
+    | QueryTag
+    | DerivedTag
+    | ReferenceTag
+    | ComputedTag
+    | EventTag
+    | VirtualTag,
     Field(discriminator="tag_type"),
 ]
 """Discriminated union of all 9 tag types.

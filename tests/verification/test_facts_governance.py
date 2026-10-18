@@ -99,10 +99,7 @@ class TestFACTSRunnerValidation:
         verdicts = report.verdicts if hasattr(report, "verdicts") else report
 
         # Extract just the list of FxTSVerdict objects
-        if isinstance(verdicts, list):
-            verdict_list = verdicts
-        else:
-            verdict_list = list(verdicts)
+        verdict_list = verdicts if isinstance(verdicts, list) else list(verdicts)
 
         # Every verdict should PASS (or at most SKIP for optional checks)
         failures = [

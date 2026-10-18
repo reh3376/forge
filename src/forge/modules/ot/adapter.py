@@ -18,7 +18,8 @@ with :class:`~forge.modules.ot.control.runtime.ControlDependencies`, it
 composes a :class:`~forge.modules.ot.control.runtime.ControlRuntime`
 (write engine, recipe adapter, PLC CIP runner, changeover orchestrator and
 MQTT ingress). ``start``/``stop`` drive it, and hub writes to Standard
-tags go through its write engine (validation, review, interlocks, authorisation, write with read-back).
+tags go through its write engine (validation, review, interlocks, authorisation, write with
+read-back).
 """
 
 from __future__ import annotations
@@ -26,7 +27,7 @@ from __future__ import annotations
 import inspect
 import logging
 from datetime import UTC, datetime
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -51,9 +52,10 @@ from forge.modules.ot.control.models import DataType, WriteRequest, WriteRole, W
 from forge.modules.ot.control.runtime import ControlDependencies, ControlRuntime
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator, Callable
+
     from forge.core.models.contextual_record import ContextualRecord
     from forge.modules.ot.tag_engine.registry import TagRegistry
-    from collections.abc import AsyncIterator, Callable
 
 logger = logging.getLogger(__name__)
 

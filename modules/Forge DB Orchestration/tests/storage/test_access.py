@@ -322,7 +322,7 @@ class TestAccessControllerSetupDefaults:
     def test_setup_creates_grants_for_all_modules(self):
         ac = AccessController()
         grants = ac.setup_default_grants()
-        # 6 modules × 2 grants each (write on own + read on canonical)
+        # 6 modules x 2 grants each (write on own + read on canonical)
         assert len(grants) == 12
 
     def test_setup_each_module_gets_write_on_own_schema(self):

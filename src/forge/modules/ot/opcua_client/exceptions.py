@@ -5,7 +5,7 @@ reaching for raw logs.  The hierarchy is intentionally shallow:
 
     OpcUaError (base)
     ├── ConnectionError       — TCP/TLS/session establishment
-    │   ├── EndpointUnreachable
+    │   ├── EndpointUnreachableError
     │   ├── SecurityNegotiationError
     │   └── SessionActivationError
     ├── TimeoutError          — Any operation exceeding its deadline
@@ -82,7 +82,7 @@ class ConnectionError(OpcUaError):
         super().__init__(message, detail=detail)
 
 
-class EndpointUnreachable(ConnectionError):
+class EndpointUnreachableError(ConnectionError):
     """TCP connection to the OPC-UA server could not be established.
 
     Common causes: wrong IP/port, firewall rules, PLC powered off,

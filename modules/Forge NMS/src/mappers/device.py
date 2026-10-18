@@ -60,10 +60,7 @@ def map_device(raw_device: dict) -> ManufacturingUnit | None:
 
     # Build product type with device_type if available
     if device_type:
-        if product_type:
-            product_type = f"{product_type} ({device_type})"
-        else:
-            product_type = device_type
+        product_type = f"{product_type} ({device_type})" if product_type else device_type
 
     # Build serial_number field: prefer mac_address, fall back to device_ip
     effective_serial = serial_number or mac_address or device_ip
@@ -110,7 +107,11 @@ def _map_lifecycle_state(raw_status: str) -> LifecycleState | None:
 
     if lower in ("healthy", "up", "online", "active", "normal") or lower in ("degraded", "warning"):
         return LifecycleState.IN_PROCESS
-    elif lower in ("down", "offline", "failed", "critical") or lower in ("quarantined", "blocked", "unauthorized"):
+    elif lower in ("down", "offline", "failed", "critical") or lower in (
+        "quarantined",
+        "blocked",
+        "unauthorized",
+    ):
         return LifecycleState.WITHDRAWN
     else:
         return None

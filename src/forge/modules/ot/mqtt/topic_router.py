@@ -268,9 +268,12 @@ class TopicRouter:
                 continue
             if not fnmatch.fnmatch(area, tmpl.area_pattern):
                 continue
-            if tag_path and tmpl.tag_pattern != "**":
-                if not _match_tag_pattern(tmpl.tag_pattern, tag_path):
-                    continue
+            if (
+                tag_path
+                and tmpl.tag_pattern != "**"
+                and not _match_tag_pattern(tmpl.tag_pattern, tag_path)
+            ):
+                continue
 
             try:
                 topic = tmpl.template.format_map(context)

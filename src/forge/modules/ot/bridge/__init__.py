@@ -58,23 +58,17 @@ from forge.modules.ot.bridge.models import (
 from forge.modules.ot.bridge.tag_mapper import TagMapper
 
 __all__ = [
-    # Models
     "BridgeConfig",
     "BridgeHealth",
-    "IgnitionTagResponse",
-    "IgnitionTagValue",
-    "TagMapping",
-    "TagMappingRule",
-    # Client
-    "IgnitionRestClient",
-    # Mapping
-    "TagMapper",
-    # Adapter
-    "IgnitionBridgeAdapter",
-    # Validation
+    "BridgeHealthDashboard",
     "ComparisonResult",
     "ConsistencyReport",
     "DualWriteValidator",
-    # Health
-    "BridgeHealthDashboard",
+    "IgnitionBridgeAdapter",
+    "IgnitionRestClient",
+    "IgnitionTagResponse",
+    "IgnitionTagValue",
+    "TagMapper",
+    "TagMapping",
+    "TagMappingRule",
 ]

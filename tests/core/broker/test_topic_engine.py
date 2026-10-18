@@ -1,6 +1,5 @@
 """Tests for TopicEngine — subscription matching, fan-out, retained messages."""
 
-
 from forge.core.broker.topic_engine import (
     TopicEngine,
     mqtt_topic_matches,

@@ -448,6 +448,6 @@ class TestFullPipelineIntegration:
         original_ids = {str(r.record_id) for r in records}
         routed_ids = set()
         for items in grouped.values():
-            for record, decision in items:
+            for _record, decision in items:
                 routed_ids.add(decision.record_id)
         assert original_ids == routed_ids, "Record IDs changed during routing"

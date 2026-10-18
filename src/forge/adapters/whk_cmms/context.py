@@ -65,10 +65,7 @@ def build_record_context(
     """
     # Handle both GraphQL responses and RabbitMQ envelopes
     envelope = raw_event.get("data", raw_event)
-    if "data" in envelope:
-        payload = envelope.get("data", {})
-    else:
-        payload = envelope
+    payload = envelope.get("data", {}) if "data" in envelope else envelope
 
     # ── Core Identity Fields ───────────────────────────────────────
     entity_type = str(payload.get("entity_type") or payload.get("__typename") or "unknown")

@@ -20,7 +20,7 @@ import json
 import logging
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -46,8 +46,9 @@ from forge.core.models.adapter import (
 )
 
 if TYPE_CHECKING:
-    from forge.core.models.contextual_record import ContextualRecord
     from collections.abc import AsyncIterator
+
+    from forge.core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +136,8 @@ class WhkCmmsAdapter(
         self._last_healthy = datetime.now(tz=UTC)
         self._startup_time = self._last_healthy
         logger.info(
-            "whk-cmms adapter started (phase 1: inject-only, %d graphql entities, %d rmq topics defined)",
+            "whk-cmms adapter started "
+            "(phase 1: inject-only, %d graphql entities, %d rmq topics defined)",
             len(CMMS_GRAPHQL_ENTITIES),
             len(CMMS_RABBITMQ_TOPICS),
         )

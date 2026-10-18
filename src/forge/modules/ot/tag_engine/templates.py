@@ -293,7 +293,9 @@ class TagTemplate(BaseModel):
         path_prefix: str,
     ) -> TagUnion:
         """Build a single concrete tag from a template definition."""
-        resolve = lambda s: self._resolve_template(s, params) if s else ""
+
+        def resolve(s: str) -> str:
+            return self._resolve_template(s, params) if s else ""
 
         # Resolve path
         path = resolve(tag_def.path_template)

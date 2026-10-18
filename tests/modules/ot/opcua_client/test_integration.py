@@ -35,7 +35,7 @@ from forge.modules.ot.opcua_client import (
     QualityCode,
 )
 from forge.modules.ot.opcua_client.exceptions import (
-    EndpointUnreachable,
+    EndpointUnreachableError,
     WriteError,
 )
 
@@ -170,12 +170,12 @@ class TestConnectionLifecycle:
 
     @pytest.mark.asyncio
     async def test_connect_to_unreachable_endpoint(self):
-        """Connecting to a dead endpoint raises EndpointUnreachable."""
+        """Connecting to a dead endpoint raises EndpointUnreachableError."""
         c = OpcUaClient(
             endpoint="opc.tcp://127.0.0.1:19999/nonexistent",
             request_timeout_ms=2_000,
         )
-        with pytest.raises(EndpointUnreachable):
+        with pytest.raises(EndpointUnreachableError):
             await c.connect()
         assert c.state == ConnectionState.FAILED
 

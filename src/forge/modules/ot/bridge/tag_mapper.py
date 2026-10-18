@@ -185,16 +185,16 @@ class TagMapper:
             return False
 
         # Include filter (empty = include all)
-        if self._config.include_patterns:
-            if not any(fnmatch.fnmatch(bare_path, pat) for pat in self._config.include_patterns):
-                return False
+        if self._config.include_patterns and not any(
+            fnmatch.fnmatch(bare_path, pat) for pat in self._config.include_patterns
+        ):
+            return False
 
         # Exclude filter
-        if self._config.exclude_patterns:
-            if any(fnmatch.fnmatch(bare_path, pat) for pat in self._config.exclude_patterns):
-                return False
-
-        return True
+        return not (
+            self._config.exclude_patterns
+            and any(fnmatch.fnmatch(bare_path, pat) for pat in self._config.exclude_patterns)
+        )
 
     def _find_rule(self, bare_path: str) -> TagMappingRule | None:
         """Find the first matching mapping rule for a bare path."""

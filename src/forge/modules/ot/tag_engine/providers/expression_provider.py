@@ -17,7 +17,7 @@ The TagEngine's change propagation loop handles ongoing re-evaluation.
 from __future__ import annotations
 
 import logging
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from forge.modules.ot.tag_engine.models import (
     TagType,

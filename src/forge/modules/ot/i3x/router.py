@@ -10,7 +10,7 @@ template_registry, acquisition_engine) via the factory function.
 from __future__ import annotations
 
 import logging
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, HTTPException, Query
 
@@ -23,9 +23,9 @@ from forge.modules.ot.i3x.models import (
 )
 
 if TYPE_CHECKING:
-    from forge.modules.ot.tag_engine.templates import TemplateRegistry
-    from forge.modules.ot.tag_engine.registry import TagRegistry
     from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
+    from forge.modules.ot.tag_engine.registry import TagRegistry
+    from forge.modules.ot.tag_engine.templates import TemplateRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -281,6 +281,7 @@ def create_i3x_router(
     async def get_ot_stats() -> dict[str, Any]:
         """OT module statistics — tag counts, provider health, templates."""
 
+        stats = await registry.get_stats()
         engine_health: dict[str, Any] = {}
         if acquisition_engine is not None:
             engine_health = await acquisition_engine.health()

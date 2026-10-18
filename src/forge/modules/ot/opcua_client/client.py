@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import asyncio
 import builtins
+import contextlib
 import logging
 import time
 from collections.abc import Callable
@@ -33,7 +34,7 @@ from forge.modules.ot.opcua_client.exceptions import (
     ConfigurationError,
     ConnectionError,
     CreateSubscriptionError,
-    EndpointUnreachable,
+    EndpointUnreachableError,
     HistoryReadError,
     OpcUaError,
     ReadError,
@@ -461,7 +462,7 @@ class OpcUaClient:
 
             url = self._endpoint.url
             if not url.startswith("opc.tcp://"):
-                raise EndpointUnreachable(
+                raise EndpointUnreachableError(
                     f"Invalid OPC-UA URL scheme: {url}",
                     endpoint_url=url,
                 )
@@ -497,11 +498,11 @@ class OpcUaClient:
             self._transition_state(ConnectionState.FAILED)
             self._ua_client = None
             raise
-        except (OSError, asyncio.TimeoutError, ConnectionRefusedError) as exc:
+        except (OSError, TimeoutError, ConnectionRefusedError) as exc:
             self._consecutive_failures += 1
             self._transition_state(ConnectionState.FAILED)
             self._ua_client = None
-            raise EndpointUnreachable(
+            raise EndpointUnreachableError(
                 f"Cannot reach {self._endpoint.url}: {exc}",
                 endpoint_url=self._endpoint.url,
             ) from exc
@@ -533,10 +534,8 @@ class OpcUaClient:
         # Cancel reconnect task
         if self._reconnect_task and not self._reconnect_task.done():
             self._reconnect_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._reconnect_task
-            except asyncio.CancelledError:
-                pass
             self._reconnect_task = None
 
         # Cancel subscription tasks
@@ -552,20 +551,16 @@ class OpcUaClient:
 
         # Delete asyncua subscriptions
         for ua_sub in self._ua_subscriptions.values():
-            try:
+            with contextlib.suppress(Exception):  # best-effort cleanup during disconnect
                 await ua_sub.delete()
-            except Exception:
-                pass  # Best-effort cleanup during disconnect
         self._ua_subscriptions.clear()
         self._subscriptions.clear()
         self._callbacks.clear()
 
         # Disconnect asyncua client
         if self._ua_client is not None:
-            try:
+            with contextlib.suppress(Exception):  # best-effort cleanup
                 await self._ua_client.disconnect()
-            except Exception:
-                pass  # Best-effort cleanup
             self._ua_client = None
 
         # Update state
@@ -959,20 +954,16 @@ class OpcUaClient:
         # Delete asyncua subscription
         if subscription_id in self._ua_subscriptions:
             ua_sub = self._ua_subscriptions.pop(subscription_id)
-            try:
+            with contextlib.suppress(Exception):  # best-effort cleanup
                 await ua_sub.delete()
-            except Exception:
-                pass  # Best-effort cleanup
 
         # Cancel background task if running
         if subscription_id in self._subscription_tasks:
             task = self._subscription_tasks.pop(subscription_id)
             if not task.done():
                 task.cancel()
-                try:
+                with contextlib.suppress(asyncio.CancelledError):
                     await task
-                except asyncio.CancelledError:
-                    pass
 
         sub = self._subscriptions.pop(subscription_id)
         self._callbacks.pop(subscription_id, None)

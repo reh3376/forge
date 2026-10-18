@@ -12,8 +12,9 @@ will be wired in when the forge.db SDK module is built (Phase 2B.1.4).
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from forge.modules.ot.tag_engine.models import TagType
 from forge.modules.ot.tag_engine.providers.base import BaseProvider
@@ -58,10 +59,8 @@ class QueryProvider(BaseProvider):
         for task in self._poll_tasks.values():
             task.cancel()
         for task in self._poll_tasks.values():
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await task
-            except asyncio.CancelledError:
-                pass
         self._poll_tasks.clear()
 
     async def _health(self) -> dict[str, Any]:

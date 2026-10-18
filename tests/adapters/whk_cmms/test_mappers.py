@@ -362,7 +362,10 @@ class TestMapInventoryInvestigation:
     """Test InventoryInvestigation → OperationalEvent mapping."""
 
     @pytest.mark.skip(
-        reason="OperationalEvent requires entity_type, entity_id, event_time - mapper needs enhancement"
+        reason=(
+            "OperationalEvent requires entity_type, entity_id, event_time - "
+            "mapper needs enhancement"
+        )
     )
     def test_basic_mapping(self):
         raw = {
@@ -387,7 +390,10 @@ class TestMapInventoryInvestigation:
         assert event is None
 
     @pytest.mark.skip(
-        reason="OperationalEvent requires entity_type, entity_id, event_time - mapper needs enhancement"
+        reason=(
+            "OperationalEvent requires entity_type, entity_id, event_time - "
+            "mapper needs enhancement"
+        )
     )
     def test_investigation_discrepancy(self):
         raw = {
@@ -399,7 +405,10 @@ class TestMapInventoryInvestigation:
         assert event.metadata["discrepancy"] == 4
 
     @pytest.mark.skip(
-        reason="OperationalEvent requires entity_type, entity_id, event_time - mapper needs enhancement"
+        reason=(
+            "OperationalEvent requires entity_type, entity_id, event_time - "
+            "mapper needs enhancement"
+        )
     )
     def test_investigation_discrepancy_zero(self):
         raw = {
@@ -411,7 +420,10 @@ class TestMapInventoryInvestigation:
         assert event.metadata["discrepancy"] == 0
 
     @pytest.mark.skip(
-        reason="OperationalEvent requires entity_type, entity_id, event_time - mapper needs enhancement"
+        reason=(
+            "OperationalEvent requires entity_type, entity_id, event_time - "
+            "mapper needs enhancement"
+        )
     )
     def test_investigation_discrepancy_missing_counts(self):
         raw = {

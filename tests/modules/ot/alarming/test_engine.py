@@ -15,7 +15,6 @@ Covers:
 - Deduplication (same tag+type doesn't create duplicates)
 """
 
-
 import pytest
 
 from forge.modules.ot.alarming.engine import AlarmEngine

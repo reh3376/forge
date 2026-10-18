@@ -14,10 +14,11 @@ in single-site Forge deployments.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
 from dataclasses import dataclass
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from forge.core.broker.session import MqttSession, SessionState
 from forge.core.broker.topic_engine import TopicEngine
@@ -174,10 +175,8 @@ class ForgeMqttBroker:
         # Stop $SYS publisher
         if self._sys_task and not self._sys_task.done():
             self._sys_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._sys_task
-            except asyncio.CancelledError:
-                pass
 
         # Disconnect all sessions
         for session in list(self._sessions.values()):

@@ -1,6 +1,5 @@
 """Tests for the bridge tag mapper."""
 
-
 from forge.modules.ot.bridge.models import BridgeConfig, TagMappingRule
 from forge.modules.ot.bridge.tag_mapper import TagMapper
 from forge.modules.ot.opcua_client.paths import PathNormalizer
