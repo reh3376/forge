@@ -34,9 +34,10 @@ jobs:
         run: |
           uv venv --clear .venv
           uv pip install --python .venv/bin/python -e ".[dev,ot]"
-      - name: ruff (advisory until BACKLOG FB-022 is cleared)
+      - name: ruff check
         run: .venv/bin/ruff check . --output-format github
-        continue-on-error: true
+      - name: ruff format
+        run: .venv/bin/ruff format --check .
       - name: pytest
         run: .venv/bin/pytest tests -q --no-header -p no:cacheprovider
 

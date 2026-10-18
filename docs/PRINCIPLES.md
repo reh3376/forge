@@ -179,7 +179,7 @@ Every spoke follows the same checklist: owner approval of the compliance plan (`
 
 From the executed sprints of April 2026 (FACTS, core models, WMS and MES adapters, gRPC transport, curation):
 
-- **Pydantic v2 and `TYPE_CHECKING` do not mix.** Types used in model field annotations must be runtime imports when `from __future__ import annotations` is on; suppress the ruff TC rules there rather than moving the import.
+- **Pydantic v2 and `TYPE_CHECKING` do not mix.** Types used in model field annotations must be runtime imports when `from __future__ import annotations` is on. `[tool.ruff.lint.flake8-type-checking] runtime-evaluated-base-classes` lists `pydantic.BaseModel` so the TC rules leave those imports alone (FB-022); do not move them by hand.
 - **`False or fallback` loses `False`.** Use explicit `is None` checks for any field where `False` is meaningful (it bit the MES mapper's `isClassDefinition`).
 - **Provenance envelope and flat references.** Every domain model carries `forge_id`, `source_system`, `source_id`, `captured_at`, `metadata`; relationships are ids (`lot_id: str`), not embedded objects. Canonical enums are defined but adapters map source-specific values.
 - **`RecordContext.extra`** keeps spoke-specific context next to the named fields, so both vocabularies survive in one record.

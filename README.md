@@ -339,8 +339,9 @@ uv sync
 # Run tests
 uv run pytest
 
-# Run linter
+# Lint and format checks (both block CI)
 uv run ruff check .
+uv run ruff format --check .
 
 # Run specific test suite
 uv run pytest tests/modules/ot/ -v           # OT Module tests
