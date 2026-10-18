@@ -1,4 +1,4 @@
-"""``forge governance specs | stamp | approve`` (BACKLOG FB-021)."""
+"""``forge governance specs | stamp | approve`` (FB-021) and ``run`` (FB-083)."""
 
 from __future__ import annotations
 
@@ -226,3 +226,64 @@ def test_render_integrity_falls_back_to_a_full_dump_without_a_top_level_block() 
 def test_validate_spec_knows_fvts_and_ftts() -> None:
     code, out = run("validate-spec", str(FVTS_OT))
     assert code == 0 and "[PASS]" in out and "FVTS" in out
+
+
+# -- run (FB-083) -----------------------------------------------------------
+
+
+def test_run_facts_by_adapter_id_and_by_file() -> None:
+    code, out = run("run", "facts", "whk-wms")
+    assert code == 0, out
+    assert "[PASS] FACTS — whk-wms" in out and "All checks passed." in out
+
+    code, out = run("run", "facts", str(FACTS_WMS), "--format", "json")
+    assert code == 0, out
+    report = json.loads(out)
+    assert report["framework"] == "FACTS" and report["target"] == "whk-wms"
+    assert report["metadata"]["spec_file"] == str(FACTS_WMS)
+    assert {v["status"] for v in report["verdicts"]} <= {"PASS", "SKIP"}
+
+
+def test_run_lists_the_failed_checks_and_exits_1(tmp_path: Path) -> None:
+    spec = json.loads(FACTS_WMS.read_text(encoding="utf-8"))
+    spec["adapter_identity"]["adapter_id"] = "Not Kebab"
+    path = tmp_path / "broken.facts.json"
+    path.write_text(json.dumps(spec, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    code, out = run("run", "facts", str(path))
+    assert code == 1
+    assert "[FAIL] FACTS — Not Kebab" in out and "Failed checks:" in out
+    assert "facts:identity-id-format" in out and "[HASH MISMATCH]" in out
+
+
+def test_run_fvts_reference_only_waits_on_the_owner(tmp_path: Path) -> None:
+    out_file = tmp_path / "fvts.json"
+    code, out = run("run", "fvts", "ot-module-views", "--format", "json", "--output", str(out_file))
+    report = json.loads(out)
+    assert report == json.loads(out_file.read_text(encoding="utf-8"))
+    assert report["framework"] == "FVTS" and len(report["verdicts"]) == 19
+    not_ok = {v["check_id"] for v in report["verdicts"] if v["status"] not in ("PASS", "SKIP")}
+    assert not_ok <= {"fvts:hash-approved"}  # pending the owner's approval, nothing else
+    assert code == (1 if not_ok else 0)
+
+
+def test_run_ftts_and_fats_load_their_specs() -> None:
+    code, out = run("run", "ftts", "grpc-hardened-transport")
+    assert code == 0, out
+    assert "[PASS] FTTS — grpc-hardened-transport" in out
+
+    code, out = run("run", "fats", "/v1/health", "--format", "json")
+    report = json.loads(out)
+    assert report["framework"] == "FATS" and report["target"] == "/v1/health"
+    assert report["metadata"]["spec_file"].endswith("v1_health.json")
+    assert not [v for v in report["verdicts"] if v["check_id"] == "fats:spec-load"]
+
+
+def test_run_rejects_unknown_frameworks_targets_and_formats(tmp_path: Path) -> None:
+    code, out = run("run", "fqts", "anything")
+    assert code == 1 and "no runner on the CLI" in out
+    code, out = run("run", "facts", "no-such-adapter")
+    assert code == 1 and "no FACTS spec for 'no-such-adapter'" in out
+    code, out = run("run", "facts", "whk-wms", "--specs", str(tmp_path))
+    assert code == 1 and str(tmp_path) in out
+    code, _ = run("run", "facts", "whk-wms", "--format", "yaml")
+    assert code == 2

@@ -173,19 +173,21 @@ Every other section is closed (`additionalProperties: false`). The enums, as the
 | `facts:live-context-fields` | Collected records contain all required context fields |
 | `facts:live-capability-interfaces` | Declared capabilities have matching interface implementations |
 
-### Usage (Planned)
+### Usage
 
 ```bash
-# Static validation
-forge governance run facts --adapter whk-wms
-forge governance run facts --spec path/to/whk-wms.facts.json
+# Static validation: by adapter_id (looked up in src/forge/governance/facts/specs) or by file
+forge governance run facts whk-wms
+forge governance run facts path/to/whk-wms.facts.json
 
-# Live validation (requires adapter code)
-forge governance run facts --adapter whk-wms --live
+# Live validation (instantiates and exercises the adapter)
+forge governance run facts whk-wms --live
 
-# JSON report output
-forge governance run facts --adapter whk-wms --format json --output reports/facts-whk-wms.json
+# JSON report (also printed with --format json)
+forge governance run facts whk-wms --output reports/facts-whk-wms.json
 ```
+
+The command exits 1 when any check fails and prints the failed checks with their violations; the first verdict is always `facts:schema-valid`.
 
 Spec integrity is on the CLI already (FB-021): `forge governance specs --pending` lists what awaits approval, `forge governance stamp <spec> --by <who> --reason <why>` re-hashes an edited spec, `forge governance approve <spec> --by <owner>` records the owner's approval, and `forge governance validate-spec <path>` checks a file against this schema.
 

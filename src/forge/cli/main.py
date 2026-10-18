@@ -7,8 +7,8 @@ Subcommands:
   forge health      — Check platform health
   forge version     — Show version info
   forge adapter     — Adapter management (list, register, status)
-  forge governance  — FxTS spec governance: runners, schema validation,
-                      spec hash stamp/approve (FB-021)
+  forge governance  — FxTS spec governance: conformance runs (FB-083),
+                      schema validation, spec hash stamp/approve (FB-021)
   forge migrate     — Database migrations
   forge db access   — Module schema grants and Forge-issued credentials (FB-057)
 """
@@ -219,49 +219,50 @@ governance_app.command("approve")(governance_cli.approve)
 
 @governance_app.command("run")
 def governance_run(
-    framework: Annotated[
-        str,
-        typer.Argument(help="Framework to run (fats, facts, fqts, fsts)"),
-    ],
+    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts")],
     target: Annotated[
         str,
-        typer.Argument(help="Target to validate (endpoint path, adapter ID, etc.)"),
+        typer.Argument(
+            help=(
+                "A spec file, or its id: endpoint path (FATS), adapter_id (FACTS), "
+                "view_id (FVTS), transport_id (FTTS)"
+            )
+        ),
     ],
     spec_dir: Annotated[
         Path | None,
-        typer.Option("--specs", help="Directory containing spec files"),
+        typer.Option("--specs", help="Directory to look an id up in (default: the framework's)"),
     ] = None,
     live: Annotated[
-        bool,
-        typer.Option("--live", help="Run live checks against running services"),
+        bool, typer.Option("--live", help="Also run the live checks (FATS, FACTS, FTTS)")
     ] = False,
+    fmt: Annotated[str, typer.Option("--format", help="text | json")] = "text",
+    output: Annotated[
+        Path | None, typer.Option("--output", help="Also write the JSON report to this file")
+    ] = None,
 ) -> None:
-    """Run FxTS governance checks for a framework."""
+    """Run one framework's conformance checks on one spec (exit 1 on any failure)."""
     import asyncio
 
-    typer.echo(f"Running {framework.upper()} governance on '{target}' ...")
-
-    if framework.lower() == "fats":
-        from forge.governance.fats.runners.fats_runner import FATSRunner
-
-        schema_path = spec_dir / "fats.schema.json" if spec_dir else None
-        runner = FATSRunner(schema_path=schema_path)
-        report = asyncio.run(runner.run(target=target, live=live))
-    else:
-        typer.echo(f"Framework '{framework}' runner not yet implemented.")
+    name = framework.lower()
+    if name not in governance_cli.FRAMEWORKS:
+        known = ", ".join(governance_cli.FRAMEWORKS)
+        typer.echo(f"Framework '{framework}' has no runner on the CLI ({known}).")
         raise typer.Exit(code=1)
-
-    # Print report
-    typer.echo(report.summary())
+    if fmt not in ("text", "json"):
+        raise typer.BadParameter("--format must be text or json")
+    if fmt == "text":
+        typer.echo(f"Running {name.upper()} governance on '{target}' ...")
+    try:
+        report = asyncio.run(
+            governance_cli.run_framework(name, target, specs_dir=spec_dir, live=live)
+        )
+    except FileNotFoundError as exc:
+        typer.echo(str(exc))
+        raise typer.Exit(code=1) from None
+    governance_cli.emit_report(report, fmt, output)
     if not report.passed:
-        typer.echo("\nFailed checks:")
-        for v in report.verdicts:
-            if v.status not in ("PASS", "SKIP"):
-                typer.echo(f"  [{v.status}] {v.check_id}: {v.message}")
-                for violation in v.violations:
-                    typer.echo(f"    → {violation.field}: {violation.message}")
         raise typer.Exit(code=1)
-    typer.echo("All checks passed.")
 
 
 # ---------------------------------------------------------------------------

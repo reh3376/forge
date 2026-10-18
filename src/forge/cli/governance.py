@@ -1,8 +1,9 @@
-"""Spec integrity from the command line (BACKLOG FB-021).
+"""Spec integrity and conformance runs from the command line (FB-021, FB-083).
 
     forge governance specs [--root DIR] [--pending]     hash state of every spec
     forge governance stamp SPEC --by WHO --reason TEXT   re-hash after an edit
     forge governance approve SPEC --by WHO               the owner's approval
+    forge governance run FRAMEWORK TARGET                one framework's checks on one spec
 
 ``stamp`` wraps :func:`forge.governance.shared.runner.add_spec_hash`: it
 recomputes the content hash, pushes the old one into ``change_history``
@@ -17,14 +18,22 @@ it (see ``docs/governance/facts-developer-guide.md``).
 Writes replace only the top-level ``integrity`` block in the file: the rest
 keeps its bytes (key order, line wrapping, escaping), so the review diff of
 an approval is the approval.
+
+``run`` takes the framework (``fats``, ``facts``, ``fvts``, ``ftts``) and a
+target that is either a spec file or the id the framework checks identity
+against (endpoint path, ``adapter_id``, ``view_id``, ``transport_id``); an
+id is looked up in the framework's spec directory.  The runner gets the
+packaged schema, and the report prints as text or JSON (``--format``,
+``--output``).  Exit status 1 when a check fails.
 """
 
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Annotated, Any
+from typing import TYPE_CHECKING, Annotated, Any
 
 import typer
 
@@ -35,8 +44,15 @@ from forge.governance.shared.runner import (
     verify_spec_hash,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from forge.governance.shared.runner import FxTSReport, FxTSRunner
+
 #: ``src/forge/governance``: every ``<framework>/specs/*.json`` under it is a spec.
 SPEC_ROOT = Path(__file__).resolve().parent.parent / "governance"
+#: The checkout; the FTTS spec lives in its top-level ``specs/``.
+REPO_ROOT = Path(__file__).resolve().parents[3]
 
 #: Who or what made a change (the FACTS schema's ``change_history[].source``).
 CHANGE_SOURCES = ("manual", "ci", "agent", "spec_update")
@@ -221,3 +237,150 @@ def approve(
         f"{spec_file.name}: hash {_short(integrity['spec_hash'])} approved by {by} "
         f"at {integrity['approved_at']}."
     )
+
+
+# -- run --------------------------------------------------------------------
+
+
+def _fats_runner(schema: Path) -> FxTSRunner:
+    from forge.governance.fats.runners.fats_runner import FATSRunner
+
+    return FATSRunner(schema_path=schema)
+
+
+def _facts_runner(schema: Path) -> FxTSRunner:
+    from forge.governance.facts.runners.facts_runner import FACTSRunner
+
+    return FACTSRunner(schema_path=schema)
+
+
+def _fvts_runner(schema: Path) -> FxTSRunner:
+    from forge.governance.fvts.runners.fvts_runner import FVTSRunner
+
+    return FVTSRunner(schema_path=schema)
+
+
+def _ftts_runner(schema: Path) -> FxTSRunner:
+    from forge.governance.ftts.runners.ftts_runner import FTTSRunner
+
+    return FTTSRunner(schema_path=schema)
+
+
+@dataclass(frozen=True)
+class Framework:
+    """How the CLI finds, identifies and runs one framework's specs."""
+
+    label: str
+    specs_dir: Path
+    pattern: str
+    schema: Path
+    identity: tuple[str, ...]  # path of the id the runner checks the target against
+    make_runner: Callable[[Path], FxTSRunner]
+    live: bool  # the runner takes a ``live`` flag
+
+
+FRAMEWORKS: dict[str, Framework] = {
+    "fats": Framework(
+        "FATS",
+        SPEC_ROOT / "fats" / "specs",
+        "*.json",
+        SPEC_ROOT / "fats" / "schema" / "fats.schema.json",
+        ("endpoint",),
+        _fats_runner,
+        live=True,
+    ),
+    "facts": Framework(
+        "FACTS",
+        SPEC_ROOT / "facts" / "specs",
+        "*.facts.json",
+        SPEC_ROOT / "facts" / "schema" / "facts.schema.json",
+        ("adapter_identity", "adapter_id"),
+        _facts_runner,
+        live=True,
+    ),
+    "fvts": Framework(
+        "FVTS",
+        SPEC_ROOT / "fvts" / "specs",
+        "*.fvts.json",
+        SPEC_ROOT / "fvts" / "schema" / "fvts.schema.json",
+        ("view_identity", "view_id"),
+        _fvts_runner,
+        live=False,
+    ),
+    "ftts": Framework(
+        "FTTS",
+        REPO_ROOT / "specs",
+        "*.ftts.json",
+        SPEC_ROOT / "ftts" / "schema" / "ftts.schema.json",
+        ("transport_identity", "transport_id"),
+        _ftts_runner,
+        live=True,
+    ),
+}
+
+
+def identity_of(spec: dict[str, Any], path: tuple[str, ...]) -> str:
+    node: Any = spec
+    for key in path:
+        node = node.get(key) if isinstance(node, dict) else None
+    return node if isinstance(node, str) else ""
+
+
+def resolve_spec(
+    framework: Framework, target: str, specs_dir: Path | None = None
+) -> tuple[Path, dict[str, Any], str]:
+    """``(file, spec, id)`` for a target that is a spec file or an id.
+
+    A file is taken as is and its id read from the spec.  An id is matched
+    against the identity field of every spec in the directory.
+    """
+    path = Path(target)
+    if path.is_file():
+        spec = json.loads(path.read_text(encoding="utf-8"))
+        return path, spec, identity_of(spec, framework.identity) or path.stem
+    directory = specs_dir or framework.specs_dir
+    for file in sorted(directory.glob(framework.pattern)):
+        try:
+            spec = json.loads(file.read_text(encoding="utf-8"))
+        except ValueError:
+            continue
+        if identity_of(spec, framework.identity) == target:
+            return file, spec, target
+    msg = f"no {framework.label} spec for '{target}' in {directory} (pass a spec file instead)"
+    raise FileNotFoundError(msg)
+
+
+async def run_framework(
+    name: str, target: str, *, specs_dir: Path | None = None, live: bool = False
+) -> FxTSReport:
+    """Run one framework's checks on one spec; the report names the file it ran."""
+    framework = FRAMEWORKS[name]
+    file, spec, ident = resolve_spec(framework, target, specs_dir)
+    runner = framework.make_runner(framework.schema)
+    kwargs: dict[str, Any] = {"spec": spec}
+    if framework.live:
+        kwargs["live"] = live
+    report = await runner.run(target=ident, **kwargs)
+    report.metadata["spec_file"] = str(file)
+    return report
+
+
+def emit_report(report: FxTSReport, fmt: str, output: Path | None) -> None:
+    """Print the report (text or JSON) and optionally write the JSON to ``output``."""
+    if output is not None:
+        output.write_text(report.to_json() + "\n", encoding="utf-8")
+    if fmt == "json":
+        typer.echo(report.to_json())
+        return
+    typer.echo(report.summary())
+    if not report.passed:
+        typer.echo("\nFailed checks:")
+        for v in report.verdicts:
+            if v.status not in ("PASS", "SKIP"):
+                typer.echo(f"  [{v.status}] {v.check_id}: {v.message}")
+                for violation in v.violations:
+                    typer.echo(f"    -> {violation.field}: {violation.message}")
+    else:
+        typer.echo("All checks passed.")
+    if output is not None:
+        typer.echo(f"JSON report written to {output}")
