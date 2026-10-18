@@ -9,7 +9,7 @@ This record accumulates the decisions and the open questions about how Forge dec
 
 ## 1. Why this matters now
 
-- Two unrelated role sets exist: the hub API's `admin / operator / viewer` (expanded to scopes such as `adapters:write`, enforced on the write, backfill and subscription endpoints since FB-063) and the OT write engine's `OPERATOR / ENGINEER / ADMIN` with per-area, per-tag permissions and interlock bypass.
+- Two unrelated role sets exist: the hub API's `admin / operator / viewer` (expanded to scopes such as `adapters:write`, enforced on the write, backfill and subscription endpoints since FB-063 and on every OT control POST since FB-074/FB-082) and the OT write engine's `OPERATOR / ENGINEER / ADMIN` with per-area, per-tag permissions and interlock bypass.
 - Nothing is scoped to a site, area or equipment, so a multi-site enterprise cannot be expressed.
 - forge-display (FVTS) needs to name the permission an action requires; the Go management modules need one SDK-provided way to declare and check permissions; third-party integration modules need the same.
 - Getting this wrong is expensive to unwind: permissions end up referenced from every module, every screen and every audit record.

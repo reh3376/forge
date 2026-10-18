@@ -46,6 +46,7 @@ Component-by-component snapshot: [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md). Delivered
 | FACTS runner validates against the schema (`facts:schema-valid` first), enums read from the schema, vocabulary extended for gRPC/push/mTLS; 8 of 9 specs validate, 5 re-stamped `pending_review` | FB-080 |
 | Repository public again; secret scanning, push protection, CodeQL, Dependabot, private vulnerability reporting, fork-PR approval re-enabled | FB-044 (owner's flip, 2026-10-17) |
 | Server-side write review: two-step review tokens and reason codes enforced in the OT write engine (`REJECTED_REVIEW`), operator write endpoints behind `adapters:write`; FVTS/FACTS OT specs re-stamped `pending_review` | FB-074 |
+| Every OT control POST (changeover confirm-start, retry-recipe, resume; connection restart) behind `adapters:write`, acting hub user on the MES write, audit record and events | FB-082 |
 
 ---
 
@@ -88,7 +89,7 @@ Phases 1–4 of the P7 plan (OPC-UA client, tag engine, scripting/MQTT, alarms, 
 | FB-073 re-stamp the OT FACTS spec (placeholder hash, non-FHTS state) | Done 2026-10-16 (awaiting owner approval) | Hash verifies; `pending_review`. Approve after FB-079. |
 | FB-079 OT FACTS spec vocabulary and identity (8 runner failures; three adapter identities) | Decision needed (D-8) | Extend the FACTS vocabulary for OT adapters or translate the spec; absorbs FB-018. |
 | FB-074 server-side two-step review and reason codes for tag writes | Done 2026-10-17 (two re-stamped specs await approval) | `WriteReviewer` is layer 2 of the chain; stage/commit REST; `REJECTED_REVIEW` in FVTS and FACTS. Multi-party approval (pending-action record) waits on D-1. |
-| FB-082 OT control POST endpoints (changeover, connection restart) carry no scope check | Not started | Found during FB-074; mirror its `adapters:write` dependency. |
+| FB-082 OT control POST endpoints (changeover, connection restart) carry no scope check | Done 2026-10-17 | Same `adapters:write` dependency and identity rule as the FB-074 write endpoints; the hub user is the recorded actor. |
 | FB-018 OT manifest tier/output_format vs manifest builder · FB-020 remaining unwired OT ↔ MES hooks (`BatchContextResolver`) | Not started | FB-065 wired the recipe adapter; the batch resolver is still manual. |
 | P7 Phases 5–7 (Ignition bridge, script migration, decommission) | Reframed by A-4 | Becomes: forge-ignition integration module + optional forge-hmi-scada module (WS-6/WS-7). |
 
@@ -136,8 +137,8 @@ FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory r
 
 | Item | Status | Notes |
 |---|---|---|
-| Public flip after GC confirmation; re-enable protections | Blocked (on GitHub Support #4862642) | Runbook §6; re-probe the purged SHAs first; collaborator must re-clone. |
-| FB-044 protections reset while private · FB-049 branch protection · FB-047 auto-PR identity token | Not started | |
+| Public flip and protections re-enabled | Done 2026-10-17 (owner's flip, D-6) | Ahead of Support's GC (#4862642): the purged commits stay fetchable through `refs/pull/4..8` until then; close the 4 secret-scanning alerts as revoked after GC. |
+| FB-044 two owner toggles (non-provider patterns, validity checks) · FB-049 branch protection · FB-047 auto-PR identity token | FB-044 done except the toggles; FB-047/FB-049 open | |
 | FB-029 rotated credentials (done) and FB-046 purge consequences | Done / monitor | Keep the gitleaks scan rule (A-9). |
 | FB-043 privacy hygiene · FB-045 env vaults · FB-050 Dependabot | Not started | FB-050 also in WS-5. |
 
@@ -202,7 +203,7 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 | WS-1 transport | — | FB-072 | FB-055, FB-056, FB-071 | FB-002 to close as superseded |
 | WS-2 hub platform | FB-001, FB-003 | FB-004, FB-005, FB-006, FB-007, FB-059, FB-075 | FB-008, FB-009 | |
 | WS-3 data model | FB-010, FB-011 | FB-012, FB-013, FB-016 | FB-014, FB-015 | |
-| WS-4 OT module | — | FB-020, FB-079, FB-082 | FB-018 | FB-073, FB-074 done (awaiting approval) |
+| WS-4 OT module | — | FB-020, FB-079 | FB-018 | FB-073, FB-074 done (awaiting approval); FB-082 done |
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
 | WS-6 forge-display | — | — | — | No backlog ids yet; tracked here until the design lands |
 | WS-7 module SDK | — | FB-017 | FB-019, FB-021 | |

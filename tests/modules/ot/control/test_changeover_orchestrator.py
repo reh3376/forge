@@ -27,6 +27,7 @@ from forge.modules.ot.control import (
     RecipeWriteResult,
     parse_recipe_payload,
 )
+from forge.modules.ot.control.changeover_orchestrator import OT_ADAPTER_ID
 from forge.modules.ot.mqtt.subscriber import IncomingMessage, MqttSubscriber
 from forge.transport.spoke_callback import WriteDispatchError, WriteOutcome
 
@@ -501,8 +502,10 @@ async def test_partial_recipe_download_is_not_reported_and_can_be_retried() -> N
     assert "2/3 parameters confirmed" in rt.last_error
 
     writer.fail_params = set()
-    assert await orch.retry_recipe("cooker") is True
+    assert await orch.retry_recipe("cooker", actor="alice") is True
     assert len(writer.calls) == 2
+    actions = [e for e in orch.events("cooker") if e.kind == "operator_action"]
+    assert actions[-1].detail == {"action": "retry_recipe", "actor": "alice"}
     assert [c[1] for c in mes.calls] == ["recipe-loaded"]
     assert rt.mes_state == "READY_TO_START" and rt.pending_recipe is None
     with pytest.raises(ChangeoverSequenceError, match="no pending recipe"):
@@ -639,3 +642,28 @@ async def test_bind_and_handle_message_route_mqtt_topics() -> None:
     )
     assert kinds(orch)[-1] == "bad_payload"
     assert subscriber.get_stats()["errors"] == 0
+
+
+async def test_operator_actions_record_the_actor() -> None:
+    """FB-082: confirm-start puts the operator on the write event and the audit
+    record; resume logs who asked; programmatic callers add nothing."""
+    orch, mes, _writer, sink = make()
+    mes.states["cooker"] = "READY_TO_START"
+    await orch.on_state(
+        "cooker", state_payload("READY_TO_START", entered="2026-06-01T10:05:00.000Z")
+    )
+    outcome = await orch.confirm_start("cooker", "alice")
+    assert outcome.success
+    event = orch.events("cooker")[-1]
+    assert event.kind == "write" and event.detail["actor"] == "alice"
+    record = sink.records[-1]
+    assert record.context.operator_id == "alice" and record.context.extra["actor"] == "alice"
+    assert record.context.extra["write_requested_by"] == OT_ADAPTER_ID
+
+    await orch.resume("cooker", actor="bob")
+    actions = [e for e in orch.events("cooker") if e.kind == "operator_action"]
+    assert actions == [actions[-1]] and actions[-1].detail == {"action": "resume", "actor": "bob"}
+
+    before = len(orch.events("cooker"))
+    await orch.resume("cooker")
+    assert [e.kind for e in orch.events("cooker")[before:]] == []
