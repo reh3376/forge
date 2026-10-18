@@ -81,9 +81,7 @@ def create_i3x_router(
                 namespaces.append(ns)
         else:
             # Infer from tag definitions
-            stats = await registry.get_stats()
             seen_connections: set[str] = set()
-            all_tags = stats.get("total_tags", 0)
             # Browse root to find connection-level folders
             root_items = await registry.browse("")
             for item in root_items:
@@ -282,7 +280,6 @@ def create_i3x_router(
     @router.get("/stats")
     async def get_ot_stats() -> dict[str, Any]:
         """OT module statistics — tag counts, provider health, templates."""
-        stats = await registry.get_stats()
 
         engine_health: dict[str, Any] = {}
         if acquisition_engine is not None:

@@ -116,7 +116,7 @@ class TestClearUnackPath:
 class TestSuppression:
     def test_suppress_from_active_unack(self, sm: AlarmStateMachine):
         alarm = _make_alarm(AlarmState.ACTIVE_UNACK)
-        result = sm.transition(alarm, AlarmAction.SUPPRESS)
+        sm.transition(alarm, AlarmAction.SUPPRESS)
         assert alarm.state == AlarmState.SUPPRESSED
         assert alarm._state_before_admin == AlarmState.ACTIVE_UNACK
 
@@ -205,7 +205,7 @@ class TestOutOfService:
 class TestReset:
     def test_reset_from_active_unack(self, sm: AlarmStateMachine):
         alarm = _make_alarm(AlarmState.ACTIVE_UNACK)
-        result = sm.transition(alarm, AlarmAction.RESET)
+        sm.transition(alarm, AlarmAction.RESET)
         assert alarm.state == AlarmState.NORMAL
 
     def test_reset_from_shelved(self, sm: AlarmStateMachine):

@@ -200,7 +200,6 @@ class TagRegistry:
         folder objects in the registry.
         """
         prefix = prefix.rstrip("/")
-        depth = len(prefix.split("/")) if prefix else 0
 
         children: dict[str, dict[str, Any]] = {}
 

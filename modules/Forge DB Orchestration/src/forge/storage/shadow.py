@@ -159,8 +159,8 @@ class ShadowWriter:
         grouped = self.router.route_batch(records)
         results: list[WriteResult] = []
 
-        for engine, items in grouped.items():
-            for record, decision in items:
+        for _engine, items in grouped.items():
+            for record, _decision in items:
                 result = await self.write(record)
                 results.append(result)
 

@@ -101,7 +101,7 @@ class TestTagPublisher:
 
     @pytest.mark.asyncio
     async def test_publish_health(self, setup):
-        tag_pub, mqtt_pub = setup
+        tag_pub, _mqtt_pub = setup
         result = await tag_pub.publish_health(
             plc_id="PLC_001",
             connected=True,
@@ -113,7 +113,7 @@ class TestTagPublisher:
 
     @pytest.mark.asyncio
     async def test_publish_equipment_status(self, setup):
-        tag_pub, mqtt_pub = setup
+        tag_pub, _mqtt_pub = setup
         result = await tag_pub.publish_equipment_status(
             equipment_id="CIP_001",
             field_name="cipState",
@@ -125,7 +125,7 @@ class TestTagPublisher:
 
     @pytest.mark.asyncio
     async def test_publish_alarm(self, setup):
-        tag_pub, mqtt_pub = setup
+        tag_pub, _mqtt_pub = setup
         result = await tag_pub.publish_alarm(
             alarm_id="a1",
             alarm_name="HIGH_TEMP",

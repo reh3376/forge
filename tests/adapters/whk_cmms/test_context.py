@@ -101,7 +101,7 @@ class TestSchedulingContext:
             "entity_type": "WorkRequest",
             "period": "Week",
         }
-        ctx = build_record_context(raw)
+        build_record_context(raw)
         # period is stored in extra if present
         # (context builder may or may not include it depending on implementation)
 
@@ -110,7 +110,7 @@ class TestSchedulingContext:
             "entity_type": "WorkRequest",
             "periodicFrequency": 2,
         }
-        ctx = build_record_context(raw)
+        build_record_context(raw)
         # periodic_frequency extraction if implemented
 
     def test_scheduled_start(self):

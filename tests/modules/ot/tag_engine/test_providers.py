@@ -215,7 +215,7 @@ class TestOpcUaProvider:
 
     @pytest.mark.asyncio
     async def test_start_connects_and_subscribes(self, setup):
-        provider, client, registry = setup
+        provider, client, _registry = setup
         await provider.start()
 
         client.connect.assert_called_once()
@@ -231,7 +231,7 @@ class TestOpcUaProvider:
 
     @pytest.mark.asyncio
     async def test_on_data_change_updates_registry(self, setup):
-        provider, client, registry = setup
+        provider, _client, registry = setup
         await provider.start()
 
         # Simulate an OPC-UA data change callback
@@ -252,7 +252,7 @@ class TestOpcUaProvider:
 
     @pytest.mark.asyncio
     async def test_on_data_change_ignores_unknown_node(self, setup):
-        provider, client, registry = setup
+        provider, _client, _registry = setup
         await provider.start()
 
         dv = DataValue(value=99.0)
@@ -262,7 +262,7 @@ class TestOpcUaProvider:
 
     @pytest.mark.asyncio
     async def test_stop_unsubscribes_and_disconnects(self, setup):
-        provider, client, registry = setup
+        provider, client, _registry = setup
         await provider.start()
         await provider.stop()
 
@@ -273,7 +273,7 @@ class TestOpcUaProvider:
 
     @pytest.mark.asyncio
     async def test_resubscribe_refreshes_subscriptions(self, setup):
-        provider, client, registry = setup
+        provider, client, _registry = setup
         await provider.start()
         assert client.subscribe.call_count == 1
 
@@ -283,7 +283,7 @@ class TestOpcUaProvider:
 
     @pytest.mark.asyncio
     async def test_health_reports_connection_metrics(self, setup):
-        provider, client, registry = setup
+        provider, _client, _registry = setup
         await provider.start()
         h = await provider.health()
 
@@ -294,7 +294,7 @@ class TestOpcUaProvider:
 
     @pytest.mark.asyncio
     async def test_read_current_reads_from_plc(self, setup):
-        provider, client, registry = setup
+        provider, client, _registry = setup
         await provider.start()
 
         dv = DataValue(
@@ -310,7 +310,7 @@ class TestOpcUaProvider:
 
     @pytest.mark.asyncio
     async def test_read_current_returns_none_for_non_standard_tag(self, setup):
-        provider, client, registry = setup
+        provider, _client, registry = setup
         await provider.start()
 
         # Register a memory tag and try to read it via OPC-UA
@@ -321,7 +321,7 @@ class TestOpcUaProvider:
 
     @pytest.mark.asyncio
     async def test_write_to_plc(self, setup):
-        provider, client, registry = setup
+        provider, client, _registry = setup
         await provider.start()
 
         ok = await provider.write_to_plc(
@@ -332,7 +332,7 @@ class TestOpcUaProvider:
 
     @pytest.mark.asyncio
     async def test_write_to_plc_fails_for_non_standard_tag(self, setup):
-        provider, client, registry = setup
+        provider, _client, registry = setup
         mem = MemoryTag(path="test/mem2", description="test")
         await registry.register(mem)
         ok = await provider.write_to_plc("test/mem2", 42)
@@ -404,7 +404,7 @@ class TestMemoryProvider:
 
     @pytest.mark.asyncio
     async def test_write_returns_false_for_unknown_tag(self, setup):
-        provider, registry = setup
+        provider, _registry = setup
         await provider.start()
         ok = await provider.write("nonexistent/tag", 1)
         assert ok is False
@@ -428,7 +428,7 @@ class TestMemoryProvider:
 
     @pytest.mark.asyncio
     async def test_health_reports_initialized_count(self, setup):
-        provider, registry = setup
+        provider, _registry = setup
         await provider.start()
         h = await provider.health()
         assert h["initialized_tags"] == 3
@@ -468,7 +468,7 @@ class TestExpressionProvider:
 
     @pytest.mark.asyncio
     async def test_start_runs_initial_computation(self, setup):
-        provider, engine, registry = setup
+        provider, _engine, registry = setup
         await provider.start()
 
         # The expression tag should have been computed
@@ -503,7 +503,7 @@ class TestExpressionProvider:
 
     @pytest.mark.asyncio
     async def test_health_reports_counts(self, setup):
-        provider, engine, registry = setup
+        provider, _engine, _registry = setup
         await provider.start()
         h = await provider.health()
         assert h["evaluable_tags"] >= 1

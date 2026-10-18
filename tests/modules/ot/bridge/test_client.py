@@ -177,7 +177,7 @@ class TestIgnitionRestClient:
     @pytest.mark.asyncio
     async def test_connect_anonymous(self):
         """Anonymous connection (no username) succeeds immediately."""
-        client, transport = self._make_client(username="", password="")
+        client, _transport = self._make_client(username="", password="")
         result = await client.connect()
         assert result is True
         assert client.is_connected

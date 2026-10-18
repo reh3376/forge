@@ -49,7 +49,7 @@ class TestAreaResolver:
                 AreaRule(pattern="WH/WHK01/Granary01/.*", area="Granary", site="WHK"),
             ]
         )
-        area, site = resolver.resolve("WH/WHK01/Granary01/TIT_1010/Out_PV")
+        area, _site = resolver.resolve("WH/WHK01/Granary01/TIT_1010/Out_PV")
         assert area == "Granary"
 
     def test_explicit_rule_no_match(self):
@@ -64,7 +64,7 @@ class TestAreaResolver:
 
     def test_empty_path(self):
         resolver = AreaResolver()
-        area, site = resolver.resolve("")
+        area, _site = resolver.resolve("")
         assert area is None
 
 

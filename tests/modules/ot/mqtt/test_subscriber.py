@@ -170,7 +170,7 @@ class TestMessageDispatch:
         sub.subscribe("test/#", lambda m: (_ for _ in ()).throw(ValueError("boom")))
 
         # Should not raise
-        count = await sub.process_message(
+        await sub.process_message(
             IncomingMessage(topic="test/x", payload=b""),
         )
         # Handler raised, so invoked=0 (exception caught before increment)

@@ -178,7 +178,6 @@ def map_baseline_anomaly(raw_device: dict) -> OperationalEvent | None:
     if not device_id:
         return None
 
-    device_ip = raw_device.get("ip_address") or raw_device.get("ipAddress")
     baseline_status = raw_device.get("baseline_status") or raw_device.get("baselineStatus")
 
     # If not anomalous, skip

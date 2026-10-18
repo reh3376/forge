@@ -61,7 +61,7 @@ class TestModuleScaffolder:
     def test_all_required_files_created(self, manifest, temp_project):
         scaffolder = ModuleScaffolder(manifest)
         target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
-        result = scaffolder.generate(target, include_tests=False, include_facts=False)
+        scaffolder.generate(target, include_tests=False, include_facts=False)
 
         required = [
             "__init__.py",

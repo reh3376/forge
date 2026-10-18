@@ -49,7 +49,7 @@ class TestRemainingLength:
 
     def test_decode_offset(self):
         data = b"\xff" + encode_remaining_length(300)
-        val, consumed = decode_remaining_length(data, offset=1)
+        val, _consumed = decode_remaining_length(data, offset=1)
         assert val == 300
 
 
@@ -76,7 +76,7 @@ class TestUtf8Encoding:
     def test_decode_offset(self):
         prefix = b"\xff\xff"
         data = prefix + encode_utf8("test")
-        s, consumed = decode_utf8(data, offset=2)
+        s, _consumed = decode_utf8(data, offset=2)
         assert s == "test"
 
 

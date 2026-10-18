@@ -289,7 +289,7 @@ class TestTagValueProcessing:
     async def test_hihi_triggers_at_200(self, engine: AlarmEngine, hi_config: AlarmConfig):
         await engine.register_config(hi_config)
 
-        events = await engine.process_tag_value("WH/WHK01/TIT_2010/Out_PV", 205.0)
+        await engine.process_tag_value("WH/WHK01/TIT_2010/Out_PV", 205.0)
         active = await engine.get_active_alarms()
         # Both HI and HIHI should trigger at 205
         assert len(active) == 2

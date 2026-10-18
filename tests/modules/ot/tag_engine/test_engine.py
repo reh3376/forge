@@ -77,7 +77,7 @@ class TestExpressionEval:
         await registry.update_value("b", 20.0, QualityCode.GOOD)
 
         result = await engine.evaluate("sum_ab")
-        value, quality = result
+        value, _quality = result
         assert value == 30.0
 
     async def test_math_functions(self, registry, engine):

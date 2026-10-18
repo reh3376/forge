@@ -89,7 +89,6 @@ def generate_config(manifest: dict[str, Any]) -> str:
     get defaults. The model is frozen for immutability.
     """
     adapter_id = manifest["adapter_id"]
-    snake = _to_snake(adapter_id)
     pascal = _to_pascal(adapter_id)
     params = manifest.get("connection_params", [])
 
@@ -524,7 +523,6 @@ def generate_context(manifest: dict[str, Any]) -> str:
         "operator_id",
     }
     used_fields = [f for f in context_fields if f in known_rc_fields]
-    unused_fields = [f for f in context_fields if f not in known_rc_fields]
 
     lines.extend(
         [

@@ -103,7 +103,7 @@ class TestSparkplugPublishPipeline:
 
     @pytest.mark.asyncio
     async def test_alias_consistency(self, setup):
-        pub, encoder = setup
+        _pub, encoder = setup
 
         # Birth assigns aliases
         metrics = [
@@ -111,7 +111,6 @@ class TestSparkplugPublishPipeline:
             SparkplugMetric(name="pressure", value=14.7),
         ]
         _, birth_payload = encoder.build_node_birth(metrics)
-        birth_aliases = {m["name"]: m["alias"] for m in birth_payload["metrics"]}
 
         # Data should use same aliases
         _, data_payload = encoder.build_device_data(

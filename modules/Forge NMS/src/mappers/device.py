@@ -28,7 +28,6 @@ def map_device(raw_device: dict) -> ManufacturingUnit | None:
 
     # Extract basic info
     device_ip = raw_device.get("ip_address") or raw_device.get("ipAddress")
-    device_name = raw_device.get("name") or raw_device.get("hostname")
     device_type = raw_device.get("type") or raw_device.get("deviceType")
 
     # Extract metadata if present
