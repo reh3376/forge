@@ -339,7 +339,7 @@ uv sync
 # Run tests
 uv run pytest
 
-# Lint and format checks (both block CI)
+# Lint and format checks (both block CI; ruff is pinned exactly so local and CI agree)
 uv run ruff check .
 uv run ruff format --check .
 
