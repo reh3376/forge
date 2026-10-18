@@ -32,10 +32,6 @@ Usage::
         await client.write("ns=2;s=Fermentation/Motor01/HMI_MO", True)
 """
 
-from forge.modules.ot.opcua_client._compat import patch_asyncua_binary as _patch_asyncua
-
-_patch_asyncua()
-
 from forge.modules.ot.opcua_client.client import OpcUaClient
 from forge.modules.ot.opcua_client.exceptions import (
     BrowseError,

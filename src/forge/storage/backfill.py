@@ -20,8 +20,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-
-from forge._compat import StrEnum
+from enum import StrEnum
 
 logger = logging.getLogger(__name__)
 

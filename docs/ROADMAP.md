@@ -52,6 +52,7 @@ Component-by-component snapshot: [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md). Delivered
 | Legacy planning records retired; principles, invariants, decision frame, origins and spoke priorities folded into `docs/PRINCIPLES.md` | FB-081 |
 | README matches the codebase: tech stack and language policy, FxTS and FACTS tables, collected test counts, licence line | FB-024 |
 | Lint gate blocking: `ruff check` and `ruff format` clean repo-wide, generated code excluded, Pydantic imports kept at runtime | FB-022 |
+| Python 3.10/3.14 compatibility shims retired; importers use `enum.StrEnum` directly | FB-026 |
 
 ---
 
@@ -212,7 +213,7 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
 | WS-6 forge-display | — | — | — | No backlog ids yet; tracked here until the design lands |
 | WS-7 module SDK | — | FB-017 | FB-019 | FB-021 done |
-| WS-8 governance | — | FB-026, FB-084 | FB-014, FB-048 (jest/tsc follow FB-076) | FB-080, FB-021, FB-083, FB-022 done; FTTS doc has no id yet |
+| WS-8 governance | — | FB-084, FB-085 | FB-014, FB-048 (jest/tsc follow FB-076) | FB-080, FB-021, FB-083, FB-022, FB-026 done; FTTS doc has no id yet |
 | WS-9 security/ops | FB-029, FB-046 | FB-043, FB-047 | FB-044, FB-049 | public since 2026-10-17; GC still on Support |
 | WS-10 MDEMG | — | FB-038, FB-042 | FB-039, FB-040, FB-041 | |
 | WS-11 docs | — | FB-025 | FB-024, FB-027 | personal docs refresh |

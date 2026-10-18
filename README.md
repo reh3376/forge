@@ -354,7 +354,7 @@ uv run pytest tests/core/ -v                  # Core tests
 ```
 Total:  4,188 tests collected (full suite green on 2026-10-18)
         249 test files
-        348 source files
+        346 source files
 
 By area:
   OT module:                       1,129  (alarming, bridge, control, mqtt, tag_engine, opcua)
@@ -401,4 +401,4 @@ Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE
 
 ---
 
-*348 Python source files | 249 test files | 4,188 tests | 9 FACTS · 21 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
+*346 Python source files | 249 test files | 4,188 tests | 9 FACTS · 21 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*

@@ -13,9 +13,8 @@ import json
 import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Any
-
-from forge._compat import StrEnum
 
 logger = logging.getLogger(__name__)
 
