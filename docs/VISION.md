@@ -1,6 +1,6 @@
 # Forge, complete — what it will be and the problems it solves
 
-**Status date:** 2026-10-16 · **Owner:** reh3376 · **Companions:** [Where we are going](WHERE-WE-ARE-GOING.md) · [Where we are](WHERE-WE-ARE.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
+**Status date:** 2026-10-16 · **Owner:** reh3376 · **Companions:** [Where we are going](WHERE-WE-ARE-GOING.md) · [Where we are](WHERE-WE-ARE.md) · [Roadmap](ROADMAP.md) · [Principles](PRINCIPLES.md) · [Backlog](../BACKLOG.md)
 
 This document defines the finished product. It is written in the present tense about a system that does not fully exist yet; the gap between this page and [Where we are](WHERE-WE-ARE.md) is the work. Nothing here is a status claim. When a decision in [`ROADMAP.md`](ROADMAP.md) §1 changes, this page changes with it.
 

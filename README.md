@@ -2,7 +2,7 @@
 
 **General industrial / manufacturing decision matrix infrastructure.** Forge is a hub-and-spoke platform that transforms raw operational data from manufacturing systems into decision-quality information — structured, governed, and actionable.
 
-**Start here:** [What Forge will be](docs/VISION.md) · [Where we are going](docs/WHERE-WE-ARE-GOING.md) · [Where we are](docs/WHERE-WE-ARE.md) · [Roadmap](docs/ROADMAP.md) · [Backlog](BACKLOG.md)
+**Start here:** [What Forge will be](docs/VISION.md) · [Where we are going](docs/WHERE-WE-ARE-GOING.md) · [Where we are](docs/WHERE-WE-ARE.md) · [Roadmap](docs/ROADMAP.md) · [Backlog](BACKLOG.md) · [Principles](docs/PRINCIPLES.md)
 
 ---
 
@@ -369,11 +369,11 @@ By area:
 | Where we are going | `docs/WHERE-WE-ARE-GOING.md` | Direction: principles, milestones, what is next, what gates it |
 | Where we are | `docs/WHERE-WE-ARE.md` | Component-by-component state snapshot, updated before every push that changes it |
 | Roadmap | `docs/ROADMAP.md` | Decisions in force, workstreams, sequence and the owner decision queue (companion to `BACKLOG.md`) |
+| Principles | `docs/PRINCIPLES.md` | Design principles, technical invariants, the governance pattern, the decision frame, technology decisions, origins, spoke priorities, lessons |
 | Sprint Plan | `docs/p7-ot-module/P7_SPRINT_PLAN.md` | P7 OT Module 24-sprint plan |
 | API Mapping | `docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md` | All 52 system.* → forge.* conversions |
 | Conversion Targets | `docs/p7-ot-module/TIER1_CONVERSION_TARGETS.md` | 82 scripts classified (42 convert, 18 replace, 14 defer, 8 drop) |
 | HMI Latency | `docs/p7-ot-module/HMI_LATENCY_CONTRACT.md` | UI response time contracts |
-| Master Plan | `PLAN.md` | Overall Forge platform plan |
 
 ## Design Decisions
 

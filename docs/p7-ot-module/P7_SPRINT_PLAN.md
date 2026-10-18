@@ -546,7 +546,7 @@ Each area follows the same pattern as Epic 7.1: subscribe → migrate alarms →
 - [ ] Integration tests pass
 - [ ] Performance benchmarks meet targets
 - [ ] Documentation updated
-- [ ] PLAN.md spoke table updated
+- [ ] `docs/WHERE-WE-ARE.md` spoke and OT rows updated
 
 ### Pre-Decommission (Phase 7)
 
@@ -563,9 +563,7 @@ Each area follows the same pattern as Epic 7.1: subscribe → migrate alarms →
 
 | Document | Update Required |
 |----------|----------------|
-| `ARCHITECTURE.md` | Add OT Module section with data flow diagrams |
-| `SPOKE_ONBOARDING.md` | Update P7 status from "Not started" to completion status |
-| `PLAN.md` | Update spoke table with final OT Module status |
+| `docs/VISION.md`, `docs/WHERE-WE-ARE.md` | OT module section and state rows (the retired `ARCHITECTURE.md` / `SPOKE_ONBOARDING.md` / `PLAN.md` updates, FB-081) |
 | `CLAUDE.md` (forge) | Add OT Module CLI commands, health checks |
 | `docs/p7-ot-module/` | Complete API reference, configuration guide, operator guide |
 | Memory files | Update `project_ignition_scada.md`, `decision_ignition_replacement.md` |
@@ -599,9 +597,8 @@ Each area follows the same pattern as Epic 7.1: subscribe → migrate alarms →
 |----------|------|---------|
 | P7 Research Summary | `docs/p7-ot-module/P7_RESEARCH_SUMMARY.md` | Full research findings (v2) |
 | Competitive Analysis | `docs/p7-ot-module/COMPETITIVE_ANALYSIS.md` | Ignition module inventory, tag engine design, competitive landscape |
-| Forge Architecture | `ARCHITECTURE.md` | Adapter tiers, OT example manifest, Ignition replacement strategy |
-| Spoke Onboarding | `SPOKE_ONBOARDING.md` | P7 priority scoring, 6-phase breakdown |
-| Forge Plan | `PLAN.md` | Spoke status table, test counts |
+| Principles | `docs/PRINCIPLES.md` | Adapter tiers, Ignition replacement strategy (§7), spoke priority scoring (§8) |
+| Where we are | `docs/WHERE-WE-ARE.md` | Spoke status table, test counts |
 | AdapterBase model | `src/forge/core/models/adapter.py` | Interface contract |
 | ContextualRecord model | `src/forge/core/models/contextual_record.py` | Record structure |
 | Ignition SCADA | `/whk-ignition-scada/` | 241 views, 9 tag providers, PLC connections |

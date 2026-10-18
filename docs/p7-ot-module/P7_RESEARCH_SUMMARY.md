@@ -764,9 +764,8 @@ The `forge.sdk.scripting` engine handles: decorator discovery, handler registrat
 - `src/forge/adapters/mqtt_sparkplug/__init__.py` — Empty stub
 - `src/forge/core/models/adapter.py` — AdapterBase, AdapterTier, AdapterState
 - `src/forge/core/models/contextual_record.py` — ContextualRecord, RecordSource, RecordValue, etc.
-- `ARCHITECTURE.md` — Adapter tiers, OPC-UA generic example manifest
-- `SPOKE_ONBOARDING.md` — P7 definition, 6 implementation phases
-- `PLAN.md` — Spoke onboarding status table
+- `docs/PRINCIPLES.md` — Adapter tiers (§5), spoke onboarding priorities (§8); the OPC-UA example manifest and the P7 phase breakdown are in git history (`ARCHITECTURE.md`, `SPOKE_ONBOARDING.md`, retired by FB-081)
+- `docs/WHERE-WE-ARE.md` — Spoke status table (§3.4)
 
 ### Ignition Codebases
 - `/whk-ignition-scada/` — 241 views, 9 tag providers, 6 Python modules
