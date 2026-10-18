@@ -370,4 +370,4 @@ The adapter can publish to `message_acknowledgment` to participate in ERPI's ack
 
 ---
 
-*This document is referenced from SPOKE_ONBOARDING.md P1 (ERP Connector). Next step: FACTS spec.*
+*This document is the discovery step for the ERP connector, priority 1 in the spoke ranking (`docs/PRINCIPLES.md` §8). Next step: FACTS spec.*

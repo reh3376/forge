@@ -49,6 +49,7 @@ Component-by-component snapshot: [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md). Delivered
 | Every OT control POST (changeover confirm-start, retry-recipe, resume; connection restart) behind `adapters:write`, acting hub user on the MES write, audit record and events | FB-082 |
 | Spec integrity CLI: `forge governance specs` / `stamp` / `approve` (owner approval without hand-editing the integrity block) | FB-021 |
 | `forge governance run` for FATS, FACTS, FVTS and FTTS: spec file or id, packaged schema, text or JSON report, exit 1 on failure | FB-083 |
+| Legacy planning records retired; principles, invariants, decision frame, origins and spoke priorities folded into `docs/PRINCIPLES.md` | FB-081 |
 
 ---
 
@@ -150,7 +151,7 @@ FB-038, FB-039, FB-040, FB-041, FB-042 — local tooling; details in `docs/MDEMG
 
 ### WS-11 · Documentation
 
-FB-024 README counts and placeholder row, FB-025 phase numbering, FB-027 stale report. `docs/personal/*` (FVTS context, FVTS review package, Rust frontend research) need a refresh once D-1/D-3 are answered: committed status (PR 26), branch name (`reh3376_dev01`), governance suite (407 passed), the gateway role model, modules-in-Go, Next.js frontend retired. `modules/Forge MES/CLAUDE.md` claims Next 15 / React 19; the code is Next 14.2 / React 18. FB-081: the top-level legacy planning documents (`ARCHITECTURE.md`, `PHASES.md`, `PLAN.md`, `RESEARCH_NOTES.md`, `ROADMAP-ADAPTER-INTEGRATION.md`, `SPOKE_ONBOARDING.md`, `SPRINT-PLAN-*.md`) are banner-marked historical since 2026-10-16; fold what is still true into `docs/VISION.md` / `docs/WHERE-WE-ARE.md` and retire them.
+FB-024 README counts and placeholder row, FB-025 phase numbering, FB-027 stale report. `docs/personal/*` (FVTS context, FVTS review package, Rust frontend research) need a refresh once D-1/D-3 are answered: committed status (PR 26), branch name (`reh3376_dev01`), governance suite (407 passed), the gateway role model, modules-in-Go, Next.js frontend retired. `modules/Forge MES/CLAUDE.md` claims Next 15 / React 19; the code is Next 14.2 / React 18. FB-081 done 2026-10-18: the top-level legacy planning documents are deleted and what was still true lives in `docs/PRINCIPLES.md`; `docs/p7-ot-module/` and `docs/personal/` are the remaining planning-era pages.
 
 ---
 
