@@ -61,7 +61,7 @@ The proposed sequence in [`ROADMAP.md`](ROADMAP.md) §4, abridged:
 7. forge-display scaffold and renderer spike; MES surfaces first.
 8. Hub platform items (FB-001, FB-003, FB-007, FB-075) as the Go module and forge-display start needing them.
 
-Items that need no decision and can be taken any time: FB-021 (approval CLI), FB-022/FB-048 (lint gates), FB-081 (retire the top-level legacy planning documents).
+Items that need no decision and can be taken any time: FB-022/FB-048 (lint gates), FB-081 (retire the top-level legacy planning documents), FB-083 (the other runners on `forge governance run`).
 
 ---
 

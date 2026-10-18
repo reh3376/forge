@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-17 · **Branch:** `reh3376_dev01` (last merged PR: 39) · **Owner:** reh3376
+**Status date:** 2026-10-17 · **Branch:** `reh3376_dev01` (last merged PR: 40) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -22,13 +22,13 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 347 files, ~66,000 lines |
-| Python tests | 248 files, ~51,900 lines, 3,986 test functions; full suite green on 2026-10-17 |
+| Python tests | 249 files, ~52,100 lines, 3,998 test functions; full suite green on 2026-10-18 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | forge-mes bridge (`modules/Forge MES`) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
 | Hub REST routes | 20 on the hub app, plus OT i3X (8) and OT control (15; every POST behind `adapters:write`), plus the curation app mounted at `/curation` |
 | Storage migrations | 8 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions) |
-| FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 6 await owner approval after the FB-080 and FB-074 re-stamps |
+| FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 6 await owner approval after the FB-080 and FB-074 re-stamps (`forge governance specs --pending`) |
 | FATS specs | 21 |
 | FVTS specs | 1 (ot-module reference, `pending_review`; re-stamped by FB-074 for `REJECTED_REVIEW`) |
 | CI jobs | hub-python, hub-go, mes-module, secrets-scan; auto-PR workflow |
@@ -150,7 +150,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | FVTS | schema + runner + reference renderer + 1 spec |
 | FQTS, FSTS | stubs |
 | FDTS, FLTS, FNTS, FOTS, FPTS | planned (doc pages only) |
-| FACTS approval CLI | ⬜ FB-021 |
+| Spec integrity CLI (`forge governance specs`, `stamp`, `approve`) | ✅ FB-021 (2026-10-18); `run` covers FATS only (FB-083) |
 
 ### 3.10 Security, identity, topology
 
@@ -179,7 +179,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | One backlog item per PR, auto-PR, owner merges on green | ✅ (A-8) |
 | Every finding fixed or recorded in `BACKLOG.md` | ✅ (80 items recorded to date) |
 | Documentation current before every push | ✅ rule since 2026-10-16 |
-| Owner-only spec approval | ✅ in practice; CLI support pending (FB-021) |
+| Owner-only spec approval | ✅ `forge governance approve <spec> --by reh3376` (FB-021); nobody runs it on the owner's behalf |
 | MDEMG/Jiminy governed memory, local models only | ✅ instance per project (A-10) |
 | Lint debt | 🟡 ruff advisory gates (FB-022, FB-048) |
 
