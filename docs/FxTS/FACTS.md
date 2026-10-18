@@ -187,6 +187,8 @@ forge governance run facts --adapter whk-wms --live
 forge governance run facts --adapter whk-wms --format json --output reports/facts-whk-wms.json
 ```
 
+Spec integrity is on the CLI already (FB-021): `forge governance specs --pending` lists what awaits approval, `forge governance stamp <spec> --by <who> --reason <why>` re-hashes an edited spec, `forge governance approve <spec> --by <owner>` records the owner's approval, and `forge governance validate-spec <path>` checks a file against this schema.
+
 ## First Adapter Specs
 
 ### whk-wms (Whiskey House Warehouse Management System)

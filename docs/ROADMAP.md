@@ -47,6 +47,7 @@ Component-by-component snapshot: [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md). Delivered
 | Repository public again; secret scanning, push protection, CodeQL, Dependabot, private vulnerability reporting, fork-PR approval re-enabled | FB-044 (owner's flip, 2026-10-17) |
 | Server-side write review: two-step review tokens and reason codes enforced in the OT write engine (`REJECTED_REVIEW`), operator write endpoints behind `adapters:write`; FVTS/FACTS OT specs re-stamped `pending_review` | FB-074 |
 | Every OT control POST (changeover confirm-start, retry-recipe, resume; connection restart) behind `adapters:write`, acting hub user on the MES write, audit record and events | FB-082 |
+| Spec integrity CLI: `forge governance specs` / `stamp` / `approve` (owner approval without hand-editing the integrity block) | FB-021 |
 
 ---
 
@@ -127,11 +128,11 @@ Needed before FB-076, forge-ignition and forge-hmi-scada can start the same way.
 |---|---|---|
 | Go module scaffold (`go/internal/scaffold` exists; `forge module init` is Python/adapter-only — FB-017) | Not started | Template must produce backend (hub link) + FVTS spec stub, not a UI. |
 | FB-019 duplicate SDK copies and template modules drift | Not started | |
-| FB-021 FACTS approval CLI | Not started | Also serves FVTS/FHTS approvals. |
+| FB-021 FACTS approval CLI | Done 2026-10-18 | `forge governance specs / stamp / approve`; serves FVTS and FTTS too. FB-083: `run` covers FATS only. |
 
 ### WS-8 · Governance (FxTS)
 
-FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory row. FB-080 done 2026-10-17 (`facts:schema-valid`, enums from the schema; 8 of 9 specs validate, the OT spec waits on D-8; five re-stamped specs await the owner's approval). FB-022 ruff debt (1,148 findings; CI advisory) and FB-048 (advisory gates) — tighten gate by gate as debt is paid. FB-014 (DTZ rule).
+FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory row. FB-080 done 2026-10-17 (`facts:schema-valid`, enums from the schema; 8 of 9 specs validate, the OT spec waits on D-8; five re-stamped specs await the owner's approval). FB-022 ruff debt (1,148 findings; CI advisory) and FB-048 (advisory gates) — tighten gate by gate as debt is paid. FB-014 (DTZ rule). FB-021 done 2026-10-18 (`forge governance specs / stamp / approve`); FB-083: `forge governance run` covers FATS only, the other runners are pytest-driven.
 
 ### WS-9 · Security and repository operations
 
@@ -206,7 +207,7 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 | WS-4 OT module | — | FB-020, FB-079 | FB-018 | FB-073, FB-074 done (awaiting approval); FB-082 done |
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
 | WS-6 forge-display | — | — | — | No backlog ids yet; tracked here until the design lands |
-| WS-7 module SDK | — | FB-017 | FB-019, FB-021 | |
+| WS-7 module SDK | — | FB-017 | FB-019 | FB-021 done |
 | WS-8 governance | — | FB-022, FB-048 | FB-014 | FB-080 done; FTTS doc has no id yet |
 | WS-9 security/ops | FB-029, FB-046 | FB-043, FB-047 | FB-044, FB-049 | public since 2026-10-17; GC still on Support |
 | WS-10 MDEMG | — | FB-038, FB-042 | FB-039, FB-040, FB-041 | |

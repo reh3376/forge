@@ -259,10 +259,19 @@ Rules:
 
 ### Step 7: Add Integrity Hash
 
-Stamp the spec with the governance helper rather than hashing by hand. It hashes the
-canonical JSON (sorted keys, compact separators) of everything *except* the `integrity`
-block, pushes the old hash into `change_history` and `previous_hash`, and sets
-`hash_state` to `modified`:
+Stamp the spec from the CLI rather than hashing by hand. `stamp` hashes the canonical
+JSON (sorted keys, compact separators) of everything *except* the `integrity` block,
+pushes the old hash into `change_history` (newest entry first) and `previous_hash`, sets
+`hash_state` to `pending_review` and drops `approved_by` / `approved_at` (the new hash is
+not approved yet). Only the `integrity` block of the file is rewritten:
+
+```bash
+forge governance stamp my-system.facts.json \
+    --by claude-code --reason "FB-nnn: what changed and why" \
+    --source agent --change-type content     # source: manual | ci | agent | spec_update
+```
+
+The same from Python (`add_spec_hash` leaves `hash_state: modified`, so set it yourself):
 
 ```python
 import json
@@ -281,18 +290,21 @@ add_spec_hash(
 spec["integrity"]["hash_state"] = "pending_review"   # until the owner approves
 ```
 
-A first stamp (no previous hash) leaves `hash_state: approved` with an empty history;
-set it to `pending_review` just the same. Keep `approved_by`/`approved_at` absent until
-approval — the schema types them as strings, so `null` is invalid. Every
-`change_history` entry needs 64-hex `previous_hash` and `new_hash` values; placeholder
-strings break FHTS verification (that was BACKLOG FB-073).
+A first stamp has no previous hash and an empty history; it is `pending_review` just the
+same. Keep `approved_by`/`approved_at` absent until approval — the schema types them as
+strings, so `null` is invalid. Every `change_history` entry needs 64-hex `previous_hash`
+and `new_hash` values; placeholder strings break FHTS verification (that was BACKLOG
+FB-073). `forge governance specs --pending` lists what awaits approval.
 
 **Only the owner approves.** On the owner's explicit word, and never on their behalf:
 
-```python
-from forge.governance.shared.runner import approve_spec_hash
-approve_spec_hash(spec, approved_by="reh3376")
+```bash
+forge governance approve my-system.facts.json --by reh3376
 ```
+
+The command refuses when the stored hash no longer covers the content (re-stamp first)
+and does nothing when the same owner already approved that hash. From Python:
+`approve_spec_hash(spec, approved_by="reh3376")`.
 
 The resulting block looks like:
 

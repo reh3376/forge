@@ -7,7 +7,8 @@ Subcommands:
   forge health      — Check platform health
   forge version     — Show version info
   forge adapter     — Adapter management (list, register, status)
-  forge governance  — Run FxTS spec governance checks
+  forge governance  — FxTS spec governance: runners, schema validation,
+                      spec hash stamp/approve (FB-021)
   forge migrate     — Database migrations
   forge db access   — Module schema grants and Forge-issued credentials (FB-057)
 """
@@ -20,6 +21,7 @@ from typing import Annotated
 import typer
 
 import forge
+from forge.cli import governance as governance_cli
 from forge.cli.db_access import access_app
 
 # ---------------------------------------------------------------------------
@@ -209,6 +211,11 @@ governance_app = typer.Typer(
 )
 app.add_typer(governance_app, name="governance")
 
+# Spec integrity: hash state listing, re-stamp after edits, owner approval (FB-021).
+governance_app.command("specs")(governance_cli.specs)
+governance_app.command("stamp")(governance_cli.stamp)
+governance_app.command("approve")(governance_cli.approve)
+
 
 @governance_app.command("run")
 def governance_run(
@@ -381,7 +388,7 @@ def governance_validate_spec(
     # Determine framework from spec or filename
     framework = None
     fname = spec_file.stem.lower()
-    for fw in ("fats", "facts", "fqts", "fsts", "fdts", "flts", "fnts", "fots", "fpts"):
+    for fw in ("fats", "facts", "fvts", "ftts", "fhts", "fqts", "fsts"):
         if fw in fname:
             framework = fw
             break

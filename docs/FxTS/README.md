@@ -103,21 +103,25 @@ Every change records `source` (agent/manual/ci), `changed_by` (agent ID), and `r
 ### CLI Commands
 
 ```bash
-# Add hashes to all specs in a framework
-forge governance run fhts --add-hashes --framework facts --spec-dir specs/
+# Hash state of every spec: state, hash, does it still verify, who approved it
+forge governance specs                 # --pending: only the ones awaiting approval
 
-# Verify hashes without running assertions
-forge governance run fhts --verify-hashes --framework facts --spec-dir specs/
+# Re-hash a spec after editing it: history entry, pending_review, approver fields dropped
+forge governance stamp src/forge/governance/facts/specs/whk-wms.facts.json \
+    --by claude-code --reason "FB-nnn: what changed" --source agent --change-type content
 
-# Full registry verification
-forge governance run fhts --verify-all
+# The owner approves the stored hash (refused when the content no longer matches it)
+forge governance approve src/forge/governance/facts/specs/whk-wms.facts.json --by reh3376
 
-# Scan and register specs from all frameworks
-forge governance run fhts --scan --framework facts
+# Validate a spec file against its framework schema (framework taken from the file name)
+forge governance validate-spec src/forge/governance/fvts/specs/ot-module.fvts.json
 
-# Full run (includes hash verification automatically in any framework runner)
-forge governance run facts --adapter whk-wms
+# Run a framework runner from the CLI: FATS today; FACTS/FVTS/FTTS run under pytest (FB-083)
+forge governance run fats /healthz
 ```
+
+Every runner verifies the hash of the spec it runs; `stamp` and `approve` rewrite only the
+`integrity` block of a spec file, so the review diff is the change to the hash record.
 
 ### Aggregate Integrity Reporting
 
@@ -202,9 +206,10 @@ src/forge/governance/
 1. Choose the appropriate framework (FATS for APIs, FACTS for adapters, FQTS for quality, etc.)
 2. Read the framework's documentation (linked above) and JSON Schema
 3. Create a new spec file in the framework's `specs/` directory
-4. Validate against the schema: `forge governance validate --framework <name> --spec <path>`
-5. Run the conformance check: `forge governance run <framework> --spec <path>`
+4. Validate against the schema: `forge governance validate-spec <path>`
+5. Run the conformance check: FATS with `forge governance run fats <target>`; FACTS, FVTS and FTTS through their pytest suites (`forge governance run` for them is FB-083)
 6. Add to CI: include in the framework's test suite
+7. Stamp it (`forge governance stamp <path> --by <you> --reason <why>`); the owner approves it with `forge governance approve <path> --by <owner>`
 
 ## Relationship to UxTS (MDEMG)
 
