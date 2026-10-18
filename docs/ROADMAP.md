@@ -136,8 +136,8 @@ FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory r
 
 | Item | Status | Notes |
 |---|---|---|
-| Public flip after GC confirmation; re-enable protections | Blocked (on GitHub Support #4862642) | Runbook §6; re-probe the purged SHAs first; collaborator must re-clone. |
-| FB-044 protections reset while private · FB-049 branch protection · FB-047 auto-PR identity token | Not started | |
+| Public flip and protections re-enabled | Done 2026-10-17 (owner's flip, D-6) | Ahead of Support's GC (#4862642): the purged commits stay fetchable through `refs/pull/4..8` until then; close the 4 secret-scanning alerts as revoked after GC. |
+| FB-044 two owner toggles (non-provider patterns, validity checks) · FB-049 branch protection · FB-047 auto-PR identity token | FB-044 done except the toggles; FB-047/FB-049 open | |
 | FB-029 rotated credentials (done) and FB-046 purge consequences | Done / monitor | Keep the gitleaks scan rule (A-9). |
 | FB-043 privacy hygiene · FB-045 env vaults · FB-050 Dependabot | Not started | FB-050 also in WS-5. |
 
