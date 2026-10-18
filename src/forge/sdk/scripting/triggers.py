@@ -22,10 +22,12 @@ from __future__ import annotations
 import enum
 import logging
 import re
-from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 

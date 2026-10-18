@@ -26,11 +26,9 @@ import importlib.util
 import logging
 import sys
 import time
-from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from types import ModuleType
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from forge.sdk.scripting.audit import (
     ScriptAuditTrail,
@@ -45,6 +43,10 @@ from forge.sdk.scripting.triggers import (
     TriggerRegistry,
     TriggerType,
 )
+
+if TYPE_CHECKING:
+    from types import ModuleType
+    from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 

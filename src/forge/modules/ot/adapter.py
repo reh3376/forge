@@ -25,9 +25,8 @@ from __future__ import annotations
 
 import inspect
 import logging
-from collections.abc import AsyncIterator, Callable
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -44,14 +43,17 @@ from forge.core.models.adapter import (
     AdapterTier,
     DataContract,
 )
-from forge.core.models.contextual_record import ContextualRecord
 from forge.modules.ot.context.record_builder import build_ot_record
 from forge.modules.ot.context.resolvers import AreaResolver, AreaRule, EnrichmentPipeline
 from forge.modules.ot.context.store_forward import StoreForwardBuffer
 from forge.modules.ot.control.config import load_control_config, parse_control_config
 from forge.modules.ot.control.models import DataType, WriteRequest, WriteRole, WriteStatus
 from forge.modules.ot.control.runtime import ControlDependencies, ControlRuntime
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from forge.core.models.contextual_record import ContextualRecord
+    from forge.modules.ot.tag_engine.registry import TagRegistry
+    from collections.abc import AsyncIterator, Callable
 
 logger = logging.getLogger(__name__)
 

@@ -10,7 +10,7 @@ template_registry, acquisition_engine) via the factory function.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from fastapi import APIRouter, HTTPException, Query
 
@@ -21,9 +21,11 @@ from forge.modules.ot.i3x.models import (
     I3xObjectType,
     I3xValue,
 )
-from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
-from forge.modules.ot.tag_engine.registry import TagRegistry
-from forge.modules.ot.tag_engine.templates import TemplateRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.tag_engine.templates import TemplateRegistry
+    from forge.modules.ot.tag_engine.registry import TagRegistry
+    from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
 
 logger = logging.getLogger(__name__)
 

@@ -14,12 +14,14 @@ This is equivalent to Ignition's Memory tag type.
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import MemoryTag, TagType
 from forge.modules.ot.tag_engine.providers.base import BaseProvider
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 

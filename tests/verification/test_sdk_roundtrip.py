@@ -14,8 +14,7 @@ import importlib
 import importlib.util
 import json
 from datetime import UTC, datetime
-from pathlib import Path
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 import pytest
 
@@ -27,6 +26,9 @@ from forge.storage.registry import (
     SchemaStatus,
     StorageEngine,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. Scaffold → Import Round-Trip

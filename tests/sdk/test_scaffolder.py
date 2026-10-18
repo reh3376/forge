@@ -13,12 +13,15 @@ Validates:
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
 
 from forge.sdk.module_builder.manifest_builder import ManifestBuilder
 from forge.sdk.module_builder.scaffolder import ModuleScaffolder
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 @pytest.fixture()

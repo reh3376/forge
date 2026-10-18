@@ -9,9 +9,11 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
-from forge.storage.config import StorageConfig
+
+if TYPE_CHECKING:
+    from forge.storage.config import StorageConfig
 
 logger = logging.getLogger(__name__)
 

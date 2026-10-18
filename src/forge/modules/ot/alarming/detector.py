@@ -16,15 +16,17 @@ import logging
 import time
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
-from forge.modules.ot.alarming.engine import AlarmEngine
 from forge.modules.ot.alarming.models import (
     AlarmConfig,
     AlarmEvent,
     AlarmType,
     ThresholdConfig,
 )
+
+if TYPE_CHECKING:
+    from forge.modules.ot.alarming.engine import AlarmEngine
 
 logger = logging.getLogger("forge.alarm.detector")
 

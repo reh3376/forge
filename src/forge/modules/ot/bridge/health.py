@@ -19,10 +19,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
-from forge.modules.ot.bridge.dual_write import ConsistencyReport
 from forge.modules.ot.bridge.models import BridgeHealth
+
+if TYPE_CHECKING:
+    from forge.modules.ot.bridge.dual_write import ConsistencyReport
 
 
 class FailoverState(str, Enum):

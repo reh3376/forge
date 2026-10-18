@@ -23,15 +23,17 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
-from forge.modules.ot.alarming.engine import AlarmEngine
 from forge.modules.ot.alarming.models import (
     AlarmConfig,
     AlarmPriority,
     AlarmType,
     ThresholdConfig,
 )
+
+if TYPE_CHECKING:
+    from forge.modules.ot.alarming.engine import AlarmEngine
 
 logger = logging.getLogger("forge.alarm.api")
 

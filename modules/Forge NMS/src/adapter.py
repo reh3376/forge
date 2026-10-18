@@ -24,10 +24,9 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from forge.adapters.base.interface import (
     AdapterBase,
@@ -48,7 +47,10 @@ from forge.core.models.adapter import (
     ConnectionParam,
     DataContract,
 )
-from forge.core.models.contextual_record import ContextualRecord
+
+if TYPE_CHECKING:
+    from forge.core.models.contextual_record import ContextualRecord
+    from collections.abc import AsyncIterator
 
 logger = logging.getLogger(__name__)
 

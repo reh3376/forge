@@ -39,10 +39,8 @@ import logging
 from collections import deque
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable, TYPE_CHECKING
 
-from forge.modules.ot.control.authorization import WriteAuthorizer
-from forge.modules.ot.control.interlock import InterlockEngine
 from forge.modules.ot.control.models import (
     DataType,
     WriteRequest,
@@ -50,7 +48,11 @@ from forge.modules.ot.control.models import (
     WriteStatus,
 )
 from forge.modules.ot.control.review import ReviewTicket, WriteReviewer
-from forge.modules.ot.control.validation import WriteValidator
+
+if TYPE_CHECKING:
+    from forge.modules.ot.control.interlock import InterlockEngine
+    from forge.modules.ot.control.authorization import WriteAuthorizer
+    from forge.modules.ot.control.validation import WriteValidator
 
 logger = logging.getLogger(__name__)
 

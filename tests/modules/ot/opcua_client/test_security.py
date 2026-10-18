@@ -6,7 +6,6 @@ and trust store management.
 
 from __future__ import annotations
 
-from pathlib import Path
 
 import pytest
 
@@ -21,6 +20,10 @@ from forge.modules.ot.opcua_client.security import (
     TrustStore,
     load_certificate_pair,
 )
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # ---------------------------------------------------------------------------
 # SecurityPolicy

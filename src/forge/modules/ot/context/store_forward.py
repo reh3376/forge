@@ -21,11 +21,13 @@ from __future__ import annotations
 import logging
 import sqlite3
 import time
-from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from forge.core.models.contextual_record import ContextualRecord
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 

@@ -13,11 +13,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from forge.modules.ot.tag_engine.models import TagType
 from forge.modules.ot.tag_engine.providers.base import BaseProvider
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 

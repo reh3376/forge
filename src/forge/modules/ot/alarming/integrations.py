@@ -21,16 +21,18 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Protocol
+from typing import Any, Protocol, TYPE_CHECKING
 
-from forge.modules.ot.alarming.engine import AlarmEngine
 from forge.modules.ot.alarming.models import (
     AlarmEvent,
     AlarmPriority,
 )
+
+if TYPE_CHECKING:
+    from forge.modules.ot.alarming.engine import AlarmEngine
+    from collections.abc import Callable
 
 logger = logging.getLogger("forge.alarm.integrations")
 

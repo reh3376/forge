@@ -18,9 +18,8 @@ Architecture:
 from __future__ import annotations
 
 import logging
-from collections.abc import AsyncIterator
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from forge.adapters.base.interface import AdapterBase, DiscoveryProvider
 from forge.core.models.adapter import (
@@ -42,7 +41,6 @@ from forge.core.models.contextual_record import (
 from forge.core.models.contextual_record import (
     QualityCode as CoreQualityCode,
 )
-from forge.modules.ot.bridge.client import IgnitionRestClient
 from forge.modules.ot.bridge.models import (
     BridgeConfig,
     BridgeHealth,
@@ -50,8 +48,12 @@ from forge.modules.ot.bridge.models import (
     IgnitionQuality,
     IgnitionTagValue,
 )
-from forge.modules.ot.bridge.tag_mapper import TagMapper
 from forge.modules.ot.context.resolvers import EnrichmentPipeline
+
+if TYPE_CHECKING:
+    from forge.modules.ot.bridge.client import IgnitionRestClient
+    from forge.modules.ot.bridge.tag_mapper import TagMapper
+    from collections.abc import AsyncIterator
 
 logger = logging.getLogger(__name__)
 

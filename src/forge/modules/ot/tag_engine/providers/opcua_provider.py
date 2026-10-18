@@ -24,17 +24,19 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
-from forge.modules.ot.opcua_client.client import OpcUaClient
-from forge.modules.ot.opcua_client.paths import PathNormalizer
-from forge.modules.ot.opcua_client.types import (
-    DataType,
-    DataValue,
-)
 from forge.modules.ot.tag_engine.models import StandardTag, TagType
 from forge.modules.ot.tag_engine.providers.base import BaseProvider
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.opcua_client.client import OpcUaClient
+    from forge.modules.ot.tag_engine.registry import TagRegistry
+    from forge.modules.ot.opcua_client.types import (
+        DataType,
+        DataValue,
+    )
+    from forge.modules.ot.opcua_client.paths import PathNormalizer
 
 logger = logging.getLogger(__name__)
 

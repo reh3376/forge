@@ -24,8 +24,10 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from collections.abc import Callable
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger("forge.util")
 

@@ -35,7 +35,7 @@ import logging
 import math
 import re
 import statistics
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import (
@@ -47,7 +47,9 @@ from forge.modules.ot.tag_engine.models import (
     ScanClass,
     TagType,
 )
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
 

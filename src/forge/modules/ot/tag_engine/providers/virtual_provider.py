@@ -12,13 +12,15 @@ will be wired in Phase 2A.4 (Context Enrichment).
 from __future__ import annotations
 
 import logging
-from datetime import datetime
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import TagType, VirtualTag
 from forge.modules.ot.tag_engine.providers.base import BaseProvider
-from forge.modules.ot.tag_engine.registry import TagRegistry
+
+if TYPE_CHECKING:
+    from forge.modules.ot.tag_engine.registry import TagRegistry
+    from datetime import datetime
 
 logger = logging.getLogger(__name__)
 

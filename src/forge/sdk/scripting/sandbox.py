@@ -32,8 +32,10 @@ import importlib.machinery
 import logging
 import sys
 from dataclasses import dataclass, field
-from types import ModuleType
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from types import ModuleType
 
 logger = logging.getLogger(__name__)
 

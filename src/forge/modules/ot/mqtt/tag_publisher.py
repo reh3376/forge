@@ -20,10 +20,12 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
-from forge.modules.ot.mqtt.publisher import OTMqttPublisher
-from forge.modules.ot.mqtt.topic_router import TopicRouter
+
+if TYPE_CHECKING:
+    from forge.modules.ot.mqtt.publisher import OTMqttPublisher
+    from forge.modules.ot.mqtt.topic_router import TopicRouter
 
 logger = logging.getLogger(__name__)
 
