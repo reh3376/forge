@@ -88,8 +88,8 @@ class PostgresProductStore(ProductStore):
                     product.description,
                     product.owner,
                     product.status.value,
-                    product.schema.schema_ref,
-                    product.schema.version,
+                    product.product_schema.schema_ref,
+                    product.product_schema.version,
                     json.dumps(product.source_adapters),
                     json.dumps([s.model_dump() for s in product.quality_slos]),
                     json.dumps(product.tags),
@@ -197,7 +197,7 @@ class PostgresProductStore(ProductStore):
             description=row["description"],
             owner=row["owner"],
             status=DataProductStatus(row["status"]),
-            schema=DataProductSchema(
+            product_schema=DataProductSchema(
                 schema_ref=row["schema_ref"],
                 version=row["schema_version"],
             ),

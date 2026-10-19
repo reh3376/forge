@@ -22,7 +22,7 @@ class TestInMemoryProductStore:
             name="Test",
             description="Test product",
             owner="tester",
-            schema=DataProductSchema(schema_ref="forge://test/v1", version="1.0"),
+            product_schema=DataProductSchema(schema_ref="forge://test/v1", version="1.0"),
         )
         store.save(product)
         assert store.get("dp-test") is not None
@@ -39,7 +39,7 @@ class TestInMemoryProductStore:
                     name=f"Product {i}",
                     description="...",
                     owner="tester",
-                    schema=DataProductSchema(schema_ref="forge://test", version="1.0"),
+                    product_schema=DataProductSchema(schema_ref="forge://test", version="1.0"),
                 )
             )
         assert len(store.list_all()) == 3
@@ -55,7 +55,7 @@ class TestInMemoryProductStore:
                 description="...",
                 owner="o",
                 status=DataProductStatus.DRAFT,
-                schema=DataProductSchema(schema_ref="x", version="1"),
+                product_schema=DataProductSchema(schema_ref="x", version="1"),
             )
         )
         store.save(
@@ -65,7 +65,7 @@ class TestInMemoryProductStore:
                 description="...",
                 owner="o",
                 status=DataProductStatus.PUBLISHED,
-                schema=DataProductSchema(schema_ref="x", version="1"),
+                product_schema=DataProductSchema(schema_ref="x", version="1"),
             )
         )
         assert len(store.list_all(DataProductStatus.DRAFT)) == 1
@@ -81,7 +81,7 @@ class TestInMemoryProductStore:
                 name="D",
                 description="...",
                 owner="o",
-                schema=DataProductSchema(schema_ref="x", version="1"),
+                product_schema=DataProductSchema(schema_ref="x", version="1"),
             )
         )
         assert store.delete("dp-del")

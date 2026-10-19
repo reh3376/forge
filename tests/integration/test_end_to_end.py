@@ -122,7 +122,7 @@ class TestEndToEnd:
             name="E2E Test Product",
             description="End-to-end test",
             owner="test",
-            schema=DataProductSchema(
+            product_schema=DataProductSchema(
                 schema_ref="forge://schemas/e2e/v1",
                 version="1.0.0",
             ),
