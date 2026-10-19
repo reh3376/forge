@@ -38,11 +38,11 @@ From [`ROADMAP.md`](ROADMAP.md) §1 and [`docs/decisions/roles.md`](decisions/ro
 | Milestone | Outcome | State |
 |---|---|---|
 | **M1 · Contract and governance floor** | Hub ↔ spoke contract end to end (push, pull, write-back, TLS/mTLS, tokens, FACTS check at Register); OT module hosted in the hub with alarms, the control-write chain and the MES changeover; FATS, FACTS, FTTS and FVTS with runners and gates; FHTS hashing on every spec. | **Done** (PRs through 36) |
-| **M2 · Decisions and designs** | Role model settled (D-1, Q21/Q22); forge-mes Go design signed off (D-3); FVTS open items answered (D-4); OT FACTS vocabulary (D-8); OT reference FVTS spec approved (FB-078). | **Now** |
+| **M2 · Decisions and designs** | Role model settled (D-1, Q21/Q22); forge-mes Go design signed off (D-3); FVTS open items answered (D-4); OT FACTS vocabulary (D-8); time representation and skew tolerances (D-9); OT reference FVTS spec approved (FB-078). | **Now** |
 | **M3 · Go SDK and the first Go module** | Module SDK template in Go; forge-mes phase 1 speaks to the hub with FB-055 as the acceptance test; `mod_mes` in the hub (FB-057); changeover + MQTT in Go; parity; cut-over; NestJS backend retired. | Not started (FB-076, FB-017, FB-057) |
 | **M4 · forge-display** | Renderer scaffold and spike against the FVTS golden messages; MES surfaces first, then OT HMI surfaces; Next.js frontend retired. | Not started (needs D-4) |
 | **M5 · Hub platform hardening** | Context Engine and Schema Registry mounted (FB-001); scoped roles enforced in the gateway (FB-075); persistent access control and registries (FB-003, FB-005); server-side write review (FB-074, done 2026-10-17); FACTS schema validation (FB-080, done 2026-10-17); FDTS, FQTS, FSTS from stub to gate. | Started (FB-074, FB-080 done) |
-| **M6 · Enterprise** | Hub of hubs, identity methods, offline tokens, Kubernetes deployment, backups and SLOs; forge-cmms and forge-whs in Go; forge-ignition. | Not started |
+| **M6 · Enterprise** | Hub of hubs (the time-authority chain follows it), identity methods, offline tokens, Kubernetes deployment, backups and SLOs; forge-cmms and forge-whs in Go; forge-ignition. | Not started |
 
 Milestones overlap where the roadmap's sequence allows (forge-display work can start once D-4 is answered, in parallel with M3).
 
@@ -52,7 +52,7 @@ Milestones overlap where the roadmap's sequence allows (forge-display work can s
 
 The proposed sequence in [`ROADMAP.md`](ROADMAP.md) §4, abridged:
 
-1. Decision session on D-1, D-3, D-4 and D-8 (owner).
+1. Decision session on D-1, D-3, D-4, D-8 and D-9 (owner).
 2. FB-076 design document, then owner sign-off.
 3. Module SDK Go scaffold; its first consumer is the Go forge-mes.
 4. FB-076 phase 1: the Go module registers, ingests and takes write-backs against the hub.
@@ -61,7 +61,7 @@ The proposed sequence in [`ROADMAP.md`](ROADMAP.md) §4, abridged:
 7. forge-display scaffold and renderer spike; MES surfaces first.
 8. Hub platform items (FB-001, FB-003, FB-007, FB-075) as the Go module and forge-display start needing them.
 
-No small decision-free item is left: FB-022, FB-026, FB-084, FB-085 and FB-086 are done. FB-014 (tz-aware timestamps, the DTZ rule) is the next item that needs no decision, but it touches every model's defaults and the stored rows, so it is a pass over the data model rather than a quick fix. The jest and tsc gates (FB-048) check the interim NestJS/Next.js code under `modules/Forge MES`, which FB-076 retires, so they follow FB-076.
+No small decision-free item is left: FB-022, FB-026, FB-084, FB-085 and FB-086 are done. The next work that needs no decision is the one-clock pass from the owner's 2026-10-18 principle: FB-014 (tz-aware timestamps, naive rejected, DTZ rule), the hub-side restamp in FB-087 and the skew measurement in FB-089; FB-092 (hub time in the contract) and FB-093 (fail-closed enforcement) start once D-9 fixes the exchange shape and the tolerances; FB-094 (every OT connection reads the clock of the device it pulls from and corrects incoming stamps by the measured offset; a device whose clock cannot be read is not pulled) is a design document that chooses among established standards (NTP/chrony, PTP/IEEE 1588, OPC UA header timestamps, IEC 61850 time classes and `TimeQuality`) for the owner to sign, then implementation. The jest and tsc gates (FB-048) check the interim NestJS/Next.js code under `modules/Forge MES`, which FB-076 retires, so they follow FB-076.
 
 ---
 
@@ -73,6 +73,7 @@ No small decision-free item is left: FB-022, FB-026, FB-084, FB-085 and FB-086 a
 | D-3 forge-mes Go design | all of M3 | `ROADMAP.md` §5 |
 | D-4 FVTS open items | M4 | `docs/FxTS/FVTS.md`, `ROADMAP.md` §5 |
 | D-8 FACTS vocabulary for OT adapters | approval of the OT FACTS spec; the OT module's identity | `ROADMAP.md` §5 |
+| D-9 one clock: which established standards to adopt (NTP/chrony strata, PTP/IEEE 1588, NTP four-timestamp measurement in-band, IEC 61850-5 tolerances, IEC 61850 `TimeQuality` + OPC UA `DataValue` fields); FB-094 recommends, the owner approves | FB-092, FB-093, FB-094's fields, the representation half of FB-087/FB-088, FB-089/FB-091 tolerances | `ROADMAP.md` §5 |
 | D-7 scope of the Go standard | long-term shape of the OT module and the Python adapters | `ROADMAP.md` §5 |
 
 ---

@@ -73,6 +73,8 @@ Goal: one contract, both directions encrypted and authenticated, every RPC serve
 | FB-056 dead-letter sink for exhausted ingest batches | Not started | FACTS names it; today it is a counter + log. |
 | FB-002 servicer no-ops | Superseded by FB-053 (`HubIngestServicer`) | Close in the backlog. |
 
+**One clock:** FB-092 adds the hub-time exchange to `forge.v1.AdapterService` and the hub → hub link, so every party can take time from its hub and the hub can measure every child's clock (owner's principle, 2026-10-18; WS-3 has the full list).
+
 ### WS-2 · Hub platform (wiring, auth, storage)
 
 | Item | Status | Notes |
@@ -85,9 +87,13 @@ Goal: one contract, both directions encrypted and authenticated, every RPC serve
 | FB-006 register RabbitMQ/MinIO health checks · FB-008 schema-registry id formats · FB-009 curation trigger | Not started | |
 | Kubernetes production deployment (compose is dev-only) | Not started | Owner note; no backlog id yet. |
 
+**One clock:** FB-093 makes time governance fail closed: the hub refuses Register and rejects Ingest from a party outside the clock tolerance for its class, and surfaces it on health and alerts (owner's principle, 2026-10-18).
+
 ### WS-3 · Core data model (MES readiness)
 
 FB-010 (`Lot.item_id`), FB-011 (step/phase execution, electronic batch record entities), FB-012 (typed ISA-88 hierarchy), FB-013 (`RecordContext` vs context field registry), FB-014 (naive `utcnow`), FB-015 (exports), FB-016 (Go models drop Python defaults). All `Not started`. The Go module rewrite (FB-076) depends on FB-010/011/012/016 being settled, because the Go models become the MES module's types.
+
+**One clock (owner's principle, 2026-10-18).** Records from different sources only reconcile if their timestamps come from one master time, and the authority is the hub: the highest hub provides time for every hub and spoke attached to it, each hub governs the modules directly connected to it, and the checks are mandatory. FB-014 raised to High and widened (tz-aware everywhere, naive rejected, DTZ rule); FB-087 hub stamps receipt; FB-088 no invented source time; FB-089 skew measured at every link and exposed; FB-090 a required `time_governance` section in FACTS; FB-091 clock agreement as a quality dimension; FB-092 the time exchange in the contract (WS-1); FB-093 fail-closed enforcement at Register and Ingest (WS-2); FB-094 the OT source-time design (WS-4). D-9 settles the top hub's reference, the tolerances and the fields.
 
 ### WS-4 · OT module (forge-ot)
 
@@ -101,6 +107,8 @@ Phases 1–4 of the P7 plan (OPC-UA client, tag engine, scripting/MQTT, alarms, 
 | FB-082 OT control POST endpoints (changeover, connection restart) carry no scope check | Done 2026-10-17 | Same `adapters:write` dependency and identity rule as the FB-074 write endpoints; the hub user is the recorded actor. |
 | FB-018 OT manifest tier/output_format vs manifest builder · FB-020 remaining unwired OT ↔ MES hooks (`BatchContextResolver`) | Not started | FB-065 wired the recipe adapter; the batch resolver is still manual. |
 | P7 Phases 5–7 (Ignition bridge, script migration, decommission) | Reframed by A-4 | Becomes: forge-ignition integration module + optional forge-hmi-scada module (WS-6/WS-7). |
+
+**One clock:** FB-094 is the OT source-time design (owner, 2026-10-18): a tag's `source_time` must be when the value occurred at the PLC, so every OT connection reads the clock of the device it pulls from, measures its offset continuously and corrects each incoming stamp by that offset on entry, recording the original stamp and the offset applied; a device whose clock cannot be read is not pulled; a warning is not a substitute for the correction.
 
 ### WS-5 · forge-mes: bridge now, Go module next
 
@@ -164,15 +172,16 @@ FB-024 done 2026-10-18 (README tech stack, language policy, counts, spec states)
 ## 4. Proposed sequence
 
 1. ~~Merge the backlog PR; land **FB-072**~~ — done 2026-10-16; both gRPC directions can be mTLS.
-2. Decision session (section 5): role model, FVTS questions, forge-mes Go design, module SDK shape.
+2. Decision session (section 5): role model, FVTS questions, forge-mes Go design, module SDK shape, time representation (D-9).
 3. **FB-076 design doc** (scope, data ownership, hub link, what the bridge keeps doing meanwhile); owner sign-off.
-4. **Module SDK Go scaffold** (WS-7) — the first consumer is the Go forge-mes.
-5. **FB-076 phase 1:** Go forge-mes speaks to the hub (Register/Configure/Ingest, write-back, pull RPCs) with FB-055 as the acceptance test.
-6. **FVTS runner + golden tests** (WS-6) in parallel with 5; approve the OT reference spec.
-7. **FB-057 `mod_mes`** with FB-004/005/059, for the Go module.
-8. **FB-076 phases 2–3:** changeover + MQTT, parity, cut-over; retire the NestJS backend.
-9. **forge-display scaffold** and the renderer spike; MES surfaces first; retire the Next.js frontend.
-10. Hub platform items (FB-001/003/007) as the Go module and forge-display start needing them.
+4. **One-clock pass** (FB-014; FB-092 time exchange in the contract; FB-087 restamp; FB-089 measurement; FB-093 fail-closed enforcement; FB-090 required FACTS section; FB-094 OT source-time design, owner-signed) before the Go module's first production ingest; D-9 settles the top hub's reference, the tolerances and the fields.
+5. **Module SDK Go scaffold** (WS-7) — the first consumer is the Go forge-mes.
+6. **FB-076 phase 1:** Go forge-mes speaks to the hub (Register/Configure/Ingest, write-back, pull RPCs) with FB-055 as the acceptance test.
+7. **FVTS runner + golden tests** (WS-6) in parallel with 6; approve the OT reference spec.
+8. **FB-057 `mod_mes`** with FB-004/005/059, for the Go module.
+9. **FB-076 phases 2–3:** changeover + MQTT, parity, cut-over; retire the NestJS backend.
+10. **forge-display scaffold** and the renderer spike; MES surfaces first; retire the Next.js frontend.
+11. Hub platform items (FB-001/003/007) as the Go module and forge-display start needing them.
 
 Security/ops items (WS-9) run alongside and are gated by GitHub Support, not by this sequence.
 
@@ -203,16 +212,18 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 
 **D-7 · Scope of the Go standard.** A-2 covers the formal management-service modules. Still to decide: whether the hub-hosted Python OT module (`src/forge/modules/ot`) and the Python ingestion adapters (`src/forge/adapters/*`) move to Go over time or stay Python inside the hub, and whether integration modules (forge-ignition) follow the Go template.
 
+**D-9 · One clock: which established standards to adopt (owner's principle, 2026-10-18).** Settled by the owner: the highest hub is the time authority, each hub governs the modules and spokes attached to it, the checks are mandatory and fail closed, and incoming stamps are corrected by the measured device offset on entry. Nothing here is novel; every part has a deployed, tested answer, and the FB-094 design document researches them and recommends, the owner approves. Distribution: NTP (RFC 5905, chrony) in a stratum hierarchy that mirrors the hub hierarchy (top hub stratum 1 or 2, child hubs below it, spokes below them), with PTP (IEEE 1588-2019; CIP Sync on EtherNet/IP, IEEE 802.1AS for TSN, PROFINET's PTCP) on the plant network where sub-millisecond matters; the top hub's own reference is a GNSS-disciplined stratum-1 source with pool servers as fallback. Measurement: the NTP on-wire four-timestamp exchange (origin, receive, transmit, destination) carried in-band on the existing RPCs rather than a new protocol, OPC UA's `RequestHeader.Timestamp` / `ResponseHeader.Timestamp` on every service call plus `ServerStatus.CurrentTime`, Logix `WallClockTime` over CIP, the S7 clock read. Tolerances: IEC 61850-5 time-performance classes for OT (1 ms for events down to microseconds for sampled values), chrony's measured LAN and WAN performance for IT spokes and hub-to-hub links. Record fields: IEC 61850 `TimeQuality` (clock synchronised, clock failure, leap seconds known, accuracy) and the OPC UA `DataValue` source/server timestamp pair with picoseconds, plus the offset Forge applied; Sparkplug B's millisecond-UTC convention for MQTT. Open for the owner: approve the design document's choices; the proto change re-stamps FATS/FACTS.
+
 ---
 
 ## 6. Open backlog by workstream
 
 | Workstream | High | Med | Low | Items |
 |---|---|---|---|---|
-| WS-1 transport | — | FB-072 | FB-055, FB-056, FB-071 | FB-002 to close as superseded |
-| WS-2 hub platform | FB-001, FB-003 | FB-004, FB-005, FB-006, FB-007, FB-059, FB-075 | FB-008, FB-009 | |
-| WS-3 data model | FB-010, FB-011 | FB-012, FB-013, FB-016 | FB-014, FB-015 | FB-086 done |
-| WS-4 OT module | — | FB-020, FB-079 | FB-018 | FB-073, FB-074 done (awaiting approval); FB-082 done |
+| WS-1 transport | FB-092 | FB-072 | FB-055, FB-056, FB-071 | FB-002 to close as superseded; FB-092 is the one-clock time exchange |
+| WS-2 hub platform | FB-001, FB-003, FB-093 | FB-004, FB-005, FB-006, FB-007, FB-059, FB-075 | FB-008, FB-009 | FB-093 is the one-clock enforcement |
+| WS-3 data model | FB-010, FB-011, FB-014, FB-087, FB-088, FB-089, FB-090 | FB-012, FB-013, FB-016, FB-091 | FB-015 | FB-086 done; the one-clock items follow the owner's 2026-10-18 principle (FB-092 in WS-1, FB-093 in WS-2), D-9 |
+| WS-4 OT module | FB-094 | FB-020, FB-079 | FB-018 | FB-073, FB-074 done (awaiting approval); FB-082 done; FB-094 is the OT source-time design |
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
 | WS-6 forge-display | — | — | — | No backlog ids yet; tracked here until the design lands |
 | WS-7 module SDK | — | FB-017 | FB-019 | FB-021 done |

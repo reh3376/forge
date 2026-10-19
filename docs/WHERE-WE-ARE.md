@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-18 · **Branch:** `reh3376_dev01` (last merged PR: 48) · **Owner:** reh3376
+**Status date:** 2026-10-18 · **Branch:** `reh3376_dev01` (last merged PR: 49) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -53,6 +53,7 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
 | FTTS transport spec and runner | 🟡 | Schema + runner exist; spec at `specs/grpc-hardened-transport.ftts.json`; no `docs/FxTS/FTTS.md` |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
+| Hub is the time authority for its spokes and child hubs; skew measured at every link and enforced | ❌ | No hub time in the contract, the spoke's clock is copied through, nothing compares the three timestamps, nothing refuses a wrong clock (FB-087, FB-089, FB-092, FB-093); one-clock principle, owner 2026-10-18 |
 
 ### 3.2 Hub platform
 
@@ -100,6 +101,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Capability | State | Notes |
 |---|---|---|
 | OPC-UA client (asyncua), tag engine, context resolvers | ✅ | `forge.modules.ot.opcua_client`, `tag_engine`, `context`; asyncua pinned `==2.1.0` (FB-085) |
+| Tag `source_time` is device time corrected to master by the device's measured clock offset, original stamp and offset recorded | ❌ | `SourceTimestamp` stored as the server sends it, invented when absent; no device clock is read, no offset applied (FB-088, FB-094; one-clock principle, owner 2026-10-18) |
 | ISA-18.2 alarming (state machine, detector, engine, integrations, API) | ✅ | `forge.modules.ot.alarming` |
 | Control writes: validation → review → interlocks → authorization → write with read-back → audit | ✅ | `forge.modules.ot.control`; audit in the hub store and an external MQTT publisher (FB-066, FB-067) |
 | MES changeover: orchestrator, PLC CIP runner, recipe integration, REST | ✅ | FB-062, FB-065 |
@@ -177,7 +179,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Practice | State |
 |---|---|
 | One backlog item per PR, auto-PR, owner merges on green | ✅ (A-8) |
-| Every finding fixed or recorded in `BACKLOG.md` | ✅ (86 items recorded to date) |
+| Every finding fixed or recorded in `BACKLOG.md` | ✅ (94 items recorded to date) |
 | Documentation current before every push | ✅ rule since 2026-10-16 |
 | Owner-only spec approval | ✅ `forge governance approve <spec> --by reh3376` (FB-021); nobody runs it on the owner's behalf |
 | MDEMG/Jiminy governed memory, local models only | ✅ instance per project (A-10) |
@@ -196,6 +198,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | D-5 | Hub core language (Python vs Rust) — parked | nothing in the current sequence |
 | D-7 | Scope of the Go standard (OT module and Python adapters) | long-term shape of `src/forge/modules` and `src/forge/adapters` |
 | D-8 | FACTS vocabulary for OT adapters (extend the schema vs translate the spec) | FB-079, approval of the OT FACTS spec |
+| D-9 | One clock: which established standards to adopt (NTP/chrony strata mirroring the hub hierarchy, PTP/IEEE 1588 on the plant network, NTP four-timestamp measurement in-band, IEC 61850-5 tolerance classes, IEC 61850 `TimeQuality` and OPC UA `DataValue` fields on the record); the FB-094 design document recommends, the owner approves (authority chain, fail-closed enforcement and offset correction on entry already settled) | FB-092's shape, FB-093's tolerances, the representation half of FB-087/FB-088, FB-094's fields, FB-089/FB-091 tolerances |
 
 ---
 
@@ -208,6 +211,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 5. **Hub services unmounted** (FB-001): Context Engine and Schema Registry exist but are not served.
 6. **Seven governance frameworks are stubs or planned**; FACTS now validates against its own schema, but six of its nine specs await the owner's hash approval.
 7. **No production deployment** (vision §P-12).
+8. **No clock discipline** (principle "one clock", owner 2026-10-18): the hub is not a time authority for anything attached to it, trusts the spoke's `ingestion_time`, the OPC-UA converter invents a source time when the server sends none, naive timestamps are accepted, no skew is measured, nothing refuses a wrong clock, and a tag's source time is whatever the OPC-UA server chose to send (FB-014, FB-087 to FB-094).
 
 ---
 
