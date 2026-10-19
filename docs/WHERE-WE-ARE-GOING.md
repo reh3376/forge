@@ -61,7 +61,7 @@ The proposed sequence in [`ROADMAP.md`](ROADMAP.md) §4, abridged:
 7. forge-display scaffold and renderer spike; MES surfaces first.
 8. Hub platform items (FB-001, FB-003, FB-007, FB-075) as the Go module and forge-display start needing them.
 
-No small decision-free item is left: FB-022, FB-026, FB-084, FB-085 and FB-086 are done. FB-014 (tz-aware timestamps, the DTZ rule) is the next item that needs no decision, but it touches every model's defaults and the stored rows, so it is a pass over the data model rather than a quick fix. The jest and tsc gates (FB-048) follow FB-076, since they guard the TypeScript forge-mes bridge.
+No small decision-free item is left: FB-022, FB-026, FB-084, FB-085 and FB-086 are done. FB-014 (tz-aware timestamps, the DTZ rule) is the next item that needs no decision, but it touches every model's defaults and the stored rows, so it is a pass over the data model rather than a quick fix. The jest and tsc gates (FB-048) check the interim NestJS/Next.js code under `modules/Forge MES`, which FB-076 retires, so they follow FB-076.
 
 ---
 

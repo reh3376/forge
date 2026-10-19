@@ -116,7 +116,7 @@ The OT tier's vocabulary gap in FACTS v0.1.0 is decision D-8 (FB-079).
 | Component | Decision | Status (2026-10-18) |
 |---|---|---|
 | Hub (forge-core) | Python ≥ 3.12, FastAPI, Typer CLI, Pydantic v2, uv, ruff | In force |
-| Management and integration modules | Go, generated from the module SDK (A-2, A-5) | In force; replaces the April 2026 choice of NestJS + Next.js modules. forge-mes still runs as the migrated TypeScript bridge until its Go rewrite (FB-076) |
+| Management and integration modules | Go, generated from the module SDK (A-2, A-5) | In force; replaces the April 2026 choice of NestJS + Next.js modules. the migrated NestJS/Next.js application runs as an interim bridge until the Go forge-mes module (FB-076) replaces it |
 | User interfaces | forge-display renders every surface from FVTS specs (A-3) | In force; the FVTS runner and reference renderer exist, forge-display does not yet |
 | Hub ↔ spoke transport | gRPC with compiled protobuf; mTLS both directions (FTTS) | In force |
 | Module events | RabbitMQ topic exchange (the `wh.whk01.distillery01.*` proto-UNS); Kafka is in the compose stack as the enterprise bus when volume requires it | In force (RabbitMQ), planned (Kafka) |
