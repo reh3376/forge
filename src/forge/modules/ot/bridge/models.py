@@ -17,7 +17,7 @@ from typing import Any
 # ---------------------------------------------------------------------------
 
 
-class IgnitionQuality(str, enum.Enum):
+class IgnitionQuality(enum.StrEnum):
     """Ignition quality codes returned by the REST API.
 
     Ignition uses a quality hierarchy: Good/Uncertain/Bad with subtypes.
@@ -202,7 +202,7 @@ class BridgeConfig:
 # ---------------------------------------------------------------------------
 
 
-class BridgeState(str, enum.Enum):
+class BridgeState(enum.StrEnum):
     """Bridge adapter operational states."""
 
     DISCONNECTED = "disconnected"

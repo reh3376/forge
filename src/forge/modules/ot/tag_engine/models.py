@@ -31,7 +31,7 @@ from forge.modules.ot.opcua_client.types import DataType, QualityCode
 # ---------------------------------------------------------------------------
 
 
-class TagType(str, enum.Enum):
+class TagType(enum.StrEnum):
     """All 9 tag types — 6 standard + 3 Forge-exclusive."""
 
     STANDARD = "standard"  # Live OPC-UA subscription
@@ -45,7 +45,7 @@ class TagType(str, enum.Enum):
     VIRTUAL = "virtual"  # Federated read from external system (★ Forge-exclusive)
 
 
-class ScanClass(str, enum.Enum):
+class ScanClass(enum.StrEnum):
     """Execution rate groups for tag evaluation.
 
     Tags are assigned to scan classes.  The tag engine evaluates all tags

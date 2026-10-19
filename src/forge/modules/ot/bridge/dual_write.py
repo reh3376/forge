@@ -19,11 +19,11 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class DiscrepancyType(str, Enum):
+class DiscrepancyType(StrEnum):
     """Categories of dual-write discrepancy."""
 
     VALUE_MISMATCH = "value_mismatch"  # Values differ beyond tolerance

@@ -24,7 +24,7 @@ import fnmatch
 import logging
 import re
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 
-class TopicType(str, Enum):
+class TopicType(StrEnum):
     """Categories of MQTT topics published by the OT Module."""
 
     TAG_VALUE = "tag_value"

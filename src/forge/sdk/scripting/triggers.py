@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 
-class TriggerType(str, enum.Enum):
+class TriggerType(enum.StrEnum):
     """All supported trigger types for script handlers."""
 
     TAG_CHANGE = "tag_change"

@@ -80,11 +80,6 @@ select = [
     "TCH",  # type-checking
     "RUF",  # ruff-specific
 ]
-ignore = [
-    # `(str, Enum)` -> `StrEnum` changes `str()`/`format()` of every member (value instead of
-    # `Cls.NAME`), so the migration is a deliberate pass, not a lint fix: BACKLOG FB-084.
-    "UP042",
-]
 
 [tool.ruff.lint.flake8-type-checking]
 # Pydantic resolves annotations at class creation, so their imports must stay at runtime.

@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-18 · **Branch:** `reh3376_dev01` (last merged PR: 46) · **Owner:** reh3376
+**Status date:** 2026-10-18 · **Branch:** `reh3376_dev01` (last merged PR: 47) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -181,7 +181,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Documentation current before every push | ✅ rule since 2026-10-16 |
 | Owner-only spec approval | ✅ `forge governance approve <spec> --by reh3376` (FB-021); nobody runs it on the owner's behalf |
 | MDEMG/Jiminy governed memory, local models only | ✅ instance per project (A-10) |
-| Lint gate | ✅ `ruff check` and `ruff format --check` clean and blocking since FB-022 (2026-10-18); jest/tsc gates still advisory (FB-048, forge-mes bridge) |
+| Lint gate | ✅ `ruff check` and `ruff format --check` clean and blocking since FB-022 (2026-10-18), no rule ignored since FB-084; jest/tsc gates still advisory (FB-048, forge-mes bridge) |
 | Top-level documents are the key documents only | ✅ FB-081 (2026-10-18): twelve planning records retired, rationale in `docs/PRINCIPLES.md` |
 
 ---
