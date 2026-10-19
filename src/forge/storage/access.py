@@ -20,10 +20,9 @@ import re
 import secrets
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Protocol
 from urllib.parse import quote
-
-from forge._compat import StrEnum
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Sequence

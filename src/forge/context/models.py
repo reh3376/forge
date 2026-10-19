@@ -8,9 +8,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, time
+from enum import StrEnum
 from typing import Any
-
-from forge._compat import StrEnum
 
 # ---------------------------------------------------------------------------
 # Equipment

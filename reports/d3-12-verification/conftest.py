@@ -20,9 +20,6 @@ SRC_ROOT = Path(__file__).resolve().parents[2] / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-# ── Python 3.10 compat shims ─────────────────────────────────────
-import forge._compat  # noqa: F401, E402 — registers StrEnum/UTC shims
-
 
 # ── Sample WMS barrel event ──────────────────────────────────────
 
