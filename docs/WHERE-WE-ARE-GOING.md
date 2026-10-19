@@ -61,7 +61,7 @@ The proposed sequence in [`ROADMAP.md`](ROADMAP.md) §4, abridged:
 7. forge-display scaffold and renderer spike; MES surfaces first.
 8. Hub platform items (FB-001, FB-003, FB-007, FB-075) as the Go module and forge-display start needing them.
 
-Items that need no decision and can be taken any time: FB-084 (StrEnum migration) and FB-085 (pin asyncua), both small. The jest and tsc gates (FB-048) follow FB-076, since they guard the TypeScript forge-mes bridge.
+Items that need no decision and can be taken any time: FB-084 (StrEnum migration) and FB-086 (`DataProduct.schema` renamed behind an alias), both small. The jest and tsc gates (FB-048) follow FB-076, since they guard the TypeScript forge-mes bridge.
 
 ---
 

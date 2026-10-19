@@ -31,7 +31,7 @@ dependencies = [
 
 [project.optional-dependencies]
 ot = [
-    "asyncua>=1.1",
+    "asyncua==2.1.0",  # exact pin: one tested version on 3.12 (CI) and 3.14 (local); 2.x is the first line with 3.14 support
     "aiomqtt>=2.0",
 ]
 dev = [

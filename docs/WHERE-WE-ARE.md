@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-18 · **Branch:** `reh3376_dev01` (last merged PR: 45) · **Owner:** reh3376
+**Status date:** 2026-10-18 · **Branch:** `reh3376_dev01` (last merged PR: 46) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -99,7 +99,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 
 | Capability | State | Notes |
 |---|---|---|
-| OPC-UA client (asyncua), tag engine, context resolvers | ✅ | `forge.modules.ot.opcua_client`, `tag_engine`, `context` |
+| OPC-UA client (asyncua), tag engine, context resolvers | ✅ | `forge.modules.ot.opcua_client`, `tag_engine`, `context`; asyncua pinned `==2.1.0` (FB-085) |
 | ISA-18.2 alarming (state machine, detector, engine, integrations, API) | ✅ | `forge.modules.ot.alarming` |
 | Control writes: validation → review → interlocks → authorization → write with read-back → audit | ✅ | `forge.modules.ot.control`; audit in the hub store and an external MQTT publisher (FB-066, FB-067) |
 | MES changeover: orchestrator, PLC CIP runner, recipe integration, REST | ✅ | FB-062, FB-065 |
@@ -177,7 +177,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Practice | State |
 |---|---|
 | One backlog item per PR, auto-PR, owner merges on green | ✅ (A-8) |
-| Every finding fixed or recorded in `BACKLOG.md` | ✅ (85 items recorded to date) |
+| Every finding fixed or recorded in `BACKLOG.md` | ✅ (86 items recorded to date) |
 | Documentation current before every push | ✅ rule since 2026-10-16 |
 | Owner-only spec approval | ✅ `forge governance approve <spec> --by reh3376` (FB-021); nobody runs it on the owner's behalf |
 | MDEMG/Jiminy governed memory, local models only | ✅ instance per project (A-10) |
