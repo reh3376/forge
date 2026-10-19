@@ -1,4 +1,4 @@
-# ruff: noqa: E402, UP017
+# ruff: noqa: E402
 """Integration tests for hardened gRPC transport (real server ↔ real client).
 
 These tests start a real grpc.aio server on a random port, connect a
@@ -16,22 +16,9 @@ schema-enforced binary protobuf communication.
 
 from __future__ import annotations
 
-import datetime as _dt_mod
-import enum
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-
-# Python 3.10 compat patches (sandbox is 3.10, code targets 3.12+)
-if not hasattr(_dt_mod, "UTC"):
-    _dt_mod.UTC = _dt_mod.timezone.utc
-
-if not hasattr(enum, "StrEnum"):
-
-    class StrEnum(str, enum.Enum):
-        pass
-
-    enum.StrEnum = StrEnum
 
 import pytest
 
@@ -143,7 +130,7 @@ def _make_record(index: int = 0) -> ContextualRecord:
                 10,
                 index // 60,
                 index % 60,
-                tzinfo=timezone.utc,
+                tzinfo=UTC,
             ),
             ingestion_time=datetime(
                 2026,
@@ -153,7 +140,7 @@ def _make_record(index: int = 0) -> ContextualRecord:
                 index // 60,
                 index % 60,
                 200000,
-                tzinfo=timezone.utc,
+                tzinfo=UTC,
             ),
         ),
         value=RecordValue(

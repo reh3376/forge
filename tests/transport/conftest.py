@@ -1,25 +1,12 @@
-# ruff: noqa: E402, UP017
+# ruff: noqa: E402
 """Shared fixtures for transport layer tests."""
 
 from __future__ import annotations
 
-import datetime as _dt_mod
-import enum
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
-
-# Python 3.10 compat patches (sandbox is 3.10, code targets 3.12+)
-if not hasattr(_dt_mod, "UTC"):
-    _dt_mod.UTC = _dt_mod.timezone.utc
-
-if not hasattr(enum, "StrEnum"):
-
-    class StrEnum(str, enum.Enum):
-        pass
-
-    enum.StrEnum = StrEnum
 
 import pytest
 
@@ -63,9 +50,9 @@ def sample_record() -> ContextualRecord:
             connection_id="conn-001",
         ),
         timestamp=RecordTimestamp(
-            source_time=datetime(2026, 4, 5, 14, 30, 0, 123000, tzinfo=timezone.utc),
-            server_time=datetime(2026, 4, 5, 14, 30, 0, 150000, tzinfo=timezone.utc),
-            ingestion_time=datetime(2026, 4, 5, 14, 30, 0, 200000, tzinfo=timezone.utc),
+            source_time=datetime(2026, 4, 5, 14, 30, 0, 123000, tzinfo=UTC),
+            server_time=datetime(2026, 4, 5, 14, 30, 0, 150000, tzinfo=UTC),
+            ingestion_time=datetime(2026, 4, 5, 14, 30, 0, 200000, tzinfo=UTC),
         ),
         value=RecordValue(
             raw=78.4,
@@ -142,8 +129,8 @@ def sample_health() -> AdapterHealth:
     return AdapterHealth(
         adapter_id="whk-wms",
         state=AdapterState.HEALTHY,
-        last_check=datetime(2026, 4, 5, 14, 35, 0, tzinfo=timezone.utc),
-        last_healthy=datetime(2026, 4, 5, 14, 35, 0, tzinfo=timezone.utc),
+        last_check=datetime(2026, 4, 5, 14, 35, 0, tzinfo=UTC),
+        last_healthy=datetime(2026, 4, 5, 14, 35, 0, tzinfo=UTC),
         error_message=None,
         records_collected=1234,
         records_failed=5,
