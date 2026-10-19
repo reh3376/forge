@@ -55,6 +55,7 @@ Component-by-component snapshot: [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md). Delivered
 | Python 3.10/3.14 compatibility shims retired; importers use `enum.StrEnum` directly | FB-026 |
 | asyncua pinned to one tested version (`asyncua==2.1.0`; Python 3.12 in CI, 3.14 locally) | FB-085 |
 | The 21 OT/SDK enums are `StrEnum`, the last ruff ignore (UP042) dropped, the inline 3.10 test fallbacks removed | FB-084 |
+| `DataProduct.product_schema` behind the `schema` alias: wire name kept, Pydantic import warning gone, Pydantic floor 2.11 | FB-086 |
 
 ---
 
@@ -210,7 +211,7 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 |---|---|---|---|---|
 | WS-1 transport | — | FB-072 | FB-055, FB-056, FB-071 | FB-002 to close as superseded |
 | WS-2 hub platform | FB-001, FB-003 | FB-004, FB-005, FB-006, FB-007, FB-059, FB-075 | FB-008, FB-009 | |
-| WS-3 data model | FB-010, FB-011 | FB-012, FB-013, FB-016 | FB-014, FB-015, FB-086 | |
+| WS-3 data model | FB-010, FB-011 | FB-012, FB-013, FB-016 | FB-014, FB-015 | FB-086 done |
 | WS-4 OT module | — | FB-020, FB-079 | FB-018 | FB-073, FB-074 done (awaiting approval); FB-082 done |
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
 | WS-6 forge-display | — | — | — | No backlog ids yet; tracked here until the design lands |

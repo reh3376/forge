@@ -222,8 +222,8 @@ def create_curation_app(
                 description=p.description,
                 owner=p.owner,
                 status=p.status.value,
-                schema_ref=p.schema.schema_ref,
-                schema_version=p.schema.version,
+                schema_ref=p.product_schema.schema_ref,
+                schema_version=p.product_schema.version,
                 source_adapters=p.source_adapters,
                 tags=p.tags,
             )
@@ -241,8 +241,8 @@ def create_curation_app(
             description=product.description,
             owner=product.owner,
             status=product.status.value,
-            schema_ref=product.schema.schema_ref,
-            schema_version=product.schema.version,
+            schema_ref=product.product_schema.schema_ref,
+            schema_version=product.product_schema.version,
             source_adapters=product.source_adapters,
             tags=product.tags,
         )
@@ -264,8 +264,8 @@ def create_curation_app(
             description=product.description,
             owner=product.owner,
             status=product.status.value,
-            schema_ref=product.schema.schema_ref,
-            schema_version=product.schema.version,
+            schema_ref=product.product_schema.schema_ref,
+            schema_version=product.product_schema.version,
             source_adapters=product.source_adapters,
             tags=product.tags,
         )
@@ -284,8 +284,8 @@ def create_curation_app(
             description=product.description,
             owner=product.owner,
             status=product.status.value,
-            schema_ref=product.schema.schema_ref,
-            schema_version=product.schema.version,
+            schema_ref=product.product_schema.schema_ref,
+            schema_version=product.product_schema.version,
             source_adapters=product.source_adapters,
             tags=product.tags,
         )

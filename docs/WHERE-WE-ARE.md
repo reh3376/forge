@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-18 · **Branch:** `reh3376_dev01` (last merged PR: 47) · **Owner:** reh3376
+**Status date:** 2026-10-18 · **Branch:** `reh3376_dev01` (last merged PR: 48) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -22,7 +22,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 346 files, ~66,700 lines |
-| Python tests | 249 files, ~53,400 lines, 4,003 test functions (4,188 collected); full suite green on 2026-10-18 |
+| Python tests | 250 files, ~53,400 lines, 4,008 test functions (4,193 collected); full suite green on 2026-10-18 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | forge-mes bridge (`modules/Forge MES`) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |

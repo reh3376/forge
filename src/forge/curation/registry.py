@@ -143,7 +143,7 @@ class DataProductRegistry:
             description=description,
             owner=owner,
             status=DataProductStatus.DRAFT,
-            schema=schema,
+            product_schema=schema,
             source_adapters=source_adapters or [],
             quality_slos=quality_slos or [],
             tags=tags or [],
@@ -237,14 +237,14 @@ class DataProductRegistry:
         schema = None
         if schema_ref:
             schema = DataProductSchema(schema_ref=schema_ref, version=version)
-            product.schema = schema
+            product.product_schema = schema
             product.updated_at = datetime.now(UTC)
             self._store.save(product)
 
         ver = DataProductVersion(
             product_id=product_id,
             version=version,
-            schema=schema or product.schema,
+            schema=schema or product.product_schema,
             fields=fields or [],
             notes=notes,
         )

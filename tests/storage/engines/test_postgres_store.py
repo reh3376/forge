@@ -39,7 +39,7 @@ def sample_product() -> DataProduct:
         description="A test data product",
         owner="test-owner",
         status=DataProductStatus.DRAFT,
-        schema=DataProductSchema(
+        product_schema=DataProductSchema(
             schema_ref="forge://schemas/test/v1",
             version="1.0.0",
         ),

@@ -11,7 +11,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class DataProductStatus(StrEnum):
@@ -48,12 +48,18 @@ class DataProduct(BaseModel):
     complete lineage, and access controls.
     """
 
+    # ``schema`` stays the wire name (JSON key, constructor keyword) but cannot be the
+    # attribute: it would shadow ``BaseModel.schema()`` and Pydantic warns on import (FB-086).
+    model_config = ConfigDict(
+        validate_by_name=True, validate_by_alias=True, serialize_by_alias=True
+    )
+
     product_id: str
     name: str
     description: str
     owner: str  # Named individual, not a department
     status: DataProductStatus = DataProductStatus.DRAFT
-    schema: DataProductSchema
+    product_schema: DataProductSchema = Field(alias="schema")
     source_adapters: list[str] = Field(default_factory=list)
     quality_slos: list[QualitySLO] = Field(default_factory=list)
     tags: list[str] = Field(default_factory=list)
