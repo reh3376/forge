@@ -239,6 +239,7 @@ Forge is complete for a site when all of the following are true. Each line is an
 12. **Production deployment is Kubernetes**, with health, SLOs, backups and an upgrade procedure.
 13. **Decisions are records** with the products and lineage they relied on and the observed outcome.
 14. **Onboarding a new system is a day's work** from the SDK: scaffold, spec, conformance green, registered, data with context in the hub.
+15. **One clock, from the top hub down**: the highest hub is the time authority, every hub governs the clocks of the modules and spokes attached to it, every stored timestamp is UTC and timezone-aware, the hub stamps receipt itself, skew is measured at every link, a tag's source time is when the value occurred at the device, corrected to master time by the device's measured clock offset, and a hub, module or spoke outside tolerance is refused.
 
 ---
 

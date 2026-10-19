@@ -53,7 +53,7 @@ Each spoke wraps one production system and produces ContextualRecords that confo
 |-----------|-----------|
 | Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,193 tests) |
 | Management and integration modules (`go/`) | Go 1.26 · `go build`, `go vet`, `go test` in CI; module SDK scaffold (the Go forge-mes is FB-076) |
-| forge-mes bridge (`modules/Forge MES`) | TypeScript · NestJS 10 · Next.js 14 (the migrated whk-mes application, until the Go module lands) |
+| Interim MES bridge (`modules/Forge MES`) | The migrated whk-mes application, NestJS 10 + Next.js 14, kept running only until the Go forge-mes module (FB-076) replaces it |
 | User interfaces | forge-display renders every surface from FVTS specs (not built yet; the FVTS runner and reference renderer exist) |
 | Transport | gRPC + Protobuf (compiled binary, never JSON-over-gRPC); mTLS in both directions |
 | Databases | PostgreSQL 16 (hub), TimescaleDB (time series), Neo4j 5 (graph); hub-owned, modules get `mod_<name>` schemas |
