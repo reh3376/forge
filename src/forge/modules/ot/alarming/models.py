@@ -23,7 +23,7 @@ from typing import Any
 # ---------------------------------------------------------------------------
 
 
-class AlarmState(str, enum.Enum):
+class AlarmState(enum.StrEnum):
     """ISA-18.2 alarm states.
 
     Core lifecycle:  NORMAL → ACTIVE_UNACK → ACTIVE_ACK → CLEAR_UNACK → NORMAL
@@ -41,7 +41,7 @@ class AlarmState(str, enum.Enum):
     OUT_OF_SERVICE = "OUT_OF_SERVICE"
 
 
-class AlarmAction(str, enum.Enum):
+class AlarmAction(enum.StrEnum):
     """Actions that drive state transitions."""
 
     TRIGGER = "TRIGGER"  # Process condition becomes abnormal
@@ -56,7 +56,7 @@ class AlarmAction(str, enum.Enum):
     RESET = "RESET"  # Force-reset to NORMAL (admin only)
 
 
-class AlarmPriority(str, enum.Enum):
+class AlarmPriority(enum.StrEnum):
     """Alarm priority levels per ISA-18.2 §6.3.
 
     Rank is used for sorting (lower = more urgent).
@@ -82,7 +82,7 @@ _PRIORITY_RANK: dict[AlarmPriority, int] = {
 }
 
 
-class AlarmType(str, enum.Enum):
+class AlarmType(enum.StrEnum):
     """Alarm detection types."""
 
     HI = "HI"

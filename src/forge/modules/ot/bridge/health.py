@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 
 from forge.modules.ot.bridge.models import BridgeHealth
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from forge.modules.ot.bridge.dual_write import ConsistencyReport
 
 
-class FailoverState(str, Enum):
+class FailoverState(StrEnum):
     """Current failover readiness."""
 
     NOT_TESTED = "not_tested"

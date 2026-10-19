@@ -54,6 +54,7 @@ Component-by-component snapshot: [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md). Delivered
 | Lint gate blocking: `ruff check` and `ruff format` clean repo-wide, generated code excluded, Pydantic imports kept at runtime | FB-022 |
 | Python 3.10/3.14 compatibility shims retired; importers use `enum.StrEnum` directly | FB-026 |
 | asyncua pinned to one tested version (`asyncua==2.1.0`; Python 3.12 in CI, 3.14 locally) | FB-085 |
+| The 21 OT/SDK enums are `StrEnum`, the last ruff ignore (UP042) dropped, the inline 3.10 test fallbacks removed | FB-084 |
 
 ---
 
@@ -138,7 +139,7 @@ Needed before FB-076, forge-ignition and forge-hmi-scada can start the same way.
 
 ### WS-8 · Governance (FxTS)
 
-FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory row. FB-080 done 2026-10-17 (`facts:schema-valid`, enums from the schema; 8 of 9 specs validate, the OT spec waits on D-8; five re-stamped specs await the owner's approval). FB-022 done 2026-10-18: the 1,148 ruff findings are cleared and `ruff check` / `ruff format` block CI; FB-048's jest and tsc gates follow FB-076. FB-026 (compatibility shims) and FB-085 (`asyncua==2.1.0`) done 2026-10-18. Open: FB-084 (StrEnum migration), FB-014 (DTZ rule). FB-021 and FB-083 done 2026-10-18: `forge governance specs / stamp / approve` and `forge governance run` for all four runners.
+FTTS has a schema, runner and spec but no `docs/FxTS/FTTS.md` and no inventory row. FB-080 done 2026-10-17 (`facts:schema-valid`, enums from the schema; 8 of 9 specs validate, the OT spec waits on D-8; five re-stamped specs await the owner's approval). FB-022 done 2026-10-18: the 1,148 ruff findings are cleared and `ruff check` / `ruff format` block CI; FB-048's jest and tsc gates follow FB-076. FB-026 (compatibility shims), FB-085 (`asyncua==2.1.0`) and FB-084 (the 21 enums are `StrEnum`; ruff ignores nothing now) done 2026-10-18. Open: FB-014 (DTZ rule). FB-021 and FB-083 done 2026-10-18: `forge governance specs / stamp / approve` and `forge governance run` for all four runners.
 
 ### WS-9 · Security and repository operations
 
@@ -214,7 +215,7 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
 | WS-6 forge-display | — | — | — | No backlog ids yet; tracked here until the design lands |
 | WS-7 module SDK | — | FB-017 | FB-019 | FB-021 done |
-| WS-8 governance | — | — | FB-014, FB-048 (jest/tsc follow FB-076), FB-084 | FB-080, FB-021, FB-083, FB-022, FB-026, FB-085 done; FTTS doc has no id yet |
+| WS-8 governance | — | — | FB-014, FB-048 (jest/tsc follow FB-076) | FB-080, FB-021, FB-083, FB-022, FB-026, FB-085, FB-084 done; FTTS doc has no id yet |
 | WS-9 security/ops | FB-029, FB-046 | FB-043, FB-047 | FB-044, FB-049 | public since 2026-10-17; GC still on Support |
 | WS-10 MDEMG | — | FB-038, FB-042 | FB-039, FB-040, FB-041 | |
 | WS-11 docs | — | FB-025 | FB-024, FB-027 | personal docs refresh |

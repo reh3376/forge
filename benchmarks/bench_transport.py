@@ -1,4 +1,4 @@
-# ruff: noqa: E402, UP017
+# ruff: noqa: E402
 """Performance benchmark: JSON vs Protobuf-compatible serialization.
 
 Measures the throughput of converting ContextualRecords between
@@ -9,24 +9,12 @@ Run: python benchmarks/bench_transport.py
 
 from __future__ import annotations
 
-import datetime as _dt_mod
-import enum
 import json
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
-
-# Python 3.10 compat
-if not hasattr(_dt_mod, "UTC"):
-    _dt_mod.UTC = _dt_mod.timezone.utc
-if not hasattr(enum, "StrEnum"):
-
-    class StrEnum(str, enum.Enum):
-        pass
-
-    enum.StrEnum = StrEnum
 
 # Ensure src/ is importable
 _src = Path(__file__).resolve().parent.parent / "src"
@@ -55,9 +43,9 @@ def make_record() -> ContextualRecord:
             tag_path="Area1/Fermenter3/Temperature",
         ),
         timestamp=RecordTimestamp(
-            source_time=datetime.now(timezone.utc),
-            server_time=datetime.now(timezone.utc),
-            ingestion_time=datetime.now(timezone.utc),
+            source_time=datetime.now(UTC),
+            server_time=datetime.now(UTC),
+            ingestion_time=datetime.now(UTC),
         ),
         value=RecordValue(
             raw=78.4,

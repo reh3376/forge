@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class ProviderState(str, enum.Enum):
+class ProviderState(enum.StrEnum):
     """Operational state of a tag provider."""
 
     IDLE = "idle"  # Constructed but not started

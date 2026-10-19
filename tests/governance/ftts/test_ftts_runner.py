@@ -1,4 +1,4 @@
-# ruff: noqa: E402, UP017
+# ruff: noqa: E402
 """Tests for the FTTS runner — validates transport governance enforcement.
 
 Covers:
@@ -12,22 +12,9 @@ Covers:
 
 from __future__ import annotations
 
-import datetime
-import enum
 import json
 import sys
 from pathlib import Path
-
-# Python 3.10 compat patches
-if not hasattr(datetime, "UTC"):
-    datetime.UTC = datetime.timezone.utc
-
-if not hasattr(enum, "StrEnum"):
-
-    class StrEnum(str, enum.Enum):
-        pass
-
-    enum.StrEnum = StrEnum
 
 # Ensure src/ is importable
 _src = Path(__file__).resolve().parents[3] / "src"

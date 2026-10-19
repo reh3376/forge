@@ -31,7 +31,7 @@ from typing import Any
 # ---------------------------------------------------------------------------
 
 
-class WriteStatus(str, enum.Enum):
+class WriteStatus(enum.StrEnum):
     """Outcome of a control write attempt."""
 
     CONFIRMED = "CONFIRMED"  # Write succeeded, read-back matched
@@ -45,7 +45,7 @@ class WriteStatus(str, enum.Enum):
     PENDING = "PENDING"  # Not yet processed
 
 
-class WriteRole(str, enum.Enum):
+class WriteRole(enum.StrEnum):
     """Operator roles for control write authorization.
 
     Hierarchy: ADMIN > ENGINEER > OPERATOR.
@@ -71,7 +71,7 @@ _ROLE_RANK: dict[WriteRole, int] = {
 }
 
 
-class WriteOrigin(str, enum.Enum):
+class WriteOrigin(enum.StrEnum):
     """Who is asking for the write (FB-074).
 
     OPERATOR: a person, or an API client acting as one; held to the tag's
@@ -86,14 +86,14 @@ class WriteOrigin(str, enum.Enum):
     SYSTEM = "SYSTEM"
 
 
-class ConfirmationMode(str, enum.Enum):
+class ConfirmationMode(enum.StrEnum):
     """How an operator write to a tag must be confirmed (FVTS ``confirmation``)."""
 
     CONFIRM = "confirm"  # One step: the client confirms, the engine executes
     TWO_STEP_WITH_REVIEW = "two_step_with_review"  # Stage, review old vs new, commit
 
 
-class DataType(str, enum.Enum):
+class DataType(enum.StrEnum):
     """Supported write data types (maps to OPC-UA VariantTypes)."""
 
     BOOLEAN = "BOOLEAN"
@@ -228,7 +228,7 @@ class WriteResult:
 # ---------------------------------------------------------------------------
 
 
-class InterlockCondition(str, enum.Enum):
+class InterlockCondition(enum.StrEnum):
     """How to evaluate the interlock check tag value."""
 
     EQUALS = "EQUALS"

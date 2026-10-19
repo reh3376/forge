@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 
-class SecurityPolicy(str, enum.Enum):
+class SecurityPolicy(enum.StrEnum):
     """OPC-UA SecurityPolicy URIs mapped to short names.
 
     These map 1:1 to the SecurityPolicy URIs in the OPC-UA spec:
@@ -64,7 +64,7 @@ class SecurityPolicy(str, enum.Enum):
         return self != SecurityPolicy.NONE
 
 
-class MessageSecurityMode(str, enum.Enum):
+class MessageSecurityMode(enum.StrEnum):
     """OPC-UA MessageSecurityMode — controls signing and encryption.
 
     When SecurityPolicy is not None, the mode determines whether
