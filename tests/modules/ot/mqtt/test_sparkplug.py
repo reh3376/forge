@@ -1,6 +1,6 @@
 """Tests for SparkplugB encoding — topic/payload generation."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from forge.modules.ot.mqtt.sparkplug import (
     SparkplugDataType,
@@ -42,7 +42,7 @@ class TestDataTypeInference:
         assert infer_sparkplug_type(b"\x00\x01") == SparkplugDataType.BYTES
 
     def test_datetime(self):
-        assert infer_sparkplug_type(datetime.now()) == SparkplugDataType.DATETIME
+        assert infer_sparkplug_type(datetime.now(UTC)) == SparkplugDataType.DATETIME
 
     def test_unknown(self):
         assert infer_sparkplug_type(object()) == SparkplugDataType.UNKNOWN

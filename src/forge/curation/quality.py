@@ -21,6 +21,7 @@ from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 
+from forge.core.clock import require_utc
 from forge.core.models.contextual_record import ContextualRecord
 
 
@@ -171,7 +172,11 @@ class FreshnessRule(QualityRule):
     ) -> None:
         self._max_age = max_age
         self._name = rule_name
-        self._reference_time = reference_time
+        self._reference_time = (
+            require_utc(reference_time, field="reference_time")
+            if reference_time is not None
+            else None
+        )
 
     @property
     def name(self) -> str:
@@ -193,9 +198,7 @@ class FreshnessRule(QualityRule):
 
         now = self._reference_time or datetime.now(UTC)
         most_recent = max(records, key=lambda r: r.timestamp.source_time)
-        source_time = most_recent.timestamp.source_time
-        if source_time.tzinfo is None:
-            source_time = source_time.replace(tzinfo=UTC)
+        source_time = most_recent.timestamp.source_time  # UTC-aware: RecordTimestamp rejects naive
 
         age = now - source_time
         passed = age <= self._max_age

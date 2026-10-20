@@ -43,7 +43,7 @@ class TestDeriveShift:
 
     def test_naive_timestamp_assumed_utc(self):
         # Naive datetime treated as UTC
-        dt = datetime(2026, 4, 6, 15, 0, 0)  # 15:00 UTC = 11:00 EDT = day
+        dt = datetime(2026, 4, 6, 15, 0, 0)  # noqa: DTZ001 — naive on purpose; 15:00 UTC = day
         assert derive_shift(dt) == "day"
 
 

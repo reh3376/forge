@@ -15,6 +15,8 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from forge.core.clock import OneClockModel, utc_now
+
 
 class QualityCode(StrEnum):
     """OPC UA-inspired data quality codes."""
@@ -25,17 +27,20 @@ class QualityCode(StrEnum):
     NOT_AVAILABLE = "NOT_AVAILABLE"
 
 
-class RecordTimestamp(BaseModel):
+class RecordTimestamp(OneClockModel):
     """Triple-timestamp for full temporal context.
 
     source_time: when the value was generated at the source system
     server_time: when the source system's server processed it
     ingestion_time: when Forge received it
+
+    All three are UTC and timezone-aware (one clock, FB-014): a naive value,
+    or an ISO string without an offset, is rejected rather than read as UTC.
     """
 
     source_time: datetime
     server_time: datetime | None = None
-    ingestion_time: datetime = Field(default_factory=datetime.utcnow)
+    ingestion_time: datetime = Field(default_factory=utc_now)
 
 
 class RecordValue(BaseModel):

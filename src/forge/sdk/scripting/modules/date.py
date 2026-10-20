@@ -134,7 +134,7 @@ class DateModule:
         """
         py_fmt = fmt if fmt.startswith("%") else _java_to_strftime(fmt)
 
-        dt = datetime.strptime(text, py_fmt)
+        dt = datetime.strptime(text, py_fmt)  # noqa: DTZ007 — zone attached just below
         if dt.tzinfo is None:
             zone = ZoneInfo(tz) if tz else self._default_tz
             dt = dt.replace(tzinfo=zone)

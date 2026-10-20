@@ -15,6 +15,8 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from forge.core.clock import OneClockModel, utc_now
+
 
 class DecisionStatus(StrEnum):
     """Lifecycle status of a decision workflow."""
@@ -53,7 +55,7 @@ class EvidenceType(StrEnum):
     NEUTRAL = "NEUTRAL"
 
 
-class EvidenceLink(BaseModel):
+class EvidenceLink(OneClockModel):
     """A link between a decision and supporting/challenging evidence.
 
     Evidence can be a reference to a data product query, a document,
@@ -66,10 +68,10 @@ class EvidenceLink(BaseModel):
     source_ref: str  # URI to data product, query, document, dashboard
     confidence: ConfidenceLevel = ConfidenceLevel.MEDIUM
     added_by: str
-    added_at: datetime = Field(default_factory=datetime.utcnow)
+    added_at: datetime = Field(default_factory=utc_now)
 
 
-class Assumption(BaseModel):
+class Assumption(OneClockModel):
     """A tracked assumption in a decision workflow.
 
     From BBD Part 2: "Every important decision should force its
@@ -86,7 +88,7 @@ class Assumption(BaseModel):
     owner: str  # Who is responsible for validating this assumption
     reassessment_date: datetime | None = None
     linked_decisions: list[UUID] = Field(default_factory=list)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
     invalidated_at: datetime | None = None
     invalidation_reason: str | None = None
 
@@ -105,7 +107,7 @@ class AlternativeHypothesis(BaseModel):
     likelihood: ConfidenceLevel = ConfidenceLevel.MEDIUM
 
 
-class ReassessmentTrigger(BaseModel):
+class ReassessmentTrigger(OneClockModel):
     """A condition that forces re-evaluation of the decision.
 
     From BBD Part 2 Step XII: "Define what event, metric, threshold,
@@ -122,7 +124,7 @@ class ReassessmentTrigger(BaseModel):
     triggered_at: datetime | None = None
 
 
-class DecisionFrame(BaseModel):
+class DecisionFrame(OneClockModel):
     """The 13-point minimum decision frame from BBD Part 2.
 
     This structure operationalizes the structured challenge framework.
@@ -177,8 +179,8 @@ class DecisionFrame(BaseModel):
     owner: str  # Named individual, not a department
 
     # Metadata
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
+    updated_at: datetime = Field(default_factory=utc_now)
     closed_at: datetime | None = None
     disposition: str | None = None
     tags: list[str] = Field(default_factory=list)

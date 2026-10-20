@@ -36,7 +36,7 @@ class TestDeriveShift:
         assert derive_shift(ts) == "night"
 
     def test_naive_timestamp_assumed_utc(self):
-        ts = datetime(2026, 4, 6, 14, 0)
+        ts = datetime(2026, 4, 6, 14, 0)  # noqa: DTZ001 — naive on purpose
         shift = derive_shift(ts)
         assert shift in ("day", "night")
 

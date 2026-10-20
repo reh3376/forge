@@ -194,7 +194,7 @@ class TestTagValue:
     def test_naive_timestamp_gets_utc(self):
         from datetime import datetime
 
-        tv = TagValue(timestamp=datetime(2026, 1, 1, 12, 0))
+        tv = TagValue(timestamp=datetime(2026, 1, 1, 12, 0))  # noqa: DTZ001 — naive on purpose
         assert tv.timestamp.tzinfo is not None
 
 

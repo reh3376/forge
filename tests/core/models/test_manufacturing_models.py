@@ -13,7 +13,7 @@ Covers all 10 entity families:
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import UTC, datetime, timedelta, timezone
 from uuid import UUID
 
 import pytest
@@ -250,7 +250,7 @@ class TestOperationalEvent:
             event_type="Entry",
             entity_type="manufacturing_unit",
             entity_id="b-1",
-            event_time=datetime(2026, 4, 5),
+            event_time=datetime(2026, 4, 5, tzinfo=UTC),
         )
         assert ev.event_type == "Entry"
 
@@ -260,7 +260,7 @@ class TestOperationalEvent:
                 **_base_kwargs(),
                 entity_type="x",
                 entity_id="x",
-                event_time=datetime(2026, 1, 1),
+                event_time=datetime(2026, 1, 1, tzinfo=UTC),
             )
 
     def test_severity_default_info(self) -> None:
@@ -269,7 +269,7 @@ class TestOperationalEvent:
             event_type="X",
             entity_type="x",
             entity_id="x",
-            event_time=datetime(2026, 1, 1),
+            event_time=datetime(2026, 1, 1, tzinfo=UTC),
         )
         assert ev.severity == EventSeverity.INFO
 
@@ -279,7 +279,7 @@ class TestOperationalEvent:
             event_type="X",
             entity_type="x",
             entity_id="x",
-            event_time=datetime(2026, 1, 1),
+            event_time=datetime(2026, 1, 1, tzinfo=UTC),
             category=EventCategory.QUALITY,
         )
         assert ev.category == EventCategory.QUALITY
@@ -291,7 +291,7 @@ class TestOperationalEvent:
                 event_type="X",
                 entity_type="x",
                 entity_id="x",
-                event_time=datetime(2026, 1, 1),
+                event_time=datetime(2026, 1, 1, tzinfo=UTC),
                 severity=s,
             )
             assert ev.severity == s
@@ -427,8 +427,8 @@ class TestWorkOrder:
             **_base_kwargs(),
             title="Fill",
             order_type="BARREL_FILL",
-            planned_start=datetime(2026, 4, 5, 8, 0),
-            planned_end=datetime(2026, 4, 5, 16, 0),
+            planned_start=datetime(2026, 4, 5, 8, 0, tzinfo=UTC),
+            planned_end=datetime(2026, 4, 5, 16, 0, tzinfo=UTC),
         )
         assert wo.planned_start.hour == 8
 
@@ -680,7 +680,7 @@ class TestCrossModelConsistency:
                 event_type="x",
                 entity_type="x",
                 entity_id="x",
-                event_time=datetime(2026, 1, 1),
+                event_time=datetime(2026, 1, 1, tzinfo=UTC),
             ),
             BusinessEntity(
                 **_base_kwargs(),
@@ -747,3 +747,54 @@ class TestCrossModelConsistency:
                 assert len(member.value) > 0
         # Spot-check that distinct enums have distinct meanings
         assert UnitStatus.ACTIVE.value != WorkOrderStatus.IN_PROGRESS.value
+
+
+# ── One clock (FB-014) ──────────────────────────────────────────────
+
+
+class TestOneClock:
+    """Every datetime on a manufacturing entity is timezone-aware and stored in UTC."""
+
+    def test_default_captured_at_is_utc_aware(self) -> None:
+        pd = ProcessDefinition(**_base_kwargs(), name="x")
+        assert pd.captured_at.tzinfo == UTC
+
+    def test_naive_captured_at_rejected(self) -> None:
+        with pytest.raises(ValidationError, match="captured_at must be timezone-aware"):
+            ProcessDefinition(
+                **_base_kwargs(),
+                name="x",
+                captured_at=datetime(2026, 1, 1),  # noqa: DTZ001 — naive on purpose
+            )
+
+    def test_naive_event_time_rejected(self) -> None:
+        with pytest.raises(ValidationError, match="event_time must be timezone-aware"):
+            OperationalEvent(
+                **_base_kwargs(),
+                event_type="X",
+                entity_type="x",
+                entity_id="x",
+                event_time=datetime(2026, 1, 1),  # noqa: DTZ001 — naive on purpose
+            )
+
+    def test_offset_less_iso_string_rejected(self) -> None:
+        payload = {
+            **_base_kwargs(),
+            "event_type": "X",
+            "entity_type": "x",
+            "entity_id": "x",
+            "event_time": "2026-01-01T00:00:00",
+        }
+        with pytest.raises(ValidationError, match="event_time must be timezone-aware"):
+            OperationalEvent.model_validate(payload)
+
+    def test_other_offset_normalised_to_utc(self) -> None:
+        eastern = timezone(timedelta(hours=-5))
+        wo = WorkOrder(
+            **_base_kwargs(),
+            title="Fill",
+            order_type="BARREL_FILL",
+            planned_start=datetime(2026, 4, 5, 8, 0, tzinfo=eastern),
+        )
+        assert wo.planned_start == datetime(2026, 4, 5, 13, 0, tzinfo=UTC)
+        assert wo.planned_start.tzinfo == UTC

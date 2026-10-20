@@ -16,16 +16,22 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import ConfigDict, Field
+
+from forge.core.clock import OneClockModel, utc_now
 
 
-class ManufacturingModelBase(BaseModel):
+class ManufacturingModelBase(OneClockModel):
     """Shared base for all manufacturing domain models.
 
     Every instance carries provenance — you always know where the
     data came from and when it was captured. The forge_id is Forge's
     own identifier; source_id is the origin system's primary key.
     They are independent and never collide.
+
+    Every datetime field on every entity (``captured_at``, ``event_time``,
+    ``planned_start``, ...) must be timezone-aware and is stored in UTC;
+    a naive value is rejected (one clock, FB-014).
     """
 
     forge_id: UUID = Field(
@@ -41,7 +47,7 @@ class ManufacturingModelBase(BaseModel):
         description="Primary key of this entity in the source system.",
     )
     captured_at: datetime = Field(
-        default_factory=datetime.utcnow,
+        default_factory=utc_now,
         description="UTC timestamp when this snapshot was captured by Forge.",
     )
     metadata: dict[str, Any] = Field(

@@ -13,6 +13,8 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from forge.core.clock import OneClockModel, utc_now
+
 
 class DataProductStatus(StrEnum):
     """Lifecycle status of a data product."""
@@ -40,7 +42,7 @@ class DataProductSchema(BaseModel):
     compatibility_mode: str = "BACKWARD"
 
 
-class DataProduct(BaseModel):
+class DataProduct(OneClockModel):
     """A curated, decision-ready dataset with governance metadata.
 
     Data products are the primary output of the Forge curation layer.
@@ -63,6 +65,6 @@ class DataProduct(BaseModel):
     source_adapters: list[str] = Field(default_factory=list)
     quality_slos: list[QualitySLO] = Field(default_factory=list)
     tags: list[str] = Field(default_factory=list)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
+    updated_at: datetime = Field(default_factory=utc_now)
     metadata: dict[str, Any] = Field(default_factory=dict)

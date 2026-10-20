@@ -215,7 +215,7 @@ class TestDataValue:
 
     def test_naive_timestamp_gets_utc(self) -> None:
         """Naive timestamps should be forced to UTC by the validator."""
-        naive_dt = datetime(2026, 1, 15, 12, 0, 0)
+        naive_dt = datetime(2026, 1, 15, 12, 0, 0)  # noqa: DTZ001 — naive on purpose
         dv = DataValue(source_timestamp=naive_dt, server_timestamp=naive_dt)
         assert dv.source_timestamp.tzinfo == UTC
         assert dv.server_timestamp.tzinfo == UTC

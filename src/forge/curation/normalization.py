@@ -13,6 +13,7 @@ import math
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
+from forge.core.clock import require_utc
 from forge.core.models.contextual_record import ContextualRecord, RecordValue
 
 # ---------------------------------------------------------------------------
@@ -261,9 +262,11 @@ class TimeBucketer:
         return cls(window=td)
 
     def bucket(self, dt: datetime) -> datetime:
-        """Floor a datetime to the nearest window boundary (UTC)."""
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=UTC)
+        """Floor a datetime to the nearest window boundary (UTC).
+
+        ``dt`` must be timezone-aware; a naive value is rejected (one clock).
+        """
+        dt = require_utc(dt, field="dt")
 
         epoch = datetime(2000, 1, 1, tzinfo=UTC)
         delta = dt - epoch
