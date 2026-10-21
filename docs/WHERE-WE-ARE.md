@@ -21,8 +21,8 @@ This page is the honest snapshot: what exists in the repository today, what is w
 
 | Measure | Value |
 |---|---|
-| Python hub (`src/forge`) | 347 files, ~66,800 lines |
-| Python tests | 251 files, ~53,500 lines, 4,031 test functions (4,218 collected); full suite green on 2026-10-20 |
+| Python hub (`src/forge`) | 347 files, ~66,900 lines |
+| Python tests | 252 files, ~53,700 lines, 4,043 test functions (4,231 collected); full suite green on 2026-10-20 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
@@ -53,7 +53,8 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
 | FTTS transport spec and runner | 🟡 | Schema + runner exist; spec at `specs/grpc-hardened-transport.ftts.json`; no `docs/FxTS/FTTS.md` |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
-| Hub is the time authority for its spokes and child hubs; skew measured at every link and enforced | ❌ | No hub time in the contract, the spoke's clock is copied through, nothing compares the three timestamps, nothing refuses a wrong clock (FB-087, FB-089, FB-092, FB-093); one-clock principle, owner 2026-10-18 |
+| Hub is the time authority for its spokes and child hubs; skew measured at every link and enforced | ❌ | No hub time in the contract, nothing compares the timestamps, nothing refuses a wrong clock (FB-089, FB-092, FB-093); one-clock principle, owner 2026-10-18 |
+| Hub stamps `ingestion_time` with its own clock on receipt (gRPC push, pull, REST); the spoke's stamp kept as `sent_time`, none invented | ✅ | `IngestPipeline.ingest` → `stamp_receipt`, one hub-clock reading per batch (FB-087, 2026-10-20); `sent_time` is hub-local and provisional until D-9 names the time fields |
 | Every timestamp Forge stores is UTC and timezone-aware; a naive datetime or an offset-less string is rejected at the model | ✅ | `forge.core.clock` (`utc_now`, `require_utc`, `OneClockModel`) behind `RecordTimestamp`, every manufacturing entity, `DataProduct` and the decision models; no `utcnow` left; ruff `DTZ` blocking (FB-014, 2026-10-20). The OT module's `DataValue`/`TagValue` still coerce naive to UTC (OPC UA `DateTime` is UTC by definition) and the adapters read an offset-less source string as UTC until FB-090 declares it per spoke |
 
 ### 3.2 Hub platform
@@ -212,7 +213,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 5. **Hub services unmounted** (FB-001): Context Engine and Schema Registry exist but are not served.
 6. **Seven governance frameworks are stubs or planned**; FACTS now validates against its own schema, but six of its nine specs await the owner's hash approval.
 7. **No production deployment** (vision §P-12).
-8. **No clock discipline** (principle "one clock", owner 2026-10-18): the hub is not a time authority for anything attached to it, trusts the spoke's `ingestion_time`, the OPC-UA converter invents a source time when the server sends none, no skew is measured, nothing refuses a wrong clock, and a tag's source time is whatever the OPC-UA server chose to send (FB-087 to FB-094; naive timestamps are rejected since FB-014, 2026-10-20).
+8. **No clock discipline** (principle "one clock", owner 2026-10-18): the hub is not a time authority for anything attached to it, the OPC-UA converter invents a source time when the server sends none, no skew is measured, nothing refuses a wrong clock, and a tag's source time is whatever the OPC-UA server chose to send (FB-088 to FB-094; naive timestamps are rejected since FB-014 and the hub stamps receipt since FB-087, both 2026-10-20).
 
 ---
 

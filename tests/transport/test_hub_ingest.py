@@ -133,6 +133,29 @@ class TestDataPlane:
         # the base-class queue is not used: nothing accumulates
         assert servicer._record_queues[sid].qsize() == 0
 
+    async def test_hub_stamps_receipt_and_keeps_the_spoke_stamp(self) -> None:
+        """ingestion_time is the hub's clock on receipt; the spoke's stamp survives as sent_time."""
+        hub_now = datetime(2026, 6, 1, 12, 30, tzinfo=UTC)
+        sink = InMemoryRecordSink()
+        servicer = HubIngestServicer(
+            IngestPipeline(fallback_sink=sink, clock=lambda: hub_now), batch_size=1
+        )
+        sid = await _session(servicer)
+
+        spoke = mes_record()
+        spoke_stamp = spoke.timestamp.ingestion_time  # the spoke's clock, sent on the wire
+        await servicer.receive_record(sid, pydantic_to_proto(spoke))
+        stored = sink.records[0].timestamp
+        assert stored.ingestion_time == hub_now
+        assert stored.sent_time == spoke_stamp
+
+        # a spoke that sends no stamp: receipt stamped, nothing invented as sent_time
+        wire = pydantic_to_proto(mes_record(1))
+        del wire["timestamp"]["ingestion_time"]
+        await servicer.receive_record(sid, wire)
+        assert sink.records[1].timestamp.ingestion_time == hub_now
+        assert sink.records[1].timestamp.sent_time is None
+
     async def test_bad_records_are_counted_not_fatal(self) -> None:
         sink = InMemoryRecordSink()
         servicer = HubIngestServicer(IngestPipeline(fallback_sink=sink), batch_size=10)

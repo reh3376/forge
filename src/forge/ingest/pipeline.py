@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Protocol
 
+from forge.core.clock import utc_now
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -31,7 +32,7 @@ from forge.storage.registry import SchemaRegistry, StorageEngine
 from forge.storage.router import DataRouter
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Mapping
+    from collections.abc import Callable, Iterable, Mapping
 
     from forge.core.models.adapter import AdapterManifest
 
@@ -154,8 +155,29 @@ def _context_has(record: ContextualRecord, name: str) -> bool:
     return bool(ctx.extra.get(name)) if ctx.extra else False
 
 
+def stamp_receipt(record: ContextualRecord, received_at: datetime) -> None:
+    """Stamp the hub's receipt on ``record`` (one clock, FB-087).
+
+    ``ingestion_time`` becomes the hub's clock reading ``received_at``. The
+    value the spoke sent there, if it sent one, moves to ``sent_time`` for the
+    clock-offset measurement (FB-089); a record that arrived without a stamp
+    keeps ``sent_time`` empty rather than inheriting the hub's own parse time.
+    A record already stamped once (replay) keeps its first ``sent_time``.
+    """
+    ts = record.timestamp
+    if ts.sent_time is None and "ingestion_time" in ts.model_fields_set:
+        ts.sent_time = ts.ingestion_time
+    ts.ingestion_time = received_at
+
+
 class IngestPipeline:
-    """Validate, route and persist records from registered adapters."""
+    """Validate, route and persist records from registered adapters.
+
+    The pipeline is the hub's receipt point for every path (gRPC push, pull,
+    REST): each record is stamped with the hub clock on entry, see
+    :func:`stamp_receipt`. ``clock`` is the hub clock, ``utc_now`` unless a
+    test or a hub-of-hubs link (FB-092) injects another.
+    """
 
     def __init__(
         self,
@@ -163,7 +185,9 @@ class IngestPipeline:
         router: DataRouter | None = None,
         sinks: Mapping[StorageEngine, RecordSink] | None = None,
         fallback_sink: RecordSink | None = None,
+        clock: Callable[[], datetime] | None = None,
     ) -> None:
+        self._clock: Callable[[], datetime] = clock or utc_now
         self._router = router or DataRouter(registry=SchemaRegistry())
         self._sinks: dict[StorageEngine, RecordSink] = dict(sinks or {})
         # `is not None`: an empty InMemoryRecordSink is falsy (it defines __len__).
@@ -237,8 +261,10 @@ class IngestPipeline:
     ) -> IngestOutcome:
         outcome = IngestOutcome()
         accepted: list[ContextualRecord] = []
+        received_at = self._clock()  # one stamp per batch: when the hub took delivery
         for record in records:
             outcome.received += 1
+            stamp_receipt(record, received_at)
             problems, missing = self.validate(record, adapter_id=adapter_id, manifest=manifest)
             if problems:
                 outcome.rejected += 1
@@ -305,9 +331,9 @@ class IngestPipeline:
                 source_time = None
         return ContextualRecord(
             source=RecordSource(adapter_id=adapter_id, system=adapter_id, tag_path=tag),
+            # no ingestion_time: the client sent none, the hub stamps receipt in ingest()
             timestamp=RecordTimestamp(
                 source_time=source_time if isinstance(source_time, datetime) else now,
-                ingestion_time=now,
             ),
             value=RecordValue(
                 raw=value,

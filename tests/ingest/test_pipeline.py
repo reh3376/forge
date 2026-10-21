@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from pydantic import ValidationError
@@ -196,3 +196,62 @@ def test_in_memory_sink_is_bounded() -> None:
     assert len(sink) == 2 and sink.total_written == 3
     sink.clear()
     assert len(sink) == 0
+
+
+# ── Hub receipt stamp (one clock, FB-087) ───────────────────────────
+
+HUB_NOW = datetime(2026, 6, 1, 12, 0, 5, tzinfo=UTC)
+SPOKE_NOW = datetime(2026, 6, 1, 12, 0, 2, tzinfo=UTC)
+
+
+def _spoke_record() -> ContextualRecord:
+    """A record as a spoke builds it: ingestion_time stamped on the spoke's clock."""
+    record = make_record()
+    record.timestamp = RecordTimestamp(
+        source_time=record.timestamp.source_time, ingestion_time=SPOKE_NOW
+    )
+    return record
+
+
+async def test_ingest_stamps_receipt_with_the_hub_clock() -> None:
+    sink = InMemoryRecordSink()
+    pipeline = IngestPipeline(fallback_sink=sink, clock=lambda: HUB_NOW)
+    await pipeline.ingest([_spoke_record()], adapter_id="forge-mes", manifest=make_manifest())
+    ts = sink.records[0].timestamp
+    assert ts.ingestion_time == HUB_NOW
+    assert ts.sent_time == SPOKE_NOW
+
+
+async def test_ingest_shares_one_receipt_stamp_per_batch() -> None:
+    ticks = iter([HUB_NOW, HUB_NOW + timedelta(seconds=30)])
+    pipeline = IngestPipeline(fallback_sink=InMemoryRecordSink(), clock=lambda: next(ticks))
+    records = [_spoke_record(), _spoke_record()]
+    await pipeline.ingest(records, adapter_id="forge-mes", manifest=make_manifest())
+    assert {r.timestamp.ingestion_time for r in records} == {HUB_NOW}
+
+
+async def test_record_without_a_spoke_stamp_keeps_sent_time_empty() -> None:
+    pipeline = IngestPipeline(fallback_sink=InMemoryRecordSink(), clock=lambda: HUB_NOW)
+    record = make_record()  # ingestion_time left to its default: the spoke sent none
+    await pipeline.ingest([record], adapter_id="forge-mes", manifest=make_manifest())
+    assert record.timestamp.ingestion_time == HUB_NOW
+    assert record.timestamp.sent_time is None
+
+
+async def test_replay_keeps_the_first_sent_time() -> None:
+    later = HUB_NOW + timedelta(minutes=1)
+    ticks = iter([HUB_NOW, later])
+    pipeline = IngestPipeline(fallback_sink=InMemoryRecordSink(), clock=lambda: next(ticks))
+    record = _spoke_record()
+    await pipeline.ingest([record], adapter_id="forge-mes", manifest=make_manifest())
+    await pipeline.ingest([record], adapter_id="forge-mes", manifest=make_manifest())
+    assert record.timestamp.sent_time == SPOKE_NOW
+    assert record.timestamp.ingestion_time == later
+
+
+def test_coerce_leaves_the_hub_stamp_to_ingest() -> None:
+    wrapped = IngestPipeline.coerce(
+        {"tag": "t", "value": 1}, adapter_id="forge-mes", manifest=make_manifest()
+    )
+    assert "ingestion_time" not in wrapped.timestamp.model_fields_set
+    assert wrapped.timestamp.sent_time is None

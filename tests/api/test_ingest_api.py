@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from datetime import UTC, datetime
 from unittest.mock import patch
 
 import pytest
@@ -93,6 +94,35 @@ async def test_full_records_are_validated_against_the_manifest(
     assert body["accepted"] == 1 and body["rejected"] == 1 and body["persisted"] == 1
     assert any("schema_ref" in e for e in body["errors"])
     assert len(sink) == 1
+
+
+@pytest.mark.asyncio
+async def test_hub_stamps_receipt_on_rest_records(client, sink: InMemoryRecordSink) -> None:
+    """ingestion_time is the hub's clock on receipt; what the client sent is kept as sent_time."""
+    await client.post("/v1/adapters/register", json=_manifest())
+    full = {
+        "source": {"adapter_id": "whk-wms", "system": "whk-wms-prod", "tag_path": "a.b"},
+        "timestamp": {
+            "source_time": "2026-06-01T12:00:00Z",
+            "ingestion_time": "2026-06-01T12:00:02Z",
+        },
+        "value": {"raw": 1, "data_type": "int64"},
+        "context": {"equipment_id": "E1", "extra": {"event_type": "x"}},
+        "lineage": {
+            "schema_ref": "forge://schemas/whk-wms/v1",
+            "adapter_id": "whk-wms",
+            "adapter_version": "1.0.0",
+        },
+    }
+    before = datetime.now(UTC)
+    resp = await client.post(
+        "/v1/records", json={"adapter_id": "whk-wms", "records": [full, {"tag": "t", "value": 1}]}
+    )
+    assert resp.status_code == 200 and resp.json()["persisted"] == 2
+    stamped, bare = sink.records[0].timestamp, sink.records[1].timestamp
+    assert stamped.sent_time == datetime(2026, 6, 1, 12, 0, 2, tzinfo=UTC)
+    assert before <= stamped.ingestion_time <= datetime.now(UTC)
+    assert bare.sent_time is None and bare.ingestion_time == stamped.ingestion_time
 
 
 @pytest.mark.asyncio

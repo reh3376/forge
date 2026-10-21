@@ -539,7 +539,7 @@ ContextualRecord(
     timestamp=RecordTimestamp(
         source_time=...,        # When the event happened
         server_time=...,        # When the source server processed it
-        ingestion_time=...,     # When Forge received it (auto-set to now)
+        # ingestion_time: leave unset — the hub stamps receipt with its own clock (FB-087)
     ),
     value=RecordValue(
         raw=raw_event,          # Original raw dict preserved
