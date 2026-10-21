@@ -65,3 +65,5 @@ fots.schema.json
 ## Implementation Status
 
 Not yet implemented. No scaffold directory exists. Will be built as part of phase F15.
+
+The first Forge instruments exist ahead of it (FB-089, 2026-10-20): meter `forge.hub` in `forge.core.telemetry`, histogram `forge.clock.offset` (seconds; attributes `forge.adapter_id`, `forge.clock.link` ∈ spoke/server/source) and counter `forge.clock.out_of_tolerance`. API only: a deployment that configures an OpenTelemetry `MeterProvider` receives them.

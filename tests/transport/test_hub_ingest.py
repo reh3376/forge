@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -155,6 +155,29 @@ class TestDataPlane:
         await servicer.receive_record(sid, wire)
         assert sink.records[1].timestamp.ingestion_time == hub_now
         assert sink.records[1].timestamp.sent_time is None
+
+    async def test_health_reports_the_measured_clock_offsets(self) -> None:
+        """The hub measures the spoke's clock from its stamps and reports it on AdapterHealth."""
+        hub_now = datetime(2026, 6, 1, 12, 30, tzinfo=UTC)
+        healths: list[tuple[str, AdapterHealth]] = []
+        servicer = HubIngestServicer(
+            IngestPipeline(fallback_sink=InMemoryRecordSink(), clock=lambda: hub_now),
+            batch_size=1,
+            on_health=lambda aid, h: healths.append((aid, h)),
+        )
+        sid = await _session(servicer)
+        spoke = mes_record()
+        spoke.timestamp.ingestion_time = hub_now - timedelta(seconds=2)  # the spoke's clock at send
+        await servicer.receive_record(sid, pydantic_to_proto(spoke))
+
+        wire = await servicer.health("forge-mes", sid)
+        assert "clock" not in wire  # hub-side only until FB-092 puts time in the contract
+        _aid, health = healths[-1]
+        spoke_clock = health.clock["spoke"]
+        assert spoke_clock.last_seconds == -2.0 and spoke_clock.samples == 1
+        assert spoke_clock.within_tolerance is False  # 1 s provisional tolerance until D-9
+        # what GET /v1/adapters/{id}/health returns once the heartbeat is cached
+        assert health.model_dump(mode="json")["clock"]["spoke"]["last_seconds"] == -2.0
 
     async def test_bad_records_are_counted_not_fatal(self) -> None:
         sink = InMemoryRecordSink()

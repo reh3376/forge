@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Protocol
 
-from forge.core.clock import utc_now
+from forge.core.clock import ClockOffsetTracker, utc_now
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -175,8 +175,11 @@ class IngestPipeline:
 
     The pipeline is the hub's receipt point for every path (gRPC push, pull,
     REST): each record is stamped with the hub clock on entry, see
-    :func:`stamp_receipt`. ``clock`` is the hub clock, ``utc_now`` unless a
-    test or a hub-of-hubs link (FB-092) injects another.
+    :func:`stamp_receipt`, and its timestamps feed the clock-offset
+    measurement, see :class:`~forge.core.clock.ClockOffsetTracker` (FB-089).
+    ``clock`` is the hub clock, ``utc_now`` unless a test or a hub-of-hubs link
+    (FB-092) injects another; ``offsets`` is the tracker, one per pipeline by
+    default.
     """
 
     def __init__(
@@ -186,8 +189,10 @@ class IngestPipeline:
         sinks: Mapping[StorageEngine, RecordSink] | None = None,
         fallback_sink: RecordSink | None = None,
         clock: Callable[[], datetime] | None = None,
+        offsets: ClockOffsetTracker | None = None,
     ) -> None:
         self._clock: Callable[[], datetime] = clock or utc_now
+        self.offsets: ClockOffsetTracker = offsets or ClockOffsetTracker()
         self._router = router or DataRouter(registry=SchemaRegistry())
         self._sinks: dict[StorageEngine, RecordSink] = dict(sinks or {})
         # `is not None`: an empty InMemoryRecordSink is falsy (it defines __len__).
@@ -217,6 +222,7 @@ class IngestPipeline:
             "sinks": {e.value: type(s).__name__ for e, s in self._sinks.items()},
             "fallback_sink": type(self._fallback).__name__,
             "stats": self.stats.to_dict(),
+            "clock_offsets": self.offsets.describe(),
         }
 
     # -- validation ----------------------------------------------------------
@@ -265,6 +271,7 @@ class IngestPipeline:
         for record in records:
             outcome.received += 1
             stamp_receipt(record, received_at)
+            self.offsets.observe_record(adapter_id or record.source.adapter_id, record.timestamp)
             problems, missing = self.validate(record, adapter_id=adapter_id, manifest=manifest)
             if problems:
                 outcome.rejected += 1

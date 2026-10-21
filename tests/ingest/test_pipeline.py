@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime, timedelta
 
 import pytest
 from pydantic import ValidationError
 
+from forge.core.clock import SERVER_LINK, SOURCE_LINK, SPOKE_LINK, ClockOffsetTracker
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
@@ -255,3 +257,38 @@ def test_coerce_leaves_the_hub_stamp_to_ingest() -> None:
     )
     assert "ingestion_time" not in wrapped.timestamp.model_fields_set
     assert wrapped.timestamp.sent_time is None
+
+
+# ── Clock-offset measurement (one clock, FB-089) ─────────────────────
+
+
+async def test_ingest_measures_clock_offsets_per_link(caplog: pytest.LogCaptureFixture) -> None:
+    pipeline = IngestPipeline(
+        fallback_sink=InMemoryRecordSink(),
+        clock=lambda: HUB_NOW,
+        offsets=ClockOffsetTracker(tolerance_seconds=0.5),
+    )
+    record = make_record()
+    record.timestamp = RecordTimestamp(
+        source_time=HUB_NOW - timedelta(seconds=4),
+        server_time=HUB_NOW - timedelta(seconds=1),
+        ingestion_time=SPOKE_NOW,  # the spoke's clock: 3 s behind the hub at send
+    )
+    with caplog.at_level(logging.WARNING, logger="forge.core.clock"):
+        await pipeline.ingest([record], adapter_id="forge-mes", manifest=make_manifest())
+    stats = pipeline.offsets.stats("forge-mes")
+    assert stats[SPOKE_LINK].last_seconds == -3.0 and not stats[SPOKE_LINK].within_tolerance
+    assert stats[SERVER_LINK].last_seconds == -1.0 and not stats[SERVER_LINK].within_tolerance
+    assert stats[SOURCE_LINK].last_seconds == -3.0
+    assert all(s.measured_at == HUB_NOW for s in stats.values())
+    assert caplog.text.count("out of tolerance") == 3
+    described = pipeline.describe()["clock_offsets"]
+    assert described["breaches"] == 3 and described["tolerance_seconds"] == 0.5
+    assert set(described["adapters"]["forge-mes"]) == {SPOKE_LINK, SERVER_LINK, SOURCE_LINK}
+
+
+async def test_ingest_keys_offsets_by_the_record_adapter_when_unnamed() -> None:
+    pipeline = IngestPipeline(fallback_sink=InMemoryRecordSink(), clock=lambda: HUB_NOW)
+    await pipeline.ingest([_spoke_record()])  # no adapter_id: the record names its source
+    assert pipeline.offsets.adapters() == ["forge-mes"]
+    assert pipeline.offsets.stats("forge-mes")[SPOKE_LINK].last_seconds == -3.0

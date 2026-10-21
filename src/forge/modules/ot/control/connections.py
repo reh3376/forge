@@ -31,6 +31,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
+from forge.core.clock import SERVER_LINK, ClockOffsetTracker
 from forge.modules.ot.opcua_client.paths import PathNormalizer
 from forge.modules.ot.opcua_client.types import ConnectionState
 from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
@@ -138,8 +139,11 @@ class PlcConnectionManager:
         poll_interval: float = 5.0,
         retry_max: float = DEFAULT_RETRY_MAX_SECONDS,
         now: Callable[[], datetime] | None = None,
+        offsets: ClockOffsetTracker | None = None,
     ) -> None:
         self.engine = engine or AcquisitionEngine()
+        #: Server-clock offsets from the liveness probe (FB-089).
+        self.offsets: ClockOffsetTracker = offsets or ClockOffsetTracker()
         self._registry = registry
         self._poll_interval = poll_interval
         self._retry_max = retry_max
@@ -282,12 +286,17 @@ class PlcConnectionManager:
         return (now - entry.last_probe_at).total_seconds() >= interval
 
     async def _probe(self, entry: _Entry, now: datetime) -> str | None:
-        """Read the server clock; a failure means the session is dead (FB-070)."""
+        """Read the server clock; a failure means the session is dead (FB-070).
+
+        The answer is the server's ``CurrentTime``, so every probe is also a
+        clock-offset measurement against the hub clock (FB-089).
+        """
         entry.probes += 1
         entry.last_probe_at = now
         timeout = max(entry.spec.request_timeout_ms / 1000.0, 0.1)
+        sent_at = self._now()
         try:
-            await asyncio.wait_for(entry.client.read([LIVENESS_NODE]), timeout=timeout)
+            values = await asyncio.wait_for(entry.client.read([LIVENESS_NODE]), timeout=timeout)
         except asyncio.CancelledError:
             raise
         except Exception as exc:
@@ -295,7 +304,30 @@ class PlcConnectionManager:
             entry.last_error = f"liveness probe failed: {type(exc).__name__}: {exc}"
             logger.warning("PLC %s unresponsive: %s", entry.spec.name, entry.last_error)
             return await self._restart(entry, reason="unresponsive")
+        self._record_server_clock(entry, values, sent_at, self._now())
         return None
+
+    def _record_server_clock(
+        self, entry: _Entry, values: Any, sent_at: datetime, received_at: datetime
+    ) -> None:
+        """Measure the server clock from the probe's answer (one clock, FB-089).
+
+        The offset is taken against the hub clock at the round trip's midpoint,
+        the way NTP does, so the transit delay cancels. OPC UA ``DateTime`` is
+        UTC by definition, so a naive value is UTC.
+        """
+        first = values[0] if values else None
+        server_time = getattr(first, "value", None)
+        if not isinstance(server_time, datetime):
+            return
+        if server_time.tzinfo is None:
+            server_time = server_time.replace(tzinfo=UTC)
+        round_trip = (received_at - sent_at).total_seconds()
+        midpoint = sent_at + (received_at - sent_at) / 2
+        offset = (server_time - midpoint).total_seconds()
+        self.offsets.observe(
+            entry.spec.name, SERVER_LINK, offset, received_at, round_trip=round_trip
+        )
 
     async def restart(self, name: str, *, requested_by: str = "") -> dict[str, Any]:
         """Operator-requested restart of one connection; returns its status.
@@ -395,6 +427,11 @@ class PlcConnectionManager:
             "probes": entry.probes,
             "probe_failures": entry.probe_failures,
             "last_probe_at": entry.last_probe_at.isoformat() if entry.last_probe_at else None,
+            "server_clock": (
+                server_clock.model_dump(mode="json")
+                if (server_clock := self.offsets.stats(entry.spec.name).get(SERVER_LINK))
+                else None
+            ),
             "last_error": entry.last_error,
             "next_retry_at": entry.next_retry_at.isoformat() if entry.next_retry_at else None,
         }

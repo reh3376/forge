@@ -13,6 +13,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from forge.core.clock import ClockOffsetStats
+
 
 class AdapterTier(StrEnum):
     """The system tier this adapter connects to."""
@@ -96,3 +98,11 @@ class AdapterHealth(BaseModel):
     records_collected: int = 0
     records_failed: int = 0
     uptime_seconds: float = 0.0
+    clock: dict[str, ClockOffsetStats] = Field(
+        default_factory=dict,
+        description=(
+            "Measured clock offsets of this adapter per link (spoke, server, source) as the "
+            "hub sees them (FB-089). Hub-side only: not on the wire until FB-092 puts time "
+            "in the contract."
+        ),
+    )
