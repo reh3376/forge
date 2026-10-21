@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pytest
+from pydantic import ValidationError
 
 from forge.core.models.adapter import (
     AdapterCapabilities,
@@ -151,6 +152,16 @@ async def test_empty_batch_is_a_noop() -> None:
     outcome = await pipeline.ingest([])
     assert outcome.to_dict()["received"] == 0
     assert pipeline.stats.batches == 1
+
+
+def test_coerce_rejects_offset_less_timestamp() -> None:
+    """A REST reading whose timestamp carries no offset names no instant; it is refused (FB-014)."""
+    with pytest.raises(ValidationError, match="source_time must be timezone-aware"):
+        IngestPipeline.coerce(
+            {"tag": "temp", "value": 72.5, "timestamp": "2026-06-01T12:00:00"},
+            adapter_id="forge-mes",
+            manifest=make_manifest(),
+        )
 
 
 def test_coerce_wraps_raw_readings_and_accepts_full_records() -> None:

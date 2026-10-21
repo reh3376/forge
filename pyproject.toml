@@ -76,6 +76,7 @@ select = [
     "N",    # pep8-naming
     "UP",   # pyupgrade
     "B",    # bugbear
+    "DTZ",  # flake8-datetimez: no naive datetimes (one clock, FB-014)
     "SIM",  # simplify
     "TCH",  # type-checking
     "RUF",  # ruff-specific
@@ -83,7 +84,11 @@ select = [
 
 [tool.ruff.lint.flake8-type-checking]
 # Pydantic resolves annotations at class creation, so their imports must stay at runtime.
-runtime-evaluated-base-classes = ["pydantic.BaseModel", "pydantic_settings.BaseSettings"]
+runtime-evaluated-base-classes = [
+    "pydantic.BaseModel",
+    "pydantic_settings.BaseSettings",
+    "forge.core.clock.OneClockModel",  # BaseModel with the one-clock validator (FB-014)
+]
 
 [tool.ruff.lint.isort]
 known-first-party = ["forge"]

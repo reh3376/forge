@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-18 · **Branch:** `reh3376_dev01` (last merged PR: 49) · **Owner:** reh3376
+**Status date:** 2026-10-20 · **Branch:** `reh3376_dev01` (last merged PR: 51) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -21,8 +21,8 @@ This page is the honest snapshot: what exists in the repository today, what is w
 
 | Measure | Value |
 |---|---|
-| Python hub (`src/forge`) | 346 files, ~66,700 lines |
-| Python tests | 250 files, ~53,400 lines, 4,008 test functions (4,193 collected); full suite green on 2026-10-18 |
+| Python hub (`src/forge`) | 347 files, ~66,800 lines |
+| Python tests | 251 files, ~53,500 lines, 4,031 test functions (4,218 collected); full suite green on 2026-10-20 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
@@ -54,6 +54,7 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 | FTTS transport spec and runner | 🟡 | Schema + runner exist; spec at `specs/grpc-hardened-transport.ftts.json`; no `docs/FxTS/FTTS.md` |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
 | Hub is the time authority for its spokes and child hubs; skew measured at every link and enforced | ❌ | No hub time in the contract, the spoke's clock is copied through, nothing compares the three timestamps, nothing refuses a wrong clock (FB-087, FB-089, FB-092, FB-093); one-clock principle, owner 2026-10-18 |
+| Every timestamp Forge stores is UTC and timezone-aware; a naive datetime or an offset-less string is rejected at the model | ✅ | `forge.core.clock` (`utc_now`, `require_utc`, `OneClockModel`) behind `RecordTimestamp`, every manufacturing entity, `DataProduct` and the decision models; no `utcnow` left; ruff `DTZ` blocking (FB-014, 2026-10-20). The OT module's `DataValue`/`TagValue` still coerce naive to UTC (OPC UA `DateTime` is UTC by definition) and the adapters read an offset-less source string as UTC until FB-090 declares it per spoke |
 
 ### 3.2 Hub platform
 
@@ -183,7 +184,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Documentation current before every push | ✅ rule since 2026-10-16 |
 | Owner-only spec approval | ✅ `forge governance approve <spec> --by reh3376` (FB-021); nobody runs it on the owner's behalf |
 | MDEMG/Jiminy governed memory, local models only | ✅ instance per project (A-10) |
-| Lint gate | ✅ `ruff check` and `ruff format --check` clean and blocking since FB-022 (2026-10-18), no rule ignored since FB-084; jest/tsc gates on the interim NestJS/Next.js code still advisory (FB-048; they go when FB-076 retires that code) |
+| Lint gate | ✅ `ruff check` and `ruff format --check` clean and blocking since FB-022 (2026-10-18), no rule ignored since FB-084, `DTZ` (no naive datetimes) blocking since FB-014 (2026-10-20); jest/tsc gates on the interim NestJS/Next.js code still advisory (FB-048; they go when FB-076 retires that code) |
 | Top-level documents are the key documents only | ✅ FB-081 (2026-10-18): twelve planning records retired, rationale in `docs/PRINCIPLES.md` |
 
 ---
@@ -211,7 +212,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 5. **Hub services unmounted** (FB-001): Context Engine and Schema Registry exist but are not served.
 6. **Seven governance frameworks are stubs or planned**; FACTS now validates against its own schema, but six of its nine specs await the owner's hash approval.
 7. **No production deployment** (vision §P-12).
-8. **No clock discipline** (principle "one clock", owner 2026-10-18): the hub is not a time authority for anything attached to it, trusts the spoke's `ingestion_time`, the OPC-UA converter invents a source time when the server sends none, naive timestamps are accepted, no skew is measured, nothing refuses a wrong clock, and a tag's source time is whatever the OPC-UA server chose to send (FB-014, FB-087 to FB-094).
+8. **No clock discipline** (principle "one clock", owner 2026-10-18): the hub is not a time authority for anything attached to it, trusts the spoke's `ingestion_time`, the OPC-UA converter invents a source time when the server sends none, no skew is measured, nothing refuses a wrong clock, and a tag's source time is whatever the OPC-UA server chose to send (FB-087 to FB-094; naive timestamps are rejected since FB-014, 2026-10-20).
 
 ---
 

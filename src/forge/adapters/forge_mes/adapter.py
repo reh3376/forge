@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -132,7 +132,7 @@ class ForgeMesAdapter(
         # TODO(P4-live): Connect to RabbitMQ and bind 34 entity exchanges
         # TODO(P4-live): Connect to MQTT broker(s) via UNS config
         self._state = AdapterState.HEALTHY
-        self._last_healthy = datetime.utcnow()
+        self._last_healthy = datetime.now(UTC)
         logger.info("WHK-MES adapter started (state=%s)", self._state)
 
     async def stop(self) -> None:

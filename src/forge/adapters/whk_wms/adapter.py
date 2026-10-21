@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -108,7 +108,7 @@ class WhkWmsAdapter(
         # TODO(P3-live): Establish GraphQL client session
         # TODO(P3-live): Connect to RabbitMQ and bind exchanges
         self._state = AdapterState.HEALTHY
-        self._last_healthy = datetime.utcnow()
+        self._last_healthy = datetime.now(UTC)
         logger.info("WHK-WMS adapter started (state=%s)", self._state)
 
     async def stop(self) -> None:

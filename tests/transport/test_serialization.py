@@ -7,9 +7,10 @@ proto-compatible dict and back without data loss.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
+from pydantic import ValidationError
 
 from forge.core.models.adapter import (
     AdapterHealth,
@@ -193,14 +194,21 @@ class TestRecordValueTypedValues:
 class TestTimestampEdgeCases:
     """Timestamp conversion edge cases."""
 
-    def test_naive_datetime_assumed_utc(self) -> None:
-        """Naive datetimes should be treated as UTC."""
-        ts = RecordTimestamp(
-            source_time=datetime(2026, 1, 1, 0, 0, 0),
-            ingestion_time=datetime(2026, 1, 1, 0, 0, 1),
-        )
-        proto_dict = pydantic_to_proto(ts)
-        restored = proto_to_pydantic(proto_dict, "RecordTimestamp")
+    def test_naive_datetime_rejected(self) -> None:
+        """A naive datetime names no instant; RecordTimestamp refuses it (one clock, FB-014)."""
+        with pytest.raises(ValidationError, match="source_time must be timezone-aware"):
+            RecordTimestamp(
+                source_time=datetime(2026, 1, 1, 0, 0, 0),  # noqa: DTZ001 — naive on purpose
+                ingestion_time=datetime(2026, 1, 1, 0, 0, 1, tzinfo=timezone.utc),
+            )
+
+    def test_other_offset_round_trips_as_utc(self) -> None:
+        """An aware stamp in another offset is the same instant, stored and sent as UTC."""
+        eastern = timezone(timedelta(hours=-5))
+        ts = RecordTimestamp(source_time=datetime(2026, 1, 1, 7, 0, 0, tzinfo=eastern))
+        assert ts.source_time == datetime(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+        restored = proto_to_pydantic(pydantic_to_proto(ts), "RecordTimestamp")
+        assert restored.source_time == ts.source_time
         assert restored.source_time.tzinfo == timezone.utc
 
     def test_none_server_time(self) -> None:

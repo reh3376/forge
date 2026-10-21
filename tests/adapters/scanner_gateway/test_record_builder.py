@@ -47,7 +47,7 @@ class TestParseTimestamp:
         assert result == dt
 
     def test_naive_datetime_gets_utc(self):
-        dt = datetime(2026, 4, 6, 14, 30)
+        dt = datetime(2026, 4, 6, 14, 30)  # noqa: DTZ001 — naive on purpose
         result = _parse_timestamp(dt)
         assert result.tzinfo == UTC
 

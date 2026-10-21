@@ -145,11 +145,10 @@ class TestTimeBucketer:
         dt = datetime(2026, 4, 5, 23, 59, 59, tzinfo=UTC)
         assert bucketer.bucket(dt) == datetime(2026, 4, 5, 0, 0, 0, tzinfo=UTC)
 
-    def test_naive_datetime_treated_as_utc(self) -> None:
+    def test_naive_datetime_rejected(self) -> None:
         bucketer = TimeBucketer.from_name("5min")
-        dt = datetime(2026, 4, 5, 14, 33, 45)  # naive
-        result = bucketer.bucket(dt)
-        assert result.tzinfo == UTC
+        with pytest.raises(ValueError, match="dt must be timezone-aware"):
+            bucketer.bucket(datetime(2026, 4, 5, 14, 33, 45))  # noqa: DTZ001 — naive on purpose
 
     def test_unknown_window_raises(self) -> None:
         with pytest.raises(ValueError, match="Unknown time window"):

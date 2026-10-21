@@ -56,6 +56,7 @@ Component-by-component snapshot: [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md). Delivered
 | asyncua pinned to one tested version (`asyncua==2.1.0`; Python 3.12 in CI, 3.14 locally) | FB-085 |
 | The 21 OT/SDK enums are `StrEnum`, the last ruff ignore (UP042) dropped, the inline 3.10 test fallbacks removed | FB-084 |
 | `DataProduct.product_schema` behind the `schema` alias: wire name kept, Pydantic import warning gone, Pydantic floor 2.11 | FB-086 |
+| One clock, hub side: `forge.core.clock` (`utc_now`, `require_utc`, `OneClockModel`); `RecordTimestamp`, the manufacturing entities, `DataProduct` and the decision models reject naive datetimes and store UTC; `utcnow` gone; ruff `DTZ` blocking | FB-014 |
 
 ---
 
@@ -91,9 +92,9 @@ Goal: one contract, both directions encrypted and authenticated, every RPC serve
 
 ### WS-3 · Core data model (MES readiness)
 
-FB-010 (`Lot.item_id`), FB-011 (step/phase execution, electronic batch record entities), FB-012 (typed ISA-88 hierarchy), FB-013 (`RecordContext` vs context field registry), FB-014 (naive `utcnow`), FB-015 (exports), FB-016 (Go models drop Python defaults). All `Not started`. The Go module rewrite (FB-076) depends on FB-010/011/012/016 being settled, because the Go models become the MES module's types.
+FB-010 (`Lot.item_id`), FB-011 (step/phase execution, electronic batch record entities), FB-012 (typed ISA-88 hierarchy), FB-013 (`RecordContext` vs context field registry), FB-015 (exports), FB-016 (Go models drop Python defaults). All `Not started`; FB-014 (naive `utcnow`) done 2026-10-20. The Go module rewrite (FB-076) depends on FB-010/011/012/016 being settled, because the Go models become the MES module's types.
 
-**One clock (owner's principle, 2026-10-18).** Records from different sources only reconcile if their timestamps come from one master time, and the authority is the hub: the highest hub provides time for every hub and spoke attached to it, each hub governs the modules directly connected to it, and the checks are mandatory. FB-014 raised to High and widened (tz-aware everywhere, naive rejected, DTZ rule); FB-087 hub stamps receipt; FB-088 no invented source time; FB-089 skew measured at every link and exposed; FB-090 a required `time_governance` section in FACTS; FB-091 clock agreement as a quality dimension; FB-092 the time exchange in the contract (WS-1); FB-093 fail-closed enforcement at Register and Ingest (WS-2); FB-094 the OT source-time design (WS-4). D-9 settles the top hub's reference, the tolerances and the fields.
+**One clock (owner's principle, 2026-10-18).** Records from different sources only reconcile if their timestamps come from one master time, and the authority is the hub: the highest hub provides time for every hub and spoke attached to it, each hub governs the modules directly connected to it, and the checks are mandatory. FB-014 done 2026-10-20 (`forge.core.clock`; tz-aware everywhere, naive rejected at the model, ruff `DTZ` blocking); FB-087 hub stamps receipt; FB-088 no invented source time; FB-089 skew measured at every link and exposed; FB-090 a required `time_governance` section in FACTS; FB-091 clock agreement as a quality dimension; FB-092 the time exchange in the contract (WS-1); FB-093 fail-closed enforcement at Register and Ingest (WS-2); FB-094 the OT source-time design (WS-4). D-9 settles the top hub's reference, the tolerances and the fields.
 
 ### WS-4 · OT module (forge-ot)
 
@@ -174,7 +175,7 @@ FB-024 done 2026-10-18 (README tech stack, language policy, counts, spec states)
 1. ~~Merge the backlog PR; land **FB-072**~~ — done 2026-10-16; both gRPC directions can be mTLS.
 2. Decision session (section 5): role model, FVTS questions, forge-mes Go design, module SDK shape, time representation (D-9).
 3. **FB-076 design doc** (scope, data ownership, hub link, what the bridge keeps doing meanwhile); owner sign-off.
-4. **One-clock pass** (FB-014; FB-092 time exchange in the contract; FB-087 restamp; FB-089 measurement; FB-093 fail-closed enforcement; FB-090 required FACTS section; FB-094 OT source-time design, owner-signed) before the Go module's first production ingest; D-9 settles the top hub's reference, the tolerances and the fields.
+4. **One-clock pass** (FB-014 done 2026-10-20; FB-092 time exchange in the contract; FB-087 restamp; FB-089 measurement; FB-093 fail-closed enforcement; FB-090 required FACTS section; FB-094 OT source-time design, owner-signed) before the Go module's first production ingest; D-9 settles the top hub's reference, the tolerances and the fields.
 5. **Module SDK Go scaffold** (WS-7) — the first consumer is the Go forge-mes.
 6. **FB-076 phase 1:** Go forge-mes speaks to the hub (Register/Configure/Ingest, write-back, pull RPCs) with FB-055 as the acceptance test.
 7. **FVTS runner + golden tests** (WS-6) in parallel with 6; approve the OT reference spec.
@@ -222,12 +223,12 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 |---|---|---|---|---|
 | WS-1 transport | FB-092 | FB-072 | FB-055, FB-056, FB-071 | FB-002 to close as superseded; FB-092 is the one-clock time exchange |
 | WS-2 hub platform | FB-001, FB-003, FB-093 | FB-004, FB-005, FB-006, FB-007, FB-059, FB-075 | FB-008, FB-009 | FB-093 is the one-clock enforcement |
-| WS-3 data model | FB-010, FB-011, FB-014, FB-087, FB-088, FB-089, FB-090 | FB-012, FB-013, FB-016, FB-091 | FB-015 | FB-086 done; the one-clock items follow the owner's 2026-10-18 principle (FB-092 in WS-1, FB-093 in WS-2), D-9 |
+| WS-3 data model | FB-010, FB-011, FB-087, FB-088, FB-089, FB-090 | FB-012, FB-013, FB-016, FB-091 | FB-015 | FB-086, FB-014 done; the one-clock items follow the owner's 2026-10-18 principle (FB-092 in WS-1, FB-093 in WS-2), D-9 |
 | WS-4 OT module | FB-094 | FB-020, FB-079 | FB-018 | FB-073, FB-074 done (awaiting approval); FB-082 done; FB-094 is the OT source-time design |
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
 | WS-6 forge-display | — | — | — | No backlog ids yet; tracked here until the design lands |
 | WS-7 module SDK | — | FB-017 | FB-019 | FB-021 done |
-| WS-8 governance | — | — | FB-014, FB-048 (jest/tsc follow FB-076) | FB-080, FB-021, FB-083, FB-022, FB-026, FB-085, FB-084 done; FTTS doc has no id yet |
+| WS-8 governance | — | — | FB-048 (jest/tsc follow FB-076) | FB-080, FB-021, FB-083, FB-022, FB-026, FB-085, FB-084, FB-014 done; FTTS doc has no id yet |
 | WS-9 security/ops | FB-029, FB-046 | FB-043, FB-047 | FB-044, FB-049 | public since 2026-10-17; GC still on Support |
 | WS-10 MDEMG | — | FB-038, FB-042 | FB-039, FB-040, FB-041 | |
 | WS-11 docs | — | FB-025 | FB-024, FB-027 | personal docs refresh |
