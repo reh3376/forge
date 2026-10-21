@@ -211,6 +211,24 @@ class TestTimestampEdgeCases:
         assert restored.source_time == ts.source_time
         assert restored.source_time.tzinfo == timezone.utc
 
+    def test_wire_without_ingestion_time_leaves_the_stamp_to_the_hub(self) -> None:
+        """A spoke that sends no ingestion_time gets the hub's receipt stamp, never a parsed one."""
+        ts = proto_to_pydantic(
+            {"source_time": {"seconds": 1_780_000_000, "nanos": 0}}, "RecordTimestamp"
+        )
+        assert "ingestion_time" not in ts.model_fields_set
+        assert ts.ingestion_time.tzinfo == timezone.utc
+        assert ts.sent_time is None
+
+    def test_sent_time_is_hub_local_and_never_on_the_wire(self) -> None:
+        ts = RecordTimestamp(
+            source_time=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            sent_time=datetime(2026, 1, 1, 0, 0, 1, tzinfo=timezone.utc),
+        )
+        wire = pydantic_to_proto(ts)
+        assert "sent_time" not in wire
+        assert proto_to_pydantic(wire, "RecordTimestamp").sent_time is None
+
     def test_none_server_time(self) -> None:
         """server_time is optional — should survive round-trip as None."""
         ts = RecordTimestamp(

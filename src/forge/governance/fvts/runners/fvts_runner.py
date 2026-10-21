@@ -394,7 +394,8 @@ class FVTSRunner(FxTSRunner):
         expected: dict[str, set[str]] = {
             "qualityCode": {e.value for e in QualityCode},
             "contextField": set(RecordContext.model_fields) - {"extra"},
-            "timestampBasis": set(RecordTimestamp.model_fields),
+            # the wire timestamps a view may trend against; sent_time is hub-local (FB-087)
+            "timestampBasis": set(RecordTimestamp.TIME_BASES),
             "alarmState": {e.value for e in AlarmState},
             "alarmPriority": {e.value for e in AlarmPriority},
             "alarmOperation": {e.value for e in AlarmAction} - SYSTEM_ALARM_ACTIONS,

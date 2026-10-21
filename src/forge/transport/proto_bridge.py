@@ -351,12 +351,20 @@ def proto_to_record_source(msg: record_msg.RecordSource) -> RecordSource:
 
 
 def proto_to_record_timestamp(msg: record_msg.RecordTimestamp) -> RecordTimestamp:
-    """Convert proto RecordTimestamp to Pydantic RecordTimestamp."""
-    return RecordTimestamp(
-        source_time=_timestamp_to_dt(msg.source_time),
-        server_time=_timestamp_to_dt(msg.server_time),
-        ingestion_time=_timestamp_to_dt(msg.ingestion_time),
-    )
+    """Convert proto RecordTimestamp to Pydantic RecordTimestamp.
+
+    ``ingestion_time`` is left unset when the spoke sent none: the hub stamps it
+    on receipt (FB-087) and only a stamp the spoke actually sent becomes
+    ``sent_time``. ``sent_time`` itself is hub-local and never on the wire.
+    """
+    kwargs: dict[str, Any] = {
+        "source_time": _timestamp_to_dt(msg.source_time),
+        "server_time": _timestamp_to_dt(msg.server_time),
+    }
+    ingestion_time = _timestamp_to_dt(msg.ingestion_time)
+    if ingestion_time is not None:
+        kwargs["ingestion_time"] = ingestion_time
+    return RecordTimestamp(**kwargs)
 
 
 def proto_to_record_value(msg: record_msg.RecordValue) -> RecordValue:

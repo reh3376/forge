@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any
+from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -32,15 +32,32 @@ class RecordTimestamp(OneClockModel):
 
     source_time: when the value was generated at the source system
     server_time: when the source system's server processed it
-    ingestion_time: when Forge received it
+    ingestion_time: when the hub received it, by the hub's clock
+    sent_time: the spoke's own clock when it built and sent the record
 
-    All three are UTC and timezone-aware (one clock, FB-014): a naive value,
-    or an ISO string without an offset, is rejected rather than read as UTC.
+    The hub stamps ``ingestion_time`` on receipt (one clock, FB-087): whatever
+    a spoke put there arrives as ``sent_time`` and is kept for the clock-offset
+    measurement (FB-089). Every field is UTC and timezone-aware (FB-014): a
+    naive value, or an ISO string without an offset, is rejected rather than
+    read as UTC.
     """
+
+    # The timestamps a view or a quality rule may take as its time axis: the three on
+    # the wire. The FVTS ``timestampBasis`` enum mirrors this tuple. ``sent_time`` is a
+    # measurement input for the clock-offset check (FB-089), never a basis.
+    TIME_BASES: ClassVar[tuple[str, ...]] = ("source_time", "server_time", "ingestion_time")
 
     source_time: datetime
     server_time: datetime | None = None
     ingestion_time: datetime = Field(default_factory=utc_now)
+    sent_time: datetime | None = Field(
+        default=None,
+        description=(
+            "The spoke's clock when it built and sent the record (its ingestion_time as "
+            "sent); set by the hub on receipt and kept for the offset measurement (FB-089). "
+            "Hub-local, not on the wire; provisional name until D-9 fixes the time fields."
+        ),
+    )
 
 
 class RecordValue(BaseModel):

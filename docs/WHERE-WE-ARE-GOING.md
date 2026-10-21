@@ -61,7 +61,7 @@ The proposed sequence in [`ROADMAP.md`](ROADMAP.md) §4, abridged:
 7. forge-display scaffold and renderer spike; MES surfaces first.
 8. Hub platform items (FB-001, FB-003, FB-007, FB-075) as the Go module and forge-display start needing them.
 
-No small decision-free item is left: FB-022, FB-026, FB-084, FB-085, FB-086 and FB-014 (tz-aware timestamps, naive rejected at the model, ruff `DTZ` blocking; done 2026-10-20) are done. The next work that needs no decision is the rest of the one-clock pass from the owner's 2026-10-18 principle: the hub-side restamp in FB-087 and the skew measurement in FB-089; FB-092 (hub time in the contract) and FB-093 (fail-closed enforcement) start once D-9 fixes the exchange shape and the tolerances; FB-094 (every OT connection reads the clock of the device it pulls from and corrects incoming stamps by the measured offset; a device whose clock cannot be read is not pulled) is a design document that chooses among established standards (NTP/chrony, PTP/IEEE 1588, OPC UA header timestamps, IEC 61850 time classes and `TimeQuality`) for the owner to sign, then implementation. The jest and tsc gates (FB-048) check the interim NestJS/Next.js code under `modules/Forge MES`, which FB-076 retires, so they follow FB-076.
+No small decision-free item is left: FB-022, FB-026, FB-084, FB-085, FB-086 and FB-014 (tz-aware timestamps, naive rejected at the model, ruff `DTZ` blocking; done 2026-10-20) are done. The next work that needs no decision is the rest of the one-clock pass from the owner's 2026-10-18 principle: the skew measurement in FB-089 (the hub-side restamp, FB-087, is done 2026-10-20); FB-092 (hub time in the contract) and FB-093 (fail-closed enforcement) start once D-9 fixes the exchange shape and the tolerances; FB-094 (every OT connection reads the clock of the device it pulls from and corrects incoming stamps by the measured offset; a device whose clock cannot be read is not pulled) is a design document that chooses among established standards (NTP/chrony, PTP/IEEE 1588, OPC UA header timestamps, IEC 61850 time classes and `TimeQuality`) for the owner to sign, then implementation. The jest and tsc gates (FB-048) check the interim NestJS/Next.js code under `modules/Forge MES`, which FB-076 retires, so they follow FB-076.
 
 ---
 
@@ -73,7 +73,7 @@ No small decision-free item is left: FB-022, FB-026, FB-084, FB-085, FB-086 and 
 | D-3 forge-mes Go design | all of M3 | `ROADMAP.md` §5 |
 | D-4 FVTS open items | M4 | `docs/FxTS/FVTS.md`, `ROADMAP.md` §5 |
 | D-8 FACTS vocabulary for OT adapters | approval of the OT FACTS spec; the OT module's identity | `ROADMAP.md` §5 |
-| D-9 one clock: which established standards to adopt (NTP/chrony strata, PTP/IEEE 1588, NTP four-timestamp measurement in-band, IEC 61850-5 tolerances, IEC 61850 `TimeQuality` + OPC UA `DataValue` fields); FB-094 recommends, the owner approves | FB-092, FB-093, FB-094's fields, the representation half of FB-087/FB-088, FB-089/FB-091 tolerances | `ROADMAP.md` §5 |
+| D-9 one clock: which established standards to adopt (NTP/chrony strata, PTP/IEEE 1588, NTP four-timestamp measurement in-band, IEC 61850-5 tolerances, IEC 61850 `TimeQuality` + OPC UA `DataValue` fields); FB-094 recommends, the owner approves | FB-092, FB-093, FB-094's fields, the representation half of FB-088 and the final name of `sent_time` (FB-087's provisional field), FB-089/FB-091 tolerances | `ROADMAP.md` §5 |
 | D-7 scope of the Go standard | long-term shape of the OT module and the Python adapters | `ROADMAP.md` §5 |
 
 ---

@@ -313,11 +313,16 @@ def _proto_to_record_source(d: dict[str, Any]) -> RecordSource:
 
 
 def _proto_to_record_timestamp(d: dict[str, Any]) -> RecordTimestamp:
-    return RecordTimestamp(
-        source_time=_proto_to_datetime(d["source_time"]),
-        server_time=_proto_to_datetime(d.get("server_time")),
-        ingestion_time=_proto_to_datetime(d.get("ingestion_time")),
-    )
+    # ingestion_time is left unset when the spoke sent none: the hub stamps it on
+    # receipt (FB-087) and only a stamp the spoke actually sent becomes sent_time.
+    ingestion_time = _proto_to_datetime(d.get("ingestion_time"))
+    kwargs: dict[str, Any] = {
+        "source_time": _proto_to_datetime(d["source_time"]),
+        "server_time": _proto_to_datetime(d.get("server_time")),
+    }
+    if ingestion_time is not None:
+        kwargs["ingestion_time"] = ingestion_time
+    return RecordTimestamp(**kwargs)
 
 
 def _proto_to_record_value(d: dict[str, Any]) -> RecordValue:
