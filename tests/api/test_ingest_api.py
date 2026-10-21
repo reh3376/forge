@@ -126,6 +126,37 @@ async def test_hub_stamps_receipt_on_rest_records(client, sink: InMemoryRecordSi
 
 
 @pytest.mark.asyncio
+async def test_ingest_stats_expose_the_measured_clock_offsets(
+    client, sink: InMemoryRecordSink
+) -> None:
+    """/v1/ingest/stats carries the clock offsets the hub measured per adapter and link (FB-089)."""
+    await client.post("/v1/adapters/register", json=_manifest())
+    record = {
+        "source": {"adapter_id": "whk-wms", "system": "whk-wms-prod", "tag_path": "a.b"},
+        "timestamp": {
+            "source_time": "2026-06-01T12:00:00Z",
+            "server_time": "2026-06-01T12:00:01Z",
+            "ingestion_time": "2026-06-01T12:00:02Z",
+        },
+        "value": {"raw": 1, "data_type": "int64"},
+        "context": {"equipment_id": "E1", "extra": {"event_type": "x"}},
+        "lineage": {
+            "schema_ref": "forge://schemas/whk-wms/v1",
+            "adapter_id": "whk-wms",
+            "adapter_version": "1.0.0",
+        },
+    }
+    await client.post("/v1/records", json={"adapter_id": "whk-wms", "records": [record]})
+    offsets = (await client.get("/v1/ingest/stats")).json()["pipeline"]["clock_offsets"]
+    links = offsets["adapters"]["whk-wms"]
+    assert set(links) == {"spoke", "server", "source"}
+    assert links["source"]["last_seconds"] == -1.0 and links["source"]["within_tolerance"] is True
+    # a stamp from June against today's hub clock: far outside any tolerance
+    assert links["spoke"]["within_tolerance"] is False and offsets["breaches"] >= 2
+    assert offsets["tolerance_seconds"] > 0
+
+
+@pytest.mark.asyncio
 async def test_unknown_adapter_still_404(client) -> None:
     resp = await client.post("/v1/records", json={"adapter_id": "nope", "records": [{"value": 1}]})
     assert resp.status_code == 404

@@ -150,6 +150,7 @@ class HubIngestServicer(AdapterServiceServicer):
             records_collected=stats.persisted,
             records_failed=failed,
             uptime_seconds=(now - session.created_at).total_seconds(),
+            clock=self.pipeline.offsets.stats(adapter_id),
         )
         if self._on_health is not None:
             try:

@@ -368,3 +368,35 @@ async def test_liveness_probe_catches_a_silently_dead_session() -> None:
     assert await disabled.check() == [] and dclients["WHK01"].probed == 0
     await disabled.stop()
     await manager.stop()
+
+
+async def test_liveness_probe_measures_the_server_clock() -> None:
+    """Every probe answer is the server clock: its hub offset is kept and alerted (FB-089)."""
+    registry = await registry_with_tags()
+    clock = Clock()
+    manager, clients = make([spec(liveness_interval_seconds=10)], registry, clock=clock)
+    await manager.start()
+    client = clients["WHK01"]
+
+    client.values[LIVENESS_NODE] = clock.t + timedelta(seconds=3)  # server 3 s ahead of the hub
+    await manager.check()
+    server_clock = manager.status()["connections"]["WHK01"]["server_clock"]
+    assert server_clock["last_seconds"] == 3.0 and server_clock["round_trip_seconds"] == 0.0
+    assert server_clock["within_tolerance"] is False and server_clock["breaches"] == 1
+    assert server_clock["measured_at"] == clock.t.isoformat().replace("+00:00", "Z")
+
+    clock.advance(10)
+    client.values[LIVENESS_NODE] = clock.t + timedelta(milliseconds=20)  # back within tolerance
+    await manager.check()
+    server_clock = manager.status()["connections"]["WHK01"]["server_clock"]
+    assert server_clock["samples"] == 2 and server_clock["within_tolerance"] is True
+    assert server_clock["last_seconds"] == pytest.approx(0.02)
+    assert manager.offsets.stats("WHK01")["server"].max_abs_seconds == 3.0
+
+
+async def test_probe_without_a_clock_value_measures_nothing() -> None:
+    registry = await registry_with_tags()
+    manager, _clients = make([spec(liveness_interval_seconds=10)], registry, clock=Clock())
+    await manager.start()
+    await manager.check()
+    assert manager.status()["connections"]["WHK01"]["server_clock"] is None
