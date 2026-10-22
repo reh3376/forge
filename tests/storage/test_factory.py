@@ -4,8 +4,11 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, PropertyMock
 
+from forge.context.equipment import InMemoryEquipmentStore, PostgresEquipmentStore
 from forge.curation.lineage import InMemoryLineageStore
 from forge.curation.registry import InMemoryProductStore
+from forge.registry.postgres_store import PostgresSchemaStore
+from forge.registry.store import InMemorySchemaStore
 from forge.storage.engines.neo4j_engine import Neo4jGraphWriter, Neo4jLineageWriter
 from forge.storage.engines.postgres import PostgresLineageStore, PostgresProductStore
 from forge.storage.engines.redis_engine import RedisSchemaCache, RedisStateCache
@@ -59,6 +62,30 @@ class TestLineageStore:
         factory = StorageFactory(pools)
         store = factory.lineage_store()
         assert isinstance(store, InMemoryLineageStore)
+
+
+class TestSchemaStore:
+    """StorageFactory.schema_store() selection (FB-005)."""
+
+    def test_returns_postgres_when_pool_available(self):
+        factory = StorageFactory(_make_pool_manager(postgres=MagicMock()))
+        assert isinstance(factory.schema_store(), PostgresSchemaStore)
+
+    def test_returns_in_memory_when_no_pool(self):
+        factory = StorageFactory(_make_pool_manager(postgres=None))
+        assert isinstance(factory.schema_store(), InMemorySchemaStore)
+
+
+class TestEquipmentStore:
+    """StorageFactory.equipment_store() selection (FB-005)."""
+
+    def test_returns_postgres_when_pool_available(self):
+        factory = StorageFactory(_make_pool_manager(postgres=MagicMock()))
+        assert isinstance(factory.equipment_store(), PostgresEquipmentStore)
+
+    def test_returns_in_memory_when_no_pool(self):
+        factory = StorageFactory(_make_pool_manager(postgres=None))
+        assert isinstance(factory.equipment_store(), InMemoryEquipmentStore)
 
 
 class TestTimescaleWriter:
@@ -159,6 +186,8 @@ class TestSummary:
         summary = factory.summary()
         assert summary["product_store"] == "postgres"
         assert summary["lineage_store"] == "postgres"
+        assert summary["schema_store"] == "postgres"
+        assert summary["equipment_store"] == "postgres"
         assert summary["timescale_writer"] == "timescale"
         assert summary["graph_writer"] == "neo4j"
         assert summary["state_cache"] == "redis"
@@ -170,6 +199,8 @@ class TestSummary:
         summary = factory.summary()
         assert summary["product_store"] == "in_memory"
         assert summary["lineage_store"] == "in_memory"
+        assert summary["schema_store"] == "in_memory"
+        assert summary["equipment_store"] == "in_memory"
         assert summary["timescale_writer"] == "unavailable"
         assert summary["graph_writer"] == "unavailable"
         assert summary["state_cache"] == "unavailable"

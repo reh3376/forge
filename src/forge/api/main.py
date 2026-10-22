@@ -172,18 +172,24 @@ def create_app(
             ingest log are persisted (FB-060). Defaults to the storage
             factory's PostgreSQL store, or in-memory without one.
         schema_store: Backing store of the Schema Registry served under
-            ``/v1/schemas`` (FB-001). In-memory by default; the Postgres
-            store joins the factory with its migration (FB-005).
+            ``/v1/schemas`` (FB-001). Defaults to the storage factory's
+            PostgreSQL store (migration 009, FB-005), or in-memory without
+            one.
         equipment_store: Backing store of the Context Engine's equipment
-            registry served under ``/v1/context`` (FB-001). In-memory by
-            default; the Postgres store joins the factory with its
-            migration (FB-005).
+            registry served under ``/v1/context`` (FB-001). Defaults to the
+            storage factory's PostgreSQL store (migration 009, FB-005), or
+            in-memory without one.
     """
     config = storage_config or StorageConfig.from_env()
     store = adapter_registry_store
     if store is None and storage_factory is not None:
         store = storage_factory.adapter_registry_store()
     registry = AdapterRegistry(store=store)
+    # The hub-served registries (FB-001) persist through the factory (FB-005).
+    if schema_store is None and storage_factory is not None:
+        schema_store = storage_factory.schema_store()
+    if equipment_store is None and storage_factory is not None:
+        equipment_store = storage_factory.equipment_store()
     # One ingest pipeline serves both transports (gRPC Ingest and REST /v1/records).
     if ingest_pipeline is not None:
         pipeline = ingest_pipeline

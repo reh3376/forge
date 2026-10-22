@@ -18,7 +18,7 @@ class TestMigrationStructure:
         assert VERSIONS_DIR.is_dir()
 
     def test_all_versions_present(self):
-        expected = ["001", "002", "003", "004", "005", "006", "007", "008"]
+        expected = ["001", "002", "003", "004", "005", "006", "007", "008", "009"]
         files = sorted(f.name for f in VERSIONS_DIR.glob("*.py") if f.name != "__init__.py")
         for version in expected:
             assert any(f.startswith(version) for f in files), f"Missing migration {version}"
@@ -113,3 +113,54 @@ class TestMigration008:
         assert permission_columns == {f.name for f in dataclasses.fields(ModulePermission)}
         audit_columns = set(re.findall(r'sa\.Column\("(\w+)"', tables["access_audit"]))
         assert audit_columns == {f.name for f in dataclasses.fields(AccessAuditEntry)} | {"id"}
+
+
+def _insert_columns(sql: str) -> set[str]:
+    """The column list of an ``INSERT INTO ... (...)`` statement."""
+    import re
+
+    match = re.search(r"INSERT INTO \S+ \((.*?)\)", sql, re.S)
+    assert match is not None
+    return {name.strip() for name in match.group(1).split(",")}
+
+
+def _migration_tables(name: str) -> dict[str, set[str]]:
+    """Table name → column names for every ``op.create_table`` in a migration."""
+    import re
+
+    source = (VERSIONS_DIR / name).read_text()
+    found = re.findall(r'op\.create_table\(\s*"(\w+)",(.*?)schema="forge_core"', source, re.S)
+    return {table: set(re.findall(r'sa\.Column\(\s*"(\w+)"', body)) for table, body in found}
+
+
+class TestMigration009:
+    """009 creates the tables the Schema Registry and equipment stores write (FB-005)."""
+
+    def test_chain(self):
+        mod = importlib.import_module(
+            "forge.storage.migrations.versions.009_registry_and_equipment_tables"
+        )
+        assert mod.revision == "009" and mod.down_revision == "008"
+
+    def test_tables_match_the_stores_sql_column_for_column(self):
+        from forge.context import equipment
+        from forge.registry import postgres_store
+
+        tables = _migration_tables("009_registry_and_equipment_tables.py")
+        assert set(tables) == {"registry_schemas", "registry_versions", "equipment_registry"}
+        assert tables["registry_schemas"] == _insert_columns(postgres_store._UPSERT_SCHEMA)
+        assert tables["registry_versions"] == _insert_columns(postgres_store._UPSERT_VERSION)
+        assert tables["equipment_registry"] == _insert_columns(equipment._UPSERT)
+
+    def test_tables_match_the_domain_models(self):
+        import dataclasses
+
+        from forge.context.models import Equipment
+        from forge.registry.models import SchemaMetadata, SchemaVersion
+
+        tables = _migration_tables("009_registry_and_equipment_tables.py")
+        metadata_fields = {f.name for f in dataclasses.fields(SchemaMetadata)} - {"versions"}
+        assert tables["registry_schemas"] == metadata_fields
+        version_fields = {f.name for f in dataclasses.fields(SchemaVersion)} | {"schema_id"}
+        assert tables["registry_versions"] == version_fields
+        assert tables["equipment_registry"] == {f.name for f in dataclasses.fields(Equipment)}

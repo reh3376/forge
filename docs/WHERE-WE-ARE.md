@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 55) · **Owner:** reh3376
+**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 56) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -13,7 +13,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 2. The **OT module runs inside the hub** with OPC-UA connections, a tag engine, ISA-18.2 alarms, the full control-write defense chain, and drives the MES changeover sequence including the PLC CIP runner.
 3. **forge-mes is Go and not yet built**: the imported NestJS backend and Next.js frontend stand in as the interim bridge and speak the spoke contract; the Go rewrite (FB-076) is decided but not designed.
 4. **Governance is real for four frameworks** (FATS, FACTS, FTTS, FVTS) plus FHTS hashing; the other seven are stubs or planned. forge-display does not exist yet; its contract (FVTS) does, with a runner and golden messages.
-5. **Not yet**: scoped roles in the gateway, persistence for the hub-served registries, `mod_mes` in the hub, the Go module SDK, the hub-of-hubs federation, Kubernetes, and any management module in Go.
+5. **Not yet**: scoped roles in the gateway, `mod_mes` in the hub, the Go module SDK, the hub-of-hubs federation, Kubernetes, and any management module in Go.
 
 ---
 
@@ -21,13 +21,13 @@ This page is the honest snapshot: what exists in the repository today, what is w
 
 | Measure | Value |
 |---|---|
-| Python hub (`src/forge`) | 348 files, ~67,200 lines |
-| Python tests | 253 files, ~54,300 lines, 4,068 test functions (4,301 collected); full suite green on 2026-10-22 |
+| Python hub (`src/forge`) | 349 files, ~67,500 lines |
+| Python tests | 254 files, ~54,400 lines, 4,086 test functions (4,319 collected); full suite green on 2026-10-22 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
 | Hub REST routes | 41 on the hub app (20 platform, 12 Context Engine, 9 Schema Registry; state changes behind `adapters:write`, `context:write` or `schemas:write`), plus OT i3X (8) and OT control (15; every POST behind `adapters:write`), plus the curation app mounted at `/curation` |
-| Storage migrations | 8 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions) |
+| Storage migrations | 9 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions, registry and equipment tables) |
 | FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 6 await owner approval after the FB-080 and FB-074 re-stamps (`forge governance specs --pending`) |
 | FATS specs | 28 (one per route the hub app serves; the hub test holds both directions) |
 | FVTS specs | 1 (ot-module reference, `pending_review`; re-stamped by FB-074 for `REJECTED_REVIEW`) |
@@ -63,10 +63,10 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 |---|---|---|
 | Hub REST API (adapters, records, writes, subscriptions, backfill, collect, ingest log, info/health) | ✅ | `src/forge/api/main.py` |
 | Curation service mounted | ✅ | `/curation` |
-| Context Engine (F21) and Schema Registry (F20) | ✅ | Served by the hub under `/v1/context` and `/v1/schemas` (FB-001, 2026-10-22); in-memory stores until FB-005 |
+| Context Engine (F21) and Schema Registry (F20) | ✅ | Served by the hub under `/v1/context` and `/v1/schemas` (FB-001); Postgres stores through the factory, migration 009 (FB-005); both 2026-10-22 |
 | Gateway: auth, RBAC, rate limiting | 🟡 | Middleware exists; auth off by default; only state-changing routes carry a scope (`adapters:write`, `context:write`, `schemas:write`), reads are open (FB-007) |
 | Access controller persistence | 🟡 | In-memory only; Postgres controller unimplemented (FB-003) |
-| Registry/equipment tables in Postgres | 🟡 | FB-005 |
+| Registry/equipment tables in Postgres | ✅ | Migration 009 (FB-005, 2026-10-22) |
 | Observer | 🟡 | Package exists; no SLO/FOTS wiring |
 | CLI `forge` | ✅ | adapter list/status, governance run/validate-spec, migrate up/status/down, db access grant/revoke/list/issue |
 
@@ -76,7 +76,7 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 |---|---|---|
 | Engines: PostgreSQL, TimescaleDB, Neo4j, Redis | ✅ | `forge.storage.engines` |
 | Storage router and factory | ✅ | |
-| Versioned migrations (8) | ✅ | |
+| Versioned migrations (9) | ✅ | |
 | Forge-issued module database credentials (`forge db access`) | ✅ | FB-057 step 1, migration 008; password printed once, never stored |
 | `mod_mes` schema in the hub (MES data moves in) | ⬜ | FB-057 steps 2–5, after the FB-076 design |
 | Backups, restore procedure | ⬜ | No backlog id yet |

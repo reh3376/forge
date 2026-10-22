@@ -17,7 +17,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -341,6 +341,46 @@ class TestHubServedServices:
             other = create_app(storage_config=StorageConfig())
         async with AsyncClient(transport=ASGITransport(app=other), base_url="http://t") as ac:
             assert (await ac.get("/v1/schemas")).json()["total"] == 0
+
+    @pytest.mark.asyncio
+    async def test_the_factory_stores_back_the_served_registries(self):
+        """With a storage factory, the hub persists through its stores (FB-005)."""
+        from forge.context.equipment import InMemoryEquipmentStore
+        from forge.context.models import Equipment
+        from forge.ingest import IngestPipeline
+        from forge.registry.models import SchemaMetadata, SchemaType
+        from forge.registry.store import InMemorySchemaStore
+        from forge.storage.adapter_registry import InMemoryAdapterRegistryStore
+        from forge.storage.factory import StorageFactory
+
+        schemas = InMemorySchemaStore()
+        seeded = SchemaMetadata(
+            schema_id="forge://schemas/seeded/A", name="A", schema_type=SchemaType.ADAPTER_OUTPUT
+        )
+        seeded.add_version({"type": "object"})
+        await schemas.save(seeded)
+        equipment = InMemoryEquipmentStore()
+        await equipment.save(Equipment(equipment_id="SEED-01", name="Seeded", site="WHK"))
+
+        factory = MagicMock(spec=StorageFactory)
+        factory.schema_store.return_value = schemas
+        factory.equipment_store.return_value = equipment
+        with patch.dict(os.environ, {"FORGE_GRPC_ENABLED": "false"}):
+            app = create_app(
+                storage_config=StorageConfig(),
+                storage_factory=factory,
+                ingest_pipeline=IngestPipeline(),
+                adapter_registry_store=InMemoryAdapterRegistryStore(),
+            )
+        factory.schema_store.assert_called_once_with()
+        factory.equipment_store.assert_called_once_with()
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://t") as ac:
+            listed = await ac.get("/v1/schemas")
+            assert [s["schema_id"] for s in listed.json()["schemas"]] == [
+                "forge://schemas/seeded/A"
+            ]
+            found = await ac.get("/v1/context/equipment/SEED-01")
+            assert found.status_code == 200 and found.json()["site"] == "WHK"
 
     @pytest.mark.asyncio
     async def test_info_names_the_served_services(self, client):
