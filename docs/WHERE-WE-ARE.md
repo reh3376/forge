@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-21 · **Branch:** `reh3376_dev01` (last merged PR: 54) · **Owner:** reh3376
+**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 55) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -13,7 +13,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 2. The **OT module runs inside the hub** with OPC-UA connections, a tag engine, ISA-18.2 alarms, the full control-write defense chain, and drives the MES changeover sequence including the PLC CIP runner.
 3. **forge-mes is Go and not yet built**: the imported NestJS backend and Next.js frontend stand in as the interim bridge and speak the spoke contract; the Go rewrite (FB-076) is decided but not designed.
 4. **Governance is real for four frameworks** (FATS, FACTS, FTTS, FVTS) plus FHTS hashing; the other seven are stubs or planned. forge-display does not exist yet; its contract (FVTS) does, with a runner and golden messages.
-5. **Not yet**: scoped roles in the gateway, the Context Engine and Schema Registry mounted, `mod_mes` in the hub, the Go module SDK, the hub-of-hubs federation, Kubernetes, and any management module in Go.
+5. **Not yet**: scoped roles in the gateway, persistence for the hub-served registries, `mod_mes` in the hub, the Go module SDK, the hub-of-hubs federation, Kubernetes, and any management module in Go.
 
 ---
 
@@ -22,14 +22,14 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 348 files, ~67,200 lines |
-| Python tests | 253 files, ~54,000 lines, 4,060 test functions (4,251 collected); full suite green on 2026-10-20 |
+| Python tests | 253 files, ~54,300 lines, 4,068 test functions (4,301 collected); full suite green on 2026-10-22 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
-| Hub REST routes | 20 on the hub app, plus OT i3X (8) and OT control (15; every POST behind `adapters:write`), plus the curation app mounted at `/curation` |
+| Hub REST routes | 41 on the hub app (20 platform, 12 Context Engine, 9 Schema Registry; state changes behind `adapters:write`, `context:write` or `schemas:write`), plus OT i3X (8) and OT control (15; every POST behind `adapters:write`), plus the curation app mounted at `/curation` |
 | Storage migrations | 8 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions) |
 | FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 6 await owner approval after the FB-080 and FB-074 re-stamps (`forge governance specs --pending`) |
-| FATS specs | 21 |
+| FATS specs | 28 (one per route the hub app serves; the hub test holds both directions) |
 | FVTS specs | 1 (ot-module reference, `pending_review`; re-stamped by FB-074 for `REJECTED_REVIEW`) |
 | CI jobs | hub-python, hub-go, mes-module, secrets-scan; auto-PR workflow |
 | Commits | 1,588 (includes the imported MES history) |
@@ -63,8 +63,8 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 |---|---|---|
 | Hub REST API (adapters, records, writes, subscriptions, backfill, collect, ingest log, info/health) | ✅ | `src/forge/api/main.py` |
 | Curation service mounted | ✅ | `/curation` |
-| Context Engine (F21) and Schema Registry (F20) | 🟡 | Code exists (`forge.context`, `forge.registry`); **not mounted** in the deployed app (FB-001) |
-| Gateway: auth, RBAC, rate limiting | 🟡 | Middleware exists; auth off by default, no route uses `require_scope`/`require_role` (FB-007) |
+| Context Engine (F21) and Schema Registry (F20) | ✅ | Served by the hub under `/v1/context` and `/v1/schemas` (FB-001, 2026-10-22); in-memory stores until FB-005 |
+| Gateway: auth, RBAC, rate limiting | 🟡 | Middleware exists; auth off by default; only state-changing routes carry a scope (`adapters:write`, `context:write`, `schemas:write`), reads are open (FB-007) |
 | Access controller persistence | 🟡 | In-memory only; Postgres controller unimplemented (FB-003) |
 | Registry/equipment tables in Postgres | 🟡 | FB-005 |
 | Observer | 🟡 | Package exists; no SLO/FOTS wiring |
@@ -147,7 +147,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 
 | Framework | State |
 |---|---|
-| FATS | schema + runner + 21 specs |
+| FATS | schema + runner + 28 specs (one per hub-served route) |
 | FACTS | schema + runner (`facts:schema-valid` + 35 rule checks, enums read from the schema) + 9 specs; 8 validate (OT spec: FB-079); 5 re-stamped specs await owner approval |
 | FHTS | hashing, verification, approval, revert, registry; owner-only approval in practice |
 | FTTS | schema + runner + 1 spec; no doc page |
@@ -210,10 +210,9 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 2. **No management module in Go** (vision §3.3): the migrated NestJS/Next.js application stands in for forge-mes until the Go module is built; the SDK template does not exist yet.
 3. **No scoped roles in force** (vision §P-11): the gateway's auth is off by default and the role model is still being designed.
 4. **No federation** (vision §P-10): a single hub only; no hub-of-hubs code.
-5. **Hub services unmounted** (FB-001): Context Engine and Schema Registry exist but are not served.
-6. **Seven governance frameworks are stubs or planned**; FACTS now validates against its own schema, but six of its nine specs await the owner's hash approval.
-7. **No production deployment** (vision §P-12).
-8. **No clock discipline** (principle "one clock", owner 2026-10-18): the hub is not a time authority for anything attached to it, the OPC-UA converter invents a source time when the server sends none, nothing refuses a wrong clock, and a tag's source time is whatever the OPC-UA server chose to send (FB-088, FB-090 to FB-094; naive timestamps are rejected since FB-014, the hub stamps receipt since FB-087 and every link's offset is measured and alerted since FB-089, all 2026-10-20).
+5. **Seven governance frameworks are stubs or planned**; FACTS now validates against its own schema, but six of its nine specs await the owner's hash approval.
+6. **No production deployment** (vision §P-12).
+7. **No clock discipline** (principle "one clock", owner 2026-10-18): the hub is not a time authority for anything attached to it, the OPC-UA converter invents a source time when the server sends none, nothing refuses a wrong clock, and a tag's source time is whatever the OPC-UA server chose to send (FB-088, FB-090 to FB-094; naive timestamps are rejected since FB-014, the hub stamps receipt since FB-087 and every link's offset is measured and alerted since FB-089, all 2026-10-20).
 
 ---
 

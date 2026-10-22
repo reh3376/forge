@@ -9,11 +9,15 @@ Test categories:
 3. Record ingestion (/v1/records)
 4. Platform info (/v1/info)
 5. Curation mount (/curation/healthz)
+6. Context Engine and Schema Registry served by the hub (FB-001)
 """
 
 from __future__ import annotations
 
+import json
 import os
+import re
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -255,6 +259,123 @@ class TestCurationMount:
         assert resp.status_code == 200
         data = resp.json()
         assert data["service"] == "forge-curation"
+
+
+# ---------------------------------------------------------------------------
+# Context Engine and Schema Registry served by the hub (FB-001)
+# ---------------------------------------------------------------------------
+
+FATS_SPECS = sorted(Path("src/forge/governance/fats/specs").glob("*.json"))
+
+
+def _served(app) -> set[tuple[str, str]]:
+    """Every (METHOD, path) the hub serves, with path converters stripped."""
+    served: set[tuple[str, str]] = set()
+    for route in app.routes:
+        methods = getattr(route, "methods", None)
+        if not methods:
+            continue
+        path = re.sub(r"\{([^}:]+):[^}]+\}", r"{\1}", route.path)
+        served.update((method, path) for method in methods)
+    return served
+
+
+class TestHubServedServices:
+    @pytest.mark.asyncio
+    async def test_schema_registry_answers_under_the_hub(self, client):
+        body = {
+            "schema_id": "forge://schemas/forge-mes/Lot",
+            "name": "Lot",
+            "schema_type": "adapter_output",
+            "schema_json": {"type": "object", "properties": {"lot_id": {"type": "string"}}},
+        }
+        created = await client.post("/v1/schemas", json=body)
+        assert created.status_code == 201, created.text
+        assert created.json()["latest_version"] == 1
+
+        listed = await client.get("/v1/schemas")
+        assert listed.json()["total"] == 1
+        fetched = await client.get("/v1/schemas/forge://schemas/forge-mes/Lot")
+        assert fetched.status_code == 200 and fetched.json()["name"] == "Lot"
+        versions = await client.get("/v1/schemas/forge://schemas/forge-mes/Lot/versions")
+        assert [v["version"] for v in versions.json()] == [1]
+        assert (await client.delete("/v1/schemas/forge://schemas/forge-mes/Lot")).status_code == 204
+        assert (await client.get("/v1/schemas/forge://schemas/forge-mes/Lot")).status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_context_engine_answers_under_the_hub(self, client):
+        equipment = {
+            "equipment_id": "COOK-01",
+            "name": "Cooker 1",
+            "site": "WHK-Main",
+            "area": "Cooking",
+            "equipment_type": "cooker",
+        }
+        assert (await client.post("/v1/context/equipment", json=equipment)).status_code == 201
+        mode = {"equipment_id": "COOK-01", "mode": "PRODUCTION", "source": "test"}
+        assert (await client.post("/v1/context/modes", json=mode)).status_code == 201
+        bad_mode = {"equipment_id": "COOK-01", "mode": "production"}
+        assert (await client.post("/v1/context/modes", json=bad_mode)).status_code == 422
+
+        enriched = await client.post("/v1/context/enrich", json={"equipment_id": "COOK-01"})
+        assert enriched.status_code == 200, enriched.text
+        data = enriched.json()
+        assert data["site"] == "WHK-Main" and data["area"] == "Cooking"
+        assert data["operating_mode"] == "PRODUCTION"
+        assert "site" in data["fields_added"]
+
+        listed = await client.get("/v1/context/equipment", params={"site": "WHK-Main"})
+        assert [e["equipment_id"] for e in listed.json()] == ["COOK-01"]
+        assert (await client.delete("/v1/context/equipment/COOK-01")).status_code == 204
+        assert (await client.get("/v1/context/equipment/COOK-01")).status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_services_are_isolated_per_app(self, app, client):
+        """Each hub app owns its stores: nothing leaks between two apps."""
+        body = {
+            "schema_id": "forge://schemas/test/A",
+            "name": "A",
+            "schema_type": "adapter_output",
+            "schema_json": {"type": "object"},
+        }
+        assert (await client.post("/v1/schemas", json=body)).status_code == 201
+        with patch.dict(os.environ, {"FORGE_GRPC_ENABLED": "false"}):
+            other = create_app(storage_config=StorageConfig())
+        async with AsyncClient(transport=ASGITransport(app=other), base_url="http://t") as ac:
+            assert (await ac.get("/v1/schemas")).json()["total"] == 0
+
+    @pytest.mark.asyncio
+    async def test_info_names_the_served_services(self, client):
+        services = (await client.get("/v1/info")).json()["services"]
+        assert services == {
+            "context": "/v1/context",
+            "schemas": "/v1/schemas",
+            "curation": "/curation",
+        }
+
+    def test_every_fats_spec_names_a_route_the_hub_serves(self, app):
+        """A FATS spec declares an endpoint that MUST exist; the hub serves all 28."""
+        served = _served(app)
+        missing = []
+        for spec_file in FATS_SPECS:
+            spec = json.loads(spec_file.read_text())
+            if (spec["method"], spec["endpoint"]) not in served:
+                missing.append(f"{spec['method']} {spec['endpoint']} ({spec_file.name})")
+        assert missing == []
+        assert len(FATS_SPECS) == 28
+
+    def test_every_context_and_registry_route_has_a_fats_spec(self, app):
+        declared = set()
+        for spec_file in FATS_SPECS:
+            spec = json.loads(spec_file.read_text())
+            declared.add((spec["method"], spec["endpoint"]))
+        hub_served = {
+            (method, path)
+            for method, path in _served(app)
+            if path.startswith(("/v1/context", "/v1/schemas"))
+        }
+        assert hub_served <= declared, sorted(hub_served - declared)
+        assert len(hub_served) == 21
 
 
 # ---------------------------------------------------------------------------

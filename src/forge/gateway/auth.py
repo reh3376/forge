@@ -82,6 +82,9 @@ def _scopes_for_role(role: Role) -> frozenset[str]:
                 "records:write",
                 "adapters:write",
                 "adapters:register",
+                # Operators run batches and set modes (FB-001); schema
+                # changes stay with admin until the role model (D-1, FB-007).
+                "context:write",
             }
         )
     if role == Role.ADMIN:

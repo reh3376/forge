@@ -25,7 +25,7 @@ from forge.context.models import (
     ShiftDefinition,
     ShiftSchedule,
 )
-from forge.context.service import create_context_app
+from forge.context.service import build_context_router, create_context_app
 from forge.context.shift import build_louisville_schedule, resolve_shift
 
 __all__ = [
@@ -46,6 +46,7 @@ __all__ = [
     "PostgresEquipmentStore",
     "ShiftDefinition",
     "ShiftSchedule",
+    "build_context_router",
     "build_louisville_schedule",
     "create_context_app",
     "resolve_shift",

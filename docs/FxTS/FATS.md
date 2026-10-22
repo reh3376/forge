@@ -24,6 +24,10 @@ FATS governs API contracts. When a FATS spec declares an endpoint, that endpoint
 | **Response** | Success status code, error format, latency | Status code match, structure, timing |
 | **Rate Limit** | Requests per minute | Rate limit field present |
 
+## Specs
+
+**Location:** `src/forge/governance/fats/specs/` — 28 specs, one per route the hub app serves on its own (platform, Context Engine under `/v1/context`, Schema Registry under `/v1/schemas`). `tests/api/test_hub_api.py` holds the inventory in both directions: every spec's endpoint is served by the hub, and every served Context Engine and Schema Registry route has a spec (FB-001, 2026-10-22).
+
 ## Schema
 
 **Location:** `src/forge/governance/fats/schema/fats.schema.json`

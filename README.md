@@ -243,7 +243,7 @@ FxTS is **spec-first governance** — the specs define what must exist and the c
 
 | Framework | Governs | State |
 |-----------|---------|-------|
-| **FATS** | API contracts: routes, shapes, status codes | schema, runner, 21 specs |
+| **FATS** | API contracts: routes, shapes, status codes | schema, runner, 28 specs (one per hub route) |
 | **FACTS** | Adapter conformance: identity, capabilities, lifecycle, connection, data contract, context mapping, error handling | schema, runner, 9 specs |
 | **FTTS** | Transport: TLS, tokens, streaming behaviour | schema, runner, 1 spec |
 | **FVTS** | Module ↔ display contract: points, alarms, actions, surfaces, profiles | schema, runner, reference renderer, 1 spec |
@@ -401,4 +401,4 @@ Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE
 
 ---
 
-*348 Python source files | 253 test files | 4,251 tests | 9 FACTS · 21 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
+*348 Python source files | 253 test files | 4,301 tests | 9 FACTS · 28 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
