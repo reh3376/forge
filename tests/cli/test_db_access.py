@@ -1,4 +1,4 @@
-"""``forge db access``: grants persist, credentials are issued once (FB-057 step 1)."""
+"""``forge db access``: grants persist, credentials are issued once (FB-057 step 1, FB-003)."""
 
 from __future__ import annotations
 
@@ -35,7 +35,8 @@ def test_grant_list_revoke(store: InMemoryPermissionStore) -> None:
 
     result = runner.invoke(app, ["db", "access", "grant", "forge-mes", "forge_core", "write"])
     assert result.exit_code != 0 and "protected" in result.output
-    assert [e.action for e in store.audit] == ["grant"]  # refusal not persisted (nothing changed)
+    assert ("forge-mes", "forge_core") not in store.permissions
+    assert [e.action for e in store.audit] == ["grant", "access_denied"]  # the refusal is audited
 
     result = runner.invoke(app, ["db", "access", "list"])
     assert result.exit_code == 0 and "forge-mes" in result.output and "admin" in result.output
@@ -43,7 +44,7 @@ def test_grant_list_revoke(store: InMemoryPermissionStore) -> None:
     result = runner.invoke(app, ["db", "access", "revoke", "forge-mes", "mod_mes"])
     assert result.exit_code == 0 and "Revoked" in result.output
     assert store.permissions[("forge-mes", "mod_mes")].active is False
-    assert [e.action for e in store.audit] == ["grant", "revoke"]
+    assert [e.action for e in store.audit] == ["grant", "access_denied", "revoke"]
     assert "No active grants" in runner.invoke(app, ["db", "access", "list"]).output
     assert runner.invoke(app, ["db", "access", "revoke", "forge-mes", "mod_mes"]).exit_code == 1
 

@@ -95,24 +95,77 @@ class TestAlembicConfig:
         assert (MIGRATIONS_DIR / "env.py").is_file()
 
 
+def _upgrade_and_downgrade(name: str) -> tuple[str, str]:
+    """The source of a migration's ``upgrade()`` and ``downgrade()``."""
+    source = (VERSIONS_DIR / name).read_text()
+    upgrade, downgrade = source.split("\ndef downgrade")
+    return upgrade, downgrade
+
+
+def _tables_in(source: str) -> dict[str, set[str]]:
+    """Table name → column names for every ``op.create_table`` in ``source``."""
+    import re
+
+    found = re.findall(r'op\.create_table\(\s*"(\w+)",(.*?)schema="forge_core"', source, re.S)
+    return {table: set(re.findall(r'sa\.Column\(\s*"(\w+)"', body)) for table, body in found}
+
+
 class TestMigration008:
-    """008 persists ModulePermission rows and the access audit (FB-057)."""
+    """008 persists ModulePermission rows and the access audit (FB-057, corrected by FB-003)."""
 
     def test_008_permission_columns_match_model(self):
         import dataclasses
-        import re
 
         from forge.storage.access import AccessAuditEntry, ModulePermission
 
-        source = (VERSIONS_DIR / "008_module_permissions.py").read_text()
-        tables = dict(
-            re.findall(r'op\.create_table\(\s*"(\w+)",(.*?)schema="forge_core"', source, re.S)
-        )
+        upgrade, _ = _upgrade_and_downgrade("008_module_permissions.py")
+        tables = _tables_in(upgrade)
         assert set(tables) == {"module_permissions", "access_audit"}
-        permission_columns = set(re.findall(r'sa\.Column\("(\w+)"', tables["module_permissions"]))
-        assert permission_columns == {f.name for f in dataclasses.fields(ModulePermission)}
-        audit_columns = set(re.findall(r'sa\.Column\("(\w+)"', tables["access_audit"]))
-        assert audit_columns == {f.name for f in dataclasses.fields(AccessAuditEntry)} | {"id"}
+        assert tables["module_permissions"] == {
+            f.name for f in dataclasses.fields(ModulePermission)
+        }
+        assert tables["access_audit"] == {f.name for f in dataclasses.fields(AccessAuditEntry)} | {
+            "id"
+        }
+
+    def test_008_replaces_the_001_tables_and_its_downgrade_restores_them(self):
+        """001 had created module_permissions (surrogate key) and access_audit_log; 008 re-created
+        the first and failed on every migrated database (FB-003)."""
+        upgrade, downgrade = _upgrade_and_downgrade("008_module_permissions.py")
+        assert upgrade.index('op.drop_table("module_permissions"') < upgrade.index(
+            'op.create_table(\n        "module_permissions"'
+        )
+        assert 'op.drop_table("access_audit_log", schema="forge_core")' in upgrade
+        assert "primary_key=True" in upgrade.split('"module_id"')[1].split("\n")[0]
+        assert "primary_key=True" in upgrade.split('"schema_name"')[1].split("\n")[0]
+        original, _ = _upgrade_and_downgrade("001_forge_core_schema.py")
+        restored = _tables_in(downgrade)
+        assert set(restored) == {"module_permissions", "access_audit_log"}
+        assert restored == {name: _tables_in(original)[name] for name in restored}
+
+    def test_upsert_conflicts_on_the_008_key(self):
+        from forge.storage.access import _UPSERT_PERMISSION
+
+        assert "ON CONFLICT (module_id, schema_name)" in _UPSERT_PERMISSION
+
+
+class TestOnlineRuns:
+    """Online runs go through asyncpg, the one PostgreSQL driver the project declares (FB-003)."""
+
+    def test_async_url_switches_the_driver(self):
+        from forge.storage.migrations.run import async_url
+
+        assert async_url("postgresql://u:p@h:5432/db") == "postgresql+asyncpg://u:p@h:5432/db"
+        assert async_url("postgresql+asyncpg://u:p@h/db") == "postgresql+asyncpg://u:p@h/db"
+        assert async_url("postgresql://u:p%40ss@h/db") == "postgresql+asyncpg://u:p%40ss@h/db"
+
+    def test_env_uses_the_async_engine_and_the_project_declares_its_extra(self):
+        env = (MIGRATIONS_DIR / "env.py").read_text()
+        assert "create_async_engine(async_url(" in env
+        code = env.split('"""')[2]  # the docstring explains psycopg2; the code never names it
+        assert "psycopg" not in code
+        pyproject = (MIGRATIONS_DIR.parents[3] / "pyproject.toml").read_text()
+        assert '"sqlalchemy[asyncio]>=' in pyproject  # greenlet, for run_sync
 
 
 def _insert_columns(sql: str) -> set[str]:
@@ -125,12 +178,9 @@ def _insert_columns(sql: str) -> set[str]:
 
 
 def _migration_tables(name: str) -> dict[str, set[str]]:
-    """Table name → column names for every ``op.create_table`` in a migration."""
-    import re
-
-    source = (VERSIONS_DIR / name).read_text()
-    found = re.findall(r'op\.create_table\(\s*"(\w+)",(.*?)schema="forge_core"', source, re.S)
-    return {table: set(re.findall(r'sa\.Column\(\s*"(\w+)"', body)) for table, body in found}
+    """Table name → column names for every ``op.create_table`` in a migration's upgrade."""
+    upgrade, _ = _upgrade_and_downgrade(name)
+    return _tables_in(upgrade)
 
 
 class TestMigration009:

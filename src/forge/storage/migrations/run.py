@@ -15,6 +15,21 @@ logger = logging.getLogger(__name__)
 _MIGRATIONS_DIR = Path(__file__).parent
 
 
+def async_url(dsn: str) -> str:
+    """``postgresql://`` → ``postgresql+asyncpg://`` (any other driver name is kept).
+
+    Online migrations connect through asyncpg, the one PostgreSQL driver the
+    project declares (FB-003); a plain ``postgresql://`` URL would make
+    SQLAlchemy look for psycopg2, which is not installed.
+    """
+    from sqlalchemy.engine import make_url
+
+    url = make_url(dsn)
+    if url.drivername == "postgresql":
+        url = url.set(drivername="postgresql+asyncpg")
+    return url.render_as_string(hide_password=False)
+
+
 def run_alembic(command: str, target: str = "postgres", steps: int | None = None) -> None:
     """Run Alembic migrations for the specified target database.
 

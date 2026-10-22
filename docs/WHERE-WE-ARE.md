@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 62) · **Owner:** reh3376
+**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 63) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -22,7 +22,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 352 files, ~68,000 lines |
-| Python tests | 256 files, ~55,200 lines, 4,131 test functions (4,386 collected); full suite green on 2026-10-22 |
+| Python tests | 256 files, ~55,400 lines, 4,141 test functions (4,396 collected); full suite green on 2026-10-22 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
@@ -65,7 +65,7 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 | Curation service mounted | ✅ | `/curation`; one curation engine builds each data product's pipeline from its `CurationSpec` and runs it on ingest for the published products the adapter feeds, curated records persisted with the raw ones (FB-009, 2026-10-22) |
 | Context Engine (F21) and Schema Registry (F20) | ✅ | Served by the hub under `/v1/context` and `/v1/schemas` (FB-001); Postgres stores through the factory, migration 009 (FB-005); both 2026-10-22 |
 | Gateway: auth, RBAC, rate limiting | 🟡 | Middleware exists; auth off by default; only state-changing routes carry a scope (`adapters:write`, `context:write`, `schemas:write`), reads are open (FB-007) |
-| Access controller persistence | 🟡 | In-memory only; Postgres controller unimplemented (FB-003) |
+| Access controller persistence | ✅ | `PersistentAccessController` over `forge_core.module_permissions` / `access_audit` (migration 008), handed out by the storage factory and run by `forge db access` (FB-003, 2026-10-22) |
 | Registry/equipment tables in Postgres | ✅ | Migration 009 (FB-005, 2026-10-22) |
 | Observer | 🟡 | Package exists; no SLO/FOTS wiring |
 | CLI `forge` | ✅ | adapter list/status, governance run/validate-spec, migrate up/status/down, db access grant/revoke/list/issue |
@@ -77,8 +77,8 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 | Engines: PostgreSQL, TimescaleDB, Neo4j, Redis | ✅ | `forge.storage.engines` |
 | Storage router and factory | ✅ | |
 | Schema references: one grammar (`forge://schemas/<spoke>[/<Entity>][/v<version>]`), three roles, held at every boundary | ✅ | `forge.core.schema_ref` (FB-008, 2026-10-22); the two registries themselves are not converged (FB-097) |
-| Versioned migrations (10) | ✅ | |
-| Forge-issued module database credentials (`forge db access`) | ✅ | FB-057 step 1, migration 008; password printed once, never stored |
+| Versioned migrations (10) | ✅ | Online runs through asyncpg on SQLAlchemy's async engine (FB-003); 008 replaces the two 001 tables it had collided with; 002's downgrade open (FB-098) |
+| Forge-issued module database credentials (`forge db access`) | ✅ | FB-057 step 1, migration 008, on the persistent controller since FB-003; password printed once, never stored |
 | `mod_mes` schema in the hub (MES data moves in) | ⬜ | FB-057 steps 2–5, after the FB-076 design |
 | Backups, restore procedure | ⬜ | No backlog id yet |
 

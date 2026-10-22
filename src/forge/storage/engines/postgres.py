@@ -5,7 +5,7 @@ as the InMemory variants:
     - PostgresProductStore  → ProductStore
     - PostgresLineageStore  → LineageStore
     - PostgresSchemaRegistry → wraps SchemaRegistry with PG persistence
-    - PostgresAccessController → wraps AccessController with PG persistence
+    - PostgresAccessController → AccessController whose grants persist (FB-003)
 
 All classes accept an asyncpg connection pool and fall back to returning
 empty results (not raising) when the pool is unavailable, so callers can
@@ -28,6 +28,7 @@ from forge.core.models.data_product import (
 )
 from forge.curation.lineage import LineageEntry, LineageStore, TransformationStep
 from forge.curation.registry import ProductStore
+from forge.storage.access import PersistentAccessController, PostgresPermissionStore
 
 logger = logging.getLogger(__name__)
 
@@ -383,3 +384,19 @@ class PostgresLineageStore(LineageStore):
             steps=steps,
             created_at=row["created_at"],
         )
+
+
+# ---------------------------------------------------------------------------
+# Access controller (FB-003)
+# ---------------------------------------------------------------------------
+
+
+class PostgresAccessController(PersistentAccessController):
+    """:class:`PersistentAccessController` over ``forge_core.module_permissions`` and its audit.
+
+    The tables are migration 008; ``forge db access`` writes the same rows, so
+    a grant made at the CLI is what the hub loads.
+    """
+
+    def __init__(self, pool: Any) -> None:
+        super().__init__(PostgresPermissionStore(pool))

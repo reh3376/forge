@@ -18,6 +18,7 @@ from forge.storage.access import (
     AccessLevel,
     InMemoryPermissionStore,
     ModulePermission,
+    PersistentAccessController,
     PostgresPermissionStore,
     module_schema,
     provisioning_statements,
@@ -186,3 +187,104 @@ async def test_postgres_permission_store_sql(mock_pool) -> None:
     rows = await store.list_permissions()
     assert conn.fetch.call_args.args == (_SELECT_PERMISSIONS,)
     assert rows == [perm]
+
+
+# ---------------------------------------------------------------------------
+# PersistentAccessController (FB-003): grants and audit outlive the process
+# ---------------------------------------------------------------------------
+
+
+def test_prepare_connection_then_record_issued_is_issue_connection() -> None:
+    ac = AccessController()
+    ac.grant("forge-mes", "mod_mes", AccessLevel.WRITE)
+    grant = ac.prepare_connection("forge-mes", pg_host="db", password="pw")
+    assert [e.action for e in ac.audit_log] == ["grant"]  # nothing issued yet
+    assert grant.connection_string == "postgresql://forge_mod_mes:pw@db:5432/forge?schema=mod_mes"
+    ac.record_issued(grant, provisioned=False)
+    assert ac.audit_log[-1].action == "connection_issued"
+    assert ac.audit_log[-1].reason == "role=forge_mod_mes provisioned=no"
+    same = ac.issue_connection("forge-mes", pg_host="db", password="pw")
+    assert same.connection_string == grant.connection_string
+    assert same.statements == grant.statements
+
+
+async def test_persistent_controller_loads_grants_and_writes_every_change() -> None:
+    store = InMemoryPermissionStore()
+    await store.upsert(ModulePermission("forge-mes", "mod_mes", AccessLevel.WRITE, granted_at=T0))
+    controller = await PersistentAccessController.open(store)
+    assert controller.store is store
+    assert controller.check("forge-mes", "mod_mes", AccessLevel.WRITE)
+    assert [p.schema_name for p in controller.list_grants("forge-mes")] == ["mod_mes"]
+
+    perm = await controller.grant(
+        "forge-mes", "forge_canonical", AccessLevel.READ, granted_by="roger"
+    )
+    assert store.permissions[("forge-mes", "forge_canonical")] is perm
+    assert [e.action for e in store.audit] == ["grant"]
+
+    with pytest.raises(ValueError, match="protected"):
+        await controller.grant("forge-mes", "forge_core", AccessLevel.WRITE)
+    assert ("forge-mes", "forge_core") not in store.permissions
+    assert [e.action for e in store.audit] == ["grant", "access_denied"]  # the refusal too
+
+    assert await controller.revoke("forge-mes", "forge_canonical") is True
+    assert store.permissions[("forge-mes", "forge_canonical")].active is False
+    assert await controller.revoke("forge-mes", "forge_canonical") is False
+    assert [e.action for e in store.audit] == ["grant", "access_denied", "revoke"]
+    assert controller.grant_count == 1
+    assert controller.list_modules_for_schema("mod_mes") == ["forge-mes"]
+    assert controller.audit_log == controller.controller.audit_log
+
+    # What the hub loads tomorrow is what the CLI granted today.
+    again = await PersistentAccessController.open(store)
+    assert [p.schema_name for p in again.all_permissions()] == ["mod_mes", "forge_canonical"]
+    assert [p.schema_name for p in again.list_grants("forge-mes")] == ["mod_mes"]
+    assert await again.load() == 2
+
+
+async def test_persistent_controller_issues_through_an_awaited_provisioner() -> None:
+    store = InMemoryPermissionStore()
+    controller = await PersistentAccessController.open(store)
+    await controller.grant("forge-mes", "mod_mes", AccessLevel.WRITE)
+    ran: list[list[str]] = []
+
+    async def provision(statements) -> None:
+        ran.append(list(statements))
+
+    grant = await controller.issue_connection(
+        "forge-mes", pg_host="db", password="pw", provisioner=provision
+    )
+    assert ran == [grant.statements]
+    assert grant.connection_string == "postgresql://forge_mod_mes:pw@db:5432/forge?schema=mod_mes"
+    issued = [e for e in store.audit if e.action == "connection_issued"]
+    assert len(issued) == 1 and issued[0].reason == "role=forge_mod_mes provisioned=yes"
+    assert "pw" not in issued[0].reason and "pw" not in issued[0].schema_name
+
+    # A plain callable is fine too; one that fails leaves no "issued" entry behind.
+    def plain(statements) -> None:
+        ran.append(list(statements))
+
+    await controller.issue_connection("forge-mes", password="pw2", provisioner=plain)
+    assert len(ran) == 2
+
+    def broken(statements) -> None:
+        raise RuntimeError("database down")
+
+    with pytest.raises(RuntimeError, match="database down"):
+        await controller.issue_connection("forge-mes", provisioner=broken)
+    assert len([e for e in store.audit if e.action == "connection_issued"]) == 2
+
+    with pytest.raises(ValueError, match="no active permission"):
+        await controller.issue_connection("nobody")
+    assert store.audit[-1].action == "access_denied"
+
+
+def test_postgres_access_controller_is_the_persistent_controller_over_forge_core(
+    mock_pool,
+) -> None:
+    from forge.storage.engines import PostgresAccessController
+
+    pool, _ = mock_pool
+    controller = PostgresAccessController(pool)
+    assert isinstance(controller, PersistentAccessController)
+    assert isinstance(controller.store, PostgresPermissionStore)
