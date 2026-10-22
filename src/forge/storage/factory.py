@@ -10,6 +10,8 @@ Usage::
     factory = StorageFactory(pool_manager)
     product_store = factory.product_store()    # Postgres or InMemory
     lineage_store = factory.lineage_store()    # Postgres or InMemory
+    schema_store  = factory.schema_store()     # Postgres or InMemory (FB-005)
+    equipment     = factory.equipment_store()  # Postgres or InMemory (FB-005)
     ts_writer     = factory.timescale_writer() # Timescale or None
     graph_writer  = factory.graph_writer()     # Neo4j or None
     state_cache   = factory.state_cache()      # Redis or None
@@ -19,8 +21,11 @@ from __future__ import annotations
 
 import logging
 
+from forge.context.equipment import EquipmentStore, InMemoryEquipmentStore, PostgresEquipmentStore
 from forge.curation.lineage import InMemoryLineageStore, LineageStore
 from forge.curation.registry import InMemoryProductStore, ProductStore
+from forge.registry.postgres_store import PostgresSchemaStore
+from forge.registry.store import InMemorySchemaStore, SchemaStore
 from forge.storage.adapter_registry import (
     AdapterRegistryStore,
     InMemoryAdapterRegistryStore,
@@ -75,6 +80,32 @@ class StorageFactory:
             return PostgresAdapterRegistryStore(pool)
         logger.info("PostgreSQL unavailable — using InMemoryAdapterRegistryStore")
         return InMemoryAdapterRegistryStore()
+
+    def schema_store(self) -> SchemaStore:
+        """Return the Schema Registry's PostgresSchemaStore if PG pool available, else InMemory.
+
+        The tables are migration 009 (FB-005); the hub serves the registry
+        under ``/v1/schemas`` (FB-001).
+        """
+        pool = self._pools.postgres
+        if pool is not None:
+            logger.info("Using PostgresSchemaStore")
+            return PostgresSchemaStore(pool)
+        logger.info("PostgreSQL unavailable — using InMemorySchemaStore")
+        return InMemorySchemaStore()
+
+    def equipment_store(self) -> EquipmentStore:
+        """Return the Context Engine's PostgresEquipmentStore if PG pool available, else InMemory.
+
+        The table is migration 009 (FB-005); the hub serves the Context
+        Engine under ``/v1/context`` (FB-001).
+        """
+        pool = self._pools.postgres
+        if pool is not None:
+            logger.info("Using PostgresEquipmentStore")
+            return PostgresEquipmentStore(pool)
+        logger.info("PostgreSQL unavailable — using InMemoryEquipmentStore")
+        return InMemoryEquipmentStore()
 
     # ------------------------------------------------------------------
     # TimescaleDB
@@ -146,6 +177,8 @@ class StorageFactory:
             "product_store": "postgres" if self._pools.postgres else "in_memory",
             "lineage_store": "postgres" if self._pools.postgres else "in_memory",
             "adapter_registry_store": "postgres" if self._pools.postgres else "in_memory",
+            "schema_store": "postgres" if self._pools.postgres else "in_memory",
+            "equipment_store": "postgres" if self._pools.postgres else "in_memory",
             "timescale_writer": "timescale" if self._pools.timescale else "unavailable",
             "graph_writer": "neo4j" if self._pools.neo4j else "unavailable",
             "state_cache": "redis" if self._pools.redis else "unavailable",
