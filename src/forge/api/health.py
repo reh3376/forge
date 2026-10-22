@@ -245,18 +245,20 @@ async def check_kafka(bootstrap_servers: str) -> ComponentHealth:
 
 
 async def check_rabbitmq(url: str) -> ComponentHealth:
-    """Check RabbitMQ connectivity via aio-pika."""
+    """Check RabbitMQ connectivity via aio-pika.
+
+    A plain (not robust) connection: the probe is one-shot, and a robust
+    connection would keep reconnecting in the background after the check
+    returned. Opening a channel proves the broker accepts AMQP, the
+    credentials and the vhost; nothing is declared, since the broker refuses
+    ``exchange.declare`` on the default exchange.
+    """
     import aio_pika
 
-    connection = await aio_pika.connect_robust(url, timeout=_CHECK_TIMEOUT)
+    connection = await aio_pika.connect(url, timeout=_CHECK_TIMEOUT)
     try:
         channel = await connection.channel()
-        # Declare a passive check on the default exchange
-        await channel.declare_exchange(
-            "",
-            aio_pika.ExchangeType.DIRECT,
-            passive=True,
-        )
+        await channel.close()
         return ComponentHealth(
             name="rabbitmq",
             status=ComponentStatus.OK,

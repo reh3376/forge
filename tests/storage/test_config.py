@@ -109,6 +109,12 @@ class TestStorageConfig:
         assert cfg.redis.url == "redis://redis.prod:6380/1"
         assert cfg.rabbitmq.url == "amqp://prod:secret@rmq.prod:5672/forge"
 
+    def test_minio_secure_from_env(self, monkeypatch):
+        monkeypatch.delenv("MINIO_SECURE", raising=False)
+        assert StorageConfig.from_env().minio.secure is False
+        monkeypatch.setenv("MINIO_SECURE", "TRUE")
+        assert StorageConfig.from_env().minio.secure is True
+
     def test_from_env_defaults(self):
         cfg = StorageConfig.from_env()
         assert cfg.postgres.host == "localhost"

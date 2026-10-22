@@ -4,19 +4,26 @@ Validates:
 1. HealthOrchestrator — concurrent probing, timeout handling, aggregation
 2. ComponentHealth — status enum, latency tracking
 3. PlatformHealth — status rollup (healthy/degraded/unhealthy)
+4. The RabbitMQ and MinIO probes (FB-006), against stand-in client modules
 """
 
 from __future__ import annotations
 
 import asyncio
+import sys
+from functools import partial
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from forge.api.health import (
+    _CHECK_TIMEOUT,
     ComponentHealth,
     ComponentStatus,
     HealthOrchestrator,
     PlatformHealth,
+    check_minio,
+    check_rabbitmq,
 )
 
 # ---------------------------------------------------------------------------
@@ -251,3 +258,76 @@ class TestHealthOrchestrator:
         result = await orch.check_all()
         # 3 OK out of 5 → degraded (not all OK)
         assert result.status == "degraded"
+
+
+# ---------------------------------------------------------------------------
+# RabbitMQ and MinIO probes (FB-006)
+# ---------------------------------------------------------------------------
+
+
+def _fake_aio_pika(channel_error: Exception | None = None):
+    """An ``aio_pika`` stand-in whose ``connect`` yields a connection with a channel."""
+    module = MagicMock()
+    channel = AsyncMock()
+    connection = AsyncMock()
+    connection.channel = AsyncMock(return_value=channel, side_effect=channel_error)
+    module.connect = AsyncMock(return_value=connection)
+    return module, connection, channel
+
+
+class TestRabbitMQProbe:
+    @pytest.mark.asyncio
+    async def test_opens_and_closes_a_channel_on_a_plain_connection(self):
+        module, connection, channel = _fake_aio_pika()
+        with patch.dict(sys.modules, {"aio_pika": module}):
+            result = await check_rabbitmq("amqp://forge:x@rmq:5672/")
+        assert result.name == "rabbitmq" and result.status == ComponentStatus.OK
+        module.connect.assert_awaited_once_with("amqp://forge:x@rmq:5672/", timeout=_CHECK_TIMEOUT)
+        # One-shot probe: no robust connection that would keep reconnecting afterwards.
+        module.connect_robust.assert_not_called()
+        channel.close.assert_awaited_once()
+        connection.close.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_closes_the_connection_when_the_channel_fails(self):
+        module, connection, _ = _fake_aio_pika(channel_error=RuntimeError("vhost refused"))
+        with patch.dict(sys.modules, {"aio_pika": module}), pytest.raises(RuntimeError):
+            await check_rabbitmq("amqp://forge:x@rmq:5672/")
+        connection.close.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_the_orchestrator_reports_a_refused_broker_as_unreachable(self):
+        module = MagicMock()
+        module.connect = AsyncMock(side_effect=ConnectionRefusedError("refused"))
+        orch = HealthOrchestrator()
+        orch.register("rabbitmq", partial(check_rabbitmq, "amqp://forge:x@rmq:5672/"))
+        with patch.dict(sys.modules, {"aio_pika": module}):
+            health = await orch.check_all()
+        assert health.status == "unhealthy"
+        assert health.components["rabbitmq"]["status"] == "unreachable"
+        assert "refused" in health.components["rabbitmq"]["message"]
+
+
+class TestMinioProbe:
+    @pytest.mark.asyncio
+    async def test_lists_buckets_with_the_configured_credentials(self):
+        module = MagicMock()
+        module.Minio.return_value.list_buckets.return_value = ["forge-archive", "forge-docs"]
+        with patch.dict(sys.modules, {"minio": module}):
+            result = await check_minio("minio:9000", "forge", "secret", secure=True)
+        assert result.name == "minio" and result.status == ComponentStatus.OK
+        assert result.details == {"bucket_count": 2}
+        module.Minio.assert_called_once_with(
+            "minio:9000", access_key="forge", secret_key="secret", secure=True
+        )
+
+    @pytest.mark.asyncio
+    async def test_the_orchestrator_reports_a_failed_listing_as_unreachable(self):
+        module = MagicMock()
+        module.Minio.return_value.list_buckets.side_effect = OSError("connection refused")
+        orch = HealthOrchestrator()
+        orch.register("minio", partial(check_minio, "minio:9000", "forge", "secret"))
+        with patch.dict(sys.modules, {"minio": module}):
+            health = await orch.check_all()
+        assert health.components["minio"]["status"] == "unreachable"
+        assert "connection refused" in health.components["minio"]["message"]

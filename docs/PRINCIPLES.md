@@ -122,7 +122,7 @@ The OT tier's vocabulary gap in FACTS v0.1.0 is decision D-8 (FB-079).
 | Hub ↔ spoke transport | gRPC with compiled protobuf; mTLS both directions (FTTS) | In force |
 | Module events | RabbitMQ topic exchange (the `wh.whk01.distillery01.*` proto-UNS); Kafka is in the compose stack as the enterprise bus when volume requires it | In force (RabbitMQ), planned (Kafka) |
 | Relational / time series / graph | PostgreSQL 16 · TimescaleDB · Neo4j 5 | In force; hub-owned (A-6), module schemas `mod_<name>` |
-| Object store · cache | MinIO · Redis | In the compose stack; health checks pending (FB-006) |
+| Object store · cache | MinIO · Redis | In the compose stack; probed by the hub's health orchestrator (FB-006, 2026-10-22) |
 | Observability | OpenTelemetry + Grafana | Planned (FOTS) |
 | Deployment | Docker Compose for development only; Kubernetes for production (P-12) | Compose in force; Kubernetes not started |
 | Governance specs | JSON (UxTS convention), hashed and owner-approved (FHTS) | In force |
