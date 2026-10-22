@@ -35,8 +35,10 @@ from forge.api.health import (
     HealthOrchestrator,
     PlatformHealth,
     check_kafka,
+    check_minio,
     check_neo4j,
     check_postgres,
+    check_rabbitmq,
     check_redis,
     check_timescaledb,
 )
@@ -242,6 +244,19 @@ def create_app(
     )
     health_orch.register("redis", partial(check_redis, config.redis.url))
     health_orch.register("kafka", partial(check_kafka, config.kafka.bootstrap_servers))
+    # The two remaining compose-stack components (FB-006); every registered
+    # check feeds both /v1/health and the /readyz verdict.
+    health_orch.register("rabbitmq", partial(check_rabbitmq, config.rabbitmq.url))
+    health_orch.register(
+        "minio",
+        partial(
+            check_minio,
+            config.minio.endpoint,
+            config.minio.access_key,
+            config.minio.secret_key,
+            config.minio.secure,
+        ),
+    )
 
     # gRPC server (lazy start — only if spoke transport is enabled). TLS for the
     # spoke → hub direction comes from FORGE_GRPC_TLS_CERT/_KEY (+ _CA for mTLS);

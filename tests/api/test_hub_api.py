@@ -99,8 +99,17 @@ class TestHealthEndpoints:
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] in ("healthy", "degraded", "unhealthy")
-        assert "components" in data
         assert "uptime_seconds" in data
+        # Every compose-stack component is probed (RabbitMQ and MinIO since FB-006).
+        assert set(data["components"]) == {
+            "postgres",
+            "timescaledb",
+            "neo4j",
+            "redis",
+            "kafka",
+            "rabbitmq",
+            "minio",
+        }
 
     @pytest.mark.asyncio
     async def test_readyz_returns_status(self, client):

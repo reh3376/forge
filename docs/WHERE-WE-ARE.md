@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 56) · **Owner:** reh3376
+**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 57) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -22,7 +22,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 349 files, ~67,500 lines |
-| Python tests | 254 files, ~54,400 lines, 4,086 test functions (4,319 collected); full suite green on 2026-10-22 |
+| Python tests | 254 files, ~54,500 lines, 4,092 test functions (4,325 collected); full suite green on 2026-10-22 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
@@ -173,6 +173,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 |---|---|---|
 | Docker Compose (postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio, forge-init, forge-hub) | ✅ dev only | `deploy/docker` |
 | Hub container image | ✅ | `deploy/docker/Dockerfile.forge` |
+| Hub health probes (`/v1/health`, `/readyz`) | ✅ | All seven compose-stack components (postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio) since FB-006 (2026-10-22) |
 | Kubernetes production deployment | ⬜ | owner note; no backlog id |
 | Backups, SLOs, performance baselines | ⬜ | FOTS/FPTS planned |
 
