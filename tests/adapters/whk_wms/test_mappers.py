@@ -112,6 +112,12 @@ class TestMapLot:
         lot = map_lot(self._raw(bblTotal=50))
         assert lot.unit_count == 50
 
+    def test_maps_item_reference(self):
+        """FB-010: the lot's MaterialItem by source_id when the WMS attaches one."""
+        assert map_lot(self._raw()).item_id is None
+        assert map_lot(self._raw(itemId="ITEM-7")).item_id == "ITEM-7"
+        assert map_lot(self._raw(item_id="ITEM-8")).item_id == "ITEM-8"
+
     def test_missing_id_returns_none(self):
         assert map_lot({"lotNumber": "LOT-001"}) is None
 

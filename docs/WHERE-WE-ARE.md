@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 63) · **Owner:** reh3376
+**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 64) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -22,7 +22,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 352 files, ~68,000 lines |
-| Python tests | 256 files, ~55,400 lines, 4,141 test functions (4,396 collected); full suite green on 2026-10-22 |
+| Python tests | 256 files, ~55,400 lines, 4,145 test functions (4,400 collected); full suite green on 2026-10-22 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
@@ -130,7 +130,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Capability | State | Notes |
 |---|---|---|
 | Python module builder (manifest builder, scaffolder, generators, `forge module init`) | 🟡 | Adapter-style, backend-only templates (FB-017); duplicate SDK copies drift (FB-019) |
-| Go models mirroring the core models | ✅ | `go/internal/models` (1,534 lines); drop Python defaults (FB-016) |
+| Go models mirroring the core models | ✅ | `go/internal/models` (1,244 lines without tests); `Lot.item_id` with the Python model (FB-010); drop Python defaults (FB-016) |
 | Go scaffold | 🟡 | `go/internal/scaffold` (112 lines); not a module template yet |
 | `forged` daemon, `forgectl` | ⬜ | 22- and 36-line placeholders |
 | Template module copies (`modules/Forge CMMS`, `Forge ERPI`, `Forge DB Orchestration`) | 🟡 | adapter templates, not Go modules |

@@ -126,6 +126,25 @@ class TestMapLot:
         assert result is not None
         assert result.recipe_id == "RCP-001"
 
+    def test_lot_item_reference(self):
+        """FB-010: itemId names the item; the MES item list gives the first, the rest stay."""
+        single = map_lot({"id": "l", "globalId": "G", "itemId": "I-1"})
+        assert single is not None and single.item_id == "I-1"
+        assert "item_ids" not in single.metadata
+
+        listed = map_lot({"id": "l", "globalId": "G", "item": [{"id": "I-1"}, {"id": "I-2"}]})
+        assert listed is not None and listed.item_id == "I-1"
+        assert listed.metadata["item_ids"] == ["I-1", "I-2"]
+
+        one = map_lot({"id": "l", "globalId": "G", "itemIds": ["I-9"]})
+        assert one is not None and one.item_id == "I-9" and "item_ids" not in one.metadata
+
+        explicit = map_lot({"id": "l", "globalId": "G", "itemId": "I-0", "items": ["I-1"]})
+        assert explicit is not None and explicit.item_id == "I-0"
+
+        container = map_lot({"id": "l", "globalId": "G", "continerItemId": "C-1"})
+        assert container is not None and container.item_id is None
+
 
 # ---------------------------------------------------------------------------
 # Physical Asset

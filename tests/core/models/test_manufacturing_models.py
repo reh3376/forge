@@ -182,6 +182,13 @@ class TestLot:
         )
         assert lot.parent_lot_id == "L-1"
 
+    def test_item_reference(self) -> None:
+        """A lot is a quantity of one MaterialItem, referenced by source_id (FB-010)."""
+        assert Lot(**_base_kwargs(), lot_number="L-1").item_id is None
+        lot = Lot(**_base_kwargs(), lot_number="L-1", item_id="ITEM-7")
+        assert lot.item_id == "ITEM-7"
+        assert "MaterialItem" in Lot.model_fields["item_id"].description
+
 
 # ── PhysicalAsset ───────────────────────────────────────────────────
 

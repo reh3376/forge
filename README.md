@@ -352,7 +352,7 @@ uv run pytest tests/core/ -v                  # Core tests
 ### Test Coverage
 
 ```
-Total:  4,396 tests collected (full suite green on 2026-10-22)
+Total:  4,400 tests collected (full suite green on 2026-10-22)
         256 test files
         352 source files
 
@@ -401,4 +401,4 @@ Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE
 
 ---
 
-*352 Python source files | 256 test files | 4,396 tests | 9 FACTS · 28 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
+*352 Python source files | 256 test files | 4,400 tests | 9 FACTS · 28 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
