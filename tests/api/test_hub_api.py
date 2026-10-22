@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 from pathlib import Path
 from unittest.mock import patch
 
@@ -269,15 +268,14 @@ FATS_SPECS = sorted(Path("src/forge/governance/fats/specs").glob("*.json"))
 
 
 def _served(app) -> set[tuple[str, str]]:
-    """Every (METHOD, path) the hub serves, with path converters stripped."""
-    served: set[tuple[str, str]] = set()
-    for route in app.routes:
-        methods = getattr(route, "methods", None)
-        if not methods:
-            continue
-        path = re.sub(r"\{([^}:]+):[^}]+\}", r"{\1}", route.path)
-        served.update((method, path) for method in methods)
-    return served
+    """Every (METHOD, path) the hub's OpenAPI document declares.
+
+    The OpenAPI document is the hub's published contract and names paths the
+    way FATS does (``{schema_id}``, no converter); reading it also keeps the
+    test independent of how FastAPI nests included routers internally.
+    """
+    paths = app.openapi()["paths"]
+    return {(method.upper(), path) for path, operations in paths.items() for method in operations}
 
 
 class TestHubServedServices:
