@@ -1,5 +1,11 @@
 """forge-registry FastAPI service — Schema Registry REST API.
 
+``build_registry_router`` builds the routes once; the hub app includes them
+(FB-001) and ``create_registry_app`` wraps the same router as a standalone
+service.  Routes that change state (register, add version, delete) take the
+``write_dependencies`` the caller passes — the hub passes its
+``schemas:write`` scope check, the standalone app passes none.
+
 Endpoints:
     POST   /v1/schemas                       — Register a new schema
     GET    /v1/schemas                       — List schemas (with filters)
@@ -9,14 +15,15 @@ Endpoints:
     GET    /v1/schemas/{schema_id}/versions  — List all versions
     GET    /v1/schemas/{schema_id}/versions/{version} — Get specific version
     POST   /v1/schemas/{schema_id}/compatibility — Check compatibility
+    GET    /v1/schemas/{schema_id}/diff/{from}/{to} — Diff two versions
 """
 
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import APIRouter, FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from forge.registry.compatibility import (
@@ -26,6 +33,9 @@ from forge.registry.compatibility import (
 )
 from forge.registry.models import CompatibilityMode, SchemaMetadata, SchemaType
 from forge.registry.store import InMemorySchemaStore, SchemaStore
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 # ---------------------------------------------------------------------------
 # Request / Response models
@@ -163,30 +173,30 @@ def _compat_to_response(r: CompatibilityResult) -> CompatibilityCheckResponse:
 
 
 # ---------------------------------------------------------------------------
-# App factory
+# Router and app factories
 # ---------------------------------------------------------------------------
 
 
-def create_registry_app(store: SchemaStore | None = None) -> FastAPI:
-    """Create the Schema Registry FastAPI application.
+def build_registry_router(
+    store: SchemaStore | None = None,
+    *,
+    write_dependencies: Sequence[Any] | None = None,
+) -> APIRouter:
+    """Build the Schema Registry routes over ``store``.
 
-    Parameters
-    ----------
-    store:
-        The schema store backend.  Falls back to ``InMemorySchemaStore``
-        if not provided.
+    ``store`` falls back to ``InMemorySchemaStore``.  ``write_dependencies``
+    (FastAPI ``Depends(...)`` objects) guard register, add-version and
+    delete; reads, compatibility checks and diffs stay open to any
+    authenticated caller.
     """
     _store: SchemaStore = store or InMemorySchemaStore()
+    write = list(write_dependencies or ())
 
-    app = FastAPI(
-        title="Forge Schema Registry",
-        description="F20 — Schema Registry Service for Forge",
-        version="0.1.0",
-    )
+    router = APIRouter(tags=["schemas"])
 
     # -- Register a new schema -----------------------------------------------
 
-    @app.post("/v1/schemas", response_model=SchemaResponse, status_code=201)
+    @router.post("/v1/schemas", response_model=SchemaResponse, status_code=201, dependencies=write)
     async def register_schema(req: RegisterSchemaRequest) -> SchemaResponse:
         existing = await _store.get(req.schema_id)
         if existing is not None:
@@ -207,7 +217,7 @@ def create_registry_app(store: SchemaStore | None = None) -> FastAPI:
 
     # -- List schemas --------------------------------------------------------
 
-    @app.get("/v1/schemas", response_model=SchemaListResponse)
+    @router.get("/v1/schemas", response_model=SchemaListResponse)
     async def list_schemas(
         schema_type: str | None = Query(None),
         status: str | None = Query(None),
@@ -234,10 +244,11 @@ def create_registry_app(store: SchemaStore | None = None) -> FastAPI:
 
     # -- Add a new version ---------------------------------------------------
 
-    @app.post(
+    @router.post(
         "/v1/schemas/{schema_id:path}/versions",
         response_model=SchemaVersionResponse,
         status_code=201,
+        dependencies=write,
     )
     async def add_version(schema_id: str, req: AddVersionRequest) -> SchemaVersionResponse:
         metadata = await _store.get(schema_id)
@@ -274,7 +285,7 @@ def create_registry_app(store: SchemaStore | None = None) -> FastAPI:
 
     # -- List versions -------------------------------------------------------
 
-    @app.get(
+    @router.get(
         "/v1/schemas/{schema_id:path}/versions",
         response_model=list[SchemaVersionResponse],
     )
@@ -296,7 +307,7 @@ def create_registry_app(store: SchemaStore | None = None) -> FastAPI:
 
     # -- Get specific version ------------------------------------------------
 
-    @app.get(
+    @router.get(
         "/v1/schemas/{schema_id:path}/versions/{version}",
         response_model=SchemaVersionResponse,
     )
@@ -318,7 +329,7 @@ def create_registry_app(store: SchemaStore | None = None) -> FastAPI:
 
     # -- Compatibility check -------------------------------------------------
 
-    @app.post(
+    @router.post(
         "/v1/schemas/{schema_id:path}/compatibility",
         response_model=CompatibilityCheckResponse,
     )
@@ -338,7 +349,7 @@ def create_registry_app(store: SchemaStore | None = None) -> FastAPI:
 
     # -- Version diff --------------------------------------------------------
 
-    @app.get(
+    @router.get(
         "/v1/schemas/{schema_id:path}/diff/{from_version}/{to_version}",
         response_model=DiffResponse,
     )
@@ -370,7 +381,7 @@ def create_registry_app(store: SchemaStore | None = None) -> FastAPI:
 
     # -- Get a single schema (greedy :path — must come AFTER sub-paths) ------
 
-    @app.get("/v1/schemas/{schema_id:path}", response_model=SchemaResponse)
+    @router.get("/v1/schemas/{schema_id:path}", response_model=SchemaResponse)
     async def get_schema(schema_id: str) -> SchemaResponse:
         metadata = await _store.get(schema_id)
         if metadata is None:
@@ -379,10 +390,21 @@ def create_registry_app(store: SchemaStore | None = None) -> FastAPI:
 
     # -- Delete a schema -----------------------------------------------------
 
-    @app.delete("/v1/schemas/{schema_id:path}", status_code=204)
+    @router.delete("/v1/schemas/{schema_id:path}", status_code=204, dependencies=write)
     async def delete_schema(schema_id: str) -> None:
         deleted = await _store.delete(schema_id)
         if not deleted:
             raise HTTPException(404, f"Schema '{schema_id}' not found")
 
+    return router
+
+
+def create_registry_app(store: SchemaStore | None = None) -> FastAPI:
+    """Create the Schema Registry as a standalone FastAPI application."""
+    app = FastAPI(
+        title="Forge Schema Registry",
+        description="F20 — Schema Registry Service for Forge",
+        version="0.1.0",
+    )
+    app.include_router(build_registry_router(store))
     return app

@@ -1,5 +1,11 @@
 """forge-context FastAPI service — Context Engine REST API.
 
+``build_context_router`` builds the routes once; the hub app includes them
+(FB-001) and ``create_context_app`` wraps the same router as a standalone
+service.  Routes that change state (equipment, batches, modes) take the
+``write_dependencies`` the caller passes — the hub passes its
+``context:write`` scope check, the standalone app passes none.
+
 Endpoints:
     POST   /v1/context/enrich              — Enrich a record's context
     POST   /v1/context/equipment           — Register equipment
@@ -18,9 +24,9 @@ Endpoints:
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import APIRouter, FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from forge.context.batch import BatchStore, InMemoryBatchStore
@@ -37,6 +43,9 @@ from forge.context.models import (
 )
 from forge.context.shift import build_louisville_schedule, resolve_shift
 from forge.core.models.contextual_record import RecordContext
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 # ---------------------------------------------------------------------------
 # Request / Response models
@@ -85,7 +94,7 @@ class EquipmentRequest(BaseModel):
     area: str = ""
     parent_id: str | None = None
     equipment_type: str = ""
-    status: str = "active"
+    status: EquipmentStatus = EquipmentStatus.ACTIVE
     attributes: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -132,7 +141,7 @@ class ModeRequest(BaseModel):
     """Request to set equipment operating mode."""
 
     equipment_id: str
-    mode: str
+    mode: OperatingMode
     source: str = "manual"
 
 
@@ -194,33 +203,37 @@ def _batch_to_response(b: Batch) -> BatchResponse:
 
 
 # ---------------------------------------------------------------------------
-# App factory
+# Router and app factories
 # ---------------------------------------------------------------------------
 
 
-def create_context_app(
+def build_context_router(
     equipment_store: EquipmentStore | None = None,
     batch_store: BatchStore | None = None,
     mode_store: ModeStore | None = None,
     shift_schedule: ShiftSchedule | None = None,
-) -> FastAPI:
-    """Create the Context Engine FastAPI application."""
+    *,
+    write_dependencies: Sequence[Any] | None = None,
+) -> APIRouter:
+    """Build the Context Engine routes over the given stores.
+
+    ``write_dependencies`` (FastAPI ``Depends(...)`` objects) guard every
+    route that changes state; ``enrich`` and ``shifts/resolve`` only compute
+    and stay open to any authenticated caller.
+    """
     _equipment: EquipmentStore = equipment_store or InMemoryEquipmentStore()
     _batches: BatchStore = batch_store or InMemoryBatchStore()
     _modes: ModeStore = mode_store or InMemoryModeStore()
     _schedule: ShiftSchedule = shift_schedule or build_louisville_schedule()
+    write = list(write_dependencies or ())
 
     _enricher = ContextEnricher(_equipment, _batches, _modes, _schedule)
 
-    app = FastAPI(
-        title="Forge Context Engine",
-        description="F21 — Context Engine Service for Forge",
-        version="0.1.0",
-    )
+    router = APIRouter(tags=["context"])
 
     # -- Enrich --------------------------------------------------------------
 
-    @app.post("/v1/context/enrich", response_model=EnrichResponse)
+    @router.post("/v1/context/enrich", response_model=EnrichResponse)
     async def enrich_context(req: EnrichRequest) -> EnrichResponse:
         context = RecordContext(
             equipment_id=req.equipment_id,
@@ -253,10 +266,11 @@ def create_context_app(
 
     # -- Equipment CRUD ------------------------------------------------------
 
-    @app.post(
+    @router.post(
         "/v1/context/equipment",
         response_model=EquipmentResponse,
         status_code=201,
+        dependencies=write,
     )
     async def register_equipment(req: EquipmentRequest) -> EquipmentResponse:
         eq = Equipment(
@@ -272,7 +286,7 @@ def create_context_app(
         await _equipment.save(eq)
         return _equipment_to_response(eq)
 
-    @app.get("/v1/context/equipment", response_model=list[EquipmentResponse])
+    @router.get("/v1/context/equipment", response_model=list[EquipmentResponse])
     async def list_equipment(
         site: str = Query(...),
         area: str | None = Query(None),
@@ -283,7 +297,7 @@ def create_context_app(
             results = await _equipment.list_by_site(site)
         return [_equipment_to_response(e) for e in results]
 
-    @app.get(
+    @router.get(
         "/v1/context/equipment/{equipment_id}/children",
         response_model=list[EquipmentResponse],
     )
@@ -293,7 +307,7 @@ def create_context_app(
         children = await _equipment.get_children(equipment_id)
         return [_equipment_to_response(c) for c in children]
 
-    @app.get(
+    @router.get(
         "/v1/context/equipment/{equipment_id}",
         response_model=EquipmentResponse,
     )
@@ -303,7 +317,7 @@ def create_context_app(
             raise HTTPException(404, f"Equipment '{equipment_id}' not found")
         return _equipment_to_response(eq)
 
-    @app.delete("/v1/context/equipment/{equipment_id}", status_code=204)
+    @router.delete("/v1/context/equipment/{equipment_id}", status_code=204, dependencies=write)
     async def delete_equipment(equipment_id: str) -> None:
         deleted = await _equipment.delete(equipment_id)
         if not deleted:
@@ -311,10 +325,11 @@ def create_context_app(
 
     # -- Batch CRUD ----------------------------------------------------------
 
-    @app.post(
+    @router.post(
         "/v1/context/batches",
         response_model=BatchResponse,
         status_code=201,
+        dependencies=write,
     )
     async def register_batch(req: BatchRequest) -> BatchResponse:
         batch = Batch(
@@ -328,12 +343,12 @@ def create_context_app(
         await _batches.save(batch)
         return _batch_to_response(batch)
 
-    @app.get("/v1/context/batches/active", response_model=list[BatchResponse])
+    @router.get("/v1/context/batches/active", response_model=list[BatchResponse])
     async def list_active_batches() -> list[BatchResponse]:
         batches = await _batches.list_active()
         return [_batch_to_response(b) for b in batches]
 
-    @app.post("/v1/context/batches/{batch_id}/complete", status_code=200)
+    @router.post("/v1/context/batches/{batch_id}/complete", status_code=200, dependencies=write)
     async def complete_batch(batch_id: str) -> BatchResponse:
         success = await _batches.complete(batch_id)
         if not success:
@@ -345,10 +360,11 @@ def create_context_app(
 
     # -- Mode ----------------------------------------------------------------
 
-    @app.post(
+    @router.post(
         "/v1/context/modes",
         response_model=ModeResponse,
         status_code=201,
+        dependencies=write,
     )
     async def set_mode(req: ModeRequest) -> ModeResponse:
         state = ModeState(
@@ -364,7 +380,7 @@ def create_context_app(
             source=state.source,
         )
 
-    @app.get(
+    @router.get(
         "/v1/context/modes/{equipment_id}",
         response_model=ModeResponse,
     )
@@ -381,7 +397,7 @@ def create_context_app(
 
     # -- Shift ---------------------------------------------------------------
 
-    @app.post(
+    @router.post(
         "/v1/context/shifts/resolve",
         response_model=ShiftResolveResponse,
     )
@@ -395,4 +411,22 @@ def create_context_app(
             timestamp=req.timestamp,
         )
 
+    return router
+
+
+def create_context_app(
+    equipment_store: EquipmentStore | None = None,
+    batch_store: BatchStore | None = None,
+    mode_store: ModeStore | None = None,
+    shift_schedule: ShiftSchedule | None = None,
+) -> FastAPI:
+    """Create the Context Engine as a standalone FastAPI application."""
+    app = FastAPI(
+        title="Forge Context Engine",
+        description="F21 — Context Engine Service for Forge",
+        version="0.1.0",
+    )
+    app.include_router(
+        build_context_router(equipment_store, batch_store, mode_store, shift_schedule)
+    )
     return app

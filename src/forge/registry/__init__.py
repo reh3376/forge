@@ -13,6 +13,7 @@ from forge.registry.models import (
     SchemaVersion,
 )
 from forge.registry.postgres_store import PostgresSchemaStore
+from forge.registry.service import build_registry_router, create_registry_app
 from forge.registry.store import InMemorySchemaStore, SchemaStore
 
 __all__ = [
@@ -23,4 +24,6 @@ __all__ = [
     "SchemaStore",
     "SchemaType",
     "SchemaVersion",
+    "build_registry_router",
+    "create_registry_app",
 ]

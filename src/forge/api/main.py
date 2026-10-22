@@ -10,6 +10,8 @@ This is the main application that ``docker compose`` runs.  It provides:
     /v1/adapters/{id}/backfill, /subscriptions — pull from the spoke (FB-061)
     /v1/writes          — Write-back targets and counters
     /api/v1/ot/...      — OT module control + i3X browse (FORGE_OT_CONTROL_CONFIG, FB-065)
+    /v1/context/...     — Context Engine (F21): enrich, equipment, batches, modes, shifts (FB-001)
+    /v1/schemas/...     — Schema Registry (F20): schemas, versions, compatibility, diff (FB-001)
     /curation/...       — Curation sub-app (products, lineage, quality)
 
 The gRPC server for spoke communication runs on a separate port
@@ -24,7 +26,7 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 from functools import partial
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -39,6 +41,7 @@ from forge.api.health import (
     check_timescaledb,
 )
 from forge.api.registry import AdapterRegistry
+from forge.context.service import build_context_router
 from forge.core.models.adapter import (
     AdapterManifest,  # noqa: TC001 — FastAPI resolves these at runtime
 )
@@ -46,6 +49,7 @@ from forge.gateway.auth import auth_config_from_env, configure_auth
 from forge.gateway.models import ForgeUser  # noqa: TC001 — FastAPI dependency type
 from forge.gateway.rbac import require_scope
 from forge.ingest import IngestPipeline, build_pipeline_from_storage
+from forge.registry.service import build_registry_router
 from forge.storage.adapter_registry import AdapterRegistryStore  # noqa: TC001
 from forge.storage.config import StorageConfig
 from forge.storage.factory import StorageFactory  # noqa: TC001
@@ -57,6 +61,10 @@ from forge.transport.spoke_pull import (
     backfill_into_pipeline,
     collect_into_pipeline,
 )
+
+if TYPE_CHECKING:
+    from forge.context.equipment import EquipmentStore
+    from forge.registry.store import SchemaStore
 
 logger = logging.getLogger(__name__)
 
@@ -145,6 +153,8 @@ def create_app(
     ingest_pipeline: IngestPipeline | None = None,
     write_dispatcher: WriteDispatcher | None = None,
     adapter_registry_store: AdapterRegistryStore | None = None,
+    schema_store: SchemaStore | None = None,
+    equipment_store: EquipmentStore | None = None,
 ) -> FastAPI:
     """Create the Forge Hub API application.
 
@@ -161,6 +171,13 @@ def create_app(
         adapter_registry_store: Where registrations, heartbeats and the
             ingest log are persisted (FB-060). Defaults to the storage
             factory's PostgreSQL store, or in-memory without one.
+        schema_store: Backing store of the Schema Registry served under
+            ``/v1/schemas`` (FB-001). In-memory by default; the Postgres
+            store joins the factory with its migration (FB-005).
+        equipment_store: Backing store of the Context Engine's equipment
+            registry served under ``/v1/context`` (FB-001). In-memory by
+            default; the Postgres store joins the factory with its
+            migration (FB-005).
     """
     config = storage_config or StorageConfig.from_env()
     store = adapter_registry_store
@@ -314,6 +331,12 @@ def create_app(
     app.state.ot_module = None
     if ot_host is not None:
         ot_host.mount(app)
+    # Where each hub-served service answers; ``/v1/info`` reports it.
+    services: dict[str, str | None] = {
+        "context": "/v1/context",
+        "schemas": "/v1/schemas",
+        "curation": None,
+    }
 
     # ------------------------------------------------------------------
     # Health endpoints
@@ -589,7 +612,28 @@ def create_app(
             "adapters_registered": len(registry.list_all()),
             "adapter_registry": registry.describe(),
             "ot_module": ot_host.status() if ot_host is not None else None,
+            "services": dict(services),
         }
+
+    # ------------------------------------------------------------------
+    # Context Engine (F21) and Schema Registry (F20), served by the hub
+    # (FB-001). The routes that change state require the matching write
+    # scope; reads, enrichment, shift resolution, compatibility checks and
+    # diffs are open to any authenticated caller.
+    # ------------------------------------------------------------------
+
+    app.include_router(
+        build_context_router(
+            equipment_store=equipment_store,
+            write_dependencies=[Depends(require_scope("context:write"))],
+        )
+    )
+    app.include_router(
+        build_registry_router(
+            schema_store,
+            write_dependencies=[Depends(require_scope("schemas:write"))],
+        )
+    )
 
     # ------------------------------------------------------------------
     # Mount curation sub-application
@@ -612,6 +656,7 @@ def create_app(
 
         curation_app = create_curation_app(**curation_kwargs)
         app.mount("/curation", curation_app)
+        services["curation"] = "/curation"
         logger.info("Curation sub-application mounted at /curation")
     except Exception:
         logger.warning("Curation service not available — skipping mount")
