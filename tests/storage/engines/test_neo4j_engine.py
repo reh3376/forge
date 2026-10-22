@@ -20,6 +20,9 @@ from forge.core.models.contextual_record import (
 from forge.curation.lineage import LineageEntry, TransformationStep
 from forge.storage.engines.neo4j_engine import Neo4jGraphWriter, Neo4jLineageWriter
 
+# An un-awaited coroutine in a mock is a bug, not a warning (FB-023).
+pytestmark = pytest.mark.filterwarnings("error::RuntimeWarning")
+
 
 @pytest.fixture
 def mock_driver():
@@ -137,15 +140,21 @@ class TestNeo4jGraphWriter:
 
     @pytest.mark.asyncio
     async def test_query_equipment_topology_success(self, mock_driver):
+        """The neo4j result is an async iterator; the mock must be one too (FB-023)."""
         driver, session = mock_driver
-        mock_result = AsyncMock()
-        mock_result.__aiter__ = AsyncMock(
-            return_value=iter([{"e": "node1", "rels": [], "neighbors": []}]),
-        )
+        rows = [{"e": "node1", "rels": [], "neighbors": []}]
+
+        async def result_rows():
+            for row in rows:
+                yield row
+
+        mock_result = MagicMock()
+        mock_result.__aiter__ = lambda self: result_rows()
         session.run.return_value = mock_result
         writer = Neo4jGraphWriter(driver)
-        await writer.query_equipment_topology("FERM-003")
+        records = await writer.query_equipment_topology("FERM-003")
         session.run.assert_called_once()
+        assert records == rows
 
     @pytest.mark.asyncio
     async def test_merge_record_tx_creates_all_nodes(self, sample_record):
