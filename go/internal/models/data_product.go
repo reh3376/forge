@@ -29,6 +29,16 @@ type DataProductSchema struct {
 
 // DataProduct is a curated, decision-ready dataset with governance metadata.
 // Data products are the primary output of the Forge curation layer.
+// CurationSpec says how the curation engine builds a product's pipeline and
+// whether the ingest path runs it (FB-009). Mirrors forge.core.models.data_product.CurationSpec.
+type CurationSpec struct {
+	Normalize  bool     `json:"normalize"`
+	TimeWindow string   `json:"time_window"`
+	GroupBy    []string `json:"group_by,omitempty"`
+	Functions  []string `json:"functions,omitempty"`
+	OnIngest   bool     `json:"on_ingest"`
+}
+
 type DataProduct struct {
 	ProductID      string            `json:"product_id"`
 	Name           string            `json:"name"`
@@ -39,6 +49,7 @@ type DataProduct struct {
 	SourceAdapters []string          `json:"source_adapters,omitempty"`
 	QualitySLOs    []QualitySLO      `json:"quality_slos,omitempty"`
 	Tags           []string          `json:"tags,omitempty"`
+	Curation       *CurationSpec     `json:"curation,omitempty"`
 	CreatedAt      time.Time         `json:"created_at"`
 	UpdatedAt      time.Time         `json:"updated_at"`
 	Metadata       map[string]any    `json:"metadata,omitempty"`

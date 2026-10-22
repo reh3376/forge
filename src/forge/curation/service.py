@@ -9,26 +9,20 @@ Provides REST API for:
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from forge.core.models.contextual_record import ContextualRecord
-from forge.core.models.data_product import DataProductStatus
-from forge.curation.aggregation import AggregationFunction, AggregationSpec
-from forge.curation.lineage import LineageTracker
-from forge.curation.normalization import UnitRegistry, build_whk_unit_registry
-from forge.curation.pipeline import (
-    AggregationStep,
-    CurationPipeline,
-    NormalizationStep,
-    TimeBucketStep,
-)
-from forge.curation.quality import (
-    QualityMonitor,
-)
-from forge.curation.registry import DataProductRegistry
+from forge.core.models.data_product import CurationSpec, DataProduct, DataProductStatus
+from forge.curation.engine import CurationEngine, validate_spec
+
+if TYPE_CHECKING:
+    from forge.curation.lineage import LineageTracker
+    from forge.curation.normalization import UnitRegistry
+    from forge.curation.quality import QualityMonitor, QualityReport
+    from forge.curation.registry import DataProductRegistry
 
 # ---------------------------------------------------------------------------
 # Request/Response schemas
@@ -62,6 +56,10 @@ class CreateProductRequest(BaseModel):
     schema_version: str = "0.1.0"
     source_adapters: list[str] = Field(default_factory=list)
     tags: list[str] = Field(default_factory=list)
+    curation: CurationSpec | None = Field(
+        default=None,
+        description="How the engine curates this product (FB-009); the default spec when omitted.",
+    )
 
 
 class ProductResponse(BaseModel):
@@ -76,6 +74,41 @@ class ProductResponse(BaseModel):
     schema_version: str
     source_adapters: list[str]
     tags: list[str]
+    curation: CurationSpec
+
+
+def _product_response(product: DataProduct) -> ProductResponse:
+    return ProductResponse(
+        product_id=product.product_id,
+        name=product.name,
+        description=product.description,
+        owner=product.owner,
+        status=product.status.value,
+        schema_ref=product.product_schema.schema_ref,
+        schema_version=product.product_schema.version,
+        source_adapters=product.source_adapters,
+        tags=product.tags,
+        curation=product.curation,
+    )
+
+
+def _report_response(product_id: str, report: QualityReport) -> QualityReportResponse:
+    return QualityReportResponse(
+        product_id=product_id,
+        record_count=report.record_count,
+        passed=report.passed,
+        score=report.score,
+        results=[
+            {
+                "rule_name": r.rule_name,
+                "dimension": r.dimension.value,
+                "passed": r.passed,
+                "score": r.score,
+                "measurement": r.measurement,
+            }
+            for r in report.results
+        ],
+    )
 
 
 class LineageResponse(BaseModel):
@@ -109,10 +142,15 @@ def create_curation_app(
     registry: DataProductRegistry | None = None,
     lineage_tracker: LineageTracker | None = None,
     quality_monitor: QualityMonitor | None = None,
+    engine: CurationEngine | None = None,
 ) -> FastAPI:
     """Create the forge-curation FastAPI application.
 
-    All dependencies are injectable for testing.
+    All dependencies are injectable for testing. ``engine`` is the curation
+    engine (FB-009); when given, its registry, lineage tracker, quality
+    monitor and unit registry are the app's, so the hub's ingest trigger and
+    the REST surface share one state. Otherwise one is built from the other
+    arguments.
     """
     app = FastAPI(
         title="Forge Curation Service",
@@ -120,15 +158,16 @@ def create_curation_app(
         version="0.1.0",
     )
 
-    # Shared state
-    units = unit_registry or build_whk_unit_registry()
-    prod_registry = registry or DataProductRegistry()
-    lineage = lineage_tracker or LineageTracker()
-    quality = quality_monitor or QualityMonitor()
-
-    # Store latest quality reports and curated records
-    _latest_reports: dict[str, QualityReportResponse] = {}
-    _curated_records: dict[str, list[ContextualRecord]] = {}
+    # Shared state lives in the engine (FB-009).
+    curation = engine or CurationEngine(
+        registry,
+        lineage_tracker=lineage_tracker,
+        quality_monitor=quality_monitor,
+        unit_registry=unit_registry,
+    )
+    prod_registry = curation.registry
+    lineage = curation.lineage
+    app.state.curation_engine = curation
 
     # ------------------------------------------------------------------
     # Health
@@ -144,52 +183,13 @@ def create_curation_app(
 
     @app.post("/curate", response_model=CurateResponse)
     async def curate_records(request: CurateRequest) -> CurateResponse:
-        product = prod_registry.get(request.product_id)
-        if product is None:
-            raise HTTPException(404, f"Data product not found: {request.product_id}")
-
-        # Build pipeline for this product
-        pipeline = CurationPipeline(
-            steps=[
-                NormalizationStep(units),
-                TimeBucketStep("5min"),
-                AggregationStep(
-                    AggregationSpec(
-                        group_by=["equipment_id"],
-                        time_window="5min",
-                        functions=[AggregationFunction.AVG],
-                        product_id=request.product_id,
-                    )
-                ),
-            ],
-            lineage_tracker=lineage,
-            quality_monitor=quality,
-            product_id=request.product_id,
-        )
-
-        result = pipeline.execute(request.records, request.product_id)
-
-        # Store curated records and quality report
-        _curated_records.setdefault(request.product_id, []).extend(
-            result.output_records,
-        )
-        if result.quality_report:
-            _latest_reports[request.product_id] = QualityReportResponse(
-                product_id=request.product_id,
-                record_count=result.quality_report.record_count,
-                passed=result.quality_report.passed,
-                score=result.quality_report.score,
-                results=[
-                    {
-                        "rule_name": r.rule_name,
-                        "dimension": r.dimension.value,
-                        "passed": r.passed,
-                        "score": r.score,
-                        "measurement": r.measurement,
-                    }
-                    for r in result.quality_report.results
-                ],
-            )
+        """Run the product's own pipeline (its ``curation`` spec) over the records."""
+        try:
+            result = await curation.curate(request.product_id, request.records)
+        except KeyError:
+            raise HTTPException(404, f"Data product not found: {request.product_id}") from None
+        except ValueError as exc:
+            raise HTTPException(400, f"Curation spec of {request.product_id}: {exc}") from None
 
         return CurateResponse(
             input_count=result.input_count,
@@ -215,40 +215,22 @@ def create_curation_app(
                 raise HTTPException(400, f"Invalid status: {status}")  # noqa: B904
 
         products = prod_registry.list_products(filter_status)
-        return [
-            ProductResponse(
-                product_id=p.product_id,
-                name=p.name,
-                description=p.description,
-                owner=p.owner,
-                status=p.status.value,
-                schema_ref=p.product_schema.schema_ref,
-                schema_version=p.product_schema.version,
-                source_adapters=p.source_adapters,
-                tags=p.tags,
-            )
-            for p in products
-        ]
+        return [_product_response(p) for p in products]
 
     @app.get("/products/{product_id}", response_model=ProductResponse)
     async def get_product(product_id: str) -> ProductResponse:
         product = prod_registry.get(product_id)
         if product is None:
             raise HTTPException(404, f"Data product not found: {product_id}")
-        return ProductResponse(
-            product_id=product.product_id,
-            name=product.name,
-            description=product.description,
-            owner=product.owner,
-            status=product.status.value,
-            schema_ref=product.product_schema.schema_ref,
-            schema_version=product.product_schema.version,
-            source_adapters=product.source_adapters,
-            tags=product.tags,
-        )
+        return _product_response(product)
 
     @app.post("/products", response_model=ProductResponse, status_code=201)
     async def create_product(request: CreateProductRequest) -> ProductResponse:
+        spec = request.curation or CurationSpec()
+        try:
+            validate_spec(spec)
+        except ValueError as exc:
+            raise HTTPException(400, f"curation: {exc}") from None
         product = prod_registry.create(
             name=request.name,
             description=request.description,
@@ -257,18 +239,9 @@ def create_curation_app(
             schema_version=request.schema_version,
             source_adapters=request.source_adapters,
             tags=request.tags,
+            curation=spec,
         )
-        return ProductResponse(
-            product_id=product.product_id,
-            name=product.name,
-            description=product.description,
-            owner=product.owner,
-            status=product.status.value,
-            schema_ref=product.product_schema.schema_ref,
-            schema_version=product.product_schema.version,
-            source_adapters=product.source_adapters,
-            tags=product.tags,
-        )
+        return _product_response(product)
 
     @app.put("/products/{product_id}/publish", response_model=ProductResponse)
     async def publish_product(product_id: str) -> ProductResponse:
@@ -278,17 +251,21 @@ def create_curation_app(
             raise HTTPException(404, f"Data product not found: {product_id}")  # noqa: B904
         except ValueError as e:
             raise HTTPException(400, str(e))  # noqa: B904
-        return ProductResponse(
-            product_id=product.product_id,
-            name=product.name,
-            description=product.description,
-            owner=product.owner,
-            status=product.status.value,
-            schema_ref=product.product_schema.schema_ref,
-            schema_version=product.product_schema.version,
-            source_adapters=product.source_adapters,
-            tags=product.tags,
-        )
+        return _product_response(product)
+
+    @app.get("/products/{product_id}/curated")
+    async def get_curated_records(
+        product_id: str, limit: int = Query(100, ge=1, le=10_000)
+    ) -> dict[str, Any]:
+        """The product's most recent curated records (bounded window, newest last)."""
+        if prod_registry.get(product_id) is None:
+            raise HTTPException(404, f"Data product not found: {product_id}")
+        records = curation.curated(product_id, limit=limit)
+        return {
+            "product_id": product_id,
+            "count": len(records),
+            "records": [r.model_dump(mode="json") for r in records],
+        }
 
     # ------------------------------------------------------------------
     # Lineage
@@ -322,10 +299,10 @@ def create_curation_app(
 
     @app.get("/products/{product_id}/quality", response_model=QualityReportResponse)
     async def get_quality_report(product_id: str) -> QualityReportResponse:
-        report = _latest_reports.get(product_id)
+        report = curation.latest_report(product_id)
         if report is None:
             raise HTTPException(404, f"No quality report for product: {product_id}")
-        return report
+        return _report_response(product_id, report)
 
     return app
 

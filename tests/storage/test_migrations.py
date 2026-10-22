@@ -18,7 +18,7 @@ class TestMigrationStructure:
         assert VERSIONS_DIR.is_dir()
 
     def test_all_versions_present(self):
-        expected = ["001", "002", "003", "004", "005", "006", "007", "008", "009"]
+        expected = ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010"]
         files = sorted(f.name for f in VERSIONS_DIR.glob("*.py") if f.name != "__init__.py")
         for version in expected:
             assert any(f.startswith(version) for f in files), f"Missing migration {version}"
@@ -164,3 +164,14 @@ class TestMigration009:
         version_fields = {f.name for f in dataclasses.fields(SchemaVersion)} | {"schema_id"}
         assert tables["registry_versions"] == version_fields
         assert tables["equipment_registry"] == {f.name for f in dataclasses.fields(Equipment)}
+
+
+class TestMigration010:
+    """010 adds the curation spec column to data products (FB-009)."""
+
+    def test_chain_and_column(self):
+        mod = importlib.import_module("forge.storage.migrations.versions.010_data_product_curation")
+        assert mod.revision == "010" and mod.down_revision == "009"
+        source = (VERSIONS_DIR / "010_data_product_curation.py").read_text()
+        assert 'op.add_column("data_products", sa.Column("curation", sa.JSON)' in source
+        assert 'schema="forge_canonical"' in source

@@ -17,6 +17,7 @@ from typing import Any
 from uuid import uuid4
 
 from forge.core.models.data_product import (
+    CurationSpec,
     DataProduct,
     DataProductSchema,
     DataProductStatus,
@@ -130,8 +131,13 @@ class DataProductRegistry:
         tags: list[str] | None = None,
         fields: list[DataProductField] | None = None,
         metadata: dict[str, Any] | None = None,
+        curation: CurationSpec | None = None,
     ) -> DataProduct:
-        """Create a new data product in DRAFT status."""
+        """Create a new data product in DRAFT status.
+
+        ``curation`` is how the engine builds the product's pipeline (FB-009);
+        the default spec is 5-minute buckets, AVG by equipment_id, run on ingest.
+        """
         product_id = f"dp-{uuid4().hex[:12]}"
         schema = DataProductSchema(
             schema_ref=schema_ref,
@@ -147,6 +153,7 @@ class DataProductRegistry:
             source_adapters=source_adapters or [],
             quality_slos=quality_slos or [],
             tags=tags or [],
+            curation=curation or CurationSpec(),
             metadata=metadata or {},
         )
         self._store.save(product)

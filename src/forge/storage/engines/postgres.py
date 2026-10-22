@@ -20,6 +20,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from forge.core.models.data_product import (
+    CurationSpec,
     DataProduct,
     DataProductSchema,
     DataProductStatus,
@@ -68,8 +69,9 @@ class PostgresProductStore(ProductStore):
                     INSERT INTO forge_canonical.data_products
                         (product_id, name, description, owner, status,
                          schema_ref, schema_version, source_adapters,
-                         quality_slos, tags, metadata, created_at, updated_at)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                         quality_slos, tags, metadata, created_at, updated_at,
+                         curation)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
                     ON CONFLICT (product_id) DO UPDATE SET
                         name = EXCLUDED.name,
                         description = EXCLUDED.description,
@@ -81,7 +83,8 @@ class PostgresProductStore(ProductStore):
                         quality_slos = EXCLUDED.quality_slos,
                         tags = EXCLUDED.tags,
                         metadata = EXCLUDED.metadata,
-                        updated_at = EXCLUDED.updated_at
+                        updated_at = EXCLUDED.updated_at,
+                        curation = EXCLUDED.curation
                     """,
                     product.product_id,
                     product.name,
@@ -96,6 +99,7 @@ class PostgresProductStore(ProductStore):
                     json.dumps(product.metadata),
                     product.created_at,
                     product.updated_at,
+                    json.dumps(product.curation.model_dump()),
                 )
         except Exception:
             logger.exception("Failed to save product %s to PostgreSQL", product.product_id)
@@ -191,6 +195,11 @@ class PostgresProductStore(ProductStore):
     def _row_to_product(row: Any) -> DataProduct:
         """Convert an asyncpg Record to a DataProduct."""
         slos_raw = json.loads(row["quality_slos"]) if row["quality_slos"] else []
+        # NULL (rows older than migration 010) means the default spec.
+        curation_raw = row["curation"] if "curation" in row.keys() else None  # noqa: SIM118
+        if isinstance(curation_raw, str):
+            curation_raw = json.loads(curation_raw)
+        curation = CurationSpec(**curation_raw) if curation_raw else CurationSpec()
         return DataProduct(
             product_id=row["product_id"],
             name=row["name"],
@@ -204,6 +213,7 @@ class PostgresProductStore(ProductStore):
             source_adapters=json.loads(row["source_adapters"]) if row["source_adapters"] else [],
             quality_slos=[QualitySLO(**s) for s in slos_raw],
             tags=json.loads(row["tags"]) if row["tags"] else [],
+            curation=curation,
             created_at=row["created_at"],
             updated_at=row["updated_at"],
             metadata=json.loads(row["metadata"]) if row["metadata"] else {},

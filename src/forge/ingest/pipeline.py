@@ -35,6 +35,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Mapping
 
     from forge.core.models.adapter import AdapterManifest
+    from forge.curation.engine import CurationEngine
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +83,9 @@ class IngestOutcome:
     missing_context: int = 0
     errors: list[str] = field(default_factory=list)
     by_engine: dict[str, int] = field(default_factory=dict)
+    # Curation on ingest (FB-009): curated records per product, and the runs that failed.
+    curated: dict[str, int] = field(default_factory=dict)
+    curation_errors: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -93,6 +97,8 @@ class IngestOutcome:
             "missing_context": self.missing_context,
             "errors": list(self.errors),
             "by_engine": dict(self.by_engine),
+            "curated": dict(self.curated),
+            "curation_errors": list(self.curation_errors),
         }
 
     def summary(self) -> str:
@@ -179,7 +185,10 @@ class IngestPipeline:
     measurement, see :class:`~forge.core.clock.ClockOffsetTracker` (FB-089).
     ``clock`` is the hub clock, ``utc_now`` unless a test or a hub-of-hubs link
     (FB-092) injects another; ``offsets`` is the tracker, one per pipeline by
-    default.
+    default. ``curation`` is the curation engine (FB-009): after a batch is
+    persisted, every published data product fed by the batch's adapter is
+    curated with it, and the curated records come back through
+    :meth:`persist`.
     """
 
     def __init__(
@@ -190,9 +199,11 @@ class IngestPipeline:
         fallback_sink: RecordSink | None = None,
         clock: Callable[[], datetime] | None = None,
         offsets: ClockOffsetTracker | None = None,
+        curation: CurationEngine | None = None,
     ) -> None:
         self._clock: Callable[[], datetime] = clock or utc_now
         self.offsets: ClockOffsetTracker = offsets or ClockOffsetTracker()
+        self.curation: CurationEngine | None = curation
         self._router = router or DataRouter(registry=SchemaRegistry())
         self._sinks: dict[StorageEngine, RecordSink] = dict(sinks or {})
         # `is not None`: an empty InMemoryRecordSink is falsy (it defines __len__).
@@ -223,6 +234,7 @@ class IngestPipeline:
             "fallback_sink": type(self._fallback).__name__,
             "stats": self.stats.to_dict(),
             "clock_offsets": self.offsets.describe(),
+            "curation": self.curation.describe() if self.curation is not None else None,
         }
 
     # -- validation ----------------------------------------------------------
@@ -283,19 +295,12 @@ class IngestPipeline:
         outcome.accepted = len(accepted)
 
         if accepted:
-            grouped = self._router.route_batch(accepted)
-            for engine, pairs in grouped.items():
-                batch = [rec for rec, _decision in pairs]
-                sink = self.sink_for(engine)
-                try:
-                    written = await sink.write_batch(batch)
-                except Exception as exc:
-                    logger.exception("Sink %s failed for %d records", engine.value, len(batch))
-                    written = 0
-                    outcome.errors.append(f"{engine.value}: {exc}")
-                outcome.persisted += written
-                outcome.failed += len(batch) - written
-                outcome.by_engine[engine.value] = outcome.by_engine.get(engine.value, 0) + written
+            await self._write(accepted, outcome)
+            if self.curation is not None:
+                source = adapter_id or accepted[0].source.adapter_id
+                outcome.curated, outcome.curation_errors = await self.curation.on_ingested(
+                    source, accepted
+                )
 
         self.stats.add(outcome)
         if outcome.rejected or outcome.failed:
@@ -303,6 +308,33 @@ class IngestPipeline:
         else:
             logger.debug("Ingest from %s: %s", adapter_id or "unknown", outcome.summary())
         return outcome
+
+    async def _write(self, records: list[ContextualRecord], outcome: IngestOutcome) -> None:
+        """Route ``records`` and write each group to its sink, counting into ``outcome``."""
+        grouped = self._router.route_batch(records)
+        for engine, pairs in grouped.items():
+            batch = [rec for rec, _decision in pairs]
+            sink = self.sink_for(engine)
+            try:
+                written = await sink.write_batch(batch)
+            except Exception as exc:
+                logger.exception("Sink %s failed for %d records", engine.value, len(batch))
+                written = 0
+                outcome.errors.append(f"{engine.value}: {exc}")
+            outcome.persisted += written
+            outcome.failed += len(batch) - written
+            outcome.by_engine[engine.value] = outcome.by_engine.get(engine.value, 0) + written
+
+    async def persist(self, records: list[ContextualRecord]) -> int:
+        """Route and write hub-born records (curated outputs) without receipt or validation.
+
+        Returns the number written; sink failures are logged, as in :meth:`ingest`.
+        """
+        if not records:
+            return 0
+        outcome = IngestOutcome(received=len(records), accepted=len(records))
+        await self._write(records, outcome)
+        return outcome.persisted
 
     # -- REST helper ---------------------------------------------------------
 
@@ -357,7 +389,9 @@ class IngestPipeline:
         )
 
 
-def build_pipeline_from_storage(storage_factory: Any) -> IngestPipeline:
+def build_pipeline_from_storage(
+    storage_factory: Any, *, curation: CurationEngine | None = None
+) -> IngestPipeline:
     """Wire the pipeline to whatever engines the StorageFactory has pools for.
 
     * TimescaleDB -> ``forge_ts.contextual_records`` (TimescaleRecordWriter).
@@ -375,6 +409,6 @@ def build_pipeline_from_storage(storage_factory: Any) -> IngestPipeline:
     graph_writer = storage_factory.graph_writer()
     if graph_writer is not None:
         sinks[StorageEngine.NEO4J] = graph_writer
-    pipeline = IngestPipeline(sinks=sinks)
+    pipeline = IngestPipeline(sinks=sinks, curation=curation)
     logger.info("Ingest pipeline sinks: %s", pipeline.describe()["sinks"] or "in-memory only")
     return pipeline

@@ -63,7 +63,15 @@ async def test_raw_readings_are_wrapped_and_persisted(client, sink: InMemoryReco
     )
     assert resp.status_code == 200
     body = resp.json()
-    assert body == {"accepted": 2, "rejected": 0, "persisted": 2, "errors": []}
+    assert body == {
+        "accepted": 2,
+        "rejected": 0,
+        "persisted": 2,
+        "errors": [],
+        # curation on ingest (FB-009): no product feeds on whk-wms here
+        "curated": {},
+        "curation_errors": [],
+    }
     assert len(sink) == 2
     assert sink.records[0].source.adapter_id == "whk-wms"
     assert sink.records[0].lineage.schema_ref == "forge://schemas/whk-wms/v1"

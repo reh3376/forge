@@ -270,6 +270,49 @@ class TestCurationMount:
 
 
 # ---------------------------------------------------------------------------
+# Curation on ingest (FB-009)
+# ---------------------------------------------------------------------------
+
+
+class TestCurationOnIngest:
+    @pytest.mark.asyncio
+    async def test_ingested_records_curate_the_published_products_they_feed(self, client):
+        await client.post("/v1/adapters/register", json=_make_manifest("whk-wms"))
+        created = await client.post(
+            "/curation/products",
+            json={
+                "name": "Temperatures",
+                "description": "5-minute averages",
+                "owner": "reh3376",
+                "schema_ref": "forge://schemas/curation/Temperatures/v1",
+                "source_adapters": ["whk-wms"],
+            },
+        )
+        product_id = created.json()["product_id"]
+        assert (await client.put(f"/curation/products/{product_id}/publish")).status_code == 200
+
+        ingested = await client.post(
+            "/v1/records",
+            json={
+                "adapter_id": "whk-wms",
+                "records": [
+                    {"tag": "temp", "value": 70.0, "equipment_id": "FERM-01"},
+                    {"tag": "temp", "value": 74.0, "equipment_id": "FERM-01"},
+                ],
+            },
+        )
+        assert ingested.status_code == 200, ingested.text
+        assert ingested.json()["accepted"] == 2
+        assert ingested.json()["curated"] == {product_id: 1}
+        assert ingested.json()["curation_errors"] == []
+
+        window = await client.get(f"/curation/products/{product_id}/curated")
+        assert window.json()["count"] == 1
+        assert window.json()["records"][0]["value"]["raw"] == 72.0
+        assert (await client.get("/v1/info")).status_code == 200
+
+
+# ---------------------------------------------------------------------------
 # Context Engine and Schema Registry served by the hub (FB-001)
 # ---------------------------------------------------------------------------
 

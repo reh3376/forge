@@ -15,11 +15,11 @@ from __future__ import annotations
 import statistics
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
 from enum import StrEnum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
+from forge.core.clock import utc_now
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -30,6 +30,9 @@ from forge.core.models.contextual_record import (
     RecordValue,
 )
 from forge.curation.normalization import TimeBucketer
+
+if TYPE_CHECKING:
+    from datetime import datetime
 
 
 class AggregationFunction(StrEnum):
@@ -172,8 +175,8 @@ def aggregate_records(
                 ),
                 timestamp=RecordTimestamp(
                     source_time=bucket_time,
-                    server_time=datetime.now(UTC),
-                    ingestion_time=datetime.now(UTC),
+                    server_time=utc_now(),
+                    ingestion_time=utc_now(),
                 ),
                 value=RecordValue(
                     raw=agg_value,

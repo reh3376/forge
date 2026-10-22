@@ -24,7 +24,7 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.ingest.pipeline import IngestPipeline, InMemoryRecordSink
+from forge.ingest.pipeline import IngestPipeline, IngestStats, InMemoryRecordSink
 from forge.storage.registry import StorageEngine
 
 SCHEMA_REF = "forge://schemas/forge-mes/v0.1.0"
@@ -292,3 +292,80 @@ async def test_ingest_keys_offsets_by_the_record_adapter_when_unnamed() -> None:
     await pipeline.ingest([_spoke_record()])  # no adapter_id: the record names its source
     assert pipeline.offsets.adapters() == ["forge-mes"]
     assert pipeline.offsets.stats("forge-mes")[SPOKE_LINK].last_seconds == -3.0
+
+
+class TestCurationOnIngest:
+    """After a batch is persisted, the products fed by its adapter are curated (FB-009)."""
+
+    @staticmethod
+    def _engine(**spec):
+        from forge.core.models.data_product import CurationSpec
+        from forge.curation.engine import CurationEngine
+
+        engine = CurationEngine()
+        product = engine.registry.create(
+            name="MES steps",
+            description="...",
+            owner="o",
+            schema_ref="forge://schemas/curation/Steps/v1",
+            source_adapters=["forge-mes"],
+            curation=CurationSpec(functions=["COUNT"], **spec),
+        )
+        engine.registry.publish(product.product_id)
+        return engine, product
+
+    @staticmethod
+    def _numeric(adapter_id: str = "forge-mes") -> ContextualRecord:
+        record = make_record(adapter_id=adapter_id, data_type="float64")
+        record.value.raw = 3.5
+        record.context.equipment_id = "LINE-1"
+        return record
+
+    @pytest.mark.asyncio
+    async def test_curated_records_land_in_the_pipeline_sinks(self):
+        engine, product = self._engine()
+        sink = InMemoryRecordSink()
+        pipeline = IngestPipeline(fallback_sink=sink, curation=engine)
+        engine.persist = pipeline.persist
+
+        outcome = await pipeline.ingest([self._numeric(), self._numeric()], adapter_id="forge-mes")
+        assert outcome.accepted == 2 and outcome.persisted == 2
+        assert outcome.curated == {product.product_id: 1} and outcome.curation_errors == []
+        assert outcome.to_dict()["curated"] == {product.product_id: 1}
+        curated = engine.curated(product.product_id)
+        assert len(curated) == 1 and curated[0].value.raw == 2  # COUNT of the bucket
+        # the raw records and the curated one are both in the store
+        assert len(sink) == 3 and sink.records[-1].lineage.adapter_id == "forge-curation"
+        assert pipeline.describe()["curation"]["runs"] == 1
+
+    @pytest.mark.asyncio
+    async def test_other_adapters_and_rejected_batches_curate_nothing(self):
+        engine, _product = self._engine()
+        pipeline = IngestPipeline(curation=engine)
+        outcome = await pipeline.ingest([self._numeric("whk-wms")], adapter_id="whk-wms")
+        assert outcome.accepted == 1 and outcome.curated == {}
+        rejected = await pipeline.ingest([self._numeric("whk-wms")], adapter_id="forge-mes")
+        assert rejected.accepted == 0 and rejected.curated == {}
+
+    @pytest.mark.asyncio
+    async def test_a_curation_failure_never_fails_the_ingest(self):
+        engine, product = self._engine(time_window="7min")
+        pipeline = IngestPipeline(curation=engine)
+        outcome = await pipeline.ingest([self._numeric()], adapter_id="forge-mes")
+        assert outcome.accepted == 1 and outcome.persisted == 1 and outcome.errors == []
+        assert outcome.curated == {}
+        assert (
+            len(outcome.curation_errors) == 1 and product.product_id in outcome.curation_errors[0]
+        )
+
+    @pytest.mark.asyncio
+    async def test_persist_writes_hub_born_records_without_receipt(self):
+        sink = InMemoryRecordSink()
+        pipeline = IngestPipeline(fallback_sink=sink)
+        record = self._numeric()
+        before = record.timestamp.ingestion_time
+        assert await pipeline.persist([record]) == 1
+        assert await pipeline.persist([]) == 0
+        assert sink.records[0].timestamp.ingestion_time == before
+        # hub-born records are not ingest traffic: the stats stay untouched
+        assert pipeline.stats.to_dict() == IngestStats().to_dict()

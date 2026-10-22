@@ -173,7 +173,7 @@ Docker Compose on a laptop is not a plant. Backups, health, upgrades and multi-n
 | **Storage** | The hub owns PostgreSQL (relational, one schema per module with Forge-issued credentials), TimescaleDB (time series, contextual records), Neo4j (lineage, topology), Redis (cache, sessions). Migrations are versioned; modules never connect on their own credentials. |
 | **Context Engine** | Resolves and enriches context (shift, area, lot, equipment) and serves the context field registry. |
 | **Schema Registry** | Versioned schemas for records and data products; compatibility rules (FDTS). |
-| **Curation** | Normalization, data product registry, pipeline, lineage, quality monitoring. |
+| **Curation** | Normalization, data product registry, per-product pipelines built from each product's curation spec and run on ingest (engine), lineage, quality monitoring. |
 | **Gateway** | Authentication by the installation's chosen method, scoped RBAC on every route and RPC, rate limiting, separation-of-duties evaluation. |
 | **Hub API** | REST for operators and modules (adapters, records, writes, subscriptions, backfill, collect, ingest log, info/health) plus the mounted service APIs (curation, context, schemas). |
 | **Observer** | Health, liveness, SLOs, performance baselines, backup status. |

@@ -113,6 +113,8 @@ class TestPostgresProductStore:
         call_args = conn.execute.call_args
         assert "INSERT INTO forge_canonical.data_products" in call_args[0][0]
         assert call_args[0][1] == "dp-test-001"
+        # the curation spec (FB-009) is the last parameter, as JSON
+        assert json.loads(call_args[0][14])["functions"] == ["AVG"]
 
     @pytest.mark.asyncio
     async def test_get_async_returns_product(self, mock_pool):
@@ -322,3 +324,50 @@ class TestPostgresLineageStore:
         store = PostgresLineageStore(pool)
         entries = await store._async_query("SELECT 1")
         assert entries == []
+
+
+class TestProductCurationColumn:
+    """The curation spec round-trips; rows older than migration 010 get the default (FB-009)."""
+
+    @pytest.mark.asyncio
+    async def test_row_with_spec(self, mock_pool):
+        from forge.core.models.data_product import CurationSpec
+
+        pool, conn = mock_pool
+        row = _product_row("dp-c1")
+        row["curation"] = json.dumps(
+            {"functions": ["MAX"], "time_window": "1hr", "on_ingest": False}
+        )
+        conn.fetchrow.return_value = row
+        product = await PostgresProductStore(pool)._get_async("dp-c1")
+        assert product is not None
+        assert product.curation == CurationSpec(
+            functions=["MAX"], time_window="1hr", on_ingest=False
+        )
+
+    @pytest.mark.asyncio
+    async def test_row_without_the_column_gets_the_default_spec(self, mock_pool):
+        from forge.core.models.data_product import CurationSpec
+
+        pool, conn = mock_pool
+        conn.fetchrow.return_value = _product_row("dp-c2")
+        product = await PostgresProductStore(pool)._get_async("dp-c2")
+        assert product is not None and product.curation == CurationSpec()
+
+
+def _product_row(product_id: str) -> dict:
+    return {
+        "product_id": product_id,
+        "name": "P",
+        "description": "d",
+        "owner": "o",
+        "status": "DRAFT",
+        "schema_ref": "forge://schemas/test/v1",
+        "schema_version": "1.0.0",
+        "source_adapters": json.dumps([]),
+        "quality_slos": json.dumps([]),
+        "tags": json.dumps([]),
+        "created_at": datetime.now(UTC),
+        "updated_at": datetime.now(UTC),
+        "metadata": json.dumps({}),
+    }

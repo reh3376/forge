@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 58) · **Owner:** reh3376
+**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 59) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -21,13 +21,13 @@ This page is the honest snapshot: what exists in the repository today, what is w
 
 | Measure | Value |
 |---|---|
-| Python hub (`src/forge`) | 350 files, ~67,600 lines |
-| Python tests | 255 files, ~54,700 lines, 4,108 test functions (4,360 collected); full suite green on 2026-10-22 |
+| Python hub (`src/forge`) | 352 files, ~68,000 lines |
+| Python tests | 256 files, ~55,200 lines, 4,130 test functions (4,385 collected); full suite green on 2026-10-22 |
 | Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
 | Hub REST routes | 41 on the hub app (20 platform, 12 Context Engine, 9 Schema Registry; state changes behind `adapters:write`, `context:write` or `schemas:write`), plus OT i3X (8) and OT control (15; every POST behind `adapters:write`), plus the curation app mounted at `/curation` |
-| Storage migrations | 9 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions, registry and equipment tables) |
+| Storage migrations | 10 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions, registry and equipment tables, data-product curation spec) |
 | FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 6 await owner approval after the FB-080 and FB-074 re-stamps (`forge governance specs --pending`) |
 | FATS specs | 28 (one per route the hub app serves; the hub test holds both directions) |
 | FVTS specs | 1 (ot-module reference, `pending_review`; re-stamped by FB-074 for `REJECTED_REVIEW`) |
@@ -62,7 +62,7 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 | Capability | State | Notes |
 |---|---|---|
 | Hub REST API (adapters, records, writes, subscriptions, backfill, collect, ingest log, info/health) | ✅ | `src/forge/api/main.py` |
-| Curation service mounted | ✅ | `/curation` |
+| Curation service mounted | ✅ | `/curation`; one curation engine builds each data product's pipeline from its `CurationSpec` and runs it on ingest for the published products the adapter feeds, curated records persisted with the raw ones (FB-009, 2026-10-22) |
 | Context Engine (F21) and Schema Registry (F20) | ✅ | Served by the hub under `/v1/context` and `/v1/schemas` (FB-001); Postgres stores through the factory, migration 009 (FB-005); both 2026-10-22 |
 | Gateway: auth, RBAC, rate limiting | 🟡 | Middleware exists; auth off by default; only state-changing routes carry a scope (`adapters:write`, `context:write`, `schemas:write`), reads are open (FB-007) |
 | Access controller persistence | 🟡 | In-memory only; Postgres controller unimplemented (FB-003) |
@@ -77,7 +77,7 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 | Engines: PostgreSQL, TimescaleDB, Neo4j, Redis | ✅ | `forge.storage.engines` |
 | Storage router and factory | ✅ | |
 | Schema references: one grammar (`forge://schemas/<spoke>[/<Entity>][/v<version>]`), three roles, held at every boundary | ✅ | `forge.core.schema_ref` (FB-008, 2026-10-22); the two registries themselves are not converged (FB-097) |
-| Versioned migrations (9) | ✅ | |
+| Versioned migrations (10) | ✅ | |
 | Forge-issued module database credentials (`forge db access`) | ✅ | FB-057 step 1, migration 008; password printed once, never stored |
 | `mod_mes` schema in the hub (MES data moves in) | ⬜ | FB-057 steps 2–5, after the FB-076 design |
 | Backups, restore procedure | ⬜ | No backlog id yet |
