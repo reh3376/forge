@@ -246,3 +246,67 @@ class TestQualityEndpoint:
     async def test_no_quality_report(self, client: AsyncClient) -> None:
         response = await client.get("/products/dp-test/quality")
         assert response.status_code == 404
+
+
+class TestCurationSpec:
+    """Each product carries how it is curated; /curate runs that, not a fixed pipeline (FB-009)."""
+
+    async def test_spec_round_trips_and_drives_curate(self, client: AsyncClient) -> None:
+        created = await client.post(
+            "/products",
+            json={
+                "name": "Peaks",
+                "description": "...",
+                "owner": "o",
+                "schema_ref": "forge://schemas/curation/Peaks/v1",
+                "source_adapters": ["whk-wms"],
+                "curation": {"functions": ["max"], "time_window": "1hr", "normalize": False},
+            },
+        )
+        assert created.status_code == 201, created.text
+        product_id = created.json()["product_id"]
+        spec = (await client.get(f"/products/{product_id}")).json()["curation"]
+        assert spec == {
+            "normalize": False,
+            "time_window": "1hr",
+            "group_by": ["equipment_id"],
+            "functions": ["max"],
+            "on_ingest": True,
+        }
+
+        curated = await client.post(
+            "/curate", json={"product_id": product_id, "records": [_make_record_dict()]}
+        )
+        assert curated.status_code == 200, curated.text
+        assert curated.json()["steps_applied"] == ["time_bucket_1hr", "aggregate_max"]
+
+        window = await client.get(f"/products/{product_id}/curated")
+        assert window.json()["count"] == 1
+        assert window.json()["records"][0]["source"]["tag_path"].endswith("/max")
+        assert (await client.get("/products/dp-nope/curated")).status_code == 404
+
+    async def test_default_spec_when_omitted(self, client: AsyncClient) -> None:
+        created = await client.post(
+            "/products",
+            json={
+                "name": "A",
+                "description": "...",
+                "owner": "o",
+                "schema_ref": "forge://schemas/t/v1",
+            },
+        )
+        assert created.json()["curation"]["functions"] == ["AVG"]
+        assert created.json()["curation"]["time_window"] == "5min"
+
+    async def test_bad_spec_is_a_400(self, client: AsyncClient) -> None:
+        created = await client.post(
+            "/products",
+            json={
+                "name": "A",
+                "description": "...",
+                "owner": "o",
+                "schema_ref": "forge://schemas/t/v1",
+                "curation": {"time_window": "7min"},
+            },
+        )
+        assert created.status_code == 400 and "unknown time_window" in created.text

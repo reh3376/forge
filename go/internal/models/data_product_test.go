@@ -84,3 +84,43 @@ func TestDataProductStatusValues(t *testing.T) {
 		}
 	}
 }
+
+// The curation spec (FB-009) round-trips and is omitted when absent, like the Python model.
+func TestDataProductCurationRoundTrip(t *testing.T) {
+	dp := models.DataProduct{
+		ProductID: "p1",
+		Name:      "Test",
+		Owner:     "owner",
+		Status:    models.DataProductStatusDraft,
+		Schema:    models.DataProductSchema{SchemaRef: "forge://schemas/t/v1", Version: "1.0"},
+		Curation:  &models.CurationSpec{Normalize: true, TimeWindow: "1hr", GroupBy: []string{"equipment_id"}, Functions: []string{"MAX"}, OnIngest: false},
+	}
+	data, err := json.Marshal(dp)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	var dp2 models.DataProduct
+	if err := json.Unmarshal(data, &dp2); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if dp2.Curation == nil || dp2.Curation.TimeWindow != "1hr" || dp2.Curation.Functions[0] != "MAX" || dp2.Curation.OnIngest {
+		t.Errorf("curation: %+v", dp2.Curation)
+	}
+	bare, _ := json.Marshal(models.DataProduct{ProductID: "p2"})
+	if string(bare) != "" && contains(string(bare), "curation") {
+		t.Errorf("curation should be omitted when nil: %s", bare)
+	}
+}
+
+func contains(s, sub string) bool {
+	return len(sub) == 0 || (len(s) >= len(sub) && (s == sub || indexOf(s, sub) >= 0))
+}
+
+func indexOf(s, sub string) int {
+	for i := 0; i+len(sub) <= len(s); i++ {
+		if s[i:i+len(sub)] == sub {
+			return i
+		}
+	}
+	return -1
+}

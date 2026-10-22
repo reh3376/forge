@@ -47,6 +47,9 @@ from forge.context.service import build_context_router
 from forge.core.models.adapter import (
     AdapterManifest,  # noqa: TC001 — FastAPI resolves these at runtime
 )
+from forge.curation.engine import CurationEngine
+from forge.curation.lineage import LineageTracker
+from forge.curation.registry import DataProductRegistry
 from forge.gateway.auth import auth_config_from_env, configure_auth
 from forge.gateway.models import ForgeUser  # noqa: TC001 — FastAPI dependency type
 from forge.gateway.rbac import require_scope
@@ -90,6 +93,9 @@ class IngestResponse(BaseModel):
     rejected: int = 0
     persisted: int = 0
     errors: list[str] = Field(default_factory=list)
+    # Curation on ingest (FB-009): curated records per data product, and failed runs.
+    curated: dict[str, int] = Field(default_factory=dict)
+    curation_errors: list[str] = Field(default_factory=list)
 
 
 class WriteRequestModel(BaseModel):
@@ -192,13 +198,29 @@ def create_app(
         schema_store = storage_factory.schema_store()
     if equipment_store is None and storage_factory is not None:
         equipment_store = storage_factory.equipment_store()
+    # One curation engine (FB-009) serves the ingest trigger and the curation sub-app;
+    # its registry and lineage persist through the factory.
+    if storage_factory is not None:
+        curation = CurationEngine(
+            DataProductRegistry(store=storage_factory.product_store()),
+            lineage_tracker=LineageTracker(store=storage_factory.lineage_store()),
+        )
+    else:
+        curation = CurationEngine()
     # One ingest pipeline serves both transports (gRPC Ingest and REST /v1/records).
     if ingest_pipeline is not None:
         pipeline = ingest_pipeline
+        if pipeline.curation is None:
+            pipeline.curation = curation
+        else:
+            curation = pipeline.curation
     elif storage_factory is not None:
-        pipeline = build_pipeline_from_storage(storage_factory)
+        pipeline = build_pipeline_from_storage(storage_factory, curation=curation)
     else:
-        pipeline = IngestPipeline()
+        pipeline = IngestPipeline(curation=curation)
+    # Curated records land in the same stores as the raw ones.
+    if curation.persist is None:
+        curation.persist = pipeline.persist
 
     def _can_write(adapter_id: str) -> bool | None:
         manifest = registry.get_manifest(adapter_id)
@@ -345,6 +367,7 @@ def create_app(
         lifespan=lifespan,
     )
     app.state.ingest_pipeline = pipeline
+    app.state.curation_engine = curation
     app.state.adapter_registry = registry
     app.state.write_dispatcher = dispatcher
     app.state.subscriptions = subscriptions
@@ -454,6 +477,8 @@ def create_app(
         return IngestResponse(
             accepted=outcome.accepted,
             rejected=outcome.rejected + len(parse_errors),
+            curated=outcome.curated,
+            curation_errors=outcome.curation_errors,
             persisted=outcome.persisted,
             errors=parse_errors + outcome.errors,
         )
@@ -663,19 +688,7 @@ def create_app(
     try:
         from forge.curation.service import create_curation_app
 
-        curation_kwargs: dict[str, Any] = {}
-        if storage_factory is not None:
-            from forge.curation.lineage import LineageTracker
-            from forge.curation.registry import DataProductRegistry
-
-            curation_kwargs["registry"] = DataProductRegistry(
-                store=storage_factory.product_store(),
-            )
-            curation_kwargs["lineage_tracker"] = LineageTracker(
-                store=storage_factory.lineage_store(),
-            )
-
-        curation_app = create_curation_app(**curation_kwargs)
+        curation_app = create_curation_app(engine=curation)
         app.mount("/curation", curation_app)
         services["curation"] = "/curation"
         logger.info("Curation sub-application mounted at /curation")

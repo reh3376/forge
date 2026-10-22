@@ -401,4 +401,4 @@ Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE
 
 ---
 
-*350 Python source files | 255 test files | 4,360 tests | 9 FACTS · 28 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
+*352 Python source files | 256 test files | 4,385 tests | 9 FACTS · 28 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*

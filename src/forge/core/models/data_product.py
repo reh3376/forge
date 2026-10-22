@@ -54,6 +54,23 @@ class DataProductSchema(BaseModel):
         return value
 
 
+class CurationSpec(BaseModel):
+    """How the curation engine builds this product's pipeline (FB-009).
+
+    ``time_window`` is one of the named windows of
+    ``forge.curation.normalization.TIME_WINDOWS``; ``functions`` are
+    ``forge.curation.aggregation.AggregationFunction`` names; the engine
+    checks both. ``on_ingest`` runs the pipeline whenever a batch from one of
+    the product's ``source_adapters`` is ingested, for a published product.
+    """
+
+    normalize: bool = True
+    time_window: str = "5min"
+    group_by: list[str] = Field(default_factory=lambda: ["equipment_id"])
+    functions: list[str] = Field(default_factory=lambda: ["AVG"])
+    on_ingest: bool = True
+
+
 class DataProduct(OneClockModel):
     """A curated, decision-ready dataset with governance metadata.
 
@@ -77,6 +94,7 @@ class DataProduct(OneClockModel):
     source_adapters: list[str] = Field(default_factory=list)
     quality_slos: list[QualitySLO] = Field(default_factory=list)
     tags: list[str] = Field(default_factory=list)
+    curation: CurationSpec = Field(default_factory=CurationSpec)
     created_at: datetime = Field(default_factory=utc_now)
     updated_at: datetime = Field(default_factory=utc_now)
     metadata: dict[str, Any] = Field(default_factory=dict)
