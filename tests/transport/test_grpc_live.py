@@ -380,7 +380,7 @@ class TestGrpcTransportAdapter:
                 tier=AdapterTier.MES_MOM,
                 capabilities=AdapterCapabilities(read=True),
                 data_contract=DataContract(
-                    schema_ref="forge://test/v1",
+                    schema_ref="forge://schemas/test/v1",
                     output_format="contextual_record",
                     context_fields=["equipment_id"],
                 ),

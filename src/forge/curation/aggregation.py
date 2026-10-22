@@ -183,7 +183,9 @@ def aggregate_records(
                 ),
                 context=RecordContext(**context_dict),
                 lineage=RecordLineage(
-                    schema_ref=f"forge://curation/{spec.product_id or 'default'}/v0.1.0",
+                    # Version ref of the product's schema under the curation spoke
+                    # (forge.core.schema_ref, FB-008).
+                    schema_ref=f"forge://schemas/curation/{spec.product_id or 'default'}/v0.1.0",
                     adapter_id="forge-curation",
                     adapter_version="0.1.0",
                     transformation_chain=[

@@ -282,7 +282,7 @@ class TestSDKPipelineIntegration:
         registry = SchemaRegistry()
         registry.register(
             SchemaEntry(
-                schema_id=manifest.data_contract.schema_ref,
+                schema_id=f"forge://schemas/{manifest.adapter_id}/historian_data/v{manifest.version}",
                 spoke_id=manifest.adapter_id,
                 entity_name="historian_data",
                 version=manifest.version,
@@ -296,8 +296,9 @@ class TestSDKPipelineIntegration:
             )
         )
 
-        # 3. Verify schema is queryable
-        entry = registry.get(manifest.data_contract.schema_ref)
+        # 3. Verify schema is queryable by its version ref (FB-008)
+        version_ref = f"forge://schemas/{manifest.adapter_id}/historian_data/v{manifest.version}"
+        entry = registry.get(version_ref)
         assert entry is not None
         assert entry.spoke_id == "test-route"
 

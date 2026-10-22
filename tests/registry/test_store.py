@@ -14,6 +14,8 @@ def _make_metadata(
     schema_type: SchemaType = SchemaType.ADAPTER_OUTPUT,
     **overrides,
 ) -> SchemaMetadata:
+    if not schema_id.startswith("forge://"):
+        schema_id = f"forge://schemas/test/{schema_id}"  # a schema id (FB-008)
     defaults = {
         "schema_id": schema_id,
         "name": name,
@@ -136,5 +138,5 @@ class TestInMemorySchemaStore:
         await store.save(_make_metadata("s1", "S1"))
         await store.save(_make_metadata("s2", "S2"))
         assert await store.count() == 2
-        await store.delete("s1")
+        await store.delete("forge://schemas/test/s1")
         assert await store.count() == 1

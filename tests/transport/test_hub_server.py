@@ -22,7 +22,7 @@ def manifest_dict() -> dict:
         version="0.1.0",
         protocol="graphql",
         tier=AdapterTier.MES_MOM,
-        data_contract=DataContract(schema_ref="forge://test/v0.1.0"),
+        data_contract=DataContract(schema_ref="forge://schemas/test/v0.1.0"),
     )
     return pydantic_to_proto(manifest)
 

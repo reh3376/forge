@@ -203,7 +203,7 @@ class TestStorageRouting:
 
         reg.register(
             SchemaEntry(
-                schema_id="forge://schemas/whk-wms/v0.1.0",
+                schema_id="forge://schemas/whk-wms/graphql/v0.1.0",
                 spoke_id="whk-wms",
                 entity_name="graphql",
                 version="0.1.0",
@@ -418,7 +418,7 @@ class TestFullPipelineIntegration:
         registry = SchemaRegistry()
         registry.register(
             SchemaEntry(
-                schema_id="forge://schemas/whk-wms/v0.1.0",
+                schema_id="forge://schemas/whk-wms/graphql/v0.1.0",
                 spoke_id="whk-wms",
                 entity_name="graphql",
                 version="0.1.0",

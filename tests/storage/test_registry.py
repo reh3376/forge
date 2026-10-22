@@ -192,3 +192,38 @@ class TestSchemaRegistry:
         registry.register(self._make_entry("whk-wms", "Barrel"))
         registry.register(self._make_entry("whk-wms", "Lot"))
         assert registry.entry_count == 2
+
+
+class TestSchemaEntryId:
+    """An entry's id is the version ref of its spoke, entity and version (FB-008)."""
+
+    def _entry(self, **overrides) -> SchemaEntry:
+        fields = {
+            "schema_id": "forge://schemas/whk-wms/Barrel/v1.0.0",
+            "spoke_id": "whk-wms",
+            "entity_name": "Barrel",
+            "version": "1.0.0",
+            "schema_json": {"type": "object"},
+            "authoritative_spoke": "whk-wms",
+            "storage_engine": StorageEngine.POSTGRESQL,
+            "storage_namespace": "spoke_wms",
+        }
+        fields.update(overrides)
+        return SchemaEntry(**fields)
+
+    def test_consistent_entry_is_accepted(self):
+        assert self._entry().schema_id == "forge://schemas/whk-wms/Barrel/v1.0.0"
+
+    def test_id_must_agree_with_spoke_entity_and_version(self):
+        import pytest
+
+        from forge.core.schema_ref import SchemaRefError
+
+        with pytest.raises(
+            SchemaRefError, match=r"expected forge://schemas/whk-wms/Barrel/v2\.0\.0"
+        ):
+            self._entry(version="2.0.0")
+        with pytest.raises(SchemaRefError, match="does not name"):
+            self._entry(schema_id="forge://schemas/whk-wms/v1.0.0")
+        with pytest.raises(SchemaRefError, match="not a schema reference"):
+            self._entry(schema_id="whk-wms/Barrel/1.0.0")

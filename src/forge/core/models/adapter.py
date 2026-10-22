@@ -11,9 +11,10 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from forge.core.clock import ClockOffsetStats
+from forge.core.schema_ref import require_versioned_ref
 
 
 class AdapterTier(StrEnum):
@@ -60,9 +61,19 @@ class ConnectionParam(BaseModel):
 class DataContract(BaseModel):
     """What this adapter produces."""
 
-    schema_ref: str
+    schema_ref: str = Field(
+        description=(
+            "Contract ref of the adapter's output, forge://schemas/<spoke>/v<version>"
+            " (forge.core.schema_ref, FB-008)."
+        )
+    )
     output_format: str = "contextual_record"
     context_fields: list[str] = Field(default_factory=list)
+
+    @field_validator("schema_ref")
+    @classmethod
+    def _schema_ref_is_versioned(cls, value: str) -> str:
+        return require_versioned_ref(value, field="schema_ref")
 
 
 class AdapterManifest(BaseModel):

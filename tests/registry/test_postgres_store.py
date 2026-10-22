@@ -265,7 +265,7 @@ class TestPostgresSchemaStore:
 
     def test_row_to_metadata_handles_nulls(self):
         row = {
-            "schema_id": "s1",
+            "schema_id": "forge://schemas/test/Nulls",
             "name": "Test",
             "schema_type": "api",
             "compatibility": "NONE",

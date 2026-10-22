@@ -16,6 +16,8 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
+from forge.core.schema_ref import require_schema_id
+
 
 class SchemaType(StrEnum):
     """Category of schema managed by the registry."""
@@ -69,7 +71,9 @@ class SchemaMetadata:
     """Top-level registry entry that groups all versions of a schema.
 
     Attributes:
-        schema_id: Unique identifier (e.g. ``forge://schemas/whk-wms/Barrel``)
+        schema_id: The schema id, ``forge://schemas/<spoke>/<Entity>`` (e.g.
+            ``forge://schemas/whk-wms/Barrel``); the registry assigns the
+            versions, so the id carries none (``forge.core.schema_ref``, FB-008)
         name: Human-readable name
         schema_type: Category of schema
         compatibility: Enforcement mode for version transitions
@@ -95,6 +99,9 @@ class SchemaMetadata:
     status: str = "active"
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+
+    def __post_init__(self) -> None:
+        require_schema_id(self.schema_id)
 
     def add_version(
         self,

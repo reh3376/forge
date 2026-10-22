@@ -244,8 +244,8 @@
       "properties": {
         "schema_ref": {
           "type": "string",
-          "pattern": "^forge://",
-          "description": "URI reference to the output data schema (e.g., 'forge://schemas/whk-wms-barrel/v1')."
+          "pattern": "^forge://schemas/[A-Za-z0-9][A-Za-z0-9_.-]*(/(?!v[0-9])[A-Za-z][A-Za-z0-9_-]*)?/v[0-9]+(\\.[0-9]+){0,2}([-+][0-9A-Za-z.-]+)?$",
+          "description": "Contract ref of the adapter's output: forge://schemas/<spoke>/v<version> (e.g. 'forge://schemas/whk-wms/v0.1.0'); forge.core.schema_ref, FB-008."
         },
         "output_format": {
           "type": "string",

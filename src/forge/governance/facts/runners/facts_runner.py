@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
+from forge.core.schema_ref import SchemaRefError, require_versioned_ref
 from forge.governance.shared.runner import (
     FxTSRunner,
     FxTSVerdict,
@@ -828,19 +829,21 @@ class FACTSRunner(FxTSRunner):
         dc = spec.get("data_contract", {})
         vocab = self.vocabulary
 
-        # schema_ref starts with forge://
+        # schema_ref is a contract ref (or a version ref): forge.core.schema_ref, FB-008
         schema_ref = dc.get("schema_ref", "")
-        if not schema_ref.startswith("forge://"):
+        try:
+            require_versioned_ref(schema_ref, field="schema_ref")
+        except SchemaRefError as exc:
             verdicts.append(
                 FxTSVerdict(
                     check_id="facts:data-contract-schema-ref",
                     spec_ref="FACTS/data_contract/schema_ref",
                     status=VerdictStatus.FAIL,
-                    message=f"schema_ref must start with 'forge://', got '{schema_ref}'.",
+                    message=f"schema_ref must be forge://schemas/<spoke>/v<version>: {exc}",
                     violations=[
                         SpecViolation(
                             field="data_contract.schema_ref",
-                            expected="forge://...",
+                            expected="forge://schemas/<spoke>[/<Entity>]/v<version>",
                             actual=schema_ref,
                             message="Invalid schema_ref.",
                         )

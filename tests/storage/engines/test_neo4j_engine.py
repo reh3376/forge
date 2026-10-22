@@ -175,7 +175,7 @@ class TestNeo4jGraphWriter:
             value=RecordValue(raw="test"),
             context=RecordContext(),  # no equipment
             lineage=RecordLineage(
-                schema_ref="test",
+                schema_ref="forge://schemas/test/v1",
                 adapter_id="test",
                 adapter_version="0.1.0",
             ),
