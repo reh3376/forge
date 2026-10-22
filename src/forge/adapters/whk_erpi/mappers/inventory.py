@@ -111,6 +111,7 @@ def map_lot(raw: dict[str, Any]) -> Lot | None:
         source_system=_SOURCE_SYSTEM,
         source_id=str(raw.get("id", global_id)),
         lot_number=str(lot_number or global_id),
+        item_id=_str_or_none(raw.get("itemId") or raw.get("item_id")),  # FB-010
         status=str(raw.get("status", "CREATED")).upper(),
         metadata={
             **_build_metadata(raw),

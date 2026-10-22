@@ -337,6 +337,12 @@ class TestMapLot:
         )
         assert result is not None
         assert result.lot_number == "LOT-2024-WB-0087"
+        assert result.item_id is None
+
+    def test_item_reference(self):
+        """FB-010: the lot's MaterialItem by source_id."""
+        result = map_lot({"id": "l1", "globalId": "LOT-001", "itemId": "ITEM-7"})
+        assert result is not None and result.item_id == "ITEM-7"
 
 
 class TestMapItemReceipt:

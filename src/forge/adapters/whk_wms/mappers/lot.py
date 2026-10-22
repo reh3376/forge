@@ -3,9 +3,10 @@
 WMS Lot fields (from Prisma schema):
     id, lotNumber, recipeId, productionOrderId, whiskeyTypeId,
     customerId, status, bblTotal, totalPGs, totalWGs, mashbillId
+    (+ itemId when the WMS attaches the lot's item; FB-010)
 
 Forge Lot fields:
-    lot_number, product_type, recipe_id, production_order_id,
+    lot_number, product_type, item_id, recipe_id, production_order_id,
     customer_id, status, quantity, unit_of_measure, parent_lot_id,
     unit_count + provenance envelope
 """
@@ -38,6 +39,7 @@ def map_lot(raw: dict[str, Any]) -> Lot | None:
         source_id=str(lot_id),
         lot_number=str(lot_number),
         product_type=raw.get("whiskeyType") or raw.get("whiskey_type"),
+        item_id=_str_or_none(raw.get("itemId") or raw.get("item_id")),
         recipe_id=_str_or_none(raw.get("recipeId") or raw.get("recipe_id")),
         production_order_id=_str_or_none(
             raw.get("productionOrderId") or raw.get("production_order_id")

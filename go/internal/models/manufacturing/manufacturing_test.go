@@ -2,6 +2,7 @@ package manufacturing_test
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -79,9 +80,25 @@ func TestLotConstruction(t *testing.T) {
 		LotNumber:              "2026-001",
 		Status:                 "CREATED",
 		ProductType:            "bourbon",
+		ItemID:                 "ITEM-7",
 	}
 	if lot.LotNumber != "2026-001" {
 		t.Errorf("lot_number: %q", lot.LotNumber)
+	}
+	// FB-010: the lot names the MaterialItem it is a quantity of, as the Python model does.
+	data, err := json.Marshal(lot)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	if !strings.Contains(string(data), `"item_id":"ITEM-7"`) {
+		t.Errorf("item_id missing from %s", data)
+	}
+	var back mfg.Lot
+	if err := json.Unmarshal(data, &back); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if back.ItemID != "ITEM-7" {
+		t.Errorf("item_id round trip: %q", back.ItemID)
 	}
 }
 

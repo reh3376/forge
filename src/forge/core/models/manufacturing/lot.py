@@ -8,7 +8,9 @@ Maps from:
 
 A Lot groups manufacturing units (barrels, batches) that share a common
 production origin. Lots are the primary unit of traceability in
-manufacturing — they connect raw materials to finished goods.
+manufacturing — they connect raw materials to finished goods. A lot is a
+quantity of one MaterialItem (ISA-95: material lot → material definition);
+``item_id`` names it by source_id (FB-010).
 """
 
 from __future__ import annotations
@@ -31,6 +33,14 @@ class Lot(ManufacturingModelBase):
     product_type: str | None = Field(
         default=None,
         description="Product classification (e.g. whiskey type code).",
+    )
+    item_id: str | None = Field(
+        default=None,
+        description=(
+            "Reference to the MaterialItem this lot is a quantity of (by source_id). "
+            "One item per lot; a source that attaches several keeps the list in "
+            "metadata['item_ids'] and names the first here (FB-010)."
+        ),
     )
     recipe_id: str | None = Field(
         default=None,

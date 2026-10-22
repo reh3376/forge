@@ -6,6 +6,7 @@ type Lot struct {
 	ManufacturingModelBase
 	LotNumber         string   `json:"lot_number"`
 	ProductType       string   `json:"product_type,omitempty"`
+	ItemID            string   `json:"item_id,omitempty"` // the MaterialItem the lot is a quantity of, by source_id (FB-010)
 	RecipeID          string   `json:"recipe_id,omitempty"`
 	ProductionOrderID string   `json:"production_order_id,omitempty"`
 	CustomerID        string   `json:"customer_id,omitempty"`
