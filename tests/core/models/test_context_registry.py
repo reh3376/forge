@@ -294,3 +294,21 @@ class TestDefaultRegistry:
         r2 = build_default_registry()
         assert r1 is not r2
         assert len(r1) == len(r2)
+
+
+class TestRegistryMatchesRecordContext:
+    """FB-013: the registry's fields are RecordContext's slots, one for one."""
+
+    def test_same_names(self) -> None:
+        from forge.core.models.contextual_record import RecordContext
+
+        registry = build_default_registry()
+        slots = set(RecordContext.model_fields) - {"extra"}
+        assert set(registry.list_field_names()) == slots
+
+    def test_types_agree(self) -> None:
+        from forge.core.models.contextual_record import RecordContext
+
+        for ctx_field in build_default_registry().list_fields():
+            annotation = str(RecordContext.model_fields[ctx_field.name].annotation)
+            assert ctx_field.field_type in annotation, ctx_field.name

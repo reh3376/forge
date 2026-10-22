@@ -16,8 +16,16 @@ The hypertable schema:
     data_type      TEXT,
     equipment_id   TEXT,
     area           TEXT,
+    site           TEXT,
     batch_id       TEXT,
+    lot_id         TEXT,
+    recipe_id      TEXT,
     operating_mode TEXT,
+    shift_id       TEXT,
+    operator_id    TEXT,
+    event_type     TEXT,
+    event_timestamp TIMESTAMPTZ,
+    work_order_id  TEXT,          -- one column per RecordContext slot (migration 011, FB-013)
     context_extra  JSONB,
     schema_ref     TEXT,
     adapter_version TEXT
@@ -60,10 +68,13 @@ class TimescaleRecordWriter:
                     INSERT INTO forge_ts.contextual_records
                         (time, record_id, adapter_id, system, tag_path,
                          raw_value, engineering_units, quality, data_type,
-                         equipment_id, area, batch_id, operating_mode,
+                         equipment_id, area, site, batch_id, lot_id, recipe_id,
+                         operating_mode, shift_id, operator_id, event_type,
+                         event_timestamp, work_order_id,
                          context_extra, schema_ref, adapter_version)
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
-                            $10, $11, $12, $13, $14, $15, $16)
+                            $10, $11, $12, $13, $14, $15, $16, $17, $18, $19,
+                            $20, $21, $22, $23, $24)
                     """,
                     *self._record_to_row(record),
                 )
@@ -88,10 +99,13 @@ class TimescaleRecordWriter:
                     INSERT INTO forge_ts.contextual_records
                         (time, record_id, adapter_id, system, tag_path,
                          raw_value, engineering_units, quality, data_type,
-                         equipment_id, area, batch_id, operating_mode,
+                         equipment_id, area, site, batch_id, lot_id, recipe_id,
+                         operating_mode, shift_id, operator_id, event_type,
+                         event_timestamp, work_order_id,
                          context_extra, schema_ref, adapter_version)
                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
-                            $10, $11, $12, $13, $14, $15, $16)
+                            $10, $11, $12, $13, $14, $15, $16, $17, $18, $19,
+                            $20, $21, $22, $23, $24)
                     """,
                     rows,
                 )
@@ -119,8 +133,16 @@ class TimescaleRecordWriter:
             record.value.data_type,
             ctx.equipment_id if ctx else None,
             ctx.area if ctx else None,
+            ctx.site if ctx else None,
             ctx.batch_id if ctx else None,
+            ctx.lot_id if ctx else None,
+            ctx.recipe_id if ctx else None,
             ctx.operating_mode if ctx else None,
+            ctx.shift_id if ctx else None,
+            ctx.operator_id if ctx else None,
+            ctx.event_type if ctx else None,
+            ctx.event_timestamp if ctx else None,
+            ctx.work_order_id if ctx else None,
             json.dumps(ctx.extra) if ctx and ctx.extra else None,
             record.lineage.schema_ref,
             record.lineage.adapter_version,

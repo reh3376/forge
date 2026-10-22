@@ -68,7 +68,7 @@ def sample_record() -> ContextualRecord:
             lot_id="L2026-0405",
             recipe_id="R-BOURBON-001",
             operating_mode="PRODUCTION",
-            shift="B",
+            shift_id="B",
             operator_id="OP-042",
             extra={"line": "Line-1", "nested": {"key": "val"}},
         ),

@@ -13,7 +13,7 @@ from enum import StrEnum
 from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from forge.core.clock import OneClockModel, utc_now
 from forge.core.schema_ref import require_versioned_ref
@@ -70,12 +70,44 @@ class RecordValue(BaseModel):
     data_type: str = "string"
 
 
-class RecordContext(BaseModel):
+def _aware_datetime(value: Any) -> datetime | None:
+    """``value`` as a timezone-aware datetime, or None if it is not one (naive included)."""
+    if isinstance(value, datetime):
+        return value if value.tzinfo is not None else None
+    if isinstance(value, str) and value:
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        return parsed if parsed.tzinfo is not None else None
+    return None
+
+
+class RecordContext(OneClockModel):
     """Operational context that travels with every data record.
 
     This is what makes Forge different from a raw data pipeline.
     Every record carries enough context for correct interpretation.
+
+    The named slots are the context field registry
+    (``forge.core.registry.context_fields``), one attribute per registered
+    field; ``extra`` holds what a spoke adds beyond them (FB-013). A producer
+    that still sends a registered field inside ``extra`` (``shift``,
+    ``shift_id``, ``event_type``, ``work_order_id``, ``event_timestamp``)
+    finds it lifted into its slot when the slot is empty; an
+    ``event_timestamp`` that is not an aware datetime stays in ``extra``, since
+    a naive value is rejected at the slot (one clock, FB-014). ``shift`` is
+    accepted as an alias of ``shift_id`` on input and as an attribute, for
+    the spokes that still use the name the slot had until FB-013.
     """
+
+    #: The registry fields a producer may still send inside ``extra``.
+    LIFTED_FROM_EXTRA: ClassVar[tuple[str, ...]] = (
+        "shift_id",
+        "event_type",
+        "work_order_id",
+        "event_timestamp",
+    )
 
     equipment_id: str | None = None
     area: str | None = None
@@ -84,9 +116,48 @@ class RecordContext(BaseModel):
     lot_id: str | None = None
     recipe_id: str | None = None
     operating_mode: str | None = None
-    shift: str | None = None
+    shift_id: str | None = Field(default=None, validation_alias=AliasChoices("shift_id", "shift"))
     operator_id: str | None = None
+    event_type: str | None = None
+    event_timestamp: datetime | None = None
+    work_order_id: str | None = None
     extra: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _lift_registry_fields(cls, data: Any) -> Any:
+        """Move the registry's fields out of ``extra`` into their slots (FB-013)."""
+        if not isinstance(data, dict):
+            return data
+        extra = data.get("extra")
+        if not isinstance(extra, dict) or not extra:
+            return data
+        out = dict(data)
+        remaining = dict(extra)
+        for key in ("shift", *cls.LIFTED_FROM_EXTRA):
+            if key not in remaining:
+                continue
+            slot = "shift_id" if key == "shift" else key
+            if out.get(slot) is not None or (slot == "shift_id" and out.get("shift") is not None):
+                continue
+            value = remaining[key]
+            if slot == "event_timestamp":
+                value = _aware_datetime(value)
+            if value is None or value == "":
+                continue
+            out[slot] = value
+            del remaining[key]
+        out["extra"] = remaining
+        return out
+
+    @property
+    def shift(self) -> str | None:
+        """``shift_id`` under the name the slot had until FB-013."""
+        return self.shift_id
+
+    @shift.setter
+    def shift(self, value: str | None) -> None:
+        self.shift_id = value
 
 
 class RecordLineage(BaseModel):
@@ -157,7 +228,8 @@ class ContextualRecord(BaseModel):
                     "equipment_id": "FERM-003",
                     "batch_id": "B2026-0405-003",
                     "operating_mode": "PRODUCTION",
-                    "shift": "B",
+                    "shift_id": "B",
+                    "event_type": "process.value",
                 },
                 "lineage": {
                     "schema_ref": "forge://schemas/opcua-generic/v1",

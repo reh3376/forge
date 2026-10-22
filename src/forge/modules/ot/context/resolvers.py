@@ -50,7 +50,7 @@ class EnrichmentContext(BaseModel):
     lot_id: str | None = None
     recipe_id: str | None = None
     operating_mode: str | None = None
-    shift: str | None = None
+    shift_id: str | None = None
     operator_id: str | None = None
     extra: dict[str, Any] = Field(default_factory=dict)
 

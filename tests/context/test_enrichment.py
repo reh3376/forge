@@ -113,19 +113,19 @@ class TestContextEnricher:
         # 10:00 Louisville = Day shift
         ts = datetime(2026, 4, 15, 10, 0, 0, tzinfo=lou)
         result = await enricher.enrich(ctx, source_time=ts)
-        assert result.context.shift == "Day"
-        assert "shift" in result.fields_added
+        assert result.context.shift_id == "Day"
+        assert "shift_id" in result.fields_added
 
     @pytest.mark.asyncio
     async def test_does_not_overwrite_existing_shift(self, enricher):
         from zoneinfo import ZoneInfo
 
         lou = ZoneInfo("America/Kentucky/Louisville")
-        ctx = RecordContext(shift="Custom")
+        ctx = RecordContext(shift_id="Custom")
         ts = datetime(2026, 4, 15, 10, 0, 0, tzinfo=lou)
         result = await enricher.enrich(ctx, source_time=ts)
-        assert result.context.shift == "Custom"
-        assert "shift" not in result.fields_added
+        assert result.context.shift_id == "Custom"
+        assert "shift_id" not in result.fields_added
 
     @pytest.mark.asyncio
     async def test_enriches_mode_from_store(self, enricher, mode_store):
@@ -172,6 +172,6 @@ class TestContextEnricher:
         assert result.context.batch_id == "B1"
         assert result.context.lot_id == "L1"
         assert result.context.recipe_id == "R1"
-        assert result.context.shift == "Day"
+        assert result.context.shift_id == "Day"
         assert result.context.operating_mode == "PRODUCTION"
         assert len(result.fields_added) == 7

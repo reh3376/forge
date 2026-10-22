@@ -42,16 +42,20 @@ type RecordValue struct {
 
 // RecordContext carries the operational context that travels with every record.
 type RecordContext struct {
-	EquipmentID   string         `json:"equipment_id,omitempty"`
-	Area          string         `json:"area,omitempty"`
-	Site          string         `json:"site,omitempty"`
-	BatchID       string         `json:"batch_id,omitempty"`
-	LotID         string         `json:"lot_id,omitempty"`
-	RecipeID      string         `json:"recipe_id,omitempty"`
-	OperatingMode string         `json:"operating_mode,omitempty"`
-	Shift         string         `json:"shift,omitempty"`
-	OperatorID    string         `json:"operator_id,omitempty"`
-	Extra         map[string]any `json:"extra,omitempty"`
+	EquipmentID   string `json:"equipment_id,omitempty"`
+	Area          string `json:"area,omitempty"`
+	Site          string `json:"site,omitempty"`
+	BatchID       string `json:"batch_id,omitempty"`
+	LotID         string `json:"lot_id,omitempty"`
+	RecipeID      string `json:"recipe_id,omitempty"`
+	OperatingMode string `json:"operating_mode,omitempty"`
+	ShiftID       string `json:"shift_id,omitempty"` // named `shift` until FB-013
+	OperatorID    string `json:"operator_id,omitempty"`
+	// The context field registry's remaining fields (FB-013).
+	EventType      string         `json:"event_type,omitempty"`
+	EventTimestamp *time.Time     `json:"event_timestamp,omitempty"`
+	WorkOrderID    string         `json:"work_order_id,omitempty"`
+	Extra          map[string]any `json:"extra,omitempty"`
 }
 
 // RecordLineage captures provenance — where this record came from.
@@ -79,9 +83,9 @@ type ContextualRecord struct {
 	RecordID  uuid.UUID       `json:"record_id"`
 	Source    RecordSource    `json:"source"`
 	Timestamp RecordTimestamp `json:"timestamp"`
-	Value     RecordValue    `json:"value"`
-	Context   RecordContext  `json:"context"`
-	Lineage   RecordLineage  `json:"lineage"`
+	Value     RecordValue     `json:"value"`
+	Context   RecordContext   `json:"context"`
+	Lineage   RecordLineage   `json:"lineage"`
 }
 
 // NewContextualRecord creates a ContextualRecord with a new UUID and

@@ -134,7 +134,6 @@ def build_record_context(
     # ── Build extra dict for adapter-specific context ─────────────
     extra: dict[str, Any] = {}
     extra["asset_id"] = asset_id
-    extra["event_type"] = event_type
     extra["actor_id"] = actor_id
     extra["disposition"] = disposition
 
@@ -161,6 +160,7 @@ def build_record_context(
             extra[key] = value
 
     return RecordContext(
+        event_type=event_type,
         equipment_id=station_id or None,
         area=location_id or None,
         site=spoke_id or None,

@@ -225,7 +225,7 @@ def record_context_to_proto(ctx: RecordContext) -> record_msg.RecordContext:
     for k, v in ctx.extra.items():
         extra_map[k] = v if isinstance(v, str) else json.dumps(v, default=str)
 
-    return record_msg.RecordContext(
+    msg = record_msg.RecordContext(
         equipment_id=ctx.equipment_id or "",
         area=ctx.area or "",
         site=ctx.site or "",
@@ -233,10 +233,16 @@ def record_context_to_proto(ctx: RecordContext) -> record_msg.RecordContext:
         lot_id=ctx.lot_id or "",
         recipe_id=ctx.recipe_id or "",
         operating_mode=ctx.operating_mode or "",
-        shift=ctx.shift or "",
+        shift_id=ctx.shift_id or "",
         operator_id=ctx.operator_id or "",
+        event_type=ctx.event_type or "",
+        work_order_id=ctx.work_order_id or "",
         extra=extra_map,
     )
+    event_timestamp = _dt_to_timestamp(ctx.event_timestamp)
+    if event_timestamp is not None:
+        msg.event_timestamp.CopyFrom(event_timestamp)
+    return msg
 
 
 def record_lineage_to_proto(lineage: RecordLineage) -> record_msg.RecordLineage:
@@ -396,8 +402,13 @@ def proto_to_record_context(msg: record_msg.RecordContext) -> RecordContext:
         lot_id=msg.lot_id or None,
         recipe_id=msg.recipe_id or None,
         operating_mode=msg.operating_mode or None,
-        shift=msg.shift or None,
+        shift_id=msg.shift_id or None,
         operator_id=msg.operator_id or None,
+        event_type=msg.event_type or None,
+        event_timestamp=(
+            _timestamp_to_dt(msg.event_timestamp) if msg.HasField("event_timestamp") else None
+        ),
+        work_order_id=msg.work_order_id or None,
         extra=extra,
     )
 

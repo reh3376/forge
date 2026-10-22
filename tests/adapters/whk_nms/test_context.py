@@ -29,7 +29,7 @@ class TestDeviceContext:
         assert context.extra["cross_system_id"] == "dev-001"
         assert context.extra["source_system"] == "whk-nms"
         assert context.extra["entity_type"] == "network_device"
-        assert context.extra["event_type"] == "device_discovery"
+        assert context.event_type == "device_discovery"
         assert context.extra["device_ip"] == "10.0.0.1"
         assert context.extra["device_type"] == "router"
         assert context.extra["device_role"] == "gateway"
@@ -125,7 +125,7 @@ class TestEventContext:
         )
 
         assert context.extra["entity_type"] == "network_device"
-        assert context.extra["event_type"] == "snmp_trap"
+        assert context.event_type == "snmp_trap"
         # device_ip is not in raw_trap as a direct field (it's from device_id lookup)
         assert context.extra.get("severity") == "high"
 
@@ -143,7 +143,7 @@ class TestEventContext:
         )
 
         assert context.extra["entity_type"] == "security_event"
-        assert context.extra["event_type"] == "security_event"
+        assert context.event_type == "security_event"
         assert context.extra["severity"] == "critical"
 
     def test_baseline_anomaly_context(self):
@@ -158,7 +158,7 @@ class TestEventContext:
         )
 
         assert context.extra["baseline_status"] == "suspicious"
-        assert context.extra["event_type"] == "baseline_anomaly"
+        assert context.event_type == "baseline_anomaly"
 
 
 class TestOperationContext:

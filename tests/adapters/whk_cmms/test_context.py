@@ -261,14 +261,14 @@ class TestContextFields:
             "event_type": "create",
         }
         ctx = build_record_context(raw)
-        assert ctx.extra["event_type"] == "create"
+        assert ctx.event_type == "create"
 
     def test_event_type_default(self):
         raw = {
             "entity_type": "WorkOrder",
         }
         ctx = build_record_context(raw)
-        assert ctx.extra["event_type"] == "query"
+        assert ctx.event_type == "query"
 
     def test_source_system_always_cmms(self):
         raw = {

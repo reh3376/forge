@@ -162,9 +162,9 @@ def build_egress_record(
         context = RecordContext(
             site=spoke_id or None,
             operator_id=inner.get("actor_id") or None,
+            event_type=normalized,
             extra={
                 "event_id": inner.get("event_id", ""),
-                "event_type": normalized,
                 "asset_id": inner.get("asset_id", ""),
                 "spoke_id": spoke_id,
             },

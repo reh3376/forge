@@ -18,7 +18,7 @@ class TestMigrationStructure:
         assert VERSIONS_DIR.is_dir()
 
     def test_all_versions_present(self):
-        expected = ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010"]
+        expected = ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011"]
         files = sorted(f.name for f in VERSIONS_DIR.glob("*.py") if f.name != "__init__.py")
         for version in expected:
             assert any(f.startswith(version) for f in files), f"Missing migration {version}"
@@ -225,3 +225,31 @@ class TestMigration010:
         source = (VERSIONS_DIR / "010_data_product_curation.py").read_text()
         assert 'op.add_column("data_products", sa.Column("curation", sa.JSON)' in source
         assert 'schema="forge_canonical"' in source
+
+
+class TestMigration011:
+    """011 gives forge_ts.contextual_records one column per RecordContext slot (FB-013)."""
+
+    def test_chain_and_columns_match_the_writer(self):
+        import re
+
+        from forge.core.models.contextual_record import RecordContext
+        from forge.storage.engines import timescale
+
+        mod = importlib.import_module(
+            "forge.storage.migrations.versions.011_contextual_records_context_columns"
+        )
+        assert mod.revision == "011" and mod.down_revision == "010"
+        added = set(mod._TEXT_COLUMNS) | {"event_timestamp"}
+        six = _tables_in(
+            _upgrade_and_downgrade("006_forge_ts_contextual_records.py")[0].replace(
+                'schema="forge_ts"', 'schema="forge_core"'
+            )
+        )["contextual_records"]
+        columns = six | added
+        assert set(RecordContext.model_fields) - {"extra"} <= columns
+        source = Path(timescale.__file__).read_text(encoding="utf-8")
+        insert = re.search(r"INSERT INTO forge_ts\.contextual_records\s*\((.*?)\)", source, re.S)
+        assert insert is not None
+        written = {name.strip() for name in insert.group(1).split(",")}
+        assert written == columns

@@ -88,14 +88,20 @@ message RecordContext {
   string lot_id = 5;
   string recipe_id = 6;
   string operating_mode = 7;
-  string shift = 8;
+  string shift_id = 8;         // named `shift` until FB-013; same field number, wire-compatible
   string operator_id = 9;
+
+  // The context field registry's remaining fields
+  // (forge.core.registry.context_fields, FB-013)
+  string event_type = 10;
+  google.protobuf.Timestamp event_timestamp = 11;
+  string work_order_id = 12;
 
   // Extensible key-value pairs for adapter-specific context.
   // Complex values should be JSON-encoded strings.
   map<string, string> extra = 15;
 
-  // reserved 10-14 for future standard context fields
+  // reserved 13-14 for future standard context fields
 }
 
 // ---------------------------------------------------------------------------

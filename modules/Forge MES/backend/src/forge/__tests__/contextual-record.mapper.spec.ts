@@ -7,7 +7,7 @@ import {
   normalizeEventType,
   toSnakeCase,
 } from "../contextual-record.mapper";
-import { fromTimestamp } from "../proto";
+import { fromTimestamp, toTimestamp } from "../proto";
 
 const OPTS = {
   adapterId: "forge-mes",
@@ -134,17 +134,18 @@ describe("mapDomainEventToRecord", () => {
       batch_id: "BATCH-2026-0042-001",
       recipe_id: "RCP-WHEATED-BOURBON-003",
       operating_mode: "Running",
-      shift: "day",
+      shift_id: "day",
       operator_id: "USR-0023",
-    });
-    expect(r.context.extra).toEqual({
       event_type: "step.started",
-      event_timestamp: "2026-06-01T14:59:00.000Z",
+      event_timestamp: { seconds: String(Date.parse("2026-06-01T14:59:00.000Z") / 1000), nanos: 0 },
+      work_order_id: "PRO-2026-WB-0042",
+    });
+    // FB-013: the registry's fields ride in their slots; extra keeps the rest.
+    expect(r.context.extra).toEqual({
       entity_type: "StepExecution",
       entity_id: "step-1",
       source_event_type: "step_started",
       production_order_id: "PRO-2026-WB-0042",
-      work_order_id: "PRO-2026-WB-0042",
       equipment_phase: "Mashing",
       process_step: "Saccharification Rest",
     });
@@ -157,9 +158,10 @@ describe("mapDomainEventToRecord", () => {
     );
     expect(r.context.batch_id).toBeUndefined();
     expect(r.context.equipment_id).toBeUndefined();
+    expect(r.context.work_order_id).toBeUndefined();
+    expect(r.context.event_type).toBe("phase.started");
+    expect(r.context.event_timestamp).toEqual(toTimestamp(OPTS.now));
     expect(r.context.extra).toEqual({
-      event_type: "phase.started",
-      event_timestamp: OPTS.now.toISOString(),
       entity_type: "ProductionEvent",
       source_event_type: "PhaseStarted",
     });

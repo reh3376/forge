@@ -78,7 +78,7 @@ class TestContextualRecordRoundTrip:
         assert restored.context.area == "Fermentation"
         assert restored.context.site == "Louisville"
         assert restored.context.batch_id == "B2026-0405-003"
-        assert restored.context.shift == "B"
+        assert restored.context.shift_id == "B"
         assert restored.context.operator_id == "OP-042"
 
     def test_context_extra_round_trip(self, sample_record: ContextualRecord) -> None:
@@ -415,3 +415,47 @@ class TestPublicApiErrors:
     def test_proto_to_pydantic_unknown_type(self) -> None:
         with pytest.raises(KeyError, match="No Pydantic converter"):
             proto_to_pydantic({}, "UnknownType")
+
+
+class TestRegistrySlotsOnTheWire:
+    """FB-013: shift_id, event_type, event_timestamp and work_order_id ride as fields."""
+
+    def test_dict_wire_round_trip(self, sample_record: ContextualRecord) -> None:
+        from datetime import UTC, datetime
+
+        sample_record.context.event_type = "fermenter.reading"
+        sample_record.context.event_timestamp = datetime(2026, 4, 5, 14, 30, tzinfo=UTC)
+        sample_record.context.work_order_id = "WO-7"
+        wire = pydantic_to_proto(sample_record)
+        assert wire["context"]["shift_id"] == "B" and "shift" not in wire["context"]
+        assert wire["context"]["event_type"] == "fermenter.reading"
+        assert wire["context"]["work_order_id"] == "WO-7"
+        assert wire["context"]["event_timestamp"] == {"seconds": 1775399400, "nanos": 0}
+        restored = proto_to_pydantic(wire, "ContextualRecord")
+        assert restored.context.event_type == "fermenter.reading"
+        assert restored.context.event_timestamp == sample_record.context.event_timestamp
+        assert restored.context.work_order_id == "WO-7"
+
+    def test_old_shift_key_is_still_read(self) -> None:
+        from forge.transport.serialization import _proto_to_record_context
+
+        assert _proto_to_record_context({"shift": "A"}).shift_id == "A"
+        assert _proto_to_record_context({}).event_timestamp is None
+
+    def test_proto_message_round_trip(self) -> None:
+        from datetime import UTC, datetime
+
+        from forge.transport.proto_bridge import proto_to_record_context, record_context_to_proto
+
+        ctx = RecordContext(
+            shift_id="B",
+            event_type="x",
+            event_timestamp=datetime(2026, 4, 5, 14, 30, tzinfo=UTC),
+            work_order_id="WO-7",
+        )
+        msg = record_context_to_proto(ctx)
+        assert msg.shift_id == "B" and msg.HasField("event_timestamp")
+        assert proto_to_record_context(msg) == ctx
+        bare = record_context_to_proto(RecordContext())
+        assert not bare.HasField("event_timestamp")
+        assert proto_to_record_context(bare).event_timestamp is None

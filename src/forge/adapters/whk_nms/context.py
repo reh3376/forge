@@ -126,7 +126,6 @@ def build_record_context(
         "cross_system_id": device_id or device_ip or "",
         "source_system": "whk-nms",
         "entity_type": entity_type,
-        "event_type": event_type,
         "operation_context": "network_monitoring",
     }
 
@@ -166,6 +165,7 @@ def build_record_context(
         equipment_id=device_id or device_ip,
         area="network_infrastructure",
         site="whk01",  # primary site
+        event_type=event_type,
         extra=extra,
     )
 
