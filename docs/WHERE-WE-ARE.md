@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-20 · **Branch:** `reh3376_dev01` (last merged PR: 51) · **Owner:** reh3376
+**Status date:** 2026-10-21 · **Branch:** `reh3376_dev01` (last merged PR: 54) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -103,7 +103,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Capability | State | Notes |
 |---|---|---|
 | OPC-UA client (asyncua), tag engine, context resolvers | ✅ | `forge.modules.ot.opcua_client`, `tag_engine`, `context`; asyncua pinned `==2.1.0` (FB-085) |
-| Tag `source_time` is device time corrected to master by the device's measured clock offset, original stamp and offset recorded | ❌ | `SourceTimestamp` stored as the server sends it, invented when absent; no device clock is read, no offset applied (FB-088, FB-094; one-clock principle, owner 2026-10-18) |
+| Tag `source_time` is device time corrected to master by the device's measured clock offset, original stamp and offset recorded | ❌ | `SourceTimestamp` stored as the server sends it, invented when absent; no device clock is read, no offset applied (FB-088, FB-094; one-clock principle, owner 2026-10-18); design record drafted 2026-10-21 (`docs/decisions/one-clock-ot-source-time.md`), awaiting the owner's signature |
 | ISA-18.2 alarming (state machine, detector, engine, integrations, API) | ✅ | `forge.modules.ot.alarming` |
 | Control writes: validation → review → interlocks → authorization → write with read-back → audit | ✅ | `forge.modules.ot.control`; audit in the hub store and an external MQTT publisher (FB-066, FB-067) |
 | MES changeover: orchestrator, PLC CIP runner, recipe integration, REST | ✅ | FB-062, FB-065 |
@@ -200,7 +200,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | D-5 | Hub core language (Python vs Rust) — parked | nothing in the current sequence |
 | D-7 | Scope of the Go standard (OT module and Python adapters) | long-term shape of `src/forge/modules` and `src/forge/adapters` |
 | D-8 | FACTS vocabulary for OT adapters (extend the schema vs translate the spec) | FB-079, approval of the OT FACTS spec |
-| D-9 | One clock: which established standards to adopt (NTP/chrony strata mirroring the hub hierarchy, PTP/IEEE 1588 on the plant network, NTP four-timestamp measurement in-band, IEC 61850-5 tolerance classes, IEC 61850 `TimeQuality` and OPC UA `DataValue` fields on the record); the FB-094 design document recommends, the owner approves (authority chain, fail-closed enforcement and offset correction on entry already settled) | FB-092's shape, FB-093's tolerances, the representation half of FB-087/FB-088, FB-094's fields, FB-089/FB-091 tolerances |
+| D-9 | One clock: which established standards to adopt (NTP/chrony strata mirroring the hub hierarchy, PTP/IEEE 1588 on the plant network, NTP four-timestamp measurement in-band, IEC 61850-5 tolerance classes, IEC 61850 `TimeQuality` and OPC UA `DataValue` fields on the record); the FB-094 design record (`docs/decisions/one-clock-ot-source-time.md`, round 1, 2026-10-21) recommends P-1 to P-10 and asks Q-1 to Q-6, the owner approves (authority chain, fail-closed enforcement and offset correction on entry already settled) | FB-092's shape, FB-093's tolerances, the representation half of FB-087/FB-088, FB-094's fields, FB-089/FB-091 tolerances |
 
 ---
 
