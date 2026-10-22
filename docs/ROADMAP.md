@@ -168,7 +168,7 @@ FB-038, FB-039, FB-040, FB-041, FB-042 — local tooling; details in `docs/MDEMG
 
 ### WS-11 · Documentation
 
-FB-024 done 2026-10-18 (README tech stack, language policy, counts, spec states); FB-025 phase numbering, FB-027 stale report. `docs/personal/*` (FVTS context, FVTS review package, Rust frontend research) need a refresh once D-1/D-3 are answered: committed status (PR 26), branch name (`reh3376_dev01`), governance suite (407 passed), the gateway role model, modules-in-Go, Next.js frontend retired. `modules/Forge MES/CLAUDE.md` claims Next 15 / React 19; the code is Next 14.2 / React 18. FB-081 done 2026-10-18: the top-level legacy planning documents are deleted and what was still true lives in `docs/PRINCIPLES.md`; `docs/p7-ot-module/` and `docs/personal/` are the remaining planning-era pages.
+FB-024 done 2026-10-18 (README tech stack, language policy, counts, spec states); FB-025 done 2026-10-22 (phase numbering history, section 7); FB-027 stale report. `docs/personal/*` (FVTS context, FVTS review package, Rust frontend research) need a refresh once D-1/D-3 are answered: committed status (PR 26), branch name (`reh3376_dev01`), governance suite (407 passed), the gateway role model, modules-in-Go, Next.js frontend retired. `modules/Forge MES/CLAUDE.md` claims Next 15 / React 19; the code is Next 14.2 / React 18. FB-081 done 2026-10-18: the top-level legacy planning documents are deleted and what was still true lives in `docs/PRINCIPLES.md`; `docs/p7-ot-module/` and `docs/personal/` are the remaining planning-era pages.
 
 ---
 
@@ -233,4 +233,18 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 | WS-8 governance | — | — | FB-048 (jest/tsc follow FB-076) | FB-080, FB-021, FB-083, FB-022, FB-026, FB-085, FB-084, FB-014 done; FTTS doc has no id yet |
 | WS-9 security/ops | FB-029, FB-046 | FB-043, FB-047 | FB-044, FB-049 | public since 2026-10-17; GC still on Support |
 | WS-10 MDEMG | — | FB-038, FB-042 | FB-039, FB-040, FB-041 | |
-| WS-11 docs | — | FB-025 | FB-024, FB-027 | personal docs refresh |
+| WS-11 docs | — | — | FB-027 | FB-024 and FB-025 done; personal docs refresh |
+
+---
+
+## 7. Phase numbering history (FB-025)
+
+Three numbering series appear in the repository's history. None is renumbered; this section says what each meant so an old commit message or PR title can be read.
+
+| Series | Where it lived | What it meant | Status |
+|---|---|---|---|
+| **F** (F01 … F2x) | `PLAN.md`, `PHASES.md` (retired by FB-081, 2026-10-18) | Feature numbers of the original Python plan (F03 broker, F04 serialization, F05 storage config, F20 Schema Registry, F21 Context Engine …). The hub's code still names a few (`F20`, `F21` in docstrings). | Retired with the planning records; the durable content is in `PRINCIPLES.md`. |
+| **P** (P1 … P8 …) | `PLAN.md` sprint plan, commit messages | Sprint numbers of that plan. **Collision:** commit `2fe26a28` (2026-04-13) is titled "Sprint P8 — Hub Infrastructure Foundation (F03 + F04 + F05)" while `PLAN.md`'s P8 was the QMS build ("replaces Intellect"); the sprint that built the hub infrastructure reused the number. The commit message stands as written. | Retired with the planning records. |
+| **G** (G0 … G15) | PR #5 (G0, project scaffold and proto generation, merged 2026-04-15) and PR #6 (G1, core models and proto converters, merged 2026-04-16) | Sprints of a "Go hub migration". Only G0 and G1 were written down in full; PR #6 named G2 (storage config and pool manager) as the next step; G3 to G15 were never written anywhere in the repository or the PR bodies, only the range. | Superseded by A-2 (2026-10-16): Go is the language of the formal modules, the hub stays Python (D-5 parked). G0/G1's output (`go/internal/models`, the scaffold, the generated bindings) carries into WS-7 (module SDK) and FB-076; new Go work is tracked by FB ids, not G phases. |
+
+Since 2026-10-15 work is tracked by backlog ids (`BACKLOG.md`), decisions by A-/D- ids (sections 1 and 5) and workstreams by WS- ids (section 3).
