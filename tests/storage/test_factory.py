@@ -9,8 +9,17 @@ from forge.curation.lineage import InMemoryLineageStore
 from forge.curation.registry import InMemoryProductStore
 from forge.registry.postgres_store import PostgresSchemaStore
 from forge.registry.store import InMemorySchemaStore
+from forge.storage.access import (
+    InMemoryPermissionStore,
+    PersistentAccessController,
+    PostgresPermissionStore,
+)
 from forge.storage.engines.neo4j_engine import Neo4jGraphWriter, Neo4jLineageWriter
-from forge.storage.engines.postgres import PostgresLineageStore, PostgresProductStore
+from forge.storage.engines.postgres import (
+    PostgresAccessController,
+    PostgresLineageStore,
+    PostgresProductStore,
+)
 from forge.storage.engines.redis_engine import RedisSchemaCache, RedisStateCache
 from forge.storage.engines.timescale import TimescaleRecordReader, TimescaleRecordWriter
 from forge.storage.factory import StorageFactory
@@ -86,6 +95,24 @@ class TestEquipmentStore:
     def test_returns_in_memory_when_no_pool(self):
         factory = StorageFactory(_make_pool_manager(postgres=None))
         assert isinstance(factory.equipment_store(), InMemoryEquipmentStore)
+
+
+class TestAccessController:
+    """FB-003: the module-grant controller persists in forge_core when a pool exists."""
+
+    def test_returns_postgres_when_pool_available(self):
+        factory = StorageFactory(_make_pool_manager(postgres=MagicMock()))
+        controller = factory.access_controller()
+        assert isinstance(controller, PostgresAccessController)
+        assert isinstance(controller.store, PostgresPermissionStore)
+        assert factory.summary()["access_controller"] == "postgres"
+
+    def test_returns_in_memory_when_no_pool(self):
+        factory = StorageFactory(_make_pool_manager(postgres=None))
+        controller = factory.access_controller()
+        assert isinstance(controller, PersistentAccessController)
+        assert isinstance(controller.store, InMemoryPermissionStore)
+        assert factory.summary()["access_controller"] == "in_memory"
 
 
 class TestTimescaleWriter:
@@ -188,6 +215,7 @@ class TestSummary:
         assert summary["lineage_store"] == "postgres"
         assert summary["schema_store"] == "postgres"
         assert summary["equipment_store"] == "postgres"
+        assert summary["access_controller"] == "postgres"
         assert summary["timescale_writer"] == "timescale"
         assert summary["graph_writer"] == "neo4j"
         assert summary["state_cache"] == "redis"
@@ -201,6 +229,7 @@ class TestSummary:
         assert summary["lineage_store"] == "in_memory"
         assert summary["schema_store"] == "in_memory"
         assert summary["equipment_store"] == "in_memory"
+        assert summary["access_controller"] == "in_memory"
         assert summary["timescale_writer"] == "unavailable"
         assert summary["graph_writer"] == "unavailable"
         assert summary["state_cache"] == "unavailable"

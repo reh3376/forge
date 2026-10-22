@@ -15,6 +15,7 @@ Key invariants:
 
 from __future__ import annotations
 
+import inspect
 import logging
 import re
 import secrets
@@ -192,8 +193,11 @@ def provisioning_statements(
 class AccessController:
     """Manages permissioned database access for Forge modules.
 
-    Phase 1: in-memory permission store for development and testing.
-    Phase 2: PostgreSQL-backed persistence in forge_core.module_permissions.
+    Holds the rules (protected schemas, level hierarchy, role naming, the
+    audit) over an in-memory grant list. :class:`PersistentAccessController`
+    is the same controller with its grants and audit written to a
+    :class:`PermissionStore` (``forge_core.module_permissions`` and
+    ``access_audit``, migration 008) as they change (FB-003).
 
     Usage::
 
@@ -344,7 +348,7 @@ class AccessController:
             }
         )
 
-    def issue_connection(
+    def prepare_connection(
         self,
         module_id: str,
         pg_host: str = "forge-pg",
@@ -352,20 +356,13 @@ class AccessController:
         pg_database: str = "forge",
         *,
         password: str | None = None,
-        provisioner: Callable[[Sequence[str]], Any] | None = None,
     ) -> ConnectionGrant:
-        """Issue the module's connection string, provisioning its role through ``provisioner``.
+        """Build the module's grant (role, SQL, connection string) without running or auditing it.
 
-        The role is the one migration 002 creates for the module's own schema
-        (``forge_mod_mes``); a module holding only READ grants gets
-        ``forge_<module>_ro``. The password is generated unless given, set on the
-        role by the provisioner (``ALTER ROLE ... PASSWORD``, so re-issuing rotates
-        it) and returned only inside the grant: the controller never stores it.
-        The connection string carries ``?schema=<own schema>`` (what Prisma and
-        most drivers read); ``search_path`` lists every accessible schema for
-        clients that set it themselves.
-
-        Raises ValueError if the module has no active grants.
+        :meth:`issue_connection` is this plus the provisioner and the audit
+        entry; :class:`PersistentAccessController` keeps the two apart so it
+        can await the provisioner. Raises ValueError (audited as
+        ``access_denied``) if the module has no active grants.
         """
         grants = self.list_grants(module_id)
         if not grants:
@@ -395,14 +392,12 @@ class AccessController:
         statements = provisioning_statements(
             role, secret, [(g.schema_name, g.access_level) for g in grants]
         )
-        if provisioner is not None:
-            provisioner(statements)
         search_path = ",".join(schemas)
         conn_str = (
             f"postgresql://{role}:{quote(secret, safe='')}@{pg_host}:{pg_port}"
             f"/{pg_database}?schema={schemas[0]}"
         )
-        grant = ConnectionGrant(
+        return ConnectionGrant(
             module_id=module_id,
             connection_string=conn_str,
             schemas_accessible=schemas,
@@ -412,14 +407,50 @@ class AccessController:
             password=secret,
             statements=statements,
         )
+
+    def record_issued(self, grant: ConnectionGrant, *, provisioned: bool) -> None:
+        """Audit and log a prepared grant as issued (the password is not part of either)."""
         self._audit(
             "connection_issued",
-            module_id,
-            search_path,
-            max_level.access_level,
-            f"role={role} provisioned={'yes' if provisioner is not None else 'no'}",
+            grant.module_id,
+            grant.search_path,
+            grant.access_level,
+            f"role={grant.role} provisioned={'yes' if provisioned else 'no'}",
         )
-        logger.info("Issued connection: %s → %s (schemas: %s)", module_id, role, search_path)
+        logger.info(
+            "Issued connection: %s → %s (schemas: %s)",
+            grant.module_id,
+            grant.role,
+            grant.search_path,
+        )
+
+    def issue_connection(
+        self,
+        module_id: str,
+        pg_host: str = "forge-pg",
+        pg_port: int = 5432,
+        pg_database: str = "forge",
+        *,
+        password: str | None = None,
+        provisioner: Callable[[Sequence[str]], Any] | None = None,
+    ) -> ConnectionGrant:
+        """Issue the module's connection string, provisioning its role through ``provisioner``.
+
+        The role is the one migration 002 creates for the module's own schema
+        (``forge_mod_mes``); a module holding only READ grants gets
+        ``forge_<module>_ro``. The password is generated unless given, set on the
+        role by the provisioner (``ALTER ROLE ... PASSWORD``, so re-issuing rotates
+        it) and returned only inside the grant: the controller never stores it.
+        The connection string carries ``?schema=<own schema>`` (what Prisma and
+        most drivers read); ``search_path`` lists every accessible schema for
+        clients that set it themselves.
+
+        Raises ValueError if the module has no active grants.
+        """
+        grant = self.prepare_connection(module_id, pg_host, pg_port, pg_database, password=password)
+        if provisioner is not None:
+            provisioner(grant.statements)
+        self.record_issued(grant, provisioned=provisioner is not None)
         return grant
 
     def setup_default_grants(self) -> list[ModulePermission]:
@@ -583,3 +614,137 @@ class PostgresPermissionStore:
                 entry.reason,
                 entry.timestamp,
             )
+
+
+# ---------------------------------------------------------------------------
+# Persistent controller (FB-003)
+# ---------------------------------------------------------------------------
+
+
+class PersistentAccessController:
+    """An :class:`AccessController` whose grants and audit outlive the process (FB-003).
+
+    The in-memory controller keeps the rules; this one loads its grants from a
+    :class:`PermissionStore` and writes every change back the moment it is
+    made, so a grant made by ``forge db access`` today is what the hub finds
+    tomorrow. Reads (:meth:`check`, :meth:`list_grants`, ...) are answered
+    from memory, so :meth:`load` (or :meth:`open`) comes before the first one.
+    The store never sees a :class:`ConnectionGrant`: no password is persisted.
+    """
+
+    def __init__(self, store: PermissionStore) -> None:
+        self._store = store
+        self._controller = AccessController()
+        self._flushed = 0  # audit entries already written to the store
+
+    @classmethod
+    async def open(cls, store: PermissionStore) -> PersistentAccessController:
+        """A controller loaded from ``store``."""
+        controller = cls(store)
+        await controller.load()
+        return controller
+
+    @property
+    def store(self) -> PermissionStore:
+        return self._store
+
+    @property
+    def controller(self) -> AccessController:
+        """The in-memory controller: a dry run acts on it and nothing is written."""
+        return self._controller
+
+    async def load(self) -> int:
+        """Replace the grants held in memory with the store's rows; returns how many."""
+        rows = await self._store.list_permissions()
+        self._controller = AccessController.restore(rows)
+        self._flushed = 0
+        return len(rows)
+
+    async def grant(
+        self,
+        module_id: str,
+        schema_name: str,
+        access_level: AccessLevel,
+        granted_by: str = "forge-core",
+        expires_at: datetime | None = None,
+    ) -> ModulePermission:
+        """:meth:`AccessController.grant`, persisted; a refusal reaches the audit too."""
+        try:
+            perm = self._controller.grant(
+                module_id, schema_name, access_level, granted_by=granted_by, expires_at=expires_at
+            )
+        except ValueError:
+            await self.flush_audit()
+            raise
+        await self._store.upsert(perm)
+        await self.flush_audit()
+        return perm
+
+    async def revoke(self, module_id: str, schema_name: str) -> bool:
+        """:meth:`AccessController.revoke`, persisted. Returns True if a grant was found."""
+        if not self._controller.revoke(module_id, schema_name):
+            return False
+        await self._store.deactivate(module_id, schema_name)
+        await self.flush_audit()
+        return True
+
+    async def issue_connection(
+        self,
+        module_id: str,
+        pg_host: str = "forge-pg",
+        pg_port: int = 5432,
+        pg_database: str = "forge",
+        *,
+        password: str | None = None,
+        provisioner: Callable[[Sequence[str]], Any] | None = None,
+    ) -> ConnectionGrant:
+        """:meth:`AccessController.issue_connection` with the audit persisted.
+
+        ``provisioner`` may be a plain callable or a coroutine function (the
+        CLI runs the SQL through asyncpg inside this loop): what it returns is
+        awaited when awaitable. The password stays inside the returned grant.
+        """
+        try:
+            grant = self._controller.prepare_connection(
+                module_id, pg_host, pg_port, pg_database, password=password
+            )
+        except ValueError:
+            await self.flush_audit()
+            raise
+        if provisioner is not None:
+            result = provisioner(grant.statements)
+            if inspect.isawaitable(result):
+                await result
+        self._controller.record_issued(grant, provisioned=provisioner is not None)
+        await self.flush_audit()
+        return grant
+
+    async def flush_audit(self) -> int:
+        """Write the audit entries not yet in the store; returns how many."""
+        pending = self._controller.audit_log[self._flushed :]
+        for entry in pending:
+            await self._store.append_audit(entry)
+        self._flushed += len(pending)
+        return len(pending)
+
+    # -- reads, answered from memory ------------------------------------
+
+    def check(self, module_id: str, schema_name: str, required_level: AccessLevel) -> bool:
+        return self._controller.check(module_id, schema_name, required_level)
+
+    def list_grants(self, module_id: str | None = None) -> list[ModulePermission]:
+        return self._controller.list_grants(module_id)
+
+    def list_modules_for_schema(self, schema_name: str) -> list[str]:
+        return self._controller.list_modules_for_schema(schema_name)
+
+    def all_permissions(self) -> list[ModulePermission]:
+        return self._controller.all_permissions()
+
+    @property
+    def audit_log(self) -> list[AccessAuditEntry]:
+        return self._controller.audit_log
+
+    @property
+    def grant_count(self) -> int:
+        return self._controller.grant_count

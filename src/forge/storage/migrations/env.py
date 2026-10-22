@@ -2,21 +2,33 @@
 
 Imports StorageConfig to determine connection strings dynamically.
 Supports --target=postgres|timescale to select which database to migrate.
+
+Online runs connect through asyncpg, the one PostgreSQL driver the project
+declares, on SQLAlchemy's async engine (FB-003: a plain ``postgresql://``
+URL made SQLAlchemy look for psycopg2, which is not installed, so
+``forge migrate up`` could not run). Offline runs (``--sql``) need no driver.
 """
 
 from __future__ import annotations
 
+import asyncio
 import os
 import sys
 from logging.config import fileConfig
+from typing import TYPE_CHECKING
 
 from alembic import context
-from sqlalchemy import create_engine, pool
+from sqlalchemy import pool
+from sqlalchemy.ext.asyncio import create_async_engine
+
+if TYPE_CHECKING:
+    from sqlalchemy.engine import Connection
 
 # Ensure forge package is importable
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
 from forge.storage.config import StorageConfig
+from forge.storage.migrations.run import async_url
 
 config = context.config
 
@@ -48,17 +60,24 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
-    """Run migrations in 'online' mode — connects to the database."""
-    connectable = create_engine(
-        _get_target_dsn(),
-        poolclass=pool.NullPool,
-    )
+def _run_migrations(connection: Connection) -> None:
+    context.configure(connection=connection, target_metadata=None)
+    with context.begin_transaction():
+        context.run_migrations()
 
-    with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=None)
-        with context.begin_transaction():
-            context.run_migrations()
+
+async def _run_migrations_async() -> None:
+    connectable = create_async_engine(async_url(_get_target_dsn()), poolclass=pool.NullPool)
+    try:
+        async with connectable.connect() as connection:
+            await connection.run_sync(_run_migrations)
+    finally:
+        await connectable.dispose()
+
+
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode — connects to the database through asyncpg."""
+    asyncio.run(_run_migrations_async())
 
 
 if context.is_offline_mode():

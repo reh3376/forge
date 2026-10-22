@@ -12,6 +12,7 @@ Usage::
     lineage_store = factory.lineage_store()    # Postgres or InMemory
     schema_store  = factory.schema_store()     # Postgres or InMemory (FB-005)
     equipment     = factory.equipment_store()  # Postgres or InMemory (FB-005)
+    access        = factory.access_controller() # Postgres or InMemory (FB-003)
     ts_writer     = factory.timescale_writer() # Timescale or None
     graph_writer  = factory.graph_writer()     # Neo4j or None
     state_cache   = factory.state_cache()      # Redis or None
@@ -26,13 +27,18 @@ from forge.curation.lineage import InMemoryLineageStore, LineageStore
 from forge.curation.registry import InMemoryProductStore, ProductStore
 from forge.registry.postgres_store import PostgresSchemaStore
 from forge.registry.store import InMemorySchemaStore, SchemaStore
+from forge.storage.access import InMemoryPermissionStore, PersistentAccessController
 from forge.storage.adapter_registry import (
     AdapterRegistryStore,
     InMemoryAdapterRegistryStore,
     PostgresAdapterRegistryStore,
 )
 from forge.storage.engines.neo4j_engine import Neo4jGraphWriter, Neo4jLineageWriter
-from forge.storage.engines.postgres import PostgresLineageStore, PostgresProductStore
+from forge.storage.engines.postgres import (
+    PostgresAccessController,
+    PostgresLineageStore,
+    PostgresProductStore,
+)
 from forge.storage.engines.redis_engine import RedisSchemaCache, RedisStateCache
 from forge.storage.engines.timescale import TimescaleRecordReader, TimescaleRecordWriter
 from forge.storage.pool import PoolManager  # noqa: TC001
@@ -107,6 +113,20 @@ class StorageFactory:
         logger.info("PostgreSQL unavailable — using InMemoryEquipmentStore")
         return InMemoryEquipmentStore()
 
+    def access_controller(self) -> PersistentAccessController:
+        """Return the module-grant controller over ``forge_core`` if PG available, else InMemory.
+
+        The tables are migration 008 and ``forge db access`` writes the same
+        rows (FB-003). Reads are answered from memory: ``await
+        controller.load()`` comes before the first one.
+        """
+        pool = self._pools.postgres
+        if pool is not None:
+            logger.info("Using PostgresAccessController")
+            return PostgresAccessController(pool)
+        logger.info("PostgreSQL unavailable — using in-memory PersistentAccessController")
+        return PersistentAccessController(InMemoryPermissionStore())
+
     # ------------------------------------------------------------------
     # TimescaleDB
     # ------------------------------------------------------------------
@@ -179,6 +199,7 @@ class StorageFactory:
             "adapter_registry_store": "postgres" if self._pools.postgres else "in_memory",
             "schema_store": "postgres" if self._pools.postgres else "in_memory",
             "equipment_store": "postgres" if self._pools.postgres else "in_memory",
+            "access_controller": "postgres" if self._pools.postgres else "in_memory",
             "timescale_writer": "timescale" if self._pools.timescale else "unavailable",
             "graph_writer": "neo4j" if self._pools.neo4j else "unavailable",
             "state_cache": "redis" if self._pools.redis else "unavailable",

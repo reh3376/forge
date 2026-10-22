@@ -8,10 +8,13 @@ a schema, provisions a PostgreSQL role for it and hands it a connection string::
     forge db access grant forge-mes mod_mes admin      # admin while Prisma owns the DDL
     forge db access issue forge-mes --host localhost   # prints DATABASE_URL=... once
 
-Grants persist in ``forge_core.module_permissions`` (migration 008). The
-password is generated at issue time, set on the role and printed once; it is
-never stored. ``--dry-run`` shows the SQL and a masked connection string
-without touching any database.
+Grants and the audit persist in ``forge_core.module_permissions`` and
+``forge_core.access_audit`` (migration 008) through
+:class:`~forge.storage.access.PersistentAccessController` (FB-003), the same
+controller the hub's storage factory hands out. The password is generated at
+issue time, set on the role and printed once; it is never stored.
+``--dry-run`` shows the SQL and a masked connection string without touching
+any database.
 """
 
 from __future__ import annotations
@@ -23,18 +26,18 @@ from typing import TYPE_CHECKING, Annotated, Any
 import typer
 
 from forge.storage.access import (
-    AccessController,
     AccessLevel,
     ConnectionGrant,
     InMemoryPermissionStore,
     ModulePermission,
     PermissionStore,
+    PersistentAccessController,
     PostgresPermissionStore,
     module_schema,
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Awaitable, Callable, Sequence
 
 access_app = typer.Typer(
     name="access",
@@ -93,23 +96,23 @@ def open_store(dry_run: bool) -> PermissionStore:
     return PostgresPermissionStore(_ConnectPerCall(_admin_dsn()))
 
 
-def sql_executor() -> Callable[[Sequence[str]], None]:
-    """Run provisioning statements on the hub's PostgreSQL as the admin user, in one transaction."""
+def sql_executor() -> Callable[[Sequence[str]], Awaitable[None]]:
+    """Run provisioning statements on the hub's PostgreSQL as the admin user, in one transaction.
+
+    A coroutine function: the controller awaits it inside the command's event loop.
+    """
     dsn = _admin_dsn()
 
-    def run(statements: Sequence[str]) -> None:
-        async def _run() -> None:
-            import asyncpg
+    async def run(statements: Sequence[str]) -> None:
+        import asyncpg
 
-            conn = await asyncpg.connect(dsn)
-            try:
-                async with conn.transaction():
-                    for statement in statements:
-                        await conn.execute(statement)
-            finally:
-                await conn.close()
-
-        asyncio.run(_run())
+        conn = await asyncpg.connect(dsn)
+        try:
+            async with conn.transaction():
+                for statement in statements:
+                    await conn.execute(statement)
+        finally:
+            await conn.close()
 
     return run
 
@@ -119,28 +122,12 @@ def sql_executor() -> Callable[[Sequence[str]], None]:
 # ---------------------------------------------------------------------------
 
 
-def _load(store: PermissionStore) -> AccessController:
-    return AccessController.restore(asyncio.run(store.list_permissions()))
+def _open(dry_run: bool) -> PersistentAccessController:
+    """The controller, loaded from the store.
 
-
-def _persist(store: PermissionStore, controller: AccessController, since: int) -> None:
-    """Write every grant row the controller holds and the audit entries added since ``since``."""
-
-    async def run() -> None:
-        for perm in controller.all_permissions():
-            await store.upsert(perm)
-        for entry in controller.audit_log[since:]:
-            await store.append_audit(entry)
-
-    asyncio.run(run())
-
-
-def _audit_only(store: PermissionStore, controller: AccessController, since: int) -> None:
-    async def run() -> None:
-        for entry in controller.audit_log[since:]:
-            await store.append_audit(entry)
-
-    asyncio.run(run())
+    A dry run acts on ``.controller`` and writes nothing.
+    """
+    return asyncio.run(PersistentAccessController.open(open_store(dry_run)))
 
 
 def _level(value: str) -> AccessLevel:
@@ -185,17 +172,24 @@ def grant(
         if expires_in_days
         else None
     )
-    store = open_store(dry_run)
-    controller = _load(store)
-    mark = len(controller.audit_log)
+    controller = _open(dry_run)
     try:
-        perm = controller.grant(
-            module, schema_name, access_level, granted_by=granted_by, expires_at=expires_at
-        )
+        if dry_run:
+            perm = controller.controller.grant(
+                module, schema_name, access_level, granted_by=granted_by, expires_at=expires_at
+            )
+        else:
+            perm = asyncio.run(
+                controller.grant(
+                    module,
+                    schema_name,
+                    access_level,
+                    granted_by=granted_by,
+                    expires_at=expires_at,
+                )
+            )
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
-    if not dry_run:
-        _persist(store, controller, mark)
     _print_grant(perm)
     typer.echo(
         "(dry run, nothing persisted)"
@@ -212,15 +206,15 @@ def revoke(
 ) -> None:
     """Revoke MODULE's grant on SCHEMA. Re-issue to re-provision the role without it."""
     schema_name = schema or module_schema(module)
-    store = open_store(dry_run)
-    controller = _load(store)
-    mark = len(controller.audit_log)
-    if not controller.revoke(module, schema_name):
+    controller = _open(dry_run)
+    revoked = (
+        controller.controller.revoke(module, schema_name)
+        if dry_run
+        else asyncio.run(controller.revoke(module, schema_name))
+    )
+    if not revoked:
         typer.echo(f"No active grant: {module} → {schema_name}")
         raise typer.Exit(code=1)
-    if not dry_run:
-        asyncio.run(store.deactivate(module, schema_name))
-        _audit_only(store, controller, mark)
     typer.echo(f"Revoked {module} → {schema_name}")
 
 
@@ -229,7 +223,7 @@ def list_grants(
     module: Annotated[str | None, typer.Option("--module", help="Only this module")] = None,
 ) -> None:
     """List active grants."""
-    controller = _load(open_store(dry_run=False))
+    controller = _open(dry_run=False)
     grants = controller.list_grants(module)
     if not grants:
         typer.echo("No active grants." + (f" ({module})" if module else ""))
@@ -254,25 +248,32 @@ def issue(
     ] = False,
 ) -> None:
     """Provision MODULE's PostgreSQL role from its grants and print its connection string once."""
-    store = open_store(dry_run)
-    controller = _load(store)
+    controller = _open(dry_run)
     if dry_run and not controller.list_grants(module):
-        controller.grant(module, module_schema(module), AccessLevel.WRITE)
-        controller.grant(module, "forge_canonical", AccessLevel.READ)
-    mark = len(controller.audit_log)
+        controller.controller.grant(module, module_schema(module), AccessLevel.WRITE)
+        controller.controller.grant(module, "forge_canonical", AccessLevel.READ)
     try:
-        grant: ConnectionGrant = controller.issue_connection(
-            module,
-            pg_host=host,
-            pg_port=port,
-            pg_database=database,
-            password=DRY_RUN_PASSWORD if dry_run else None,
-            provisioner=None if dry_run else sql_executor(),
-        )
+        if dry_run:
+            grant: ConnectionGrant = controller.controller.issue_connection(
+                module,
+                pg_host=host,
+                pg_port=port,
+                pg_database=database,
+                password=DRY_RUN_PASSWORD,
+                provisioner=None,
+            )
+        else:
+            grant = asyncio.run(
+                controller.issue_connection(
+                    module,
+                    pg_host=host,
+                    pg_port=port,
+                    pg_database=database,
+                    provisioner=sql_executor(),
+                )
+            )
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
-    if not dry_run:
-        _audit_only(store, controller, mark)
     if show_sql or dry_run:
         typer.echo("-- provisioning SQL (password masked)")
         for statement in grant.statements:
