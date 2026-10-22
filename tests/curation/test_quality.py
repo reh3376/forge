@@ -135,7 +135,7 @@ class TestRangeRule:
                 timestamp=RecordTimestamp(source_time=datetime.now(UTC)),
                 value=RecordValue(raw="string_value", data_type="string"),
                 lineage=RecordLineage(
-                    schema_ref="x",
+                    schema_ref="forge://schemas/test/v1",
                     adapter_id="test",
                     adapter_version="0.1.0",
                 ),

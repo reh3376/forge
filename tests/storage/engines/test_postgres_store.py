@@ -156,7 +156,7 @@ class TestPostgresProductStore:
                 "description": "desc",
                 "owner": "owner",
                 "status": "PUBLISHED",
-                "schema_ref": "ref",
+                "schema_ref": "forge://schemas/test/v1",
                 "schema_version": "1.0.0",
                 "source_adapters": json.dumps([]),
                 "quality_slos": json.dumps([]),

@@ -113,7 +113,7 @@ class TestForgeOwnStamps:
             "name": "n",
             "description": "d",
             "owner": "o",
-            "schema": DataProductSchema(schema_ref="forge://s", version="1"),
+            "schema": DataProductSchema(schema_ref="forge://schemas/test/v1", version="1"),
         }
         kwargs.update(overrides)
         return DataProduct(**kwargs)  # type: ignore[arg-type]

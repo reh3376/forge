@@ -414,6 +414,35 @@ class TestPatternValidation:
         with pytest.raises(ValidationError):
             validator.validate(minimal_spec)
 
+    @pytest.mark.parametrize(
+        "ref",
+        [
+            "forge://schemas/test-adapter",  # no version
+            "forge://schemas/test-adapter/Barrel",  # a schema id, not a contract ref
+            "forge://schemas/test-adapter/v0.3.0/bridge",  # trailing segment
+            "forge://other/test-adapter/v1",
+        ],
+    )
+    def test_schema_ref_must_follow_the_grammar(
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
+        ref: str,
+    ):
+        """forge.core.schema_ref: forge://schemas/<spoke>[/<Entity>]/v<version> (FB-008)."""
+        minimal_spec["data_contract"]["schema_ref"] = ref
+        with pytest.raises(ValidationError):
+            validator.validate(minimal_spec)
+
+    def test_schema_ref_accepts_contract_and_version_refs(
+        self,
+        validator: Draft202012Validator,
+        minimal_spec: dict,
+    ):
+        for ref in ("forge://schemas/test-adapter/v0.1.0", "forge://schemas/test-adapter/Lot/v2"):
+            minimal_spec["data_contract"]["schema_ref"] = ref
+            validator.validate(minimal_spec)
+
     def test_connection_param_name_snake_case(
         self,
         validator: Draft202012Validator,

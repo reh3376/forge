@@ -79,7 +79,7 @@ facts.schema.json
 │   ├── params[]          #   array of {name, type, required, secret, description, default (typed to match type), validation}
 │   └── auth_methods[]    #   array of strings (none, bearer_token, api_key, basic, oauth2, certificate, azure_entra_id, mtls, device_token)
 ├── data_contract         # object — What does the adapter produce?
-│   ├── schema_ref        #   string — forge:// URI to output schema
+│   ├── schema_ref        #   string — contract ref forge://schemas/<spoke>/v<version> (forge.core.schema_ref)
 │   ├── output_format     #   enum — contextual_record | raw
 │   ├── context_fields[]  #   array of required context field names
 │   ├── optional_context_fields[] # array of optional context field names
@@ -142,7 +142,7 @@ Every other section is closed (`additionalProperties: false`). The enums, as the
 | `facts:connection-params-present` | Connection | at least one param |
 | `facts:connection-params-valid` | Connection | snake_case names, `type` in the schema enum |
 | `facts:connection-auth-methods` | Connection | at least one method, each in the schema enum |
-| `facts:data-contract-schema-ref` | Data Contract | `schema_ref` starts with `forge://` |
+| `facts:data-contract-schema-ref` | Data Contract | `schema_ref` is a contract ref, `forge://schemas/<spoke>/v<version>` (or a version ref of one of its schemas); the schema's `pattern` holds the same grammar (FB-008) |
 | `facts:data-contract-output-format` | Data Contract | `output_format` is in the schema enum |
 | `facts:data-contract-context-fields` | Data Contract | `context_fields` is non-empty |
 | `facts:data-contract-sources-valid` | Data Contract | `source_type` and `collection_mode` in the schema enums, ≥1 entity per source (*conditional*) |

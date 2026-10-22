@@ -13,9 +13,10 @@ from enum import StrEnum
 from typing import Any, ClassVar
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from forge.core.clock import OneClockModel, utc_now
+from forge.core.schema_ref import require_versioned_ref
 
 
 class QualityCode(StrEnum):
@@ -91,10 +92,20 @@ class RecordContext(BaseModel):
 class RecordLineage(BaseModel):
     """Provenance chain — where this record came from and how it was transformed."""
 
-    schema_ref: str
+    schema_ref: str = Field(
+        description=(
+            "Contract ref of the producing adapter, forge://schemas/<spoke>/v<version>,"
+            " or a version ref of one of its schemas (forge.core.schema_ref, FB-008)."
+        )
+    )
     adapter_id: str
     adapter_version: str
     transformation_chain: list[str] = Field(default_factory=list)
+
+    @field_validator("schema_ref")
+    @classmethod
+    def _schema_ref_is_versioned(cls, value: str) -> str:
+        return require_versioned_ref(value, field="lineage.schema_ref")
 
 
 class RecordSource(BaseModel):

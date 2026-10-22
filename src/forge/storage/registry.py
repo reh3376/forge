@@ -16,6 +16,8 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
+from forge.core.schema_ref import SchemaRef, SchemaRefError
+
 logger = logging.getLogger(__name__)
 
 
@@ -58,7 +60,9 @@ class SchemaEntry:
     """A registered entity schema in the Forge Schema Registry.
 
     Attributes:
-        schema_id: Unique URI (forge://schemas/<spoke>/<entity>/v<version>)
+        schema_id: The version ref ``forge://schemas/<spoke>/<entity>/v<version>``,
+            which must agree with ``spoke_id``, ``entity_name`` and ``version``
+            (``forge.core.schema_ref``, FB-008)
         spoke_id: Source spoke identifier (e.g., "whk-wms", "forge-mes")
         entity_name: Entity type name (e.g., "Barrel", "Recipe", "Device")
         version: Semantic version string
@@ -90,6 +94,13 @@ class SchemaEntry:
     updated_at: datetime = field(default_factory=lambda: datetime.now(tz=UTC))
 
     def __post_init__(self) -> None:
+        expected = SchemaRef(self.spoke_id, self.entity_name, self.version)
+        if SchemaRef.parse(self.schema_id) != expected:
+            msg = (
+                f"schema_id {self.schema_id!r} does not name spoke {self.spoke_id!r},"
+                f" entity {self.entity_name!r} and version {self.version!r}: expected {expected}"
+            )
+            raise SchemaRefError(msg)
         if not self.integrity_hash:
             self.integrity_hash = self.compute_hash()
 

@@ -105,7 +105,7 @@ class TestProductEndpoints:
                 "name": "A",
                 "description": "...",
                 "owner": "o",
-                "schema_ref": "x",
+                "schema_ref": "forge://schemas/test/v1",
             },
         )
         await client.post(
@@ -114,7 +114,7 @@ class TestProductEndpoints:
                 "name": "B",
                 "description": "...",
                 "owner": "o",
-                "schema_ref": "x",
+                "schema_ref": "forge://schemas/test/v1",
             },
         )
         response = await client.get("/products")
@@ -128,7 +128,7 @@ class TestProductEndpoints:
                 "name": "Test",
                 "description": "...",
                 "owner": "o",
-                "schema_ref": "x",
+                "schema_ref": "forge://schemas/test/v1",
             },
         )
         pid = create.json()["product_id"]
@@ -147,7 +147,7 @@ class TestProductEndpoints:
                 "name": "Test",
                 "description": "...",
                 "owner": "o",
-                "schema_ref": "x",
+                "schema_ref": "forge://schemas/test/v1",
             },
         )
         pid = create.json()["product_id"]
@@ -162,7 +162,7 @@ class TestProductEndpoints:
                 "name": "Test",
                 "description": "...",
                 "owner": "o",
-                "schema_ref": "x",
+                "schema_ref": "forge://schemas/test/v1",
             },
         )
         pid = create.json()["product_id"]
@@ -180,7 +180,7 @@ class TestCurateEndpoint:
                 "name": "Test",
                 "description": "...",
                 "owner": "o",
-                "schema_ref": "x",
+                "schema_ref": "forge://schemas/test/v1",
             },
         )
         pid = create.json()["product_id"]
@@ -220,7 +220,7 @@ class TestLineageEndpoint:
                 "name": "Test",
                 "description": "...",
                 "owner": "o",
-                "schema_ref": "x",
+                "schema_ref": "forge://schemas/test/v1",
             },
         )
         pid = create.json()["product_id"]

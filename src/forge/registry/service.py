@@ -24,8 +24,9 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
+from forge.core.schema_ref import require_schema_id
 from forge.registry.compatibility import (
     CompatibilityResult,
     check_compatibility,
@@ -45,7 +46,7 @@ if TYPE_CHECKING:
 class RegisterSchemaRequest(BaseModel):
     """Request to register a new schema."""
 
-    schema_id: str
+    schema_id: str = Field(description="forge://schemas/<spoke>/<Entity> (FB-008).")
     name: str
     schema_type: SchemaType
     schema_json: dict[str, Any]
@@ -53,6 +54,11 @@ class RegisterSchemaRequest(BaseModel):
     owner: str = ""
     description: str = ""
     tags: list[str] = Field(default_factory=list)
+
+    @field_validator("schema_id")
+    @classmethod
+    def _schema_id_is_a_schema_id(cls, value: str) -> str:
+        return require_schema_id(value)
 
 
 class SchemaVersionResponse(BaseModel):

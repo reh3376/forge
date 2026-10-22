@@ -343,7 +343,7 @@ class TestManifestRoundTrip:
                 version="0.1.0",
                 protocol="test",
                 tier=tier,
-                data_contract=DataContract(schema_ref="test"),
+                data_contract=DataContract(schema_ref="forge://schemas/test/v1"),
             )
             proto_dict = pydantic_to_proto(manifest)
             restored = proto_to_pydantic(proto_dict, "AdapterManifest")

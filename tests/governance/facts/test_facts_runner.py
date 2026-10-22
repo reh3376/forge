@@ -490,6 +490,15 @@ class TestCheckDataContract:
         ref_check = [v for v in verdicts if "schema-ref" in v.check_id]
         assert any(v.status == verdict_status.FAIL for v in ref_check)
 
+    def test_schema_ref_without_a_version_fails_the_grammar(self, runner, verdict_status):
+        """forge:// alone is not enough: the ref must carry a version (FB-008)."""
+        spec = _minimal_spec()
+        spec["data_contract"]["schema_ref"] = "forge://schemas/test-adapter/Barrel"
+        verdicts = runner._check_data_contract(spec)
+        ref_check = [v for v in verdicts if "schema-ref" in v.check_id]
+        assert [v.status for v in ref_check] == [verdict_status.FAIL]
+        assert "must name a version" in ref_check[0].message
+
     def test_invalid_output_format(self, runner, verdict_status):
         spec = _minimal_spec()
         spec["data_contract"]["output_format"] = "csv"

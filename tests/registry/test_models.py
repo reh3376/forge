@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from forge.registry.models import (
     CompatibilityMode,
     SchemaMetadata,
@@ -71,7 +73,7 @@ class TestSchemaVersion:
 class TestSchemaMetadata:
     def _make(self, **overrides) -> SchemaMetadata:
         defaults = {
-            "schema_id": "forge://schemas/test/v1",
+            "schema_id": "forge://schemas/test/Widget",
             "name": "Test Schema",
             "schema_type": SchemaType.ADAPTER_OUTPUT,
         }
@@ -132,3 +134,23 @@ class TestSchemaMetadata:
         m = self._make()
         v = m.add_version({"type": "object"})
         assert v.integrity_hash == SchemaVersion.compute_hash({"type": "object"})
+
+
+class TestSchemaIdGrammar:
+    """A registry entry is keyed by a schema id, never by a versioned ref (FB-008)."""
+
+    def test_rejects_a_versioned_or_entity_less_id(self):
+        from forge.core.schema_ref import SchemaRefError
+
+        bad_ids = ("forge://schemas/whk-wms/Barrel/v1", "forge://schemas/whk-wms/v0.1.0", "Barrel")
+        for bad in bad_ids:
+            with pytest.raises(SchemaRefError):
+                SchemaMetadata(schema_id=bad, name="Barrel", schema_type=SchemaType.ADAPTER_OUTPUT)
+
+    def test_accepts_a_schema_id(self):
+        meta = SchemaMetadata(
+            schema_id="forge://schemas/whk-wms/Barrel",
+            name="Barrel",
+            schema_type=SchemaType.ADAPTER_OUTPUT,
+        )
+        assert meta.latest_version == 0

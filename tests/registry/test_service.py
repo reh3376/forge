@@ -322,3 +322,12 @@ class TestVersionDiff:
         await client.post("/v1/schemas", json=_register_payload())
         resp = await client.get("/v1/schemas/forge://schemas/test/Widget/diff/1/99")
         assert resp.status_code == 404
+
+
+class TestSchemaIdValidation:
+    @pytest.mark.asyncio
+    async def test_a_versioned_or_malformed_id_is_a_422(self, client):
+        for bad in ("forge://schemas/test/Widget/v1", "forge://schemas/test/v0.1.0", "Widget"):
+            resp = await client.post("/v1/schemas", json=_register_payload(schema_id=bad))
+            assert resp.status_code == 422, bad
+            assert "schema id" in resp.text or "schema reference" in resp.text

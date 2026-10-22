@@ -11,9 +11,10 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from forge.core.clock import OneClockModel, utc_now
+from forge.core.schema_ref import parse_schema_ref
 
 
 class DataProductStatus(StrEnum):
@@ -37,9 +38,20 @@ class QualitySLO(BaseModel):
 class DataProductSchema(BaseModel):
     """Schema reference for a data product."""
 
-    schema_ref: str  # e.g., "forge://schemas/production-context/v2"
+    schema_ref: str = Field(
+        description=(
+            "A schema reference, forge://schemas/<spoke>[/<Entity>][/v<version>]"
+            " (forge.core.schema_ref, FB-008), e.g. forge://schemas/production-context/v2."
+        )
+    )
     version: str
     compatibility_mode: str = "BACKWARD"
+
+    @field_validator("schema_ref")
+    @classmethod
+    def _schema_ref_parses(cls, value: str) -> str:
+        parse_schema_ref(value)
+        return value
 
 
 class DataProduct(OneClockModel):

@@ -11,6 +11,10 @@ from forge.curation.registry import (
     InMemoryProductStore,
 )
 
+# Schema references in the one grammar (forge.core.schema_ref, FB-008).
+_PRODUCT_REF = "forge://schemas/curation/Product/v1"
+_SPOKE_REF = "forge://schemas/test"
+
 
 class TestInMemoryProductStore:
     def test_save_and_get(self) -> None:
@@ -22,7 +26,7 @@ class TestInMemoryProductStore:
             name="Test",
             description="Test product",
             owner="tester",
-            product_schema=DataProductSchema(schema_ref="forge://test/v1", version="1.0"),
+            product_schema=DataProductSchema(schema_ref="forge://schemas/test/v1", version="1.0"),
         )
         store.save(product)
         assert store.get("dp-test") is not None
@@ -39,7 +43,7 @@ class TestInMemoryProductStore:
                     name=f"Product {i}",
                     description="...",
                     owner="tester",
-                    product_schema=DataProductSchema(schema_ref="forge://test", version="1.0"),
+                    product_schema=DataProductSchema(schema_ref=_SPOKE_REF, version="1.0"),
                 )
             )
         assert len(store.list_all()) == 3
@@ -55,7 +59,7 @@ class TestInMemoryProductStore:
                 description="...",
                 owner="o",
                 status=DataProductStatus.DRAFT,
-                product_schema=DataProductSchema(schema_ref="x", version="1"),
+                product_schema=DataProductSchema(schema_ref=_PRODUCT_REF, version="1"),
             )
         )
         store.save(
@@ -65,7 +69,7 @@ class TestInMemoryProductStore:
                 description="...",
                 owner="o",
                 status=DataProductStatus.PUBLISHED,
-                product_schema=DataProductSchema(schema_ref="x", version="1"),
+                product_schema=DataProductSchema(schema_ref=_PRODUCT_REF, version="1"),
             )
         )
         assert len(store.list_all(DataProductStatus.DRAFT)) == 1
@@ -81,7 +85,7 @@ class TestInMemoryProductStore:
                 name="D",
                 description="...",
                 owner="o",
-                product_schema=DataProductSchema(schema_ref="x", version="1"),
+                product_schema=DataProductSchema(schema_ref=_PRODUCT_REF, version="1"),
             )
         )
         assert store.delete("dp-del")
@@ -106,7 +110,7 @@ class TestDataProductRegistry:
             name="Test",
             description="...",
             owner="o",
-            schema_ref="forge://test/v1",
+            schema_ref="forge://schemas/test/v1",
         )
         retrieved = product_registry.get(product.product_id)
         assert retrieved is not None
@@ -116,8 +120,8 @@ class TestDataProductRegistry:
         assert product_registry.get("dp-nonexistent") is None
 
     def test_list_products(self, product_registry: DataProductRegistry) -> None:
-        product_registry.create(name="A", description="...", owner="o", schema_ref="x")
-        product_registry.create(name="B", description="...", owner="o", schema_ref="x")
+        product_registry.create(name="A", description="...", owner="o", schema_ref=_PRODUCT_REF)
+        product_registry.create(name="B", description="...", owner="o", schema_ref=_PRODUCT_REF)
         assert len(product_registry.list_products()) == 2
 
     def test_publish(self, product_registry: DataProductRegistry) -> None:
@@ -125,7 +129,7 @@ class TestDataProductRegistry:
             name="Test",
             description="...",
             owner="o",
-            schema_ref="x",
+            schema_ref=_PRODUCT_REF,
         )
         published = product_registry.publish(product.product_id)
         assert published.status == DataProductStatus.PUBLISHED
@@ -135,7 +139,7 @@ class TestDataProductRegistry:
             name="Test",
             description="...",
             owner="o",
-            schema_ref="x",
+            schema_ref=_PRODUCT_REF,
         )
         product_registry.publish(product.product_id)
         with pytest.raises(ValueError, match="Can only publish DRAFT"):
@@ -146,7 +150,7 @@ class TestDataProductRegistry:
             name="Test",
             description="...",
             owner="o",
-            schema_ref="x",
+            schema_ref=_PRODUCT_REF,
         )
         product_registry.publish(product.product_id)
         deprecated = product_registry.deprecate(product.product_id)
@@ -157,7 +161,7 @@ class TestDataProductRegistry:
             name="Test",
             description="...",
             owner="o",
-            schema_ref="x",
+            schema_ref=_PRODUCT_REF,
         )
         product_registry.publish(product.product_id)
         product_registry.deprecate(product.product_id)
@@ -172,7 +176,7 @@ class TestDataProductRegistry:
             name="Test",
             description="...",
             owner="o",
-            schema_ref="x",
+            schema_ref=_PRODUCT_REF,
         )
         with pytest.raises(ValueError, match="Can only deprecate PUBLISHED"):
             product_registry.deprecate(product.product_id)
@@ -182,12 +186,12 @@ class TestDataProductRegistry:
             name="Test",
             description="...",
             owner="o",
-            schema_ref="x",
+            schema_ref=_PRODUCT_REF,
         )
         ver = product_registry.add_version(
             product.product_id,
             version="0.2.0",
-            schema_ref="forge://test/v2",
+            schema_ref="forge://schemas/test/v2",
             notes="Added new field",
         )
         assert ver.version == "0.2.0"
@@ -203,7 +207,7 @@ class TestDataProductRegistry:
             name="Test",
             description="...",
             owner="o",
-            schema_ref="x",
+            schema_ref=_PRODUCT_REF,
             quality_slos=slos,
         )
         assert len(product.quality_slos) == 2
@@ -217,7 +221,7 @@ class TestDataProductRegistry:
             name="Test",
             description="...",
             owner="o",
-            schema_ref="x",
+            schema_ref=_PRODUCT_REF,
             fields=fields,
         )
         versions = product_registry.get_versions(product.product_id)
@@ -228,7 +232,7 @@ class TestDataProductRegistry:
             name="Test",
             description="...",
             owner="o",
-            schema_ref="x",
+            schema_ref=_PRODUCT_REF,
         )
         assert product_registry.delete(product.product_id)
         assert product_registry.get(product.product_id) is None
@@ -238,7 +242,7 @@ class TestDataProductRegistry:
             name="Test",
             description="...",
             owner="o",
-            schema_ref="x",
+            schema_ref=_PRODUCT_REF,
         )
         product_registry.publish(product.product_id)
         with pytest.raises(ValueError, match="Can only delete DRAFT or RETIRED"):
