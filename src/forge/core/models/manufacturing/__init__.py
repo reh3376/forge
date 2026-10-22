@@ -22,8 +22,10 @@ Entity families:
 from forge.core.models.manufacturing.base import ManufacturingModelBase
 from forge.core.models.manufacturing.business_entity import BusinessEntity
 from forge.core.models.manufacturing.enums import (
+    AssetOperationalState,
     AssetType,
     EntityType,
+    EventCategory,
     EventSeverity,
     LifecycleState,
     OrderStatus,
@@ -46,9 +48,11 @@ from forge.core.models.manufacturing.quality_sample import QualitySample, Sample
 from forge.core.models.manufacturing.work_order import WorkOrder, WorkOrderDependency
 
 __all__ = [
+    "AssetOperationalState",
     "AssetType",
     "BusinessEntity",
     "EntityType",
+    "EventCategory",
     "EventSeverity",
     "LifecycleState",
     "Lot",

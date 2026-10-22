@@ -798,3 +798,26 @@ class TestOneClock:
         )
         assert wo.planned_start == datetime(2026, 4, 5, 13, 0, tzinfo=UTC)
         assert wo.planned_start.tzinfo == UTC
+
+
+class TestPackageExports:
+    """Every public class of the manufacturing modules is exported by the package (FB-015)."""
+
+    def test_every_public_class_is_in_all(self):
+        import importlib
+        import inspect
+        import pkgutil
+
+        import forge.core.models.manufacturing as package
+
+        exported = set(package.__all__)
+        missing: dict[str, list[str]] = {}
+        for info in pkgutil.iter_modules(package.__path__):
+            module = importlib.import_module(f"{package.__name__}.{info.name}")
+            for name, obj in inspect.getmembers(module, inspect.isclass):
+                own = obj.__module__ == module.__name__ and not name.startswith("_")
+                if own and name not in exported:
+                    missing.setdefault(info.name, []).append(name)
+        assert missing == {}
+        assert {"AssetOperationalState", "EventCategory"} <= exported
+        assert all(getattr(package, name) is not None for name in exported)
