@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 61) · **Owner:** reh3376
+**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 62) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
