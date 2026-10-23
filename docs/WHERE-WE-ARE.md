@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-23 · **Branch:** `reh3376_dev01` (last merged PR: 66) · **Owner:** reh3376
+**Status date:** 2026-10-23 · **Branch:** `reh3376_dev01` (last merged PR: 67) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -22,7 +22,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 353 files, ~68,500 lines |
-| Python tests | 258 files, ~56,000 lines, 4,164 test functions (4,431 collected); full suite green on 2026-10-23 |
+| Python tests | 258 files, ~56,000 lines, 4,168 test functions (4,435 collected); full suite green on 2026-10-23 |
 | Go (`go/`) | 32 files, ~9,500 lines (1,800 of models and 1,488 of their tests, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs); `gofmt`, `go vet` and `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |

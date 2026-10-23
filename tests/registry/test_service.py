@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from forge.registry.service import create_registry_app
+from forge.registry.service import (
+    AddVersionRequest,
+    CompatibilityCheckRequest,
+    RegisterSchemaRequest,
+    SchemaVersionResponse,
+    create_registry_app,
+)
 
 
 @pytest.fixture
@@ -331,3 +340,57 @@ class TestSchemaIdValidation:
             resp = await client.post("/v1/schemas", json=_register_payload(schema_id=bad))
             assert resp.status_code == 422, bad
             assert "schema id" in resp.text or "schema reference" in resp.text
+
+
+class TestSchemaJsonIsTheWireName:
+    """``schema_json`` stays the wire name of ``schema_document`` (FB-095)."""
+
+    MODELS = (
+        RegisterSchemaRequest,
+        SchemaVersionResponse,
+        AddVersionRequest,
+        CompatibilityCheckRequest,
+    )
+
+    def test_attribute_does_not_shadow_base_model(self):
+        for model in self.MODELS:
+            assert "schema_json" not in model.model_fields, model.__name__
+            assert model.model_fields["schema_document"].alias == "schema_json", model.__name__
+            assert callable(model.schema_json), model.__name__  # BaseModel's method, not a field
+
+    def test_constructs_by_alias_and_by_name_and_dumps_the_alias(self):
+        document = {"type": "object", "properties": {}}
+        by_alias = AddVersionRequest.model_validate({"schema_json": document})
+        by_name = AddVersionRequest(schema_document=document)
+        assert by_alias.schema_document == by_name.schema_document == document
+        assert by_name.model_dump() == {
+            "schema_json": document,
+            "description": "",
+            "check_compatibility": True,
+        }
+        props = AddVersionRequest.model_json_schema()["properties"]
+        assert "schema_json" in props and "schema_document" not in props
+
+    @pytest.mark.asyncio
+    async def test_the_routes_still_speak_schema_json(self, client):
+        resp = await client.post("/v1/schemas", json=_register_payload())
+        assert resp.status_code == 201
+        version = resp.json()["versions"][0]
+        assert version["schema_json"] == _register_payload()["schema_json"]
+        assert "schema_document" not in version
+        resp = await client.get("/v1/schemas/forge://schemas/test/Widget/versions/1")
+        assert resp.json()["schema_json"]["required"] == ["widget_id"]
+        resp = await client.post(
+            "/v1/schemas/forge://schemas/test/Widget/compatibility",
+            json={"schema_json": _register_payload()["schema_json"]},
+        )
+        assert resp.status_code == 200 and resp.json()["compatible"] is True
+
+    def test_import_emits_no_warning(self):
+        run = subprocess.run(
+            [sys.executable, "-W", "error", "-c", "import forge.registry.service"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert run.returncode == 0 and run.stderr == "", run.stderr

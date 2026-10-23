@@ -16,6 +16,12 @@ Endpoints:
     GET    /v1/schemas/{schema_id}/versions/{version} — Get specific version
     POST   /v1/schemas/{schema_id}/compatibility — Check compatibility
     GET    /v1/schemas/{schema_id}/diff/{from}/{to} — Diff two versions
+
+The JSON Schema document travels as ``schema_json`` on the wire (requests and
+responses); the attribute on the request/response models is
+``schema_document``, because ``schema_json`` is a (deprecated) method of
+``pydantic.BaseModel`` and a field of that name shadows it (FB-095, as FB-086
+did for ``DataProduct.schema``).
 """
 
 from __future__ import annotations
@@ -24,7 +30,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from forge.core.schema_ref import require_schema_id
 from forge.registry.compatibility import (
@@ -42,14 +48,20 @@ if TYPE_CHECKING:
 # Request / Response models
 # ---------------------------------------------------------------------------
 
+#: ``schema_document`` is read and written as ``schema_json`` (FB-095).
+_WIRE_NAMES = ConfigDict(validate_by_name=True, validate_by_alias=True, serialize_by_alias=True)
+_SCHEMA_DOCUMENT = "The JSON Schema document (``schema_json`` on the wire)."
+
 
 class RegisterSchemaRequest(BaseModel):
     """Request to register a new schema."""
 
+    model_config = _WIRE_NAMES
+
     schema_id: str = Field(description="forge://schemas/<spoke>/<Entity> (FB-008).")
     name: str
     schema_type: SchemaType
-    schema_json: dict[str, Any]
+    schema_document: dict[str, Any] = Field(alias="schema_json", description=_SCHEMA_DOCUMENT)
     compatibility: CompatibilityMode = CompatibilityMode.BACKWARD
     owner: str = ""
     description: str = ""
@@ -64,12 +76,16 @@ class RegisterSchemaRequest(BaseModel):
 class SchemaVersionResponse(BaseModel):
     """Response for a single schema version."""
 
+    model_config = _WIRE_NAMES
+
     version: int
     integrity_hash: str
     description: str = ""
     previous_version: int | None = None
     created_at: datetime
-    schema_json: dict[str, Any] = Field(default_factory=dict)
+    schema_document: dict[str, Any] = Field(
+        default_factory=dict, alias="schema_json", description=_SCHEMA_DOCUMENT
+    )
 
 
 class SchemaResponse(BaseModel):
@@ -99,7 +115,9 @@ class SchemaListResponse(BaseModel):
 class AddVersionRequest(BaseModel):
     """Request to add a new version to an existing schema."""
 
-    schema_json: dict[str, Any]
+    model_config = _WIRE_NAMES
+
+    schema_document: dict[str, Any] = Field(alias="schema_json", description=_SCHEMA_DOCUMENT)
     description: str = ""
     check_compatibility: bool = True
 
@@ -107,7 +125,9 @@ class AddVersionRequest(BaseModel):
 class CompatibilityCheckRequest(BaseModel):
     """Request to check compatibility of a proposed schema."""
 
-    schema_json: dict[str, Any]
+    model_config = _WIRE_NAMES
+
+    schema_document: dict[str, Any] = Field(alias="schema_json", description=_SCHEMA_DOCUMENT)
     mode: CompatibilityMode | None = None  # defaults to schema's configured mode
 
 
@@ -151,7 +171,7 @@ def _metadata_to_response(m: SchemaMetadata) -> SchemaResponse:
                 description=v.description,
                 previous_version=v.previous_version,
                 created_at=v.created_at,
-                schema_json=v.schema_json,
+                schema_document=v.schema_json,
             )
             for v in m.versions
         ],
@@ -217,7 +237,7 @@ def build_registry_router(
             description=req.description,
             tags=req.tags,
         )
-        metadata.add_version(req.schema_json, description="Initial version")
+        metadata.add_version(req.schema_document, description="Initial version")
         await _store.save(metadata)
         return _metadata_to_response(metadata)
 
@@ -266,7 +286,7 @@ def build_registry_router(
             latest = metadata.get_latest()
             if latest is not None:
                 result = check_compatibility(
-                    latest.schema_json, req.schema_json, metadata.compatibility
+                    latest.schema_json, req.schema_document, metadata.compatibility
                 )
                 if not result.compatible:
                     raise HTTPException(
@@ -278,7 +298,7 @@ def build_registry_router(
                         },
                     )
 
-        version = metadata.add_version(req.schema_json, description=req.description)
+        version = metadata.add_version(req.schema_document, description=req.description)
         await _store.save(metadata)
         return SchemaVersionResponse(
             version=version.version,
@@ -286,7 +306,7 @@ def build_registry_router(
             description=version.description,
             previous_version=version.previous_version,
             created_at=version.created_at,
-            schema_json=version.schema_json,
+            schema_document=version.schema_json,
         )
 
     # -- List versions -------------------------------------------------------
@@ -306,7 +326,7 @@ def build_registry_router(
                 description=v.description,
                 previous_version=v.previous_version,
                 created_at=v.created_at,
-                schema_json=v.schema_json,
+                schema_document=v.schema_json,
             )
             for v in metadata.versions
         ]
@@ -330,7 +350,7 @@ def build_registry_router(
             description=v.description,
             previous_version=v.previous_version,
             created_at=v.created_at,
-            schema_json=v.schema_json,
+            schema_document=v.schema_json,
         )
 
     # -- Compatibility check -------------------------------------------------
@@ -350,7 +370,7 @@ def build_registry_router(
         if latest is None:
             raise HTTPException(400, "No versions to check against")
         mode = req.mode or metadata.compatibility
-        result = check_compatibility(latest.schema_json, req.schema_json, mode)
+        result = check_compatibility(latest.schema_json, req.schema_document, mode)
         return _compat_to_response(result)
 
     # -- Version diff --------------------------------------------------------
