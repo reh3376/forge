@@ -58,18 +58,18 @@ type DataContract struct {
 // AdapterManifest is the adapter's self-description document.
 // It is validated against the FACTS schema at registration time.
 type AdapterManifest struct {
-	AdapterID            string              `json:"adapter_id"`
-	Name                 string              `json:"name"`
-	Version              string              `json:"version"`
-	Type                 string              `json:"type"`
-	Protocol             string              `json:"protocol"`
-	Tier                 AdapterTier         `json:"tier"`
-	Capabilities         AdapterCapabilities `json:"capabilities"`
-	DataContract         DataContract        `json:"data_contract"`
-	HealthCheckIntervalMs int                `json:"health_check_interval_ms"`
-	ConnectionParams     []ConnectionParam   `json:"connection_params,omitempty"`
-	AuthMethods          []string            `json:"auth_methods,omitempty"`
-	Metadata             map[string]any      `json:"metadata,omitempty"`
+	AdapterID             string              `json:"adapter_id"`
+	Name                  string              `json:"name"`
+	Version               string              `json:"version"`
+	Type                  string              `json:"type"`
+	Protocol              string              `json:"protocol"`
+	Tier                  AdapterTier         `json:"tier"`
+	Capabilities          AdapterCapabilities `json:"capabilities"`
+	DataContract          DataContract        `json:"data_contract"`
+	HealthCheckIntervalMs int                 `json:"health_check_interval_ms"`
+	ConnectionParams      []ConnectionParam   `json:"connection_params,omitempty"`
+	AuthMethods           []string            `json:"auth_methods,omitempty"`
+	Metadata              map[string]any      `json:"metadata,omitempty"`
 }
 
 // AdapterHealth holds the current health status of an adapter instance.
