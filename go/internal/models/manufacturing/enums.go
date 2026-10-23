@@ -3,7 +3,13 @@
 // These types are the Go equivalents of the Python models in
 // src/forge/core/models/manufacturing/. Adapters map source-system-specific
 // values to these canonical types during ingestion.
+//
+// Every enumeration lists its members through a Values function, in the
+// Python enum's order, and reports membership through Valid; the parity test
+// holds the members equal to the Python enum's (FB-016).
 package manufacturing
+
+import "slices"
 
 // -- Manufacturing Unit --
 
@@ -18,6 +24,21 @@ const (
 	UnitStatusScrapped    UnitStatus = "SCRAPPED"
 	UnitStatusTransferred UnitStatus = "TRANSFERRED"
 )
+
+// UnitStatusValues lists the enumeration's members in the Python enum's order.
+func UnitStatusValues() []UnitStatus {
+	return []UnitStatus{
+		UnitStatusPending,
+		UnitStatusActive,
+		UnitStatusComplete,
+		UnitStatusHeld,
+		UnitStatusScrapped,
+		UnitStatusTransferred,
+	}
+}
+
+// Valid reports whether the value is a member of the enumeration.
+func (v UnitStatus) Valid() bool { return slices.Contains(UnitStatusValues(), v) }
 
 // LifecycleState is a granular lifecycle phase within a manufacturing unit's journey.
 type LifecycleState string
@@ -34,6 +55,25 @@ const (
 	LifecycleDumped    LifecycleState = "DUMPED"
 	LifecycleComplete  LifecycleState = "COMPLETE"
 )
+
+// LifecycleStateValues lists the enumeration's members in the Python enum's order.
+func LifecycleStateValues() []LifecycleState {
+	return []LifecycleState{
+		LifecycleCreated,
+		LifecycleFilling,
+		LifecycleInProcess,
+		LifecycleAging,
+		LifecycleInStorage,
+		LifecycleInTransit,
+		LifecycleSampling,
+		LifecycleWithdrawn,
+		LifecycleDumped,
+		LifecycleComplete,
+	}
+}
+
+// Valid reports whether the value is a member of the enumeration.
+func (v LifecycleState) Valid() bool { return slices.Contains(LifecycleStateValues(), v) }
 
 // -- Physical Asset --
 
@@ -52,6 +92,24 @@ const (
 	AssetTypeStagingArea     AssetType = "STAGING_AREA"
 )
 
+// AssetTypeValues lists the enumeration's members in the Python enum's order.
+func AssetTypeValues() []AssetType {
+	return []AssetType{
+		AssetTypeEnterprise,
+		AssetTypeSite,
+		AssetTypeArea,
+		AssetTypeWorkCenter,
+		AssetTypeWorkUnit,
+		AssetTypeStorageZone,
+		AssetTypeStoragePosition,
+		AssetTypeEquipment,
+		AssetTypeStagingArea,
+	}
+}
+
+// Valid reports whether the value is a member of the enumeration.
+func (v AssetType) Valid() bool { return slices.Contains(AssetTypeValues(), v) }
+
 // AssetOperationalState is the current operational state of an asset.
 type AssetOperationalState string
 
@@ -63,6 +121,21 @@ const (
 	AssetStateOffline     AssetOperationalState = "OFFLINE"
 	AssetStateFaulted     AssetOperationalState = "FAULTED"
 )
+
+// AssetOperationalStateValues lists the enumeration's members in the Python enum's order.
+func AssetOperationalStateValues() []AssetOperationalState {
+	return []AssetOperationalState{
+		AssetStateIdle,
+		AssetStateRunning,
+		AssetStateMaintenance,
+		AssetStateChangeover,
+		AssetStateOffline,
+		AssetStateFaulted,
+	}
+}
+
+// Valid reports whether the value is a member of the enumeration.
+func (v AssetOperationalState) Valid() bool { return slices.Contains(AssetOperationalStateValues(), v) }
 
 // -- Operational Event --
 
@@ -76,6 +149,19 @@ const (
 	EventSeverityCritical EventSeverity = "CRITICAL"
 )
 
+// EventSeverityValues lists the enumeration's members in the Python enum's order.
+func EventSeverityValues() []EventSeverity {
+	return []EventSeverity{
+		EventSeverityInfo,
+		EventSeverityWarning,
+		EventSeverityError,
+		EventSeverityCritical,
+	}
+}
+
+// Valid reports whether the value is a member of the enumeration.
+func (v EventSeverity) Valid() bool { return slices.Contains(EventSeverityValues(), v) }
+
 // EventCategory classifies operational events at a high level.
 type EventCategory string
 
@@ -88,6 +174,21 @@ const (
 	EventCategoryCompliance  EventCategory = "COMPLIANCE"
 )
 
+// EventCategoryValues lists the enumeration's members in the Python enum's order.
+func EventCategoryValues() []EventCategory {
+	return []EventCategory{
+		EventCategoryProduction,
+		EventCategoryQuality,
+		EventCategoryLogistics,
+		EventCategoryMaintenance,
+		EventCategorySafety,
+		EventCategoryCompliance,
+	}
+}
+
+// Valid reports whether the value is a member of the enumeration.
+func (v EventCategory) Valid() bool { return slices.Contains(EventCategoryValues(), v) }
+
 // -- Business Entity --
 
 // EntityType classifies business entities.
@@ -99,6 +200,19 @@ const (
 	EntityTypePartner  EntityType = "PARTNER"
 	EntityTypeInternal EntityType = "INTERNAL"
 )
+
+// EntityTypeValues lists the enumeration's members in the Python enum's order.
+func EntityTypeValues() []EntityType {
+	return []EntityType{
+		EntityTypeCustomer,
+		EntityTypeVendor,
+		EntityTypePartner,
+		EntityTypeInternal,
+	}
+}
+
+// Valid reports whether the value is a member of the enumeration.
+func (v EntityType) Valid() bool { return slices.Contains(EntityTypeValues(), v) }
 
 // -- Work Order --
 
@@ -115,6 +229,22 @@ const (
 	WorkOrderStatusCancelled  WorkOrderStatus = "CANCELLED"
 )
 
+// WorkOrderStatusValues lists the enumeration's members in the Python enum's order.
+func WorkOrderStatusValues() []WorkOrderStatus {
+	return []WorkOrderStatus{
+		WorkOrderStatusDraft,
+		WorkOrderStatusPending,
+		WorkOrderStatusScheduled,
+		WorkOrderStatusInProgress,
+		WorkOrderStatusPaused,
+		WorkOrderStatusComplete,
+		WorkOrderStatusCancelled,
+	}
+}
+
+// Valid reports whether the value is a member of the enumeration.
+func (v WorkOrderStatus) Valid() bool { return slices.Contains(WorkOrderStatusValues(), v) }
+
 // WorkOrderPriority indicates work order priority level.
 type WorkOrderPriority string
 
@@ -124,6 +254,19 @@ const (
 	WorkOrderPriorityHigh   WorkOrderPriority = "HIGH"
 	WorkOrderPriorityUrgent WorkOrderPriority = "URGENT"
 )
+
+// WorkOrderPriorityValues lists the enumeration's members in the Python enum's order.
+func WorkOrderPriorityValues() []WorkOrderPriority {
+	return []WorkOrderPriority{
+		WorkOrderPriorityLow,
+		WorkOrderPriorityNormal,
+		WorkOrderPriorityHigh,
+		WorkOrderPriorityUrgent,
+	}
+}
+
+// Valid reports whether the value is a member of the enumeration.
+func (v WorkOrderPriority) Valid() bool { return slices.Contains(WorkOrderPriorityValues(), v) }
 
 // -- Production Order --
 
@@ -141,6 +284,23 @@ const (
 	OrderStatusCancelled  OrderStatus = "CANCELLED"
 )
 
+// OrderStatusValues lists the enumeration's members in the Python enum's order.
+func OrderStatusValues() []OrderStatus {
+	return []OrderStatus{
+		OrderStatusDraft,
+		OrderStatusPlanned,
+		OrderStatusReleased,
+		OrderStatusInProgress,
+		OrderStatusPaused,
+		OrderStatusComplete,
+		OrderStatusClosed,
+		OrderStatusCancelled,
+	}
+}
+
+// Valid reports whether the value is a member of the enumeration.
+func (v OrderStatus) Valid() bool { return slices.Contains(OrderStatusValues(), v) }
+
 // -- Quality --
 
 // SampleOutcome is the result of a quality sample evaluation.
@@ -152,3 +312,16 @@ const (
 	SampleOutcomeInconclusive SampleOutcome = "INCONCLUSIVE"
 	SampleOutcomePending      SampleOutcome = "PENDING"
 )
+
+// SampleOutcomeValues lists the enumeration's members in the Python enum's order.
+func SampleOutcomeValues() []SampleOutcome {
+	return []SampleOutcome{
+		SampleOutcomePass,
+		SampleOutcomeFail,
+		SampleOutcomeInconclusive,
+		SampleOutcomePending,
+	}
+}
+
+// Valid reports whether the value is a member of the enumeration.
+func (v SampleOutcome) Valid() bool { return slices.Contains(SampleOutcomeValues(), v) }

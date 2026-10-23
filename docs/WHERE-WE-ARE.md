@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-22 · **Branch:** `reh3376_dev01` (last merged PR: 65) · **Owner:** reh3376
+**Status date:** 2026-10-23 · **Branch:** `reh3376_dev01` (last merged PR: 66) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -22,12 +22,12 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 353 files, ~68,500 lines |
-| Python tests | 257 files, ~55,600 lines, 4,161 test functions (4,416 collected); full suite green on 2026-10-22 |
-| Go (`go/`) | 31 files, ~8,300 lines (1,534 models, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs) |
+| Python tests | 258 files, ~56,000 lines, 4,164 test functions (4,431 collected); full suite green on 2026-10-23 |
+| Go (`go/`) | 32 files, ~9,500 lines (1,800 of models and 1,488 of their tests, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs); `gofmt`, `go vet` and `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
 | Hub REST routes | 41 on the hub app (20 platform, 12 Context Engine, 9 Schema Registry; state changes behind `adapters:write`, `context:write` or `schemas:write`), plus OT i3X (8) and OT control (15; every POST behind `adapters:write`), plus the curation app mounted at `/curation` |
-| Storage migrations | 10 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions, registry and equipment tables, data-product curation spec) |
+| Storage migrations | 11 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions, registry and equipment tables, data-product curation spec, contextual-record context columns) |
 | FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 6 await owner approval after the FB-080 and FB-074 re-stamps (`forge governance specs --pending`) |
 | FATS specs | 28 (one per route the hub app serves; the hub test holds both directions) |
 | FVTS specs | 1 (ot-module reference, `pending_review`; re-stamped by FB-074 for `REJECTED_REVIEW`) |
@@ -130,7 +130,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Capability | State | Notes |
 |---|---|---|
 | Python module builder (manifest builder, scaffolder, generators, `forge module init`) | 🟡 | Adapter-style, backend-only templates (FB-017); duplicate SDK copies drift (FB-019) |
-| Go models mirroring the core models | ✅ | `go/internal/models` (1,244 lines without tests); `Lot.item_id` with the Python model (FB-010); drop Python defaults (FB-016) |
+| Go models mirroring the core models | ✅ | `go/internal/models` (1,800 lines, 1,488 of tests); `Lot.item_id` (FB-010) and the `RecordContext` slots (FB-013) with the Python models; every manufacturing entity has a `New*` constructor with the Python defaults and a `Validate()`, held equal to the Python models by one fixture both suites read (FB-016) |
 | Go scaffold | 🟡 | `go/internal/scaffold` (112 lines); not a module template yet |
 | `forged` daemon, `forgectl` | ⬜ | 22- and 36-line placeholders |
 | Template module copies (`modules/Forge CMMS`, `Forge ERPI`, `Forge DB Orchestration`) | 🟡 | adapter templates, not Go modules |

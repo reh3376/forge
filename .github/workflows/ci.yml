@@ -55,6 +55,10 @@ jobs:
           go-version-file: go/go.mod
           cache-dependency-path: go/go.sum
       - run: go build ./...
+      - name: gofmt
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then echo "gofmt -l:"; echo "$unformatted"; exit 1; fi
       - run: go vet ./...
       - run: go test ./... -count=1
 

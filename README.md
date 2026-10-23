@@ -51,7 +51,7 @@ Each spoke wraps one production system and produces ContextualRecords that confo
 
 | Component | Technology |
 |-----------|-----------|
-| Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,251 tests) |
+| Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,431 tests) |
 | Management and integration modules (`go/`) | Go 1.26 · `go build`, `go vet`, `go test` in CI; module SDK scaffold (the Go forge-mes is FB-076) |
 | Interim MES bridge (`modules/Forge MES`) | The migrated whk-mes application, NestJS 10 + Next.js 14, kept running only until the Go forge-mes module (FB-076) replaces it |
 | User interfaces | forge-display renders every surface from FVTS specs (not built yet; the FVTS runner and reference renderer exist) |
@@ -352,8 +352,8 @@ uv run pytest tests/core/ -v                  # Core tests
 ### Test Coverage
 
 ```
-Total:  4,416 tests collected (full suite green on 2026-10-22)
-        257 test files
+Total:  4,431 tests collected (full suite green on 2026-10-23)
+        258 test files
         353 source files
 
 By area:
@@ -361,7 +361,7 @@ By area:
   Spokes (adapters):                 994
   Governance (FxTS):                 553  (FATS, FACTS, FTTS, FVTS runners and schemas)
   Scripting SDK, module builder:     356
-  Core models, registry, context:    354
+  Core models, registry, context:    369
   Storage:                           287
   Transport, ingest, API, gateway:   246
   Curation:                          130
@@ -401,4 +401,4 @@ Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE
 
 ---
 
-*353 Python source files | 257 test files | 4,416 tests | 9 FACTS · 28 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
+*353 Python source files | 258 test files | 4,431 tests | 9 FACTS · 28 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*

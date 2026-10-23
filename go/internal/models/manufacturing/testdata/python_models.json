@@ -1,0 +1,928 @@
+{
+  "generated_by": "python -m tests.core.models.test_go_parity (tests/core/models/test_go_parity.py)",
+  "enums": {
+    "UnitStatus": [
+      "PENDING",
+      "ACTIVE",
+      "COMPLETE",
+      "HELD",
+      "SCRAPPED",
+      "TRANSFERRED"
+    ],
+    "LifecycleState": [
+      "CREATED",
+      "FILLING",
+      "IN_PROCESS",
+      "AGING",
+      "IN_STORAGE",
+      "IN_TRANSIT",
+      "SAMPLING",
+      "WITHDRAWN",
+      "DUMPED",
+      "COMPLETE"
+    ],
+    "AssetType": [
+      "ENTERPRISE",
+      "SITE",
+      "AREA",
+      "WORK_CENTER",
+      "WORK_UNIT",
+      "STORAGE_ZONE",
+      "STORAGE_POSITION",
+      "EQUIPMENT",
+      "STAGING_AREA"
+    ],
+    "AssetOperationalState": [
+      "IDLE",
+      "RUNNING",
+      "MAINTENANCE",
+      "CHANGEOVER",
+      "OFFLINE",
+      "FAULTED"
+    ],
+    "EventSeverity": [
+      "INFO",
+      "WARNING",
+      "ERROR",
+      "CRITICAL"
+    ],
+    "EventCategory": [
+      "PRODUCTION",
+      "QUALITY",
+      "LOGISTICS",
+      "MAINTENANCE",
+      "SAFETY",
+      "COMPLIANCE"
+    ],
+    "EntityType": [
+      "CUSTOMER",
+      "VENDOR",
+      "PARTNER",
+      "INTERNAL"
+    ],
+    "WorkOrderStatus": [
+      "DRAFT",
+      "PENDING",
+      "SCHEDULED",
+      "IN_PROGRESS",
+      "PAUSED",
+      "COMPLETE",
+      "CANCELLED"
+    ],
+    "WorkOrderPriority": [
+      "LOW",
+      "NORMAL",
+      "HIGH",
+      "URGENT"
+    ],
+    "OrderStatus": [
+      "DRAFT",
+      "PLANNED",
+      "RELEASED",
+      "IN_PROGRESS",
+      "PAUSED",
+      "COMPLETE",
+      "CLOSED",
+      "CANCELLED"
+    ],
+    "SampleOutcome": [
+      "PASS",
+      "FAIL",
+      "INCONCLUSIVE",
+      "PENDING"
+    ]
+  },
+  "models": {
+    "BusinessEntity": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "entity_type",
+        "name",
+        "parent_id",
+        "external_ids",
+        "contact_info",
+        "location",
+        "is_active"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "entity_type",
+        "name"
+      ],
+      "optional": [
+        "parent_id",
+        "location"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "C-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "entity_type": "CUSTOMER",
+        "name": "Acme Corp",
+        "external_ids": {},
+        "contact_info": {},
+        "is_active": true
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "C-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "tier": 1
+        },
+        "entity_type": "CUSTOMER",
+        "name": "Acme Corp",
+        "parent_id": "C-000",
+        "external_ids": {
+          "erp": "C-12345"
+        },
+        "contact_info": {
+          "email": "ops@acme.example"
+        },
+        "location": "Louisville, KY",
+        "is_active": false
+      }
+    },
+    "Lot": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "lot_number",
+        "product_type",
+        "item_id",
+        "recipe_id",
+        "production_order_id",
+        "customer_id",
+        "status",
+        "quantity",
+        "unit_of_measure",
+        "parent_lot_id",
+        "unit_count"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "lot_number"
+      ],
+      "optional": [
+        "product_type",
+        "item_id",
+        "recipe_id",
+        "production_order_id",
+        "customer_id",
+        "quantity",
+        "unit_of_measure",
+        "parent_lot_id",
+        "unit_count"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "L-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "lot_number": "2026-001",
+        "status": "CREATED"
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "L-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "whiskey_type_id": "WT-1"
+        },
+        "lot_number": "2026-001",
+        "product_type": "bourbon",
+        "item_id": "ITEM-7",
+        "recipe_id": "R-001",
+        "production_order_id": "PO-001",
+        "customer_id": "C-001",
+        "status": "STARTED",
+        "quantity": 53.0,
+        "unit_of_measure": "bbl",
+        "parent_lot_id": "2025-009",
+        "unit_count": 10
+      }
+    },
+    "ManufacturingUnit": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "unit_type",
+        "serial_number",
+        "lot_id",
+        "location_id",
+        "owner_id",
+        "recipe_id",
+        "status",
+        "lifecycle_state",
+        "quantity",
+        "unit_of_measure",
+        "product_type"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "unit_type"
+      ],
+      "optional": [
+        "serial_number",
+        "lot_id",
+        "location_id",
+        "owner_id",
+        "recipe_id",
+        "lifecycle_state",
+        "quantity",
+        "unit_of_measure",
+        "product_type"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "B-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "unit_type": "barrel",
+        "status": "PENDING"
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "B-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "disposition": "AGING"
+        },
+        "unit_type": "barrel",
+        "serial_number": "SN-12345",
+        "lot_id": "L-001",
+        "location_id": "WH-A-1-3-12",
+        "owner_id": "C-001",
+        "recipe_id": "R-001",
+        "status": "ACTIVE",
+        "lifecycle_state": "AGING",
+        "quantity": 53.0,
+        "unit_of_measure": "gallons",
+        "product_type": "bourbon"
+      }
+    },
+    "MaterialItem": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "item_number",
+        "name",
+        "description",
+        "category",
+        "unit_of_measure",
+        "vendor_id",
+        "external_ids",
+        "is_active"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "item_number",
+        "name"
+      ],
+      "optional": [
+        "description",
+        "category",
+        "unit_of_measure",
+        "vendor_id"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "I-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "item_number": "BBL-53-WHT-OAK",
+        "name": "53-gallon White Oak Barrel",
+        "external_ids": {},
+        "is_active": true
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "I-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "char_level": 4
+        },
+        "item_number": "BBL-53-WHT-OAK",
+        "name": "53-gallon White Oak Barrel",
+        "description": "Charred white oak, 53 gallons.",
+        "category": "barrel",
+        "unit_of_measure": "each",
+        "vendor_id": "V-001",
+        "external_ids": {
+          "erp": "ITEM-1234"
+        },
+        "is_active": false
+      }
+    },
+    "OperationalEvent": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "event_type",
+        "event_subtype",
+        "category",
+        "severity",
+        "entity_type",
+        "entity_id",
+        "asset_id",
+        "operator_id",
+        "event_time",
+        "result",
+        "work_order_id"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "event_type",
+        "entity_type",
+        "entity_id",
+        "event_time"
+      ],
+      "optional": [
+        "event_subtype",
+        "category",
+        "asset_id",
+        "operator_id",
+        "result",
+        "work_order_id"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "EVT-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "event_type": "Entry",
+        "severity": "INFO",
+        "entity_type": "manufacturing_unit",
+        "entity_id": "B-001",
+        "event_time": "2026-10-23T13:00:00Z"
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "EVT-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "reason_id": 3
+        },
+        "event_type": "Entry",
+        "event_subtype": "Received",
+        "category": "LOGISTICS",
+        "severity": "WARNING",
+        "entity_type": "manufacturing_unit",
+        "entity_id": "B-001",
+        "asset_id": "WH-A",
+        "operator_id": "op-17",
+        "event_time": "2026-10-23T13:00:00Z",
+        "result": "OK",
+        "work_order_id": "WO-001"
+      }
+    },
+    "PhysicalAsset": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "asset_type",
+        "name",
+        "parent_id",
+        "location_path",
+        "operational_state",
+        "capacity",
+        "capacity_unit"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "asset_type",
+        "name"
+      ],
+      "optional": [
+        "parent_id",
+        "location_path",
+        "operational_state",
+        "capacity",
+        "capacity_unit"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "WH-A",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "asset_type": "SITE",
+        "name": "Warehouse A"
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "WH-A",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "floors": 7
+        },
+        "asset_type": "SITE",
+        "name": "Warehouse A",
+        "parent_id": "ENT-1",
+        "location_path": "Enterprise/Site-1",
+        "operational_state": "RUNNING",
+        "capacity": 20000.0,
+        "capacity_unit": "bbl"
+      }
+    },
+    "ProcessStep": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "step_number",
+        "name",
+        "step_type",
+        "parent_step_id",
+        "duration_minutes",
+        "parameters",
+        "description"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "step_number",
+        "name"
+      ],
+      "optional": [
+        "step_type",
+        "parent_step_id",
+        "duration_minutes",
+        "description"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "forge-mes",
+        "source_id": "S-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "step_number": 1,
+        "name": "Milling",
+        "parameters": {}
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "forge-mes",
+        "source_id": "S-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "operation_id": "OP-9"
+        },
+        "step_number": 1,
+        "name": "Milling",
+        "step_type": "operation",
+        "parent_step_id": "S-000",
+        "duration_minutes": 30.0,
+        "parameters": {
+          "temp_c": 65.5,
+          "agitate": true,
+          "mode": "slow"
+        },
+        "description": "Mill the grain bill."
+      }
+    },
+    "ProcessDefinition": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "name",
+        "version",
+        "product_type",
+        "is_published",
+        "customer_id",
+        "steps",
+        "parameters",
+        "bill_of_materials",
+        "description"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "name"
+      ],
+      "optional": [
+        "version",
+        "product_type",
+        "customer_id",
+        "description"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "forge-mes",
+        "source_id": "R-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "name": "Bourbon Mash Recipe",
+        "is_published": false,
+        "steps": [],
+        "parameters": {},
+        "bill_of_materials": []
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "forge-mes",
+        "source_id": "R-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "whiskey_type": "bourbon"
+        },
+        "name": "Bourbon Mash Recipe",
+        "version": "2.0",
+        "product_type": "bourbon",
+        "is_published": true,
+        "customer_id": "C-001",
+        "steps": [
+          {
+            "forge_id": "00000000-0000-4000-8000-000000000001",
+            "source_system": "forge-mes",
+            "source_id": "S-001",
+            "captured_at": "2026-10-23T12:00:00Z",
+            "metadata": {},
+            "step_number": 1,
+            "name": "Milling",
+            "step_type": "operation",
+            "parent_step_id": "S-000",
+            "duration_minutes": 30.0,
+            "parameters": {
+              "temp_c": 65.5,
+              "agitate": true,
+              "mode": "slow"
+            },
+            "description": "Mill the grain bill."
+          }
+        ],
+        "parameters": {
+          "yield_target": 0.92,
+          "organic": false,
+          "grain": "corn"
+        },
+        "bill_of_materials": [
+          {
+            "item_id": "CORN",
+            "quantity": 1000.0,
+            "unit": "kg"
+          }
+        ],
+        "description": "Standard bourbon mash."
+      }
+    },
+    "ProductionOrder": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "order_number",
+        "recipe_id",
+        "customer_id",
+        "status",
+        "product_type",
+        "planned_quantity",
+        "actual_quantity",
+        "unit_of_measure",
+        "planned_start",
+        "planned_end",
+        "actual_start",
+        "actual_end",
+        "lot_ids",
+        "priority"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "order_number"
+      ],
+      "optional": [
+        "recipe_id",
+        "customer_id",
+        "product_type",
+        "planned_quantity",
+        "actual_quantity",
+        "unit_of_measure",
+        "planned_start",
+        "planned_end",
+        "actual_start",
+        "actual_end",
+        "priority"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "forge-mes",
+        "source_id": "PO-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "order_number": "PO-2026-001",
+        "status": "DRAFT",
+        "lot_ids": []
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "forge-mes",
+        "source_id": "PO-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "container_type": "barrel"
+        },
+        "order_number": "PO-2026-001",
+        "recipe_id": "R-001",
+        "customer_id": "C-001",
+        "status": "IN_PROGRESS",
+        "product_type": "bourbon",
+        "planned_quantity": 100.0,
+        "actual_quantity": 40.0,
+        "unit_of_measure": "bbl",
+        "planned_start": "2026-10-23T13:00:00Z",
+        "planned_end": "2026-10-23T15:30:00Z",
+        "actual_start": "2026-10-23T13:00:00Z",
+        "actual_end": "2026-10-23T15:30:00Z",
+        "lot_ids": [
+          "L-001",
+          "L-002"
+        ],
+        "priority": 2
+      }
+    },
+    "SampleResult": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "parameter_name",
+        "measured_value",
+        "measured_text",
+        "unit_of_measure",
+        "lower_limit",
+        "upper_limit",
+        "outcome"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "parameter_name"
+      ],
+      "optional": [
+        "measured_value",
+        "measured_text",
+        "unit_of_measure",
+        "lower_limit",
+        "upper_limit"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "SR-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "parameter_name": "proof",
+        "outcome": "PENDING"
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "SR-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "sample_type_id": 2
+        },
+        "parameter_name": "proof",
+        "measured_value": 90.0,
+        "measured_text": "90 proof",
+        "unit_of_measure": "proof",
+        "lower_limit": 80.0,
+        "upper_limit": 100.0,
+        "outcome": "PASS"
+      }
+    },
+    "QualitySample": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "sample_type",
+        "entity_type",
+        "entity_id",
+        "sampled_by",
+        "sampled_at",
+        "asset_id",
+        "results",
+        "overall_outcome"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "sample_type",
+        "entity_type",
+        "entity_id"
+      ],
+      "optional": [
+        "sampled_by",
+        "sampled_at",
+        "asset_id"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "QS-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "sample_type": "proof_check",
+        "entity_type": "manufacturing_unit",
+        "entity_id": "B-001",
+        "results": [],
+        "overall_outcome": "PENDING"
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "QS-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "volume_ml": 50
+        },
+        "sample_type": "proof_check",
+        "entity_type": "manufacturing_unit",
+        "entity_id": "B-001",
+        "sampled_by": "op-17",
+        "sampled_at": "2026-10-23T13:00:00Z",
+        "asset_id": "LAB-1",
+        "results": [
+          {
+            "forge_id": "00000000-0000-4000-8000-000000000001",
+            "source_system": "whk-wms",
+            "source_id": "SR-001",
+            "captured_at": "2026-10-23T12:00:00Z",
+            "metadata": {},
+            "parameter_name": "proof",
+            "measured_value": 90.0,
+            "measured_text": "90 proof",
+            "unit_of_measure": "proof",
+            "lower_limit": 80.0,
+            "upper_limit": 100.0,
+            "outcome": "PASS"
+          }
+        ],
+        "overall_outcome": "PASS"
+      }
+    },
+    "WorkOrderDependency": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "dependent_order_id",
+        "prerequisite_order_id",
+        "dependency_type"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "dependent_order_id",
+        "prerequisite_order_id"
+      ],
+      "optional": [],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "DEP-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "dependent_order_id": "WO-002",
+        "prerequisite_order_id": "WO-001",
+        "dependency_type": "BLOCKS"
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "DEP-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "template_id": "T-1"
+        },
+        "dependent_order_id": "WO-002",
+        "prerequisite_order_id": "WO-001",
+        "dependency_type": "RELATED"
+      }
+    },
+    "WorkOrder": {
+      "fields": [
+        "forge_id",
+        "source_system",
+        "source_id",
+        "captured_at",
+        "metadata",
+        "title",
+        "order_type",
+        "status",
+        "priority",
+        "parent_id",
+        "assigned_asset_id",
+        "assigned_operator_id",
+        "planned_start",
+        "planned_end",
+        "actual_start",
+        "actual_end",
+        "production_order_id",
+        "lot_id"
+      ],
+      "required": [
+        "source_system",
+        "source_id",
+        "title",
+        "order_type"
+      ],
+      "optional": [
+        "parent_id",
+        "assigned_asset_id",
+        "assigned_operator_id",
+        "planned_start",
+        "planned_end",
+        "actual_start",
+        "actual_end",
+        "production_order_id",
+        "lot_id"
+      ],
+      "minimal": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "WO-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {},
+        "title": "Transfer barrels to Warehouse B",
+        "order_type": "TRANSFER",
+        "status": "PENDING",
+        "priority": "NORMAL"
+      },
+      "full": {
+        "forge_id": "00000000-0000-4000-8000-000000000001",
+        "source_system": "whk-wms",
+        "source_id": "WO-001",
+        "captured_at": "2026-10-23T12:00:00Z",
+        "metadata": {
+          "job_type": "TRANSFER"
+        },
+        "title": "Transfer barrels to Warehouse B",
+        "order_type": "TRANSFER",
+        "status": "IN_PROGRESS",
+        "priority": "HIGH",
+        "parent_id": "WO-000",
+        "assigned_asset_id": "WH-B",
+        "assigned_operator_id": "op-17",
+        "planned_start": "2026-10-23T13:00:00Z",
+        "planned_end": "2026-10-23T15:30:00Z",
+        "actual_start": "2026-10-23T13:00:00Z",
+        "actual_end": "2026-10-23T15:30:00Z",
+        "production_order_id": "PO-001",
+        "lot_id": "L-001"
+      }
+    }
+  }
+}

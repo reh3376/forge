@@ -119,12 +119,12 @@ func TestContextualRecordProtoRoundTrip(t *testing.T) {
 			DataType:         "float64",
 		},
 		Context: models.RecordContext{
-			EquipmentID:   "FERM-001",
-			Area:          "Fermentation",
-			Site:          "WHK-Main",
-			BatchID:       "B001",
-			LotID:         "L001",
-			RecipeID:      "R001",
+			EquipmentID:    "FERM-001",
+			Area:           "Fermentation",
+			Site:           "WHK-Main",
+			BatchID:        "B001",
+			LotID:          "L001",
+			RecipeID:       "R001",
 			OperatingMode:  "PRODUCTION",
 			ShiftID:        "Day",
 			OperatorID:     "op-001",
@@ -276,16 +276,16 @@ func TestQualityCodeProtoRoundTrip(t *testing.T) {
 
 func TestAdapterManifestConstruction(t *testing.T) {
 	m := models.AdapterManifest{
-		AdapterID:            "whk-wms",
-		Name:                 "WHK WMS Adapter",
-		Version:              "0.1.0",
-		Type:                 "INGESTION",
-		Protocol:             "graphql+amqp",
-		Tier:                 models.AdapterTierERPBusiness,
-		Capabilities:         models.DefaultAdapterCapabilities(),
-		DataContract:         models.DataContract{SchemaRef: "forge://schemas/whk-wms/v1", OutputFormat: "contextual_record"},
+		AdapterID:             "whk-wms",
+		Name:                  "WHK WMS Adapter",
+		Version:               "0.1.0",
+		Type:                  "INGESTION",
+		Protocol:              "graphql+amqp",
+		Tier:                  models.AdapterTierERPBusiness,
+		Capabilities:          models.DefaultAdapterCapabilities(),
+		DataContract:          models.DataContract{SchemaRef: "forge://schemas/whk-wms/v1", OutputFormat: "contextual_record"},
 		HealthCheckIntervalMs: 5000,
-		AuthMethods:          []string{"azure_entra_id"},
+		AuthMethods:           []string{"azure_entra_id"},
 	}
 
 	if m.AdapterID != "whk-wms" {
@@ -332,14 +332,14 @@ func TestAdapterManifestJSONRoundTrip(t *testing.T) {
 
 func TestAdapterManifestProtoRoundTrip(t *testing.T) {
 	m := &models.AdapterManifest{
-		AdapterID:            "whk-wms",
-		Name:                 "WHK WMS",
-		Version:              "0.1.0",
-		Type:                 "INGESTION",
-		Protocol:             "graphql+amqp",
-		Tier:                 models.AdapterTierERPBusiness,
-		Capabilities:         models.AdapterCapabilities{Read: true, Subscribe: true, Discover: true},
-		DataContract:         models.DataContract{SchemaRef: "ref", OutputFormat: "contextual_record", ContextFields: []string{"equipment_id", "batch_id"}},
+		AdapterID:             "whk-wms",
+		Name:                  "WHK WMS",
+		Version:               "0.1.0",
+		Type:                  "INGESTION",
+		Protocol:              "graphql+amqp",
+		Tier:                  models.AdapterTierERPBusiness,
+		Capabilities:          models.AdapterCapabilities{Read: true, Subscribe: true, Discover: true},
+		DataContract:          models.DataContract{SchemaRef: "ref", OutputFormat: "contextual_record", ContextFields: []string{"equipment_id", "batch_id"}},
 		HealthCheckIntervalMs: 5000,
 		ConnectionParams: []models.ConnectionParam{
 			{Name: "host", Description: "API host", Required: true},
@@ -415,8 +415,8 @@ func TestAdapterTierRoundTrip(t *testing.T) {
 	}
 	for _, tier := range tiers {
 		m := &models.AdapterManifest{
-			AdapterID: "test",
-			Tier:      tier,
+			AdapterID:    "test",
+			Tier:         tier,
 			DataContract: models.DataContract{SchemaRef: "ref"},
 		}
 		pb := models.AdapterManifestToProto(m)
