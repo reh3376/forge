@@ -172,8 +172,13 @@ func recordContextToProto(c *RecordContext) *forgev1.RecordContext {
 		LotId:         c.LotID,
 		RecipeId:      c.RecipeID,
 		OperatingMode: c.OperatingMode,
-		Shift:         c.Shift,
+		ShiftId:       c.ShiftID,
 		OperatorId:    c.OperatorID,
+		EventType:     c.EventType,
+		WorkOrderId:   c.WorkOrderID,
+	}
+	if c.EventTimestamp != nil {
+		pb.EventTimestamp = timestamppb.New(*c.EventTimestamp)
 	}
 	if len(c.Extra) > 0 {
 		pb.Extra = make(map[string]string, len(c.Extra))
@@ -204,8 +209,14 @@ func recordContextFromProto(pb *forgev1.RecordContext) RecordContext {
 	c.LotID = pb.LotId
 	c.RecipeID = pb.RecipeId
 	c.OperatingMode = pb.OperatingMode
-	c.Shift = pb.Shift
+	c.ShiftID = pb.ShiftId
 	c.OperatorID = pb.OperatorId
+	c.EventType = pb.EventType
+	c.WorkOrderID = pb.WorkOrderId
+	if pb.EventTimestamp != nil {
+		t := pb.EventTimestamp.AsTime()
+		c.EventTimestamp = &t
+	}
 
 	if len(pb.Extra) > 0 {
 		c.Extra = make(map[string]any, len(pb.Extra))
@@ -253,14 +264,14 @@ func qualityCodeFromProto(q forgev1.QualityCode) QualityCode {
 // AdapterManifestToProto converts a domain AdapterManifest to its proto form.
 func AdapterManifestToProto(m *AdapterManifest) *forgev1.AdapterManifest {
 	pb := &forgev1.AdapterManifest{
-		AdapterId:            m.AdapterID,
-		Name:                 m.Name,
-		Version:              m.Version,
-		Type:                 m.Type,
-		Protocol:             m.Protocol,
-		Tier:                 adapterTierToProto(m.Tier),
+		AdapterId:             m.AdapterID,
+		Name:                  m.Name,
+		Version:               m.Version,
+		Type:                  m.Type,
+		Protocol:              m.Protocol,
+		Tier:                  adapterTierToProto(m.Tier),
 		HealthCheckIntervalMs: int32(m.HealthCheckIntervalMs),
-		AuthMethods:          m.AuthMethods,
+		AuthMethods:           m.AuthMethods,
 	}
 
 	pb.Capabilities = &forgev1.AdapterCapabilities{
@@ -297,14 +308,14 @@ func AdapterManifestToProto(m *AdapterManifest) *forgev1.AdapterManifest {
 // AdapterManifestFromProto converts a proto AdapterManifest to a domain struct.
 func AdapterManifestFromProto(pb *forgev1.AdapterManifest) *AdapterManifest {
 	m := &AdapterManifest{
-		AdapterID:            pb.GetAdapterId(),
-		Name:                 pb.GetName(),
-		Version:              pb.GetVersion(),
-		Type:                 pb.GetType(),
-		Protocol:             pb.GetProtocol(),
-		Tier:                 adapterTierFromProto(pb.GetTier()),
+		AdapterID:             pb.GetAdapterId(),
+		Name:                  pb.GetName(),
+		Version:               pb.GetVersion(),
+		Type:                  pb.GetType(),
+		Protocol:              pb.GetProtocol(),
+		Tier:                  adapterTierFromProto(pb.GetTier()),
 		HealthCheckIntervalMs: int(pb.GetHealthCheckIntervalMs()),
-		AuthMethods:          pb.GetAuthMethods(),
+		AuthMethods:           pb.GetAuthMethods(),
 	}
 
 	if caps := pb.GetCapabilities(); caps != nil {

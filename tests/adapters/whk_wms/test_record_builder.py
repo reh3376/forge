@@ -163,10 +163,10 @@ class TestBuildContextualRecord:
         assert record.timestamp.ingestion_time is not None
 
     def test_context_passed_through(self):
-        ctx = RecordContext(equipment_id="FERM-003", shift="day")
+        ctx = RecordContext(equipment_id="FERM-003", shift_id="day")
         record = self._build(context=ctx)
         assert record.context.equipment_id == "FERM-003"
-        assert record.context.shift == "day"
+        assert record.context.shift_id == "day"
 
     def test_record_has_uuid(self):
         record = self._build()

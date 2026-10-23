@@ -395,7 +395,7 @@ async def test_full_sequence_with_cip_skipped_and_operator_confirmation() -> Non
         rec.value.raw["success"] is True and rec.value.raw["readback"]["state"] == "READY_TO_START"
     )
     assert rec.value.raw["recipe_result"]["confirmed"] == 3
-    assert rec.context.extra["event_type"] == "changeover.recipe-loaded"
+    assert rec.context.event_type == "changeover.recipe-loaded"
     assert rec.context.extra["changeover_area"] == "cooker"
     assert rec.context.equipment_id == "Distillery01/COOKER_01"
     assert rec.lineage.adapter_id == "forge-ot-module"

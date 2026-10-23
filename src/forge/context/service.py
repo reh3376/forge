@@ -27,7 +27,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field
 
 from forge.context.batch import BatchStore, InMemoryBatchStore
 from forge.context.enrichment import ContextEnricher
@@ -62,8 +62,11 @@ class EnrichRequest(BaseModel):
     lot_id: str | None = None
     recipe_id: str | None = None
     operating_mode: str | None = None
-    shift: str | None = None
+    shift_id: str | None = Field(default=None, validation_alias=AliasChoices("shift_id", "shift"))
     operator_id: str | None = None
+    event_type: str | None = None
+    event_timestamp: datetime | None = None
+    work_order_id: str | None = None
     source_time: datetime | None = None
     extra: dict[str, Any] = Field(default_factory=dict)
 
@@ -78,8 +81,11 @@ class EnrichResponse(BaseModel):
     lot_id: str | None = None
     recipe_id: str | None = None
     operating_mode: str | None = None
-    shift: str | None = None
+    shift_id: str | None = None
     operator_id: str | None = None
+    event_type: str | None = None
+    event_timestamp: datetime | None = None
+    work_order_id: str | None = None
     extra: dict[str, Any] = Field(default_factory=dict)
     fields_added: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
@@ -243,8 +249,11 @@ def build_context_router(
             lot_id=req.lot_id,
             recipe_id=req.recipe_id,
             operating_mode=req.operating_mode,
-            shift=req.shift,
+            shift_id=req.shift_id,
             operator_id=req.operator_id,
+            event_type=req.event_type,
+            event_timestamp=req.event_timestamp,
+            work_order_id=req.work_order_id,
             extra=req.extra,
         )
         result = await _enricher.enrich(context, source_time=req.source_time)
@@ -257,8 +266,11 @@ def build_context_router(
             lot_id=ctx.lot_id,
             recipe_id=ctx.recipe_id,
             operating_mode=ctx.operating_mode,
-            shift=ctx.shift,
+            shift_id=ctx.shift_id,
             operator_id=ctx.operator_id,
+            event_type=ctx.event_type,
+            event_timestamp=ctx.event_timestamp,
+            work_order_id=ctx.work_order_id,
             extra=ctx.extra,
             fields_added=result.fields_added,
             warnings=result.warnings,

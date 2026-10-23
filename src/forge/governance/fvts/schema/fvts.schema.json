@@ -342,7 +342,7 @@
     "contextField": {
       "type": "string",
       "description": "Mirrors forge.core.models.contextual_record.RecordContext.",
-      "enum": ["site", "area", "equipment_id", "batch_id", "lot_id", "recipe_id", "operating_mode", "shift", "operator_id"]
+      "enum": ["site", "area", "equipment_id", "batch_id", "lot_id", "recipe_id", "operating_mode", "shift_id", "operator_id", "event_type", "event_timestamp", "work_order_id"]
     },
     "timestampBasis": {
       "type": "string",

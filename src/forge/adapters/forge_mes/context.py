@@ -360,16 +360,13 @@ def build_record_context(
         extra["batch_id"] = batch_id
     if recipe_id:
         extra["recipe_id"] = recipe_id
-    if event_ts:
+    if event_ts is not None and event_ts.tzinfo is None:
+        # Not a one-clock value: kept as sent, outside the event_timestamp slot (FB-013).
         extra["event_timestamp"] = event_ts.isoformat()
-    if event_type != "unknown":
-        extra["event_type"] = event_type
 
     # Optional FACTS context fields -> extra
     if schedule_order_id:
         extra["schedule_order_id"] = schedule_order_id
-    if work_order_id:
-        extra["work_order_id"] = work_order_id
     if whiskey_type:
         extra["whiskey_type"] = whiskey_type
     if equipment_phase:
@@ -388,7 +385,10 @@ def build_record_context(
         batch_id=batch_id,
         lot_id=lot_id,
         recipe_id=recipe_id,
-        shift=shift,
+        shift_id=shift,
         operator_id=operator_id,
+        event_type=event_type if event_type != "unknown" else None,
+        event_timestamp=event_ts if event_ts is not None and event_ts.tzinfo else None,
+        work_order_id=str(work_order_id) if work_order_id else None,
         extra=extra,
     )

@@ -256,6 +256,24 @@ class TestEnrichEndpoint:
         assert "site" in data["fields_added"]
 
     @pytest.mark.asyncio
+    async def test_enrich_carries_the_registry_slots(self, client):
+        """FB-013: shift (old name) is accepted; shift_id and the three slots come back."""
+        resp = await client.post(
+            "/v1/context/enrich",
+            json={
+                "shift": "Custom",
+                "event_type": "step.started",
+                "event_timestamp": "2026-04-05T14:30:00Z",
+                "work_order_id": "WO-7",
+            },
+        )
+        assert resp.status_code == 200, resp.text
+        body = resp.json()
+        assert body["shift_id"] == "Custom" and "shift" not in body
+        assert body["event_type"] == "step.started"
+        assert body["event_timestamp"] == "2026-04-05T14:30:00Z"
+        assert body["work_order_id"] == "WO-7"
+
     async def test_enrich_empty_context(self, client):
         resp = await client.post("/v1/context/enrich", json={})
         assert resp.status_code == 200

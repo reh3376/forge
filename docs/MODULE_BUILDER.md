@@ -477,9 +477,12 @@ def build_record_context(raw_event: dict) -> RecordContext:
 | `lot_id` | `str \| None` | Lot/material lot ID |
 | `recipe_id` | `str \| None` | Recipe/formula ID |
 | `operating_mode` | `str \| None` | Operating mode (PRODUCTION, CIP, IDLE, etc.) |
-| `shift` | `str \| None` | Shift identifier |
+| `shift_id` | `str \| None` | Shift identifier (`shift` is still accepted on input) |
 | `operator_id` | `str \| None` | Operator/user ID |
-| `extra` | `dict` | Any additional context fields specific to your adapter |
+| `event_type` | `str \| None` | Normalised event classification |
+| `event_timestamp` | `datetime \| None` | When the event occurred (timezone-aware; a naive value stays in `extra`) |
+| `work_order_id` | `str \| None` | Work order driving the operation |
+| `extra` | `dict` | Any additional context fields specific to your adapter; a registered field sent here is lifted into its slot (FB-013) |
 
 ### Enrichment Rules
 

@@ -153,7 +153,6 @@ def build_record_context(
         "cross_system_id": global_id,
         "source_system": "erpi",
         "entity_type": record_name,
-        "event_type": event_type,
         "operation_type": transaction_type,
         "sync_state": transaction_status,
         "transaction_initiator": transaction_initiator,
@@ -178,6 +177,7 @@ def build_record_context(
         batch_id=production_order_id,
         lot_id=lot_id,
         recipe_id=recipe_id,
+        event_type=event_type,
         extra=extra,
     )
 

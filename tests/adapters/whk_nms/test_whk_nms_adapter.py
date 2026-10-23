@@ -238,7 +238,7 @@ class TestCollect:
 
         assert len(records) == 1
         record = records[0]
-        assert record.context.extra["event_type"] == "snmp_trap"
+        assert record.context.event_type == "snmp_trap"
         # device_ip field should be in extra if present in raw message
         assert record.source.tag_path.endswith("snmp_trap") or "snmp_trap" in record.source.tag_path
 

@@ -141,7 +141,7 @@ describe("ForgeHubClient against an in-process AdapterService", () => {
     const wire = seen.ingested[0] as any;
     expect(wire.source).toEqual({ adapter_id: "forge-mes", system: "forge-mes", tag_path: "mes.backend.stepexecution" });
     expect(wire.context.batch_id).toBe("B-1");
-    expect(wire.context.extra.event_type).toBe("step.started");
+    expect(wire.context.event_type).toBe("step.started"); // its own slot since FB-013
     expect(wire.value.quality).toBe("QUALITY_CODE_GOOD");
     expect(wire.value.json_value).toContain('"id":"step-1"');
     expect(wire.timestamp.source_time.seconds).toBe(String(Date.parse("2026-06-01T12:00:00Z") / 1000));

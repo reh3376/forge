@@ -12,9 +12,10 @@
  *   - the Louisville two-shift enrichment rule
  *   - the quality assessment heuristics
  *
- * Fields that exist on the proto RecordContext are set directly; the FACTS
- * fields that do not (production_order_id, event_type, ...) travel in
- * `context.extra`, exactly as the Python RecordContext serialises them.
+ * Fields that exist on the proto RecordContext are set directly (since FB-013
+ * that includes shift_id, event_type, event_timestamp and work_order_id); the
+ * FACTS fields that do not (production_order_id, schedule_order_id, ...) travel
+ * in `context.extra`, exactly as the Python RecordContext serialises them.
  */
 import { randomUUID } from "crypto";
 import type { DomainEventParams } from "../mqttDomainPublisher/types";
@@ -48,8 +49,11 @@ export interface ContextualRecordMessage {
     lot_id?: string;
     recipe_id?: string;
     operating_mode?: string;
-    shift?: string;
+    shift_id?: string;
     operator_id?: string;
+    event_type?: string;
+    event_timestamp?: ProtoTimestamp;
+    work_order_id?: string;
     extra: Record<string, string>;
   };
   lineage: {
@@ -308,14 +312,13 @@ export function mapDomainEventToRecord(
     nested(raw, "whiskeyType", "name") ?? nested(raw, "recipe", "whiskeyType", "name");
   const entityId = pick(raw, "id");
 
+  // event_type, event_timestamp and work_order_id ride in their RecordContext
+  // slots (FB-013); extra keeps what the hub has no slot for.
   const extra = defined({
-    event_type: eventType,
-    event_timestamp: sourceTime.toISOString(),
     entity_type: params.entityType,
     entity_id: entityId,
     source_event_type: params.eventType,
     production_order_id: productionOrderId,
-    work_order_id: productionOrderId,
     schedule_order_id: scheduleOrderId,
     equipment_phase: equipmentPhase,
     process_step: processStep,
@@ -353,9 +356,12 @@ export function mapDomainEventToRecord(
         lot_id: lotId,
         recipe_id: recipeId,
         operating_mode: pick(raw, "newState", "state", "status"),
-        shift: deriveShift(sourceTime),
+        shift_id: deriveShift(sourceTime),
         operator_id: operatorId,
+        event_type: eventType,
+        work_order_id: productionOrderId,
       }),
+      event_timestamp: toTimestamp(sourceTime),
       extra,
     },
     lineage: {

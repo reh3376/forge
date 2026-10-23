@@ -143,8 +143,8 @@ class TestBuildRecordContext:
     def test_populates_shift_from_timestamp(self):
         raw = {"event_timestamp": "2026-04-06T14:30:00+00:00"}
         ctx = build_record_context(raw)
-        assert ctx.shift is not None
-        assert ctx.shift in ("day", "night")
+        assert ctx.shift_id is not None
+        assert ctx.shift_id in ("day", "night")
 
     def test_populates_extra_facts_fields(self):
         raw = {
@@ -161,18 +161,19 @@ class TestBuildRecordContext:
         assert "manufacturing_unit_id" in ctx.extra
         assert "physical_asset_id" in ctx.extra
         assert "business_entity_id" in ctx.extra
-        assert "event_type" in ctx.extra
-        assert "event_timestamp" in ctx.extra
+        # FB-013: the registry's fields ride in their slots
+        assert ctx.event_type is not None and "event_type" not in ctx.extra
+        assert ctx.event_timestamp is not None and "event_timestamp" not in ctx.extra
 
     def test_z_suffix_timestamp_parsing(self):
         """Python 3.10 requires Z → +00:00 replacement."""
         raw = {"event_timestamp": "2026-04-06T14:30:00Z"}
         ctx = build_record_context(raw)
-        assert ctx.shift is not None
+        assert ctx.shift_id is not None
 
     def test_empty_raw_event(self):
         ctx = build_record_context({})
-        assert ctx.shift is None
+        assert ctx.shift_id is None
         assert ctx.equipment_id is None
         assert ctx.lot_id is None
 

@@ -47,7 +47,7 @@ class TestBuildRecordContext:
         ctx = build_record_context(event)
         assert ctx.operator_id == "user-001"
         assert ctx.extra["asset_id"] == "asset-001"
-        assert ctx.extra["event_type"] == "asset.received"
+        assert ctx.event_type == "asset.received"
 
     def test_with_asset_enrichment(self):
         event = {
@@ -121,4 +121,4 @@ class TestBuildRecordContext:
     def test_empty_event_minimal_context(self):
         ctx = build_record_context({})
         assert ctx.operator_id is None
-        assert ctx.extra["event_type"] == "unknown"
+        assert ctx.event_type == "unknown"

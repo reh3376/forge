@@ -151,7 +151,7 @@ class TestBuildContextualRecord:
         defaults = {
             "equipment_id": "EQ-001",
             "batch_id": "B-001",
-            "shift": "day",
+            "shift_id": "day",
             "extra": {"production_order_id": "PRO-001", "event_type": "batch.started"},
         }
         defaults.update(overrides)

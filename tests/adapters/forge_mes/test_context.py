@@ -165,16 +165,26 @@ class TestBuildRecordContext:
     def test_shift_enrichment(self):
         raw = {"batch_id": "B-001", "timestamp": "2026-04-06T14:30:00Z"}
         ctx = build_record_context(raw)
-        assert ctx.shift in ("day", "night")
+        assert ctx.shift_id in ("day", "night")
 
-    def test_event_type_in_extra(self):
+    def test_event_type_in_its_slot(self):
+        """FB-013: event_type, event_timestamp and work_order_id are slots, not extra keys."""
         raw = {
             "batch_id": "B-001",
             "event_type": "batch_started",
+            "productionOrderId": "PRO-001",
             "timestamp": "2026-04-06T14:30:00Z",
         }
         ctx = build_record_context(raw)
-        assert ctx.extra.get("event_type") == "batch.started"
+        assert ctx.event_type == "batch.started"
+        assert ctx.work_order_id == "PRO-001"
+        assert ctx.event_timestamp is not None and ctx.event_timestamp.tzinfo is not None
+        assert not {"event_type", "event_timestamp", "work_order_id"} & set(ctx.extra)
+
+    def test_naive_event_timestamp_stays_in_extra(self):
+        ctx = build_record_context({"batch_id": "B-001", "timestamp": "2026-04-06T14:30:00"})
+        assert ctx.event_timestamp is None
+        assert ctx.extra["event_timestamp"] == "2026-04-06T14:30:00"
 
     def test_production_order_in_extra(self):
         raw = {"productionOrderId": "PRO-001", "timestamp": "2026-04-06T14:30:00Z"}
@@ -194,7 +204,7 @@ class TestBuildRecordContext:
     def test_z_suffix_timestamp(self):
         raw = {"batch_id": "B-001", "timestamp": "2026-04-06T14:30:00Z"}
         ctx = build_record_context(raw)
-        assert ctx.extra.get("event_timestamp") is not None
+        assert ctx.event_timestamp is not None
 
     def test_empty_event(self):
         ctx = build_record_context({})
@@ -246,7 +256,7 @@ class TestBuildRecordContext:
     def test_work_order_aliases_production_order(self):
         raw = {"production_order_id": "PRO-001", "timestamp": "2026-04-06T14:30:00Z"}
         ctx = build_record_context(raw)
-        assert ctx.extra.get("work_order_id") == "PRO-001"
+        assert ctx.work_order_id == "PRO-001"  # its own slot since FB-013
 
     def test_nested_equipment_phase_name(self):
         raw = {
@@ -260,7 +270,7 @@ class TestBuildRecordContext:
     def test_event_type_from_rabbitmq_exchange(self):
         raw = {"batch_id": "B-001", "timestamp": "2026-04-06T14:30:00Z"}
         ctx = build_record_context(raw, exchange_name="wh.whk01.distillery01.equipmentphase")
-        assert ctx.extra.get("event_type") == "phase.event"
+        assert ctx.event_type == "phase.event"  # its own slot since FB-013
 
     def test_schedule_order_id_in_extra(self):
         raw = {

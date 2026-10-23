@@ -139,7 +139,6 @@ def build_record_context(
         "cross_system_id": global_id,
         "source_system": "whk-cmms",
         "entity_type": entity_type,
-        "event_type": event_type,
         "operation_context": "maintenance",
         "entity_category": category,
     }
@@ -181,6 +180,7 @@ def build_record_context(
         site="whk01.distillery01",
         batch_id=work_order_type,
         lot_id=kit_id,
+        event_type=event_type,
         extra=extra,
     )
 

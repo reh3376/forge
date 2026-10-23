@@ -128,7 +128,7 @@ class TestTimescaleRecordWriter:
 
     def test_record_to_row_extracts_fields(self, sample_record):
         row = TimescaleRecordWriter._record_to_row(sample_record)
-        assert len(row) == 16
+        assert len(row) == 24  # one column per RecordContext slot since migration 011 (FB-013)
         # Check key fields
         assert row[0] == sample_record.timestamp.source_time  # time
         assert row[1] == sample_record.record_id  # record_id
@@ -139,6 +139,20 @@ class TestTimescaleRecordWriter:
         assert row[8] == "float64"  # data_type
         assert row[9] == "FERM-003"  # equipment_id
         assert row[10] == "Area1"  # area
+        ctx = sample_record.context
+        assert row[11:21] == (
+            ctx.site,
+            ctx.batch_id,
+            ctx.lot_id,
+            ctx.recipe_id,
+            ctx.operating_mode,
+            ctx.shift_id,
+            ctx.operator_id,
+            ctx.event_type,
+            ctx.event_timestamp,
+            ctx.work_order_id,
+        )
+        assert row[22] == sample_record.lineage.schema_ref
 
 
 class TestTimescaleRecordReader:

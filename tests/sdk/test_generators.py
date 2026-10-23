@@ -69,7 +69,7 @@ def full_manifest() -> dict:
         .context_field("equipment_id")
         .context_field("batch_id")
         .context_field("lot_id")
-        .context_field("shift")
+        .context_field("shift_id")
         .context_field("operator_id")
         .context_field("event_type")
         .auth_method("azure_entra_id")

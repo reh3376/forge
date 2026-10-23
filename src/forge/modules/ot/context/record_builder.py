@@ -96,7 +96,7 @@ def build_ot_record(
         lot_id=enrichment.lot_id,
         recipe_id=enrichment.recipe_id,
         operating_mode=enrichment.operating_mode,
-        shift=enrichment.shift,
+        shift_id=enrichment.shift_id,
         operator_id=enrichment.operator_id,
         extra=enrichment.extra,
     )

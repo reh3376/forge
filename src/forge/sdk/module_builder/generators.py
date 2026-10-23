@@ -503,9 +503,13 @@ def generate_context(manifest: dict[str, Any]) -> str:
             "lot_id",
             "recipe_id",
             "operating_mode",
-            "shift",
+            "shift_id",
             "operator_id",
+            "event_type",
+            "work_order_id",
         ):
+            # event_timestamp goes through extra on purpose: RecordContext lifts it into
+            # its slot when it is an aware datetime and keeps a naive one as sent (FB-013).
             lines.append(f"    if {field}:")
             lines.append(f'        extra["{field}"] = {field}')
 
@@ -518,8 +522,10 @@ def generate_context(manifest: dict[str, Any]) -> str:
         "lot_id",
         "recipe_id",
         "operating_mode",
-        "shift",
+        "shift_id",
         "operator_id",
+        "event_type",
+        "work_order_id",
     }
     used_fields = [f for f in context_fields if f in known_rc_fields]
 

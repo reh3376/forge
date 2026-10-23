@@ -125,10 +125,13 @@ func TestContextualRecordProtoRoundTrip(t *testing.T) {
 			BatchID:       "B001",
 			LotID:         "L001",
 			RecipeID:      "R001",
-			OperatingMode: "PRODUCTION",
-			Shift:         "Day",
-			OperatorID:    "op-001",
-			Extra:         map[string]any{"custom": "val"},
+			OperatingMode:  "PRODUCTION",
+			ShiftID:        "Day",
+			OperatorID:     "op-001",
+			EventType:      "fermenter.reading",
+			EventTimestamp: timePtr(time.Date(2026, 4, 5, 14, 30, 0, 0, time.UTC)),
+			WorkOrderID:    "WO-001",
+			Extra:          map[string]any{"custom": "val"},
 		},
 		Lineage: models.RecordLineage{
 			SchemaRef:           "forge://schemas/whk-wms/v1",
@@ -179,8 +182,15 @@ func TestContextualRecordProtoRoundTrip(t *testing.T) {
 	if rec2.Context.Site != rec.Context.Site {
 		t.Errorf("site: %q != %q", rec2.Context.Site, rec.Context.Site)
 	}
-	if rec2.Context.Shift != rec.Context.Shift {
-		t.Errorf("shift: %q != %q", rec2.Context.Shift, rec.Context.Shift)
+	if rec2.Context.ShiftID != rec.Context.ShiftID {
+		t.Errorf("shift_id: %q != %q", rec2.Context.ShiftID, rec.Context.ShiftID)
+	}
+	// FB-013: the registry's three fields ride in their own slots, not in extra.
+	if rec2.Context.EventType != "fermenter.reading" || rec2.Context.WorkOrderID != "WO-001" {
+		t.Errorf("event_type/work_order_id: %q / %q", rec2.Context.EventType, rec2.Context.WorkOrderID)
+	}
+	if rec2.Context.EventTimestamp == nil || !rec2.Context.EventTimestamp.Equal(*rec.Context.EventTimestamp) {
+		t.Errorf("event_timestamp: %v != %v", rec2.Context.EventTimestamp, rec.Context.EventTimestamp)
 	}
 	if rec2.Lineage.SchemaRef != rec.Lineage.SchemaRef {
 		t.Errorf("schema_ref: %q != %q", rec2.Lineage.SchemaRef, rec.Lineage.SchemaRef)
@@ -435,3 +445,5 @@ func TestAdapterStateRoundTrip(t *testing.T) {
 		}
 	}
 }
+
+func timePtr(t time.Time) *time.Time { return &t }

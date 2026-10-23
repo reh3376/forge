@@ -222,10 +222,9 @@ def build_record_context(
     )
     if customer_id:
         extra["business_entity_id"] = customer_id
-    if event_ts:
+    if event_ts is not None and event_ts.tzinfo is None:
+        # Not a one-clock value: kept as sent, outside the event_timestamp slot (FB-013).
         extra["event_timestamp"] = event_ts.isoformat()
-    if event_type != "unknown":
-        extra["event_type"] = event_type
 
     # Optional FACTS context fields
     work_order_id = (
@@ -234,8 +233,6 @@ def build_record_context(
         or raw_event.get("warehouse_job_id")
         or raw_event.get("warehouseJobId")
     )
-    if work_order_id:
-        extra["work_order_id"] = work_order_id
     warehouse_loc = (
         raw_event.get("warehouse_location_id")
         or raw_event.get("warehouseLocationId")
@@ -259,7 +256,14 @@ def build_record_context(
         lot_id=lot_id,
         recipe_id=recipe_id,
         operating_mode=operating_mode,
-        shift=shift,
+        shift_id=shift,
         operator_id=operator_id,
+        event_type=event_type if event_type != "unknown" else None,
+        event_timestamp=event_ts if event_ts is not None and event_ts.tzinfo else None,
+        work_order_id=_str_or_none(work_order_id),
         extra=extra,
     )
+
+
+def _str_or_none(val: Any) -> str | None:
+    return str(val) if val else None

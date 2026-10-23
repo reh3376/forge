@@ -780,11 +780,9 @@ class ChangeoverOrchestrator:
             raw["error"] = f"{type(error).__name__}: {error}"
         quality = QualityCode.GOOD if success else QualityCode.BAD
         extra = {
-            "event_type": f"changeover.{command}",
             "entity_type": "Changeover",
             "changeover_area": area,
             "write_requested_by": self._requested_by,
-            "event_timestamp": now.isoformat(),
         }
         if actor:
             extra["actor"] = actor
@@ -805,6 +803,8 @@ class ChangeoverOrchestrator:
                 equipment_id=rt.config.equipment_id,
                 operating_mode=rt.mes_state,
                 operator_id=actor or self._requested_by,
+                event_type=f"changeover.{command}",
+                event_timestamp=now,
                 extra=extra,
             ),
             lineage=RecordLineage(

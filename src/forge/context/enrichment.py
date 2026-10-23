@@ -117,14 +117,14 @@ class ContextEnricher:
                     added.append("recipe_id")
 
         # 3. Shift resolution
-        if self._schedule and source_time and not context.shift:
+        if self._schedule and source_time and not context.shift_id:
             from datetime import datetime as dt
 
             if isinstance(source_time, dt):
                 shift_name = resolve_shift(self._schedule, source_time)
                 if shift_name:
-                    context.shift = shift_name
-                    added.append("shift")
+                    context.shift_id = shift_name
+                    added.append("shift_id")
 
         # 4. Operating mode
         if context.equipment_id and not context.operating_mode:

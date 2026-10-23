@@ -92,9 +92,10 @@ def write_result_to_record(
     Conventions match the changeover orchestrator's audit records: the
     source tag is ``ot.control.write.<plc tag path>``, the whole decision
     chain is the raw value, quality follows the outcome (CONFIRMED → GOOD,
-    UNCONFIRMED → UNCERTAIN, anything else → BAD) and ``context.extra``
-    carries ``event_type = "control.write"`` with the status, role, reason,
-    origin, reason code, review timing, batch and request ids for filtering.
+    UNCONFIRMED → UNCERTAIN, anything else → BAD); the context carries
+    ``event_type = "control.write"`` and ``event_timestamp`` (completion) in
+    their slots, and ``context.extra`` the status, role, reason, origin,
+    reason code, review timing, batch and request ids for filtering.
     """
     now = now or datetime.now(UTC)
     status = str(record.get("status") or WriteStatus.PENDING.value)
@@ -108,7 +109,6 @@ def write_result_to_record(
     requested_at = _parse_time(record.get("timestamp"), now)
     completed_at = _parse_time(record.get("completed_at"), now)
     extra: dict[str, Any] = {
-        "event_type": "control.write",
         "entity_type": "ControlWrite",
         "target_tag_path": tag_path,
         "write_status": status,
@@ -117,7 +117,6 @@ def write_result_to_record(
         "write_origin": record.get("origin") or WriteOrigin.OPERATOR.value,
         "write_requested_by": record.get("requestor"),
         "request_id": record.get("request_id"),
-        "event_timestamp": completed_at.isoformat(),
     }
     for key in ("batch_id", "interlock_rule_id", "reason_code", "staged_at", "stage_attempt"):
         if record.get(key):
@@ -145,6 +144,8 @@ def write_result_to_record(
             equipment_id=record.get("equipment_id") or None,
             site=site,
             operator_id=record.get("requestor") or None,
+            event_type="control.write",
+            event_timestamp=completed_at,
             extra=extra,
         ),
         lineage=RecordLineage(

@@ -176,7 +176,7 @@ class TestContextualRecordAuditSink:
         assert cr.source.tag_path == "ot.control.write.WH/WHK01/Distillery01/TIT_2010/SP"
         assert cr.context.area == "Distillery01" and cr.context.site == "whk01"
         assert cr.context.operator_id == record["requestor"]
-        assert cr.context.extra["event_type"] == "control.write"
+        assert cr.context.event_type == "control.write"
         assert cr.context.extra["target_tag_path"] == "WH/WHK01/Distillery01/TIT_2010/SP"
         assert cr.context.extra["write_status"] == record["status"]
         assert cr.value.raw["requested_value"] == record["requested_value"]

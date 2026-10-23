@@ -361,7 +361,7 @@ class TestCollect:
         adapter.inject_records([_SAMPLE_WORK_ORDER_MESSAGE])
         records = [r async for r in adapter.collect()]
         ctx = records[0].context
-        assert ctx.extra["event_type"] == "create"
+        assert ctx.event_type == "create"
 
     @pytest.mark.asyncio
     async def test_record_context_operation_context(self):

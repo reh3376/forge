@@ -201,11 +201,15 @@ def _record_context_to_proto(ctx: RecordContext) -> dict[str, Any]:
         "lot_id",
         "recipe_id",
         "operating_mode",
-        "shift",
+        "shift_id",
         "operator_id",
+        "event_type",
+        "work_order_id",
     ):
         val = getattr(ctx, field, None)
         result[field] = val or ""
+    if ctx.event_timestamp is not None:
+        result["event_timestamp"] = _datetime_to_proto(ctx.event_timestamp)
     # extra → map<string, string>: complex values JSON-encoded
     extra_map: dict[str, str] = {}
     for k, v in ctx.extra.items():
@@ -370,8 +374,11 @@ def _proto_to_record_context(d: dict[str, Any]) -> RecordContext:
         lot_id=d.get("lot_id") or None,
         recipe_id=d.get("recipe_id") or None,
         operating_mode=d.get("operating_mode") or None,
-        shift=d.get("shift") or None,
+        shift_id=d.get("shift_id") or d.get("shift") or None,  # `shift` until FB-013
         operator_id=d.get("operator_id") or None,
+        event_type=d.get("event_type") or None,
+        event_timestamp=_proto_to_datetime(d.get("event_timestamp") or None),
+        work_order_id=d.get("work_order_id") or None,
         extra=extra,
     )
 

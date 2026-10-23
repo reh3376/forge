@@ -60,7 +60,7 @@ def sample_record() -> ContextualRecord:
             lot_id="L2026-0405",
             recipe_id="R-BOURBON-001",
             operating_mode="PRODUCTION",
-            shift="B",
+            shift_id="B",
         ),
         lineage=RecordLineage(
             schema_ref="forge://schemas/whk-wms/v0.1.0",
@@ -170,7 +170,7 @@ def make_record_batch(
                     batch_id="B2026-0405-003",
                     lot_id="L2026-0405",
                     operating_mode="PRODUCTION",
-                    shift="B",
+                    shift_id="B",
                 ),
                 lineage=RecordLineage(
                     schema_ref=f"forge://schemas/{adapter}/v0.1.0",
