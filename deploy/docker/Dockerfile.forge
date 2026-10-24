@@ -2,35 +2,32 @@
 # Build: docker build -f deploy/docker/Dockerfile.forge -t forge:dev .
 # Run:   docker run -p 8000:8000 -p 50051:50051 forge:dev
 #
-# Uses uv for fast, reproducible dependency resolution.
+# Every Python version comes from uv.lock (FB-096): the image is built with `uv sync --locked`,
+# which fails when pyproject.toml and the lock disagree. The root .dockerignore keeps the build
+# context to the files copied below.
 
 # ---- Stage 1: Builder ----
 FROM python:3.12-slim AS builder
 
-# Install uv (standalone binary — no pip needed)
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+# Install uv (standalone binary — no pip needed); the 0.9 line wrote the committed lock
+COPY --from=ghcr.io/astral-sh/uv:0.9 /uv /usr/local/bin/uv
 
 WORKDIR /app
+# Use the image's Python 3.12 (never download one) and copy, not hardlink, out of the cache mount
+ENV UV_PYTHON_DOWNLOADS=never UV_LINK_MODE=copy
 
-# Copy dependency manifests first (cache layer)
-COPY pyproject.toml ./
-# If a lockfile exists, copy it for reproducible builds
-COPY uv.loc[k] ./
+# Dependencies first, from the manifest and the lock alone, so this layer is cached until one of
+# them changes; the project itself is installed after the source is copied. The ot extra carries
+# the OT module the hub hosts (asyncua, aiomqtt); dev tooling stays out of the image.
+COPY pyproject.toml uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-install-project --extra ot
 
-# Install production dependencies into a virtual environment
-RUN uv venv /app/.venv \
-    && uv pip install --python /app/.venv/bin/python \
-       --no-cache \
-       -e ".[dev]" \
-    || uv pip install --python /app/.venv/bin/python \
-       --no-cache \
-       -e .
-
-# Copy application source
+# Application source and the project itself (editable, into the same /app/.venv)
+COPY README.md ./
 COPY src/ ./src/
-
-# Install the project itself into the venv
-RUN uv pip install --python /app/.venv/bin/python --no-cache -e .
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --extra ot
 
 
 # ---- Stage 2: Runtime ----

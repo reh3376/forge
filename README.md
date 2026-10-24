@@ -51,7 +51,7 @@ Each spoke wraps one production system and produces ContextualRecords that confo
 
 | Component | Technology |
 |-----------|-----------|
-| Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,435 tests) |
+| Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,442 tests) |
 | Management and integration modules (`go/`) | Go 1.26 · `go build`, `go vet`, `go test` in CI; module SDK scaffold (the Go forge-mes is FB-076) |
 | Interim MES bridge (`modules/Forge MES`) | The migrated whk-mes application, NestJS 10 + Next.js 14, kept running only until the Go forge-mes module (FB-076) replaces it |
 | User interfaces | forge-display renders every surface from FVTS specs (not built yet; the FVTS runner and reference renderer exist) |
@@ -333,8 +333,8 @@ The scripting SDK provides 11 modules that replace Ignition's `system.*` namespa
 git clone https://github.com/reh3376/forge.git
 cd forge
 
-# Install dependencies
-uv sync
+# Install from the lock (dev + ot extras); the same command CI and the hub image run
+uv sync --locked --extra dev --extra ot
 
 # Run tests
 uv run pytest
@@ -349,11 +349,24 @@ uv run pytest tests/sdk/scripting/ -v         # Scripting SDK tests
 uv run pytest tests/core/ -v                  # Core tests
 ```
 
+### Dependencies
+
+`uv.lock` pins every Python dependency for every platform. CI, the hub image
+(`deploy/docker/Dockerfile.forge`) and the quick start all install from it with
+`uv sync --locked`, which fails when `pyproject.toml` and the lock disagree, so a dependency
+moves only through a committed re-lock:
+
+```bash
+uv lock --upgrade-package fastapi    # one package, within its pyproject range
+uv lock --upgrade                    # everything the ranges allow
+uv sync --locked --extra dev --extra ot && uv run pytest   # then commit uv.lock with the change
+```
+
 ### Test Coverage
 
 ```
-Total:  4,435 tests collected (full suite green on 2026-10-23)
-        258 test files
+Total:  4,442 tests collected (full suite green on 2026-10-24)
+        259 test files
         353 source files
 
 By area:
@@ -367,6 +380,7 @@ By area:
   Curation:                          130
   Broker, integration, verification: 119
   CLI:                                20
+  Repository (dependency lock):        7
 ```
 
 Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE.md` §2 carries them and is updated before every push.
@@ -401,4 +415,4 @@ Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE
 
 ---
 
-*353 Python source files | 258 test files | 4,435 tests | 9 FACTS · 28 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
+*353 Python source files | 259 test files | 4,442 tests | 9 FACTS · 28 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
