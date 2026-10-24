@@ -29,11 +29,11 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.12"
-      # Create .venv explicitly (setup-uv v5 pre-created it, v6 does not); --clear makes it idempotent.
-      - name: Install (dev + ot extras)
-        run: |
-          uv venv --clear .venv
-          uv pip install --python .venv/bin/python -e ".[dev,ot]"
+      # Every version comes from uv.lock; --locked fails the job when pyproject.toml and the lock
+      # disagree, so a dependency moves only through a committed re-lock (FB-096). uv sync creates
+      # .venv with the Python setup-uv selected.
+      - name: Install from the lock (dev + ot extras)
+        run: uv sync --locked --extra dev --extra ot
       - name: ruff check
         run: .venv/bin/ruff check . --output-format github
       - name: ruff format
