@@ -18,7 +18,7 @@ class TestMigrationStructure:
         assert VERSIONS_DIR.is_dir()
 
     def test_all_versions_present(self):
-        expected = ["001", "002", "003", "004", "005", "006", "007", "008", "009", "010", "011"]
+        expected = [f"{n:03d}" for n in range(1, 13)]
         files = sorted(f.name for f in VERSIONS_DIR.glob("*.py") if f.name != "__init__.py")
         for version in expected:
             assert any(f.startswith(version) for f in files), f"Missing migration {version}"
@@ -124,6 +124,14 @@ class TestMigration002:
         role = downgrade.index("DROP ROLE {role_name}")
         assert guard < owned < role < downgrade.index("END IF")
         assert "REVOKE" not in downgrade  # nothing runs against a role that may already be gone
+
+    def test_roles_are_created_without_login_or_password(self):
+        """A spoke role has no way in until `forge db access issue` sets a Forge-issued
+        password; the placeholder `changeme` login is gone (FB-099)."""
+        upgrade, _ = _upgrade_and_downgrade("002_spoke_schemas.py")
+        assert "CREATE ROLE {role_name} NOLOGIN; " in upgrade
+        assert "PASSWORD" not in upgrade.split('"""')[2]  # the docstring records the history
+        assert "changeme" not in upgrade.split('"""')[2]
 
 
 class TestMigration008:
@@ -241,6 +249,44 @@ class TestMigration010:
         source = (VERSIONS_DIR / "010_data_product_curation.py").read_text()
         assert 'op.add_column("data_products", sa.Column("curation", sa.JSON)' in source
         assert 'schema="forge_canonical"' in source
+
+
+class TestMigration012:
+    """012 takes the placeholder login away from spoke roles that 002's earlier text created
+    LOGIN PASSWORD 'changeme', unless Forge has issued the role a password (FB-099)."""
+
+    def test_chain_and_roles(self):
+        mod = importlib.import_module("forge.storage.migrations.versions.012_spoke_roles_nologin")
+        two = importlib.import_module("forge.storage.migrations.versions.002_spoke_schemas")
+        assert mod.revision == "012" and mod.down_revision == "011"
+        assert tuple(f"forge_{schema}" for schema in two.SPOKE_SCHEMAS) == mod.SPOKE_ROLES
+
+    def test_nologin_runs_only_for_a_role_forge_never_issued(self):
+        upgrade, downgrade = _upgrade_and_downgrade("012_spoke_roles_nologin.py")
+        exists = upgrade.index(
+            "IF EXISTS (SELECT FROM pg_roles WHERE rolname = '{role_name}' AND rolcanlogin)"
+        )
+        never_issued = upgrade.index("AND NOT EXISTS (SELECT FROM forge_core.access_audit ")
+        nologin = upgrade.index("ALTER ROLE {role_name} NOLOGIN")
+        assert exists < never_issued < nologin < upgrade.index("END IF")
+        for word in ("LOGIN PASSWORD", "changeme"):
+            assert word not in downgrade  # nothing to return to
+
+    def test_the_audit_row_it_looks_for_is_the_one_record_issued_writes(self):
+        """The match is on the exact reason text `record_issued` audits; a dry run
+        (provisioned=no) must not count as an issue."""
+        from forge.storage.access import AccessController, AccessLevel
+
+        upgrade, _ = _upgrade_and_downgrade("012_spoke_roles_nologin.py")
+        controller = AccessController()
+        controller.grant("forge-mes", "mod_mes", AccessLevel.WRITE)
+        grant = controller.prepare_connection("forge-mes")
+        controller.record_issued(grant, provisioned=True)
+        entry = controller.audit_log[-1]
+        assert entry.action == "connection_issued"
+        assert entry.reason == "role=forge_mod_mes provisioned=yes"
+        assert "WHERE action = 'connection_issued' " in upgrade
+        assert "AND reason = 'role={role_name} provisioned=yes'" in upgrade
 
 
 class TestMigration011:

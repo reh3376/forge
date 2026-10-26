@@ -437,10 +437,12 @@ class AccessController:
         """Issue the module's connection string, provisioning its role through ``provisioner``.
 
         The role is the one migration 002 creates for the module's own schema
-        (``forge_mod_mes``); a module holding only READ grants gets
-        ``forge_<module>_ro``. The password is generated unless given, set on the
-        role by the provisioner (``ALTER ROLE ... PASSWORD``, so re-issuing rotates
-        it) and returned only inside the grant: the controller never stores it.
+        (``forge_mod_mes``, ``NOLOGIN`` and without a password until issued here,
+        FB-099); a module holding only READ grants gets ``forge_<module>_ro``. The
+        password is generated unless given, set on the role by the provisioner
+        (``ALTER ROLE ... WITH LOGIN PASSWORD``, so the first issue opens the role
+        and re-issuing rotates it) and returned only inside the grant: the
+        controller never stores it.
         The connection string carries ``?schema=<own schema>`` (what Prisma and
         most drivers read); ``search_path`` lists every accessible schema for
         clients that set it themselves.

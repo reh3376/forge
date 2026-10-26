@@ -85,7 +85,7 @@ Goal: one contract, both directions encrypted and authenticated, every RPC serve
 | FB-007 hub API auth on all routes, scope registry from manifests | Not started | FB-063 gated the write path only (`adapters:write`). |
 | FB-075 scoped role model (platform-wide, site-scoped) | **In dialogue** (D-1) | Owner decided 2026-10-16: roles will be scoped; design worked through before code. |
 | FB-001 mount Context Engine and Schema Registry apps | Done 2026-10-22 | Both served by the hub (`/v1/context`, `/v1/schemas`); state changes scoped; 28 FATS specs, one per served route. |
-| FB-003 Postgres-backed `AccessController` | Done 2026-10-22 | `PersistentAccessController` over migration 008; the storage factory and `forge db access` share it; migration 008 and the alembic driver corrected on the way; 002's downgrade (FB-098) done 2026-10-26. |
+| FB-003 Postgres-backed `AccessController` | Done 2026-10-22 | `PersistentAccessController` over migration 008; the storage factory and `forge db access` share it; migration 008 and the alembic driver corrected on the way; 002's downgrade (FB-098) and the spoke roles' placeholder login (FB-099, migration 012) done 2026-10-26. |
 | FB-004 schema naming (`mod_<x>` everywhere) · FB-059 migration 004 table | Not started | Pair with FB-057. FB-005 (registry and equipment tables, migration 009) done 2026-10-22. |
 | FB-097 converge the two schema registries | Design record round 1 (2026-10-26), waiting for the owner's signature (D-10) | FB-006 (RabbitMQ and MinIO health checks), FB-008 (one schema-reference grammar) and FB-009 (per-product curation, run on ingest) done 2026-10-22. |
 | Kubernetes production deployment (compose is dev-only) | Not started | Owner note; no backlog id yet. |
@@ -226,7 +226,7 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 | Workstream | High | Med | Low | Items |
 |---|---|---|---|---|
 | WS-1 transport | FB-092 | FB-072 | FB-055, FB-056, FB-071 | FB-002 to close as superseded; FB-092 is the one-clock time exchange |
-| WS-2 hub platform | FB-093 | FB-004, FB-007, FB-059, FB-075, FB-097 | FB-099, FB-100, FB-101 | FB-001, FB-003, FB-005, FB-006, FB-008 and FB-009 done 2026-10-22, FB-098 done 2026-10-26 (FB-099 to FB-101 found on the way); FB-093 is the one-clock enforcement |
+| WS-2 hub platform | FB-093 | FB-004, FB-007, FB-059, FB-075, FB-097 | FB-100, FB-101 | FB-001, FB-003, FB-005, FB-006, FB-008 and FB-009 done 2026-10-22, FB-098 and FB-099 done 2026-10-26 (FB-100 and FB-101 found on the way); FB-093 is the one-clock enforcement |
 | WS-3 data model | FB-011, FB-088, FB-090 | FB-012, FB-091 | — | FB-086, FB-014, FB-087, FB-089, FB-015, FB-010, FB-013, FB-016 done; the one-clock items follow the owner's 2026-10-18 principle (FB-092 in WS-1, FB-093 in WS-2), D-9 |
 | WS-4 OT module | FB-094 | FB-020, FB-079 | FB-018 | FB-073, FB-074 done (awaiting approval); FB-082 done; FB-094 is the OT source-time design |
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
