@@ -38,7 +38,7 @@ dev = [
     "pytest>=8.3.0",
     "pytest-asyncio>=0.25.0",
     "pytest-cov>=6.0.0",
-    "ruff==0.17.1",  # exact pin: the formatter must agree between the local venv and CI
+    "ruff==0.17.2",  # exact pin: the formatter must agree between the local venv and CI
     "mypy>=1.13.0",
     "pre-commit>=4.0.0",
     "grpcio-tools>=1.60.0",
