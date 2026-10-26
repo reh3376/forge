@@ -1,0 +1,8 @@
+# Build context for deploy/docker/Dockerfile.forge: only what it copies (FB-096). Without this the
+# context carried .git, .venv and the interim MES bridge's node_modules (well over a gigabyte).
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!src/
+src/**/__pycache__/
