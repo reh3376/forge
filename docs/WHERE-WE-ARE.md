@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-23 · **Branch:** `reh3376_dev01` (last merged PR: 67) · **Owner:** reh3376
+**Status date:** 2026-10-24 · **Branch:** `reh3376_dev01` (last merged PR: 69) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -22,7 +22,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 353 files, ~68,500 lines |
-| Python tests | 258 files, ~56,000 lines, 4,168 test functions (4,435 collected); full suite green on 2026-10-23 |
+| Python tests | 259 files, ~56,000 lines, 4,175 test functions (4,442 collected); full suite green on 2026-10-24 on the locked dependency set |
 | Go (`go/`) | 32 files, ~9,500 lines (1,800 of models and 1,488 of their tests, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs); `gofmt`, `go vet` and `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
@@ -31,7 +31,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 6 await owner approval after the FB-080 and FB-074 re-stamps (`forge governance specs --pending`) |
 | FATS specs | 28 (one per route the hub app serves; the hub test holds both directions) |
 | FVTS specs | 1 (ot-module reference, `pending_review`; re-stamped by FB-074 for `REJECTED_REVIEW`) |
-| CI jobs | hub-python, hub-go, mes-module, secrets-scan; auto-PR workflow |
+| CI jobs | hub-python (installs from `uv.lock` with `uv sync --locked`, FB-096), hub-go, mes-module, secrets-scan; auto-PR workflow |
 | Commits | 1,588 (includes the imported MES history) |
 
 ---
@@ -173,7 +173,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Capability | State | Notes |
 |---|---|---|
 | Docker Compose (postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio, forge-init, forge-hub) | ✅ dev only | `deploy/docker` |
-| Hub container image | ✅ | `deploy/docker/Dockerfile.forge` |
+| Hub container image | ✅ | `deploy/docker/Dockerfile.forge`, built from `uv.lock` with `uv sync --locked` (dependency layer before the source, `ot` extra in, dev tooling out; `.dockerignore` keeps the context to what it copies) since FB-096 (2026-10-24) |
 | Hub health probes (`/v1/health`, `/readyz`) | ✅ | All seven compose-stack components (postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio) since FB-006 (2026-10-22) |
 | Kubernetes production deployment | ⬜ | owner note; no backlog id |
 | Backups, SLOs, performance baselines | ⬜ | FOTS/FPTS planned |
@@ -183,11 +183,12 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Practice | State |
 |---|---|
 | One backlog item per PR, auto-PR, owner merges on green | ✅ (A-8) |
-| Every finding fixed or recorded in `BACKLOG.md` | ✅ (94 items recorded to date) |
+| Every finding fixed or recorded in `BACKLOG.md` | ✅ (98 items recorded to date) |
 | Documentation current before every push | ✅ rule since 2026-10-16 |
 | Owner-only spec approval | ✅ `forge governance approve <spec> --by reh3376` (FB-021); nobody runs it on the owner's behalf |
 | MDEMG/Jiminy governed memory, local models only | ✅ instance per project (A-10) |
 | Lint gate | ✅ `ruff check` and `ruff format --check` clean and blocking since FB-022 (2026-10-18), no rule ignored since FB-084, `DTZ` (no naive datetimes) blocking since FB-014 (2026-10-20); jest/tsc gates on the interim NestJS/Next.js code still advisory (FB-048; they go when FB-076 retires that code) |
+| Dependency lock | ✅ `uv.lock` committed (FB-096, 2026-10-24); CI, the hub image and the README quick start install with `uv sync --locked`, which fails on a stale lock, so a dependency moves only through a committed re-lock; `tests/test_dependency_lock.py` holds the lock to the manifest and the installers to the lock |
 | Top-level documents are the key documents only | ✅ FB-081 (2026-10-18): twelve planning records retired, rationale in `docs/PRINCIPLES.md` |
 
 ---
