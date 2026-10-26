@@ -3,6 +3,11 @@
 Creates isolated schemas for each spoke module and scoped
 PostgreSQL roles that enforce single-writer access.
 
+The downgrade drops everything a role holds in this database before the
+role itself: PostgreSQL refuses ``DROP ROLE`` while the role still owns an
+object or holds a privilege, and after the upgrade each role holds ``USAGE``
+on ``forge_core`` and ``SELECT`` on its tables (FB-098).
+
 Revision ID: 002
 Create Date: 2026-04-12
 """
@@ -49,11 +54,16 @@ def upgrade() -> None:
 def downgrade() -> None:
     for schema in reversed(SPOKE_SCHEMAS):
         role_name = f"forge_{schema}"
-        op.execute(f"REVOKE ALL ON SCHEMA {schema} FROM {role_name}")
+        # CASCADE takes the schema's objects, its ACL and its default privileges with it.
         op.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+        # DROP OWNED BY revokes every privilege the role holds in this database (the
+        # forge_core grants above, anything `forge db access` granted since, FB-057) and
+        # drops any object it owns; only then can the role go. Everything sits inside the
+        # existence check, so a role already gone is not an error.
         op.execute(
             f"DO $$ BEGIN "
             f"  IF EXISTS (SELECT FROM pg_roles WHERE rolname = '{role_name}') THEN "
+            f"    DROP OWNED BY {role_name}; "
             f"    DROP ROLE {role_name}; "
             f"  END IF; "
             f"END $$"
