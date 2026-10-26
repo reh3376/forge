@@ -1,6 +1,6 @@
 # Where we are
 
-**Status date:** 2026-10-26 · **Branch:** `reh3376_dev01` (last merged PR: 70) · **Owner:** reh3376
+**Status date:** 2026-10-26 · **Branch:** `reh3376_dev01` (last merged PR: 72) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
@@ -183,12 +183,12 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Practice | State |
 |---|---|
 | One backlog item per PR, auto-PR, owner merges on green | ✅ (A-8) |
-| Every finding fixed or recorded in `BACKLOG.md` | ✅ (101 items recorded to date) |
+| Every finding fixed or recorded in `BACKLOG.md` | ✅ (102 items recorded to date) |
 | Documentation current before every push | ✅ rule since 2026-10-16 |
 | Owner-only spec approval | ✅ `forge governance approve <spec> --by reh3376` (FB-021); nobody runs it on the owner's behalf |
 | MDEMG/Jiminy governed memory, local models only | ✅ instance per project (A-10) |
 | Lint gate | ✅ `ruff check` and `ruff format --check` clean and blocking since FB-022 (2026-10-18), no rule ignored since FB-084, `DTZ` (no naive datetimes) blocking since FB-014 (2026-10-20); jest/tsc gates on the interim NestJS/Next.js code still advisory (FB-048; they go when FB-076 retires that code) |
-| Dependency lock | ✅ `uv.lock` committed (FB-096, 2026-10-24); CI, the hub image and the README quick start install with `uv sync --locked`, which fails on a stale lock, so a dependency moves only through a committed re-lock; `tests/test_dependency_lock.py` holds the lock to the manifest and the installers to the lock |
+| Dependency lock | ✅ `uv.lock` committed (FB-096, 2026-10-24); CI, the hub image and the README quick start install with `uv sync --locked`, which fails on a stale lock, so a dependency moves only through a committed re-lock; Dependabot proposes Python bumps on the `uv` ecosystem, manifest and lock together (FB-102); `tests/test_dependency_lock.py` holds the lock to the manifest and the installers to the lock |
 | Top-level documents are the key documents only | ✅ FB-081 (2026-10-18): twelve planning records retired, rationale in `docs/PRINCIPLES.md` |
 
 ---
