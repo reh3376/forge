@@ -110,6 +110,22 @@ def _tables_in(source: str) -> dict[str, set[str]]:
     return {table: set(re.findall(r'sa\.Column\(\s*"(\w+)"', body)) for table, body in found}
 
 
+class TestMigration002:
+    """002's downgrade drops what each spoke role holds before the role itself (FB-098)."""
+
+    def test_downgrade_drops_owned_before_the_role_inside_the_guard(self):
+        """PostgreSQL refuses DROP ROLE while the role holds the forge_core grants the upgrade
+        made (or anything `forge db access` granted since); DROP OWNED BY takes them all."""
+        upgrade, downgrade = _upgrade_and_downgrade("002_spoke_schemas.py")
+        assert "GRANT USAGE ON SCHEMA forge_core TO {role_name}" in upgrade
+        assert "GRANT SELECT ON ALL TABLES IN SCHEMA forge_core TO {role_name}" in upgrade
+        guard = downgrade.index("IF EXISTS (SELECT FROM pg_roles WHERE rolname = '{role_name}')")
+        owned = downgrade.index("DROP OWNED BY {role_name}")
+        role = downgrade.index("DROP ROLE {role_name}")
+        assert guard < owned < role < downgrade.index("END IF")
+        assert "REVOKE" not in downgrade  # nothing runs against a role that may already be gone
+
+
 class TestMigration008:
     """008 persists ModulePermission rows and the access audit (FB-057, corrected by FB-003)."""
 
