@@ -1,0 +1,88 @@
+name: Deploy Tutorial
+
+# Builds the Forge tutorial (docs/tutorial.md) with tutorial-forge and, on main,
+# publishes the static output to GitHub Pages. Shape from the framework's FSD
+# (scripts/tutorial-forge/FSD.md §16.3), adjusted for this repository:
+#
+# - The build job runs on every branch that touches a tutorial source, so a PR's
+#   commits prove the deck still renders (every Mermaid block parses) and passes
+#   the FSD's verification contracts (scripts/check_tutorial_build.py). Forge keeps
+#   the output out of git (build/tutorial-static/ is gitignored), so the drift
+#   gate (scripts/verify_tutorial_embed.py) runs against this fresh build.
+# - The deploy job runs on main only, and only once GitHub Pages is enabled for the
+#   repository. That is a one-time repo-admin action (FSD §16.2):
+#       gh api -X POST repos/reh3376/forge/pages -f build_type=workflow
+#   Until then the deploy is skipped with a notice, never failed.
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "docs/tutorial.md"
+      - "tutorial.config.json"
+      - "scripts/tutorial-forge/**"
+      - "scripts/verify_tutorial_embed.py"
+      - "scripts/check_tutorial_build.py"
+      - ".github/workflows/deploy-tutorial.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-tutorial-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: build-tutorial
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: scripts/tutorial-forge/package-lock.json
+      - name: Install tutorial-forge dependencies
+        working-directory: scripts/tutorial-forge
+        env:
+          # Puppeteer downloads Chromium on install; the mermaid render needs it.
+          PUPPETEER_SKIP_DOWNLOAD: "false"
+        run: npm ci --no-audit --no-fund
+      - name: Build the tutorial
+        run: node scripts/tutorial-forge/cli.mjs build --config tutorial.config.json
+      - name: Verify the breadcrumb (FSD §11.1)
+        run: python3 scripts/verify_tutorial_embed.py
+      - name: Check the build invariants (FSD §8, §15.6)
+        run: python3 scripts/check_tutorial_build.py
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/tutorial-static
+
+  deploy:
+    name: deploy-pages
+    needs: build
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Is GitHub Pages enabled for this repository?
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/pages" >/dev/null 2>&1; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::GitHub Pages is not enabled for ${GITHUB_REPOSITORY}; deploy skipped. Enable once with: gh api -X POST repos/${GITHUB_REPOSITORY}/pages -f build_type=workflow"
+          fi
+      - name: Deploy to GitHub Pages
+        if: steps.pages.outputs.enabled == 'true'
+        id: deploy
+        uses: actions/deploy-pages@v4

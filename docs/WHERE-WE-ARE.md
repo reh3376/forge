@@ -1,9 +1,9 @@
 # Where we are
 
-**Status date:** 2026-10-27 · **Branch:** `reh3376_dev01` (last merged PR: 76) · **Owner:** reh3376
+**Status date:** 2026-10-27 · **Branch:** `reh3376_dev01` (last merged PR: 77) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
-**Pick-up point (2026-10-27):** PR 76 (FB-101) is merged and `reh3376_dev01` is level with `main`. No decision-free backlog item is left: FB-100 waits on FB-057 step 2; FB-097 on D-10 (`decisions/one-schema-registry.md`, Q-1 to Q-8); FB-088 and FB-090 to FB-094 on the owner's signature of the one-clock record (D-9); the rest on D-1, D-3, D-4 and D-8 (§4). Work in progress: FB-103, the Forge tutorial package built with `scripts/tutorial-forge` (two tracks from a landing fork, contributor onboarding and end-user overview; deck `docs/tutorial.md`, config `tutorial.config.json`, output `build/tutorial-static/`), modelled on the MDEMG tutorial at https://reh3376.github.io/mdemg/.
+**Pick-up point (2026-10-27):** PR 76 (FB-101) is merged and `reh3376_dev01` is level with `main`. No decision-free backlog item is left: FB-100 waits on FB-057 step 2; FB-097 on D-10 (`decisions/one-schema-registry.md`, Q-1 to Q-8); FB-088 and FB-090 to FB-094 on the owner's signature of the one-clock record (D-9); the rest on D-1, D-3, D-4 and D-8 (§4). FB-103, the Forge tutorial package built with `scripts/tutorial-forge` (two tracks from a landing fork, contributor onboarding and end-user overview; deck `docs/tutorial.md`, config `tutorial.config.json`, output `build/tutorial-static/`), modelled on the MDEMG tutorial at https://reh3376.github.io/mdemg/, was delivered on 2026-10-27; publishing it to GitHub Pages waits for the owner to enable Pages on the repository.
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
 
@@ -33,7 +33,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 6 await owner approval after the FB-080 and FB-074 re-stamps (`forge governance specs --pending`) |
 | FATS specs | 28 (one per route the hub app serves; the hub test holds both directions) |
 | FVTS specs | 1 (ot-module reference, `pending_review`; re-stamped by FB-074 for `REJECTED_REVIEW`) |
-| CI jobs | hub-python (installs from `uv.lock` with `uv sync --locked`, FB-096), hub-go, mes-module, secrets-scan; auto-PR workflow |
+| CI jobs | hub-python (installs from `uv.lock` with `uv sync --locked`, FB-096), hub-go, mes-module, secrets-scan; auto-PR workflow; Deploy Tutorial workflow (builds the deck on every push that touches it, publishes from `main` once Pages is enabled) |
 | Commits | 1,588 (includes the imported MES history) |
 
 ---
@@ -185,13 +185,14 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Practice | State |
 |---|---|
 | One backlog item per PR, auto-PR, owner merges on green | ✅ (A-8) |
-| Every finding fixed or recorded in `BACKLOG.md` | ✅ (103 items recorded to date) |
+| Every finding fixed or recorded in `BACKLOG.md` | ✅ (104 items recorded to date) |
 | Documentation current before every push | ✅ rule since 2026-10-16 |
 | Owner-only spec approval | ✅ `forge governance approve <spec> --by reh3376` (FB-021); nobody runs it on the owner's behalf |
 | MDEMG/Jiminy governed memory, local models only | ✅ instance per project (A-10) |
 | Lint gate | ✅ `ruff check` and `ruff format --check` clean and blocking since FB-022 (2026-10-18), no rule ignored since FB-084, `DTZ` (no naive datetimes) blocking since FB-014 (2026-10-20); jest/tsc gates on the interim NestJS/Next.js code still advisory (FB-048; they go when FB-076 retires that code) |
 | Dependency lock | ✅ `uv.lock` committed (FB-096, 2026-10-24); CI, the hub image and the README quick start install with `uv sync --locked`, which fails on a stale lock, so a dependency moves only through a committed re-lock; Dependabot proposes Python bumps on the `uv` ecosystem, manifest and lock together (FB-102); `tests/test_dependency_lock.py` holds the lock to the manifest and the installers to the lock |
 | Top-level documents are the key documents only | ✅ FB-081 (2026-10-18): twelve planning records retired, rationale in `docs/PRINCIPLES.md` |
+| Onboarding tutorial | ✅ FB-103 (2026-10-27): `docs/tutorial.md` (contributor track F1–F10, end-user track U1–U11, 19 diagrams, speaker notes) rendered by the vendored tutorial-forge into `build/tutorial-static/` (gitignored); `make sync-tutorial-embed`, the drift gate and the FSD invariants check run locally and in the Deploy Tutorial workflow; GitHub Pages publish waits for the owner to enable Pages |
 
 ---
 

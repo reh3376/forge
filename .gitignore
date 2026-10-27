@@ -51,3 +51,7 @@ reports/*.json
 !.env.example
 !.env.*.example
 !.env.vault
+scripts/tutorial-forge/node_modules/
+scripts/tutorial-forge/example/dist/
+build/tutorial-static/
+forge-tutorial.zip

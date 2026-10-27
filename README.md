@@ -385,6 +385,20 @@ By area:
 
 Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE.md` §2 carries them and is updated before every push.
 
+### Tutorial
+
+Two guided paths through the platform, built from `docs/tutorial.md` by tutorial-forge (`scripts/tutorial-forge/`, config `tutorial.config.json`): software-dev / contributor onboarding (F1–F10) and an end-user overview (U1–U11), with 19 pre-rendered diagrams, a sidebar of sections and diagrams, acronyms expanded on first use and a glossary. The framework's reference is `scripts/tutorial-forge/FSD.md`; the model is the MDEMG tutorial at https://reh3376.github.io/mdemg/.
+
+```bash
+(cd scripts/tutorial-forge && npm ci)   # once; downloads Chromium for the diagram render
+make sync-tutorial-embed                # renders build/tutorial-static/ (gitignored)
+make verify-tutorial-embed              # the drift gate: the build matches the sources
+make check-tutorial-build               # the FSD's verification contracts and every fragment link
+make serve-tutorial                     # http://localhost:8000/ at a viewport of 980px or wider
+```
+
+The `Deploy Tutorial` workflow builds the deck on every push that touches its sources and publishes it to GitHub Pages from `main` once Pages is enabled for the repository (a one-time owner action: `gh api -X POST repos/reh3376/forge/pages -f build_type=workflow`); until then the deploy step is skipped.
+
 ### Project Documentation
 
 | Document | Location | Purpose |
@@ -394,6 +408,7 @@ Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE
 | Where we are | `docs/WHERE-WE-ARE.md` | Component-by-component state snapshot, updated before every push that changes it |
 | Roadmap | `docs/ROADMAP.md` | Decisions in force, workstreams, sequence and the owner decision queue (companion to `BACKLOG.md`) |
 | Principles | `docs/PRINCIPLES.md` | Design principles, technical invariants, the governance pattern, the decision frame, technology decisions, origins, spoke priorities, lessons |
+| Tutorial | `docs/tutorial.md` | The onboarding deck (contributor and end-user tracks) rendered by tutorial-forge; see "Tutorial" above |
 | Sprint Plan | `docs/p7-ot-module/P7_SPRINT_PLAN.md` | P7 OT Module 24-sprint plan |
 | API Mapping | `docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md` | All 52 system.* → forge.* conversions |
 | Conversion Targets | `docs/p7-ot-module/TIER1_CONVERSION_TARGETS.md` | 82 scripts classified (42 convert, 18 replace, 14 defer, 8 drop) |
