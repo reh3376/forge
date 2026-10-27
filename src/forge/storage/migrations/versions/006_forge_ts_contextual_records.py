@@ -11,6 +11,10 @@ and leaves the 004 table in place for anything still reading it.
 The hypertable conversion only runs when the timescaledb extension is
 present, so the same revision chain applies to a plain PostgreSQL target.
 
+The downgrade removes the ``forge_ts`` schema it created along with the
+table, without cascade: anything else placed in the schema since stops the
+downgrade instead of vanishing with it (FB-101).
+
 Revision ID: 006
 Create Date: 2026-10-15
 """
@@ -18,6 +22,7 @@ Create Date: 2026-10-15
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.schema import DropSchema
 
 revision = "006"
 down_revision = "005"
@@ -90,3 +95,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("contextual_records", schema="forge_ts")
+    # 011 only adds columns to that table, so the schema is empty here; no cascade,
+    # so a foreign object in it is an error to look at rather than a silent loss.
+    op.execute(DropSchema("forge_ts", if_exists=True))
