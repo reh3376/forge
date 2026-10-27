@@ -134,6 +134,22 @@ class TestMigration002:
         assert "changeme" not in upgrade.split('"""')[2]
 
 
+class TestMigration006:
+    """006's downgrade takes the forge_ts schema it created with the table (FB-101)."""
+
+    def test_downgrade_removes_the_schema_after_the_table_without_cascade(self):
+        mod = importlib.import_module(
+            "forge.storage.migrations.versions.006_forge_ts_contextual_records"
+        )
+        assert mod.revision == "006" and mod.down_revision == "005"
+        upgrade, downgrade = _upgrade_and_downgrade("006_forge_ts_contextual_records.py")
+        assert "CREATE SCHEMA IF NOT EXISTS forge_ts" in upgrade
+        table = downgrade.index('op.drop_table("contextual_records", schema="forge_ts")')
+        schema = downgrade.index('op.execute(DropSchema("forge_ts", if_exists=True))')
+        assert table < schema
+        assert "cascade" not in downgrade.lower().replace("no cascade", "")  # fail closed
+
+
 class TestMigration008:
     """008 persists ModulePermission rows and the access audit (FB-057, corrected by FB-003)."""
 

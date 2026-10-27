@@ -226,7 +226,7 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 | Workstream | High | Med | Low | Items |
 |---|---|---|---|---|
 | WS-1 transport | FB-092 | FB-072 | FB-055, FB-056, FB-071 | FB-002 to close as superseded; FB-092 is the one-clock time exchange |
-| WS-2 hub platform | FB-093 | FB-004, FB-007, FB-059, FB-075, FB-097 | FB-100, FB-101 | FB-001, FB-003, FB-005, FB-006, FB-008 and FB-009 done 2026-10-22, FB-098 and FB-099 done 2026-10-26 (FB-100 and FB-101 found on the way); FB-093 is the one-clock enforcement |
+| WS-2 hub platform | FB-093 | FB-004, FB-007, FB-059, FB-075, FB-097 | FB-100 | FB-001, FB-003, FB-005, FB-006, FB-008 and FB-009 done 2026-10-22, FB-098 and FB-099 done 2026-10-26, FB-101 done 2026-10-27 (FB-100 found on the way, waits on FB-057 step 2); FB-093 is the one-clock enforcement |
 | WS-3 data model | FB-011, FB-088, FB-090 | FB-012, FB-091 | — | FB-086, FB-014, FB-087, FB-089, FB-015, FB-010, FB-013, FB-016 done; the one-clock items follow the owner's 2026-10-18 principle (FB-092 in WS-1, FB-093 in WS-2), D-9 |
 | WS-4 OT module | FB-094 | FB-020, FB-079 | FB-018 | FB-073, FB-074 done (awaiting approval); FB-082 done; FB-094 is the OT source-time design |
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
