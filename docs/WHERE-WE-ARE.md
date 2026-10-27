@@ -1,7 +1,9 @@
 # Where we are
 
-**Status date:** 2026-10-27 · **Branch:** `reh3376_dev01` (last merged PR: 75) · **Owner:** reh3376
+**Status date:** 2026-10-27 · **Branch:** `reh3376_dev01` (last merged PR: 76) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
+
+**Pick-up point (2026-10-27):** PR 76 (FB-101) is merged and `reh3376_dev01` is level with `main`. No decision-free backlog item is left: FB-100 waits on FB-057 step 2; FB-097 on D-10 (`decisions/one-schema-registry.md`, Q-1 to Q-8); FB-088 and FB-090 to FB-094 on the owner's signature of the one-clock record (D-9); the rest on D-1, D-3, D-4 and D-8 (§4). Work in progress: FB-103, the Forge tutorial package built with `scripts/tutorial-forge` (two tracks from a landing fork, contributor onboarding and end-user overview; deck `docs/tutorial.md`, config `tutorial.config.json`, output `build/tutorial-static/`), modelled on the MDEMG tutorial at https://reh3376.github.io/mdemg/.
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
 
@@ -27,7 +29,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
 | Hub REST routes | 41 on the hub app (20 platform, 12 Context Engine, 9 Schema Registry; state changes behind `adapters:write`, `context:write` or `schemas:write`), plus OT i3X (8) and OT control (15; every POST behind `adapters:write`), plus the curation app mounted at `/curation` |
-| Storage migrations | 11 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions, registry and equipment tables, data-product curation spec, contextual-record context columns) |
+| Storage migrations | 12 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions, registry and equipment tables, data-product curation spec, contextual-record context columns, spoke roles without login) |
 | FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 6 await owner approval after the FB-080 and FB-074 re-stamps (`forge governance specs --pending`) |
 | FATS specs | 28 (one per route the hub app serves; the hub test holds both directions) |
 | FVTS specs | 1 (ot-module reference, `pending_review`; re-stamped by FB-074 for `REJECTED_REVIEW`) |
@@ -183,7 +185,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Practice | State |
 |---|---|
 | One backlog item per PR, auto-PR, owner merges on green | ✅ (A-8) |
-| Every finding fixed or recorded in `BACKLOG.md` | ✅ (102 items recorded to date) |
+| Every finding fixed or recorded in `BACKLOG.md` | ✅ (103 items recorded to date) |
 | Documentation current before every push | ✅ rule since 2026-10-16 |
 | Owner-only spec approval | ✅ `forge governance approve <spec> --by reh3376` (FB-021); nobody runs it on the owner's behalf |
 | MDEMG/Jiminy governed memory, local models only | ✅ instance per project (A-10) |
