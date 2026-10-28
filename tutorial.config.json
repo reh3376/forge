@@ -1,0 +1,76 @@
+{
+  "_comment": "tutorial-forge config for the Forge Platform tutorial (FB-103). Deck: docs/tutorial.md; output: build/tutorial-static (gitignored, rebuilt by `make sync-tutorial-embed`). Schema and conventions: scripts/tutorial-forge/FSD.md (§5 config, §7 authoring, §16 GitHub Pages).",
+  "deck": "docs/tutorial.md",
+  "output": "build/tutorial-static",
+  "title": "Forge Platform Tutorial",
+  "acronyms": {
+    "expandCount": 1,
+    "extra": {
+      "FxTS": "Forge Test Specification",
+      "FATS": "Forge API Test Specification",
+      "FACTS": "Forge Adapter Conformance Test Specification",
+      "FTTS": "Forge Transport Test Specification",
+      "FVTS": "Forge View Test Specification",
+      "FHTS": "Forge Hash Test Specification",
+      "FDTS": "Forge Data Test Specification",
+      "FQTS": "Forge Quality Test Specification",
+      "FSTS": "Forge Security Test Specification",
+      "FOTS": "Forge Observability Test Specification",
+      "FPTS": "Forge Performance Test Specification",
+      "FLTS": "Forge Lineage Test Specification",
+      "FNTS": "Forge Normalization Test Specification",
+      "MES": "Manufacturing Execution System",
+      "WMS": "Warehouse Management System",
+      "CMMS": "Computerized Maintenance Management System",
+      "ERP": "Enterprise Resource Planning",
+      "ERPI": "Enterprise Resource Planning Integration",
+      "NMS": "Network Management System",
+      "IMS": "Inventory Management System",
+      "QMS": "Quality Management System",
+      "LIMS": "Laboratory Information Management System",
+      "SCADA": "Supervisory Control and Data Acquisition",
+      "HMI": "Human-Machine Interface",
+      "PLC": "Programmable Logic Controller",
+      "DCS": "Distributed Control System",
+      "OT": "Operational Technology",
+      "OPC": "Open Platform Communications",
+      "MQTT": "Message Queuing Telemetry Transport",
+      "AMQP": "Advanced Message Queuing Protocol",
+      "gRPC": "gRPC Remote Procedure Calls",
+      "TLS": "Transport Layer Security",
+      "mTLS": "mutual Transport Layer Security",
+      "RBAC": "Role-Based Access Control",
+      "OIDC": "OpenID Connect",
+      "SAML": "Security Assertion Markup Language",
+      "LDAP": "Lightweight Directory Access Protocol",
+      "CIP": "Common Industrial Protocol",
+      "REST": "Representational State Transfer",
+      "PR": "Pull Request",
+      "WAN": "Wide Area Network",
+      "UTC": "Coordinated Universal Time",
+      "NTP": "Network Time Protocol",
+      "PTP": "Precision Time Protocol",
+      "UDT": "User-Defined Type",
+      "DDL": "Data Definition Language",
+      "MDEMG": "Multi-Dimensional Emergent Memory Graph"
+    },
+    "disabled": ["Forge", "CMS", "FT"],
+    "glossary": {
+      "enabled": true,
+      "label": "Glossary"
+    }
+  },
+  "mermaid": {
+    "theme": "default"
+  },
+  "toc": {
+    "enabled": true,
+    "minLevel": 1,
+    "maxLevel": 2,
+    "label": "Contents",
+    "graphs": {
+      "enabled": true,
+      "label": "Graphs"
+    }
+  }
+}
