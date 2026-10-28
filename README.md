@@ -397,7 +397,7 @@ make check-tutorial-build               # the FSD's verification contracts and e
 make serve-tutorial                     # http://localhost:8000/ at a viewport of 980px or wider
 ```
 
-The `Deploy Tutorial` workflow builds the deck on every push that touches its sources and publishes it to GitHub Pages from `main` once Pages is enabled for the repository (a one-time owner action: `gh api -X POST repos/reh3376/forge/pages -f build_type=workflow`); until then the deploy step is skipped.
+The published tutorial is at https://reh3376.github.io/forge/. The `Deploy Tutorial` workflow builds the deck on every push that touches its sources and publishes it to GitHub Pages from `main` (Pages enabled for the repository on 2026-10-28 with `gh api -X POST repos/reh3376/forge/pages -f build_type=workflow`); on a fork where Pages is not enabled the deploy step is skipped with a notice.
 
 ### Project Documentation
 
