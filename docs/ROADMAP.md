@@ -235,7 +235,7 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 | WS-8 governance | — | — | FB-048 (jest/tsc follow FB-076) | FB-080, FB-021, FB-083, FB-022, FB-026, FB-085, FB-084, FB-014 done; FTTS doc has no id yet |
 | WS-9 security/ops | FB-029, FB-046 | FB-043, FB-047 | FB-044, FB-049 | public since 2026-10-17; GC still on Support |
 | WS-10 MDEMG | — | FB-038, FB-042 | FB-039, FB-040, FB-041 | |
-| WS-11 docs | — | — | FB-027 | FB-024 and FB-025 done; personal docs refresh; FB-103 (the tutorial package) done 2026-10-27, its Pages publish waits for the owner to enable Pages |
+| WS-11 docs | — | — | FB-027 | FB-024 and FB-025 done; personal docs refresh; FB-103 (the tutorial package) done 2026-10-27, live on GitHub Pages at https://reh3376.github.io/forge/ since 2026-10-28 |
 
 ---
 

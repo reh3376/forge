@@ -9,10 +9,11 @@ name: Deploy Tutorial
 #   the FSD's verification contracts (scripts/check_tutorial_build.py). Forge keeps
 #   the output out of git (build/tutorial-static/ is gitignored), so the drift
 #   gate (scripts/verify_tutorial_embed.py) runs against this fresh build.
-# - The deploy job runs on main only, and only once GitHub Pages is enabled for the
-#   repository. That is a one-time repo-admin action (FSD §16.2):
+# - The deploy job runs on main only, and only where GitHub Pages is enabled for the
+#   repository. That is a one-time repo-admin action (FSD §16.2), done for
+#   reh3376/forge on 2026-10-28 (live at https://reh3376.github.io/forge/):
 #       gh api -X POST repos/reh3376/forge/pages -f build_type=workflow
-#   Until then the deploy is skipped with a notice, never failed.
+#   Where it is not enabled (a fork), the deploy is skipped with a notice, never failed.
 
 on:
   push:
