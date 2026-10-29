@@ -75,7 +75,12 @@ class LocalBrokerIngress:
             return
         self._filters = sorted(self._subscriber.get_topic_filters())
         for topic_filter in self._filters:
-            self._broker.subscribe_local(self._name, topic_filter, self._deliver)
+            # The ingress replays the retained store itself (``_replay``: one copy
+            # per topic across overlapping filters, the stored timestamp), so the
+            # broker's per-filter replay on subscribe is turned off here.
+            await self._broker.subscribe_local(
+                self._name, topic_filter, self._deliver, replay_retained=False
+            )
         self._started = True
         if self._replay_retained:
             await self._replay()
@@ -101,15 +106,12 @@ class LocalBrokerIngress:
                 )
 
     async def _deliver(self, topic: str, payload: bytes, qos: int, retain: bool) -> None:
-        # MQTT 3.1.1 §3.3.1.3: a message matching an established subscription is
-        # delivered with RETAIN=0 whatever the publisher set; only replays of the
-        # retained store (see ``_replay``) carry RETAIN=1. The embedded broker
-        # hands local subscribers the publisher's flag, so normalise here.
-        del retain
+        # A live message arrives with retain=False from the broker (MQTT 3.1.1
+        # §3.3.1.3, FB-068); only ``_replay`` marks a message retain=True.
         self._delivered += 1
         await self._subscriber.process_message(
             IncomingMessage(
-                topic=topic, payload=payload, qos=qos, retain=False, timestamp=time.time()
+                topic=topic, payload=payload, qos=qos, retain=retain, timestamp=time.time()
             )
         )
 

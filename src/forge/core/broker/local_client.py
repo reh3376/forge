@@ -100,18 +100,27 @@ class LocalMqttClient:
             }
         )
 
-    def subscribe(
+    async def subscribe(
         self,
         topic_filter: str,
         callback: Callable[[str, bytes, int, bool], Awaitable[None] | None],
-    ) -> None:
-        """Subscribe to a topic pattern via the broker's local API."""
-        self._broker.subscribe_local(
+        *,
+        replay_retained: bool = True,
+    ) -> int:
+        """Subscribe to a topic pattern via the broker's local API.
+
+        Retained messages matching the filter are replayed with ``retain=True``
+        before this returns, as a TCP SUBSCRIBE receives them (MQTT 3.1.1
+        §3.3.1.3); returns how many were replayed.
+        """
+        replayed = await self._broker.subscribe_local(
             self._client_id,
             topic_filter,
             callback,
+            replay_retained=replay_retained,
         )
         self._subscriptions.append(topic_filter)
+        return replayed
 
     def get_info(self) -> dict[str, Any]:
         """Return client info for monitoring."""

@@ -290,7 +290,7 @@ async def test_full_changeover_over_the_embedded_broker() -> None:
         broker = rt.broker
         assert broker is not None and broker.is_started and rt.ingress is not None
         audit_topics: list[str] = []
-        broker.subscribe_local(
+        await broker.subscribe_local(
             "test-audit",
             "whk/whk01/+/ot/control/audit/#",
             lambda t, p, q, r: audit_topics.append(t),
