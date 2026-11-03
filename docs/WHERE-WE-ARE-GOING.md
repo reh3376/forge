@@ -38,7 +38,7 @@ From [`ROADMAP.md`](ROADMAP.md) §1 and [`docs/decisions/roles.md`](decisions/ro
 | Milestone | Outcome | State |
 |---|---|---|
 | **M1 · Contract and governance floor** | Hub ↔ spoke contract end to end (push, pull, write-back, TLS/mTLS, tokens, FACTS check at Register); OT module hosted in the hub with alarms, the control-write chain and the MES changeover; FATS, FACTS, FTTS and FVTS with runners and gates; FHTS hashing on every spec. | **Done** (PRs through 36) |
-| **M2 · Decisions and designs** | Role model settled (D-1, Q21/Q22); forge-mes Go design signed off (D-3); FVTS open items answered (D-4); OT FACTS vocabulary (D-8); time representation and skew tolerances (D-9); OT reference FVTS spec approved (FB-078). | **Now** |
+| **M2 · Decisions and designs** | Role model settled (D-1, Q21/Q22); forge-mes Go design signed off (D-3; record drafted 2026-11-03, `docs/decisions/forge-mes-go.md`); FVTS open items answered (D-4); OT FACTS vocabulary (D-8); time representation and skew tolerances (D-9); OT reference FVTS spec approved (FB-078). | **Now** |
 | **M3 · Go SDK and the first Go module** | Module SDK template in Go; forge-mes phase 1 speaks to the hub with FB-055 as the acceptance test; `mod_mes` in the hub (FB-057); changeover + MQTT in Go; parity; cut-over; NestJS backend retired. | Not started (FB-076, FB-017, FB-057) |
 | **M4 · forge-display** | Renderer scaffold and spike against the FVTS golden messages; MES surfaces first, then OT HMI surfaces; Next.js frontend retired. | Not started (needs D-4) |
 | **M5 · Hub platform hardening** | Context Engine and Schema Registry served by the hub (FB-001, done 2026-10-22); scoped roles enforced in the gateway (FB-075); persistent access control (FB-003, done 2026-10-22) and registries (FB-005, done 2026-10-22); server-side write review (FB-074, done 2026-10-17); FACTS schema validation (FB-080, done 2026-10-17); FDTS, FQTS, FSTS from stub to gate. | Started (FB-074, FB-080, FB-001, FB-003, FB-005 done) |
@@ -53,7 +53,7 @@ Milestones overlap where the roadmap's sequence allows (forge-display work can s
 The proposed sequence in [`ROADMAP.md`](ROADMAP.md) §4, abridged:
 
 1. Decision session on D-1, D-3, D-4, D-8 and D-9 (owner).
-2. FB-076 design document, then owner sign-off.
+2. FB-076 design document (`docs/decisions/forge-mes-go.md`, drafted 2026-11-03), then owner sign-off.
 3. Module SDK Go scaffold; its first consumer is the Go forge-mes.
 4. FB-076 phase 1: the Go module registers, ingests and takes write-backs against the hub.
 5. FB-057 `mod_mes`, with FB-004/059 as needed by the Go module (FB-005 done 2026-10-22).
