@@ -176,7 +176,7 @@ From `docs/WHERE-WE-ARE.md` §1, the snapshot at PR 76:
 
 1. The **hub ↔ spoke contract works end to end**: a spoke registers, is checked against its FACTS spec, pushes records that are persisted, is pulled (Collect, Backfill, Subscribe) and receives write-backs, over TLS/mTLS both ways with per-spoke tokens.
 2. The **OT module runs inside the hub** with OPC-UA connections, a tag engine, ISA-18.2 alarms, the full control-write defense chain, and drives the MES changeover sequence including the PLC CIP runner.
-3. **forge-mes is Go and not yet built**: the imported NestJS backend and Next.js frontend stand in as the interim bridge and speak the spoke contract; the Go rewrite (FB-076) is decided but not designed.
+3. **forge-mes is Go and not yet built**: the imported NestJS backend and Next.js frontend stand in as the interim bridge and speak the spoke contract; the Go rewrite (FB-076) is decided and designed (`docs/decisions/forge-mes-go.md`, signed 2026-11-03); the Go SDK scaffold is its first step.
 4. **Governance is real for four frameworks** (FATS, FACTS, FTTS, FVTS) plus FHTS hashing; the other seven are stubs or planned. forge-display does not exist yet; its contract (FVTS) does, with a runner and golden messages.
 5. **Not yet**: scoped roles in the gateway, `mod_mes` in the hub, the Go module SDK, the hub-of-hubs federation, Kubernetes, and any management module in Go.
 
@@ -211,7 +211,7 @@ flowchart LR
 - **`VISION.md`** changes only when a decision in `ROADMAP.md` §1 changes.
 - **`WHERE-WE-ARE-GOING.md`** changes when a milestone or the sequence changes.
 - **`WHERE-WE-ARE.md`** changes **before any push** that changes the state it describes (rule since 2026-10-16).
-- **`ROADMAP.md`** holds decisions in force (A-1 … A-10, R-1 … R-17), the workstreams, the proposed sequence and the owner's decision queue (D-1 …).
+- **`ROADMAP.md`** holds decisions in force (A-1 … A-10, R-1 … R-19), the workstreams, the proposed sequence and the owner's decision queue (D-1 …).
 - **`BACKLOG.md`** is the unit of work: one item per PR; a finding is fixed or recorded, never skipped.
 - **`PRINCIPLES.md`** holds the design principles, technical invariants, the governance pattern, the decision frame, adapter tiers, technology choices and lessons that still bind.
 
@@ -316,7 +316,7 @@ flowchart TD
 
 note:
 - The context field registry (`src/forge/core/registry`) and the manufacturing entity catalog (`docs/core/manufacturing-entity-catalog.md`) define what each slot means, so "area" is the same thing in every spoke.
-- `sent_time` is provisional until the one-clock decision (D-9) names the time fields.
+- `sent_time` becomes `spoke_time` under the one-clock design (D-9, signed 2026-11-03) when the hub-to-spoke time exchange lands (FB-092).
 
 ---
 
@@ -330,7 +330,7 @@ note:
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
 | FTTS transport spec and runner | 🟡 | `specs/grpc-hardened-transport.ftts.json`; no `docs/FxTS/FTTS.md` page yet |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
-| Hub time in the contract; fail-closed clock enforcement | ⬜ | FB-092, FB-093 wait on D-9 |
+| Hub time in the contract; fail-closed clock enforcement | ⬜ | FB-092, FB-093 (D-9 signed 2026-11-03) |
 
 Code: `src/forge/transport/grpc_server.py` (hub), `spoke_client.py` (spoke side), `grpc_channel.py` (retry), `proto_bridge.py` (proto ↔ model), `transport_adapter.py` (adapter base).
 
@@ -364,7 +364,7 @@ sequenceDiagram
 
 - `forge.ingest.facts_check` verifies the spec's hash before trusting it; a spoke whose manifest or hash does not match is refused.
 - One hub-clock reading per batch (`IngestPipeline.ingest` → `stamp_receipt`).
-- Every link's clock offset is measured and exposed on `AdapterHealth.clock`, `GET /v1/ingest/stats`, the OT connection status and OpenTelemetry (`forge.clock.offset`, `forge.clock.out_of_tolerance`); the provisional tolerance is 1 s (FB-089). Enforcement waits on D-9 (FB-093).
+- Every link's clock offset is measured and exposed on `AdapterHealth.clock`, `GET /v1/ingest/stats`, the OT connection status and OpenTelemetry (`forge.clock.offset`, `forge.clock.out_of_tolerance`); the provisional tolerance is 1 s (FB-089). Enforcement is FB-093 (D-9 signed 2026-11-03: per-link tolerance classes, never silent).
 - Curated records are persisted with the raw ones (FB-009).
 
 note:
@@ -393,8 +393,8 @@ note:
 |---|---|
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.1 |
 | Go transport parity tests | FB-055 |
-| Hub time in the contract; refusing an out-of-tolerance clock | FB-092, FB-093 (D-9) |
-| The spoke's time fields (`sent_time`, source time per spoke) | FB-088, FB-090 (D-9) |
+| Hub time in the contract; refusing an out-of-tolerance clock | FB-092, FB-093 (D-9 signed 2026-11-03) |
+| The spoke's time fields (`sent_time`, source time per spoke) | FB-088, FB-090 (D-9 signed 2026-11-03) |
 | Generic adapters (csv_file, mqtt_sparkplug, opcua, rest_generic) | package stubs only |
 
 **Next**: where the records land.
@@ -518,7 +518,7 @@ stateDiagram-v2
 ```
 
 - The hybrid path from `docs/DB_ORCHESTRATION_FRAMEWORK.md`: adapters read spoke databases, a shadow writer mirrors into the hub, ownership transfers per module.
-- Step 1 (grants and issued credentials) is delivered; steps 2–5 (the MES data into `mod_mes`) follow the forge-mes Go design (FB-057, D-3).
+- Step 1 (grants and issued credentials) is delivered; steps 2–5 (the MES data into `mod_mes`) follow the forge-mes Go design, signed 2026-11-03 (FB-057, D-3).
 - `forge.storage.shadow` and `forge.storage.backfill` are the shadow writer and the historical backfill.
 
 note:
@@ -534,7 +534,7 @@ note:
 | Models | `SchemaMetadata`, `SchemaVersion`, integer versions, compatibility mode | `SchemaEntry` with engine, namespace, retention, authoritative spoke, status |
 | Effect | the registry the hub exposes | empty on every start, so routing uses the default routes |
 
-The design record `docs/decisions/one-schema-registry.md` (round 1, 2026-10-26) recommends folding routing into the F20 registry as a placement facet, with ten proposals and eight questions. Its first three implementation steps need only the owner's signature (FB-097, D-10).
+The design record `docs/decisions/one-schema-registry.md` (round 1 2026-10-26, signed 2026-11-03) folds routing into the F20 registry as a placement facet: ten proposals, eight questions answered by the owner one at a time, eight implementation steps, one PR each (FB-097, D-10).
 
 note:
 - This is the pattern for every design the owner must sign: a record with a status line, statements tagged [OWNER] / [FACT] / [PROPOSED] / [OPEN], numbered proposals and questions with proposed answers. Nobody signs on the owner's behalf.
@@ -623,7 +623,7 @@ note:
 Governance is declarative by invariant: quality, lineage, normalization and security rules are specifications, not code paths.
 
 note:
-- Six FACTS specs await the owner's approval after re-stamps (`forge governance specs --pending`); the OT spec fails schema validation until the OT vocabulary decision (D-8, FB-079).
+- Six FACTS specs await the owner's approval after re-stamps (`forge governance specs --pending`); the OT spec fails schema validation until FB-079 extends the vocabulary (D-8, decided 2026-11-03).
 
 ---
 
@@ -669,7 +669,7 @@ note:
 - The developer guide, `docs/governance/facts-developer-guide.md`, walks the schema, how to write a spec, running the runner, common failures and cross-spoke consistency.
 
 note:
-- Adapter tiers and what they mean: `docs/PRINCIPLES.md` §5. The OT tier's vocabulary gap in FACTS v0.1.0 is decision D-8.
+- Adapter tiers and what they mean: `docs/PRINCIPLES.md` §5. The OT tier's vocabulary gap in FACTS v0.1.0 is decision D-8 (decided 2026-11-03: extend the enums, FB-079).
 
 ---
 
@@ -801,7 +801,7 @@ flowchart TD
 ```
 
 - Safety stays in the core: roles, interlocks, confirmation, read-back and audit are enforced in forge-core/OT, never only in a UI.
-- Server-side two-step review with reason codes and `REJECTED_REVIEW` since FB-074; multi-party approval waits on the role model (D-1).
+- Server-side two-step review with reason codes and `REJECTED_REVIEW` since FB-074; multi-party approval follows the role model (D-1, signed 2026-11-03; FB-075).
 - The audit record goes to the hub store and to an external publisher (FB-066, FB-067).
 - The FVTS contract binds every UI action to a required role, a confirmation mode and the statuses it must handle; the render profile decides whether a surface may write at all.
 
@@ -862,9 +862,9 @@ The owner's principle (2026-10-18): records from different sources only reconcil
 | Every stored timestamp is UTC and timezone-aware; naive rejected at the model | ✅ FB-014 |
 | The hub stamps receipt with its own clock | ✅ FB-087 |
 | The offset of every connected clock is measured, recorded and surfaced | ✅ FB-089 (provisional 1 s tolerance, warning only) |
-| A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | ❌ FB-088, FB-094; design record `docs/decisions/one-clock-ot-source-time.md` awaits the owner's signature |
-| Hub time in the contract; a hub, module or spoke outside tolerance is refused | ⬜ FB-092, FB-093 (D-9) |
-| Per-spoke declaration of source time zones; a quality dimension for time | ⬜ FB-090, FB-091 (D-9) |
+| A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | ❌ FB-088, FB-094; design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
+| Hub time in the contract; a hub, module or spoke outside tolerance is refused | ⬜ FB-092, FB-093 (D-9 signed 2026-11-03) |
+| Per-spoke declaration of source time zones; a quality dimension for time | ⬜ FB-090, FB-091 (D-9 signed 2026-11-03) |
 
 note:
 - Today the OPC-UA converter stores `SourceTimestamp` as the server sends it and invents one when absent; no device clock is read. That row is marked ❌ deliberately: the principle says a device whose clock cannot be read is not a valid source.
@@ -997,7 +997,7 @@ note:
 |---|---|
 | Go module SDK template; forge-mes in Go | FB-017, FB-076 (D-3) |
 | Module builder templates adapter-style; duplicate SDK copies | FB-017, FB-019 |
-| forge-display runtime | needs D-4; no code yet |
+| forge-display runtime | D-4 decided 2026-11-03; design next, no code yet |
 | Template module copies (`modules/Forge CMMS`, `Forge ERPI`, `Forge DB Orchestration`) are adapter templates, not Go modules | `docs/WHERE-WE-ARE.md` §3.7 |
 
 **Next**: how a value becomes decision-quality.
@@ -1140,7 +1140,7 @@ note:
 
 ---
 
-## The Role Model · R-1 … R-17 (D-1 in progress)
+## The Role Model · R-1 … R-19 (D-1 signed 2026-11-03)
 
 Designed in dialogue in `docs/decisions/roles.md`; enterprise-class:
 
@@ -1148,7 +1148,7 @@ Designed in dialogue in `docs/decisions/roles.md`; enterprise-class:
 - Roles are **scoped** (R-7), shipped **per module as data** (R-12), chosen in shape by the installing administrator (R-3, R-4), and **constrain reads as well as actions** (R-11).
 - Roles are assigned at the **managing hub** and inherited downward (R-16); tokens verify **offline** against the issuing hub's public key with a one-hour default lifetime (R-8, R-15).
 - **Separation of duties** (two-step review, interlock bypass with reason, approvals) is evaluated by the hub (R-6).
-- Open: Q21 (a derived copy of assignments at the site hub) and Q22 (the ladder preset). They gate FB-075, FB-078 and the multi-party approval step above FB-074.
+- Resolved 2026-11-03: Q21, a derived copy of assignments at the site hub, refreshed from the managing hub and never edited locally (R-18); Q22, the four-role ladder as an optional preset, off by default (R-19). FB-075, FB-078 and the multi-party approval step above FB-074 can start.
 
 note:
 - The record's format is the one every design record follows: status line for the owner's signature, participants, tagged statements, numbered proposals and questions.
@@ -1415,28 +1415,28 @@ note:
 | **M1 · Contract and governance floor** | hub ↔ spoke end to end; OT module in the hub; FATS, FACTS, FTTS, FVTS with runners and gates; FHTS hashing | **Done** (PRs through 36) |
 | **M2 · Decisions and designs** | role model (D-1), forge-mes Go design (D-3), FVTS open items (D-4), OT FACTS vocabulary (D-8), one clock (D-9), OT reference FVTS spec approved | **Now** |
 | **M3 · Go SDK and the first Go module** | Go module template; forge-mes phase 1 against the hub; `mod_mes`; changeover and MQTT in Go; cut-over | not started |
-| **M4 · forge-display** | renderer scaffold and spike; MES surfaces first, then OT HMI | not started (needs D-4) |
+| **M4 · forge-display** | renderer scaffold and spike; MES surfaces first, then OT HMI | unblocked 2026-11-03 (D-4 decided) |
 | **M5 · Hub platform hardening** | Context Engine and Schema Registry (done), scoped roles, persistent access control (done), FDTS/FQTS/FSTS from stub to gate | started |
 | **M6 · Enterprise** | hub of hubs, identity methods, offline tokens, Kubernetes, backups and SLOs; forge-cmms and forge-whs in Go; forge-ignition | not started |
 
 note:
-- Milestones overlap where the sequence allows: forge-display can start once D-4 is answered, in parallel with M3.
+- Milestones overlap where the sequence allows: forge-display can start now that D-4 is answered, in parallel with M3.
 
 ---
 
-## The Decision Queue (owner input needed)
+## The Decision Queue (owner input)
 
-| # | Decision | Blocks |
+| # | Decision | State |
 |---|---|---|
-| D-1 | Platform role model (Q21, Q22) | FB-075, FB-078, multi-party approval above FB-074 |
-| D-3 | forge-mes Go design document | FB-076, FB-057 steps 2–5, the Go SDK scaffold |
-| D-4 | FVTS open items (name, write authority per profile, mobile acknowledge, transport, layout, server-side enforcement) | forge-display |
-| D-7 | Scope of the Go standard (OT module, Python adapters) | parked |
-| D-8 | FACTS vocabulary for OT adapters | FB-079, approval of the OT FACTS spec |
-| D-9 | One clock: which established standards to adopt; the FB-094 record recommends | FB-088, FB-090 to FB-094, the time fields and tolerances |
-| D-10 | One schema registry; the FB-097 record recommends | FB-097's eight steps, the Go module's schema registration, the FDTS gate |
+| D-1 | Platform role model (Q21, Q22) | signed 2026-11-03; FB-075, FB-078 and the multi-party approval above FB-074 can start |
+| D-3 | forge-mes Go design (`docs/decisions/forge-mes-go.md`) | signed 2026-11-03; ten steps, the Go SDK scaffold first |
+| D-4 | FVTS open items (name, write authority per profile, mobile acknowledge, transport, layout) | decided 2026-11-03; forge-display design next |
+| D-7 | Scope of the Go standard (OT module, Python adapters) | open |
+| D-8 | FACTS vocabulary for OT adapters | decided 2026-11-03: extend the enums; FB-079 can start |
+| D-9 | One clock: which established standards to adopt (`docs/decisions/one-clock-ot-source-time.md`) | signed 2026-11-03; FB-088, FB-090 to FB-094 in the record's step order |
+| D-10 | One schema registry (`docs/decisions/one-schema-registry.md`) | signed 2026-11-03; FB-097's eight steps |
 
-As of 2026-10-27 **no decision-free backlog item remains**: everything open waits on one of these or on FB-057 step 2.
+On 2026-11-03 the owner answered the open questions **one at a time** (34 answers) and declared the answers the signature; every gated item can start. Two standing rules came with the answers: no silent failure, and no decision that pins the platform in.
 
 note:
 - A design record is signed by the owner editing its status line; implementation does not start before that.
@@ -1932,7 +1932,7 @@ note:
 
 ## What You Look at Today · Honest
 
-- **forge-display does not exist yet.** Its contract (FVTS), the checker, a render-profile baseline, a reference renderer and example messages do; the renderer waits on the owner's answers to its open questions (D-4).
+- **forge-display does not exist yet.** Its contract (FVTS), the checker, a render-profile baseline, a reference renderer and example messages do; its open questions were answered by the owner on 2026-11-03 (D-4), so the renderer's design is next.
 - The manufacturing system's screens today are the **interim MES bridge's** own web frontend, imported with it; they will be retired when forge-display renders the MES surfaces.
 - Plant-floor screens today are the vendor's (Ignition) where a site keeps them; the OT module serves the data behind them and its REST interfaces.
 
@@ -1962,7 +1962,7 @@ Who may do what, where, and how systems get their credentials.
 Where it stands: the role model is designed and awaits two owner decisions; the hub's authentication is off by default in development, and scoped roles on every route are not yet enforced.
 
 note:
-- `docs/decisions/roles.md` (R-1 … R-17); `docs/WHERE-WE-ARE.md` §3.10.
+- `docs/decisions/roles.md` (R-1 … R-19, signed 2026-11-03); `docs/WHERE-WE-ARE.md` §3.10.
 
 ---
 
