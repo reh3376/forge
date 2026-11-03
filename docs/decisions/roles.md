@@ -1,9 +1,9 @@
 # Forge authorization model — decision record
 
-**Status:** draft, round 5 of the owner dialogue (2026-10-16) · **Backlog:** FB-075 · **Roadmap:** D-1
+**Status:** approved by reh3376 on 2026-11-03 (round 6: Q21 and Q22 answered one at a time on 2026-11-03 and the answers declared the signature; the status line was set on that word) · **Backlog:** FB-075 · **Roadmap:** D-1
 **Participants:** reh3376 (owner, decides), Claude (drafts, challenges)
 
-This record accumulates the decisions and the open questions about how Forge decides what a person, a spoke or a module may do. It is edited in place as the dialogue proceeds; every statement is tagged **[OWNER]** (decided by the owner), **[PROPOSED]** (Claude's proposal, not yet approved) or **[OPEN]** (question outstanding). Nothing here is implemented until the status line says `approved`.
+This record accumulates the decisions and the open questions about how Forge decides what a person, a spoke or a module may do. It is edited in place as the dialogue proceeds; every statement is tagged **[OWNER]** (decided by the owner), **[PROPOSED]** (Claude's proposal, not yet approved) or **[OPEN]** (question outstanding; none remain). Nothing here was implemented before the status line said `approved`; implementation (FB-075) follows the signature of 2026-11-03.
 
 ---
 
@@ -29,12 +29,14 @@ This record accumulates the decisions and the open questions about how Forge dec
 | R-9 | Topology is a **hub of hubs** along ISA-95 Part 2. Every instance has a site hub; a multi-site enterprise adds an enterprise hub above its sites; area hubs are possible below a site. (Round 4 correction: not every instance has an enterprise hub.) Details in §8. | [OWNER] |
 | R-10 | Identity methods ship in the order OIDC + local accounts + service identities, then LDAP / Active Directory, then SAML. | [OWNER] |
 | R-11 | Assignments constrain **reads as well as actions**: a subject without a domain's read scope sees none of that domain's data (e.g. ERP data hidden from distillery operators). Details in §10. | [OWNER] |
-| R-12 | Shipped roles are **per module** (each module ships its domain roles as data). A cross-module "universal ladder" is at most an optional overlay. Details in §11. | [OWNER, overlay question open] |
+| R-12 | Shipped roles are **per module** (each module ships its domain roles as data). A cross-module "universal ladder" is at most an optional overlay. Details in §11. | [OWNER; the overlay is decided by R-19] |
 | R-13 | **Each hub owns what is attached directly to it**: its spokes (the enterprise hub has spokes of its own), its child hubs and the subjects whose credentials are associated with it. Nothing communicates *through* a hub: a subject or hub that needs something held elsewhere asks its **next-hop hub**, which obtains it from the owning hub (unless it already holds it) and serves it. Details in §8. | [OWNER] |
 | R-14 | **Each hub collects, governs, stores, curates and serves** the data of its directly attached spokes and hubs. Hubs on the same side of the enterprise hub (one site subtree) request data from one another directly; across the enterprise hub they ask the enterprise hub, which handles it. The same structure applies one level down. Details in §8. | [OWNER] |
 | R-15 | Access-token lifetime is an installation choice within the floor and ceiling of §7; the **default is 1 hour**. | [OWNER] |
 | R-16 | **Roles are assigned at the managing hub and inherited downward.** The managing hub is the site hub of a single-site instance and the enterprise hub of a multi-site one. Every datum has exactly one source of truth, and that source is a hub; the same data is not stored long-term in two places. | [OWNER] |
 | R-17 | **Audit records always flow upward**; every other data set is requested on demand unless a site opts it into replication. | [OWNER] |
+| R-18 | **A site hub below an enterprise hub holds a derived copy** of the assignments that apply to its subtree, refreshed from the managing hub and never edited locally; the managing hub stays the single source of truth (R-16); tokens issued at the site carry the scopes from that copy; the copy's age is visible on the site hub's health. Resolves Q21. Debt note: a cache with a visible staleness age, not a second master; a site that wants no copy sets the refresh to "at sign-in" and accepts that sign-in needs the WAN. | [OWNER] 2026-11-03 |
+| R-19 | **The four-role ladder ships as an optional preset**, off by default and chosen at setup: `viewer`, `operator`, `engineer`, `admin`, each inheriting every installed module's role of the same rank, defined as data over the one model (§3). `viewer` is the ladder's bottom rung, which is where FVTS's read-only role lives (D-4 item 2, 2026-11-03). Resolves Q22 (and Q15, Q20). Debt note: data, not code; nothing to unwind. | [OWNER] 2026-11-03 |
 
 ## 3. Design consequence of R-3, R-4 and R-5
 
@@ -132,7 +134,7 @@ enterprise hub (required)       trust root; identity providers; enterprise direc
 | Trust (PKI) | The hub tree **is** the certificate tree. The enterprise hub holds the root CA and issues an intermediate CA to each site hub; a site hub issues an intermediate to each area hub; every hub issues leaf certificates to its own spokes. Hub-to-hub and spoke-to-hub links are mTLS verified against the enterprise root (FB-063 and FB-072 take a CA on both ends already). Each hub's token-signing key is certified by its parent, so any hub verifies any other hub's tokens offline (R-8) by walking the chain, never by calling the issuer. |
 | Home hub | Every subject has exactly one home hub: where its credentials are associated, where its subject record and sign-in live, and which signs its tokens. Corporate users signing in through OIDC at the enterprise hub are homed there; site users at the site hub; area users at the area hub. |
 | Cross-hub access | A subject talks only to its next-hop hub. That hub verifies the home-hub token against the chain, checks what the subject may read or do at the target, obtains the data or the action's outcome from the owning hub (through its own next hop when needed) and serves it. No session is tunnelled and no visitor token is issued (resolves Q17). |
-| Where assignments live (R-16) | At the **managing hub** only: the site hub of a single-site instance, the enterprise hub of a multi-site one. Lower hubs inherit them. What a site hub holds locally so that local sign-in survives a WAN outage is Q21. |
+| Where assignments live (R-16) | At the **managing hub** only: the site hub of a single-site instance, the enterprise hub of a multi-site one. Lower hubs inherit them. A site hub holds a refreshed, never locally edited, derived copy for its subtree so that local sign-in survives a WAN outage (R-18). |
 | Where a decision is made | At the hub that owns the resource, against its own store. A local operation never waits on another hub. |
 | Data requests | Direct between hubs on the same side of the enterprise hub; across sites, site A asks the enterprise hub, which fetches from site B's hub unless it already holds the value, and serves site A. The same rule one level down. A hub answers with what it governs, filtered by the requesting subject's read scopes (R-11). The enterprise hub therefore holds copies of site data; how they get there is Q19. |
 | Outage (resolves Q12) | Local work never depends on the WAN, so there is no grace period to design for it. A non-local hub is simply unreachable while the next hop is down; local break-glass accounts cover administration meanwhile. |
@@ -156,24 +158,24 @@ enterprise hub (required)       trust root; identity providers; enterprise direc
 
 ## 11. Presets (A10, clarified): per-module roles are the default (R-12)
 
-"Presets" in Q10 meant only **the role bundles Forge ships**. The owner's reading, that roles are determined per module, is the default: each module ships its domain roles as data (forge-mes: `mes-operator`, `mes-supervisor`, `mes-planner`, `mes-admin`; the OT module: `ot-operator`, `ot-engineer`, `ot-admin`; the hub: `hub-admin`, `hub-auditor`). The "universal ladder" (`viewer < operator < engineer < admin` across all modules) would be an **optional overlay**: four enterprise-wide roles that inherit each module's role of the same rank, for installations that want one simple ladder. Whether the overlay ships in v1 is Q20 (Q15 re-asked with context).
+"Presets" in Q10 meant only **the role bundles Forge ships**. The owner's reading, that roles are determined per module, is the default: each module ships its domain roles as data (forge-mes: `mes-operator`, `mes-supervisor`, `mes-planner`, `mes-admin`; the OT module: `ot-operator`, `ot-engineer`, `ot-admin`; the hub: `hub-admin`, `hub-auditor`). The "universal ladder" (`viewer < operator < engineer < admin` across all modules) would be an **optional overlay**: four enterprise-wide roles that inherit each module's role of the same rank, for installations that want one simple ladder. The overlay ships as an optional preset, off by default and chosen at setup (R-19, 2026-11-03).
 
 ## 12. Migration from today
 
 | Today | Becomes |
 |---|---|
-| gateway `Role.ADMIN/OPERATOR/VIEWER` | hub roles `hub-admin`, `hub-operator`, `hub-auditor` (and the ladder overlay if Q15 says yes); scopes unchanged (`adapters:*`, `records:*`, `health:read`) plus the new registry |
+| gateway `Role.ADMIN/OPERATOR/VIEWER` | hub roles `hub-admin`, `hub-operator`, `hub-auditor` (and the ladder overlay preset, R-19); scopes unchanged (`adapters:*`, `records:*`, `health:read`) plus the new registry |
 | OT `WriteRole` | scopes `ot:tag:write`, `ot:recipe:download`, `ot:interlock:bypass`, `ot:alarm:*`; `WritePermission` area/tag patterns become constraints |
-| FVTS `required_role` | `required_scope`; the `VIEWER` enum entry disappears (read is the absence of an action) |
+| FVTS `required_role` | `required_scope`; the `VIEWER` enum entry disappears (read is the absence of an action, and read-only users hold the ladder's `viewer` role, R-19) |
 | spoke session id + callback token | unchanged (channel authentication); acting subject added to requests |
 | hub-issued JWT (`FORGE_JWT_*`) | the access token of §7, now carrying constraints and `iss`/`kid`; verified offline by spokes |
 
-## 13. Open questions (round 5)
+## 13. Questions (all resolved; round 6, 2026-11-03)
 
 Resolved in round 3: Q11 (the PKI follows the hub tree, restated in §8), Q12 (no WAN grace for local work; a non-local hub needs the next hop), Q13 (each hub stores and governs its own; direct within a site, through the enterprise hub across sites), Q14 (one owning hub per resource; the other hub requests), Q16 (lifetime range confirmed, default 1 h).
 
 - **Resolved Q17 (round 4 clarification):** the next-hop hub is in the data path as a serving broker, never a tunnel. It fetches from the owning hub unless it already holds the value, and serves the requester; no visitor token, no proxied session.
 - **Resolved Q18 and Q19 (round 4):** assignments live at the managing hub only and are inherited (R-16); audit always upward, everything else on demand unless opted in (R-17).
 - **Q20 (round 4):** the owner decided where roles are assigned (R-16); whether the four-role ladder ships as a preset is re-asked as Q22.
-- **[OPEN] Q21 the site hub's working copy:** assignments are mastered at the managing hub (R-16), and local sign-in must survive a WAN outage (A12). A site hub below an enterprise hub therefore needs the assignments that apply to its subtree at hand. Proposal: it holds them as a **derived copy** refreshed from the managing hub, never edited locally, with the managing hub remaining the single source of truth; tokens issued at the site carry the scopes from that copy. Is a refreshed derived copy acceptable under "no long-term duplicate storage", or must a site hub fetch assignments from the enterprise hub at every sign-in, and therefore sign nobody in while the WAN is down?
-- **[OPEN] Q22 ladder preset, yes or no:** ship the four generic roles (`viewer`, `operator`, `engineer`, `admin`, each inheriting every installed module's role of the same rank) as an optional preset, off by default and chosen at setup (§11)? Yes or no is enough.
+- **Resolved Q21 (2026-11-03) the site hub's working copy:** assignments are mastered at the managing hub (R-16), and local sign-in must survive a WAN outage (A12). The owner chose the **derived copy**: refreshed from the managing hub, never edited locally, the managing hub the single source of truth, tokens issued at the site carrying the scopes from the copy, the copy's age visible (R-18). Debt check: a cache with a visible staleness age pins nothing; the alternative (fetch at every sign-in) would have made every site's sign-in depend on the WAN.
+- **Resolved Q22 (2026-11-03) ladder preset:** **yes**, the four generic roles ship as an optional preset, off by default and chosen at setup (R-19). Debt check: the preset is data over the one model (§3), so it pins nothing.

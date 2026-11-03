@@ -213,7 +213,7 @@ Every framework has a schema, a runner with asserted schema–runner parity, spe
 
 ### 3.6 Security and identity
 
-The role model in `docs/decisions/roles.md` (R-1 … R-17): installation-chosen identity method and role shape, Forge-decided assignment, scoped roles assigned at the managing hub and inherited downward, reads constrained like actions, separation of duties in the hub, offline-verifiable tokens with a one-hour default lifetime, service identities for spokes and modules.
+The role model in `docs/decisions/roles.md` (R-1 … R-19, signed 2026-11-03): installation-chosen identity method and role shape, Forge-decided assignment, scoped roles assigned at the managing hub and inherited downward, reads constrained like actions, separation of duties in the hub, offline-verifiable tokens with a one-hour default lifetime, service identities for spokes and modules.
 
 ### 3.7 The engineering platform
 
