@@ -5,7 +5,8 @@
 # (deck docs/tutorial.md, output build/tutorial-static/, gitignored).
 #
 # One-time setup on a fresh checkout: cd scripts/tutorial-forge && npm ci
-# (downloads Chromium for the Mermaid render, ~150 MB).
+# (Node 22+; downloads Chromium for the Mermaid render, ~150 MB). The
+# framework's own tests: cd scripts/tutorial-forge && npm test.
 
 .PHONY: sync-tutorial-embed verify-tutorial-embed check-tutorial-build serve-tutorial tutorial-zip
 
