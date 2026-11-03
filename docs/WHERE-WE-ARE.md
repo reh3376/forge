@@ -1,9 +1,9 @@
 # Where we are
 
-**Status date:** 2026-10-28 · **Branch:** `reh3376_dev01` (last merged PR: 78) · **Owner:** reh3376
+**Status date:** 2026-10-29 · **Branch:** `reh3376_dev01` (last merged PR: 79) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
-**Pick-up point (2026-10-28):** PR 78 (FB-103) is merged and `reh3376_dev01` is level with `main`. No decision-free backlog item is left: FB-100 waits on FB-057 step 2; FB-097 on D-10 (`decisions/one-schema-registry.md`, Q-1 to Q-8); FB-088 and FB-090 to FB-094 on the owner's signature of the one-clock record (D-9); the rest on D-1, D-3, D-4 and D-8 (§4). FB-103, the Forge tutorial package built with `scripts/tutorial-forge` (two tracks from a landing fork, contributor onboarding and end-user overview; deck `docs/tutorial.md`, config `tutorial.config.json`, output `build/tutorial-static/`), modelled on the MDEMG tutorial at https://reh3376.github.io/mdemg/, was delivered on 2026-10-27 (PR 78) and is live at https://reh3376.github.io/forge/ since 2026-10-28, when the owner enabled GitHub Pages and the Deploy Tutorial workflow published `main`.
+**Pick-up point (2026-10-29):** PR 79 is merged and `reh3376_dev01` is level with `main`. FB-068 (the embedded broker's RETAIN semantics for local subscribers: a live message arrives with RETAIN=0, a new subscription gets the retained store replayed with RETAIN=1) was done on 2026-10-29 after a re-check of the backlog found it waited on no decision; FB-105 (the Dependabot security updates on `main` fail against the vendored tutorial framework's lockfile) is recorded for the upstream fix in mdemg with FB-104. No other decision-free backlog item is left: FB-100 waits on FB-057 step 2; FB-097 on D-10 (`decisions/one-schema-registry.md`, Q-1 to Q-8); FB-088 and FB-090 to FB-094 on the owner's signature of the one-clock record (D-9); the rest on D-1, D-3, D-4 and D-8 (§4). FB-103, the Forge tutorial package built with `scripts/tutorial-forge` (two tracks from a landing fork, contributor onboarding and end-user overview; deck `docs/tutorial.md`, config `tutorial.config.json`, output `build/tutorial-static/`), modelled on the MDEMG tutorial at https://reh3376.github.io/mdemg/, was delivered on 2026-10-27 (PR 78) and is live at https://reh3376.github.io/forge/ since 2026-10-28, when the owner enabled GitHub Pages and the Deploy Tutorial workflow published `main`.
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
 
@@ -24,7 +24,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | Measure | Value |
 |---|---|
 | Python hub (`src/forge`) | 354 files, ~68,500 lines |
-| Python tests | 259 files, ~56,000 lines, 4,181 test functions (4,448 collected); full suite green on 2026-10-27 on the locked dependency set |
+| Python tests | 259 files, ~56,000 lines, 4,187 test functions (4,454 collected); full suite green on 2026-10-29 on the locked dependency set |
 | Go (`go/`) | 32 files, ~9,500 lines (1,800 of models and 1,488 of their tests, 112 scaffold, generated bindings, 58 lines of daemon/CLI stubs); `gofmt`, `go vet` and `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`; NestJS + Next.js until the Go forge-mes lands, FB-076) | ~248,000 lines of TypeScript (backend + frontend) |
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
@@ -185,7 +185,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Practice | State |
 |---|---|
 | One backlog item per PR, auto-PR, owner merges on green | ✅ (A-8) |
-| Every finding fixed or recorded in `BACKLOG.md` | ✅ (104 items recorded to date) |
+| Every finding fixed or recorded in `BACKLOG.md` | ✅ (105 items recorded to date) |
 | Documentation current before every push | ✅ rule since 2026-10-16 |
 | Owner-only spec approval | ✅ `forge governance approve <spec> --by reh3376` (FB-021); nobody runs it on the owner's behalf |
 | MDEMG/Jiminy governed memory, local models only | ✅ instance per project (A-10) |

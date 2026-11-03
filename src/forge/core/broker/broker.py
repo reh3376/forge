@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from forge.core.broker.session import MqttSession, SessionState
-from forge.core.broker.topic_engine import TopicEngine
+from forge.core.broker.topic_engine import TopicEngine, mqtt_topic_matches
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -93,10 +93,11 @@ class ForgeMqttBroker:
         # In-process publish (bypasses TCP)
         await broker.publish("whk/whk01/ot/health/PLC_001", payload, qos=1)
 
-        # In-process subscribe
+        # In-process subscribe: retained messages matching the filter are
+        # replayed first (retain=True), later publishes arrive with retain=False
         async def on_message(topic, payload, qos, retain):
             print(f"Received: {topic}")
-        broker.subscribe_local("my-handler", "whk/#", on_message)
+        await broker.subscribe_local("my-handler", "whk/#", on_message)
 
         await broker.stop()
     """
@@ -305,24 +306,31 @@ class ForgeMqttBroker:
                 if ok:
                     delivered += 1
 
-        # Deliver to local (in-process) subscribers
-        for local_sub in self._local_subs:
-            from forge.core.broker.topic_engine import mqtt_topic_matches
-
-            if mqtt_topic_matches(local_sub.topic_filter, topic):
-                try:
-                    result = local_sub.callback(topic, payload, qos, retain)
-                    if asyncio.iscoroutine(result):
-                        await result
-                    delivered += 1
-                except Exception as exc:
-                    logger.error(
-                        "Local subscriber %s failed: %s",
-                        local_sub.name,
-                        exc,
-                    )
+        # Deliver to local (in-process) subscribers. MQTT 3.1.1 §3.3.1.3: a
+        # message that matches an established subscription is delivered with
+        # RETAIN=0 whatever the publisher set; only a replay from the retained
+        # store (subscribe_local) carries RETAIN=1. The TCP path above does the
+        # same through session.deliver's default (FB-068).
+        for local_sub in list(self._local_subs):
+            if mqtt_topic_matches(local_sub.topic_filter, topic) and await self._deliver_local(
+                local_sub, topic, payload, qos, retain=False
+            ):
+                delivered += 1
 
         return delivered
+
+    async def _deliver_local(
+        self, sub: LocalSubscription, topic: str, payload: bytes, qos: int, retain: bool
+    ) -> bool:
+        """Call one local subscriber; a failing handler is logged, never raised."""
+        try:
+            result = sub.callback(topic, payload, qos, retain)
+            if asyncio.iscoroutine(result):
+                await result
+            return True
+        except Exception as exc:
+            logger.error("Local subscriber %s failed: %s", sub.name, exc)
+            return False
 
     # ------------------------------------------------------------------
     # In-process API (for Forge modules)
@@ -359,24 +367,31 @@ class ForgeMqttBroker:
             sender_id="$local",
         )
 
-    def subscribe_local(
+    async def subscribe_local(
         self,
         name: str,
         topic_filter: str,
         callback: Callable[[str, bytes, int, bool], Awaitable[None] | None],
-    ) -> None:
+        *,
+        replay_retained: bool = True,
+    ) -> int:
         """Subscribe an in-process handler to a topic pattern.
 
-        The callback receives (topic, payload, qos, retain).
+        The callback receives (topic, payload, qos, retain). As a TCP SUBSCRIBE
+        does (MQTT 3.1.1 §3.3.1.3), every retained message matching the filter
+        is replayed to the new subscription with ``retain=True`` before this
+        returns, unless ``replay_retained`` is False; every later publish
+        arrives with ``retain=False``. Returns the number of replayed messages.
         """
-        self._local_subs.append(
-            LocalSubscription(
-                name=name,
-                topic_filter=topic_filter,
-                callback=callback,
-            )
-        )
+        sub = LocalSubscription(name=name, topic_filter=topic_filter, callback=callback)
+        self._local_subs.append(sub)
         logger.debug("Local subscriber %s registered for %s", name, topic_filter)
+        replayed = 0
+        if replay_retained:
+            for msg in self._topic_engine.get_retained_for(topic_filter):
+                if await self._deliver_local(sub, msg.topic, msg.payload, msg.qos, retain=True):
+                    replayed += 1
+        return replayed
 
     def unsubscribe_local(self, name: str) -> int:
         """Remove all local subscriptions by name."""
