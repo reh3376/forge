@@ -59,7 +59,7 @@ jobs:
         run: python3 scripts/verify_tutorial_embed.py
       - name: Check the build invariants (FSD §8, §15.6)
         run: python3 scripts/check_tutorial_build.py
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: build/tutorial-static
 
@@ -86,4 +86,4 @@ jobs:
       - name: Deploy to GitHub Pages
         if: steps.pages.outputs.enabled == 'true'
         id: deploy
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
