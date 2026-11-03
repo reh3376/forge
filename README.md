@@ -390,7 +390,7 @@ Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE
 Two guided paths through the platform, built from `docs/tutorial.md` by tutorial-forge (`scripts/tutorial-forge/`, config `tutorial.config.json`): software-dev / contributor onboarding (F1–F10) and an end-user overview (U1–U11), with 19 pre-rendered diagrams, a sidebar of sections and diagrams, acronyms expanded on first use and a glossary. The framework's reference is `scripts/tutorial-forge/FSD.md`; the model is the MDEMG tutorial at https://reh3376.github.io/mdemg/.
 
 ```bash
-(cd scripts/tutorial-forge && npm ci)   # once; downloads Chromium for the diagram render
+(cd scripts/tutorial-forge && npm ci)   # once; Node 22+; downloads Chromium for the diagram render
 make sync-tutorial-embed                # renders build/tutorial-static/ (gitignored)
 make verify-tutorial-embed              # the drift gate: the build matches the sources
 make check-tutorial-build               # the FSD's verification contracts and every fragment link
