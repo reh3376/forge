@@ -479,7 +479,7 @@
   "integrity": {
     "hash_method": "sha256-c14n-v1",
     "spec_hash": "1348ccbca10fe37d2ebbf6e55ffa655a4181560a2e5613a2a775f68d38980c80",
-    "hash_state": "pending_review",
+    "hash_state": "approved",
     "previous_hash": "1b70a7d7af75ee804c40078444252b6a5770dbf942c3aa30ac3a0d4ec2a6c7b3",
     "change_history": [
       {
@@ -500,6 +500,8 @@
         "change_type": "structural",
         "reason": "FB-080: schema conformance. data_contract.cross_module_data_flows moved to metadata; the two pre-FHTS change_history entries (null hashes, sources discovery/compliance) moved to metadata.spec_history. Adapter behaviour unchanged. Awaiting owner approval."
       }
-    ]
+    ],
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-13T19:35:04Z"
   }
 }

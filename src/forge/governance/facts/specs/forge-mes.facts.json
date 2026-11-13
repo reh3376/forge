@@ -750,7 +750,7 @@
   "integrity": {
     "hash_method": "sha256-c14n-v1",
     "spec_hash": "81a0310e44404b5d189c97750919fc6ba9ec829fd38075d516d9b72ab320569c",
-    "hash_state": "pending_review",
+    "hash_state": "approved",
     "previous_hash": "95ca14f6c9a444571059071e21298ccb3b95e62c333c8c6d25a43b4c20a8a3d8",
     "change_history": [
       {
@@ -780,6 +780,8 @@
         "change_type": "structural",
         "reason": "Initial MES FACTS spec \u2014 Sprint 3 of FACTS development plan"
       }
-    ]
+    ],
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-13T19:35:04Z"
   }
 }

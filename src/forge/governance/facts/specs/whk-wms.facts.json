@@ -546,7 +546,7 @@
   "integrity": {
     "hash_method": "sha256-c14n-v1",
     "spec_hash": "a2bffd716f93a4e531d6dc6f445b1db50e3289ac8bc04b93093e15f7e763ca1c",
-    "hash_state": "pending_review",
+    "hash_state": "approved",
     "previous_hash": "ace250ed52c3d8b3bfb0995f351302c3620a6a90b54c8eba42290c7de1d40b20",
     "change_history": [
       {
@@ -567,6 +567,8 @@
         "change_type": "structural",
         "reason": "Initial WMS FACTS spec — Sprint 2 of FACTS development plan"
       }
-    ]
+    ],
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-13T19:35:05Z"
   }
 }

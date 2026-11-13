@@ -374,7 +374,7 @@
   "integrity": {
     "hash_method": "sha256-c14n-v1",
     "spec_hash": "f4ccb338d9399bc7303b0f03b0d34e56bece09944701258e17990678673c8865",
-    "hash_state": "pending_review",
+    "hash_state": "approved",
     "previous_hash": "4b79ac4f978f08c04d30be05fbc81f94b215b7412fc0da8c92271495c227e758",
     "change_history": [
       {
@@ -395,6 +395,8 @@
         "change_type": "structural",
         "reason": "FB-080: schema conformance. error_handling.dead_letter fields renamed to the schema's (destination→topic, retention_days→max_age_hours = days×24); draft-era integrity notes (state 'draft', created_at, spec_author, notes) moved to metadata.spec_*. Adapter behaviour unchanged. Awaiting owner approval."
       }
-    ]
+    ],
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-13T19:35:04Z"
   }
 }

@@ -447,7 +447,7 @@
   "integrity": {
     "hash_method": "sha256-c14n-v1",
     "spec_hash": "ae949fd830117526d0224564cb2bc720fd31187b8035410c9538f6da68219773",
-    "hash_state": "pending_review",
+    "hash_state": "approved",
     "previous_hash": "ff29a4e51c482e7acc2e7cfc57f307fd474b5b6d2eba3a1e4319af226033a4a4",
     "change_history": [
       {
@@ -459,6 +459,8 @@
         "change_type": "structural",
         "reason": "FB-090: time_governance section (one clock, D-9 step 4). Awaiting owner approval."
       }
-    ]
+    ],
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-13T19:35:04Z"
   }
 }

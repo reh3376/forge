@@ -489,7 +489,7 @@
   "integrity": {
     "hash_method": "sha256-c14n-v1",
     "spec_hash": "6b03b3c134b73208ed9e348108c9284fa3c5d9fcbbc536de8c9cf5217b01321c",
-    "hash_state": "pending_review",
+    "hash_state": "approved",
     "previous_hash": "3cfbd373f3522815e3ad5e6d2a2f9417e7196d9699e3851e67c1eef5eb59d282",
     "change_history": [
       {
@@ -510,6 +510,8 @@
         "change_type": "structural",
         "reason": "FB-080: schema conformance. poll_interval_seconds validation keys renamed minimum/maximum\u2192min/max; the two pre-FHTS change_history entries (null hashes, sources discovery/compliance) moved to metadata.spec_history. Adapter behaviour unchanged. Awaiting owner approval."
       }
-    ]
+    ],
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-13T19:35:05Z"
   }
 }

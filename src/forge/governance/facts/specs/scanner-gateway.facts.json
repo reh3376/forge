@@ -387,7 +387,7 @@
   "integrity": {
     "hash_method": "sha256-c14n-v1",
     "spec_hash": "615a953528ce0d474995fbbb6f765be781b2cb620075e18a008e7175827d7cf4",
-    "hash_state": "pending_review",
+    "hash_state": "approved",
     "previous_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",
     "change_history": [
       {
@@ -408,6 +408,8 @@
         "change_type": "structural",
         "reason": "FB-080: schema conformance. context_mapping.routing_rules and error_handling.scan_rejection moved to metadata (adapter-specific, outside the FACTS contract); dead_letter fields renamed to the schema's (destination\u2192topic, retention_days\u2192max_age_hours = days\u00d724); draft-era integrity notes (state 'draft', created_at, spec_author, notes) moved to metadata.spec_*. Adapter behaviour unchanged. Awaiting owner approval."
       }
-    ]
+    ],
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-13T19:35:04Z"
   }
 }
