@@ -670,6 +670,23 @@ async def test_connections_are_composed_started_and_served_over_rest() -> None:
         assert r.status_code == 200 and r.json()["restarts"] == 1 and client.connects == 2
         assert (await c.post("/api/v1/ot/control/connections/nope/restart")).status_code == 404
         assert (await c.get("/api/v1/ot/control/status")).json()["connections"]["total"] == 1
+        # the clock probe cadence is a runtime setting (one-clock record P-2, FB-094 step 2)
+        r = await c.post(
+            "/api/v1/ot/control/connections/WHK01/clock-probe-interval", json={"seconds": 5}
+        )
+        assert r.status_code == 200 and r.json()["clock_probe_interval_seconds"] == 5.0
+        assert r.json()["clock_probe_interval_source"].startswith("set by ")
+        assert r.json()["clock_id"] == "server:WHK01"
+        r = await c.post(
+            "/api/v1/ot/control/connections/WHK01/clock-probe-interval", json={"seconds": 0.5}
+        )
+        assert r.status_code == 422
+        r = await c.post(
+            "/api/v1/ot/control/connections/nope/clock-probe-interval", json={"seconds": 5}
+        )
+        assert r.status_code == 404
+        r = await c.get("/api/v1/ot/control/connections")
+        assert r.json()["connections"]["WHK01"]["clock_probe_interval_seconds"] == 5.0
 
     await rt.stop()
     assert client.state is UaConnectionState.DISCONNECTED and not rt.connections.started

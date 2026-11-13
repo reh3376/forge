@@ -16,15 +16,14 @@ from __future__ import annotations
 import logging
 import os
 from collections import deque
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from forge.core.models.contextual_record import RecordTimestamp
 
 
@@ -117,10 +116,64 @@ def clock_tolerance_seconds() -> float:
     return value
 
 
+@dataclass(frozen=True)
+class ClockSample:
+    """One reading of a remote clock against Forge's own, NTP style (one-clock record P-2).
+
+    ``sent_at`` (T1) and ``received_at`` (T4) are Forge's clock around the exchange;
+    ``server_time`` (T3) is the clock read. The offset is taken at the round trip's
+    midpoint so the transit delay cancels, and half the round trip bounds the error
+    from path asymmetry. ``service`` names the exchange (``CurrentTime``, ``ReadRequest``).
+    """
+
+    sent_at: datetime
+    server_time: datetime
+    received_at: datetime
+    service: str = ""
+
+    @property
+    def round_trip_seconds(self) -> float:
+        return (self.received_at - self.sent_at).total_seconds()
+
+    @property
+    def offset_seconds(self) -> float:
+        """``server_time - midpoint``: positive means the measured clock is ahead."""
+        midpoint = self.sent_at + (self.received_at - self.sent_at) / 2
+        return (self.server_time - midpoint).total_seconds()
+
+    @property
+    def uncertainty_seconds(self) -> float:
+        return abs(self.round_trip_seconds) / 2
+
+
+#: Receives every :class:`ClockSample` a connection measures.
+ClockSink = Callable[[ClockSample], None]
+
+
+class ClockReader(Protocol):
+    """A way to read the clock a connection pulls from (one-clock record P-2).
+
+    One reader per protocol: OPC UA ``ServerStatus.CurrentTime`` (the supervisor's probe)
+    and the response-header tap exist; Logix ``WallClockTime`` (``pycomm3``), the S7 clock
+    (``snap7``) and a Modbus register map implement the same surface when those drivers
+    land; Sparkplug's publish stamp is measured one-way by its ingest adapter. ``None``
+    means the party answered without a clock value (FB-093 makes that a refusal).
+    """
+
+    async def read_clock(self) -> ClockSample | None: ...
+
+
 class ClockOffsetStats(BaseModel):
     """Rolling statistics of one measured clock against its governing clock."""
 
     link: str
+    clock_id: str | None = Field(
+        default=None,
+        description=(
+            "The clock measured, when named (server:WHK01, device:WHK01; one-clock record "
+            "P-2); None for a series derived from records' stamps and keyed by link alone."
+        ),
+    )
     samples: int
     window: int
     last_seconds: float
@@ -140,8 +193,11 @@ class ClockOffsetStats(BaseModel):
 class _OffsetWindow:
     """The last ``window`` samples of one (adapter, link) pair."""
 
-    def __init__(self, link: str, window: int, tolerance: float) -> None:
+    def __init__(
+        self, link: str, window: int, tolerance: float, clock_id: str | None = None
+    ) -> None:
         self.link = link
+        self.clock_id = clock_id
         self.window = window
         self.tolerance = tolerance
         self._samples: deque[float] = deque(maxlen=window)
@@ -165,6 +221,7 @@ class _OffsetWindow:
         assert samples and self.last_at is not None  # only after observe()
         return ClockOffsetStats(
             link=self.link,
+            clock_id=self.clock_id,
             samples=len(samples),
             window=self.window,
             last_seconds=samples[-1],
@@ -188,6 +245,12 @@ class ClockOffsetTracker:
     warning when the pair enters breach (and an info line when it recovers) and
     calls ``on_breach``. Measuring and alerting is this class's whole job;
     refusing the party is FB-093, once D-9 fixes the tolerances.
+
+    A series is keyed by adapter, link and the clock measured (``clock_id``, FB-094
+    step 2): a record's stamps feed the unnamed per-link series (``stats``); a probe
+    or a response-header tap names the clock it read (``server:WHK01``,
+    ``device:WHK01``), so a server relaying several PLCs holds one series per clock
+    it can read and one for itself (``clocks``).
     """
 
     def __init__(
@@ -202,7 +265,7 @@ class ClockOffsetTracker:
         )
         self.window = window
         self._on_breach = on_breach
-        self._windows: dict[tuple[str, str], _OffsetWindow] = {}
+        self._windows: dict[tuple[str, str, str | None], _OffsetWindow] = {}
 
     def observe(
         self,
@@ -212,25 +275,32 @@ class ClockOffsetTracker:
         at: datetime,
         *,
         round_trip: float | None = None,
+        clock_id: str | None = None,
     ) -> ClockOffsetStats:
-        """Record one offset sample (``measured clock - governing clock``, seconds)."""
+        """Record one offset sample (``measured clock - governing clock``, seconds).
+
+        ``clock_id`` names the clock a probe or tap read (``server:WHK01``); a sample
+        derived from a record's stamps leaves it None and feeds the per-link series.
+        """
         from forge.core import telemetry
 
-        key = (adapter_id, link)
+        key = (adapter_id, link, clock_id)
         window = self._windows.get(key)
         if window is None:
-            window = self._windows[key] = _OffsetWindow(link, self.window, self.tolerance_seconds)
+            window = self._windows[key] = _OffsetWindow(
+                link, self.window, self.tolerance_seconds, clock_id
+            )
         was_breached = window.breached
         stats = window.observe(seconds, at, round_trip)
-        telemetry.record_clock_offset(adapter_id, link, seconds)
+        telemetry.record_clock_offset(adapter_id, link, seconds, clock_id=clock_id)
         if not stats.within_tolerance:
-            telemetry.record_clock_breach(adapter_id, link)
+            telemetry.record_clock_breach(adapter_id, link, clock_id=clock_id)
             if not was_breached:
                 logger.warning(
                     "Clock offset out of tolerance: %s %s clock is %+.3fs from its hub "
                     "(tolerance %.3fs); the one-clock invariant is not met",
                     adapter_id,
-                    link,
+                    clock_id or link,
                     seconds,
                     self.tolerance_seconds,
                 )
@@ -264,15 +334,23 @@ class ClockOffsetTracker:
         return observed
 
     def stats(self, adapter_id: str) -> dict[str, ClockOffsetStats]:
-        """Current statistics for one adapter, keyed by link."""
+        """Current statistics of the series derived from records, keyed by link."""
         return {
             link: window.stats()
-            for (aid, link), window in self._windows.items()
-            if aid == adapter_id and window.last_at is not None
+            for (aid, link, clock_id), window in self._windows.items()
+            if aid == adapter_id and clock_id is None and window.last_at is not None
+        }
+
+    def clocks(self, adapter_id: str) -> dict[str, ClockOffsetStats]:
+        """Current statistics of the clocks read by name (probe, tap), keyed by clock_id."""
+        return {
+            clock_id: window.stats()
+            for (aid, _link, clock_id), window in self._windows.items()
+            if aid == adapter_id and clock_id is not None and window.last_at is not None
         }
 
     def adapters(self) -> list[str]:
-        return sorted({aid for aid, _link in self._windows})
+        return sorted({aid for aid, _link, _clock in self._windows})
 
     @property
     def breaches(self) -> int:
@@ -287,6 +365,11 @@ class ClockOffsetTracker:
             "adapters": {
                 aid: {link: s.model_dump(mode="json") for link, s in self.stats(aid).items()}
                 for aid in self.adapters()
+            },
+            "clocks": {
+                aid: {cid: s.model_dump(mode="json") for cid, s in clocks.items()}
+                for aid in self.adapters()
+                if (clocks := self.clocks(aid))
             },
         }
 

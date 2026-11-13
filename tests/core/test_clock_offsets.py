@@ -75,6 +75,31 @@ class TestRollingStats:
         assert described["tolerance_seconds"] == 10 and described["breaches"] == 0
         assert set(described["adapters"]) == {"a", "b"}
         assert described["adapters"]["a"][SERVER_LINK]["measured_at"] == "2026-06-01T12:00:00Z"
+        assert described["clocks"] == {}
+
+    def test_named_clocks_are_kept_apart_from_the_record_series(self) -> None:
+        """A probe or tap names the clock it read (FB-094 step 2); records feed the link series."""
+        tracker = ClockOffsetTracker(tolerance_seconds=10)
+        tracker.observe("WHK01", SERVER_LINK, 0.5, T0, clock_id="server:WHK01", round_trip=0.004)
+        tracker.observe("WHK01", SERVER_LINK, 0.7, T0, clock_id="server:WHK01")
+        tracker.observe("WHK01", SERVER_LINK, -1.0, T0, clock_id="device:PLC7")
+        tracker.observe("WHK01", SERVER_LINK, 2.0, T0)  # from a record's server_time
+        clocks = tracker.clocks("WHK01")
+        assert set(clocks) == {"server:WHK01", "device:PLC7"}
+        assert (
+            clocks["server:WHK01"].samples == 2
+            and clocks["server:WHK01"].clock_id == "server:WHK01"
+        )
+        assert clocks["server:WHK01"].last_seconds == 0.7
+        assert (
+            clocks["device:PLC7"].last_seconds == -1.0 and clocks["device:PLC7"].link == SERVER_LINK
+        )
+        assert tracker.stats("WHK01")[SERVER_LINK].samples == 1  # the unnamed series stays its own
+        assert tracker.stats("WHK01")[SERVER_LINK].clock_id is None
+        assert tracker.clocks("nobody") == {}
+        described = tracker.describe()
+        assert set(described["clocks"]["WHK01"]) == {"server:WHK01", "device:PLC7"}
+        assert described["adapters"]["WHK01"][SERVER_LINK]["last_seconds"] == 2.0
 
 
 class TestToleranceAlert:
@@ -177,3 +202,22 @@ class TestTelemetry:
             if p.attributes.get(telemetry.ATTR_ADAPTER_ID) == "otel-behind"
         ]
         assert points and points[0].value == pytest.approx(-2.5)
+
+    def test_a_named_clock_is_an_attribute_of_the_metric(self) -> None:
+        reader = _metric_reader()
+        if reader is None:
+            pytest.skip("another MeterProvider owns this process")
+        ClockOffsetTracker(tolerance_seconds=5.0).observe(
+            "otel-named", SERVER_LINK, 0.25, T0, clock_id="device:PLC7"
+        )
+        data = reader.get_metrics_data()
+        points = [
+            p
+            for rm in data.resource_metrics
+            for sm in rm.scope_metrics
+            for m in sm.metrics
+            if m.name == telemetry.CLOCK_OFFSET
+            for p in m.data.data_points
+            if p.attributes.get(telemetry.ATTR_ADAPTER_ID) == "otel-named"
+        ]
+        assert points and points[0].attributes[telemetry.ATTR_CLOCK_ID] == "device:PLC7"

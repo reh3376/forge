@@ -111,7 +111,8 @@ class OpcUaProvider(BaseProvider):
 
     async def _health(self) -> dict[str, Any]:
         """OPC-UA-specific health metrics."""
-        client_health = self._client.health()
+        health = getattr(self._client, "health", None)
+        client_health = health() if callable(health) else health  # property on OpcUaClient
         return {
             "connection_state": client_health.state.value,
             "endpoint_url": client_health.endpoint_url,
