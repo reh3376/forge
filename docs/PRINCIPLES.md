@@ -127,7 +127,7 @@ The OT tier's vocabulary gap in FACTS v0.1.0 is decision D-8 (FB-079).
 | Deployment | Docker Compose for development only; Kubernetes for production (P-12) | Compose in force; Kubernetes not started |
 | Governance specs | JSON (UxTS convention), hashed and owner-approved (FHTS) | In force |
 | Database ownership | Hybrid "observe → shadow → own": adapters read spoke databases, a shadow writer mirrors into the hub, ownership transfers per module | In force; design in [`DB_ORCHESTRATION_FRAMEWORK.md`](DB_ORCHESTRATION_FRAMEWORK.md), first step delivered (FB-057) |
-| Identity | Installation-chosen identity method; roles assigned at the managing hub (R-1 … R-17) | Decision D-1 in progress, [`decisions/roles.md`](decisions/roles.md) |
+| Identity | Installation-chosen identity method; roles assigned at the managing hub (R-1 … R-19) | Decision D-1 signed 2026-11-03, [`decisions/roles.md`](decisions/roles.md) |
 | MDEMG/Jiminy tooling | Local models only (A-10) | In force |
 | Licence | Commercial intent; model undecided | Open |
 
@@ -168,7 +168,7 @@ Spokes were ranked in April 2026 on five weighted factors: business value (×3),
 | 4 | Scanner gateway | 26 | Adapter done; spec re-stamped, awaiting approval |
 | 5 | NextTrend | 27 | Adapter done; spec re-stamped, awaiting approval |
 | 6 | IMS (bosc_ims) | 23 | Adapter done; spec approved (no approver recorded) |
-| 7 | OT module (new build) | 30 | Built as forge-ot; spec waits on D-8 |
+| 7 | OT module (new build) | 30 | Built as forge-ot; spec waits on FB-079 (D-8 decided 2026-11-03) |
 | 8 | QMS module (new build) | 28 | Not started |
 | 9 | OT UI builder | 17 | Superseded by forge-display (A-3) |
 

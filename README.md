@@ -265,7 +265,7 @@ Each spoke has a FACTS spec that declares its identity, capabilities, connection
 | `whk-nms` | Network management (REST, WebSocket; 11 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
 | `next-trend` | Time-series historian (REST, WebSocket; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
 | `scanner-gateway` | Barcode scanner gateway (gRPC server unary and stream; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
-| `ot-module` | OPC-UA, MQTT, alarms, control writes, scripting (21 sources) | v0.5.0 — pending review; fails schema validation until D-8 (FB-079) |
+| `ot-module` | OPC-UA, MQTT, alarms, control writes, scripting (21 sources) | v0.5.0 — pending review; fails schema validation until FB-079 (D-8 decided 2026-11-03: extend the enums) |
 
 `forge governance specs --pending` lists what awaits the owner; `forge governance run facts <spoke>` runs one spec.
 
