@@ -178,6 +178,8 @@ FB-024 done 2026-10-18 (README tech stack, language policy, counts, spec states)
 
 ## 4. Proposed sequence
 
+*Paused 2026-11-13 after PR 91 (FB-094 complete for what the tree has) at the owner's request: the owner adds new functionality in a PR of their own; implementation resumes on the owner's word with FB-090 (the FACTS `time_governance` section), then FB-093, FB-092, FB-091, FB-097's eight steps, FB-017 and the forge-mes steps.*
+
 1. ~~Merge the backlog PR; land **FB-072**~~ — done 2026-10-16; both gRPC directions can be mTLS.
 2. ~~Decision session (section 5)~~ — done 2026-11-03: D-1, D-3, D-4, D-8, D-9 and D-10 answered one at a time by the owner and signed; two standing rules came with the answers (no silent failure; no decision that pins the platform in).
 3. ~~**FB-076 design doc**~~ — drafted and signed 2026-11-03 (`docs/decisions/forge-mes-go.md`).
