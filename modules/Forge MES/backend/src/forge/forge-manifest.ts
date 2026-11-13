@@ -39,6 +39,25 @@ export interface ForgeMesManifest {
   connection_params: ManifestConnectionParam[];
   auth_methods: string[];
   metadata?: Record<string, unknown>;
+  /** The FACTS time_governance section (one clock, FB-090), as the hub's manifest carries it. */
+  time_governance?: ManifestTimeGovernance;
+}
+
+export interface ManifestTimeGovernance {
+  time_source: string;
+  sync_protocol: string;
+  clock_read_method?: string;
+  clock_probe_interval_seconds: number;
+  source_timestamp_origin: string;
+  tolerance_class: string;
+  fail_closed: boolean;
+  connections?: Array<{
+    name: string;
+    clock_read_method?: string;
+    clock_probe_interval_seconds?: number;
+    source_timestamp_origin?: string;
+    tolerance_class?: string;
+  }>;
 }
 
 export interface ProtoAdapterManifest {
@@ -60,6 +79,7 @@ export interface ProtoAdapterManifest {
   }>;
   auth_methods: string[];
   metadata?: ProtoStruct;
+  time_governance?: ManifestTimeGovernance;
 }
 
 export const FORGE_MES_MANIFEST: ForgeMesManifest =
@@ -98,5 +118,6 @@ export function toProtoManifest(
     })),
     auth_methods: [...manifest.auth_methods],
     ...(manifest.metadata ? { metadata: toStruct(manifest.metadata) } : {}),
+    ...(manifest.time_governance ? { time_governance: { ...manifest.time_governance } } : {}),
   };
 }

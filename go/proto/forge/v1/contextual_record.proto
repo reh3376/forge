@@ -40,6 +40,41 @@ message RecordTimestamp {
 
   // When Forge received it (set by hub on ingestion)
   google.protobuf.Timestamp ingestion_time = 3;
+
+  // One clock (docs/decisions/one-clock-ot-source-time.md, P-3): fields 5 to 10 are the
+  // record's time-quality fields. 6 and 8 landed with FB-088; 5, 7 and 9 with FB-094
+  // step 3; 10 (spoke_time, the renamed sent_time) comes with FB-092. Field 4 stays free.
+
+  // The stamp exactly as the stamping clock sent it. source_time is this minus
+  // source_offset_seconds once the stamping clock is measured, and equal to it until then;
+  // unset when Forge's own read time stood in (source_clock "forge").
+  google.protobuf.Timestamp source_time_as_sent = 5;
+
+  // Which clock stamped source_time: "device:<name>", "server:<name>", "edge:<name>", or
+  // "forge" when Forge's own read time stands in for a stamp the protocol does not carry
+  // (FB-088). Empty until the connection declares its origin.
+  string source_clock = 6;
+
+  // The offset subtracted from the stamp on entry at the spoke (stamping clock minus master,
+  // seconds); absent when no measured clock was applied. The hub never corrects again.
+  optional double source_offset_seconds = 7;
+
+  // How far source_time may sit from the instant the value occurred, in seconds: the poll
+  // bound when source_clock is "forge" (FB-088); half the probe round trip plus the
+  // sampling bound once the stamping clock is measured (FB-094).
+  optional double source_uncertainty_seconds = 8;
+
+  // IEC 61850 TimeQuality in Forge's words, set when the stamping clock is measured.
+  TimeQuality time_quality = 9;
+}
+
+// IEC 61850 TimeQuality in Forge's words (one-clock record P-3). An unset bool means
+// Forge does not know; accuracy_class is an IEC 61850-5 class "T0".."T5" or "unspecified".
+message TimeQuality {
+  optional bool synchronized = 1;
+  optional bool clock_failure = 2;
+  optional bool leap_seconds_known = 3;
+  string accuracy_class = 4;
 }
 
 // ---------------------------------------------------------------------------

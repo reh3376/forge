@@ -226,13 +226,17 @@ class DataValue(BaseModel):
         default=0,
         description="Raw OPC-UA StatusCode (uint32) for protocol-level detail",
     )
-    source_timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(UTC),
-        description="Timestamp from the source (PLC clock)",
+    source_timestamp: datetime | None = Field(
+        default=None,
+        description=(
+            "The stamp the source (the PLC clock) put on the value; None when the server "
+            "sent none. Never invented here (one clock, FB-088): the record builder decides "
+            "what may stand in for it, per the connection's declared origin."
+        ),
     )
-    server_timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(UTC),
-        description="Timestamp from the OPC-UA server",
+    server_timestamp: datetime | None = Field(
+        default=None,
+        description="The OPC-UA server's stamp; None when the server sent none (FB-088).",
     )
 
     @field_validator("source_timestamp", "server_timestamp", mode="before")
@@ -386,3 +390,10 @@ class ConnectionHealth(BaseModel):
     active_subscriptions: int = 0
     monitored_items_count: int = 0
     latency_ms: float | None = None  # Last measured round-trip time
+    # The server's clock against Forge's, from the response-header tap (one clock,
+    # FB-094 step 2): the last sample's offset, its ±uncertainty (half the round trip),
+    # how many samples the tap has taken and when the last one arrived.
+    server_clock_offset_seconds: float | None = None
+    server_clock_uncertainty_seconds: float | None = None
+    clock_samples: int = 0
+    last_clock_sample_at: datetime | None = None

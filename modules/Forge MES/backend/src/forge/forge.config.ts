@@ -8,6 +8,11 @@
  * Retry, circuit-breaker and dead-letter thresholds mirror the
  * `error_handling` section of `specs/forge-mes.facts.json`.
  */
+import {
+  SOURCE_TIMESTAMP_ORIGINS,
+  SourceTimestampOrigin,
+} from "./contextual-record.mapper";
+
 export const FORGE_CONFIG = "FORGE_CONFIG";
 
 export interface ForgeTlsConfig {
@@ -67,6 +72,12 @@ export interface ForgeConfig {
   /** ISA-95 site / area used for RecordContext when an event carries none. */
   site: string;
   area: string;
+  /**
+   * The clock that stamps this bridge's events when the event carries no time
+   * (FORGE_SOURCE_TIMESTAMP_ORIGIN; one-clock record P-4). Only "forge" lets the
+   * bridge's clock stand in; undeclared, such an event is refused (FB-088).
+   */
+  sourceTimestampOrigin?: SourceTimestampOrigin;
   ingest: ForgeIngestConfig;
   /** Health heartbeat cadence (defaults to the manifest's health_check_interval_ms). */
   healthIntervalMs: number;
@@ -95,6 +106,19 @@ function int(get: Getter, key: string, fallback: number): number {
   return Number.isFinite(n) && n >= 0 ? n : fallback;
 }
 
+function origin(get: Getter, key: string): SourceTimestampOrigin | undefined {
+  const v = get(key);
+  if (v === undefined || v === "") return undefined;
+  const value = v.trim().toLowerCase();
+  if (!(SOURCE_TIMESTAMP_ORIGINS as readonly string[]).includes(value)) {
+    // A misdeclared clock is a configuration error, refused at startup (fail closed).
+    throw new Error(
+      `${key}=${JSON.stringify(v)} must be one of ${SOURCE_TIMESTAMP_ORIGINS.join(", ")}`
+    );
+  }
+  return value as SourceTimestampOrigin;
+}
+
 function bool(get: Getter, key: string, fallback: boolean): boolean {
   const v = get(key);
   if (v === undefined || v === "") return fallback;
@@ -119,6 +143,7 @@ export function loadForgeConfig(get: Getter): ForgeConfig {
     adapterId: str(get, "FORGE_ADAPTER_ID", "forge-mes"),
     site: str(get, "FORGE_SITE", "whk01"),
     area: str(get, "FORGE_AREA", "distillery01"),
+    sourceTimestampOrigin: origin(get, "FORGE_SOURCE_TIMESTAMP_ORIGIN"),
     ingest: {
       batchSize: int(get, "FORGE_INGEST_BATCH_SIZE", 100),
       flushIntervalMs: int(get, "FORGE_INGEST_FLUSH_INTERVAL_MS", 1000),

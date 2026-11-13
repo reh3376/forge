@@ -15,7 +15,7 @@ from uuid import UUID, uuid4
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from forge.core.clock import OneClockModel, utc_now
+from forge.core.clock import SOURCE_CLOCK_PATTERN, OneClockModel, TimeQuality, utc_now
 from forge.core.schema_ref import require_versioned_ref
 
 
@@ -40,7 +40,14 @@ class RecordTimestamp(OneClockModel):
     a spoke put there arrives as ``sent_time`` and is kept for the clock-offset
     measurement (FB-089). Every field is UTC and timezone-aware (FB-014): a
     naive value, or an ISO string without an offset, is rejected rather than
-    read as UTC.
+    read as UTC. ``source_time`` is never invented (FB-088): a value the source
+    did not stamp is refused unless its connection declared ``origin: forge``,
+    and then ``source_clock`` says so and ``source_uncertainty_seconds`` carries
+    the poll bound. Once the stamping clock is measured (FB-094), ``source_time``
+    is the stamp corrected to master time on entry at the spoke, and the record
+    keeps what was done: ``source_time_as_sent``, ``source_offset_seconds``,
+    ``source_uncertainty_seconds`` and ``time_quality`` (the one-clock record's
+    P-3; ``sent_time`` becomes ``spoke_time`` with FB-092's exchange).
     """
 
     # The timestamps a view or a quality rule may take as its time axis: the three on
@@ -57,6 +64,50 @@ class RecordTimestamp(OneClockModel):
             "The spoke's clock when it built and sent the record (its ingestion_time as "
             "sent); set by the hub on receipt and kept for the offset measurement (FB-089). "
             "Hub-local, not on the wire; provisional name until D-9 fixes the time fields."
+        ),
+    )
+    source_clock: str | None = Field(
+        default=None,
+        pattern=SOURCE_CLOCK_PATTERN,
+        description=(
+            "Which clock stamped source_time (one-clock record, P-3/P-4): device:<name>, "
+            "server:<name>, edge:<name>, or forge when Forge's own read time stands in for a "
+            "stamp the protocol does not carry (FB-088). None until the connection declares "
+            "its origin; FB-094 names it on every record. Proto field 6."
+        ),
+    )
+    source_uncertainty_seconds: float | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "How far source_time may sit from the instant the value occurred, in seconds: "
+            "the poll bound when source_clock is forge (FB-088); half the probe round trip "
+            "plus the sampling bound once the stamping clock is measured (FB-094). Proto "
+            "field 8."
+        ),
+    )
+    source_time_as_sent: datetime | None = Field(
+        default=None,
+        description=(
+            "The stamp exactly as the stamping clock sent it (one-clock record P-3); "
+            "source_time is this minus source_offset_seconds once the clock is measured, "
+            "and equal to it until then. None when Forge's own read time stood in. Proto "
+            "field 5."
+        ),
+    )
+    source_offset_seconds: float | None = Field(
+        default=None,
+        description=(
+            "The offset subtracted from the stamp on entry (stamping clock minus master, "
+            "FB-089's sign); None when no measured clock was applied. Proto field 7."
+        ),
+    )
+    time_quality: TimeQuality | None = Field(
+        default=None,
+        description=(
+            "IEC 61850 TimeQuality in Forge's words, set when the stamping clock is "
+            "measured: synchronized, clock_failure, leap_seconds_known, accuracy_class. "
+            "Proto field 9."
         ),
     )
 

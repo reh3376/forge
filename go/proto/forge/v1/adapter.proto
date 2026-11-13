@@ -74,6 +74,31 @@ message AdapterManifest {
   repeated ConnectionParam connection_params = 10;
   repeated string auth_methods = 11;      // e.g. ["azure_entra_id", "bearer_token"]
   google.protobuf.Struct metadata = 12;   // flexible key-value metadata
+  // How the spoke is time-governed: the FACTS time_governance section (one clock, FB-090).
+  // Unset only for a manifest built before FB-090; the hub refuses a registration without
+  // it once FB-093 lands.
+  TimeGovernance time_governance = 13;
+}
+
+// The FACTS time_governance section (docs/decisions/one-clock-ot-source-time.md P-7).
+message TimeGovernance {
+  string time_source = 1;                 // "hub-ntp" | "site-ptp" | "gnss"
+  string sync_protocol = 2;               // "ntp" | "ptp-cip-sync" | "ptp-802.1as" | "profinet-ptcp" ("none" fails conformance)
+  string clock_read_method = 3;           // empty when the spoke's protocol offers none (the hub measures it)
+  double clock_probe_interval_seconds = 4;
+  string source_timestamp_origin = 5;     // "device" | "server" | "edge" | "forge"
+  string tolerance_class = 6;             // "T0".."T5" | "it-lan" | "it-wan" | "edge-mqtt"
+  bool fail_closed = 7;                   // must be true
+  repeated ConnectionTimeGovernance connections = 8;
+}
+
+// A per-connection declaration where the spoke knows its connections statically.
+message ConnectionTimeGovernance {
+  string name = 1;
+  string clock_read_method = 2;
+  optional double clock_probe_interval_seconds = 3;
+  string source_timestamp_origin = 4;
+  string tolerance_class = 5;
 }
 
 // ---------------------------------------------------------------------------

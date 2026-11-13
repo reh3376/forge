@@ -22,7 +22,7 @@ import enum
 from datetime import UTC, datetime
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from forge.modules.ot.opcua_client.types import DataType, QualityCode
 
@@ -169,13 +169,23 @@ class TagValue(BaseModel):
 
     value: Any = None
     quality: QualityCode = QualityCode.NOT_AVAILABLE
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    source_timestamp: datetime | None = None
+    timestamp: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        description="Forge's own clock when the registry took the value (its read time).",
+    )
+    source_timestamp: datetime | None = Field(
+        default=None,
+        description="The source's stamp as it came, None when it sent none (FB-088).",
+    )
+    server_timestamp: datetime | None = Field(
+        default=None,
+        description="The OPC-UA server's stamp as it came, None when it sent none (FB-088).",
+    )
     previous_value: Any = None
     previous_quality: QualityCode | None = None
     change_count: int = 0
 
-    @field_validator("timestamp", "source_timestamp", mode="before")
+    @field_validator("timestamp", "source_timestamp", "server_timestamp", mode="before")
     @classmethod
     def _ensure_utc(cls, v: Any) -> Any:
         if isinstance(v, datetime) and v.tzinfo is None:
@@ -213,6 +223,16 @@ class BaseTag(BaseModel):
     )
     data_type: DataType = Field(default=DataType.DOUBLE, description="Expected value data type")
     scan_class: ScanClass = Field(default=ScanClass.STANDARD, description="Evaluation rate group")
+    max_sampling_uncertainty_ms: int | None = Field(
+        default=None,
+        ge=1,
+        description=(
+            "How far a value's time may sit from the instant it occurred, in milliseconds "
+            "(one-clock record P-6). None accepts what the acquisition gives: the scan class "
+            "interval, or a Query tag's poll interval. A requirement tighter than the "
+            "acquisition can meet is a configuration error, refused at load."
+        ),
+    )
     description: str = ""
     engineering_units: str = ""
     area: str = ""
@@ -227,6 +247,30 @@ class BaseTag(BaseModel):
 
     # Freeform metadata
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @property
+    def sampling_bound_ms(self) -> int:
+        """The acquisition's actual bound on a value's time: the scan class interval.
+
+        A polled value is known to have occurred within one interval before its stamp
+        (one-clock record P-6); this is what ``source_uncertainty_seconds`` carries on
+        every value, with the clock's own bound once it is measured. A Query tag's poll
+        interval is its bound.
+        """
+        return SCAN_CLASS_INTERVALS_MS[self.scan_class]
+
+    @model_validator(mode="after")
+    def _sampling_requirement_is_met(self) -> BaseTag:
+        """A requirement tighter than the acquisition gives is refused at load (P-6)."""
+        required = self.max_sampling_uncertainty_ms
+        if required is not None and required < self.sampling_bound_ms:
+            msg = (
+                f"tag {self.path!r}: max_sampling_uncertainty_ms={required} is tighter than its "
+                f"acquisition gives ({self.sampling_bound_ms} ms, scan class "
+                f"{self.scan_class.value}); the tag is refused at load (one-clock record P-6)"
+            )
+            raise ValueError(msg)
+        return self
 
 
 # ---------------------------------------------------------------------------
@@ -318,6 +362,11 @@ class QueryTag(BaseTag):
     scalar: bool = Field(
         default=True, description="If True, extract first column of first row as scalar value"
     )
+
+    @property
+    def sampling_bound_ms(self) -> int:
+        """A query result is known to within its poll interval (one-clock record P-6)."""
+        return self.poll_interval_ms
 
 
 class DerivedSource(BaseModel):

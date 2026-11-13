@@ -31,7 +31,13 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
-from forge.core.clock import SERVER_LINK, ClockOffsetTracker
+from forge.core.clock import (
+    SERVER_LINK,
+    ClockEstimate,
+    ClockOffsetTracker,
+    ClockSample,
+    source_clock_name,
+)
 from forge.modules.ot.opcua_client.paths import PathNormalizer
 from forge.modules.ot.opcua_client.types import ConnectionState
 from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
@@ -53,6 +59,33 @@ ProviderFactory = Callable[[str, "TagRegistry", Any, PathNormalizer], Any]
 DEFAULT_RETRY_MAX_SECONDS = 60.0
 #: ``Server_ServerStatus_CurrentTime`` — every OPC-UA server has it (FB-070).
 LIVENESS_NODE = "i=2258"
+#: The shortest clock probe cadence an operator may set at runtime (one-clock record P-2).
+MIN_CLOCK_PROBE_INTERVAL_SECONDS = 1.0
+
+
+class OpcUaCurrentTimeReader:
+    """The OPC UA :class:`~forge.core.clock.ClockReader`: ``ServerStatus.CurrentTime``.
+
+    One read of ``i=2258`` yields T3 between Forge's T1 and T4; it is also the liveness
+    probe (FB-070), since a dead session cannot answer it. ``None`` when the server
+    answered without a clock value.
+    """
+
+    def __init__(self, client: Any, *, now: Callable[[], datetime]) -> None:
+        self._client = client
+        self._now = now
+
+    async def read_clock(self) -> ClockSample | None:
+        sent_at = self._now()
+        values = await self._client.read([LIVENESS_NODE])
+        received_at = self._now()
+        first = values[0] if values else None
+        server_time = getattr(first, "value", None)
+        if not isinstance(server_time, datetime):
+            return None
+        if server_time.tzinfo is None:  # OPC UA DateTime is UTC by definition
+            server_time = server_time.replace(tzinfo=UTC)
+        return ClockSample(sent_at, server_time, received_at, service="CurrentTime")
 
 
 def default_client_factory(spec: PlcConnectionSpec) -> Any:
@@ -85,6 +118,12 @@ def default_client_factory(spec: PlcConnectionSpec) -> Any:
     return OpcUaClient(endpoint, name=spec.name, security=security)
 
 
+def client_health(client: Any) -> Any:
+    """``client.health``, a property on ``OpcUaClient`` and a method on the test doubles."""
+    health = getattr(client, "health", None)
+    return health() if callable(health) else health
+
+
 def default_provider_factory(
     name: str, registry: TagRegistry, client: Any, normalizer: PathNormalizer
 ) -> Any:
@@ -108,6 +147,16 @@ class _Entry:
     last_probe_at: datetime | None = None
     probes: int = 0
     probe_failures: int = 0
+    #: The clock this connection's probe and tap measure (``server:WHK01`` or, for a
+    #: PLC-embedded server declared ``device``, ``device:WHK01``), one-clock record P-2.
+    clock_id: str = ""
+    #: The probe cadence in force: the spec's value until an operator changes it at runtime.
+    clock_probe_interval: float = 30.0
+    clock_probe_set_by: str | None = None
+    clock_probe_set_at: datetime | None = None
+    clock_samples: int = 0
+    #: Probe answers that carried no clock value (FB-093 turns these into a refusal).
+    clock_unreadable: int = 0
 
 
 class PlcConnectionManager:
@@ -165,12 +214,21 @@ class PlcConnectionManager:
             client = make_client(spec)
             provider = make_provider(spec.name, registry, client, self.normalizer)
             self.engine.add_provider(provider, priority=50)
-            self._entries[spec.name] = _Entry(
+            entry = _Entry(
                 spec=spec,
                 provider=provider,
                 client=client,
                 backoff=max(spec.reconnect_interval_ms / 1000.0, 0.1),
+                clock_id=source_clock_name(spec.source_timestamp_origin or "server", spec.name)
+                or f"server:{spec.name}",
+                clock_probe_interval=spec.clock_probe_interval_seconds,
             )
+            self._entries[spec.name] = entry
+            # Every response the client receives also measures the server's clock
+            # (FB-094 step 2); the samples land in the same series as the probe's.
+            set_sink = getattr(client, "set_clock_sink", None)
+            if callable(set_sink):
+                set_sink(lambda sample, e=entry: self._record_clock_sample(e, sample))
 
     # -- introspection --------------------------------------------------------
 
@@ -278,7 +336,7 @@ class PlcConnectionManager:
         return actions
 
     def _probe_due(self, entry: _Entry, now: datetime) -> bool:
-        interval = entry.spec.liveness_interval_seconds
+        interval = entry.clock_probe_interval
         if interval <= 0:
             return False
         if entry.last_probe_at is None:
@@ -286,17 +344,20 @@ class PlcConnectionManager:
         return (now - entry.last_probe_at).total_seconds() >= interval
 
     async def _probe(self, entry: _Entry, now: datetime) -> str | None:
-        """Read the server clock; a failure means the session is dead (FB-070).
+        """Read the server clock on the cadence; a failure means the session is dead.
 
-        The answer is the server's ``CurrentTime``, so every probe is also a
-        clock-offset measurement against the hub clock (FB-089).
+        The read is ``ServerStatus.CurrentTime`` (FB-070's liveness probe), so every
+        probe is also a clock measurement (FB-089, FB-094 step 2): the offset is taken
+        against Forge's clock at the round trip's midpoint, the way NTP does, so the
+        transit delay cancels, and the sample lands in the series of the clock this
+        connection declared (``clock_id``).
         """
         entry.probes += 1
         entry.last_probe_at = now
         timeout = max(entry.spec.request_timeout_ms / 1000.0, 0.1)
-        sent_at = self._now()
+        reader = OpcUaCurrentTimeReader(entry.client, now=self._now)
         try:
-            values = await asyncio.wait_for(entry.client.read([LIVENESS_NODE]), timeout=timeout)
+            sample = await asyncio.wait_for(reader.read_clock(), timeout=timeout)
         except asyncio.CancelledError:
             raise
         except Exception as exc:
@@ -304,30 +365,69 @@ class PlcConnectionManager:
             entry.last_error = f"liveness probe failed: {type(exc).__name__}: {exc}"
             logger.warning("PLC %s unresponsive: %s", entry.spec.name, entry.last_error)
             return await self._restart(entry, reason="unresponsive")
-        self._record_server_clock(entry, values, sent_at, self._now())
+        if sample is None:
+            # The session lives but the clock could not be read: counted and visible on the
+            # status now; FB-093 makes it CLOCK_UNREADABLE and stops the connection.
+            entry.clock_unreadable += 1
+            entry.last_error = "clock probe: the server answered without a clock value"
+            logger.warning("PLC %s: %s", entry.spec.name, entry.last_error)
+            return None
+        self._record_clock_sample(entry, sample)
         return None
 
-    def _record_server_clock(
-        self, entry: _Entry, values: Any, sent_at: datetime, received_at: datetime
-    ) -> None:
-        """Measure the server clock from the probe's answer (one clock, FB-089).
-
-        The offset is taken against the hub clock at the round trip's midpoint,
-        the way NTP does, so the transit delay cancels. OPC UA ``DateTime`` is
-        UTC by definition, so a naive value is UTC.
-        """
-        first = values[0] if values else None
-        server_time = getattr(first, "value", None)
-        if not isinstance(server_time, datetime):
-            return
-        if server_time.tzinfo is None:
-            server_time = server_time.replace(tzinfo=UTC)
-        round_trip = (received_at - sent_at).total_seconds()
-        midpoint = sent_at + (received_at - sent_at) / 2
-        offset = (server_time - midpoint).total_seconds()
+    def _record_clock_sample(self, entry: _Entry, sample: ClockSample) -> None:
+        """One measurement of the connection's clock, from the probe or the tap."""
+        entry.clock_samples += 1
         self.offsets.observe(
-            entry.spec.name, SERVER_LINK, offset, received_at, round_trip=round_trip
+            entry.spec.name,
+            SERVER_LINK,
+            sample.offset_seconds,
+            sample.received_at,
+            round_trip=sample.round_trip_seconds,
+            clock_id=entry.clock_id,
         )
+
+    def clock_estimate(self, name: str) -> ClockEstimate | None:
+        """The current estimate of the clock connection ``name`` declared (FB-094 step 3).
+
+        For the correction on entry (one-clock record P-3, P-10); None until the probe or
+        the response-header tap has read the clock.
+        """
+        entry = self._entries.get(name)
+        if entry is None:
+            return None
+        stats = self.offsets.clock(name, entry.clock_id)
+        return ClockEstimate.from_stats(stats) if stats is not None else None
+
+    def set_clock_probe_interval(
+        self, name: str, seconds: float, *, requested_by: str = ""
+    ) -> dict[str, Any]:
+        """Change one connection's clock probe cadence at runtime (one-clock record P-2).
+
+        The owner's condition (2026-11-03): the cadence is a dynamic per-connection
+        variable the user adjusts as needed, no restart. The value in force and who set
+        it are on the connection status. Raises ``KeyError`` for an unknown connection
+        and ``ValueError`` below the 1 s minimum.
+        """
+        entry = self._entry(name)
+        if seconds < MIN_CLOCK_PROBE_INTERVAL_SECONDS:
+            msg = (
+                f"clock probe interval for '{name}' must be at least "
+                f"{MIN_CLOCK_PROBE_INTERVAL_SECONDS:g} s; got {seconds!r}"
+            )
+            raise ValueError(msg)
+        previous = entry.clock_probe_interval
+        entry.clock_probe_interval = float(seconds)
+        entry.clock_probe_set_by = requested_by or "anonymous"
+        entry.clock_probe_set_at = self._now()
+        logger.info(
+            "PLC %s: clock probe interval %gs -> %gs (by %s)",
+            name,
+            previous,
+            entry.clock_probe_interval,
+            entry.clock_probe_set_by,
+        )
+        return self._status_for(entry)
 
     async def restart(self, name: str, *, requested_by: str = "") -> dict[str, Any]:
         """Operator-requested restart of one connection; returns its status.
@@ -385,7 +485,7 @@ class PlcConnectionManager:
     @staticmethod
     def _connection_state(entry: _Entry) -> ConnectionState:
         try:
-            return ConnectionState(entry.client.health().state)
+            return ConnectionState(client_health(entry.client).state)
         except Exception:
             return ConnectionState.DISCONNECTED
 
@@ -402,7 +502,7 @@ class PlcConnectionManager:
     def _status_for(self, entry: _Entry) -> dict[str, Any]:
         health: Any = None
         with contextlib.suppress(Exception):
-            health = entry.client.health()
+            health = client_health(entry.client)
         return {
             "name": entry.spec.name,
             "endpoint": entry.spec.endpoint,
@@ -427,9 +527,20 @@ class PlcConnectionManager:
             "probes": entry.probes,
             "probe_failures": entry.probe_failures,
             "last_probe_at": entry.last_probe_at.isoformat() if entry.last_probe_at else None,
+            # the clock this connection measures (one-clock record P-2): its id, the probe
+            # cadence in force and who set it, and the rolling offset statistics
+            "clock_id": entry.clock_id,
+            "clock_probe_interval_seconds": entry.clock_probe_interval,
+            "clock_probe_interval_source": (
+                f"set by {entry.clock_probe_set_by} at {entry.clock_probe_set_at.isoformat()}"
+                if entry.clock_probe_set_at is not None
+                else "config"
+            ),
+            "clock_samples": entry.clock_samples,
+            "clock_unreadable": entry.clock_unreadable,
             "server_clock": (
                 server_clock.model_dump(mode="json")
-                if (server_clock := self.offsets.stats(entry.spec.name).get(SERVER_LINK))
+                if (server_clock := self.offsets.clocks(entry.spec.name).get(entry.clock_id))
                 else None
             ),
             "last_error": entry.last_error,

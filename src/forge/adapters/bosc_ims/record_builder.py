@@ -18,6 +18,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from forge.adapters.bosc_ims.context import build_record_context
+from forge.core.clock import FORGE_CLOCK, resolve_source_stamp
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -29,17 +30,17 @@ from forge.core.models.contextual_record import (
 )
 
 
-def _parse_timestamp(raw: Any) -> datetime:
+def _parse_timestamp(raw: Any) -> datetime | None:
     """Parse a timestamp from various BOSC IMS formats.
 
     Handles:
       - ISO 8601 strings
       - Proto Timestamp dict with seconds/nanos
       - datetime objects passthrough
-      - None → current time
+      - None, or an unparseable string → None: no stamp is invented (FB-088)
     """
     if raw is None:
-        return datetime.now(tz=UTC)
+        return None
 
     if isinstance(raw, datetime):
         if raw.tzinfo is None:
@@ -66,7 +67,7 @@ def _parse_timestamp(raw: Any) -> datetime:
             dt = dt.replace(tzinfo=UTC)
         return dt
     except ValueError:
-        return datetime.now(tz=UTC)
+        return None
 
 
 def _serialize_payload(event: dict[str, Any]) -> str:
@@ -109,6 +110,7 @@ def build_contextual_record(
     adapter_id: str,
     adapter_version: str,
     asset: dict[str, Any] | None = None,
+    source_timestamp_origin: str | None = None,
 ) -> ContextualRecord:
     """Build a ContextualRecord from a BOSC IMS TransactionEvent.
 
@@ -117,24 +119,38 @@ def build_contextual_record(
         context: Pre-built RecordContext from context.py.
         adapter_id: The adapter's identity string.
         adapter_version: The adapter's version string.
+        source_timestamp_origin: the origin the connection declared for the clock that
+            stamps its values (device, server, edge or forge); None when undeclared (FB-088)
         asset: Optional associated Asset dict for enrichment.
 
     Returns:
         A fully-populated ContextualRecord.
     """
-    source_time = _parse_timestamp(raw_event.get("occurred_at"))
     now = datetime.now(tz=UTC)
+    tag_path = _event_tag_path(raw_event)
+    asset_id = raw_event.get("asset_id")
+    # occurred_at is the source time; an event without one is refused unless the adapter
+    # declares source_timestamp_origin: forge (one clock, FB-088).
+    stamp = resolve_source_stamp(
+        _parse_timestamp(raw_event.get("occurred_at")),
+        origin=source_timestamp_origin,
+        read_at=now,
+        adapter_id=adapter_id,
+        connection=str(asset_id) if asset_id else None,
+        tag_path=tag_path,
+    )
 
     return ContextualRecord(
         source=RecordSource(
             adapter_id=adapter_id,
             system="bosc-ims",
-            tag_path=_event_tag_path(raw_event),
+            tag_path=tag_path,
             connection_id=raw_event.get("asset_id"),
         ),
         timestamp=RecordTimestamp(
-            source_time=source_time,
-            server_time=source_time,
+            **stamp.timestamp_fields(),
+            # the IMS server's own stamp doubles as server_time; none when Forge's stood in
+            server_time=stamp.source_time if stamp.source_clock != FORGE_CLOCK else None,
             ingestion_time=now,
         ),
         value=RecordValue(
@@ -162,6 +178,7 @@ def build_asset_record(
     asset: dict[str, Any],
     adapter_id: str,
     adapter_version: str,
+    source_timestamp_origin: str | None = None,
 ) -> ContextualRecord:
     """Build a ContextualRecord from a BOSC IMS Asset snapshot.
 
@@ -173,10 +190,16 @@ def build_asset_record(
         asset=asset,
     )
 
-    source_time = _parse_timestamp(
-        asset.get("updated_at") or asset.get("created_at"),
-    )
     now = datetime.now(tz=UTC)
+    asset_id = asset.get("id")
+    stamp = resolve_source_stamp(
+        _parse_timestamp(asset.get("updated_at") or asset.get("created_at")),
+        origin=source_timestamp_origin,
+        read_at=now,
+        adapter_id=adapter_id,
+        connection=str(asset_id) if asset_id else None,
+        tag_path="bosc.asset.snapshot",
+    )
 
     return ContextualRecord(
         source=RecordSource(
@@ -186,8 +209,9 @@ def build_asset_record(
             connection_id=asset.get("id"),
         ),
         timestamp=RecordTimestamp(
-            source_time=source_time,
-            server_time=source_time,
+            **stamp.timestamp_fields(),
+            # the IMS server's own stamp doubles as server_time; none when Forge's stood in
+            server_time=stamp.source_time if stamp.source_clock != FORGE_CLOCK else None,
             ingestion_time=now,
         ),
         value=RecordValue(

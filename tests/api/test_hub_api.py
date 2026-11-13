@@ -28,6 +28,7 @@ from forge.core.models.adapter import (
     AdapterManifest,
     AdapterState,
     DataContract,
+    TimeGovernance,
 )
 from forge.storage.config import StorageConfig
 
@@ -75,6 +76,14 @@ def _make_manifest(adapter_id: str = "whk-wms") -> dict:
         connection_params=[],
         auth_methods=["bearer_token"],
         health_check_interval_ms=15000,
+        # bare REST readings carry no timestamp: the hub's read time may stand in (FB-088),
+        # declared in the FACTS time_governance section (FB-090)
+        time_governance=TimeGovernance(
+            time_source="hub-ntp",
+            sync_protocol="ntp",
+            source_timestamp_origin="forge",
+            tolerance_class="it-lan",
+        ),
     ).model_dump(mode="json")
 
 

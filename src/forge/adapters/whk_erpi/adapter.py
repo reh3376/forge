@@ -27,6 +27,7 @@ from forge.adapters.whk_erpi.config import WhkErpiConfig
 from forge.adapters.whk_erpi.context import build_record_context
 from forge.adapters.whk_erpi.record_builder import build_contextual_record
 from forge.adapters.whk_erpi.topics import ERPI_ACK_TOPICS, ERPI_ENTITY_TOPICS
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -35,6 +36,7 @@ from forge.core.models.adapter import (
     AdapterTier,
     ConnectionParam,
     DataContract,
+    TimeGovernance,
 )
 
 if TYPE_CHECKING:
@@ -62,6 +64,10 @@ def _load_manifest() -> AdapterManifest:
         connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
+        # the FACTS time_governance section, as the spoke's declaration (one clock, FB-090)
+        time_governance=(
+            TimeGovernance(**raw["time_governance"]) if raw.get("time_governance") else None
+        ),
     )
 
 
@@ -104,6 +110,7 @@ class WhkErpiAdapter(
         Does NOT open any connections — that happens in start().
         """
         self._config = WhkErpiConfig(**params)
+        self.check_time_governance()
         self._state = AdapterState.REGISTERED
 
     async def start(self) -> None:
@@ -146,6 +153,7 @@ class WhkErpiAdapter(
             records_collected=self._records_collected,
             records_failed=self._records_failed,
             uptime_seconds=uptime,
+            **self.refusal_health(),
         )
 
     # ── Data Collection ────────────────────────────────────────
@@ -168,9 +176,12 @@ class WhkErpiAdapter(
                     context=context,
                     adapter_id=self.adapter_id,
                     adapter_version=self.manifest.version,
+                    source_timestamp_origin=self.source_timestamp_origin,
                 )
                 self._records_collected += 1
                 yield record
+            except SourceStampMissingError as exc:
+                self.refuse(exc)
             except Exception:
                 self._records_failed += 1
                 logger.exception("Failed to map ERPI event: %s", raw_event)

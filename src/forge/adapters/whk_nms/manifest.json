@@ -77,5 +77,13 @@
     "hub_module": "forge.adapters.whk_nms",
     "source_repo": "https://github.com/WhiskeyHouse/net-topology",
     "external_contract": "openapi://nms-api/v1.0.0"
+  },
+  "time_governance": {
+    "time_source": "hub-ntp",
+    "sync_protocol": "ntp",
+    "clock_probe_interval_seconds": 30,
+    "source_timestamp_origin": "server",
+    "tolerance_class": "it-lan",
+    "fail_closed": true
   }
 }

@@ -244,7 +244,8 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_collect_multiple_tags(self):
-        adapter, transport = _make_adapter()
+        # the gateway's responses carry no timestamps: the bridge declares origin forge
+        adapter, transport = _make_adapter(source_timestamp_origin="forge")
         transport.set_post_response({})
         transport.set_get_response({})
         await adapter.configure({})
@@ -273,8 +274,42 @@ class TestCollect:
             records.append(record)
 
         assert len(records) == 3
+        # Forge's read time stood in for the missing gateway stamp, and each record says
+        # so, with the poll interval (1 s) as the uncertainty (one clock, FB-088)
+        assert {r.timestamp.source_clock for r in records} == {"forge"}
+        assert {r.timestamp.source_uncertainty_seconds for r in records} == {1.0}
+        assert all(r.timestamp.server_time is None for r in records)
         assert adapter.bridge_health.tags_good == 2
         assert adapter.bridge_health.tags_bad == 1
+
+    @pytest.mark.asyncio
+    async def test_collect_refuses_unstamped_values_unless_declared_and_shows_it(self):
+        """One clock (FB-088): no invented stamp, and the refusal is on the adapter's health."""
+        adapter, transport = _make_adapter()
+        transport.set_post_response({})
+        transport.set_get_response({})
+        await adapter.configure({})
+        await adapter.start()
+        adapter.add_tags(["[WHK01]tag1", "[WHK01]tag2"])
+        transport.set_post_response(
+            {
+                "results": [
+                    {"value": 1.0, "quality": "Good"},
+                    {"value": 2.0, "quality": "Good", "timestamp": 1712678400000},
+                ]
+            }
+        )
+
+        records = [record async for record in adapter.collect()]
+
+        assert len(records) == 1 and records[0].value.raw == 2.0
+        assert records[0].timestamp.source_clock is None
+        health = await adapter.health()
+        assert health.state == AdapterState.DEGRADED
+        assert health.records_failed == 1
+        assert health.refusals == {"source_stamp_missing": 1}
+        assert health.last_refusal is not None and "connection WHK01" in health.last_refusal
+        assert health.error_message == health.last_refusal
 
     @pytest.mark.asyncio
     async def test_collect_lineage_chain(self):

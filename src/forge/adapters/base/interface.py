@@ -12,8 +12,10 @@ it declares in its manifest's capabilities.
 from __future__ import annotations
 
 import abc
+import logging
 from typing import TYPE_CHECKING, Any
 
+from forge.core.clock import TimeGovernanceConflictError
 from forge.core.models.adapter import (
     AdapterHealth,
     AdapterManifest,
@@ -25,6 +27,8 @@ if TYPE_CHECKING:
     from datetime import datetime
 
     from forge.core.models.contextual_record import ContextualRecord
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Lifecycle mixin
@@ -81,6 +85,8 @@ class AdapterBase(AdapterLifecycle):
         self._state: AdapterState = AdapterState.REGISTERED
         self._records_collected: int = 0
         self._records_failed: int = 0
+        self._refusals: dict[str, int] = {}
+        self._last_refusal: str | None = None
 
     @property
     def adapter_id(self) -> str:
@@ -89,6 +95,44 @@ class AdapterBase(AdapterLifecycle):
     @property
     def state(self) -> AdapterState:
         return self._state
+
+    @property
+    def source_timestamp_origin(self) -> str | None:
+        """The origin declared for the clock that stamps this adapter's values.
+
+        The FACTS ``time_governance`` section on the manifest is the governed declaration
+        (one-clock record P-4, FB-090); the config model's ``source_timestamp_origin`` is
+        the fallback for a manifest without it. None until declared. A value without a
+        source stamp is refused unless the origin is ``forge`` (FB-088).
+        """
+        governance = getattr(self.manifest, "time_governance", None)
+        if governance is not None:
+            return governance.source_timestamp_origin
+        return getattr(getattr(self, "_config", None), "source_timestamp_origin", None)
+
+    def check_time_governance(self) -> None:
+        """Refuse connection parameters that contradict the FACTS declaration (FB-090).
+
+        ``configure`` calls it once the config model is built. A ``source_timestamp_origin``
+        parameter that differs from the manifest's ``time_governance`` declaration is a
+        refusal like any other: counted on the health under ``time_governance_conflict``,
+        logged, and raised so the configure call fails loudly instead of letting one
+        declaration silently win. A parameter that repeats the declaration passes; so does
+        a manifest without the section, where the parameter stands in until FB-093.
+        """
+        governance = getattr(self.manifest, "time_governance", None)
+        configured = getattr(getattr(self, "_config", None), "source_timestamp_origin", None)
+        if governance is None or configured is None:
+            return
+        if configured == governance.source_timestamp_origin:
+            return
+        exc = TimeGovernanceConflictError(
+            adapter_id=self.adapter_id,
+            declared=governance.source_timestamp_origin,
+            configured=configured,
+        )
+        self.refuse(exc)
+        raise exc
 
     @abc.abstractmethod
     async def collect(self) -> AsyncIterator[ContextualRecord]:
@@ -100,6 +144,42 @@ class AdapterBase(AdapterLifecycle):
         data contract before entering the governance pipeline.
         """
         yield  # pragma: no cover — abstract async generator
+
+    def refuse(self, exc: Exception, *, cause: str | None = None) -> None:
+        """Count a value this adapter refused rather than invent something about it.
+
+        A refusal is never silent (owner, 2026-11-03). It counts on ``records_failed``
+        and under its cause in ``refusals``; its message becomes ``last_refusal`` and
+        the health's ``error_message``; the adapter goes DEGRADED while it is HEALTHY;
+        the first refusal per cause is logged as a warning, every one counts on the
+        ``forge.ingest.refused`` metric. ``cause`` defaults to the exception's ``cause``
+        attribute (``SourceStampMissingError.cause``, FB-088). A restart returns the adapter
+        to HEALTHY; the probe-based recovery is FB-093.
+        """
+        from forge.core import telemetry
+
+        cause = cause or getattr(exc, "cause", None) or type(exc).__name__
+        first = cause not in self._refusals
+        self._refusals[cause] = self._refusals.get(cause, 0) + 1
+        self._records_failed += 1
+        self._last_refusal = str(exc)
+        if self._state == AdapterState.HEALTHY:
+            self._state = AdapterState.DEGRADED
+        telemetry.record_refusal(self.adapter_id, cause)
+        log = logger.warning if first else logger.debug
+        log("%s refused a value (%s): %s", self.adapter_id, cause, exc)
+
+    def refusal_health(self, error_message: str | None = None) -> dict[str, Any]:
+        """The refusal fields of this adapter's ``AdapterHealth`` (``**self.refusal_health()``).
+
+        ``error_message`` is the adapter's own message when it has one, else the last
+        refusal, so the cause travels on the wire field the health contract already has.
+        """
+        return {
+            "refusals": dict(self._refusals),
+            "last_refusal": self._last_refusal,
+            "error_message": error_message or self._last_refusal,
+        }
 
     async def validate_record(self, record: ContextualRecord) -> bool:
         """Optional pre-send validation hook.

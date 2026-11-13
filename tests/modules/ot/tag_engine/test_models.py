@@ -432,3 +432,62 @@ class TestTagUnion:
         assert isinstance(restored, StandardTag)
         assert restored.alarm.hi == 85
         assert restored.scale.raw_max == 65535
+
+
+class TestSamplingBound:
+    """The per-tag sampling bound and its requirement (one-clock record P-6, FB-094 step 6)."""
+
+    def test_the_acquisition_s_bound_is_the_scan_class_interval(self):
+        tag = StandardTag(path="WH/A/B/PV", opcua_node_id="ns=2;s=x")
+        assert tag.max_sampling_uncertainty_ms is None
+        assert tag.sampling_bound_ms == 1000
+        fast = StandardTag(
+            path="WH/A/B/PV", opcua_node_id="ns=2;s=x", scan_class=ScanClass.CRITICAL
+        )
+        assert fast.sampling_bound_ms == 100
+
+    def test_a_query_tag_is_bounded_by_its_poll_interval(self):
+        tag = QueryTag(path="WH/A/B/Q", query="select 1", poll_interval_ms=5000)
+        assert tag.sampling_bound_ms == 5000
+
+    def test_a_requirement_the_acquisition_meets_is_kept(self):
+        tag = StandardTag(
+            path="WH/A/B/PV", opcua_node_id="ns=2;s=x", max_sampling_uncertainty_ms=1000
+        )
+        assert tag.max_sampling_uncertainty_ms == 1000
+        looser = StandardTag(
+            path="WH/A/B/PV", opcua_node_id="ns=2;s=x", max_sampling_uncertainty_ms=5000
+        )
+        assert looser.max_sampling_uncertainty_ms == 5000
+
+    def test_a_tighter_requirement_is_refused_at_load(self):
+        with pytest.raises(ValidationError, match="tighter than its acquisition gives"):
+            StandardTag(path="WH/A/B/PV", opcua_node_id="ns=2;s=x", max_sampling_uncertainty_ms=500)
+        # the same tag at a faster scan class meets it
+        StandardTag(
+            path="WH/A/B/PV",
+            opcua_node_id="ns=2;s=x",
+            scan_class=ScanClass.HIGH,
+            max_sampling_uncertainty_ms=500,
+        )
+        with pytest.raises(ValidationError, match="refused at load"):
+            QueryTag(
+                path="WH/A/B/Q",
+                query="select 1",
+                poll_interval_ms=5000,
+                max_sampling_uncertainty_ms=1000,
+            )
+
+    def test_the_refusal_applies_to_a_json_tag_document(self):
+        from pydantic import TypeAdapter
+
+        adapter = TypeAdapter(TagUnion)
+        with pytest.raises(ValidationError, match="one-clock record P-6"):
+            adapter.validate_python(
+                {
+                    "tag_type": "standard",
+                    "path": "WH/A/B/PV",
+                    "opcua_node_id": "ns=2;s=x",
+                    "max_sampling_uncertainty_ms": 10,
+                }
+            )

@@ -185,6 +185,38 @@ class TestConnectionLifecycle:
 # ---------------------------------------------------------------------------
 
 
+class TestClockTap:
+    """Every service call measures the server's clock (one clock, FB-094 step 2)."""
+
+    @pytest.mark.asyncio
+    async def test_every_read_measures_the_server_clock(self, client, opcua_server):
+        samples = []
+        client.set_clock_sink(samples.append)
+        before = client.health.clock_samples
+        nid = opcua_server["temperature"].nodeid.to_string()
+        await client.read([nid])
+
+        health = client.health
+        assert health.clock_samples >= before + 1 and samples
+        sample = client.last_clock_sample
+        assert sample is not None and sample.service == "ReadRequest"
+        # the server runs on this host: its clock is Forge's clock, within the round trip
+        assert abs(sample.offset_seconds) < 1.0
+        assert 0 <= sample.uncertainty_seconds < 1.0
+        assert health.server_clock_offset_seconds == pytest.approx(sample.offset_seconds)
+        assert health.server_clock_uncertainty_seconds == pytest.approx(sample.uncertainty_seconds)
+        assert health.last_clock_sample_at == sample.received_at
+
+    @pytest.mark.asyncio
+    async def test_the_tap_is_removed_on_disconnect(self, opcua_server):
+        c = OpcUaClient(endpoint=_TEST_ENDPOINT, name="tap-lifecycle")
+        await c.connect()
+        low = c._ua_client.uaclient
+        assert c._clock_tap is not None and low._send_request is c._clock_tap
+        await c.disconnect()
+        assert c._clock_tap is None
+
+
 class TestBrowseService:
     """Tests for browsing the OPC-UA address space."""
 

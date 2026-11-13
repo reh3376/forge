@@ -105,6 +105,23 @@ type RecordTimestamp struct {
 	ServerTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"`
 	// When Forge received it (set by hub on ingestion)
 	IngestionTime *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=ingestion_time,json=ingestionTime,proto3" json:"ingestion_time,omitempty"`
+	// The stamp exactly as the stamping clock sent it. source_time is this minus
+	// source_offset_seconds once the stamping clock is measured, and equal to it until then;
+	// unset when Forge's own read time stood in (source_clock "forge").
+	SourceTimeAsSent *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=source_time_as_sent,json=sourceTimeAsSent,proto3" json:"source_time_as_sent,omitempty"`
+	// Which clock stamped source_time: "device:<name>", "server:<name>", "edge:<name>", or
+	// "forge" when Forge's own read time stands in for a stamp the protocol does not carry
+	// (FB-088). Empty until the connection declares its origin.
+	SourceClock string `protobuf:"bytes,6,opt,name=source_clock,json=sourceClock,proto3" json:"source_clock,omitempty"`
+	// The offset subtracted from the stamp on entry at the spoke (stamping clock minus master,
+	// seconds); absent when no measured clock was applied. The hub never corrects again.
+	SourceOffsetSeconds *float64 `protobuf:"fixed64,7,opt,name=source_offset_seconds,json=sourceOffsetSeconds,proto3,oneof" json:"source_offset_seconds,omitempty"`
+	// How far source_time may sit from the instant the value occurred, in seconds: the poll
+	// bound when source_clock is "forge" (FB-088); half the probe round trip plus the
+	// sampling bound once the stamping clock is measured (FB-094).
+	SourceUncertaintySeconds *float64 `protobuf:"fixed64,8,opt,name=source_uncertainty_seconds,json=sourceUncertaintySeconds,proto3,oneof" json:"source_uncertainty_seconds,omitempty"`
+	// IEC 61850 TimeQuality in Forge's words, set when the stamping clock is measured.
+	TimeQuality   *TimeQuality `protobuf:"bytes,9,opt,name=time_quality,json=timeQuality,proto3" json:"time_quality,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -160,6 +177,111 @@ func (x *RecordTimestamp) GetIngestionTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *RecordTimestamp) GetSourceTimeAsSent() *timestamppb.Timestamp {
+	if x != nil {
+		return x.SourceTimeAsSent
+	}
+	return nil
+}
+
+func (x *RecordTimestamp) GetSourceClock() string {
+	if x != nil {
+		return x.SourceClock
+	}
+	return ""
+}
+
+func (x *RecordTimestamp) GetSourceOffsetSeconds() float64 {
+	if x != nil && x.SourceOffsetSeconds != nil {
+		return *x.SourceOffsetSeconds
+	}
+	return 0
+}
+
+func (x *RecordTimestamp) GetSourceUncertaintySeconds() float64 {
+	if x != nil && x.SourceUncertaintySeconds != nil {
+		return *x.SourceUncertaintySeconds
+	}
+	return 0
+}
+
+func (x *RecordTimestamp) GetTimeQuality() *TimeQuality {
+	if x != nil {
+		return x.TimeQuality
+	}
+	return nil
+}
+
+// IEC 61850 TimeQuality in Forge's words (one-clock record P-3). An unset bool means
+// Forge does not know; accuracy_class is an IEC 61850-5 class "T0".."T5" or "unspecified".
+type TimeQuality struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Synchronized     *bool                  `protobuf:"varint,1,opt,name=synchronized,proto3,oneof" json:"synchronized,omitempty"`
+	ClockFailure     *bool                  `protobuf:"varint,2,opt,name=clock_failure,json=clockFailure,proto3,oneof" json:"clock_failure,omitempty"`
+	LeapSecondsKnown *bool                  `protobuf:"varint,3,opt,name=leap_seconds_known,json=leapSecondsKnown,proto3,oneof" json:"leap_seconds_known,omitempty"`
+	AccuracyClass    string                 `protobuf:"bytes,4,opt,name=accuracy_class,json=accuracyClass,proto3" json:"accuracy_class,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *TimeQuality) Reset() {
+	*x = TimeQuality{}
+	mi := &file_forge_v1_contextual_record_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TimeQuality) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TimeQuality) ProtoMessage() {}
+
+func (x *TimeQuality) ProtoReflect() protoreflect.Message {
+	mi := &file_forge_v1_contextual_record_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TimeQuality.ProtoReflect.Descriptor instead.
+func (*TimeQuality) Descriptor() ([]byte, []int) {
+	return file_forge_v1_contextual_record_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *TimeQuality) GetSynchronized() bool {
+	if x != nil && x.Synchronized != nil {
+		return *x.Synchronized
+	}
+	return false
+}
+
+func (x *TimeQuality) GetClockFailure() bool {
+	if x != nil && x.ClockFailure != nil {
+		return *x.ClockFailure
+	}
+	return false
+}
+
+func (x *TimeQuality) GetLeapSecondsKnown() bool {
+	if x != nil && x.LeapSecondsKnown != nil {
+		return *x.LeapSecondsKnown
+	}
+	return false
+}
+
+func (x *TimeQuality) GetAccuracyClass() string {
+	if x != nil {
+		return x.AccuracyClass
+	}
+	return ""
+}
+
 type RecordValue struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The raw value — exactly one variant is set
@@ -183,7 +305,7 @@ type RecordValue struct {
 
 func (x *RecordValue) Reset() {
 	*x = RecordValue{}
-	mi := &file_forge_v1_contextual_record_proto_msgTypes[2]
+	mi := &file_forge_v1_contextual_record_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -195,7 +317,7 @@ func (x *RecordValue) String() string {
 func (*RecordValue) ProtoMessage() {}
 
 func (x *RecordValue) ProtoReflect() protoreflect.Message {
-	mi := &file_forge_v1_contextual_record_proto_msgTypes[2]
+	mi := &file_forge_v1_contextual_record_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -208,7 +330,7 @@ func (x *RecordValue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RecordValue.ProtoReflect.Descriptor instead.
 func (*RecordValue) Descriptor() ([]byte, []int) {
-	return file_forge_v1_contextual_record_proto_rawDescGZIP(), []int{2}
+	return file_forge_v1_contextual_record_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *RecordValue) GetTypedValue() isRecordValue_TypedValue {
@@ -358,7 +480,7 @@ type RecordContext struct {
 
 func (x *RecordContext) Reset() {
 	*x = RecordContext{}
-	mi := &file_forge_v1_contextual_record_proto_msgTypes[3]
+	mi := &file_forge_v1_contextual_record_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -370,7 +492,7 @@ func (x *RecordContext) String() string {
 func (*RecordContext) ProtoMessage() {}
 
 func (x *RecordContext) ProtoReflect() protoreflect.Message {
-	mi := &file_forge_v1_contextual_record_proto_msgTypes[3]
+	mi := &file_forge_v1_contextual_record_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -383,7 +505,7 @@ func (x *RecordContext) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RecordContext.ProtoReflect.Descriptor instead.
 func (*RecordContext) Descriptor() ([]byte, []int) {
-	return file_forge_v1_contextual_record_proto_rawDescGZIP(), []int{3}
+	return file_forge_v1_contextual_record_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *RecordContext) GetEquipmentId() string {
@@ -489,7 +611,7 @@ type RecordLineage struct {
 
 func (x *RecordLineage) Reset() {
 	*x = RecordLineage{}
-	mi := &file_forge_v1_contextual_record_proto_msgTypes[4]
+	mi := &file_forge_v1_contextual_record_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -501,7 +623,7 @@ func (x *RecordLineage) String() string {
 func (*RecordLineage) ProtoMessage() {}
 
 func (x *RecordLineage) ProtoReflect() protoreflect.Message {
-	mi := &file_forge_v1_contextual_record_proto_msgTypes[4]
+	mi := &file_forge_v1_contextual_record_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -514,7 +636,7 @@ func (x *RecordLineage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RecordLineage.ProtoReflect.Descriptor instead.
 func (*RecordLineage) Descriptor() ([]byte, []int) {
-	return file_forge_v1_contextual_record_proto_rawDescGZIP(), []int{4}
+	return file_forge_v1_contextual_record_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *RecordLineage) GetSchemaRef() string {
@@ -559,7 +681,7 @@ type ContextualRecord struct {
 
 func (x *ContextualRecord) Reset() {
 	*x = ContextualRecord{}
-	mi := &file_forge_v1_contextual_record_proto_msgTypes[5]
+	mi := &file_forge_v1_contextual_record_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -571,7 +693,7 @@ func (x *ContextualRecord) String() string {
 func (*ContextualRecord) ProtoMessage() {}
 
 func (x *ContextualRecord) ProtoReflect() protoreflect.Message {
-	mi := &file_forge_v1_contextual_record_proto_msgTypes[5]
+	mi := &file_forge_v1_contextual_record_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -584,7 +706,7 @@ func (x *ContextualRecord) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ContextualRecord.ProtoReflect.Descriptor instead.
 func (*ContextualRecord) Descriptor() ([]byte, []int) {
-	return file_forge_v1_contextual_record_proto_rawDescGZIP(), []int{5}
+	return file_forge_v1_contextual_record_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ContextualRecord) GetRecordId() string {
@@ -639,13 +761,28 @@ const file_forge_v1_contextual_record_proto_rawDesc = "" +
 	"adapter_id\x18\x01 \x01(\tR\tadapterId\x12\x16\n" +
 	"\x06system\x18\x02 \x01(\tR\x06system\x12\x19\n" +
 	"\btag_path\x18\x03 \x01(\tR\atagPath\x12#\n" +
-	"\rconnection_id\x18\x04 \x01(\tR\fconnectionId\"\xce\x01\n" +
+	"\rconnection_id\x18\x04 \x01(\tR\fconnectionId\"\xab\x04\n" +
 	"\x0fRecordTimestamp\x12;\n" +
 	"\vsource_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"sourceTime\x12;\n" +
 	"\vserver_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"serverTime\x12A\n" +
-	"\x0eingestion_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ringestionTime\"\xed\x02\n" +
+	"\x0eingestion_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ringestionTime\x12I\n" +
+	"\x13source_time_as_sent\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\x10sourceTimeAsSent\x12!\n" +
+	"\fsource_clock\x18\x06 \x01(\tR\vsourceClock\x127\n" +
+	"\x15source_offset_seconds\x18\a \x01(\x01H\x00R\x13sourceOffsetSeconds\x88\x01\x01\x12A\n" +
+	"\x1asource_uncertainty_seconds\x18\b \x01(\x01H\x01R\x18sourceUncertaintySeconds\x88\x01\x01\x128\n" +
+	"\ftime_quality\x18\t \x01(\v2\x15.forge.v1.TimeQualityR\vtimeQualityB\x18\n" +
+	"\x16_source_offset_secondsB\x1d\n" +
+	"\x1b_source_uncertainty_seconds\"\xf4\x01\n" +
+	"\vTimeQuality\x12'\n" +
+	"\fsynchronized\x18\x01 \x01(\bH\x00R\fsynchronized\x88\x01\x01\x12(\n" +
+	"\rclock_failure\x18\x02 \x01(\bH\x01R\fclockFailure\x88\x01\x01\x121\n" +
+	"\x12leap_seconds_known\x18\x03 \x01(\bH\x02R\x10leapSecondsKnown\x88\x01\x01\x12%\n" +
+	"\x0eaccuracy_class\x18\x04 \x01(\tR\raccuracyClassB\x0f\n" +
+	"\r_synchronizedB\x10\n" +
+	"\x0e_clock_failureB\x15\n" +
+	"\x13_leap_seconds_known\"\xed\x02\n" +
 	"\vRecordValue\x12#\n" +
 	"\fnumber_value\x18\x01 \x01(\x01H\x00R\vnumberValue\x12#\n" +
 	"\fstring_value\x18\x02 \x01(\tH\x00R\vstringValue\x12\x1f\n" +
@@ -709,35 +846,38 @@ func file_forge_v1_contextual_record_proto_rawDescGZIP() []byte {
 	return file_forge_v1_contextual_record_proto_rawDescData
 }
 
-var file_forge_v1_contextual_record_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_forge_v1_contextual_record_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_forge_v1_contextual_record_proto_goTypes = []any{
 	(*RecordSource)(nil),          // 0: forge.v1.RecordSource
 	(*RecordTimestamp)(nil),       // 1: forge.v1.RecordTimestamp
-	(*RecordValue)(nil),           // 2: forge.v1.RecordValue
-	(*RecordContext)(nil),         // 3: forge.v1.RecordContext
-	(*RecordLineage)(nil),         // 4: forge.v1.RecordLineage
-	(*ContextualRecord)(nil),      // 5: forge.v1.ContextualRecord
-	nil,                           // 6: forge.v1.RecordContext.ExtraEntry
-	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
-	(QualityCode)(0),              // 8: forge.v1.QualityCode
+	(*TimeQuality)(nil),           // 2: forge.v1.TimeQuality
+	(*RecordValue)(nil),           // 3: forge.v1.RecordValue
+	(*RecordContext)(nil),         // 4: forge.v1.RecordContext
+	(*RecordLineage)(nil),         // 5: forge.v1.RecordLineage
+	(*ContextualRecord)(nil),      // 6: forge.v1.ContextualRecord
+	nil,                           // 7: forge.v1.RecordContext.ExtraEntry
+	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
+	(QualityCode)(0),              // 9: forge.v1.QualityCode
 }
 var file_forge_v1_contextual_record_proto_depIdxs = []int32{
-	7,  // 0: forge.v1.RecordTimestamp.source_time:type_name -> google.protobuf.Timestamp
-	7,  // 1: forge.v1.RecordTimestamp.server_time:type_name -> google.protobuf.Timestamp
-	7,  // 2: forge.v1.RecordTimestamp.ingestion_time:type_name -> google.protobuf.Timestamp
-	8,  // 3: forge.v1.RecordValue.quality:type_name -> forge.v1.QualityCode
-	7,  // 4: forge.v1.RecordContext.event_timestamp:type_name -> google.protobuf.Timestamp
-	6,  // 5: forge.v1.RecordContext.extra:type_name -> forge.v1.RecordContext.ExtraEntry
-	0,  // 6: forge.v1.ContextualRecord.source:type_name -> forge.v1.RecordSource
-	1,  // 7: forge.v1.ContextualRecord.timestamp:type_name -> forge.v1.RecordTimestamp
-	2,  // 8: forge.v1.ContextualRecord.value:type_name -> forge.v1.RecordValue
-	3,  // 9: forge.v1.ContextualRecord.context:type_name -> forge.v1.RecordContext
-	4,  // 10: forge.v1.ContextualRecord.lineage:type_name -> forge.v1.RecordLineage
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	8,  // 0: forge.v1.RecordTimestamp.source_time:type_name -> google.protobuf.Timestamp
+	8,  // 1: forge.v1.RecordTimestamp.server_time:type_name -> google.protobuf.Timestamp
+	8,  // 2: forge.v1.RecordTimestamp.ingestion_time:type_name -> google.protobuf.Timestamp
+	8,  // 3: forge.v1.RecordTimestamp.source_time_as_sent:type_name -> google.protobuf.Timestamp
+	2,  // 4: forge.v1.RecordTimestamp.time_quality:type_name -> forge.v1.TimeQuality
+	9,  // 5: forge.v1.RecordValue.quality:type_name -> forge.v1.QualityCode
+	8,  // 6: forge.v1.RecordContext.event_timestamp:type_name -> google.protobuf.Timestamp
+	7,  // 7: forge.v1.RecordContext.extra:type_name -> forge.v1.RecordContext.ExtraEntry
+	0,  // 8: forge.v1.ContextualRecord.source:type_name -> forge.v1.RecordSource
+	1,  // 9: forge.v1.ContextualRecord.timestamp:type_name -> forge.v1.RecordTimestamp
+	3,  // 10: forge.v1.ContextualRecord.value:type_name -> forge.v1.RecordValue
+	4,  // 11: forge.v1.ContextualRecord.context:type_name -> forge.v1.RecordContext
+	5,  // 12: forge.v1.ContextualRecord.lineage:type_name -> forge.v1.RecordLineage
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_forge_v1_contextual_record_proto_init() }
@@ -746,7 +886,9 @@ func file_forge_v1_contextual_record_proto_init() {
 		return
 	}
 	file_forge_v1_enums_proto_init()
-	file_forge_v1_contextual_record_proto_msgTypes[2].OneofWrappers = []any{
+	file_forge_v1_contextual_record_proto_msgTypes[1].OneofWrappers = []any{}
+	file_forge_v1_contextual_record_proto_msgTypes[2].OneofWrappers = []any{}
+	file_forge_v1_contextual_record_proto_msgTypes[3].OneofWrappers = []any{
 		(*RecordValue_NumberValue)(nil),
 		(*RecordValue_StringValue)(nil),
 		(*RecordValue_BoolValue)(nil),
@@ -760,7 +902,7 @@ func file_forge_v1_contextual_record_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_forge_v1_contextual_record_proto_rawDesc), len(file_forge_v1_contextual_record_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

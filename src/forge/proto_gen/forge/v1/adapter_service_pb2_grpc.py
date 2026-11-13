@@ -7,7 +7,7 @@ from forge.proto_gen.forge.v1 import adapter_pb2 as forge_dot_v1_dot_adapter__pb
 from forge.proto_gen.forge.v1 import adapter_service_pb2 as forge_dot_v1_dot_adapter__service__pb2
 from forge.proto_gen.forge.v1 import contextual_record_pb2 as forge_dot_v1_dot_contextual__record__pb2
 
-GRPC_GENERATED_VERSION = '1.80.0'
+GRPC_GENERATED_VERSION = '1.85.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -27,7 +27,7 @@ if _version_not_supported:
     )
 
 
-class AdapterServiceStub(object):
+class AdapterServiceStub:
     """---------------------------------------------------------------------------
     AdapterService — the hub ↔ spoke contract
     ---------------------------------------------------------------------------
@@ -103,7 +103,7 @@ class AdapterServiceStub(object):
                 _registered_method=True)
 
 
-class AdapterServiceServicer(object):
+class AdapterServiceServicer:
     """---------------------------------------------------------------------------
     AdapterService — the hub ↔ spoke contract
     ---------------------------------------------------------------------------
@@ -274,7 +274,7 @@ def add_AdapterServiceServicer_to_server(servicer, server):
 
 
  # This class is part of an EXPERIMENTAL API.
-class AdapterService(object):
+class AdapterService:
     """---------------------------------------------------------------------------
     AdapterService — the hub ↔ spoke contract
     ---------------------------------------------------------------------------

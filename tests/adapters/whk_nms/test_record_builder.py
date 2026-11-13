@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+import pytest
 
 from forge.adapters.whk_nms.context import build_record_context
 from forge.adapters.whk_nms.record_builder import build_contextual_record
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.contextual_record import QualityCode
 
 
@@ -27,6 +28,7 @@ class TestRecordBuilder:
             context=context,
             adapter_id="whk-nms",
             adapter_version="0.1.0",
+            source_timestamp_origin="forge",
             entity_type="network_device",
             event_type="device_discovery",
         )
@@ -53,15 +55,16 @@ class TestRecordBuilder:
             context=context,
             adapter_id="whk-nms",
             adapter_version="0.1.0",
+            source_timestamp_origin="forge",
             entity_type="network_device",
             event_type="snmp_trap",
         )
 
         assert record.timestamp.source_time is not None
-        assert record.timestamp.server_time is not None
+        # the NMS sends no server stamp; none is invented (one clock, FB-088)
+        assert record.timestamp.server_time is None
         assert record.timestamp.ingestion_time is not None
         assert record.timestamp.source_time.tzinfo is not None
-        assert record.timestamp.server_time.tzinfo is not None
 
     def test_record_tag_path_format(self):
         raw_event = {
@@ -77,6 +80,7 @@ class TestRecordBuilder:
             context=context,
             adapter_id="whk-nms",
             adapter_version="0.1.0",
+            source_timestamp_origin="forge",
             entity_type="network_device",
             event_type="infrastructure_alert",
         )
@@ -99,6 +103,7 @@ class TestRecordBuilder:
             context=context,
             adapter_id="whk-nms",
             adapter_version="0.1.0",
+            source_timestamp_origin="forge",
             entity_type="security_event",
             event_type="security_event",
         )
@@ -119,6 +124,7 @@ class TestRecordBuilder:
             context=context,
             adapter_id="whk-nms",
             adapter_version="0.1.0",
+            source_timestamp_origin="forge",
             entity_type="network_device",
             event_type="spof_detection",
         )
@@ -140,6 +146,7 @@ class TestRecordBuilder:
             context=context,
             adapter_id="whk-nms",
             adapter_version="0.1.0",
+            source_timestamp_origin="forge",
             entity_type="network_device",
             event_type="unknown",
         )
@@ -162,6 +169,7 @@ class TestRecordBuilder:
             context=context,
             adapter_id="whk-nms",
             adapter_version="0.1.0",
+            source_timestamp_origin="forge",
             entity_type="network_device",
             event_type="device_discovery",
         )
@@ -185,6 +193,7 @@ class TestRecordBuilder:
             context=context,
             adapter_id="whk-nms",
             adapter_version="0.1.0",
+            source_timestamp_origin="forge",
             entity_type="network_device",
             event_type="unknown",
         )
@@ -208,31 +217,38 @@ class TestRecordBuilder:
             context=context,
             adapter_id="whk-nms",
             adapter_version="0.1.0",
+            source_timestamp_origin="forge",
             entity_type="network_device",
             event_type="unknown",
         )
 
         assert "10.0.0.1" in record.source.tag_path
 
-    def test_record_missing_timestamp_defaults_to_now(self):
+    def test_record_missing_timestamp_is_refused_unless_the_adapter_declared_forge(self):
+        """One clock (FB-088): an NMS record without a timestamp gets no invented one."""
         raw_event = {"id": "test-001"}
-        # no timestamp field
-
         context = build_record_context(
             raw_event, entity_type="network_device", event_type="unknown"
         )
+        with pytest.raises(SourceStampMissingError, match=r"nms.network_device.*FB-088"):
+            build_contextual_record(
+                raw_event=raw_event,
+                context=context,
+                adapter_id="whk-nms",
+                adapter_version="0.1.0",
+                entity_type="network_device",
+                event_type="unknown",
+            )
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
             adapter_id="whk-nms",
             adapter_version="0.1.0",
+            source_timestamp_origin="forge",
+            poll_bound_seconds=60.0,
             entity_type="network_device",
             event_type="unknown",
         )
-
-        # Should have current timestamp
-        assert record.timestamp.source_time is not None
-        now = datetime.now(tz=UTC)
-        # Allow some time difference
-        time_diff = abs((now - record.timestamp.source_time).total_seconds())
-        assert time_diff < 5  # within 5 seconds
+        assert record.timestamp.source_clock == "forge"
+        assert record.timestamp.source_uncertainty_seconds == 60.0
+        assert record.timestamp.source_time == record.timestamp.ingestion_time

@@ -154,9 +154,13 @@ class TagRegistry:
         quality: QualityCode = QualityCode.GOOD,
         timestamp: datetime | None = None,
         source_timestamp: datetime | None = None,
+        server_timestamp: datetime | None = None,
     ) -> bool:
         """Update a tag's runtime value.
 
+        ``timestamp`` is the registry's read time and defaults to Forge's clock now;
+        ``source_timestamp`` and ``server_timestamp`` are the source's and the server's
+        stamps exactly as they came, None when they sent none (one clock, FB-088).
         Returns True if the value actually changed.
         Notifies change callbacks and returns dependent paths for re-evaluation.
         """
@@ -173,6 +177,7 @@ class TagRegistry:
         tv.quality = quality
         tv.timestamp = now
         tv.source_timestamp = source_timestamp
+        tv.server_timestamp = server_timestamp
         if changed:
             tv.change_count += 1
 

@@ -7,7 +7,7 @@
 **Phase:** TBD (forge-display)
 **MDEMG Analog:** None — new for forge-display
 
-> **Name note.** FDTS ("Display") would collide with the existing FDTS (Forge *Data* Test Specification), so this framework is FVTS — "View". Rename before approval if preferred; nothing references the ID yet.
+> **Name note.** FDTS ("Display") would collide with the existing FDTS (Forge *Data* Test Specification), so this framework is FVTS — "View". The owner confirmed the name on 2026-11-03 (D-4, item 1 below).
 
 ---
 
@@ -185,12 +185,14 @@ A golden message may carry `"profiles": [...]` to apply to some renderers only (
 | FPTS | Update-rate and history-latency budgets are verified by FPTS benchmarks |
 | FHTS | Integrity hashing and agent-change governance, as for every framework |
 
-## Open decisions (to confirm before approval)
+## Decisions (confirmed by the owner on 2026-11-03, roadmap D-4)
 
-1. **Framework ID** — FVTS ("View") vs another name. FDTS is taken.
-2. **`VIEWER` role** — FVTS adds it for read-only users; `WriteRole` has no equivalent. Either add it to the core role model or map read-only access elsewhere.
-3. **Write authority by profile** — baseline allows tag writes only from `desktop_hmi`. Confirm `desktop_app` (e.g., MES recipe or engineering writes) should not write in v0.1.0.
-4. **Mobile alarm acknowledgement** — baseline allows ACKNOWLEDGE from mobile. Some sites require acknowledgement only at the HMI.
-5. **Rate ceilings** — 20 / 10 / 4 / 1 Hz per profile are starting values.
-6. **Contract encoding on the wire** — proto messages for subscription, history and action results (likely under FTTS) are not yet defined.
-7. **Configured-screen format** — the layout schema for `configured` surfaces (HMI screens, dashboards) is a follow-on spec, not part of v0.1.0.
+Asked one at a time, each with a debt check (does the answer pin the framework in later?); none does. forge-display design (M4) is unblocked.
+
+1. **Framework ID** — FVTS stays. (Was: FVTS ("View") vs another name; FDTS is taken.) Debt check: the name is in paths, runner IDs and the CI gate; renaming later would have been a sweep.
+2. **`VIEWER` role** — `viewer` is the bottom rung of the D-1 ladder preset (`docs/decisions/roles.md` R-19), so FVTS's read-only role has a home in the core model. The binding itself moves from `required_role` to `required_scope` when FB-075 lands (`roles.md` §12), read-only access being the read scope. Debt check: one model, not a second read-only mapping.
+3. **Write authority by profile** — confirmed: only `desktop_hmi` writes tags in v0.1.0; `desktop_app` acts through the hub's write endpoint and module commands. Debt check: write authority is data in the profile baseline, so widening it later is a profile change.
+4. **Mobile alarm acknowledgement** — allowed by the baseline, with a per-site switch to turn it off; every acknowledgement records the profile it came from. Debt check: a profile flag either way; the switch avoids a per-site fork.
+5. **Rate ceilings** — 20 / 10 / 4 / 1 Hz per profile confirmed as starting values, revisited with measurements from the first forge-display surfaces. Debt check: numbers in the baseline, enforced server-side.
+6. **Contract encoding on the wire** — proto messages for subscription, history and action results, defined under FTTS and served over the Connect protocol (the Go tree's `connect-go`), which browsers reach over HTTP without a gRPC-Web proxy; no WebSocket or SSE side path. Debt check: one protocol for hub, modules and browsers; a second transport would have needed its own auth, versioning and tests.
+7. **Configured-screen format** — a follow-on spec, not part of v0.1.0; v0.1.0 surfaces are declared, not laid out, and no interim layout file ships before that spec. Debt check: nothing to migrate when the layout spec arrives.

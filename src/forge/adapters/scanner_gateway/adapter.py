@@ -38,6 +38,7 @@ from forge.adapters.scanner_gateway.server import (
     ScannerServiceHandler,
 )
 from forge.adapters.scanner_gateway.spoke_router import SpokeRouter
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -46,6 +47,7 @@ from forge.core.models.adapter import (
     AdapterTier,
     ConnectionParam,
     DataContract,
+    TimeGovernance,
 )
 
 logger = logging.getLogger(__name__)
@@ -69,6 +71,10 @@ def _load_manifest() -> AdapterManifest:
         connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
+        # the FACTS time_governance section, as the spoke's declaration (one clock, FB-090)
+        time_governance=(
+            TimeGovernance(**raw["time_governance"]) if raw.get("time_governance") else None
+        ),
     )
 
 
@@ -137,6 +143,7 @@ class ScannerGatewayAdapter(
         MockScannerServiceHandler as a fallback for testing/conformance.
         """
         self._config = ScannerGatewayConfig(**params)
+        self.check_time_governance()
         self._router = SpokeRouter(
             wms_adapter_id=self._config.wms_adapter_id,
             ims_adapter_id=self._config.ims_adapter_id,
@@ -218,6 +225,7 @@ class ScannerGatewayAdapter(
             last_healthy=self._last_healthy,
             records_collected=self._records_collected,
             records_failed=self._records_failed,
+            **self.refusal_health(),
         )
 
     # ── Core read interface (AdapterBase) ───────────────────────
@@ -253,6 +261,8 @@ class ScannerGatewayAdapter(
                     self._records_collected += 1
                     has_yielded = True
                     yield record
+                except SourceStampMissingError as exc:
+                    self.refuse(exc)
                 except Exception:
                     self._records_failed += 1
                     logger.exception("Failed to map scan event from queue")
@@ -266,6 +276,8 @@ class ScannerGatewayAdapter(
                 record = self._translate_and_route(scan_event)
                 self._records_collected += 1
                 yield record
+            except SourceStampMissingError as exc:
+                self.refuse(exc)
             except Exception:
                 self._records_failed += 1
                 logger.exception("Failed to map scan event")
@@ -282,6 +294,7 @@ class ScannerGatewayAdapter(
             context=context,
             adapter_id=self.adapter_id,
             adapter_version=self.manifest.version,
+            source_timestamp_origin=self.source_timestamp_origin,
         )
 
         # Annotate with routing info

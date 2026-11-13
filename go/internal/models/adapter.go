@@ -70,6 +70,31 @@ type AdapterManifest struct {
 	ConnectionParams      []ConnectionParam   `json:"connection_params,omitempty"`
 	AuthMethods           []string            `json:"auth_methods,omitempty"`
 	Metadata              map[string]any      `json:"metadata,omitempty"`
+	// TimeGovernance is the FACTS time_governance section (one clock, FB-090); nil only for
+	// a manifest built before FB-090. Proto field 13.
+	TimeGovernance *TimeGovernance `json:"time_governance,omitempty"`
+}
+
+// TimeGovernance is the FACTS time_governance section (one-clock record P-7): how a spoke
+// is time-governed. FailClosed must be true.
+type TimeGovernance struct {
+	TimeSource                string                     `json:"time_source"`
+	SyncProtocol              string                     `json:"sync_protocol"`
+	ClockReadMethod           string                     `json:"clock_read_method,omitempty"`
+	ClockProbeIntervalSeconds float64                    `json:"clock_probe_interval_seconds"`
+	SourceTimestampOrigin     string                     `json:"source_timestamp_origin"`
+	ToleranceClass            string                     `json:"tolerance_class"`
+	FailClosed                bool                       `json:"fail_closed"`
+	Connections               []ConnectionTimeGovernance `json:"connections,omitempty"`
+}
+
+// ConnectionTimeGovernance is a per-connection declaration inside TimeGovernance.
+type ConnectionTimeGovernance struct {
+	Name                      string   `json:"name"`
+	ClockReadMethod           string   `json:"clock_read_method,omitempty"`
+	ClockProbeIntervalSeconds *float64 `json:"clock_probe_interval_seconds,omitempty"`
+	SourceTimestampOrigin     string   `json:"source_timestamp_origin,omitempty"`
+	ToleranceClass            string   `json:"tolerance_class,omitempty"`
 }
 
 // AdapterHealth holds the current health status of an adapter instance.

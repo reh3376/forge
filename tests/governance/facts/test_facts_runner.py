@@ -72,6 +72,15 @@ def verdict_status():
     return VerdictStatus
 
 
+def _expected_fails(spec: dict[str, Any]) -> set[str]:
+    """The checks a real spec may fail: the hash state alone, while the owner's approval of
+    its newest stamp is pending. Only the owner approves (FB-021); an agent re-stamps and
+    leaves the spec ``pending_review``, which the runner reports as it should."""
+    if spec["integrity"]["hash_state"] == "approved":
+        return set()
+    return {"facts:integrity-hash-state"}
+
+
 def _run(coro):
     """Helper to run an async coroutine synchronously."""
     return asyncio.run(coro)
@@ -172,6 +181,14 @@ def _minimal_spec(**overrides: Any) -> dict[str, Any]:
                 "failed_after_failures": 10,
             },
         },
+        "time_governance": {
+            "time_source": "hub-ntp",
+            "sync_protocol": "ntp",
+            "clock_probe_interval_seconds": 30,
+            "source_timestamp_origin": "server",
+            "tolerance_class": "it-lan",
+            "fail_closed": True,
+        },
         "metadata": {"spoke": "test"},
         "integrity": {
             "hash_method": "sha256-c14n-v1",
@@ -216,7 +233,7 @@ class TestSchemaRunnerParity:
         assert extra == set(), f"Runner has extra fields not in schema: {extra}"
 
     def test_implemented_fields_count(self, runner):
-        assert len(runner.implemented_fields()) == 10
+        assert len(runner.implemented_fields()) == 11
 
     def test_framework_identity(self, runner):
         assert runner.framework == "FACTS"
@@ -670,6 +687,127 @@ class TestCheckErrorHandling:
 
 
 # =========================================================================
+# 9b. Unit Tests — _check_time_governance (one clock, FB-090)
+# =========================================================================
+
+
+class TestCheckTimeGovernance:
+    """Unit tests for _check_time_governance: the blocking ``facts:time-governed`` check."""
+
+    @staticmethod
+    def _verdict(runner, spec):
+        verdicts = runner._check_time_governance(spec)
+        assert [v.check_id for v in verdicts] == ["facts:time-governed"]
+        return verdicts[0]
+
+    def test_valid_declaration_passes(self, runner, verdict_status):
+        verdict = self._verdict(runner, _minimal_spec())
+        assert verdict.status == verdict_status.PASS
+        assert verdict.message.startswith("Time-governed:")
+
+    def test_missing_section_fails(self, runner, verdict_status):
+        spec = _minimal_spec()
+        del spec["time_governance"]
+        verdict = self._verdict(runner, spec)
+        assert verdict.status == verdict_status.FAIL
+        assert [v.field for v in verdict.violations] == ["time_governance"]
+
+    def test_an_undisciplined_clock_is_refused(self, runner, verdict_status):
+        spec = _minimal_spec()
+        spec["time_governance"]["sync_protocol"] = "none"
+        verdict = self._verdict(runner, spec)
+        assert verdict.status == verdict_status.FAIL
+        [violation] = verdict.violations
+        assert violation.field == "time_governance.sync_protocol" and violation.actual == "none"
+
+    def test_must_fail_closed(self, runner, verdict_status):
+        spec = _minimal_spec()
+        spec["time_governance"]["fail_closed"] = False
+        verdict = self._verdict(runner, spec)
+        assert verdict.status == verdict_status.FAIL
+        assert [v.field for v in verdict.violations] == ["time_governance.fail_closed"]
+
+    def test_probe_cadence_below_one_second(self, runner, verdict_status):
+        spec = _minimal_spec()
+        spec["time_governance"]["clock_probe_interval_seconds"] = 0.5
+        verdict = self._verdict(runner, spec)
+        assert verdict.status == verdict_status.FAIL
+        assert [v.field for v in verdict.violations] == [
+            "time_governance.clock_probe_interval_seconds"
+        ]
+
+    def test_enum_values_come_from_the_schema(self, runner, verdict_status):
+        spec = _minimal_spec()
+        spec["time_governance"]["time_source"] = "wristwatch"
+        spec["time_governance"]["tolerance_class"] = "T9"
+        spec["time_governance"]["source_timestamp_origin"] = "guess"
+        verdict = self._verdict(runner, spec)
+        assert verdict.status == verdict_status.FAIL
+        assert {v.field for v in verdict.violations} == {
+            "time_governance.time_source",
+            "time_governance.tolerance_class",
+            "time_governance.source_timestamp_origin",
+        }
+
+    def test_a_protocol_that_offers_a_clock_read_must_declare_one(self, runner, verdict_status):
+        spec = _minimal_spec()
+        spec["adapter_identity"]["protocol"] = "opcua"
+        verdict = self._verdict(runner, spec)
+        assert verdict.status == verdict_status.FAIL
+        [violation] = verdict.violations
+        assert violation.field == "time_governance.clock_read_method"
+        assert "offers a clock-read method" in violation.message
+        spec["time_governance"]["clock_read_method"] = "opcua-current-time"
+        assert self._verdict(runner, spec).status == verdict_status.PASS
+
+    def test_a_method_the_protocol_cannot_perform_is_refused(self, runner, verdict_status):
+        spec = _minimal_spec()
+        spec["adapter_identity"]["protocol"] = "opcua"
+        spec["time_governance"]["clock_read_method"] = "s7-clock"
+        verdict = self._verdict(runner, spec)
+        assert verdict.status == verdict_status.FAIL
+        [violation] = verdict.violations
+        assert "cannot perform" in violation.message
+
+    def test_a_method_on_a_protocol_the_hub_measures_is_refused(self, runner, verdict_status):
+        spec = _minimal_spec()  # protocol graphql: the hub measures this spoke
+        spec["time_governance"]["clock_read_method"] = "opcua-current-time"
+        verdict = self._verdict(runner, spec)
+        assert verdict.status == verdict_status.FAIL
+        [violation] = verdict.violations
+        assert violation.expected == "no method (the hub measures this spoke)"
+
+    def test_connections_are_checked_one_by_one(self, runner, verdict_status):
+        spec = _minimal_spec()
+        spec["adapter_identity"]["protocol"] = "opcua"
+        spec["time_governance"]["clock_read_method"] = "opcua-current-time"
+        spec["time_governance"]["connections"] = [
+            {
+                "name": "WHK01",
+                "clock_read_method": "opcua-response-header",
+                "source_timestamp_origin": "device",
+                "tolerance_class": "T0",
+                "clock_probe_interval_seconds": 10,
+            },
+            {"tolerance_class": "T0"},
+            {
+                "name": "WHK03",
+                "clock_read_method": "s7-clock",
+                "tolerance_class": "T9",
+                "clock_probe_interval_seconds": 0,
+            },
+        ]
+        verdict = self._verdict(runner, spec)
+        assert verdict.status == verdict_status.FAIL
+        assert [v.field for v in verdict.violations] == [
+            "time_governance.connections[1].name",
+            "time_governance.connections[2].clock_read_method",
+            "time_governance.connections[2].tolerance_class",
+            "time_governance.connections[2].clock_probe_interval_seconds",
+        ]
+
+
+# =========================================================================
 # 10. Unit Tests — _check_metadata
 # =========================================================================
 
@@ -843,8 +981,11 @@ class TestIntegrationWMS:
             f"NOT_IMPLEMENTED (parity violation): {[v.check_id for v in not_impl]}"
         )
         assert errors == [], f"ERROR verdicts: {[v.message for v in errors]}"
-        assert fails == [], f"FAIL verdicts: {[(v.check_id, v.message) for v in fails]}"
-        assert report.passed is True
+        expected = _expected_fails(wms_spec)
+        assert {v.check_id for v in fails} == expected, (
+            f"FAIL verdicts: {[(v.check_id, v.message) for v in fails]}"
+        )
+        assert report.passed is (not expected)
 
     def test_wms_hash_verified(self, runner, wms_spec):
         report = _run(runner.run(target="whk-wms", spec=wms_spec))
@@ -876,8 +1017,11 @@ class TestIntegrationMES:
             f"NOT_IMPLEMENTED (parity violation): {[v.check_id for v in not_impl]}"
         )
         assert errors == [], f"ERROR verdicts: {[v.message for v in errors]}"
-        assert fails == [], f"FAIL verdicts: {[(v.check_id, v.message) for v in fails]}"
-        assert report.passed is True
+        expected = _expected_fails(mes_spec)
+        assert {v.check_id for v in fails} == expected, (
+            f"FAIL verdicts: {[(v.check_id, v.message) for v in fails]}"
+        )
+        assert report.passed is (not expected)
 
     def test_mes_hash_verified(self, runner, mes_spec):
         report = _run(runner.run(target="forge-mes", spec=mes_spec))
@@ -907,8 +1051,8 @@ class TestCrossSpecConsistency:
     def test_both_specs_pass(self, runner, wms_spec, mes_spec):
         wms_report = _run(runner.run(target="whk-wms", spec=wms_spec))
         mes_report = _run(runner.run(target="forge-mes", spec=mes_spec))
-        assert wms_report.passed is True
-        assert mes_report.passed is True
+        assert wms_report.passed is (not _expected_fails(wms_spec))
+        assert mes_report.passed is (not _expected_fails(mes_spec))
 
     def test_both_hashes_verified(self, runner, wms_spec, mes_spec):
         wms_report = _run(runner.run(target="whk-wms", spec=wms_spec))

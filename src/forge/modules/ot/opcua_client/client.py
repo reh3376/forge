@@ -23,12 +23,13 @@ import logging
 import time
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from asyncua import Client as UaClient
 from asyncua import Node as UaNode
 from asyncua import ua
 
+from forge.modules.ot.opcua_client.clock_tap import ResponseHeaderTap, install_response_header_tap
 from forge.modules.ot.opcua_client.exceptions import (
     BrowseError,
     ConfigurationError,
@@ -62,6 +63,9 @@ from forge.modules.ot.opcua_client.types import (
     QualityCode,
     Subscription,
 )
+
+if TYPE_CHECKING:
+    from forge.core.clock import ClockSample, ClockSink
 
 logger = logging.getLogger(__name__)
 
@@ -177,22 +181,24 @@ def _convert_data_value(ua_dv: ua.DataValue) -> DataValue:
     # Extract the actual Python value from the Variant
     value = ua_dv.Value.Value if ua_dv.Value is not None else None
 
-    # Timestamps — asyncua gives datetime or None
-    source_ts = ua_dv.SourceTimestamp or datetime.now(UTC)
-    server_ts = ua_dv.ServerTimestamp or datetime.now(UTC)
-    if source_ts.tzinfo is None:
-        source_ts = source_ts.replace(tzinfo=UTC)
-    if server_ts.tzinfo is None:
-        server_ts = server_ts.replace(tzinfo=UTC)
-
+    # Timestamps: asyncua gives a datetime or None. None stays None. A stamp the server
+    # did not send is not invented here (one clock, FB-088); the record builder decides
+    # what may stand in for it, per the connection's declared source_timestamp_origin.
     return DataValue(
         value=value,
         data_type=data_type,
         quality=QualityCode.from_status_code(raw_status),
         status_code=raw_status,
-        source_timestamp=source_ts,
-        server_timestamp=server_ts,
+        source_timestamp=_aware_or_none(ua_dv.SourceTimestamp),
+        server_timestamp=_aware_or_none(ua_dv.ServerTimestamp),
     )
+
+
+def _aware_or_none(stamp: datetime | None) -> datetime | None:
+    """asyncua hands back naive UTC datetimes; make them aware, and keep None as None."""
+    if stamp is None:
+        return None
+    return stamp.replace(tzinfo=UTC) if stamp.tzinfo is None else stamp
 
 
 def _forge_node_id_to_ua(node_id: NodeId) -> ua.NodeId:
@@ -258,13 +264,10 @@ class _ForgeSubHandler:
             if hasattr(data, "monitored_item") and hasattr(data.monitored_item, "Value"):
                 forge_dv = _convert_data_value(data.monitored_item.Value)
             else:
-                # Fallback: construct from raw value
-                forge_dv = DataValue(
-                    value=val,
-                    quality=QualityCode.GOOD,
-                    source_timestamp=datetime.now(UTC),
-                    server_timestamp=datetime.now(UTC),
-                )
+                # Fallback: construct from the raw value. No stamps are invented for it
+                # (FB-088): the record builder refuses it, or stands Forge's read time
+                # in when the connection declares origin forge.
+                forge_dv = DataValue(value=val, quality=QualityCode.GOOD)
 
             self._client_ref._last_data_received = datetime.now(UTC)
             self._callback(node_id_str, forge_dv)
@@ -312,6 +315,7 @@ class OpcUaClient:
         request_timeout_ms: int = 10_000,
         reconnect_interval_ms: int = 1_000,
         max_reconnect_attempts: int = 0,
+        clock_sink: ClockSink | None = None,
     ) -> None:
         """Initialize the OPC-UA client.
 
@@ -323,6 +327,9 @@ class OpcUaClient:
             request_timeout_ms: Per-request timeout in milliseconds.
             reconnect_interval_ms: Initial reconnect delay (doubles with backoff).
             max_reconnect_attempts: Max reconnection attempts (0 = unlimited).
+            clock_sink: Receives a ClockSample of the server's clock from every
+                service response once connected (one clock, FB-094 step 2); the
+                connection supervisor sets it with ``set_clock_sink``.
 
         Raises:
             ConfigurationError: If the endpoint URL is invalid.
@@ -354,6 +361,11 @@ class OpcUaClient:
         self._reconnect_count = 0
         self._consecutive_failures = 0
         self._latency_ms: float | None = None
+        # The server's clock from every response (one clock, FB-094 step 2).
+        self._clock_sink: ClockSink | None = clock_sink
+        self._clock_tap: ResponseHeaderTap | None = None
+        self._last_clock_sample: ClockSample | None = None
+        self._clock_samples: int = 0
 
         # Subscription management (Forge-level tracking)
         self._subscriptions: dict[int, Subscription] = {}
@@ -418,7 +430,31 @@ class OpcUaClient:
             active_subscriptions=len(self._subscriptions),
             monitored_items_count=sum(s.node_count for s in self._subscriptions.values()),
             latency_ms=self._latency_ms,
+            server_clock_offset_seconds=(
+                self._last_clock_sample.offset_seconds if self._last_clock_sample else None
+            ),
+            server_clock_uncertainty_seconds=(
+                self._last_clock_sample.uncertainty_seconds if self._last_clock_sample else None
+            ),
+            clock_samples=self._clock_samples,
+            last_clock_sample_at=(
+                self._last_clock_sample.received_at if self._last_clock_sample else None
+            ),
         )
+
+    def set_clock_sink(self, sink: ClockSink | None) -> None:
+        """Route every clock sample the connection measures to ``sink`` (FB-094 step 2)."""
+        self._clock_sink = sink
+
+    @property
+    def last_clock_sample(self) -> ClockSample | None:
+        return self._last_clock_sample
+
+    def _on_clock_sample(self, sample: ClockSample) -> None:
+        self._last_clock_sample = sample
+        self._clock_samples += 1
+        if self._clock_sink is not None:
+            self._clock_sink(sample)
 
     # ------------------------------------------------------------------
     # Async context manager
@@ -481,6 +517,9 @@ class OpcUaClient:
             await self._ua_client.connect()
             self._latency_ms = (time.monotonic() - t0) * 1000.0
 
+            # Every response from here on also measures the server's clock (FB-094 step 2).
+            self._clock_tap = install_response_header_tap(self._ua_client, self._on_clock_sample)
+
             # Mark connected
             self._transition_state(ConnectionState.CONNECTED)
             self._connected_since = datetime.now(UTC)
@@ -529,6 +568,9 @@ class OpcUaClient:
         deletes asyncua subscriptions, closes the session, and
         releases the transport.
         """
+        if self._clock_tap is not None:
+            self._clock_tap.uninstall()
+            self._clock_tap = None
         logger.info("Disconnecting from %s...", self._endpoint.url)
 
         # Cancel reconnect task

@@ -20,6 +20,7 @@ from forge.core.models.adapter import (
     AdapterManifest,
     AdapterTier,
     DataContract,
+    TimeGovernance,
 )
 
 # ── Fixtures ─────────────────────────────────────────────────────
@@ -240,6 +241,14 @@ class TestMultiAdapterFlow:
                     tier=AdapterTier.MES_MOM,
                     data_contract=DataContract(
                         schema_ref=f"forge://schemas/{aid}/v0.1.0",
+                    ),
+                    # a bare reading carries no timestamp: the hub's read time may stand in
+                    # (FB-088), declared in the FACTS time_governance section (FB-090)
+                    time_governance=TimeGovernance(
+                        time_source="hub-ntp",
+                        sync_protocol="ntp",
+                        source_timestamp_origin="forge",
+                        tolerance_class="it-lan",
                     ),
                 ).model_dump(mode="json"),
             )

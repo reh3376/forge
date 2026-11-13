@@ -410,6 +410,80 @@ class TestControlComposition:
         assert [row["status"] for row in journal] == ["REJECTED_VALIDATION", "CONFIRMED"]
         assert journal[0]["requestor"] == "forge-ot-module"
 
+    def test_the_facts_declaration_is_the_default_origin(self, mock_registry):
+        """Without a connection-level declaration the manifest's section answers (FB-090)."""
+        from forge.modules.ot.tag_engine.models import StandardTag
+
+        adapter = OTModuleAdapter(registry=mock_registry)
+        governance = adapter.manifest.time_governance
+        assert governance is not None
+        assert governance.source_timestamp_origin == "server"
+        assert governance.clock_read_method == "opcua-current-time"
+        assert governance.tolerance_class == "T0" and governance.fail_closed is True
+        assert governance.clock_probe_interval_seconds == 30
+        tag = StandardTag(
+            path="WH/WHK09/Cooker01/TIT_2010/PV", opcua_node_id="ns=2;s=x", connection_name="WHK09"
+        )
+        assert adapter.source_timestamp_origin_for(tag) == "server"
+
+    @pytest.mark.asyncio
+    async def test_the_connection_spec_declares_the_source_timestamp_origin(self):
+        """The control config's connection is the first home of the declaration (FB-094 step 2)."""
+        from types import SimpleNamespace
+
+        from forge.modules.ot.control import ControlDependencies
+        from forge.modules.ot.tag_engine.models import StandardTag
+        from forge.modules.ot.tag_engine.registry import TagRegistry
+
+        adapter = OTModuleAdapter(
+            registry=TagRegistry(),
+            control=ControlDependencies(
+                write_dispatcher=AsyncMock(),
+                tag_io=self._Plc(),
+                plc_client_factory=lambda spec: SimpleNamespace(name=spec.name),
+            ),
+        )
+        doc = self._control_doc()
+        doc["connections"] = [
+            {
+                "name": "WHK01",
+                "endpoint": "opc.tcp://10.0.0.1:4840",
+                "source_timestamp_origin": "device",
+            },
+            {"name": "WHK02", "endpoint": "opc.tcp://10.0.0.2:4840"},
+        ]
+        doc["connection_poll_seconds"] = 0
+        await adapter.configure({"control_config": doc, "source_timestamp_origin": {"*": "forge"}})
+
+        def tag(connection: str) -> StandardTag:
+            return StandardTag(
+                path=f"WH/{connection}/Cooker01/TIT_2010/PV",
+                opcua_node_id="ns=2;s=x",
+                connection_name=connection,
+            )
+
+        assert adapter.source_timestamp_origin_for(tag("WHK01")) == "device"
+        assert adapter.source_timestamp_origin_for(tag("WHK02")) == "forge"  # the params' default
+        assert adapter.source_timestamp_origin_for(tag("WHK03")) == "forge"
+
+        # the clock estimate for the correction on entry comes from the manager (FB-094 step 3)
+        from forge.core.clock import SERVER_LINK
+
+        assert adapter.clock_estimate_for(tag("WHK01")) is None
+        manager = adapter.control_runtime.connections
+        manager.offsets.observe(
+            "WHK01",
+            SERVER_LINK,
+            1.5,
+            datetime.now(tz=UTC),
+            round_trip=0.01,
+            clock_id="device:WHK01",
+        )
+        estimate = adapter.clock_estimate_for(tag("WHK01"))
+        assert estimate is not None and estimate.clock_id == "device:WHK01"
+        assert estimate.offset_seconds == 1.5
+        assert adapter.clock_estimate_for(tag("WHK03")) is None
+
     @pytest.mark.asyncio
     async def test_area_rules_configure_the_area_resolver(self, mock_registry):
         adapter = OTModuleAdapter(registry=mock_registry)

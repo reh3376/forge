@@ -36,6 +36,7 @@ from forge.adapters.base.interface import (
     SubscriptionProvider,
     WritableAdapter,
 )
+from forge.core.clock import SOURCE_TIMESTAMP_ORIGINS, SourceStampMissingError
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -43,6 +44,7 @@ from forge.core.models.adapter import (
     AdapterState,
     AdapterTier,
     DataContract,
+    TimeGovernance,
 )
 from forge.modules.ot.context.record_builder import build_ot_record
 from forge.modules.ot.context.resolvers import AreaResolver, AreaRule, EnrichmentPipeline
@@ -54,10 +56,29 @@ from forge.modules.ot.control.runtime import ControlDependencies, ControlRuntime
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Callable
 
+    from forge.core.clock import ClockEstimate
     from forge.core.models.contextual_record import ContextualRecord
+    from forge.modules.ot.tag_engine.models import BaseTag
     from forge.modules.ot.tag_engine.registry import TagRegistry
 
 logger = logging.getLogger(__name__)
+
+
+def parse_source_timestamp_origins(declared: Any) -> dict[str, str]:
+    """``source_timestamp_origin`` from ``configure`` params: a string, or a dict by connection.
+
+    Every value must be one of the one-clock record's origins; anything else is a
+    configuration error and is refused at configure time.
+    """
+    mapping = {"*": declared} if isinstance(declared, str) else dict(declared)
+    for connection, origin in mapping.items():
+        if origin not in SOURCE_TIMESTAMP_ORIGINS:
+            msg = (
+                f"source_timestamp_origin for connection {connection!r} must be one of "
+                f"{SOURCE_TIMESTAMP_ORIGINS}; got {origin!r}"
+            )
+            raise ValueError(msg)
+    return mapping
 
 
 class OTModuleAdapter(
@@ -96,6 +117,16 @@ class OTModuleAdapter(
             context_fields=["area", "equipment_id", "operating_mode"],
         ),
         health_check_interval_ms=5000,
+        # One clock (FB-090): the module's defaults; each PLC connection declares its own
+        # origin and cadence in the control config (PlcConnectionSpec), which must agree.
+        time_governance=TimeGovernance(
+            time_source="hub-ntp",
+            sync_protocol="ntp",
+            clock_read_method="opcua-current-time",
+            clock_probe_interval_seconds=30,
+            source_timestamp_origin="server",
+            tolerance_class="T0",
+        ),
     )
 
     def __init__(
@@ -117,6 +148,9 @@ class OTModuleAdapter(
         self._next_sub_id: int = 0
         self._started_at: datetime | None = None
         self._hub_connected: bool = True
+        # connection name -> declared source_timestamp_origin ("*" applies to every
+        # connection); the FACTS time_governance section takes this over with FB-090.
+        self._source_timestamp_origins: dict[str, str] = {}
 
     @property
     def control_runtime(self) -> ControlRuntime | None:
@@ -136,8 +170,17 @@ class OTModuleAdapter(
             - area_rules: List of AreaRule dicts (pattern, area, site)
             - control_config: OTControlConfig document (dict)
             - control_config_path: path to an OTControlConfig JSON file
+            - source_timestamp_origin: which clock stamps each connection's values
+              (one-clock record P-4: ``device``, ``server``, ``edge`` or ``forge``),
+              one string for every connection or a dict keyed by connection name
+              (``"*"`` as the default). A value that arrives without a source stamp
+              on a connection not declared ``forge`` is refused (FB-088).
         """
         self._state = AdapterState.CONNECTING
+
+        declared = params.get("source_timestamp_origin")
+        if declared is not None:
+            self._source_timestamp_origins = parse_source_timestamp_origins(declared)
 
         if self._buffer is None and params.get("buffer_db_path"):
             self._buffer = StoreForwardBuffer(
@@ -216,7 +259,43 @@ class OTModuleAdapter(
             records_collected=self._records_collected,
             records_failed=self._records_failed,
             uptime_seconds=uptime,
+            **self.refusal_health(),
         )
+
+    def source_timestamp_origin_for(self, tag: BaseTag) -> str | None:
+        """The origin declared for the tag's connection, or None (FB-088).
+
+        The connection's spec in the control config declares it first (FB-094 step 2:
+        the same declaration names the clock the probe measures), then the ``configure``
+        params' map, then the FACTS ``time_governance`` declaration on the manifest
+        (FB-090): the connection's own entry, else the module's default.
+        """
+        connection = getattr(tag, "connection_name", None)
+        if not connection:
+            return None
+        if self._control is not None:
+            for spec in self._control.config.connections:
+                if spec.name == connection and spec.source_timestamp_origin:
+                    return spec.source_timestamp_origin
+        origins = self._source_timestamp_origins
+        declared = origins.get(connection) or origins.get("*")
+        if declared:
+            return declared
+        # the FACTS declaration (FB-090): the spoke's default, or the connection's own entry
+        governance = self.manifest.time_governance
+        return governance.origin_for(connection) if governance is not None else None
+
+    def clock_estimate_for(self, tag: BaseTag) -> ClockEstimate | None:
+        """The measured estimate of the clock the tag's connection declared (FB-094 step 3).
+
+        It comes from the control runtime's connection manager, whose probe and
+        response-header tap keep the series; None for a tag without a connection, a
+        connection the manager does not own, or a clock not read yet.
+        """
+        connection = getattr(tag, "connection_name", None)
+        if not connection or self._control is None or self._control.connections is None:
+            return None
+        return self._control.connections.clock_estimate(connection)
 
     # ------------------------------------------------------------------
     # AdapterBase.collect() — core read interface
@@ -241,9 +320,13 @@ class OTModuleAdapter(
                     tag=tag,
                     tag_value=tag_value,
                     enrichment=enrichment,
+                    source_timestamp_origin=self.source_timestamp_origin_for(tag),
+                    clock=self.clock_estimate_for(tag),
                 )
                 self._records_collected += 1
                 yield record
+            except SourceStampMissingError as exc:
+                self.refuse(exc)
             except Exception:
                 self._records_failed += 1
                 logger.exception("Failed to build record for %s", path)
@@ -424,7 +507,12 @@ class OTModuleAdapter(
                 tag=tag,
                 tag_value=tag_value,
                 enrichment=enrichment,
+                source_timestamp_origin=self.source_timestamp_origin_for(tag),
+                clock=self.clock_estimate_for(tag),
             )
+        except SourceStampMissingError as exc:
+            self.refuse(exc)
+            return
         except Exception:
             self._records_failed += 1
             return
