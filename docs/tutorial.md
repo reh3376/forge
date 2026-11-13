@@ -1436,6 +1436,7 @@ note:
 | D-8 | FACTS vocabulary for OT adapters | decided 2026-11-03: extend the enums; FB-079 can start |
 | D-9 | One clock: which established standards to adopt (`docs/decisions/one-clock-ot-source-time.md`) | signed 2026-11-03; FB-088 done 2026-11-13, FB-090 to FB-094 in the record's step order |
 | D-10 | One schema registry (`docs/decisions/one-schema-registry.md`) | signed 2026-11-03; FB-097's eight steps |
+| D-11 | Three-layer process control framework, PC-L1/PC-L2/PC-L3 (`docs/decisions/process-control-framework.md`) | signed 2026-11-13 by the owner; Forge review done; the FSDs follow the owner's round-4 answers (FB-110) |
 
 On 2026-11-03 the owner answered the open questions **one at a time** (34 answers) and declared the answers the signature; every gated item can start. Two standing rules came with the answers: no silent failure, and no decision that pins the platform in.
 
