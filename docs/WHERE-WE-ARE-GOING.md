@@ -66,7 +66,7 @@ The decision-free items done so far: FB-022, FB-026, FB-084, FB-085, FB-086, FB-
 
 ---
 
-**Resumed (2026-11-13):** PR 93, the owner's own, added D-11, the three-layer process control framework (`ROADMAP.md` WS-12). Development continues on `reh3376_dev01`: FB-090 first (done 2026-11-13: no open question, and the framework's MPC deployment is a spoke under the one-clock rules that now declares its time governance like every spoke), then FB-093 (next), FB-092, FB-091; the process-control FSDs start once the owner has answered the Forge review's nine questions (`ROADMAP.md` §5, D-11); FB-097's eight steps, FB-017 and the forge-mes steps follow.
+**Resumed (2026-11-13):** PR 93, the owner's own, added D-11, the three-layer process control framework (`ROADMAP.md` WS-12). Development continues on `reh3376_dev01`: FB-090 first (done 2026-11-13: no open question, and the framework's MPC deployment is a spoke under the one-clock rules that now declares its time governance like every spoke), then FB-114 (next: the tutorial review the owner asked for on 2026-11-13), FB-093, FB-092, FB-091; the process-control FSDs start once the owner has answered the Forge review's nine questions (`ROADMAP.md` §5, D-11); FB-097's eight steps, FB-017 and the forge-mes steps follow.
 
 ## 5. What gates the route
 
