@@ -101,10 +101,8 @@ def build_contextual_record(
         ),
         # This system sends no server stamp; none is invented (FB-088).
         timestamp=RecordTimestamp(
-            source_time=stamp.source_time,
+            **stamp.timestamp_fields(),
             ingestion_time=now,
-            source_clock=stamp.source_clock,
-            source_uncertainty_seconds=stamp.source_uncertainty_seconds,
         ),
         value=RecordValue(
             raw=json.dumps(payload, default=str, ensure_ascii=False),

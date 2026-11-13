@@ -43,6 +43,17 @@ export interface ContextualRecordMessage {
      *  bridge's own clock stood in for an event that carried no time (FB-088). */
     source_clock?: string;
     source_uncertainty_seconds?: number;
+    /** The remaining one-clock fields (P-3, FB-094 step 3): the stamp as sent, the offset
+     *  the spoke subtracted and the time quality. The bridge measures no clock and sets none;
+     *  the Go rewrite (FB-076) inherits them from the SDK. */
+    source_time_as_sent?: ProtoTimestamp;
+    source_offset_seconds?: number;
+    time_quality?: {
+      synchronized?: boolean;
+      clock_failure?: boolean;
+      leap_seconds_known?: boolean;
+      accuracy_class: string;
+    };
   };
   value: { json_value: string; quality: QualityCode; data_type: string };
   context: {

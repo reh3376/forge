@@ -4,7 +4,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from forge.core.clock import SourceStampMissingError
+from forge.core.clock import ClockEstimate, SourceStampMissingError
 from forge.core.models.contextual_record import (
     ContextualRecord,
 )
@@ -175,6 +175,59 @@ class TestBuildOtRecord:
         )
         assert record.timestamp.source_time == sample_value.source_timestamp
         assert record.timestamp.source_clock == "device:WHK01"
+
+    def test_a_measured_clock_corrects_the_stamps_on_entry(self, sample_tag, full_enrichment):
+        """The device's offset is subtracted where the stamp enters (one-clock record P-3, P-10)."""
+        read_at = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
+        value = TagValue(
+            value=1.0,
+            quality=QualityCode.GOOD,
+            timestamp=read_at,
+            source_timestamp=read_at + timedelta(seconds=2),  # the PLC runs 2 s ahead
+            server_timestamp=read_at + timedelta(seconds=2, milliseconds=10),
+        )
+        estimate = ClockEstimate("device:WHK01", 2.0, 0.004, within_tolerance=True)
+        record = build_ot_record(
+            tag=sample_tag,
+            tag_value=value,
+            enrichment=full_enrichment,
+            source_timestamp_origin="device",
+            clock=estimate,
+        )
+        ts = record.timestamp
+        assert ts.source_time == read_at  # corrected to master time
+        assert ts.source_time_as_sent == read_at + timedelta(seconds=2)
+        assert ts.source_offset_seconds == 2.0 and ts.source_clock == "device:WHK01"
+        assert ts.server_time == read_at + timedelta(milliseconds=10)  # the same clock, corrected
+        assert ts.source_uncertainty_seconds == pytest.approx(1.004)  # half RTT + 1 s scan
+        assert ts.time_quality is not None and ts.time_quality.synchronized is True
+
+    def test_without_a_measured_clock_the_stamp_stands_as_sent(
+        self, sample_tag, sample_value, full_enrichment
+    ):
+        record = build_ot_record(
+            tag=sample_tag,
+            tag_value=sample_value,
+            enrichment=full_enrichment,
+            source_timestamp_origin="device",
+        )
+        ts = record.timestamp
+        assert ts.source_time == sample_value.source_timestamp == ts.source_time_as_sent
+        assert ts.source_offset_seconds is None and ts.time_quality is None
+        assert ts.server_time == sample_value.server_timestamp
+
+    def test_an_estimate_of_another_clock_does_not_correct(
+        self, sample_tag, sample_value, full_enrichment
+    ):
+        record = build_ot_record(
+            tag=sample_tag,
+            tag_value=sample_value,
+            enrichment=full_enrichment,
+            source_timestamp_origin="server",
+            clock=ClockEstimate("device:WHK01", 2.0, None, True),
+        )
+        assert record.timestamp.source_offset_seconds is None
+        assert record.timestamp.source_time == sample_value.source_timestamp
 
     def test_forge_born_tag_has_forge_as_its_source_clock(self, full_enrichment):
         """A memory tag has no connection: Forge's clock is its source clock by nature."""

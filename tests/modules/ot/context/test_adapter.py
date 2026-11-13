@@ -450,6 +450,24 @@ class TestControlComposition:
         assert adapter.source_timestamp_origin_for(tag("WHK02")) == "forge"  # the params' default
         assert adapter.source_timestamp_origin_for(tag("WHK03")) == "forge"
 
+        # the clock estimate for the correction on entry comes from the manager (FB-094 step 3)
+        from forge.core.clock import SERVER_LINK
+
+        assert adapter.clock_estimate_for(tag("WHK01")) is None
+        manager = adapter.control_runtime.connections
+        manager.offsets.observe(
+            "WHK01",
+            SERVER_LINK,
+            1.5,
+            datetime.now(tz=UTC),
+            round_trip=0.01,
+            clock_id="device:WHK01",
+        )
+        estimate = adapter.clock_estimate_for(tag("WHK01"))
+        assert estimate is not None and estimate.clock_id == "device:WHK01"
+        assert estimate.offset_seconds == 1.5
+        assert adapter.clock_estimate_for(tag("WHK03")) is None
+
     @pytest.mark.asyncio
     async def test_area_rules_configure_the_area_resolver(self, mock_registry):
         adapter = OTModuleAdapter(registry=mock_registry)
