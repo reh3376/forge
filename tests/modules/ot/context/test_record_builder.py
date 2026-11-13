@@ -86,7 +86,8 @@ class TestBuildOtRecord:
         assert record.timestamp.server_time == sample_value.server_timestamp
         assert record.timestamp.ingestion_time is not None
         assert record.timestamp.source_clock is None  # the connection has not declared one
-        assert record.timestamp.source_uncertainty_seconds is None
+        # the tag's sampling bound (P-6): a STANDARD scan class value occurred within 1 s
+        assert record.timestamp.source_uncertainty_seconds == 1.0
 
     def test_record_value_fields(self, sample_tag, sample_value, full_enrichment):
         record = build_ot_record(tag=sample_tag, tag_value=sample_value, enrichment=full_enrichment)
@@ -228,6 +229,21 @@ class TestBuildOtRecord:
         )
         assert record.timestamp.source_offset_seconds is None
         assert record.timestamp.source_time == sample_value.source_timestamp
+
+    def test_a_query_tag_is_bounded_by_its_poll_interval(self, full_enrichment):
+        """The acquisition's own bound goes on the value (one-clock record P-6)."""
+        from forge.modules.ot.tag_engine.models import QueryTag
+
+        tag = QueryTag(path="WH/WHK01/DB/Count", query="select 1", poll_interval_ms=5000)
+        read_at = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
+        value = TagValue(
+            value=7, quality=QualityCode.GOOD, timestamp=read_at, source_timestamp=read_at
+        )
+        record = build_ot_record(
+            tag=tag, tag_value=value, enrichment=full_enrichment, source_timestamp_origin="server"
+        )
+        assert record.timestamp.source_uncertainty_seconds == 5.0
+        assert record.timestamp.source_clock == "server:default"
 
     def test_forge_born_tag_has_forge_as_its_source_clock(self, full_enrichment):
         """A memory tag has no connection: Forge's clock is its source clock by nature."""

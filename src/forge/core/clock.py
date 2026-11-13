@@ -561,6 +561,7 @@ def resolve_source_stamp(
     tag_path: str | None = None,
     detail: str | None = None,
     clock: ClockEstimate | None = None,
+    sampling_bound_seconds: float | None = None,
 ) -> SourceStamp:
     """The source stamp of one value, never invented (FB-088), corrected on entry (FB-094).
 
@@ -578,13 +579,19 @@ def resolve_source_stamp(
     ``source_clock`` is ``forge`` and ``poll_bound_seconds`` is recorded as the
     uncertainty. Anything else raises :class:`SourceStampMissingError`, which the
     adapter counts on its health.
+
+    Two bounds (one-clock record P-6): ``sampling_bound_seconds`` is how far a stamp
+    the source applied at poll may sit from the occurrence (an OT tag's scan or poll
+    interval; None for an event the source stamped at the instant), and goes on every
+    stamped value, added to the clock's bound once corrected; ``poll_bound_seconds`` is
+    the bound on Forge's own read time when it stands in.
     """
     if stamp is not None:
         # passed through as it came: RecordTimestamp is the one-clock gate (a naive stamp
         # fails there with the field named)
         clock_name = source_clock_name(origin, connection) if origin != FORGE_CLOCK else None
         if clock is not None and clock_name is not None and clock.clock_id == clock_name:
-            uncertainty = (clock.uncertainty_seconds or 0.0) + (poll_bound_seconds or 0.0)
+            uncertainty = (clock.uncertainty_seconds or 0.0) + (sampling_bound_seconds or 0.0)
             return SourceStamp(
                 source_time=clock.correct(stamp),
                 source_clock=clock_name,
@@ -593,7 +600,7 @@ def resolve_source_stamp(
                 source_offset_seconds=clock.offset_seconds,
                 time_quality=TimeQuality(synchronized=clock.within_tolerance, clock_failure=False),
             )
-        return SourceStamp(stamp, clock_name, None, source_time_as_sent=stamp)
+        return SourceStamp(stamp, clock_name, sampling_bound_seconds, source_time_as_sent=stamp)
     if origin == FORGE_CLOCK:
         return SourceStamp(read_at, FORGE_CLOCK, poll_bound_seconds)
     source_clock_name(origin, connection)  # an unknown origin is a configuration error

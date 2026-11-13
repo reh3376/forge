@@ -147,7 +147,7 @@ class TestCorrectionOnEntry:
             STAMP,
             origin="device",
             read_at=READ_AT,
-            poll_bound_seconds=1.0,
+            sampling_bound_seconds=1.0,  # the tag's scan interval (P-6)
             adapter_id="ot",
             connection="WHK01",
             clock=self.ESTIMATE,
@@ -254,3 +254,47 @@ class TestTimeQuality:
         assert dumped["time_quality"]["accuracy_class"] == "T0"
         with pytest.raises(ValidationError, match="source_time_as_sent must be timezone-aware"):
             RecordTimestamp(source_time=STAMP, source_time_as_sent=STAMP.replace(tzinfo=None))
+
+
+class TestSamplingBound:
+    """The acquisition's bound goes on every stamped value (one-clock record P-6)."""
+
+    def test_an_uncorrected_stamp_carries_the_sampling_bound(self) -> None:
+        stamp = resolve_source_stamp(
+            STAMP,
+            origin="server",
+            read_at=READ_AT,
+            adapter_id="ot",
+            connection="WHK01",
+            sampling_bound_seconds=1.0,
+        )
+        assert stamp.source_uncertainty_seconds == 1.0 and stamp.source_offset_seconds is None
+
+    def test_an_event_the_source_stamped_at_the_instant_has_none(self) -> None:
+        stamp = resolve_source_stamp(STAMP, origin=None, read_at=READ_AT, adapter_id="whk-wms")
+        assert stamp.source_uncertainty_seconds is None
+
+    def test_a_corrected_stamp_adds_the_clock_s_bound(self) -> None:
+        estimate = ClockEstimate("server:WHK01", 1.0, 0.002, within_tolerance=True)
+        stamp = resolve_source_stamp(
+            STAMP,
+            origin="server",
+            read_at=READ_AT,
+            adapter_id="ot",
+            connection="WHK01",
+            clock=estimate,
+            sampling_bound_seconds=0.5,
+            poll_bound_seconds=9.0,
+        )
+        assert stamp.source_uncertainty_seconds == pytest.approx(0.502)
+
+    def test_forge_s_own_read_time_uses_the_poll_bound(self) -> None:
+        stamp = resolve_source_stamp(
+            None,
+            origin="forge",
+            read_at=READ_AT,
+            adapter_id="ot",
+            poll_bound_seconds=5.0,
+            sampling_bound_seconds=0.5,
+        )
+        assert stamp.source_uncertainty_seconds == 5.0
