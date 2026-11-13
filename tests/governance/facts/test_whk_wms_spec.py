@@ -320,18 +320,27 @@ class TestIntegrity:
         computed = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
         assert computed == spec["integrity"]["spec_hash"]
 
-    def test_hash_state_is_approved(self, spec):
-        assert spec["integrity"]["hash_state"] == "approved"
+    def test_hash_state_is_approved_or_awaiting_the_owner(self, spec):
+        """Only the owner approves a stamp (FB-021); until then the spec says so."""
+        integrity = spec["integrity"]
+        assert integrity["hash_state"] in {"approved", "pending_review"}
+        if integrity["hash_state"] == "pending_review":
+            assert "approved_by" not in integrity and "approved_at" not in integrity
+            assert integrity["change_history"][0]["source"] == "agent"
 
-    def test_approved_by_is_set(self, spec):
-        assert spec["integrity"]["approved_by"] is not None
-        assert len(spec["integrity"]["approved_by"]) > 0
+    def test_approved_by_names_the_approver_when_approved(self, spec):
+        integrity = spec["integrity"]
+        if integrity["hash_state"] == "approved":
+            assert integrity["approved_by"]
+        else:
+            assert integrity.get("approved_by") is None
 
     def test_change_history_has_initial_entry(self, spec):
         ch = spec["integrity"]["change_history"]
         assert len(ch) >= 1
-        assert ch[0]["source"] == "manual"
-        assert ch[0]["change_type"] == "structural"
+        # the stamp puts the newest entry first; the initial creation is the oldest
+        assert ch[-1]["source"] == "manual"
+        assert ch[-1]["change_type"] == "structural"
 
     def test_hash_method_is_normative(self, spec):
         assert spec["integrity"]["hash_method"] == "sha256-c14n-v1"

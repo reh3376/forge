@@ -75,6 +75,11 @@ class FactsVocabulary:
     collection_modes: frozenset[str]
     enrichment_rule_types: frozenset[str]
     backoff_strategies: frozenset[str]
+    time_sources: frozenset[str]
+    sync_protocols: frozenset[str]
+    clock_read_methods: frozenset[str]
+    source_timestamp_origins: frozenset[str]
+    tolerance_classes: frozenset[str]
 
     #: Attribute → path of its enum in the schema (also the parity test's table).
     PATHS: ClassVar[dict[str, tuple[str, ...]]] = {
@@ -89,6 +94,11 @@ class FactsVocabulary:
         "collection_modes": ("data_contract", "data_sources", "[]", "collection_mode"),
         "enrichment_rule_types": ("context_mapping", "enrichment_rules", "[]", "rule_type"),
         "backoff_strategies": ("error_handling", "retry_policy", "backoff_strategy"),
+        "time_sources": ("time_governance", "time_source"),
+        "sync_protocols": ("time_governance", "sync_protocol"),
+        "clock_read_methods": ("time_governance", "clock_read_method"),
+        "source_timestamp_origins": ("time_governance", "source_timestamp_origin"),
+        "tolerance_classes": ("time_governance", "tolerance_class"),
     }
 
     @classmethod
@@ -110,6 +120,35 @@ VALID_SOURCE_TYPES = VOCABULARY.source_types
 VALID_COLLECTION_MODES = VOCABULARY.collection_modes
 VALID_ENRICHMENT_RULE_TYPES = VOCABULARY.enrichment_rule_types
 VALID_BACKOFF_STRATEGIES = VOCABULARY.backoff_strategies
+VALID_TIME_SOURCES = VOCABULARY.time_sources
+VALID_SYNC_PROTOCOLS = VOCABULARY.sync_protocols
+VALID_CLOCK_READ_METHODS = VOCABULARY.clock_read_methods
+VALID_SOURCE_TIMESTAMP_ORIGINS = VOCABULARY.source_timestamp_origins
+VALID_TOLERANCE_CLASSES = VOCABULARY.tolerance_classes
+
+#: Which clock-read methods a protocol token makes possible (one-clock record P-2). A spoke
+#: whose protocol offers none is measured by the hub instead (FB-089, FB-092); one whose
+#: protocol offers some must declare one of them, and may not declare another.
+CLOCK_READ_METHODS_BY_PROTOCOL: dict[str, frozenset[str]] = {
+    "opcua": frozenset({"opcua-response-header", "opcua-current-time"}),
+    "opc-ua": frozenset({"opcua-response-header", "opcua-current-time"}),
+    "cip": frozenset({"cip-wall-clock-time"}),
+    "ethernet-ip": frozenset({"cip-wall-clock-time"}),
+    "ethernetip": frozenset({"cip-wall-clock-time"}),
+    "logix": frozenset({"cip-wall-clock-time"}),
+    "s7": frozenset({"s7-clock"}),
+    "modbus": frozenset({"modbus-registers"}),
+    "sparkplug": frozenset({"sparkplug-payload-timestamp"}),
+}
+
+
+def clock_read_methods_for(protocol: str) -> frozenset[str]:
+    """The clock-read methods a spoke's declared protocol can perform."""
+    offered: set[str] = set()
+    for token in re.split(r"[+/, ]+", protocol.strip().lower()):
+        offered |= CLOCK_READ_METHODS_BY_PROTOCOL.get(token, frozenset())
+    return frozenset(offered)
+
 
 ADAPTER_ID_PATTERN = re.compile(r"^[a-z][a-z0-9-]*$")
 SEMVER_PATTERN = re.compile(r"^\d+\.\d+\.\d+")
@@ -148,6 +187,7 @@ class FACTSRunner(FxTSRunner):
         "data_contract",
         "context_mapping",
         "error_handling",
+        "time_governance",
         "metadata",
         "integrity",
     }
@@ -207,6 +247,7 @@ class FACTSRunner(FxTSRunner):
         verdicts.extend(self._check_data_contract(spec))
         verdicts.extend(self._check_context_mapping(spec))
         verdicts.extend(self._check_error_handling(spec))
+        verdicts.extend(self._check_time_governance(spec))
         verdicts.append(self._check_metadata(spec))
         verdicts.extend(self._check_integrity(spec))
 
@@ -1254,6 +1295,231 @@ class FACTSRunner(FxTSRunner):
     # ------------------------------------------------------------------
     # metadata (free-form — always passes if present as dict)
     # ------------------------------------------------------------------
+
+    # ------------------------------------------------------------------
+    # facts:time-governed — one clock (FB-090, one-clock record P-7)
+    # ------------------------------------------------------------------
+
+    def _check_time_governance(self, spec: dict[str, Any]) -> list[FxTSVerdict]:
+        """The spoke declares how it is time-governed, and the declaration is coherent.
+
+        Blocking. Fails a spec that omits the section, declares ``none`` for the
+        sync protocol, does not fail closed, names a clock-read method its protocol
+        cannot perform, or omits the method when its protocol offers one. The owner's
+        rule (2026-10-18): the requirement and its checks are not optional.
+        """
+        tg = spec.get("time_governance")
+        ref = "FACTS/time_governance"
+        if not isinstance(tg, dict):
+            return [
+                FxTSVerdict(
+                    check_id="facts:time-governed",
+                    spec_ref=ref,
+                    status=VerdictStatus.FAIL,
+                    message="No time_governance section: the spoke does not declare how it is "
+                    "time-governed (one clock, FB-090).",
+                    violations=[
+                        SpecViolation(
+                            field="time_governance",
+                            expected="object (one-clock record P-7)",
+                            actual=_short(tg),
+                            message="Section missing.",
+                        )
+                    ],
+                )
+            ]
+        vocab = self.vocabulary
+        protocol = str(spec.get("adapter_identity", {}).get("protocol", ""))
+        offered = clock_read_methods_for(protocol)
+        violations: list[SpecViolation] = []
+
+        def enum_check(field: str, value: Any, allowed: frozenset[str], *, required: bool) -> None:
+            if value is None:
+                if required:
+                    violations.append(
+                        SpecViolation(
+                            field=field,
+                            expected=str(sorted(allowed)),
+                            actual=None,
+                            message="Required.",
+                        )
+                    )
+                return
+            if value not in allowed:
+                violations.append(
+                    SpecViolation(
+                        field=field,
+                        expected=str(sorted(allowed)),
+                        actual=_short(value),
+                        message="Not in the schema enum.",
+                    )
+                )
+
+        enum_check(
+            "time_governance.time_source", tg.get("time_source"), vocab.time_sources, required=True
+        )
+        sync = tg.get("sync_protocol")
+        enum_check("time_governance.sync_protocol", sync, vocab.sync_protocols, required=True)
+        if sync == "none":
+            violations.append(
+                SpecViolation(
+                    field="time_governance.sync_protocol",
+                    expected="a disciplining protocol",
+                    actual="none",
+                    message="An undisciplined clock is not a valid source (owner, 2026-10-18).",
+                )
+            )
+        enum_check(
+            "time_governance.source_timestamp_origin",
+            tg.get("source_timestamp_origin"),
+            vocab.source_timestamp_origins,
+            required=True,
+        )
+        enum_check(
+            "time_governance.tolerance_class",
+            tg.get("tolerance_class"),
+            vocab.tolerance_classes,
+            required=True,
+        )
+        interval = tg.get("clock_probe_interval_seconds")
+        if isinstance(interval, bool) or not isinstance(interval, int | float) or interval < 1:
+            violations.append(
+                SpecViolation(
+                    field="time_governance.clock_probe_interval_seconds",
+                    expected="number ≥1",
+                    actual=_short(interval),
+                    message="The probe cadence must be a number of at least 1 s.",
+                )
+            )
+        if tg.get("fail_closed") is not True:
+            violations.append(
+                SpecViolation(
+                    field="time_governance.fail_closed",
+                    expected=True,
+                    actual=_short(tg.get("fail_closed")),
+                    message="Must fail closed (one-clock record P-5; owner, 2026-11-03).",
+                )
+            )
+
+        def method_check(field: str, method: Any, *, required_when_offered: bool) -> None:
+            if method is None:
+                if offered and required_when_offered:
+                    violations.append(
+                        SpecViolation(
+                            field=field,
+                            expected=str(sorted(offered)),
+                            actual=None,
+                            message=(
+                                f"Protocol {protocol!r} offers a clock-read method; declare one."
+                            ),
+                        )
+                    )
+                return
+            if method not in vocab.clock_read_methods:
+                violations.append(
+                    SpecViolation(
+                        field=field,
+                        expected=str(sorted(vocab.clock_read_methods)),
+                        actual=_short(method),
+                        message="Not in the schema enum.",
+                    )
+                )
+            elif method not in offered:
+                violations.append(
+                    SpecViolation(
+                        field=field,
+                        expected=str(sorted(offered))
+                        if offered
+                        else "no method (the hub measures this spoke)",
+                        actual=_short(method),
+                        message=f"Protocol {protocol!r} cannot perform this clock-read method.",
+                    )
+                )
+
+        method_check(
+            "time_governance.clock_read_method",
+            tg.get("clock_read_method"),
+            required_when_offered=True,
+        )
+
+        connections = tg.get("connections", [])
+        if not isinstance(connections, list):
+            violations.append(
+                SpecViolation(
+                    field="time_governance.connections",
+                    expected="array",
+                    actual=_short(connections),
+                    message="Must be an array of per-connection declarations.",
+                )
+            )
+            connections = []
+        for index, entry in enumerate(connections):
+            prefix = f"time_governance.connections[{index}]"
+            if not isinstance(entry, dict) or not str(entry.get("name", "")).strip():
+                violations.append(
+                    SpecViolation(
+                        field=f"{prefix}.name",
+                        expected="non-empty connection name",
+                        actual=_short(entry),
+                        message="Each entry names its connection.",
+                    )
+                )
+                continue
+            method_check(
+                f"{prefix}.clock_read_method",
+                entry.get("clock_read_method"),
+                required_when_offered=False,
+            )
+            enum_check(
+                f"{prefix}.source_timestamp_origin",
+                entry.get("source_timestamp_origin"),
+                vocab.source_timestamp_origins,
+                required=False,
+            )
+            enum_check(
+                f"{prefix}.tolerance_class",
+                entry.get("tolerance_class"),
+                vocab.tolerance_classes,
+                required=False,
+            )
+            c_interval = entry.get("clock_probe_interval_seconds")
+            if c_interval is not None and (
+                isinstance(c_interval, bool)
+                or not isinstance(c_interval, int | float)
+                or c_interval < 1
+            ):
+                violations.append(
+                    SpecViolation(
+                        field=f"{prefix}.clock_probe_interval_seconds",
+                        expected="number ≥1",
+                        actual=_short(c_interval),
+                        message="The probe cadence must be a number of at least 1 s.",
+                    )
+                )
+
+        if violations:
+            return [
+                FxTSVerdict(
+                    check_id="facts:time-governed",
+                    spec_ref=ref,
+                    status=VerdictStatus.FAIL,
+                    message=f"{len(violations)} time governance error(s).",
+                    violations=violations,
+                )
+            ]
+        method = tg.get("clock_read_method") or "hub-measured"
+        return [
+            FxTSVerdict(
+                check_id="facts:time-governed",
+                spec_ref=ref,
+                status=VerdictStatus.PASS,
+                message=(
+                    f"Time-governed: {tg.get('time_source')} via {sync}, clock read by {method}, "
+                    f"probe every {interval}s, origin {tg.get('source_timestamp_origin')}, class "
+                    f"{tg.get('tolerance_class')}, fail closed."
+                ),
+            )
+        ]
 
     def _check_metadata(self, spec: dict[str, Any]) -> FxTSVerdict:
         metadata = spec.get("metadata")

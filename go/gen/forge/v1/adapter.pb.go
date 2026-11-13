@@ -256,8 +256,12 @@ type AdapterManifest struct {
 	ConnectionParams      []*ConnectionParam     `protobuf:"bytes,10,rep,name=connection_params,json=connectionParams,proto3" json:"connection_params,omitempty"`
 	AuthMethods           []string               `protobuf:"bytes,11,rep,name=auth_methods,json=authMethods,proto3" json:"auth_methods,omitempty"` // e.g. ["azure_entra_id", "bearer_token"]
 	Metadata              *structpb.Struct       `protobuf:"bytes,12,opt,name=metadata,proto3" json:"metadata,omitempty"`                          // flexible key-value metadata
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// How the spoke is time-governed: the FACTS time_governance section (one clock, FB-090).
+	// Unset only for a manifest built before FB-090; the hub refuses a registration without
+	// it once FB-093 lands.
+	TimeGovernance *TimeGovernance `protobuf:"bytes,13,opt,name=time_governance,json=timeGovernance,proto3" json:"time_governance,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *AdapterManifest) Reset() {
@@ -374,6 +378,191 @@ func (x *AdapterManifest) GetMetadata() *structpb.Struct {
 	return nil
 }
 
+func (x *AdapterManifest) GetTimeGovernance() *TimeGovernance {
+	if x != nil {
+		return x.TimeGovernance
+	}
+	return nil
+}
+
+// The FACTS time_governance section (docs/decisions/one-clock-ot-source-time.md P-7).
+type TimeGovernance struct {
+	state                     protoimpl.MessageState      `protogen:"open.v1"`
+	TimeSource                string                      `protobuf:"bytes,1,opt,name=time_source,json=timeSource,proto3" json:"time_source,omitempty"`                  // "hub-ntp" | "site-ptp" | "gnss"
+	SyncProtocol              string                      `protobuf:"bytes,2,opt,name=sync_protocol,json=syncProtocol,proto3" json:"sync_protocol,omitempty"`            // "ntp" | "ptp-cip-sync" | "ptp-802.1as" | "profinet-ptcp" ("none" fails conformance)
+	ClockReadMethod           string                      `protobuf:"bytes,3,opt,name=clock_read_method,json=clockReadMethod,proto3" json:"clock_read_method,omitempty"` // empty when the spoke's protocol offers none (the hub measures it)
+	ClockProbeIntervalSeconds float64                     `protobuf:"fixed64,4,opt,name=clock_probe_interval_seconds,json=clockProbeIntervalSeconds,proto3" json:"clock_probe_interval_seconds,omitempty"`
+	SourceTimestampOrigin     string                      `protobuf:"bytes,5,opt,name=source_timestamp_origin,json=sourceTimestampOrigin,proto3" json:"source_timestamp_origin,omitempty"` // "device" | "server" | "edge" | "forge"
+	ToleranceClass            string                      `protobuf:"bytes,6,opt,name=tolerance_class,json=toleranceClass,proto3" json:"tolerance_class,omitempty"`                        // "T0".."T5" | "it-lan" | "it-wan" | "edge-mqtt"
+	FailClosed                bool                        `protobuf:"varint,7,opt,name=fail_closed,json=failClosed,proto3" json:"fail_closed,omitempty"`                                   // must be true
+	Connections               []*ConnectionTimeGovernance `protobuf:"bytes,8,rep,name=connections,proto3" json:"connections,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
+}
+
+func (x *TimeGovernance) Reset() {
+	*x = TimeGovernance{}
+	mi := &file_forge_v1_adapter_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TimeGovernance) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TimeGovernance) ProtoMessage() {}
+
+func (x *TimeGovernance) ProtoReflect() protoreflect.Message {
+	mi := &file_forge_v1_adapter_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TimeGovernance.ProtoReflect.Descriptor instead.
+func (*TimeGovernance) Descriptor() ([]byte, []int) {
+	return file_forge_v1_adapter_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *TimeGovernance) GetTimeSource() string {
+	if x != nil {
+		return x.TimeSource
+	}
+	return ""
+}
+
+func (x *TimeGovernance) GetSyncProtocol() string {
+	if x != nil {
+		return x.SyncProtocol
+	}
+	return ""
+}
+
+func (x *TimeGovernance) GetClockReadMethod() string {
+	if x != nil {
+		return x.ClockReadMethod
+	}
+	return ""
+}
+
+func (x *TimeGovernance) GetClockProbeIntervalSeconds() float64 {
+	if x != nil {
+		return x.ClockProbeIntervalSeconds
+	}
+	return 0
+}
+
+func (x *TimeGovernance) GetSourceTimestampOrigin() string {
+	if x != nil {
+		return x.SourceTimestampOrigin
+	}
+	return ""
+}
+
+func (x *TimeGovernance) GetToleranceClass() string {
+	if x != nil {
+		return x.ToleranceClass
+	}
+	return ""
+}
+
+func (x *TimeGovernance) GetFailClosed() bool {
+	if x != nil {
+		return x.FailClosed
+	}
+	return false
+}
+
+func (x *TimeGovernance) GetConnections() []*ConnectionTimeGovernance {
+	if x != nil {
+		return x.Connections
+	}
+	return nil
+}
+
+// A per-connection declaration where the spoke knows its connections statically.
+type ConnectionTimeGovernance struct {
+	state                     protoimpl.MessageState `protogen:"open.v1"`
+	Name                      string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	ClockReadMethod           string                 `protobuf:"bytes,2,opt,name=clock_read_method,json=clockReadMethod,proto3" json:"clock_read_method,omitempty"`
+	ClockProbeIntervalSeconds *float64               `protobuf:"fixed64,3,opt,name=clock_probe_interval_seconds,json=clockProbeIntervalSeconds,proto3,oneof" json:"clock_probe_interval_seconds,omitempty"`
+	SourceTimestampOrigin     string                 `protobuf:"bytes,4,opt,name=source_timestamp_origin,json=sourceTimestampOrigin,proto3" json:"source_timestamp_origin,omitempty"`
+	ToleranceClass            string                 `protobuf:"bytes,5,opt,name=tolerance_class,json=toleranceClass,proto3" json:"tolerance_class,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
+}
+
+func (x *ConnectionTimeGovernance) Reset() {
+	*x = ConnectionTimeGovernance{}
+	mi := &file_forge_v1_adapter_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectionTimeGovernance) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectionTimeGovernance) ProtoMessage() {}
+
+func (x *ConnectionTimeGovernance) ProtoReflect() protoreflect.Message {
+	mi := &file_forge_v1_adapter_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectionTimeGovernance.ProtoReflect.Descriptor instead.
+func (*ConnectionTimeGovernance) Descriptor() ([]byte, []int) {
+	return file_forge_v1_adapter_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ConnectionTimeGovernance) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ConnectionTimeGovernance) GetClockReadMethod() string {
+	if x != nil {
+		return x.ClockReadMethod
+	}
+	return ""
+}
+
+func (x *ConnectionTimeGovernance) GetClockProbeIntervalSeconds() float64 {
+	if x != nil && x.ClockProbeIntervalSeconds != nil {
+		return *x.ClockProbeIntervalSeconds
+	}
+	return 0
+}
+
+func (x *ConnectionTimeGovernance) GetSourceTimestampOrigin() string {
+	if x != nil {
+		return x.SourceTimestampOrigin
+	}
+	return ""
+}
+
+func (x *ConnectionTimeGovernance) GetToleranceClass() string {
+	if x != nil {
+		return x.ToleranceClass
+	}
+	return ""
+}
+
 type AdapterHealth struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	AdapterId        string                 `protobuf:"bytes,1,opt,name=adapter_id,json=adapterId,proto3" json:"adapter_id,omitempty"`
@@ -390,7 +579,7 @@ type AdapterHealth struct {
 
 func (x *AdapterHealth) Reset() {
 	*x = AdapterHealth{}
-	mi := &file_forge_v1_adapter_proto_msgTypes[4]
+	mi := &file_forge_v1_adapter_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -402,7 +591,7 @@ func (x *AdapterHealth) String() string {
 func (*AdapterHealth) ProtoMessage() {}
 
 func (x *AdapterHealth) ProtoReflect() protoreflect.Message {
-	mi := &file_forge_v1_adapter_proto_msgTypes[4]
+	mi := &file_forge_v1_adapter_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -415,7 +604,7 @@ func (x *AdapterHealth) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdapterHealth.ProtoReflect.Descriptor instead.
 func (*AdapterHealth) Descriptor() ([]byte, []int) {
-	return file_forge_v1_adapter_proto_rawDescGZIP(), []int{4}
+	return file_forge_v1_adapter_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *AdapterHealth) GetAdapterId() string {
@@ -495,7 +684,7 @@ const file_forge_v1_adapter_proto_rawDesc = "" +
 	"\n" +
 	"schema_ref\x18\x01 \x01(\tR\tschemaRef\x12#\n" +
 	"\routput_format\x18\x02 \x01(\tR\foutputFormat\x12%\n" +
-	"\x0econtext_fields\x18\x03 \x03(\tR\rcontextFields\"\x92\x04\n" +
+	"\x0econtext_fields\x18\x03 \x03(\tR\rcontextFields\"\xd5\x04\n" +
 	"\x0fAdapterManifest\x12\x1d\n" +
 	"\n" +
 	"adapter_id\x18\x01 \x01(\tR\tadapterId\x12\x12\n" +
@@ -510,7 +699,26 @@ const file_forge_v1_adapter_proto_rawDesc = "" +
 	"\x11connection_params\x18\n" +
 	" \x03(\v2\x19.forge.v1.ConnectionParamR\x10connectionParams\x12!\n" +
 	"\fauth_methods\x18\v \x03(\tR\vauthMethods\x123\n" +
-	"\bmetadata\x18\f \x01(\v2\x17.google.protobuf.StructR\bmetadata\"\xf6\x02\n" +
+	"\bmetadata\x18\f \x01(\v2\x17.google.protobuf.StructR\bmetadata\x12A\n" +
+	"\x0ftime_governance\x18\r \x01(\v2\x18.forge.v1.TimeGovernanceR\x0etimeGovernance\"\x8b\x03\n" +
+	"\x0eTimeGovernance\x12\x1f\n" +
+	"\vtime_source\x18\x01 \x01(\tR\n" +
+	"timeSource\x12#\n" +
+	"\rsync_protocol\x18\x02 \x01(\tR\fsyncProtocol\x12*\n" +
+	"\x11clock_read_method\x18\x03 \x01(\tR\x0fclockReadMethod\x12?\n" +
+	"\x1cclock_probe_interval_seconds\x18\x04 \x01(\x01R\x19clockProbeIntervalSeconds\x126\n" +
+	"\x17source_timestamp_origin\x18\x05 \x01(\tR\x15sourceTimestampOrigin\x12'\n" +
+	"\x0ftolerance_class\x18\x06 \x01(\tR\x0etoleranceClass\x12\x1f\n" +
+	"\vfail_closed\x18\a \x01(\bR\n" +
+	"failClosed\x12D\n" +
+	"\vconnections\x18\b \x03(\v2\".forge.v1.ConnectionTimeGovernanceR\vconnections\"\xa2\x02\n" +
+	"\x18ConnectionTimeGovernance\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12*\n" +
+	"\x11clock_read_method\x18\x02 \x01(\tR\x0fclockReadMethod\x12D\n" +
+	"\x1cclock_probe_interval_seconds\x18\x03 \x01(\x01H\x00R\x19clockProbeIntervalSeconds\x88\x01\x01\x126\n" +
+	"\x17source_timestamp_origin\x18\x04 \x01(\tR\x15sourceTimestampOrigin\x12'\n" +
+	"\x0ftolerance_class\x18\x05 \x01(\tR\x0etoleranceClassB\x1f\n" +
+	"\x1d_clock_probe_interval_seconds\"\xf6\x02\n" +
 	"\rAdapterHealth\x12\x1d\n" +
 	"\n" +
 	"adapter_id\x18\x01 \x01(\tR\tadapterId\x12,\n" +
@@ -535,32 +743,36 @@ func file_forge_v1_adapter_proto_rawDescGZIP() []byte {
 	return file_forge_v1_adapter_proto_rawDescData
 }
 
-var file_forge_v1_adapter_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_forge_v1_adapter_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_forge_v1_adapter_proto_goTypes = []any{
-	(*AdapterCapabilities)(nil),   // 0: forge.v1.AdapterCapabilities
-	(*ConnectionParam)(nil),       // 1: forge.v1.ConnectionParam
-	(*DataContract)(nil),          // 2: forge.v1.DataContract
-	(*AdapterManifest)(nil),       // 3: forge.v1.AdapterManifest
-	(*AdapterHealth)(nil),         // 4: forge.v1.AdapterHealth
-	(AdapterTier)(0),              // 5: forge.v1.AdapterTier
-	(*structpb.Struct)(nil),       // 6: google.protobuf.Struct
-	(AdapterState)(0),             // 7: forge.v1.AdapterState
-	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
+	(*AdapterCapabilities)(nil),      // 0: forge.v1.AdapterCapabilities
+	(*ConnectionParam)(nil),          // 1: forge.v1.ConnectionParam
+	(*DataContract)(nil),             // 2: forge.v1.DataContract
+	(*AdapterManifest)(nil),          // 3: forge.v1.AdapterManifest
+	(*TimeGovernance)(nil),           // 4: forge.v1.TimeGovernance
+	(*ConnectionTimeGovernance)(nil), // 5: forge.v1.ConnectionTimeGovernance
+	(*AdapterHealth)(nil),            // 6: forge.v1.AdapterHealth
+	(AdapterTier)(0),                 // 7: forge.v1.AdapterTier
+	(*structpb.Struct)(nil),          // 8: google.protobuf.Struct
+	(AdapterState)(0),                // 9: forge.v1.AdapterState
+	(*timestamppb.Timestamp)(nil),    // 10: google.protobuf.Timestamp
 }
 var file_forge_v1_adapter_proto_depIdxs = []int32{
-	5, // 0: forge.v1.AdapterManifest.tier:type_name -> forge.v1.AdapterTier
-	0, // 1: forge.v1.AdapterManifest.capabilities:type_name -> forge.v1.AdapterCapabilities
-	2, // 2: forge.v1.AdapterManifest.data_contract:type_name -> forge.v1.DataContract
-	1, // 3: forge.v1.AdapterManifest.connection_params:type_name -> forge.v1.ConnectionParam
-	6, // 4: forge.v1.AdapterManifest.metadata:type_name -> google.protobuf.Struct
-	7, // 5: forge.v1.AdapterHealth.state:type_name -> forge.v1.AdapterState
-	8, // 6: forge.v1.AdapterHealth.last_check:type_name -> google.protobuf.Timestamp
-	8, // 7: forge.v1.AdapterHealth.last_healthy:type_name -> google.protobuf.Timestamp
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	7,  // 0: forge.v1.AdapterManifest.tier:type_name -> forge.v1.AdapterTier
+	0,  // 1: forge.v1.AdapterManifest.capabilities:type_name -> forge.v1.AdapterCapabilities
+	2,  // 2: forge.v1.AdapterManifest.data_contract:type_name -> forge.v1.DataContract
+	1,  // 3: forge.v1.AdapterManifest.connection_params:type_name -> forge.v1.ConnectionParam
+	8,  // 4: forge.v1.AdapterManifest.metadata:type_name -> google.protobuf.Struct
+	4,  // 5: forge.v1.AdapterManifest.time_governance:type_name -> forge.v1.TimeGovernance
+	5,  // 6: forge.v1.TimeGovernance.connections:type_name -> forge.v1.ConnectionTimeGovernance
+	9,  // 7: forge.v1.AdapterHealth.state:type_name -> forge.v1.AdapterState
+	10, // 8: forge.v1.AdapterHealth.last_check:type_name -> google.protobuf.Timestamp
+	10, // 9: forge.v1.AdapterHealth.last_healthy:type_name -> google.protobuf.Timestamp
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_forge_v1_adapter_proto_init() }
@@ -569,13 +781,14 @@ func file_forge_v1_adapter_proto_init() {
 		return
 	}
 	file_forge_v1_enums_proto_init()
+	file_forge_v1_adapter_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_forge_v1_adapter_proto_rawDesc), len(file_forge_v1_adapter_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

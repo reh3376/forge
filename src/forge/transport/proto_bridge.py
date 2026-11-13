@@ -35,7 +35,9 @@ from forge.core.models.adapter import (
     AdapterState,
     AdapterTier,
     ConnectionParam,
+    ConnectionTimeGovernance,
     DataContract,
+    TimeGovernance,
 )
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -334,7 +336,58 @@ def manifest_to_proto(manifest: AdapterManifest) -> adapter_msg.AdapterManifest:
     # metadata → google.protobuf.Struct
     if manifest.metadata:
         proto_manifest.metadata.update(manifest.metadata)
+    if manifest.time_governance is not None:
+        proto_manifest.time_governance.CopyFrom(time_governance_to_proto(manifest.time_governance))
     return proto_manifest
+
+
+def time_governance_to_proto(tg: TimeGovernance) -> adapter_msg.TimeGovernance:
+    """Convert Pydantic TimeGovernance to its proto message (FB-090)."""
+    msg = adapter_msg.TimeGovernance(
+        time_source=tg.time_source,
+        sync_protocol=tg.sync_protocol,
+        clock_read_method=tg.clock_read_method or "",
+        clock_probe_interval_seconds=tg.clock_probe_interval_seconds,
+        source_timestamp_origin=tg.source_timestamp_origin,
+        tolerance_class=tg.tolerance_class,
+        fail_closed=tg.fail_closed,
+    )
+    for entry in tg.connections:
+        conn = msg.connections.add()
+        conn.name = entry.name
+        conn.clock_read_method = entry.clock_read_method or ""
+        if entry.clock_probe_interval_seconds is not None:
+            conn.clock_probe_interval_seconds = entry.clock_probe_interval_seconds
+        conn.source_timestamp_origin = entry.source_timestamp_origin or ""
+        conn.tolerance_class = entry.tolerance_class or ""
+    return msg
+
+
+def proto_to_time_governance(msg: adapter_msg.TimeGovernance) -> TimeGovernance:
+    """Convert a proto TimeGovernance message to the Pydantic model (FB-090)."""
+    return TimeGovernance(
+        time_source=msg.time_source,
+        sync_protocol=msg.sync_protocol,
+        clock_read_method=msg.clock_read_method or None,
+        clock_probe_interval_seconds=msg.clock_probe_interval_seconds,
+        source_timestamp_origin=msg.source_timestamp_origin,
+        tolerance_class=msg.tolerance_class,
+        fail_closed=msg.fail_closed,
+        connections=[
+            ConnectionTimeGovernance(
+                name=c.name,
+                clock_read_method=c.clock_read_method or None,
+                clock_probe_interval_seconds=(
+                    c.clock_probe_interval_seconds
+                    if c.HasField("clock_probe_interval_seconds")
+                    else None
+                ),
+                source_timestamp_origin=c.source_timestamp_origin or None,
+                tolerance_class=c.tolerance_class or None,
+            )
+            for c in msg.connections
+        ],
+    )
 
 
 def health_to_proto(health: AdapterHealth) -> adapter_msg.AdapterHealth:
@@ -520,6 +573,11 @@ def proto_to_manifest(msg: adapter_msg.AdapterManifest) -> AdapterManifest:
         connection_params=[proto_to_connection_param(p) for p in msg.connection_params],
         auth_methods=list(msg.auth_methods) if msg.auth_methods else ["none"],
         metadata=dict(msg.metadata) if msg.HasField("metadata") else {},
+        time_governance=(
+            proto_to_time_governance(msg.time_governance)
+            if msg.HasField("time_governance")
+            else None
+        ),
     )
 
 

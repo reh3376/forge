@@ -41,6 +41,7 @@ from forge.core.models.adapter import (
     AdapterTier,
     ConnectionParam,
     DataContract,
+    TimeGovernance,
 )
 
 logger = logging.getLogger(__name__)
@@ -65,6 +66,10 @@ def _load_manifest() -> AdapterManifest:
         connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
+        # the FACTS time_governance section, as the spoke's declaration (one clock, FB-090)
+        time_governance=(
+            TimeGovernance(**raw["time_governance"]) if raw.get("time_governance") else None
+        ),
     )
 
 
@@ -111,6 +116,7 @@ class ForgeMesAdapter(
     async def configure(self, params: dict[str, Any]) -> None:
         """Validate and store connection parameters."""
         self._config = ForgeMesConfig(**params)
+        self.check_time_governance()
         self._state = AdapterState.REGISTERED
         logger.info(
             "WHK-MES adapter configured: graphql=%s, mqtt=%s:%s",

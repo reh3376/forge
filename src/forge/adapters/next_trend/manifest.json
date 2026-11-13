@@ -100,5 +100,13 @@
     "deployment": "Docker Compose (historian + web + QuestDB)",
     "production_url": "https://trend.whiskeyhouse.com",
     "notes": "First HISTORIAN-tier Forge adapter. Cross-language spoke: Python adapter wraps Rust REST API. Supports live SSE streaming and historical backfill via time-range queries."
+  },
+  "time_governance": {
+    "time_source": "hub-ntp",
+    "sync_protocol": "ntp",
+    "clock_probe_interval_seconds": 30,
+    "source_timestamp_origin": "server",
+    "tolerance_class": "it-lan",
+    "fail_closed": true
   }
 }

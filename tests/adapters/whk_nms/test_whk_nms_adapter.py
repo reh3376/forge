@@ -6,6 +6,7 @@ import pytest
 from pydantic import ValidationError
 
 from forge.adapters.whk_nms import WhkNmsAdapter
+from forge.core.clock import TimeGovernanceConflictError
 from forge.core.models.adapter import AdapterState
 
 # ── Test Fixtures ──────────────────────────────────────────────
@@ -14,8 +15,8 @@ _VALID_CONFIG = {
     "nms_api_url": "http://localhost:8000/api/v1",
     "nms_ws_url": "ws://localhost:8000/api/v1/events/stream",
     "poll_interval_seconds": 60,
-    # the sample messages carry no timestamp: Forge's read time may stand in (FB-088)
-    "source_timestamp_origin": "forge",
+    # the origin is the FACTS declaration on the manifest (server, FB-090): every NMS
+    # event carries the NMS server's own time
 }
 
 _SAMPLE_DEVICE_MESSAGE = {
@@ -29,6 +30,7 @@ _SAMPLE_DEVICE_MESSAGE = {
     "is_critical": True,
     "is_ot_device": False,
     "location": "data-center-1",
+    "last_seen": "2026-04-07T14:20:00Z",
     "device_metadata": {
         "serial_number": "SN-123456",
         "vendor": "Cisco",
@@ -46,7 +48,7 @@ _SAMPLE_TRAP_MESSAGE = {
     "trap_type": "linkDown",
     "oid": "1.3.6.1.6.3.1.1.5.3",
     "severity": "high",
-    "trap_time": "2026-04-07T14:30:00Z",
+    "timestamp": "2026-04-07T14:30:00Z",
 }
 
 _SAMPLE_ALERT_MESSAGE = {
@@ -59,7 +61,7 @@ _SAMPLE_ALERT_MESSAGE = {
     "description": "CPU usage exceeded 85%",
     "condition": "cpu > 85%",
     "severity": "high",
-    "alert_time": "2026-04-07T14:35:00Z",
+    "timestamp": "2026-04-07T14:35:00Z",
 }
 
 _SAMPLE_SECURITY_MESSAGE = {
@@ -85,6 +87,7 @@ _SAMPLE_BASELINE_MESSAGE = {
     "suspicious_reason": "Unusual outbound traffic pattern detected",
     "health_status": "healthy",
     "location": "warehouse-floor",
+    "last_seen": "2026-04-07T14:45:00Z",
 }
 
 _SAMPLE_SPOF_MESSAGE = {
@@ -345,10 +348,10 @@ class TestRefusals:
     @pytest.mark.asyncio
     async def test_timeless_record_is_refused_and_visible_on_health(self):
         adapter = WhkNmsAdapter()
-        config = {k: v for k, v in _VALID_CONFIG.items() if k != "source_timestamp_origin"}
-        await adapter.configure(config)
+        await adapter.configure(_VALID_CONFIG)
         await adapter.start()
-        adapter.inject_records([_SAMPLE_DEVICE_MESSAGE])
+        timeless = {k: v for k, v in _SAMPLE_DEVICE_MESSAGE.items() if k != "last_seen"}
+        adapter.inject_records([timeless])
 
         records = [record async for record in adapter.collect()]
 
@@ -361,19 +364,36 @@ class TestRefusals:
         assert health.error_message == health.last_refusal
 
     @pytest.mark.asyncio
-    async def test_declared_forge_stamps_the_read_time_and_says_so(self):
+    async def test_the_facts_declaration_is_the_origin(self):
+        """The manifest's time_governance declares the NMS server's clock (FB-090)."""
         adapter = WhkNmsAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
+        governance = adapter.manifest.time_governance
+        assert governance is not None and governance.source_timestamp_origin == "server"
+        assert adapter.source_timestamp_origin == "server"
         adapter.inject_records([_SAMPLE_DEVICE_MESSAGE])
 
         records = [record async for record in adapter.collect()]
 
         assert len(records) == 1
-        assert records[0].timestamp.source_clock == "forge"
-        assert records[0].timestamp.source_uncertainty_seconds == 60.0
+        assert records[0].timestamp.source_time.isoformat() == "2026-04-07T14:20:00+00:00"
         health = await adapter.health()
         assert health.state == AdapterState.HEALTHY and health.refusals == {}
+
+    @pytest.mark.asyncio
+    async def test_a_parameter_that_contradicts_the_declaration_is_refused(self):
+        """A connection parameter may repeat the FACTS declaration, never replace it (FB-090)."""
+        adapter = WhkNmsAdapter()
+        with pytest.raises(TimeGovernanceConflictError, match="declaration says server"):
+            await adapter.configure({**_VALID_CONFIG, "source_timestamp_origin": "forge"})
+        health = await adapter.health()
+        assert health.refusals == {"time_governance_conflict": 1}
+        assert health.last_refusal is not None and "FB-090" in health.last_refusal
+        assert health.error_message == health.last_refusal
+
+        await adapter.configure({**_VALID_CONFIG, "source_timestamp_origin": "server"})
+        assert adapter.source_timestamp_origin == "server"
 
 
 class TestRecordCounting:

@@ -87,7 +87,10 @@
       "default": "10000"
     }
   ],
-  "auth_methods": ["mtls", "none"],
+  "auth_methods": [
+    "mtls",
+    "none"
+  ],
   "metadata": {
     "spoke": "bosc-ims",
     "hub_module": "forge.adapters.bosc_ims",
@@ -98,7 +101,19 @@
     "grpc_service_count": 7,
     "rpc_count": 45,
     "isa_95_compliance": "Material Class > Material Definition > Material Lot > Material Sublot",
-    "state_dimensions": ["disposition", "system_state", "asset_state"],
+    "state_dimensions": [
+      "disposition",
+      "system_state",
+      "asset_state"
+    ],
     "event_model": "append-only TransactionEvent with SecurityContext"
+  },
+  "time_governance": {
+    "time_source": "hub-ntp",
+    "sync_protocol": "ntp",
+    "clock_probe_interval_seconds": 30,
+    "source_timestamp_origin": "server",
+    "tolerance_class": "it-lan",
+    "fail_closed": true
   }
 }

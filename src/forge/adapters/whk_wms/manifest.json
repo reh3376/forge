@@ -26,21 +26,80 @@
   },
   "health_check_interval_ms": 30000,
   "connection_params": [
-    {"name": "graphql_url", "description": "WMS GraphQL endpoint", "required": true, "secret": false},
-    {"name": "rabbitmq_url", "description": "AMQP connection URL", "required": true, "secret": false},
-    {"name": "azure_tenant_id", "description": "Azure Entra ID tenant", "required": true, "secret": false},
-    {"name": "azure_client_id", "description": "Azure app registration ID", "required": true, "secret": false},
-    {"name": "azure_client_secret", "description": "Azure client secret", "required": true, "secret": true},
-    {"name": "api_key", "description": "API key for inventory endpoints", "required": false, "secret": true},
-    {"name": "rabbitmq_vhost", "description": "RabbitMQ virtual host", "required": false, "secret": false, "default": "/"},
-    {"name": "graphql_timeout_ms", "description": "GraphQL timeout (ms)", "required": false, "secret": false, "default": "10000"},
-    {"name": "redis_url", "description": "Optional Redis cache URL", "required": false, "secret": false}
+    {
+      "name": "graphql_url",
+      "description": "WMS GraphQL endpoint",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "rabbitmq_url",
+      "description": "AMQP connection URL",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "azure_tenant_id",
+      "description": "Azure Entra ID tenant",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "azure_client_id",
+      "description": "Azure app registration ID",
+      "required": true,
+      "secret": false
+    },
+    {
+      "name": "azure_client_secret",
+      "description": "Azure client secret",
+      "required": true,
+      "secret": true
+    },
+    {
+      "name": "api_key",
+      "description": "API key for inventory endpoints",
+      "required": false,
+      "secret": true
+    },
+    {
+      "name": "rabbitmq_vhost",
+      "description": "RabbitMQ virtual host",
+      "required": false,
+      "secret": false,
+      "default": "/"
+    },
+    {
+      "name": "graphql_timeout_ms",
+      "description": "GraphQL timeout (ms)",
+      "required": false,
+      "secret": false,
+      "default": "10000"
+    },
+    {
+      "name": "redis_url",
+      "description": "Optional Redis cache URL",
+      "required": false,
+      "secret": false
+    }
   ],
-  "auth_methods": ["azure_entra_id", "bearer_token", "api_key"],
+  "auth_methods": [
+    "azure_entra_id",
+    "bearer_token",
+    "api_key"
+  ],
   "metadata": {
     "spoke": "whk-wms",
     "hub_module": "forge.adapters.whk_wms",
     "source_repo": "https://github.com/WhiskeyHouse/whk-wms",
     "source_lines": 507000
+  },
+  "time_governance": {
+    "time_source": "hub-ntp",
+    "sync_protocol": "ntp",
+    "clock_probe_interval_seconds": 30,
+    "source_timestamp_origin": "server",
+    "tolerance_class": "it-lan",
+    "fail_closed": true
   }
 }

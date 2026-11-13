@@ -47,6 +47,7 @@ from forge.core.models.adapter import (
     AdapterTier,
     ConnectionParam,
     DataContract,
+    TimeGovernance,
 )
 
 logger = logging.getLogger(__name__)
@@ -70,6 +71,10 @@ def _load_manifest() -> AdapterManifest:
         connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
+        # the FACTS time_governance section, as the spoke's declaration (one clock, FB-090)
+        time_governance=(
+            TimeGovernance(**raw["time_governance"]) if raw.get("time_governance") else None
+        ),
     )
 
 
@@ -138,6 +143,7 @@ class ScannerGatewayAdapter(
         MockScannerServiceHandler as a fallback for testing/conformance.
         """
         self._config = ScannerGatewayConfig(**params)
+        self.check_time_governance()
         self._router = SpokeRouter(
             wms_adapter_id=self._config.wms_adapter_id,
             ims_adapter_id=self._config.ims_adapter_id,

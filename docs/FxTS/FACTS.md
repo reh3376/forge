@@ -94,6 +94,15 @@ facts.schema.json
 │   ├── circuit_breaker   #   object — {failure_threshold, half_open_after_ms, success_threshold}
 │   ├── dead_letter       #   object — {enabled, topic, max_age_hours, description}
 │   └── health_degradation # object — {degraded_after_failures, failed_after_failures}
+├── time_governance       # object — How is this spoke time-governed? (one clock, FB-090; required)
+│   ├── time_source       #   enum — hub-ntp | site-ptp | gnss
+│   ├── sync_protocol     #   enum — ntp | ptp-cip-sync | ptp-802.1as | profinet-ptcp | none (none fails)
+│   ├── clock_read_method #   enum — opcua-response-header | opcua-current-time | cip-wall-clock-time | s7-clock | modbus-registers | sparkplug-payload-timestamp (required when the protocol offers one)
+│   ├── clock_probe_interval_seconds # number ≥1 — default probe cadence (30), adjustable per connection at runtime
+│   ├── source_timestamp_origin #   enum — device | server | edge | forge
+│   ├── tolerance_class   #   enum — T0..T5 | it-lan | it-wan | edge-mqtt (one-clock record P-8)
+│   ├── fail_closed       #   const true
+│   └── connections[]     #   optional array of per-connection declarations {name, clock_read_method?, clock_probe_interval_seconds?, source_timestamp_origin?, tolerance_class?}
 ├── integrity             # object — Hashing lock + AI agent governance (FHTS)
 │   ├── hash_method       #   string — "sha256-c14n-v1" (normative)
 │   ├── spec_hash         #   string — SHA-256 hex digest (excluded from own hash input)
@@ -106,6 +115,12 @@ facts.schema.json
 ```
 
 Every other section is closed (`additionalProperties: false`). The enums, as the schema carries them today and the runner reads them (`FactsVocabulary`): `source_type` graphql_query, graphql_mutation, graphql_subscription, rest_get, rest_post, rabbitmq, mqtt, websocket, file, database, grpc_unary, grpc_stream, grpc_server_unary, grpc_server_stream · `collection_mode` poll, subscribe, backfill, write, push · `auth_methods` none, bearer_token, api_key, basic, oauth2, certificate, azure_entra_id, mtls, device_token · `rule_type` timestamp_to_shift, location_to_area, lookup, computed, static, enum_normalize, composite · lifecycle states REGISTERED, CONNECTING, HEALTHY, DEGRADED, FAILED, STOPPED · `type` INGESTION, BIDIRECTIONAL, WRITE_ONLY, DISCOVERY_ONLY · `tier` OT, MES_MOM, ERP_BUSINESS, HISTORIAN, DOCUMENT. The gRPC, `push`, mTLS/device-token and the two enrichment rule types were added on 2026-10-17 (FB-080) because live spokes already used them; the OT vocabulary waits on D-8.
+
+### Time governance (one clock, FB-090)
+
+Every spoke declares how it is time-governed, because records from different sources only reconcile if their stamps come from one master time (owner's principle, 2026-10-18; `docs/decisions/one-clock-ot-source-time.md`, signed 2026-11-03). The section is **required**: a spec without it fails `facts:time-governed`, and the hub refuses a party whose clock is outside its class for three consecutive probes (FB-093). The declaration also drives the hub's behaviour at runtime: `source_timestamp_origin` is the rule FB-088 applies to a value that arrives without a source stamp (only `forge` lets Forge's read time stand in), `clock_probe_interval_seconds` is the default cadence the operator adjusts per connection, and `tolerance_class` is the limit the measured offset is held to. A spoke whose connections are site configuration (the OT module) declares its defaults here and each connection's own origin and cadence in its connection configuration (`PlcConnectionSpec`), which must agree; a spoke that knows its connections statically lists them in `connections[]`. The deployment requirement behind the section is `docs/deployment/clock-discipline.md`.
+
+The same section rides on the adapter manifest (`AdapterManifest.time_governance`, proto field 13) and is what the adapter base, the OT module and the ingest pipeline read for the stamp origin. Connection configuration must agree with it: a `source_timestamp_origin` connection parameter that contradicts the declaration is refused when the adapter is configured (`TimeGovernanceConflictError`, counted on the health as `time_governance_conflict`), one that repeats it passes.
 
 ## Runner
 
@@ -153,6 +168,7 @@ Every other section is closed (`additionalProperties: false`). The enums, as the
 | `facts:context-enrichment-valid` | Context Mapping | `rule_type` in the schema enum (*conditional*) |
 | `facts:error-retry-policy` | Error Handling | `max_retries` 0–20, `initial_delay_ms` ≥100, `backoff_strategy` in the schema enum |
 | `facts:error-circuit-breaker` | Error Handling | `failure_threshold` ≥1, `half_open_after_ms` ≥1,000 |
+| `facts:time-governed` | Time Governance | section present; every enum in the schema; `sync_protocol` is not `none`; `fail_closed` is `true`; `clock_probe_interval_seconds` ≥1; `clock_read_method` is one the spoke's protocol can perform and is declared when the protocol offers one (opcua, cip/ethernet-ip/logix, s7, modbus, sparkplug); each `connections[]` entry names its connection and obeys the same rules. **Blocking** (one clock, FB-090; `docs/decisions/one-clock-ot-source-time.md` P-7) |
 | `facts:metadata` | Metadata | `metadata` is a dict (free-form, never inspected) |
 | `facts:integrity-present` | Integrity | integrity block present (SKIP when absent) |
 | `facts:integrity-hash-format` | Integrity | `spec_hash` is 64-char hex |

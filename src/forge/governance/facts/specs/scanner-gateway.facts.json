@@ -319,6 +319,14 @@
       "description": "Undeliverable scan events (unroutable scan type, all target spokes down) are sent to dead letter queue for manual review."
     }
   },
+  "time_governance": {
+    "time_source": "hub-ntp",
+    "sync_protocol": "ntp",
+    "clock_probe_interval_seconds": 30,
+    "source_timestamp_origin": "server",
+    "tolerance_class": "it-lan",
+    "fail_closed": true
+  },
   "metadata": {
     "routing_rules": [
       {
@@ -378,10 +386,19 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",
+    "spec_hash": "615a953528ce0d474995fbbb6f765be781b2cb620075e18a008e7175827d7cf4",
     "hash_state": "pending_review",
-    "previous_hash": "b5ffbfaa4b7b4e4bbd7eb4a75135aecce494f2528e95b80f4b8f2d3c3ce15827",
+    "previous_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",
     "change_history": [
+      {
+        "previous_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",
+        "new_hash": "615a953528ce0d474995fbbb6f765be781b2cb620075e18a008e7175827d7cf4",
+        "changed_at": "2026-11-13T18:43:32Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "structural",
+        "reason": "FB-090: time_governance section (one clock, D-9 step 4). Awaiting owner approval."
+      },
       {
         "previous_hash": "b5ffbfaa4b7b4e4bbd7eb4a75135aecce494f2528e95b80f4b8f2d3c3ce15827",
         "new_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",

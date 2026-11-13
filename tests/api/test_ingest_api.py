@@ -15,6 +15,7 @@ from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
     DataContract,
+    TimeGovernance,
 )
 from forge.ingest.pipeline import IngestPipeline, InMemoryRecordSink
 from forge.storage.config import StorageConfig
@@ -22,9 +23,8 @@ from forge.storage.config import StorageConfig
 
 def _manifest(adapter_id: str = "whk-wms", *, declared: bool = True) -> dict:
     # declared: the adapter says Forge's read time may stand in for a reading that carries
-    # no timestamp (source_timestamp_origin: forge, one clock, FB-088); the declaration
-    # lives on the manifest's metadata until FB-090 puts the FACTS time_governance section
-    # there.
+    # no timestamp (source_timestamp_origin: forge, one clock, FB-088); the declaration is
+    # the FACTS time_governance section on the manifest (FB-090).
     return AdapterManifest(
         adapter_id=adapter_id,
         name=f"Test {adapter_id}",
@@ -36,7 +36,14 @@ def _manifest(adapter_id: str = "whk-wms", *, declared: bool = True) -> dict:
             schema_ref=f"forge://schemas/{adapter_id}/v1",
             context_fields=["event_type", "equipment_id"],
         ),
-        metadata={"source_timestamp_origin": "forge"} if declared else {},
+        time_governance=TimeGovernance(
+            time_source="hub-ntp",
+            sync_protocol="ntp",
+            source_timestamp_origin="forge",
+            tolerance_class="it-lan",
+        )
+        if declared
+        else None,
     ).model_dump(mode="json")
 
 

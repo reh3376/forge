@@ -423,6 +423,14 @@
       "failed_after_failures": 10
     }
   },
+  "time_governance": {
+    "time_source": "hub-ntp",
+    "sync_protocol": "ntp",
+    "clock_probe_interval_seconds": 30,
+    "source_timestamp_origin": "server",
+    "tolerance_class": "it-lan",
+    "fail_closed": true
+  },
   "metadata": {
     "spoke": "cmms",
     "hub_module": "forge-adapters",
@@ -486,12 +494,19 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "3c2312c0fef72f56451a9914de9ce95a013776cab1a6b0bebdefef5af615dffa",
+    "spec_hash": "4496bed9d7456f1c0293f40df2f70acec9ddf84c444a84033917723d08f5980b",
     "hash_state": "pending_review",
-    "previous_hash": "1706dcabe56a70480a26f3d302d9f3866f1504e5f8164ff0ef16271d7ed36c0f",
-    "approved_by": "reh3376",
-    "approved_at": "2026-04-08T00:00:00Z",
+    "previous_hash": "3c2312c0fef72f56451a9914de9ce95a013776cab1a6b0bebdefef5af615dffa",
     "change_history": [
+      {
+        "previous_hash": "3c2312c0fef72f56451a9914de9ce95a013776cab1a6b0bebdefef5af615dffa",
+        "new_hash": "4496bed9d7456f1c0293f40df2f70acec9ddf84c444a84033917723d08f5980b",
+        "changed_at": "2026-11-13T18:43:32Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "structural",
+        "reason": "FB-090: time_governance section (one clock, D-9 step 4). Awaiting owner approval."
+      },
       {
         "previous_hash": "1706dcabe56a70480a26f3d302d9f3866f1504e5f8164ff0ef16271d7ed36c0f",
         "new_hash": "3c2312c0fef72f56451a9914de9ce95a013776cab1a6b0bebdefef5af615dffa",

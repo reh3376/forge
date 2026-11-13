@@ -257,6 +257,34 @@ Rules:
 - `failure_threshold`: ≥ 1
 - `half_open_after_ms`: ≥ 1000
 
+### Step 6b: Declare Time Governance (one clock, FB-090)
+
+```json
+{
+  "time_governance": {
+    "time_source": "hub-ntp",
+    "sync_protocol": "ntp",
+    "clock_read_method": "opcua-current-time",
+    "clock_probe_interval_seconds": 30,
+    "source_timestamp_origin": "server",
+    "tolerance_class": "T0",
+    "fail_closed": true
+  }
+}
+```
+
+Rules (`facts:time-governed`, blocking):
+- The section is required. A spoke that does not say how it is time-governed fails conformance.
+- `sync_protocol` is never `none`: an undisciplined clock is not a valid source.
+- `clock_read_method` is required when your protocol offers one (`opcua`, `cip`/`ethernet-ip`/`logix`, `s7`, `modbus`, `sparkplug`) and must be one of those; an IT spoke (GraphQL, AMQP, REST, gRPC) leaves it out, and the hub measures the spoke itself (FB-092) and its source through the server stamps on its records (FB-089).
+- `source_timestamp_origin` is who stamps your values: `device`, `server`, `edge`, or `forge` when the protocol carries no stamp. A value without a stamp on a spoke not declared `forge` is refused (FB-088).
+- `tolerance_class`: `T0` (10 ms) to `T5` for OT links, `it-lan` (10 ms), `it-wan` (100 ms), `edge-mqtt` (500 ms, one-way). See `docs/decisions/one-clock-ot-source-time.md` P-8.
+- `fail_closed` is `true`, always.
+- `connections[]` (optional) declares per-connection overrides where you know your connections statically.
+- Connection configuration must agree with the declaration: a `source_timestamp_origin` connection parameter that contradicts it is refused when the adapter is configured (`time_governance_conflict` on the health, the configure call fails); one that repeats it passes.
+
+Carry the same section in the adapter's `manifest.json`: the manifest hands it to the hub at Register (`AdapterManifest.time_governance`).
+
 ### Step 7: Add Integrity Hash
 
 Stamp the spec from the CLI rather than hashing by hand. `stamp` hashes the canonical
@@ -411,6 +439,10 @@ pytest tests/governance/facts/test_whk_wms_spec.py -v
 ### `facts:integrity-hash-state` — FAIL
 **Cause:** `hash_state` is `modified` or `pending_review` — the spec changed and the owner has not approved the new hash.
 **Fix:** Re-stamp with `add_spec_hash()` (Step 7) and ask the owner to approve. Do not set `approved` yourself; the gate tolerates `pending_review` only where a test lists it as an allowed failure.
+
+### `facts:time-governed` — FAIL
+
+The spec lacks the `time_governance` section, declares `sync_protocol: none`, sets `fail_closed` to anything but `true`, or names a `clock_read_method` the protocol cannot perform (or omits one the protocol offers). See Step 6b; the vocabulary is in `facts.schema.json`.
 
 ### `parity:*` — NOT_IMPLEMENTED
 **Cause:** The schema has a field that the runner doesn't check. This is a runner bug, not a spec bug.
