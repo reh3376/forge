@@ -26,7 +26,6 @@ from forge.core.models.contextual_record import (
 from forge.core.models.contextual_record import (
     QualityCode as CoreQualityCode,
 )
-from forge.modules.ot.tag_engine.models import SCAN_CLASS_INTERVALS_MS
 
 if TYPE_CHECKING:
     from forge.core.clock import ClockEstimate
@@ -58,8 +57,10 @@ def build_ot_record(
     connection keeps the stamp its source sent; when the source sent none, only a
     connection declared ``source_timestamp_origin: forge`` lets Forge's own read
     time (the registry's ``timestamp``) stand in, marked ``source_clock=forge``
-    with the tag's scan interval as the uncertainty bound (the per-tag sampling
-    bound of FB-094 refines it); any other connection raises
+    with the tag's sampling bound as the uncertainty (``BaseTag.sampling_bound_ms``,
+    one-clock record P-6: the scan interval, or a Query tag's poll interval; a tag
+    whose ``max_sampling_uncertainty_ms`` is tighter is refused at load); any other
+    connection raises
     :class:`~forge.core.clock.SourceStampMissingError`, which the adapter counts
     on its health. A Forge-born tag (memory, expression, derived, computed, event,
     reference: no connection) has Forge's clock as its source clock by nature.
@@ -68,7 +69,7 @@ def build_ot_record(
     stamps are corrected to master time on entry (one-clock record P-3, P-10): the
     source stamp and the server stamp each lose the clock's offset, and the record
     keeps the stamp as sent, the offset, the uncertainty (half the probe round trip
-    plus the scan interval) and the time quality. The hub never corrects again.
+    plus the tag's sampling bound) and the time quality. The hub never corrects again.
 
     Args:
         tag: Tag definition (path, data_type, engineering_units, etc.)
@@ -96,11 +97,16 @@ def build_ot_record(
     )
 
     # ── Timestamps ────────────────────────────────────────
+    # The tag's sampling bound (one-clock record P-6): a polled value occurred within one
+    # scan or poll interval before its stamp. It is on every value, with the clock's own
+    # bound once the stamp is corrected, and it is the bound on Forge's read time too.
+    bound = tag.sampling_bound_ms / 1000.0
     stamp = resolve_source_stamp(
         tag_value.source_timestamp,
         origin=source_timestamp_origin if connection is not None else FORGE_CLOCK,
         read_at=tag_value.timestamp,
-        poll_bound_seconds=SCAN_CLASS_INTERVALS_MS[tag.scan_class] / 1000.0,
+        poll_bound_seconds=bound,
+        sampling_bound_seconds=bound,
         adapter_id=adapter_id,
         connection=connection,
         tag_path=tag.path,

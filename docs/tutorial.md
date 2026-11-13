@@ -863,7 +863,7 @@ The owner's principle (2026-10-18): records from different sources only reconcil
 | Every stored timestamp is UTC and timezone-aware; naive rejected at the model | ✅ FB-014 |
 | The hub stamps receipt with its own clock | ✅ FB-087 |
 | The offset of every connected clock is measured, recorded and surfaced | ✅ FB-089 (provisional 1 s tolerance, warning only) |
-| A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | 🟡 FB-088 done 2026-11-13 (no invented stamp; the stamping clock named once declared); FB-094 steps 2 and 3 done 2026-11-13 (the server's clock is read on every OPC-UA response and on a runtime probe cadence, and the source and server stamps are corrected by its filtered offset at the spoke, the stamp as sent, the offset and the time quality kept); step 6, the per-tag sampling bound, next; design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
+| A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | 🟡 FB-088 done 2026-11-13 (no invented stamp; the stamping clock named once declared); FB-094 steps 2 and 3 done 2026-11-13 (the server's clock is read on every OPC-UA response and on a runtime probe cadence, and the source and server stamps are corrected by its filtered offset at the spoke, the stamp as sent, the offset and the time quality kept); step 6 done too (every tag declares `max_sampling_uncertainty_ms`, refused at load when the acquisition cannot meet it; the bound is on every value), so FB-094 is complete for what the tree has; FB-090 next; design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
 | Hub time in the contract; a hub, module or spoke outside tolerance is refused | ⬜ FB-092, FB-093 (D-9 signed 2026-11-03) |
 | Per-spoke declaration of source time zones; a quality dimension for time | ⬜ FB-090, FB-091 (D-9 signed 2026-11-03) |
 
@@ -877,7 +877,7 @@ note:
 
 | Gap | Backlog / decision |
 |---|---|
-| Source time is corrected to master on OPC UA only; the per-tag sampling bound and the other protocols' readers remain | FB-094 step 6 (steps 1 to 3 done 2026-11-13) |
+| Source time is corrected to master on OPC UA only; the Logix, S7 and Modbus readers follow their drivers; the FACTS declaration is FB-090 | FB-090 (FB-094 done 2026-11-13) |
 | One adapter identity (code `forge-ot-module`, manifest and spec `ot-module`) | FB-079 (includes FB-018) |
 | Batch context resolver wired to MES | FB-020 |
 | OT FACTS vocabulary | D-8 |
