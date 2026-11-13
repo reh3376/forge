@@ -7,6 +7,8 @@ a Pydantic model for type-safe access.
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -43,6 +45,16 @@ class WhkErpiConfig(BaseModel):
     rabbitmq_vhost: str = Field(
         default="/",
         description="RabbitMQ virtual host.",
+    )
+
+    source_timestamp_origin: Literal["device", "server", "edge", "forge"] | None = Field(
+        default=None,
+        description=(
+            "Which clock stamps this connection's values (one-clock record P-4). Only "
+            "'forge' lets Forge's own read time stand in for an event that carries no "
+            "timestamp; otherwise such an event is refused (FB-088). FB-090 moves the "
+            "declaration into the FACTS time_governance section."
+        ),
     )
 
     model_config = ConfigDict(frozen=True)

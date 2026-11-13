@@ -61,6 +61,19 @@ class TestContextualRecordRoundTrip:
 
         assert restored.timestamp.server_time is not None
 
+    def test_one_clock_fields_round_trip(self, sample_record: ContextualRecord) -> None:
+        """source_clock and source_uncertainty_seconds (FB-088) cross the dict form intact."""
+        plain = proto_to_pydantic(pydantic_to_proto(sample_record), "ContextualRecord")
+        assert plain.timestamp.source_clock is None
+        assert plain.timestamp.source_uncertainty_seconds is None
+        assert "source_clock" not in pydantic_to_proto(sample_record)["timestamp"]
+
+        sample_record.timestamp.source_clock = "device:conn-001"
+        sample_record.timestamp.source_uncertainty_seconds = 0.0
+        restored = proto_to_pydantic(pydantic_to_proto(sample_record), "ContextualRecord")
+        assert restored.timestamp.source_clock == "device:conn-001"
+        assert restored.timestamp.source_uncertainty_seconds == 0.0
+
     def test_value_round_trip_float(self, sample_record: ContextualRecord) -> None:
         proto_dict = pydantic_to_proto(sample_record)
         restored = proto_to_pydantic(proto_dict, "ContextualRecord")

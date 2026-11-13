@@ -169,13 +169,23 @@ class TagValue(BaseModel):
 
     value: Any = None
     quality: QualityCode = QualityCode.NOT_AVAILABLE
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    source_timestamp: datetime | None = None
+    timestamp: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        description="Forge's own clock when the registry took the value (its read time).",
+    )
+    source_timestamp: datetime | None = Field(
+        default=None,
+        description="The source's stamp as it came, None when it sent none (FB-088).",
+    )
+    server_timestamp: datetime | None = Field(
+        default=None,
+        description="The OPC-UA server's stamp as it came, None when it sent none (FB-088).",
+    )
     previous_value: Any = None
     previous_quality: QualityCode | None = None
     change_count: int = 0
 
-    @field_validator("timestamp", "source_timestamp", mode="before")
+    @field_validator("timestamp", "source_timestamp", "server_timestamp", mode="before")
     @classmethod
     def _ensure_utc(cls, v: Any) -> Any:
         if isinstance(v, datetime) and v.tzinfo is None:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from datetime import UTC, datetime
 from unittest.mock import patch
@@ -19,7 +20,11 @@ from forge.ingest.pipeline import IngestPipeline, InMemoryRecordSink
 from forge.storage.config import StorageConfig
 
 
-def _manifest(adapter_id: str = "whk-wms") -> dict:
+def _manifest(adapter_id: str = "whk-wms", *, declared: bool = True) -> dict:
+    # declared: the adapter says Forge's read time may stand in for a reading that carries
+    # no timestamp (source_timestamp_origin: forge, one clock, FB-088); the declaration
+    # lives on the manifest's metadata until FB-090 puts the FACTS time_governance section
+    # there.
     return AdapterManifest(
         adapter_id=adapter_id,
         name=f"Test {adapter_id}",
@@ -31,6 +36,7 @@ def _manifest(adapter_id: str = "whk-wms") -> dict:
             schema_ref=f"forge://schemas/{adapter_id}/v1",
             context_fields=["event_type", "equipment_id"],
         ),
+        metadata={"source_timestamp_origin": "forge"} if declared else {},
     ).model_dump(mode="json")
 
 
@@ -75,6 +81,38 @@ async def test_raw_readings_are_wrapped_and_persisted(client, sink: InMemoryReco
     assert len(sink) == 2
     assert sink.records[0].source.adapter_id == "whk-wms"
     assert sink.records[0].lineage.schema_ref == "forge://schemas/whk-wms/v1"
+    # neither reading carried a timestamp: the hub's read time stands in, and says so
+    assert {r.timestamp.source_clock for r in sink.records} == {"forge"}
+
+
+@pytest.mark.asyncio
+async def test_reading_without_timestamp_is_refused_unless_the_adapter_declared_forge(
+    client, sink: InMemoryRecordSink, caplog: pytest.LogCaptureFixture
+) -> None:
+    """One clock (FB-088): the hub never invents a source time, and the refusal is visible."""
+    await client.post("/v1/adapters/register", json=_manifest(declared=False))
+    with caplog.at_level(logging.WARNING, logger="forge.api.main"):
+        resp = await client.post(
+            "/v1/records",
+            json={
+                "adapter_id": "whk-wms",
+                "records": [
+                    {"tag": "temp", "value": 72.5},
+                    {"tag": "temp", "value": 73.0, "timestamp": "2026-06-01T12:00:00Z"},
+                ],
+            },
+        )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["accepted"] == 1 and body["rejected"] == 1 and body["persisted"] == 1
+    assert len(body["errors"]) == 1
+    assert "tag temp" in body["errors"][0] and "without a source timestamp" in body["errors"][0]
+    assert "FB-088" in body["errors"][0]
+    assert "refused before ingest" in caplog.text
+    assert len(sink) == 1 and sink.records[0].timestamp.source_clock is None
+    # the refusal is on the ingest log too
+    log = (await client.get("/v1/adapters/whk-wms/ingest-log")).json()
+    assert log and log[0]["rejected"] == 1
 
 
 @pytest.mark.asyncio
@@ -128,6 +166,7 @@ async def test_hub_stamps_receipt_on_rest_records(client, sink: InMemoryRecordSi
     )
     assert resp.status_code == 200 and resp.json()["persisted"] == 2
     stamped, bare = sink.records[0].timestamp, sink.records[1].timestamp
+    assert stamped.source_clock is None and bare.source_clock == "forge"
     assert stamped.sent_time == datetime(2026, 6, 1, 12, 0, 2, tzinfo=UTC)
     assert before <= stamped.ingestion_time <= datetime.now(UTC)
     assert bare.sent_time is None and bare.ingestion_time == stamped.ingestion_time

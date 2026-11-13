@@ -192,6 +192,14 @@ def adapter_status(
         typer.echo(f"  Records Collected: {health.get('records_collected', 0)}")
         typer.echo(f"  Records Failed:   {health.get('records_failed', 0)}")
         typer.echo(f"  Uptime:           {health.get('uptime_seconds', 0):.0f}s")
+        if health.get("error_message"):
+            typer.echo(f"  Error:            {health['error_message']}")
+        refusals = health.get("refusals") or {}
+        if refusals:
+            # Never silent (owner, 2026-11-03): a refused value shows here with its cause.
+            counts = ", ".join(f"{cause}={n}" for cause, n in sorted(refusals.items()))
+            typer.echo(f"  Refused:          {counts}")
+            typer.echo(f"  Last Refusal:     {health.get('last_refusal')}")
     except httpx.ConnectError as exc:
         typer.echo(f"[ERROR] Cannot connect to {base_url}")
         raise typer.Exit(code=1) from exc

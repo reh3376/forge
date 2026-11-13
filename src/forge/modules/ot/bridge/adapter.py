@@ -22,6 +22,7 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 from forge.adapters.base.interface import AdapterBase, DiscoveryProvider
+from forge.core.clock import SourceStampMissingError, resolve_source_stamp
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -184,6 +185,7 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
             records_collected=self._records_collected,
             records_failed=self._records_failed,
             uptime_seconds=uptime,
+            **self.refusal_health(),
         )
 
     # ------------------------------------------------------------------
@@ -235,6 +237,8 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
                 if record is not None:
                     self._records_collected += 1
                     yield record
+            except SourceStampMissingError as exc:
+                self.refuse(exc)
             except Exception:
                 self._records_failed += 1
                 logger.debug(
@@ -339,6 +343,19 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
         forge_path = mapping.forge_path
         now = datetime.now(tz=UTC)
 
+        # The gateway's stamp is the source time; when the response carried none, only a
+        # bridge declared origin forge lets Forge's read time stand in, with the poll
+        # interval as the uncertainty bound (one clock, FB-088).
+        stamp = resolve_source_stamp(
+            tag_value.timestamp,
+            origin=self._config.source_timestamp_origin,
+            read_at=now,
+            poll_bound_seconds=self._config.poll_interval_ms / 1000.0,
+            adapter_id=_BRIDGE_ADAPTER_ID,
+            connection=mapping.connection_name,
+            tag_path=forge_path,
+        )
+
         # Map Ignition quality to core quality
         core_quality = _map_ignition_quality(tag_value.quality)
 
@@ -354,9 +371,11 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
         )
 
         timestamp = RecordTimestamp(
-            source_time=tag_value.timestamp,
+            source_time=stamp.source_time,
             server_time=tag_value.timestamp,
             ingestion_time=now,
+            source_clock=stamp.source_clock,
+            source_uncertainty_seconds=stamp.source_uncertainty_seconds,
         )
 
         value = RecordValue(

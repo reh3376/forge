@@ -105,8 +105,16 @@ type RecordTimestamp struct {
 	ServerTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=server_time,json=serverTime,proto3" json:"server_time,omitempty"`
 	// When Forge received it (set by hub on ingestion)
 	IngestionTime *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=ingestion_time,json=ingestionTime,proto3" json:"ingestion_time,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// Which clock stamped source_time: "device:<name>", "server:<name>", "edge:<name>", or
+	// "forge" when Forge's own read time stands in for a stamp the protocol does not carry
+	// (FB-088). Empty until the connection declares its origin.
+	SourceClock string `protobuf:"bytes,6,opt,name=source_clock,json=sourceClock,proto3" json:"source_clock,omitempty"`
+	// How far source_time may sit from the instant the value occurred, in seconds: the poll
+	// bound when source_clock is "forge" (FB-088); half the probe round trip plus the
+	// sampling bound once the stamping clock is measured (FB-094).
+	SourceUncertaintySeconds *float64 `protobuf:"fixed64,8,opt,name=source_uncertainty_seconds,json=sourceUncertaintySeconds,proto3,oneof" json:"source_uncertainty_seconds,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
 func (x *RecordTimestamp) Reset() {
@@ -158,6 +166,20 @@ func (x *RecordTimestamp) GetIngestionTime() *timestamppb.Timestamp {
 		return x.IngestionTime
 	}
 	return nil
+}
+
+func (x *RecordTimestamp) GetSourceClock() string {
+	if x != nil {
+		return x.SourceClock
+	}
+	return ""
+}
+
+func (x *RecordTimestamp) GetSourceUncertaintySeconds() float64 {
+	if x != nil && x.SourceUncertaintySeconds != nil {
+		return *x.SourceUncertaintySeconds
+	}
+	return 0
 }
 
 type RecordValue struct {
@@ -639,13 +661,16 @@ const file_forge_v1_contextual_record_proto_rawDesc = "" +
 	"adapter_id\x18\x01 \x01(\tR\tadapterId\x12\x16\n" +
 	"\x06system\x18\x02 \x01(\tR\x06system\x12\x19\n" +
 	"\btag_path\x18\x03 \x01(\tR\atagPath\x12#\n" +
-	"\rconnection_id\x18\x04 \x01(\tR\fconnectionId\"\xce\x01\n" +
+	"\rconnection_id\x18\x04 \x01(\tR\fconnectionId\"\xd3\x02\n" +
 	"\x0fRecordTimestamp\x12;\n" +
 	"\vsource_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"sourceTime\x12;\n" +
 	"\vserver_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"serverTime\x12A\n" +
-	"\x0eingestion_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ringestionTime\"\xed\x02\n" +
+	"\x0eingestion_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ringestionTime\x12!\n" +
+	"\fsource_clock\x18\x06 \x01(\tR\vsourceClock\x12A\n" +
+	"\x1asource_uncertainty_seconds\x18\b \x01(\x01H\x00R\x18sourceUncertaintySeconds\x88\x01\x01B\x1d\n" +
+	"\x1b_source_uncertainty_seconds\"\xed\x02\n" +
 	"\vRecordValue\x12#\n" +
 	"\fnumber_value\x18\x01 \x01(\x01H\x00R\vnumberValue\x12#\n" +
 	"\fstring_value\x18\x02 \x01(\tH\x00R\vstringValue\x12\x1f\n" +
@@ -746,6 +771,7 @@ func file_forge_v1_contextual_record_proto_init() {
 		return
 	}
 	file_forge_v1_enums_proto_init()
+	file_forge_v1_contextual_record_proto_msgTypes[1].OneofWrappers = []any{}
 	file_forge_v1_contextual_record_proto_msgTypes[2].OneofWrappers = []any{
 		(*RecordValue_NumberValue)(nil),
 		(*RecordValue_StringValue)(nil),

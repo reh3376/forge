@@ -6,9 +6,6 @@ import logging
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from opentelemetry import metrics
-from opentelemetry.sdk.metrics import MeterProvider
-from opentelemetry.sdk.metrics.export import InMemoryMetricReader
 
 from forge.core import telemetry
 from forge.core.clock import (
@@ -21,21 +18,11 @@ from forge.core.clock import (
     clock_tolerance_seconds,
 )
 from forge.core.models.contextual_record import RecordTimestamp
+from tests.otel import metric_reader
 
 T0 = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
 
-_READER = InMemoryMetricReader()
-
-
-def _metric_reader() -> InMemoryMetricReader | None:
-    """Bind the process's meter provider once; None if another provider already owns it."""
-    current = metrics.get_meter_provider()
-    if isinstance(current, MeterProvider):
-        return (
-            _READER if _READER in getattr(current, "_sdk_config", current).metric_readers else None
-        )
-    metrics.set_meter_provider(MeterProvider(metric_readers=[_READER]))
-    return _READER
+_metric_reader = metric_reader
 
 
 class TestTolerance:
@@ -156,14 +143,15 @@ class TestTelemetry:
         by_name = {
             m.name: m for rm in data.resource_metrics for sm in rm.scope_metrics for m in sm.metrics
         }
-        histogram = by_name[telemetry.CLOCK_OFFSET]
+        gauge = by_name[telemetry.CLOCK_OFFSET]
         points = [
             p
-            for p in histogram.data.data_points
+            for p in gauge.data.data_points
             if p.attributes.get(telemetry.ATTR_ADAPTER_ID) == "otel-spoke"
         ]
         assert points and points[0].attributes[telemetry.ATTR_CLOCK_LINK] == SPOKE_LINK
-        assert points[0].count == 2 and points[0].sum == pytest.approx(3.1)
+        assert points[0].value == pytest.approx(3.0)  # a gauge: the last sample
+
         counter = by_name[telemetry.CLOCK_OUT_OF_TOLERANCE]
         breaches = [
             p.value
@@ -171,3 +159,21 @@ class TestTelemetry:
             if p.attributes.get(telemetry.ATTR_ADAPTER_ID) == "otel-spoke"
         ]
         assert breaches == [1]
+
+    def test_a_clock_behind_its_hub_reaches_the_metric(self) -> None:
+        """A negative offset is a real measurement; a histogram would have dropped it."""
+        reader = _metric_reader()
+        if reader is None:
+            pytest.skip("another MeterProvider owns this process")
+        ClockOffsetTracker(tolerance_seconds=5.0).observe("otel-behind", SERVER_LINK, -2.5, T0)
+        data = reader.get_metrics_data()
+        points = [
+            p
+            for rm in data.resource_metrics
+            for sm in rm.scope_metrics
+            for m in sm.metrics
+            if m.name == telemetry.CLOCK_OFFSET
+            for p in m.data.data_points
+            if p.attributes.get(telemetry.ATTR_ADAPTER_ID) == "otel-behind"
+        ]
+        assert points and points[0].value == pytest.approx(-2.5)

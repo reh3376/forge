@@ -26,6 +26,7 @@ from forge.adapters.bosc_ims.record_builder import (
     build_asset_record,
     build_contextual_record,
 )
+from forge.core.clock import FORGE_CLOCK, SourceStampMissingError
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -37,7 +38,7 @@ from forge.core.models.contextual_record import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
+    from collections.abc import AsyncIterator, Callable
 
     from forge.adapters.bosc_ims.client import BoscImsClient
 
@@ -45,6 +46,16 @@ logger = logging.getLogger(__name__)
 
 
 # ── Event collector (primary data path) ──────────────────────────
+
+
+def _refuse(
+    exc: SourceStampMissingError, on_refusal: Callable[[SourceStampMissingError], None] | None
+) -> None:
+    """Hand a refusal to the adapter; without one it is still a warning (never silent)."""
+    if on_refusal is not None:
+        on_refusal(exc)
+    else:
+        logger.warning("%s", exc)
 
 
 async def collect_events(
@@ -55,8 +66,14 @@ async def collect_events(
     since: datetime | None = None,
     limit: int = 100,
     enrich_assets: bool = True,
+    source_timestamp_origin: str | None = None,
+    on_refusal: Callable[[SourceStampMissingError], None] | None = None,
 ) -> AsyncIterator[ContextualRecord]:
     """Collect TransactionEvents from the BOSC IMS event log.
+
+    An event without ``occurred_at`` is refused unless the adapter declares
+    ``source_timestamp_origin: forge`` (one clock, FB-088); ``on_refusal`` is the
+    adapter's ``refuse`` so the refusal lands on its health, never silently.
 
     This is the primary ingress path. Events are fetched incrementally
     using the 'since' watermark. For each event, the associated Asset
@@ -83,9 +100,12 @@ async def collect_events(
                 adapter_id=adapter_id,
                 adapter_version=adapter_version,
                 asset=asset,
+                source_timestamp_origin=source_timestamp_origin,
             )
             yield record
 
+        except SourceStampMissingError as exc:
+            _refuse(exc, on_refusal)
         except Exception:
             logger.exception(
                 "Failed to collect event: %s",
@@ -125,10 +145,13 @@ async def collect_locations(
                     tag_path="bosc.inventory.location",
                     connection_id=loc.get("id"),
                 ),
+                # A snapshot is Forge's own observation: its source time is the read time by
+                # Forge's clock, and the record says so (one clock, FB-088). The IMS sends
+                # no server stamp for it, so none is written.
                 timestamp=RecordTimestamp(
                     source_time=now,
-                    server_time=now,
                     ingestion_time=now,
+                    source_clock=FORGE_CLOCK,
                 ),
                 value=RecordValue(
                     raw=json.dumps(loc, default=str, ensure_ascii=False),
@@ -193,10 +216,13 @@ async def collect_suppliers(
                     tag_path="bosc.supplier",
                     connection_id=supplier.get("id"),
                 ),
+                # A snapshot is Forge's own observation: its source time is the read time by
+                # Forge's clock, and the record says so (one clock, FB-088). The IMS sends
+                # no server stamp for it, so none is written.
                 timestamp=RecordTimestamp(
                     source_time=now,
-                    server_time=now,
                     ingestion_time=now,
+                    source_clock=FORGE_CLOCK,
                 ),
                 value=RecordValue(
                     raw=json.dumps(
@@ -242,12 +268,17 @@ async def collect_asset_snapshots(
     adapter_id: str,
     adapter_version: str,
     asset_ids: list[str],
+    source_timestamp_origin: str | None = None,
+    on_refusal: Callable[[SourceStampMissingError], None] | None = None,
 ) -> AsyncIterator[ContextualRecord]:
     """Collect current Asset snapshots by ID.
 
     Used during backfill or when the hub requests a point-in-time
     snapshot of specific assets. Each asset is fetched individually
-    and mapped to a ContextualRecord via build_asset_record().
+    and mapped to a ContextualRecord via build_asset_record(). An asset
+    without ``updated_at`` or ``created_at`` is refused unless the adapter
+    declares ``source_timestamp_origin: forge`` (FB-088); ``on_refusal``
+    is the adapter's ``refuse``.
 
     Yields:
         ContextualRecord for each Asset found.
@@ -263,8 +294,11 @@ async def collect_asset_snapshots(
                 asset=asset,
                 adapter_id=adapter_id,
                 adapter_version=adapter_version,
+                source_timestamp_origin=source_timestamp_origin,
             )
 
+        except SourceStampMissingError as exc:
+            _refuse(exc, on_refusal)
         except Exception:
             logger.exception(
                 "Failed to collect asset snapshot: %s",
@@ -308,10 +342,13 @@ async def collect_compliance(
                     tag_path="bosc.compliance.test_record",
                     connection_id=asset_id,
                 ),
+                # A snapshot is Forge's own observation: its source time is the read time by
+                # Forge's clock, and the record says so (one clock, FB-088). The IMS sends
+                # no server stamp for it, so none is written.
                 timestamp=RecordTimestamp(
                     source_time=now,
-                    server_time=now,
                     ingestion_time=now,
+                    source_clock=FORGE_CLOCK,
                 ),
                 value=RecordValue(
                     raw=json.dumps(

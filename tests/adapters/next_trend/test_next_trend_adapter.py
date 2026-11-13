@@ -301,9 +301,8 @@ class TestRecordBuilder:
         dt = _parse_timestamp(1775649600.0)
         assert isinstance(dt, datetime)
 
-        # None
-        dt = _parse_timestamp(None)
-        assert isinstance(dt, datetime)
+        # None: no stamp is invented for a point without one (one clock, FB-088)
+        assert _parse_timestamp(None) is None
 
         # Datetime passthrough
         now = datetime.now(tz=UTC)

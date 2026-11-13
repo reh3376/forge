@@ -44,6 +44,7 @@ from forge.api.health import (
 )
 from forge.api.registry import AdapterRegistry
 from forge.context.service import build_context_router
+from forge.core import telemetry
 from forge.core.models.adapter import (
     AdapterManifest,  # noqa: TC001 — FastAPI resolves these at runtime
 )
@@ -470,17 +471,31 @@ def create_app(
                 )
             except Exception as exc:
                 parse_errors.append(f"record {index}: {exc}")
+                cause = getattr(exc, "cause", None)
+                if isinstance(cause, str):
+                    # A refusal (no source stamp, FB-088) is never silent: counted on the
+                    # metric, named in the response and the ingest log, logged with cause.
+                    telemetry.record_refusal(request.adapter_id, cause)
+        if parse_errors:
+            logger.warning(
+                "REST ingest from adapter '%s': %d of %d records refused before ingest; first: %s",
+                request.adapter_id,
+                len(parse_errors),
+                len(request.records),
+                parse_errors[0],
+            )
         outcome = await pipeline.ingest(records, adapter_id=request.adapter_id, manifest=manifest)
-        if outcome.received or parse_errors:
+        pipeline.note_refused(outcome, parse_errors)
+        if outcome.received:
             await registry.log_batch(request.adapter_id, "rest", outcome)
         logger.info("REST ingest from adapter '%s': %s", request.adapter_id, outcome.summary())
         return IngestResponse(
             accepted=outcome.accepted,
-            rejected=outcome.rejected + len(parse_errors),
+            rejected=outcome.rejected,
             curated=outcome.curated,
             curation_errors=outcome.curation_errors,
             persisted=outcome.persisted,
-            errors=parse_errors + outcome.errors,
+            errors=outcome.errors,
         )
 
     @app.get("/v1/ingest/stats")

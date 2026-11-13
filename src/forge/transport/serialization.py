@@ -180,6 +180,10 @@ def _record_timestamp_to_proto(ts: RecordTimestamp) -> dict[str, Any]:
     }
     if ts.server_time is not None:
         result["server_time"] = _datetime_to_proto(ts.server_time)
+    if ts.source_clock:
+        result["source_clock"] = ts.source_clock
+    if ts.source_uncertainty_seconds is not None:
+        result["source_uncertainty_seconds"] = ts.source_uncertainty_seconds
     return result
 
 
@@ -326,6 +330,12 @@ def _proto_to_record_timestamp(d: dict[str, Any]) -> RecordTimestamp:
     }
     if ingestion_time is not None:
         kwargs["ingestion_time"] = ingestion_time
+    # The one-clock fields (FB-088): an empty source_clock is "undeclared", and an absent
+    # uncertainty stays None (proto3 optional, so 0.0 on the wire is a real bound).
+    if d.get("source_clock"):
+        kwargs["source_clock"] = d["source_clock"]
+    if d.get("source_uncertainty_seconds") is not None:
+        kwargs["source_uncertainty_seconds"] = float(d["source_uncertainty_seconds"])
     return RecordTimestamp(**kwargs)
 
 

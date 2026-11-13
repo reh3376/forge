@@ -10,6 +10,7 @@ import { Inject, Injectable, Logger, Optional } from "@nestjs/common";
 import type { DomainEventParams } from "../mqttDomainPublisher/types";
 import {
   ContextualRecordMessage,
+  SourceStampMissingError,
   mapDomainEventToRecord,
 } from "./contextual-record.mapper";
 import { FORGE_CONFIG, ForgeConfig } from "./forge.config";
@@ -36,6 +37,9 @@ export interface IngestStatus {
   recordsCollected: number;
   /** Records put back after a Collect stream could not deliver them. */
   recordsRestored: number;
+  /** Events refused rather than stamped with an invented time (FB-088, never silent). */
+  recordsRefused: number;
+  lastRefusal?: string;
   lastError?: string;
   lastFlushAt?: string;
 }
@@ -71,6 +75,8 @@ export class ForgeIngestService {
   private deadLettered = 0;
   private collected = 0;
   private restored = 0;
+  private refused = 0;
+  private lastRefusal?: string;
   private consecutiveFailures = 0;
   private circuit: CircuitState = "closed";
   private circuitOpenedAt = 0;
@@ -107,8 +113,18 @@ export class ForgeIngestService {
         adapterVersion: FORGE_MES_MANIFEST.version,
         site: this.config.site,
         area: this.config.area,
+        sourceTimestampOrigin: this.config.sourceTimestampOrigin,
       });
     } catch (err) {
+      if (err instanceof SourceStampMissingError) {
+        // Never silent (owner, 2026-11-03): counted, named on the status and on the
+        // spoke's Health answer; the first one per process is a warning.
+        this.refused++;
+        this.lastRefusal = err.message;
+        const log = this.refused === 1 ? this.logger.warn : this.logger.debug;
+        log.call(this.logger, `Refused (${err.refusalCause}): ${err.message}`);
+        return;
+      }
       this.logger.warn(
         `Could not map ${params.entityType}/${params.eventType} to a ContextualRecord: ${err}`
       );
@@ -242,6 +258,8 @@ export class ForgeIngestService {
       subscribers: this.listeners.size,
       recordsCollected: this.collected,
       recordsRestored: this.restored,
+      recordsRefused: this.refused,
+      lastRefusal: this.lastRefusal,
       lastError: this.lastError,
       lastFlushAt: this.lastFlushAt
         ? new Date(this.lastFlushAt).toISOString()

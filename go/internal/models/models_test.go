@@ -447,3 +447,36 @@ func TestAdapterStateRoundTrip(t *testing.T) {
 }
 
 func timePtr(t time.Time) *time.Time { return &t }
+
+// The one-clock fields of FB-088 survive the proto round trip, and their absence stays
+// absent (an unset uncertainty is nil, not 0; an undeclared clock is "").
+func TestRecordTimestampSourceClockRoundTrip(t *testing.T) {
+	now := time.Now().UTC().Round(time.Millisecond)
+	bound := 1.0
+	rec := &models.ContextualRecord{
+		RecordID: uuid.New(),
+		Source:   models.RecordSource{AdapterID: "forge-ot-module", System: "forge-ot"},
+		Timestamp: models.RecordTimestamp{
+			SourceTime:               now,
+			IngestionTime:            now,
+			SourceClock:              "forge",
+			SourceUncertaintySeconds: &bound,
+		},
+		Value:   models.RecordValue{Raw: 1.0, Quality: models.QualityGood, DataType: "float64"},
+		Lineage: models.RecordLineage{SchemaRef: "s", AdapterID: "a", AdapterVersion: "v"},
+	}
+	back := models.ContextualRecordFromProto(models.ContextualRecordToProto(rec))
+	if back.Timestamp.SourceClock != "forge" {
+		t.Errorf("source_clock: got %q", back.Timestamp.SourceClock)
+	}
+	if back.Timestamp.SourceUncertaintySeconds == nil || *back.Timestamp.SourceUncertaintySeconds != 1.0 {
+		t.Errorf("source_uncertainty_seconds: got %v", back.Timestamp.SourceUncertaintySeconds)
+	}
+
+	rec.Timestamp.SourceClock = ""
+	rec.Timestamp.SourceUncertaintySeconds = nil
+	back = models.ContextualRecordFromProto(models.ContextualRecordToProto(rec))
+	if back.Timestamp.SourceClock != "" || back.Timestamp.SourceUncertaintySeconds != nil {
+		t.Errorf("unset fields did not stay unset: %q %v", back.Timestamp.SourceClock, back.Timestamp.SourceUncertaintySeconds)
+	}
+}

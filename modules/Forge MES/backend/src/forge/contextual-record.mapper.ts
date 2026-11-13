@@ -39,6 +39,10 @@ export interface ContextualRecordMessage {
     source_time: ProtoTimestamp;
     server_time?: ProtoTimestamp;
     ingestion_time: ProtoTimestamp;
+    /** Which clock stamped source_time (one-clock record P-3/P-4); "forge" when the
+     *  bridge's own clock stood in for an event that carried no time (FB-088). */
+    source_clock?: string;
+    source_uncertainty_seconds?: number;
   };
   value: { json_value: string; quality: QualityCode; data_type: string };
   context: {
@@ -64,6 +68,15 @@ export interface ContextualRecordMessage {
   };
 }
 
+/** The clock that stamps a connection's values (one-clock record P-4). */
+export type SourceTimestampOrigin = "device" | "server" | "edge" | "forge";
+export const SOURCE_TIMESTAMP_ORIGINS: readonly SourceTimestampOrigin[] = [
+  "device",
+  "server",
+  "edge",
+  "forge",
+];
+
 export interface MapperOptions {
   adapterId: string;
   adapterVersion: string;
@@ -71,6 +84,30 @@ export interface MapperOptions {
   area: string;
   /** Injected for deterministic tests; defaults to new Date(). */
   now?: Date;
+  /**
+   * What stamps this bridge's events when the event itself carries no time. Only
+   * "forge" lets the bridge's clock (`now`) stand in, marked `source_clock: "forge"`;
+   * otherwise such an event is refused with SourceStampMissingError (FB-088). Set from
+   * FORGE_SOURCE_TIMESTAMP_ORIGIN; FB-090 moves the declaration into FACTS.
+   */
+  sourceTimestampOrigin?: SourceTimestampOrigin;
+}
+
+/**
+ * An event arrived without a timestamp and the bridge may not invent one (one clock,
+ * FB-088). Never silent: the ingest service counts it (`recordsRefused`, `lastRefusal`)
+ * and the spoke's Health answer carries it to the hub.
+ */
+export class SourceStampMissingError extends Error {
+  readonly refusalCause = "source_stamp_missing";
+  constructor(entityType: string | undefined, eventType: string | undefined) {
+    super(
+      `${entityType ?? "event"}/${eventType ?? "unknown"} arrived without a timestamp; ` +
+        "the bridge does not declare source_timestamp_origin: forge, and Forge does not " +
+        "invent one (one clock, FB-088)"
+    );
+    this.name = "SourceStampMissingError";
+  }
 }
 
 // MES domain event types -> normalised Forge identifiers.
@@ -277,7 +314,14 @@ export function mapDomainEventToRecord(
   const raw: Raw = (params.data ?? {}) as Raw;
   const ctx = params.context ?? {};
 
-  const sourceTime = extractSourceTime(raw) ?? now;
+  // The event's own time is the source time. Without one, only a bridge declared
+  // origin "forge" may stand its clock in, and the record says so (FB-088).
+  const extracted = extractSourceTime(raw);
+  if (!extracted && opts.sourceTimestampOrigin !== "forge") {
+    throw new SourceStampMissingError(params.entityType, params.eventType);
+  }
+  const sourceTime = extracted ?? now;
+  const sourceClock = extracted ? undefined : "forge";
   const eventType = normalizeEventType(params.entityType, params.eventType);
 
   const productionOrderId =
@@ -341,6 +385,7 @@ export function mapDomainEventToRecord(
       source_time: toTimestamp(sourceTime),
       ...(serverTime ? { server_time: toTimestamp(serverTime) } : {}),
       ingestion_time: toTimestamp(now),
+      ...(sourceClock ? { source_clock: sourceClock } : {}),
     },
     value: {
       json_value: encodeRawValue(raw),

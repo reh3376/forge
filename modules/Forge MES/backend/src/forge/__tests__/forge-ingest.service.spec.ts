@@ -45,6 +45,11 @@ function event(i: number) {
   };
 }
 
+/** An event the MES emitted without any timestamp (FB-088). */
+function timelessEvent(i: number) {
+  return { entityType: "StepExecution", eventType: "step_started", data: { id: `s${i}`, batchId: "B" } };
+}
+
 describe("ForgeIngestService", () => {
   let clock: FakeClock;
   let client: FakeClient;
@@ -58,6 +63,15 @@ describe("ForgeIngestService", () => {
     const svc = new ForgeIngestService(cfg, client as unknown as ForgeHubClient, clock);
     return svc;
   }
+
+  it("refuses an event without a timestamp, visibly, instead of inventing one (FB-088)", async () => {
+    const svc = make();
+    svc.setSession("sess");
+    svc.enqueueDomainEvent(timelessEvent(1));
+    svc.enqueueDomainEvent(timelessEvent(2));
+    expect(svc.getStatus()).toMatchObject({ queued: 0, recordsRefused: 2 });
+    expect(svc.getStatus().lastRefusal).toMatch(/without a timestamp/);
+  });
 
   it("is inert when disabled", () => {
     const cfg = loadForgeConfig(() => undefined);

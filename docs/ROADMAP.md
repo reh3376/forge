@@ -59,6 +59,7 @@ Component-by-component snapshot: [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md). Delivered
 | One clock, hub side: `forge.core.clock` (`utc_now`, `require_utc`, `OneClockModel`); `RecordTimestamp`, the manufacturing entities, `DataProduct` and the decision models reject naive datetimes and store UTC; `utcnow` gone; ruff `DTZ` blocking | FB-014 |
 | One clock, hub receipt: `IngestPipeline.ingest` stamps `ingestion_time` with the hub clock on every path (gRPC push, pull, REST); the spoke's stamp kept as `sent_time`, none invented | FB-087 |
 | One clock, measurement: clock offset per adapter and link (spoke, server, source) from every record and from the OPC-UA probe's `CurrentTime`; on `AdapterHealth.clock`, `/v1/ingest/stats`, the OT connection status and the first OpenTelemetry instruments (`forge.clock.offset`, `forge.clock.out_of_tolerance`); alert on a provisional 1 s tolerance | FB-089 |
+| One clock, no invented source stamp: a value without one is refused unless its connection declares `source_timestamp_origin: forge`, then Forge's read time stands in with `source_clock=forge` and the poll bound as `source_uncertainty_seconds` (proto fields 6 and 8); the refusal is never silent (adapter DEGRADED, health, API, CLI, `forge.ingest.refused`) | FB-088 |
 
 ---
 
@@ -227,7 +228,7 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 |---|---|---|---|---|
 | WS-1 transport | FB-092 | FB-072 | FB-055, FB-056, FB-071 | FB-002 to close as superseded; FB-092 is the one-clock time exchange |
 | WS-2 hub platform | FB-093 | FB-004, FB-007, FB-059, FB-075, FB-097 | FB-100 | FB-001, FB-003, FB-005, FB-006, FB-008 and FB-009 done 2026-10-22, FB-098 and FB-099 done 2026-10-26, FB-101 done 2026-10-27 (FB-100 found on the way, waits on FB-057 step 2); FB-093 is the one-clock enforcement |
-| WS-3 data model | FB-011, FB-088, FB-090 | FB-012, FB-091 | — | FB-086, FB-014, FB-087, FB-089, FB-015, FB-010, FB-013, FB-016 done; the one-clock items follow the owner's 2026-10-18 principle (FB-092 in WS-1, FB-093 in WS-2), D-9 |
+| WS-3 data model | FB-011, FB-090 | FB-012, FB-091 | — | FB-086, FB-014, FB-087, FB-089, FB-015, FB-010, FB-013, FB-016, FB-088 done; the one-clock items follow the owner's 2026-10-18 principle (FB-092 in WS-1, FB-093 in WS-2), D-9 |
 | WS-4 OT module | FB-094 | FB-020, FB-079 | FB-018 | FB-073, FB-074 done (awaiting approval); FB-082 done; FB-094 is the OT source-time design |
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
 | WS-6 forge-display | — | — | — | No backlog ids yet; tracked here until the design lands |

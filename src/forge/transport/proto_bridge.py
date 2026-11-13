@@ -205,6 +205,10 @@ def record_timestamp_to_proto(ts: RecordTimestamp) -> record_msg.RecordTimestamp
     ingest_ts = _dt_to_timestamp(ts.ingestion_time)
     if ingest_ts is not None:
         proto_ts.ingestion_time.CopyFrom(ingest_ts)
+    if ts.source_clock:
+        proto_ts.source_clock = ts.source_clock
+    if ts.source_uncertainty_seconds is not None:
+        proto_ts.source_uncertainty_seconds = ts.source_uncertainty_seconds
     return proto_ts
 
 
@@ -370,6 +374,12 @@ def proto_to_record_timestamp(msg: record_msg.RecordTimestamp) -> RecordTimestam
     ingestion_time = _timestamp_to_dt(msg.ingestion_time)
     if ingestion_time is not None:
         kwargs["ingestion_time"] = ingestion_time
+    # The one-clock fields (FB-088): an empty source_clock is "undeclared"; the
+    # uncertainty is proto3 optional, so presence is checked rather than zero.
+    if msg.source_clock:
+        kwargs["source_clock"] = msg.source_clock
+    if msg.HasField("source_uncertainty_seconds"):
+        kwargs["source_uncertainty_seconds"] = msg.source_uncertainty_seconds
     return RecordTimestamp(**kwargs)
 
 

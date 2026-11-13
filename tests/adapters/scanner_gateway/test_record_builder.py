@@ -2,11 +2,14 @@
 
 from datetime import UTC, datetime
 
+import pytest
+
 from forge.adapters.scanner_gateway.record_builder import (
     _parse_timestamp,
     _scan_tag_path,
     build_contextual_record,
 )
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.contextual_record import QualityCode, RecordContext
 
 # ── Parse Timestamp ──────────────────────────────────────────────
@@ -15,9 +18,10 @@ from forge.core.models.contextual_record import QualityCode, RecordContext
 class TestParseTimestamp:
     """Verify timestamp parsing from scanner event formats."""
 
-    def test_none_returns_now(self):
-        result = _parse_timestamp(None)
-        assert result.tzinfo is not None
+    def test_none_returns_none(self):
+        # no stamp is invented for a scan without one (one clock, FB-088)
+        assert _parse_timestamp(None) is None
+        assert _parse_timestamp("not a time") is None
 
     def test_iso_string(self):
         result = _parse_timestamp("2026-04-06T14:30:00+00:00")
@@ -150,8 +154,32 @@ class TestBuildContextualRecord:
             adapter_version="0.1.0",
         )
         assert record.timestamp.source_time.year == 2026
-        assert record.timestamp.server_time is not None
+        # the gateway sends no server stamp; none is invented (FB-088)
+        assert record.timestamp.server_time is None
         assert record.timestamp.ingestion_time is not None
+        assert record.timestamp.source_clock is None
+
+    def test_scan_without_scanned_at_is_refused_unless_the_adapter_declared_forge(self):
+        """One clock (FB-088): a scan without scanned_at gets no invented time."""
+        event = {"scan_type": "SCAN_TYPE_ENTRY", "device_id": "scanner-7"}
+        with pytest.raises(
+            SourceStampMissingError, match=r"connection scanner-7, tag scanner.scan.entry"
+        ):
+            build_contextual_record(
+                scan_event=event,
+                context=self._make_context(),
+                adapter_id="scanner-gateway",
+                adapter_version="0.1.0",
+            )
+        record = build_contextual_record(
+            scan_event=event,
+            context=self._make_context(),
+            adapter_id="scanner-gateway",
+            adapter_version="0.1.0",
+            source_timestamp_origin="forge",
+        )
+        assert record.timestamp.source_clock == "forge"
+        assert record.timestamp.source_time == record.timestamp.ingestion_time
 
     def test_internal_fields_excluded_from_payload(self):
         record = build_contextual_record(

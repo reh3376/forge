@@ -27,6 +27,7 @@ from forge.adapters.whk_erpi.config import WhkErpiConfig
 from forge.adapters.whk_erpi.context import build_record_context
 from forge.adapters.whk_erpi.record_builder import build_contextual_record
 from forge.adapters.whk_erpi.topics import ERPI_ACK_TOPICS, ERPI_ENTITY_TOPICS
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -146,6 +147,7 @@ class WhkErpiAdapter(
             records_collected=self._records_collected,
             records_failed=self._records_failed,
             uptime_seconds=uptime,
+            **self.refusal_health(),
         )
 
     # ── Data Collection ────────────────────────────────────────
@@ -168,9 +170,12 @@ class WhkErpiAdapter(
                     context=context,
                     adapter_id=self.adapter_id,
                     adapter_version=self.manifest.version,
+                    source_timestamp_origin=self.source_timestamp_origin,
                 )
                 self._records_collected += 1
                 yield record
+            except SourceStampMissingError as exc:
+                self.refuse(exc)
             except Exception:
                 self._records_failed += 1
                 logger.exception("Failed to map ERPI event: %s", raw_event)

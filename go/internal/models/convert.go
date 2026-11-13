@@ -75,6 +75,11 @@ func recordTimestampToProto(ts *RecordTimestamp) *forgev1.RecordTimestamp {
 	if !ts.IngestionTime.IsZero() {
 		pb.IngestionTime = timestamppb.New(ts.IngestionTime)
 	}
+	pb.SourceClock = ts.SourceClock
+	if ts.SourceUncertaintySeconds != nil {
+		u := *ts.SourceUncertaintySeconds
+		pb.SourceUncertaintySeconds = &u
+	}
 	return pb
 }
 
@@ -92,6 +97,11 @@ func recordTimestampFromProto(pb *forgev1.RecordTimestamp) RecordTimestamp {
 	}
 	if pb.IngestionTime != nil {
 		ts.IngestionTime = pb.IngestionTime.AsTime()
+	}
+	ts.SourceClock = pb.GetSourceClock()
+	if pb.SourceUncertaintySeconds != nil {
+		u := pb.GetSourceUncertaintySeconds()
+		ts.SourceUncertaintySeconds = &u
 	}
 	return ts
 }

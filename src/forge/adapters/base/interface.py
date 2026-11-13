@@ -12,6 +12,7 @@ it declares in its manifest's capabilities.
 from __future__ import annotations
 
 import abc
+import logging
 from typing import TYPE_CHECKING, Any
 
 from forge.core.models.adapter import (
@@ -25,6 +26,8 @@ if TYPE_CHECKING:
     from datetime import datetime
 
     from forge.core.models.contextual_record import ContextualRecord
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Lifecycle mixin
@@ -81,6 +84,8 @@ class AdapterBase(AdapterLifecycle):
         self._state: AdapterState = AdapterState.REGISTERED
         self._records_collected: int = 0
         self._records_failed: int = 0
+        self._refusals: dict[str, int] = {}
+        self._last_refusal: str | None = None
 
     @property
     def adapter_id(self) -> str:
@@ -89,6 +94,16 @@ class AdapterBase(AdapterLifecycle):
     @property
     def state(self) -> AdapterState:
         return self._state
+
+    @property
+    def source_timestamp_origin(self) -> str | None:
+        """The origin this adapter's connection declared for the clock that stamps its values.
+
+        Adapters keep the declaration on their config model (``source_timestamp_origin``,
+        one-clock record P-4); None until it is declared. A value without a source stamp is
+        refused unless the origin is ``forge`` (FB-088).
+        """
+        return getattr(getattr(self, "_config", None), "source_timestamp_origin", None)
 
     @abc.abstractmethod
     async def collect(self) -> AsyncIterator[ContextualRecord]:
@@ -100,6 +115,42 @@ class AdapterBase(AdapterLifecycle):
         data contract before entering the governance pipeline.
         """
         yield  # pragma: no cover — abstract async generator
+
+    def refuse(self, exc: Exception, *, cause: str | None = None) -> None:
+        """Count a value this adapter refused rather than invent something about it.
+
+        A refusal is never silent (owner, 2026-11-03). It counts on ``records_failed``
+        and under its cause in ``refusals``; its message becomes ``last_refusal`` and
+        the health's ``error_message``; the adapter goes DEGRADED while it is HEALTHY;
+        the first refusal per cause is logged as a warning, every one counts on the
+        ``forge.ingest.refused`` metric. ``cause`` defaults to the exception's ``cause``
+        attribute (``SourceStampMissingError.cause``, FB-088). A restart returns the adapter
+        to HEALTHY; the probe-based recovery is FB-093.
+        """
+        from forge.core import telemetry
+
+        cause = cause or getattr(exc, "cause", None) or type(exc).__name__
+        first = cause not in self._refusals
+        self._refusals[cause] = self._refusals.get(cause, 0) + 1
+        self._records_failed += 1
+        self._last_refusal = str(exc)
+        if self._state == AdapterState.HEALTHY:
+            self._state = AdapterState.DEGRADED
+        telemetry.record_refusal(self.adapter_id, cause)
+        log = logger.warning if first else logger.debug
+        log("%s refused a value (%s): %s", self.adapter_id, cause, exc)
+
+    def refusal_health(self, error_message: str | None = None) -> dict[str, Any]:
+        """The refusal fields of this adapter's ``AdapterHealth`` (``**self.refusal_health()``).
+
+        ``error_message`` is the adapter's own message when it has one, else the last
+        refusal, so the cause travels on the wire field the health contract already has.
+        """
+        return {
+            "refusals": dict(self._refusals),
+            "last_refusal": self._last_refusal,
+            "error_message": error_message or self._last_refusal,
+        }
 
     async def validate_record(self, record: ContextualRecord) -> bool:
         """Optional pre-send validation hook.

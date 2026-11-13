@@ -11,6 +11,7 @@ import json
 from datetime import UTC, datetime
 from typing import Any
 
+from forge.core.clock import resolve_source_stamp
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -22,10 +23,10 @@ from forge.core.models.contextual_record import (
 )
 
 
-def _parse_timestamp(raw: Any) -> datetime:
-    """Parse a timestamp from various scanner event formats."""
+def _parse_timestamp(raw: Any) -> datetime | None:
+    """Parse a timestamp from the scanner event formats; None when there is none (FB-088)."""
     if raw is None:
-        return datetime.now(tz=UTC)
+        return None
 
     if isinstance(raw, datetime):
         if raw.tzinfo is None:
@@ -50,7 +51,7 @@ def _parse_timestamp(raw: Any) -> datetime:
             dt = dt.replace(tzinfo=UTC)
         return dt
     except ValueError:
-        return datetime.now(tz=UTC)
+        return None
 
 
 def _scan_tag_path(scan_event: dict[str, Any]) -> str:
@@ -72,6 +73,7 @@ def build_contextual_record(
     context: RecordContext,
     adapter_id: str,
     adapter_version: str,
+    source_timestamp_origin: str | None = None,
 ) -> ContextualRecord:
     """Build a ContextualRecord from a scanner.v1 ScanEvent.
 
@@ -80,12 +82,25 @@ def build_contextual_record(
         context: Pre-built RecordContext from context.py.
         adapter_id: The adapter's identity string.
         adapter_version: The adapter's version string.
+        source_timestamp_origin: the origin the connection declared for the clock that
+            stamps its values (device, server, edge or forge); None when undeclared (FB-088)
 
     Returns:
         A fully-populated ContextualRecord.
     """
-    source_time = _parse_timestamp(scan_event.get("scanned_at"))
     now = datetime.now(tz=UTC)
+    tag_path = _scan_tag_path(scan_event)
+    device_id = scan_event.get("device_id")
+    # scanned_at is the source time; a scan without one is refused unless the adapter
+    # declares source_timestamp_origin: forge (one clock, FB-088).
+    stamp = resolve_source_stamp(
+        _parse_timestamp(scan_event.get("scanned_at")),
+        origin=source_timestamp_origin,
+        read_at=now,
+        adapter_id=adapter_id,
+        connection=str(device_id) if device_id is not None else None,
+        tag_path=tag_path,
+    )
 
     # The scan event payload is the full event minus internal fields
     payload = {k: v for k, v in scan_event.items() if k not in ("_routed_to",) and v is not None}
@@ -94,13 +109,15 @@ def build_contextual_record(
         source=RecordSource(
             adapter_id=adapter_id,
             system="scanner-gateway",
-            tag_path=_scan_tag_path(scan_event),
+            tag_path=tag_path,
             connection_id=scan_event.get("device_id"),
         ),
+        # This system sends no server stamp; none is invented (FB-088).
         timestamp=RecordTimestamp(
-            source_time=source_time,
-            server_time=now,
+            source_time=stamp.source_time,
             ingestion_time=now,
+            source_clock=stamp.source_clock,
+            source_uncertainty_seconds=stamp.source_uncertainty_seconds,
         ),
         value=RecordValue(
             raw=json.dumps(payload, default=str, ensure_ascii=False),

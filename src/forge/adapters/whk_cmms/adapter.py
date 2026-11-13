@@ -35,6 +35,7 @@ from forge.adapters.whk_cmms.topics import (
     CMMS_GRAPHQL_ENTITIES,
     CMMS_RABBITMQ_TOPICS,
 )
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -162,6 +163,7 @@ class WhkCmmsAdapter(
             records_collected=self._records_collected,
             records_failed=self._records_failed,
             uptime_seconds=uptime,
+            **self.refusal_health(),
         )
 
     # ── Data Collection ────────────────────────────────────────
@@ -184,9 +186,13 @@ class WhkCmmsAdapter(
                     context=context,
                     adapter_id=self.adapter_id,
                     adapter_version=self.manifest.version,
+                    source_timestamp_origin=self.source_timestamp_origin,
+                    poll_bound_seconds=self._config.poll_interval_seconds if self._config else None,
                 )
                 self._records_collected += 1
                 yield record
+            except SourceStampMissingError as exc:
+                self.refuse(exc)
             except Exception:
                 self._records_failed += 1
                 logger.exception("Failed to map CMMS event: %s", raw_event)

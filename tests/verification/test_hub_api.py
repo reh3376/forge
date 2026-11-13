@@ -241,6 +241,8 @@ class TestMultiAdapterFlow:
                     data_contract=DataContract(
                         schema_ref=f"forge://schemas/{aid}/v0.1.0",
                     ),
+                    # a bare reading carries no timestamp: the hub's read time may stand in
+                    metadata={"source_timestamp_origin": "forge"},
                 ).model_dump(mode="json"),
             )
 

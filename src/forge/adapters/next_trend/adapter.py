@@ -34,6 +34,7 @@ from forge.adapters.base.interface import (
 from forge.adapters.next_trend.config import NextTrendConfig
 from forge.adapters.next_trend.context import build_record_context
 from forge.adapters.next_trend.record_builder import build_contextual_record
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -197,6 +198,7 @@ class NextTrendAdapter(
             last_healthy=self._last_healthy,
             records_collected=self._records_collected,
             records_failed=self._records_failed,
+            **self.refusal_health(),
         )
 
     # ── Core read interface (AdapterBase) ───────────────────────
@@ -235,9 +237,15 @@ class NextTrendAdapter(
                     context=context,
                     adapter_id=self.adapter_id,
                     adapter_version=self.manifest.version,
+                    source_timestamp_origin=self.source_timestamp_origin,
+                    poll_bound_seconds=self._config.poll_interval_ms / 1000.0
+                    if self._config
+                    else None,
                 )
                 self._records_collected += 1
                 yield record
+            except SourceStampMissingError as exc:
+                self.refuse(exc)
             except Exception:
                 self._records_failed += 1
                 logger.exception("Failed to map NextTrend tag value")
@@ -293,9 +301,15 @@ class NextTrendAdapter(
                     context=context,
                     adapter_id=self.adapter_id,
                     adapter_version=self.manifest.version,
+                    source_timestamp_origin=self.source_timestamp_origin,
+                    poll_bound_seconds=self._config.poll_interval_ms / 1000.0
+                    if self._config
+                    else None,
                 )
                 self._records_collected += 1
                 yield record
+            except SourceStampMissingError as exc:
+                self.refuse(exc)
             except Exception:
                 self._records_failed += 1
                 logger.exception("Failed to map backfill tag value")
