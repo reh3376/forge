@@ -31,7 +31,13 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
-from forge.core.clock import SERVER_LINK, ClockOffsetTracker, ClockSample, source_clock_name
+from forge.core.clock import (
+    SERVER_LINK,
+    ClockEstimate,
+    ClockOffsetTracker,
+    ClockSample,
+    source_clock_name,
+)
 from forge.modules.ot.opcua_client.paths import PathNormalizer
 from forge.modules.ot.opcua_client.types import ConnectionState
 from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
@@ -380,6 +386,18 @@ class PlcConnectionManager:
             round_trip=sample.round_trip_seconds,
             clock_id=entry.clock_id,
         )
+
+    def clock_estimate(self, name: str) -> ClockEstimate | None:
+        """The current estimate of the clock connection ``name`` declared (FB-094 step 3).
+
+        For the correction on entry (one-clock record P-3, P-10); None until the probe or
+        the response-header tap has read the clock.
+        """
+        entry = self._entries.get(name)
+        if entry is None:
+            return None
+        stats = self.offsets.clock(name, entry.clock_id)
+        return ClockEstimate.from_stats(stats) if stats is not None else None
 
     def set_clock_probe_interval(
         self, name: str, seconds: float, *, requested_by: str = ""

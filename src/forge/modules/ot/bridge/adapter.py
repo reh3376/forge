@@ -371,11 +371,9 @@ class IgnitionBridgeAdapter(AdapterBase, DiscoveryProvider):
         )
 
         timestamp = RecordTimestamp(
-            source_time=stamp.source_time,
+            **stamp.timestamp_fields(),
             server_time=tag_value.timestamp,
             ingestion_time=now,
-            source_clock=stamp.source_clock,
-            source_uncertainty_seconds=stamp.source_uncertainty_seconds,
         )
 
         value = RecordValue(

@@ -480,3 +480,45 @@ func TestRecordTimestampSourceClockRoundTrip(t *testing.T) {
 		t.Errorf("unset fields did not stay unset: %q %v", back.Timestamp.SourceClock, back.Timestamp.SourceUncertaintySeconds)
 	}
 }
+
+// The correction fields of FB-094 step 3 cross the wire: the stamp as sent, the offset
+// subtracted and the time quality, each absent when unset.
+func TestRecordTimestampCorrectionRoundTrip(t *testing.T) {
+	now := time.Now().UTC().Round(time.Millisecond)
+	asSent := now.Add(2 * time.Second)
+	offset := 2.0
+	synced := true
+	rec := &models.ContextualRecord{
+		RecordID: uuid.New(),
+		Source:   models.RecordSource{AdapterID: "forge-ot-module", System: "forge-ot"},
+		Timestamp: models.RecordTimestamp{
+			SourceTime:          now,
+			IngestionTime:       now,
+			SourceClock:         "device:WHK01",
+			SourceTimeAsSent:    &asSent,
+			SourceOffsetSeconds: &offset,
+			TimeQuality:         &models.TimeQuality{Synchronized: &synced, AccuracyClass: "T0"},
+		},
+		Value:   models.RecordValue{Raw: 1.0, Quality: models.QualityGood, DataType: "float64"},
+		Lineage: models.RecordLineage{SchemaRef: "s", AdapterID: "a", AdapterVersion: "v"},
+	}
+	back := models.ContextualRecordFromProto(models.ContextualRecordToProto(rec))
+	if back.Timestamp.SourceTimeAsSent == nil || !back.Timestamp.SourceTimeAsSent.Equal(asSent) {
+		t.Errorf("source_time_as_sent: got %v", back.Timestamp.SourceTimeAsSent)
+	}
+	if back.Timestamp.SourceOffsetSeconds == nil || *back.Timestamp.SourceOffsetSeconds != 2.0 {
+		t.Errorf("source_offset_seconds: got %v", back.Timestamp.SourceOffsetSeconds)
+	}
+	q := back.Timestamp.TimeQuality
+	if q == nil || q.Synchronized == nil || !*q.Synchronized || q.ClockFailure != nil || q.AccuracyClass != "T0" {
+		t.Errorf("time_quality: got %+v", q)
+	}
+
+	rec.Timestamp.SourceTimeAsSent = nil
+	rec.Timestamp.SourceOffsetSeconds = nil
+	rec.Timestamp.TimeQuality = nil
+	back = models.ContextualRecordFromProto(models.ContextualRecordToProto(rec))
+	if back.Timestamp.SourceTimeAsSent != nil || back.Timestamp.SourceOffsetSeconds != nil || back.Timestamp.TimeQuality != nil {
+		t.Errorf("unset correction fields did not stay unset: %+v", back.Timestamp)
+	}
+}

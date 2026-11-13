@@ -45,6 +45,7 @@ from forge.core.models.contextual_record import (
     RecordSource,
     RecordTimestamp,
     RecordValue,
+    TimeQuality,
 )
 from forge.proto_gen.forge.v1 import adapter_pb2 as adapter_msg
 from forge.proto_gen.forge.v1 import contextual_record_pb2 as record_msg
@@ -209,6 +210,19 @@ def record_timestamp_to_proto(ts: RecordTimestamp) -> record_msg.RecordTimestamp
         proto_ts.source_clock = ts.source_clock
     if ts.source_uncertainty_seconds is not None:
         proto_ts.source_uncertainty_seconds = ts.source_uncertainty_seconds
+    if ts.source_time_as_sent is not None:
+        as_sent = _dt_to_timestamp(ts.source_time_as_sent)
+        if as_sent is not None:
+            proto_ts.source_time_as_sent.CopyFrom(as_sent)
+    if ts.source_offset_seconds is not None:
+        proto_ts.source_offset_seconds = ts.source_offset_seconds
+    if ts.time_quality is not None:
+        quality = ts.time_quality
+        proto_ts.time_quality.accuracy_class = quality.accuracy_class
+        for name in ("synchronized", "clock_failure", "leap_seconds_known"):
+            flag = getattr(quality, name)
+            if flag is not None:
+                setattr(proto_ts.time_quality, name, flag)
     return proto_ts
 
 
@@ -380,6 +394,20 @@ def proto_to_record_timestamp(msg: record_msg.RecordTimestamp) -> RecordTimestam
         kwargs["source_clock"] = msg.source_clock
     if msg.HasField("source_uncertainty_seconds"):
         kwargs["source_uncertainty_seconds"] = msg.source_uncertainty_seconds
+    if msg.HasField("source_time_as_sent"):
+        kwargs["source_time_as_sent"] = _timestamp_to_dt(msg.source_time_as_sent)
+    if msg.HasField("source_offset_seconds"):
+        kwargs["source_offset_seconds"] = msg.source_offset_seconds
+    if msg.HasField("time_quality"):
+        quality = msg.time_quality
+        kwargs["time_quality"] = TimeQuality(
+            synchronized=quality.synchronized if quality.HasField("synchronized") else None,
+            clock_failure=quality.clock_failure if quality.HasField("clock_failure") else None,
+            leap_seconds_known=(
+                quality.leap_seconds_known if quality.HasField("leap_seconds_known") else None
+            ),
+            accuracy_class=quality.accuracy_class or "unspecified",
+        )
     return RecordTimestamp(**kwargs)
 
 

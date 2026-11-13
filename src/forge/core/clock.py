@@ -18,8 +18,8 @@ import os
 from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any, Protocol
+from datetime import UTC, datetime, timedelta
+from typing import TYPE_CHECKING, Any, Literal, Protocol
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
@@ -163,6 +163,30 @@ class ClockReader(Protocol):
     async def read_clock(self) -> ClockSample | None: ...
 
 
+#: IEC 61850-5 time-performance classes (one-clock record P-8), or undeclared.
+AccuracyClass = Literal["T0", "T1", "T2", "T3", "T4", "T5", "unspecified"]
+
+
+class TimeQuality(BaseModel):
+    """IEC 61850 ``TimeQuality`` in Forge's words (one-clock record P-3).
+
+    ``synchronized``: the stamping clock was inside its tolerance when the value was
+    stamped; ``clock_failure``: the clock could not be read (FB-093's state);
+    ``leap_seconds_known``: the clock accounts for leap seconds; ``accuracy_class``:
+    the class the connection declared (P-8), ``unspecified`` until FB-090's FACTS
+    section carries it. None means Forge does not know. Proto message ``TimeQuality``.
+    """
+
+    synchronized: bool | None = None
+    clock_failure: bool | None = None
+    leap_seconds_known: bool | None = None
+    accuracy_class: AccuracyClass = "unspecified"
+
+
+#: NTP's clock-discipline weight: each new sample moves the estimate an eighth of the way.
+ESTIMATE_WEIGHT = 0.125
+
+
 class ClockOffsetStats(BaseModel):
     """Rolling statistics of one measured clock against its governing clock."""
 
@@ -188,6 +212,16 @@ class ClockOffsetStats(BaseModel):
     round_trip_seconds: float | None = Field(
         default=None, description="Round trip of a direct probe (OPC-UA CurrentTime), if any."
     )
+    estimate_seconds: float = Field(
+        description=(
+            "The current offset estimate the correction uses (one-clock record P-2): the "
+            "samples filtered by an exponentially weighted mean, NTP's 1/8 weight."
+        ),
+    )
+    estimate_uncertainty_seconds: float | None = Field(
+        default=None,
+        description="Half the last round trip, the error bound from path asymmetry (P-2).",
+    )
 
 
 class _OffsetWindow:
@@ -205,11 +239,17 @@ class _OffsetWindow:
         self.breached = False
         self.last_at: datetime | None = None
         self.round_trip: float | None = None
+        self.estimate: float | None = None
 
     def observe(self, seconds: float, at: datetime, round_trip: float | None) -> ClockOffsetStats:
         self._samples.append(seconds)
         self.last_at = at
         self.round_trip = round_trip
+        self.estimate = (
+            seconds
+            if self.estimate is None
+            else self.estimate + ESTIMATE_WEIGHT * (seconds - self.estimate)
+        )
         within = abs(seconds) <= self.tolerance
         if not within:
             self.breaches += 1
@@ -234,6 +274,10 @@ class _OffsetWindow:
             breaches=self.breaches,
             measured_at=self.last_at,
             round_trip_seconds=self.round_trip,
+            estimate_seconds=self.estimate if self.estimate is not None else samples[-1],
+            estimate_uncertainty_seconds=(
+                abs(self.round_trip) / 2 if self.round_trip is not None else None
+            ),
         )
 
 
@@ -349,6 +393,10 @@ class ClockOffsetTracker:
             if aid == adapter_id and clock_id is not None and window.last_at is not None
         }
 
+    def clock(self, adapter_id: str, clock_id: str) -> ClockOffsetStats | None:
+        """The current statistics of one named clock, or None when it was never read."""
+        return self.clocks(adapter_id).get(clock_id)
+
     def adapters(self) -> list[str]:
         return sorted({aid for aid, _link, _clock in self._windows})
 
@@ -434,12 +482,54 @@ class SourceStampMissingError(ValueError):
 
 
 @dataclass(frozen=True)
+class ClockEstimate:
+    """What a record builder needs to correct a stamp: a clock's current offset and bound.
+
+    Built from the tracker's statistics of the clock that stamps a connection's values
+    (``ClockOffsetTracker.clock``): the filtered offset (P-2), its uncertainty (half the
+    last round trip) and whether the last sample sat inside tolerance.
+    """
+
+    clock_id: str
+    offset_seconds: float
+    uncertainty_seconds: float | None
+    within_tolerance: bool
+
+    @classmethod
+    def from_stats(cls, stats: ClockOffsetStats) -> ClockEstimate:
+        return cls(
+            clock_id=stats.clock_id or stats.link,
+            offset_seconds=stats.estimate_seconds,
+            uncertainty_seconds=stats.estimate_uncertainty_seconds,
+            within_tolerance=stats.within_tolerance,
+        )
+
+    def correct(self, stamp: datetime) -> datetime:
+        """``stamp`` in master time: the stamping clock's offset subtracted (P-3)."""
+        return stamp - timedelta(seconds=self.offset_seconds)
+
+
+@dataclass(frozen=True)
 class SourceStamp:
-    """The resolved source stamp of one value: what goes on ``RecordTimestamp``."""
+    """The resolved source stamp of one value: what goes on ``RecordTimestamp`` (P-3)."""
 
     source_time: datetime
     source_clock: str | None
     source_uncertainty_seconds: float | None
+    source_time_as_sent: datetime | None = None
+    source_offset_seconds: float | None = None
+    time_quality: TimeQuality | None = None
+
+    def timestamp_fields(self) -> dict[str, Any]:
+        """The ``RecordTimestamp`` keyword arguments this stamp fills."""
+        return {
+            "source_time": self.source_time,
+            "source_time_as_sent": self.source_time_as_sent,
+            "source_clock": self.source_clock,
+            "source_offset_seconds": self.source_offset_seconds,
+            "source_uncertainty_seconds": self.source_uncertainty_seconds,
+            "time_quality": self.time_quality,
+        }
 
 
 def source_clock_name(origin: str | None, connection: str | None = None) -> str | None:
@@ -470,24 +560,40 @@ def resolve_source_stamp(
     connection: str | None = None,
     tag_path: str | None = None,
     detail: str | None = None,
+    clock: ClockEstimate | None = None,
 ) -> SourceStamp:
-    """The source stamp of one value, never invented (FB-088).
+    """The source stamp of one value, never invented (FB-088), corrected on entry (FB-094).
 
     ``stamp`` is what the source sent: None when it sent nothing, or something that
     did not parse (``detail`` says which). With a stamp, that is the source time and
     ``source_clock`` names the declared origin's clock (None while undeclared; a
     connection declared ``forge`` that nevertheless sends stamps keeps them, the
-    declaration-against-wire check is FB-094's). Without a stamp, only a connection
-    declared ``origin: forge`` may stand in: ``read_at``, Forge's own clock when it
-    read the value, becomes the source time, ``source_clock`` is ``forge`` and
-    ``poll_bound_seconds`` is recorded as the uncertainty. Anything else raises
-    :class:`SourceStampMissingError`, which the adapter counts on its health.
+    declaration-against-wire check is FB-094's). When ``clock`` is the measured
+    estimate of that very clock, the stamp is corrected to master time on entry
+    (one-clock record P-3, P-10): ``source_time = stamp - offset``, the stamp as sent,
+    the offset subtracted, the clock's uncertainty plus ``poll_bound_seconds`` (the
+    sampling bound) and the time quality are recorded; the hub never corrects again.
+    Without a stamp, only a connection declared ``origin: forge`` may stand in:
+    ``read_at``, Forge's own clock when it read the value, becomes the source time,
+    ``source_clock`` is ``forge`` and ``poll_bound_seconds`` is recorded as the
+    uncertainty. Anything else raises :class:`SourceStampMissingError`, which the
+    adapter counts on its health.
     """
     if stamp is not None:
         # passed through as it came: RecordTimestamp is the one-clock gate (a naive stamp
         # fails there with the field named)
-        clock = source_clock_name(origin, connection) if origin != FORGE_CLOCK else None
-        return SourceStamp(stamp, clock, None)
+        clock_name = source_clock_name(origin, connection) if origin != FORGE_CLOCK else None
+        if clock is not None and clock_name is not None and clock.clock_id == clock_name:
+            uncertainty = (clock.uncertainty_seconds or 0.0) + (poll_bound_seconds or 0.0)
+            return SourceStamp(
+                source_time=clock.correct(stamp),
+                source_clock=clock_name,
+                source_uncertainty_seconds=uncertainty,
+                source_time_as_sent=stamp,
+                source_offset_seconds=clock.offset_seconds,
+                time_quality=TimeQuality(synchronized=clock.within_tolerance, clock_failure=False),
+            )
+        return SourceStamp(stamp, clock_name, None, source_time_as_sent=stamp)
     if origin == FORGE_CLOCK:
         return SourceStamp(read_at, FORGE_CLOCK, poll_bound_seconds)
     source_clock_name(origin, connection)  # an unknown origin is a configuration error

@@ -69,11 +69,9 @@ def build_contextual_record(
         tag_path=tag_path,
     )
     timestamp = RecordTimestamp(
-        source_time=stamp.source_time,
+        **stamp.timestamp_fields(),
         server_time=_extract_server_time(raw_event),
         ingestion_time=now,
-        source_clock=stamp.source_clock,
-        source_uncertainty_seconds=stamp.source_uncertainty_seconds,
     )
 
     # -- Value ----------------------------------------------------------

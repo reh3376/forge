@@ -29,6 +29,7 @@ from forge.core.models.contextual_record import (
 from forge.modules.ot.tag_engine.models import SCAN_CLASS_INTERVALS_MS
 
 if TYPE_CHECKING:
+    from forge.core.clock import ClockEstimate
     from forge.modules.ot.context.resolvers import EnrichmentContext
     from forge.modules.ot.tag_engine.models import BaseTag, TagValue
 
@@ -48,6 +49,7 @@ def build_ot_record(
     adapter_id: str = _ADAPTER_ID,
     adapter_version: str = _ADAPTER_VERSION,
     source_timestamp_origin: str | None = None,
+    clock: ClockEstimate | None = None,
 ) -> ContextualRecord:
     """Build a ContextualRecord from a tag definition, its current value,
     and the enrichment context resolved for that tag's path.
@@ -62,6 +64,12 @@ def build_ot_record(
     on its health. A Forge-born tag (memory, expression, derived, computed, event,
     reference: no connection) has Forge's clock as its source clock by nature.
 
+    With ``clock``, the measured estimate of the clock the connection declared, the
+    stamps are corrected to master time on entry (one-clock record P-3, P-10): the
+    source stamp and the server stamp each lose the clock's offset, and the record
+    keeps the stamp as sent, the offset, the uncertainty (half the probe round trip
+    plus the scan interval) and the time quality. The hub never corrects again.
+
     Args:
         tag: Tag definition (path, data_type, engineering_units, etc.)
         tag_value: Current runtime value (value, quality, timestamps)
@@ -70,6 +78,8 @@ def build_ot_record(
         adapter_version: Adapter version (default: 0.1.0)
         source_timestamp_origin: the origin the tag's connection declared
             (``device``, ``server``, ``edge`` or ``forge``), None when undeclared
+        clock: the current estimate of that clock (``PlcConnectionManager.clock_estimate``),
+            None when it has not been measured
 
     Returns:
         A fully-formed ContextualRecord ready for governance pipeline.
@@ -94,13 +104,17 @@ def build_ot_record(
         adapter_id=adapter_id,
         connection=connection,
         tag_path=tag.path,
+        clock=clock,
     )
+    # The server's stamp is corrected by the same clock when the correction applied: a
+    # PLC-embedded server is the device's clock, and a relaying server stamps itself.
+    server_time = tag_value.server_timestamp
+    if server_time is not None and stamp.source_offset_seconds is not None and clock is not None:
+        server_time = clock.correct(server_time)
     timestamp = RecordTimestamp(
-        source_time=stamp.source_time,
-        server_time=tag_value.server_timestamp,
+        **stamp.timestamp_fields(),
+        server_time=server_time,
         ingestion_time=now,
-        source_clock=stamp.source_clock,
-        source_uncertainty_seconds=stamp.source_uncertainty_seconds,
     )
 
     # ── Value ─────────────────────────────────────────────

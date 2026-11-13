@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from pydantic import ValidationError
 
 from forge.core.clock import (
     FORGE_CLOCK,
+    SERVER_LINK,
     SOURCE_TIMESTAMP_ORIGINS,
+    ClockEstimate,
+    ClockOffsetTracker,
     SourceStampMissingError,
+    TimeQuality,
     resolve_source_stamp,
     source_clock_name,
 )
@@ -126,3 +130,127 @@ class TestRecordTimestampFields:
         )
         back = RecordTimestamp.model_validate(ts.model_dump(mode="json"))
         assert back.source_clock == "forge" and back.source_uncertainty_seconds == 1.0
+
+
+class TestCorrectionOnEntry:
+    """A measured clock corrects the stamp where it enters (one-clock record P-3, P-10)."""
+
+    ESTIMATE = ClockEstimate(
+        clock_id="device:WHK01",
+        offset_seconds=2.0,
+        uncertainty_seconds=0.005,
+        within_tolerance=True,
+    )
+
+    def test_the_stamp_is_corrected_and_everything_done_is_recorded(self) -> None:
+        stamp = resolve_source_stamp(
+            STAMP,
+            origin="device",
+            read_at=READ_AT,
+            poll_bound_seconds=1.0,
+            adapter_id="ot",
+            connection="WHK01",
+            clock=self.ESTIMATE,
+        )
+        assert stamp.source_time == STAMP - timedelta(seconds=2)
+        assert stamp.source_time_as_sent == STAMP
+        assert stamp.source_offset_seconds == 2.0
+        assert stamp.source_clock == "device:WHK01"
+        assert stamp.source_uncertainty_seconds == pytest.approx(1.005)  # half RTT + sampling
+        assert stamp.time_quality == TimeQuality(synchronized=True, clock_failure=False)
+        fields = stamp.timestamp_fields()
+        assert set(fields) == {
+            "source_time",
+            "source_time_as_sent",
+            "source_clock",
+            "source_offset_seconds",
+            "source_uncertainty_seconds",
+            "time_quality",
+        }
+        record = RecordTimestamp(**fields)
+        assert record.source_time_as_sent == STAMP and record.source_offset_seconds == 2.0
+
+    def test_a_breaching_clock_says_so_in_the_time_quality(self) -> None:
+        estimate = ClockEstimate("device:WHK01", 5.0, None, within_tolerance=False)
+        stamp = resolve_source_stamp(
+            STAMP,
+            origin="device",
+            read_at=READ_AT,
+            adapter_id="ot",
+            connection="WHK01",
+            clock=estimate,
+        )
+        assert stamp.time_quality is not None and stamp.time_quality.synchronized is False
+        assert stamp.source_uncertainty_seconds == 0.0  # no round trip known, no sampling bound
+
+    def test_an_estimate_of_another_clock_does_not_apply(self) -> None:
+        """Only the clock that stamped the value may correct it."""
+        stamp = resolve_source_stamp(
+            STAMP,
+            origin="server",
+            read_at=READ_AT,
+            adapter_id="ot",
+            connection="WHK01",
+            clock=self.ESTIMATE,
+        )
+        assert stamp.source_time == STAMP and stamp.source_offset_seconds is None
+        assert stamp.source_time_as_sent == STAMP and stamp.source_clock == "server:WHK01"
+        assert stamp.time_quality is None
+
+    def test_an_undeclared_connection_is_not_corrected(self) -> None:
+        stamp = resolve_source_stamp(
+            STAMP,
+            origin=None,
+            read_at=READ_AT,
+            adapter_id="ot",
+            connection="WHK01",
+            clock=self.ESTIMATE,
+        )
+        assert stamp.source_time == STAMP and stamp.source_offset_seconds is None
+        assert stamp.source_time_as_sent == STAMP
+
+    def test_forge_s_own_read_time_has_nothing_as_sent(self) -> None:
+        stamp = resolve_source_stamp(None, origin="forge", read_at=READ_AT, adapter_id="ot")
+        assert stamp.source_time_as_sent is None and stamp.source_offset_seconds is None
+
+    def test_the_estimate_comes_from_the_tracker_s_filtered_offset(self) -> None:
+        tracker = ClockOffsetTracker(tolerance_seconds=5.0)
+        tracker.observe(
+            "WHK01", SERVER_LINK, 2.0, READ_AT, round_trip=0.010, clock_id="device:WHK01"
+        )
+        tracker.observe(
+            "WHK01", SERVER_LINK, 1.0, READ_AT, round_trip=0.020, clock_id="device:WHK01"
+        )
+        estimate = ClockEstimate.from_stats(tracker.clock("WHK01", "device:WHK01"))
+        assert estimate.clock_id == "device:WHK01"
+        assert estimate.offset_seconds == pytest.approx(1.875)  # 2 + (1 - 2) / 8
+        assert estimate.uncertainty_seconds == pytest.approx(0.010)
+        assert estimate.within_tolerance is True
+        assert estimate.correct(STAMP) == STAMP - timedelta(seconds=1.875)
+
+
+class TestTimeQuality:
+    def test_defaults_mean_unknown(self) -> None:
+        quality = TimeQuality()
+        assert quality.synchronized is None and quality.accuracy_class == "unspecified"
+
+    @pytest.mark.parametrize("cls", ["T0", "T1", "T5", "unspecified"])
+    def test_accuracy_classes_are_iec_61850_5(self, cls: str) -> None:
+        assert TimeQuality(accuracy_class=cls).accuracy_class == cls
+
+    def test_an_unknown_class_is_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            TimeQuality(accuracy_class="T9")
+
+    def test_the_record_carries_it_and_rejects_a_naive_stamp_as_sent(self) -> None:
+        ts = RecordTimestamp(
+            source_time=STAMP,
+            source_time_as_sent=STAMP,
+            source_offset_seconds=-0.5,
+            time_quality=TimeQuality(synchronized=True, accuracy_class="T0"),
+        )
+        dumped = ts.model_dump(mode="json")
+        assert dumped["source_offset_seconds"] == -0.5
+        assert dumped["time_quality"]["accuracy_class"] == "T0"
+        with pytest.raises(ValidationError, match="source_time_as_sent must be timezone-aware"):
+            RecordTimestamp(source_time=STAMP, source_time_as_sent=STAMP.replace(tzinfo=None))

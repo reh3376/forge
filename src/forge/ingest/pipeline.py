@@ -404,9 +404,7 @@ class IngestPipeline:
             source=RecordSource(adapter_id=adapter_id, system=adapter_id, tag_path=tag),
             # no ingestion_time: the client sent none, the hub stamps receipt in ingest()
             timestamp=RecordTimestamp(
-                source_time=stamp.source_time,
-                source_clock=stamp.source_clock,
-                source_uncertainty_seconds=stamp.source_uncertainty_seconds,
+                **stamp.timestamp_fields(),
             ),
             value=RecordValue(
                 raw=value,

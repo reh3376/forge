@@ -80,7 +80,30 @@ func recordTimestampToProto(ts *RecordTimestamp) *forgev1.RecordTimestamp {
 		u := *ts.SourceUncertaintySeconds
 		pb.SourceUncertaintySeconds = &u
 	}
+	if ts.SourceTimeAsSent != nil {
+		pb.SourceTimeAsSent = timestamppb.New(*ts.SourceTimeAsSent)
+	}
+	if ts.SourceOffsetSeconds != nil {
+		o := *ts.SourceOffsetSeconds
+		pb.SourceOffsetSeconds = &o
+	}
+	if ts.TimeQuality != nil {
+		pb.TimeQuality = &forgev1.TimeQuality{
+			Synchronized:     copyBool(ts.TimeQuality.Synchronized),
+			ClockFailure:     copyBool(ts.TimeQuality.ClockFailure),
+			LeapSecondsKnown: copyBool(ts.TimeQuality.LeapSecondsKnown),
+			AccuracyClass:    ts.TimeQuality.AccuracyClass,
+		}
+	}
 	return pb
+}
+
+func copyBool(b *bool) *bool {
+	if b == nil {
+		return nil
+	}
+	v := *b
+	return &v
 }
 
 func recordTimestampFromProto(pb *forgev1.RecordTimestamp) RecordTimestamp {
@@ -102,6 +125,26 @@ func recordTimestampFromProto(pb *forgev1.RecordTimestamp) RecordTimestamp {
 	if pb.SourceUncertaintySeconds != nil {
 		u := pb.GetSourceUncertaintySeconds()
 		ts.SourceUncertaintySeconds = &u
+	}
+	if pb.SourceTimeAsSent != nil {
+		t := pb.SourceTimeAsSent.AsTime()
+		ts.SourceTimeAsSent = &t
+	}
+	if pb.SourceOffsetSeconds != nil {
+		o := pb.GetSourceOffsetSeconds()
+		ts.SourceOffsetSeconds = &o
+	}
+	if q := pb.GetTimeQuality(); q != nil {
+		class := q.GetAccuracyClass()
+		if class == "" {
+			class = "unspecified"
+		}
+		ts.TimeQuality = &TimeQuality{
+			Synchronized:     copyBool(q.Synchronized),
+			ClockFailure:     copyBool(q.ClockFailure),
+			LeapSecondsKnown: copyBool(q.LeapSecondsKnown),
+			AccuracyClass:    class,
+		}
 	}
 	return ts
 }

@@ -148,12 +148,10 @@ def build_contextual_record(
             connection_id=raw_event.get("asset_id"),
         ),
         timestamp=RecordTimestamp(
-            source_time=stamp.source_time,
+            **stamp.timestamp_fields(),
             # the IMS server's own stamp doubles as server_time; none when Forge's stood in
             server_time=stamp.source_time if stamp.source_clock != FORGE_CLOCK else None,
             ingestion_time=now,
-            source_clock=stamp.source_clock,
-            source_uncertainty_seconds=stamp.source_uncertainty_seconds,
         ),
         value=RecordValue(
             raw=_serialize_payload(raw_event),
@@ -211,12 +209,10 @@ def build_asset_record(
             connection_id=asset.get("id"),
         ),
         timestamp=RecordTimestamp(
-            source_time=stamp.source_time,
+            **stamp.timestamp_fields(),
             # the IMS server's own stamp doubles as server_time; none when Forge's stood in
             server_time=stamp.source_time if stamp.source_clock != FORGE_CLOCK else None,
             ingestion_time=now,
-            source_clock=stamp.source_clock,
-            source_uncertainty_seconds=stamp.source_uncertainty_seconds,
         ),
         value=RecordValue(
             raw=json.dumps(asset, default=str, ensure_ascii=False),

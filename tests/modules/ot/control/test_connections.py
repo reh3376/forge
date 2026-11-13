@@ -418,6 +418,23 @@ async def test_probe_without_a_clock_value_is_counted_and_visible() -> None:
     assert conn["last_error"] == "clock probe: the server answered without a clock value"
 
 
+async def test_the_manager_hands_the_builder_the_clock_estimate() -> None:
+    """The estimate the correction on entry uses comes from the probe's series (FB-094 step 3)."""
+    registry = await registry_with_tags()
+    clock = Clock()
+    manager, clients = make([spec(liveness_interval_seconds=10)], registry, clock=clock)
+    await manager.start()
+    assert manager.clock_estimate("WHK01") is None  # not read yet
+    assert manager.clock_estimate("nope") is None
+    clients["WHK01"].values[LIVENESS_NODE] = clock.t + timedelta(seconds=2)
+    await manager.check()
+    estimate = manager.clock_estimate("WHK01")
+    assert estimate is not None and estimate.clock_id == "server:WHK01"
+    assert estimate.offset_seconds == 2.0 and estimate.uncertainty_seconds == 0.0
+    assert estimate.within_tolerance is False  # 2 s against the provisional 1 s tolerance
+    await manager.stop()
+
+
 async def test_a_declared_device_origin_names_the_clock_the_probe_reads() -> None:
     registry = await registry_with_tags()
     clock = Clock()

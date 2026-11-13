@@ -55,6 +55,7 @@ from forge.modules.ot.control.runtime import ControlDependencies, ControlRuntime
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Callable
 
+    from forge.core.clock import ClockEstimate
     from forge.core.models.contextual_record import ContextualRecord
     from forge.modules.ot.tag_engine.models import BaseTag
     from forge.modules.ot.tag_engine.registry import TagRegistry
@@ -267,6 +268,18 @@ class OTModuleAdapter(
         origins = self._source_timestamp_origins
         return origins.get(connection) or origins.get("*")
 
+    def clock_estimate_for(self, tag: BaseTag) -> ClockEstimate | None:
+        """The measured estimate of the clock the tag's connection declared (FB-094 step 3).
+
+        It comes from the control runtime's connection manager, whose probe and
+        response-header tap keep the series; None for a tag without a connection, a
+        connection the manager does not own, or a clock not read yet.
+        """
+        connection = getattr(tag, "connection_name", None)
+        if not connection or self._control is None or self._control.connections is None:
+            return None
+        return self._control.connections.clock_estimate(connection)
+
     # ------------------------------------------------------------------
     # AdapterBase.collect() — core read interface
     # ------------------------------------------------------------------
@@ -291,6 +304,7 @@ class OTModuleAdapter(
                     tag_value=tag_value,
                     enrichment=enrichment,
                     source_timestamp_origin=self.source_timestamp_origin_for(tag),
+                    clock=self.clock_estimate_for(tag),
                 )
                 self._records_collected += 1
                 yield record
@@ -477,6 +491,7 @@ class OTModuleAdapter(
                 tag_value=tag_value,
                 enrichment=enrichment,
                 source_timestamp_origin=self.source_timestamp_origin_for(tag),
+                clock=self.clock_estimate_for(tag),
             )
         except SourceStampMissingError as exc:
             self.refuse(exc)

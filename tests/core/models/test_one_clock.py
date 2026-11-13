@@ -78,7 +78,10 @@ class TestRecordTimestamp:
         ts = RecordTimestamp(source_time=utc_now())
         assert ts.ingestion_time.tzinfo == UTC
 
-    @pytest.mark.parametrize("field", ["source_time", "server_time", "ingestion_time", "sent_time"])
+    @pytest.mark.parametrize(
+        "field",
+        ["source_time", "server_time", "ingestion_time", "sent_time", "source_time_as_sent"],
+    )
     def test_naive_field_rejected(self, field: str) -> None:
         kwargs = {"source_time": utc_now(), field: NAIVE}
         with pytest.raises(ValidationError, match=f"{field} must be timezone-aware"):

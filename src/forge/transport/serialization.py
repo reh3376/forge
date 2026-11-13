@@ -46,6 +46,7 @@ from forge.core.models.contextual_record import (
     RecordSource,
     RecordTimestamp,
     RecordValue,
+    TimeQuality,
 )
 
 # ---------------------------------------------------------------------------
@@ -184,6 +185,12 @@ def _record_timestamp_to_proto(ts: RecordTimestamp) -> dict[str, Any]:
         result["source_clock"] = ts.source_clock
     if ts.source_uncertainty_seconds is not None:
         result["source_uncertainty_seconds"] = ts.source_uncertainty_seconds
+    if ts.source_time_as_sent is not None:
+        result["source_time_as_sent"] = _datetime_to_proto(ts.source_time_as_sent)
+    if ts.source_offset_seconds is not None:
+        result["source_offset_seconds"] = ts.source_offset_seconds
+    if ts.time_quality is not None:
+        result["time_quality"] = ts.time_quality.model_dump(exclude_none=True)
     return result
 
 
@@ -336,6 +343,12 @@ def _proto_to_record_timestamp(d: dict[str, Any]) -> RecordTimestamp:
         kwargs["source_clock"] = d["source_clock"]
     if d.get("source_uncertainty_seconds") is not None:
         kwargs["source_uncertainty_seconds"] = float(d["source_uncertainty_seconds"])
+    if d.get("source_time_as_sent"):
+        kwargs["source_time_as_sent"] = _proto_to_datetime(d["source_time_as_sent"])
+    if d.get("source_offset_seconds") is not None:
+        kwargs["source_offset_seconds"] = float(d["source_offset_seconds"])
+    if d.get("time_quality"):
+        kwargs["time_quality"] = TimeQuality.model_validate(d["time_quality"])
     return RecordTimestamp(**kwargs)
 
 

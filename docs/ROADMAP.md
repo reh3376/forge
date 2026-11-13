@@ -61,6 +61,7 @@ Component-by-component snapshot: [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md). Delivered
 | One clock, measurement: clock offset per adapter and link (spoke, server, source) from every record and from the OPC-UA probe's `CurrentTime`; on `AdapterHealth.clock`, `/v1/ingest/stats`, the OT connection status and the first OpenTelemetry instruments (`forge.clock.offset`, `forge.clock.out_of_tolerance`); alert on a provisional 1 s tolerance | FB-089 |
 | One clock, no invented source stamp: a value without one is refused unless its connection declares `source_timestamp_origin: forge`, then Forge's read time stands in with `source_clock=forge` and the poll bound as `source_uncertainty_seconds` (proto fields 6 and 8); the refusal is never silent (adapter DEGRADED, health, API, CLI, `forge.ingest.refused`) | FB-088 |
 | One clock, clock readers: every OPC-UA response measures the server's clock (T1/T3/T4 from the request and response headers), the `CurrentTime` probe runs on a per-connection cadence the operator sets at runtime, the offset series are keyed by the clock measured (`clock_id`); Logix, S7, Modbus and Sparkplug readers follow their drivers | FB-094 step 2 |
+| One clock, correction on entry: the record carries all six P-3 fields (`source_time_as_sent`, `source_clock`, `source_offset_seconds`, `source_uncertainty_seconds`, `time_quality`), the OT builder corrects the source and server stamps by the declared clock's filtered offset at the spoke, the hub never corrects again | FB-094 step 3 |
 
 ---
 
