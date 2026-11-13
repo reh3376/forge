@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-10-27` against the repository `reh3376/forge` at the merge of PR 76 (branch `main`).
+`Last verified: 2026-11-13` against the repository `reh3376/forge` at the merge of PR 95 (branch `main`): every slide reviewed against the tree and the key documents (FB-114), the three-layer process control framework (D-11) added to both tracks.
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -29,7 +29,7 @@ Two walkthroughs branch from here.
 |---|---|---|
 | **For** | Engineers and technical PMs who will build on or inside Forge | Operators, supervisors and managers who will run a Forge site or decide from it |
 | **Depth** | ~90 min, engineering-dense, code pointers throughout | ~45 min, plain language, no code required |
-| **Covers** | contract, storage, governance, OT module, modules and SDK, context and curation, security, the contributor workflow, where we are | what Forge is for, how data flows, the hub you run, your systems as spokes, the plant floor, context and decisions, governance, screens, roles, operations |
+| **Covers** | contract, storage, governance, OT module and the three layers of process control, modules and SDK, context and curation, security, the contributor workflow, where we are | what Forge is for, how data flows, the hub you run, your systems as spokes, the plant floor and the layers of control above it, context and decisions, governance, screens, roles, operations |
 | **Next** | Continue below ↓ (Contents → F1 Opening) | [Jump to the End User path →](#end-user-path) |
 
 note:
@@ -52,7 +52,7 @@ note:
 | [F2](#f2--the-hub-spoke-contract) | The hub ↔ spoke contract: `AdapterService`, `ContextualRecord`, transport, ingest | ~12 min | what crosses the hub boundary and how |
 | [F3](#f3--storage-and-the-hubs-databases) | Storage: hub-owned databases, routing, migrations, Forge-issued credentials | ~8 min | where data lands and who may touch it |
 | [F4](#f4--governance-fxts) | **Spec-first governance** (headline): the four layers, the FxTS family, hashing and the owner's approval | ~14 min | why nothing changes silently |
-| [F5](#f5--the-ot-module) | The plant-floor module (forge-ot): tags, alarms, the write defense chain, changeover, one clock | ~12 min | how the plant floor is reached safely |
+| [F5](#f5--the-ot-module) | The plant-floor module (forge-ot): tags, alarms, the write defense chain, changeover, one clock, the three-layer process control framework | ~15 min | how the plant floor is reached safely, and what will sit above the PLC |
 | [F6](#f6--modules-the-sdk-and-forge-display) | Modules, the module builder and forge-display | ~8 min | how new capability is built and shown |
 | [F7](#f7--context-curation-and-decisions) | Context, curation and decisions | ~8 min | how a value becomes decision-quality |
 | [F8](#f8--security-identity-and-federation) | Security, identity and federation | ~6 min | roles, credentials, hub of hubs, repo posture |
@@ -172,24 +172,25 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md` §1, the snapshot at PR 76:
+From `docs/WHERE-WE-ARE.md` §1, the snapshot at PR 95:
 
 1. The **hub ↔ spoke contract works end to end**: a spoke registers, is checked against its FACTS spec, pushes records that are persisted, is pulled (Collect, Backfill, Subscribe) and receives write-backs, over TLS/mTLS both ways with per-spoke tokens.
-2. The **OT module runs inside the hub** with OPC-UA connections, a tag engine, ISA-18.2 alarms, the full control-write defense chain, and drives the MES changeover sequence including the PLC CIP runner.
+2. The **OT module runs inside the hub** with OPC-UA connections, a tag engine, ISA-18.2 alarms, the full control-write defense chain, and drives the MES changeover sequence including the PLC CIP runner. Since the one-clock steps of 2026-11-13 no record builder invents a source time, the OPC-UA server's clock is read and every stamp corrected by its measured offset, and every spoke declares how it is time-governed in its FACTS contract (FB-088, FB-094, FB-090).
 3. **forge-mes is Go and not yet built**: the imported NestJS backend and Next.js frontend stand in as the interim bridge and speak the spoke contract; the Go rewrite (FB-076) is decided and designed (`docs/decisions/forge-mes-go.md`, signed 2026-11-03); the Go SDK scaffold is its first step.
 4. **Governance is real for four frameworks** (FATS, FACTS, FTTS, FVTS) plus FHTS hashing; the other seven are stubs or planned. forge-display does not exist yet; its contract (FVTS) does, with a runner and golden messages.
 5. **Not yet**: scoped roles in the gateway, `mod_mes` in the hub, the Go module SDK, the hub-of-hubs federation, Kubernetes, and any management module in Go.
+6. **The three-layer process control framework** (PC-L1 PID in the PLC, PC-L2 MPC, PC-L3 SME agents) is decided and signed by the owner (D-11, 2026-11-13); nothing of it is built, and nothing is built before its FSDs (F5).
 
-| Measure | Value (2026-10-27) |
+| Measure | Value (2026-11-13) |
 |---|---|
-| Python hub (`src/forge`) | 354 files, ~68,500 lines |
-| Python tests | 259 files, 4,448 collected, full suite green on the locked dependency set |
-| Go (`go/`) | 32 files, ~9,500 lines; `gofmt`, `go vet`, `go test` gate CI |
+| Python hub (`src/forge`) | 355 files, ~70,600 lines |
+| Python tests | 267 files, 4,584 collected, full suite green on the locked dependency set |
+| Go (`go/`) | 32 files, ~10,100 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~248,000 lines of TypeScript, kept until the Go forge-mes lands |
-| Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (15), plus the curation app |
+| Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
 | Storage migrations | 12 |
 | FACTS specs · FATS specs · FVTS specs | 9 · 28 · 1 |
-| Backlog | 103 items recorded; every finding fixed or recorded |
+| Backlog | 114 items recorded; every finding fixed or recorded |
 
 note:
 - Wording rule from the owner: the NestJS/Next.js code under `modules/Forge MES` is "the interim MES bridge"; forge-mes is the Go module that FB-076 builds. Never "TypeScript forge-mes".
@@ -215,7 +216,7 @@ flowchart LR
 - **`BACKLOG.md`** is the unit of work: one item per PR; a finding is fixed or recorded, never skipped.
 - **`PRINCIPLES.md`** holds the design principles, technical invariants, the governance pattern, the decision frame, adapter tiers, technology choices and lessons that still bind.
 
-Design records for decisions the owner must sign live in `docs/decisions/` (`roles.md`, `one-clock-ot-source-time.md`, `one-schema-registry.md`).
+Design records for decisions the owner must sign live in `docs/decisions/` (`roles.md`, `forge-mes-go.md`, `one-clock-ot-source-time.md`, `one-schema-registry.md`, `process-control-framework.md`, all signed); an agent-facing context document accompanies the last in `docs/personal/`.
 
 note:
 - `docs/WHERE-WE-ARE-GOING.md` §6 is the reading guide. A newcomer reads VISION once, GOING once, and WHERE-WE-ARE every time.
@@ -235,11 +236,11 @@ note:
 | `src/forge/gateway` · `api` · `observer` · `cli` | auth and RBAC middleware, the hub FastAPI app, health, the `forge` CLI |
 | `src/forge/modules/ot` | the OT module: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
 | `src/forge/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
-| `src/forge/adapters` | in-repo spoke adapters (whk-cmms reference, the forge-mes hub-side adapter) |
+| `src/forge/adapters` | the eight in-repo spoke adapters (whk-wms, forge-mes, whk-cmms, whk-erpi, whk-nms, bosc-ims, next-trend, scanner-gateway), each with its manifest and config, and four generic adapter stubs |
 | `go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js) that FB-076 retires |
-| `tests/` | 259 files mirroring `src/`; migration tests read the migration source |
-| `docs/` | the key docs, `FxTS/` framework pages, `decisions/`, `governance/`, `core/`, `spokes/`, `p7-ot-module/` |
+| `tests/` | 267 files mirroring `src/`; migration tests read the migration source |
+| `docs/` | the key docs, `FxTS/` framework pages, `decisions/`, `deployment/` (clock discipline), `governance/`, `core/`, `spokes/`, `p7-ot-module/`, `personal/` (agent context) |
 | `deploy/docker` | the development compose stack and the hub image |
 
 note:
@@ -546,7 +547,7 @@ note:
 
 | Gap | Backlog |
 |---|---|
-| `mod_mes` in the hub (MES data moves in) | FB-057 steps 2–5, after the FB-076 design |
+| `mod_mes` in the hub (MES data moves in) | FB-057 steps 2–5, in the signed forge-mes Go design's step order (D-3) |
 | Backups and a restore procedure | no backlog id yet |
 | The two registries converge | FB-097 (D-10) |
 | Bootstrap read grant on `forge_core` partial | FB-100 |
@@ -611,10 +612,10 @@ note:
 
 ## The Family
 
-| Framework | Governs | State (2026-10-27) |
+| Framework | Governs | State (2026-11-13) |
 |---|---|---|
 | **FATS** · Forge API Test Specification | API contracts: routes, shapes, status codes | schema + runner + 28 specs, one per hub-served route |
-| **FACTS** · Forge Adapter Conformance Test Specification | identity, capabilities, lifecycle, connection, data contract, context mapping, error handling | schema + runner (`facts:schema-valid` + 35 rule checks) + 9 specs; 8 validate |
+| **FACTS** · Forge Adapter Conformance Test Specification | identity, capabilities, lifecycle, connection, data contract, context mapping, error handling, time governance | schema + runner (`facts:schema-valid` + 35 rule checks, `facts:time-governed` among them since FB-090) + 9 specs, every hash owner-approved; 8 validate |
 | **FTTS** · Forge Transport Test Specification | TLS, tokens, streaming behaviour | schema + runner + 1 spec; no doc page |
 | **FVTS** · Forge View Test Specification | module ↔ display: points, alarms, actions, surfaces, profiles | schema + 19-check runner + reference renderer + golden messages + 1 spec |
 | **FHTS** · Forge Hash Test Specification | hash integrity and owner approval of every spec above | hashing, verification, approval, revert, registry |
@@ -624,7 +625,7 @@ note:
 Governance is declarative by invariant: quality, lineage, normalization and security rules are specifications, not code paths.
 
 note:
-- Six FACTS specs await the owner's approval after re-stamps (`forge governance specs --pending`); the OT spec fails schema validation until FB-079 extends the vocabulary (D-8, decided 2026-11-03).
+- All nine FACTS hashes were approved by the owner on 2026-11-13 after the FB-090 re-stamp (`forge governance specs`); the OT spec fails schema validation until FB-079 extends the vocabulary (D-8, decided 2026-11-03).
 
 ---
 
@@ -662,6 +663,7 @@ note:
 | `data_sources` | each source the spoke reads or writes (GraphQL, REST, RabbitMQ, MQTT, gRPC, database, WebSocket …), with its schema reference |
 | `context_mapping` | source field → Forge context field, and the enrichment rules the hub applies |
 | `error_handling` | dead-letter policy, retry classes, what is fatal |
+| `time_governance` | how the spoke is time-governed (one clock, FB-090): time source, sync protocol, clock-read method, probe cadence, which clock stamps its values, tolerance class, `fail_closed: true`, per-connection entries; required, checked by the blocking `facts:time-governed` |
 | `sample_records` | records the runner validates against the data contract |
 | `integrity` | the FHTS block |
 
@@ -698,7 +700,7 @@ note:
 
 | Gap | Backlog / decision |
 |---|---|
-| Six FACTS specs await the owner's approval after re-stamps | `forge governance specs --pending` |
+| The time-governance declaration is in place; refusing a clock outside its class is not | FB-093 (D-9) |
 | The OT FACTS spec fails `facts:schema-valid` and eight vocabulary checks | FB-079, D-8 |
 | FQTS and FSTS are stubs; FDTS, FLTS, FNTS, FOTS, FPTS are planned | M5 |
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.9 |
@@ -715,10 +717,10 @@ note:
 
 **Nav**: [← F4](#f4--governance-fxts) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [F6 →](#f6--modules-the-sdk-and-forge-display)
 
-forge-ot is the most mature module and lives in this repository. This section covers the tag engine, ISA-18.2 alarming, the control-write defense chain, the MES changeover, the scripting SDK, the Ignition bridge, and the one-clock principle.
+forge-ot is the most mature module and lives in this repository. This section covers the tag engine, ISA-18.2 alarming, the control-write defense chain, the MES changeover, the scripting SDK, the Ignition bridge, the one-clock principle, and the three-layer process control framework the owner decided on 2026-11-13 (D-11).
 
 note:
-- Source: `docs/VISION.md` P-4 and P-6, `docs/WHERE-WE-ARE.md` §3.5, `README.md` "OT Module", `src/forge/modules/ot`, `docs/PRINCIPLES.md` §2 (one clock).
+- Source: `docs/VISION.md` P-4 and P-6, `docs/WHERE-WE-ARE.md` §3.5, `README.md` "OT Module", `src/forge/modules/ot`, `docs/PRINCIPLES.md` §2 (one clock), `docs/decisions/process-control-framework.md` (D-11).
 
 ---
 
@@ -761,7 +763,7 @@ note:
 - Context resolvers attach site, area, equipment, lot, shift and mode to OT records; the batch context resolver wired to MES is open (FB-020).
 
 note:
-- The OT module's `DataValue` and `TagValue` still coerce a naive datetime to UTC because OPC UA `DateTime` is UTC by definition; the source-time correction is the subject of FB-088 and FB-094 (below).
+- The OT module's `DataValue` and `TagValue` still coerce a naive datetime to UTC because OPC UA `DateTime` is UTC by definition; the source-time correction landed with FB-088 and FB-094 on 2026-11-13 (below).
 
 ---
 
@@ -863,13 +865,78 @@ The owner's principle (2026-10-18): records from different sources only reconcil
 | Every stored timestamp is UTC and timezone-aware; naive rejected at the model | ✅ FB-014 |
 | The hub stamps receipt with its own clock | ✅ FB-087 |
 | The offset of every connected clock is measured, recorded and surfaced | ✅ FB-089 (provisional 1 s tolerance, warning only) |
-| A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | 🟡 FB-088 done 2026-11-13 (no invented stamp; the stamping clock named once declared); FB-094 steps 2 and 3 done 2026-11-13 (the server's clock is read on every OPC-UA response and on a runtime probe cadence, and the source and server stamps are corrected by its filtered offset at the spoke, the stamp as sent, the offset and the time quality kept); step 6 done too (every tag declares `max_sampling_uncertainty_ms`, refused at load when the acquisition cannot meet it; the bound is on every value), so FB-094 is complete for what the tree has; FB-090 next; design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
+| A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | 🟡 FB-088 done 2026-11-13 (no invented stamp; the stamping clock named once declared); FB-094 steps 2 and 3 done 2026-11-13 (the server's clock is read on every OPC-UA response and on a runtime probe cadence, and the source and server stamps are corrected by its filtered offset at the spoke, the stamp as sent, the offset and the time quality kept); step 6 done too (every tag declares `max_sampling_uncertainty_ms`, refused at load when the acquisition cannot meet it; the bound is on every value), so FB-094 is complete for what the tree has; FB-090 done 2026-11-13 (the FACTS declaration); design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
 | Hub time in the contract; a hub, module or spoke outside tolerance is refused | ⬜ FB-092, FB-093 (D-9 signed 2026-11-03) |
 | Per-spoke declaration of time governance; a quality dimension for time | 🟡 FB-090 done 2026-11-13 (FACTS `time_governance`: clock origin, probe cadence, tolerance class, fail closed); FB-091 (the quality dimension and the offset assumed on an offset-less stamp) |
 
 note:
 - The OPC-UA converter stores `SourceTimestamp` as the server sends it and, since FB-088 (2026-11-13), invents nothing when it is absent: the value is refused unless the connection declares origin `forge`. Since FB-094 steps 2 and 3 (2026-11-13) the server's clock is read on every response and on the probe cadence, keyed by the clock measured, and each stamp is corrected by that clock's filtered offset where it enters, the stamp as sent and the offset kept on the record. That row is marked 🟡 deliberately: the principle says a device whose clock cannot be read is not a valid source.
 - D-9 chooses among established standards: NTP/chrony strata mirroring the hub hierarchy, PTP/IEEE 1588 on the plant network, NTP four-timestamp measurement in-band, IEC 61850-5 tolerance classes, IEC 61850 `TimeQuality` and OPC UA `DataValue` fields on the record.
+- The deployment requirement (the NTP/PTP chain from the top hub, the tolerance classes, what fails closed, a new-site checklist) is `docs/deployment/clock-discipline.md` (FB-090).
+
+---
+
+## Three Layers of Control · PC-L1 / PC-L2 / PC-L3 (D-11)
+
+```mermaid
+flowchart TD
+  G["User goals<br/>a structured goal spec: metric, target, horizon, constraints, priority"] --> L3
+  L3["PC-L3 · SME agents<br/>a language model plus deterministic tools; acts on an area as a whole"]
+  L3 -- "acts only on PC-L2 (H-1)" --> L2
+  L3 -. "schedule change requests, through forge_core" .-> MES["The MES owns the schedule"]
+  L2["PC-L2 · the MPC Supervisor module<br/>MPC/APC deployments near the PLC, plus the supervisory mechanisms PC-L3 acts through"]
+  L2 -- "every PLC write through the local hub's OT write engine (A-7)" --> L1
+  L1["PC-L1 · PID in the PLC<br/>plus PLC-side logic an engineer writes: heartbeat, MPC-mode handshake, baseline gains, shed, clamps, take-over tag"]
+```
+
+- **New, not the classic control hierarchy** (owner, F-2): portions of layers 1 and 2 have run in industry for years; the whole, with PC-L3 and the autonomy model, has not. The distillery's seven batch processes are an example only; the framework is for every industry Forge serves (F-6).
+- **One vocabulary for PID and MPC**: PV (the variable controlled), SP (its target), MV (what the controller moves), DV (a disturbance); "CV" is retired because it means two different things (V-1 to V-4). Logix `PIDE.CV` maps to MV at the PLC boundary.
+- **PC-L2's two goals**: consistent control of a complex loop, and predicting disturbances to act before they manifest (F-3); it improves its own model and tuning (F-4) under the autonomy model on the next slide.
+- **Strict adjacency** (H-1): PC-L3 reaches PC-L1 only through PC-L2; if PC-L2 is offline, PC-L3 writes recommendation logs only (H-8).
+
+note:
+- Source: `docs/decisions/process-control-framework.md` §1, §2.1 and §2.2, with the companion context in `docs/personal/`. The layers are named PC-L1/2/3 so they cannot be confused with the reference architecture's L1–L5 or with ISA-95 levels (V-5).
+
+---
+
+## What Never Changes, and How Autonomy Is Earned
+
+| # | Hard invariant (no setting, rollout profile or earned autonomy relaxes it) |
+|---|---|
+| H-1 | each layer affects only the layer directly below it |
+| H-2 | no PLC code is generated or edited on a PLC; recommendations only, an engineer writes the logic |
+| H-3 · H-4 | no layer writes to safety systems; none forces, bypasses or overrides an interlock or permissive |
+| H-5 | PLC-side clamps range- and rate-check every value PC-L2 writes |
+| H-6 | the operator can always take a loop out of MPC mode, immediately, from the plant's own HMI (UI-1) |
+| H-8 | PC-L2 offline: PC-L3 knows it, cannot effect change, writes recommendation logs only |
+
+- Every PC-L2 self-improvement category (model parameters, tuning, model structure, operating limits) and every PC-L3 action type (targets; limits and priorities; controller configuration; schedule requests) is **Off**, **Propose** or **Autonomous**; everything ships **Off** (AU-1, L2-10, L3-4).
+- Autonomy is **earned per category**: four confidence signals (prediction accuracy, the outcome of promoted changes, the human agreement rate, shadow-run performance), each over its own threshold, for a duration and a minimum number of evaluated events; the framework ships no values, a user enters them; a person grants the switch by default; revocation is automatic (AU-3 to AU-9).
+- Changes are versioned and validated by a backtest plus a shadow run; rollback is a default an administrator may adjust, and without it a category is Propose at most (AU-10 to AU-16). Shed: heartbeat bad, and the PID resumes in auto at the last SP with the baseline gains stored in the PLC (L2-5).
+- Permissions reuse Forge's model: a service identity per controller with `ot:tag:write` on its own tags, never `ot:interlock:bypass` (L2-13).
+
+note:
+- Record §2.2, §2.3 and §2.5; the autonomy model is one mechanism for both layers (L3-5), built and audited once.
+
+---
+
+## Process Control · Where It Stands
+
+| Item | State |
+|---|---|
+| Decision record signed by the owner (rounds 1 to 3, Q-1 to Q-50) | ✅ 2026-11-13 (D-11, the owner's PR 93) |
+| Forge review of the tree for O-2 to O-4 (write path, scopes, loop model, schemas, FVTS, one clock) | ✅ 2026-11-13, record §4a; FB-112 recorded |
+| Framework FSD, then PC-L1, PC-L2 and PC-L3 FSDs; an FxTS spec per contract before code | ⬜ FB-110, after the owner's round-4 answers (nine questions: the FSDs' home and format, the module's language O-2, the mapping O-3, a `CONTROLLER` write origin, the PLC contract's home, batch phase as a context field, a one-clock refusal as a shed event, publication before the prior-art search, a provenance line) |
+| The MPC Supervisor module (all of PC-L2; a new build to the SDK) | ⬜ language decided after the review (O-2) |
+| Controller write path: a `CONTROLLER` origin, a cycle write, a heartbeat class, write timing on the status | ⬜ FB-112, designed in the PC-L2 FSD |
+| PC-L3 agent topology | [OPEN] O-1; the FSD notes it undecided |
+| Prior-art search on the framework's novelty | ⬜ FB-111, before any IP filing or public positioning |
+
+- What the tree gives it today: the OT write engine's defense chain (one tag per write, pre-read, write, read-back, audit), OPC UA to Logix, the decision models for proposals and approvals, and the one-clock rules every spoke follows: an MPC deployment is a spoke, so its FACTS `time_governance` declaration applies and a refused connection sheds its loops.
+- Nothing of the framework is implemented, and nothing is before its FSD (WS-12, roadmap sequence item 12).
+
+note:
+- `docs/ROADMAP.md` WS-12 and D-11; `docs/WHERE-WE-ARE.md` §3.13. The record's §4a holds the review's facts and its [PROPOSED] answers; the owner's signature does not cover those.
 
 ---
 
@@ -882,6 +949,7 @@ note:
 | Batch context resolver wired to MES | FB-020 |
 | OT FACTS vocabulary | D-8 |
 | OT reference FVTS spec with real tags, owner-approved | FB-078 |
+| The three-layer process control framework: decided (D-11), not built; FSDs after the owner's round-4 answers | FB-110, FB-111, FB-112 |
 
 **Next**: how modules are built and shown.
 
@@ -908,11 +976,11 @@ note:
 | Hub (forge-core) | Python ≥ 3.12, FastAPI, Typer, Pydantic v2, uv, ruff | in force |
 | Management and integration modules (`forge-<service>`) | **Go**, generated from the module SDK (A-2, A-5) | in force; the Go forge-mes is FB-076 |
 | Spokes | Python inside the hub, or any language that speaks the proto as an external process | in force |
-| forge-mes today | the migrated NestJS/Next.js application runs as the **interim MES bridge** until the Go module replaces it | bridge in place; design (D-3) not written |
+| forge-mes today | the migrated NestJS/Next.js application runs as the **interim MES bridge** until the Go module replaces it | bridge in place; the Go design signed (D-3, 2026-11-03) |
 | User interfaces | none in modules: forge-display renders every surface from FVTS specs (A-3) | runner and reference renderer exist; the renderer does not |
 
 note:
-- Decision D-7 (scope of the Go standard for the OT module and the Python adapters) is parked; nothing in the current sequence depends on it.
+- Decision D-7 (scope of the Go standard for the OT module and the Python adapters) is parked; the process control framework's MPC Supervisor module raises it again, since that module's language (O-2) is decided after the Forge review.
 
 ---
 
@@ -960,7 +1028,7 @@ note:
 |---|---|
 | NestJS backend + Next.js frontend imported as the bridge (`modules/Forge MES`); the spoke speaks the contract (push, pull, Collect, token, TLS) | ✅ |
 | FACTS spec `forge-mes` (18 data sources incl. the AuditLog backfill), approved | ✅ |
-| Go rewrite from the module SDK | ⬜ FB-076: decided (A-2), design document not written (D-3) |
+| Go rewrite from the module SDK | ⬜ FB-076: decided (A-2) and designed (D-3, signed 2026-11-03); the Go SDK scaffold (FB-017) is the first step |
 | Prisma data into the hub's `mod_mes` | ⬜ FB-057 steps 2–5 |
 | Frontend retired in favour of forge-display | ⬜ after forge-display exists |
 
@@ -985,7 +1053,7 @@ flowchart LR
 
 - A module publishes points (units, precision, ranges, staleness), alarms, actions, surfaces and the render profiles it supports; a module can only **tighten** the baseline, never loosen it.
 - forge-display enforces nothing safety-critical itself (the core does); it ships staleness marking, bad-quality handling, ISA-101 presentation, alarm annunciation and action feedback with audit confirmation.
-- Today: FVTS v0.1.0 schema, the 19-check runner, the render-profile baseline, a reference renderer, golden messages and a CI gate (FB-077). The renderer itself has no code and no backlog id until the design lands; the FVTS open items are decision D-4.
+- Today: FVTS v0.1.0 schema, the 19-check runner, the render-profile baseline, a reference renderer, golden messages and a CI gate (FB-077). The renderer itself has no code; its open items were decided on 2026-11-03 (D-4), so its design is next (M4).
 
 note:
 - "Solved when": no module in the repository contains UI code, and the same FVTS spec renders on all four profiles (`docs/VISION.md` P-8).
@@ -1000,6 +1068,7 @@ note:
 | Module builder templates adapter-style; duplicate SDK copies | FB-017, FB-019 |
 | forge-display runtime | D-4 decided 2026-11-03; design next, no code yet |
 | Template module copies (`modules/Forge CMMS`, `Forge ERPI`, `Forge DB Orchestration`) are adapter templates, not Go modules | `docs/WHERE-WE-ARE.md` §3.7 |
+| The MPC Supervisor module (all of PC-L2) is a new build to the SDK; its language is open (O-2, with D-7) | FB-110 (D-11) |
 
 **Next**: how a value becomes decision-quality.
 
@@ -1245,13 +1314,13 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q                         # 4,448 tests, ~1 minute
+uv run pytest tests -q                         # 4,584 tests, ~1 minute
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
 ```
 
-- Python 3.12+, uv, ruff, Docker for the services; Go 1.26 for `go/`; Node 20 only for the interim MES bridge.
+- Python 3.12+, uv, ruff, Docker for the services; Go 1.26 for `go/`; Node 20 for the interim MES bridge's CI job and Node 22 for the tutorial build.
 - Every Python dependency is locked in `uv.lock`; `--locked` fails on a stale lock, so a dependency moves only through a committed re-lock (FB-096):
 
 ```bash
@@ -1300,7 +1369,7 @@ note:
 | **Forge-issued passwords are printed once and never stored** | FB-057 |
 | **Local models only** for the project's tooling (MDEMG/Jiminy on `mdemg-llm-v1`); never a cloud model | A-10 |
 | **Nothing imported without a gitleaks history scan**; gitleaks before every push | A-9 |
-| **Never `git push --force`, never `rm -rf`, never a bare `DROP` of a table, schema, index or database** in a command; the governance hook denies them | Jiminy PreToolUse |
+| **Never `git push --force`, never `rm -rf`, never a bare `DROP` of a table, schema, index or database, never the SQL verb that empties a table** in a command (the hook matches the bare word in any case, inside identifiers too: reword, never work around); the governance hook denies them | Jiminy PreToolUse |
 | **A migration already applied is never edited**; a repair is a new revision | F3 |
 | **Wording**: the NestJS/Next.js code is "the interim MES bridge"; forge-mes is Go | owner |
 
@@ -1345,7 +1414,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 259 files, 4,448 collected; the full suite runs in about a minute on the locked dependency set.
+- `tests/` mirrors `src/`: 267 files, 4,584 collected; the full suite runs in about a minute on the locked dependency set.
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -1398,11 +1467,12 @@ note:
 
 1. **No forge-display**: the contract and runner exist; the renderer does not.
 2. **No management module in Go**: the interim MES bridge stands in for forge-mes; the SDK template does not exist yet.
-3. **No scoped roles in force**: the gateway's auth is off by default and the role model is still being designed.
+3. **No scoped roles in force**: the gateway's auth is off by default; the role model is signed (D-1, 2026-11-03) and not yet enforced (FB-075).
 4. **No federation**: a single hub only; no hub-of-hubs code.
-5. **Seven governance frameworks are stubs or planned**; six FACTS specs await the owner's hash approval.
+5. **Seven governance frameworks are stubs or planned**; FACTS validates against its own schema and all nine of its specs carry owner-approved hashes (2026-11-13).
 6. **No production deployment**: compose only.
-7. **No clock discipline below the hub**: the hub is not yet a time authority for what is attached to it and nothing refuses a wrong clock; since FB-088 (2026-11-13) no source time is invented when the server sends none.
+7. **Clock discipline declared, not yet enforced**: every spoke declares how it is time-governed (FB-090) and the deployment requirement is written down, but the hub is not yet a time authority for what is attached to it and nothing refuses a wrong clock (FB-093; hub time in the contract, FB-092).
+8. **Process control decided, not built**: the three-layer framework is signed (D-11, 2026-11-13) and waits for its FSDs.
 
 note:
 - `docs/WHERE-WE-ARE.md` §5 verbatim in substance. Each gap has backlog ids and a decision it waits on.
@@ -1414,7 +1484,7 @@ note:
 | Milestone | Outcome | State |
 |---|---|---|
 | **M1 · Contract and governance floor** | hub ↔ spoke end to end; OT module in the hub; FATS, FACTS, FTTS, FVTS with runners and gates; FHTS hashing | **Done** (PRs through 36) |
-| **M2 · Decisions and designs** | role model (D-1), forge-mes Go design (D-3), FVTS open items (D-4), OT FACTS vocabulary (D-8), one clock (D-9), OT reference FVTS spec approved | **Now** |
+| **M2 · Decisions and designs** | role model (D-1), forge-mes Go design (D-3), FVTS open items (D-4), OT FACTS vocabulary (D-8), one clock (D-9), one schema registry (D-10), process control (D-11); OT reference FVTS spec approved | **Mostly done**: six decisions signed 2026-11-03, D-11 on 2026-11-13; the OT FVTS spec (FB-078) open |
 | **M3 · Go SDK and the first Go module** | Go module template; forge-mes phase 1 against the hub; `mod_mes`; changeover and MQTT in Go; cut-over | not started |
 | **M4 · forge-display** | renderer scaffold and spike; MES surfaces first, then OT HMI | unblocked 2026-11-03 (D-4 decided) |
 | **M5 · Hub platform hardening** | Context Engine and Schema Registry (done), scoped roles, persistent access control (done), FDTS/FQTS/FSTS from stub to gate | started |
@@ -1447,14 +1517,15 @@ note:
 
 ## What Is Next
 
-1. A decision session on D-1, D-3, D-4, D-8, D-9 and D-10 (owner).
-2. The FB-076 design document, then owner sign-off.
-3. The module SDK Go scaffold; its first consumer is the Go forge-mes.
+1. ~~A decision session on D-1, D-3, D-4, D-8, D-9 and D-10~~ (done 2026-11-03, one question at a time) and ~~the FB-076 design document~~ (signed the same day); D-11 signed 2026-11-13.
+2. The one-clock steps in the record's order: FB-088, FB-094 and FB-090 done 2026-11-13; **FB-093** (fail-closed enforcement at Register and Ingest) next, then FB-092 (hub time in the contract) and FB-091 (the time-quality dimension); the one-registry steps (FB-097, D-10) before the Go module's first ingest.
+3. The module SDK Go scaffold (FB-017); its first consumer is the Go forge-mes.
 4. FB-076 phase 1: the Go module registers, ingests and takes write-backs against the hub.
 5. FB-057 `mod_mes`, with FB-004 and FB-059 as the Go module needs them.
 6. FB-076 phases 2–3: changeover and MQTT, parity, cut-over.
 7. forge-display scaffold and renderer spike; MES surfaces first.
 8. Hub platform items (FB-007, FB-075) as the Go module and forge-display start needing them.
+9. Process control (D-11, WS-12): the framework FSD, then the PC-L1, PC-L2 and PC-L3 FSDs, each contract an FxTS spec before code; after the owner's round-4 answers, beside items 3 to 6.
 
 note:
 - `docs/WHERE-WE-ARE-GOING.md` §4; the detailed sequence with dependencies is `docs/ROADMAP.md` §4.
@@ -1495,7 +1566,7 @@ This track is for the people who will run a Forge site or decide from it: operat
 | [U2 How Data Flows](#u2--how-data-flows) | from a plant system to a screen, in six steps |
 | [U3 The Hub You Run](#u3--the-hub-you-run) | what is running, how to tell it is healthy, the command line |
 | [U4 Your Systems as Spokes](#u4--your-systems-as-spokes) | the connected systems and what their contracts mean to you |
-| [U5 The Plant Floor](#u5--the-plant-floor) | tags, alarms, writes, changeover |
+| [U5 The Plant Floor](#u5--the-plant-floor) | tags, alarms, writes, changeover, the three layers of control above the PLC |
 | [U6 Context, Products, Decisions](#u6--context-products-and-decisions) | why "area" means one thing, where figures come from, recording a decision |
 | [U7 Governance for Users](#u7--governance-for-users) | what "approved" means and why nothing changes silently |
 | [U8 Screens](#u8--screens) | what you will look at, and what you look at today |
@@ -1570,7 +1641,7 @@ flowchart LR
 6. **Data products** are built from the records and feed screens, decisions and, where a site chooses, training data for its own models.
 
 note:
-- Honest: today the hub measures clock offsets and warns; refusing a spoke whose clock is out of tolerance is designed but not yet enforced (decision D-9).
+- Honest: today the hub measures clock offsets and warns, and every connected system declares how it keeps time in its contract (2026-11-13); refusing a spoke whose clock is out of tolerance is decided (D-9, signed 2026-11-03) and not yet enforced (FB-093).
 
 ---
 
@@ -1602,7 +1673,7 @@ Forge exists so that people at every level decide from the same picture, and rec
 - A hub, module or spoke **outside tolerance is refused**: warnings are not a substitute for correction.
 - For a plant-floor tag, the time that counts is **when the value occurred at the device**, corrected to master time, never the poll time passed off as device time.
 
-Where it stands: timestamps are UTC and receipt is stamped; offsets are measured and warned on. Correcting device time and refusing a bad clock are designed and wait for the owner's decision on which time standards to adopt (D-9).
+Where it stands: timestamps are UTC and receipt is stamped; offsets are measured and warned on; on the plant floor a tag's time is corrected to the master clock by the server's measured offset (OPC UA, since 2026-11-13), no time is ever invented, and every connected system declares how it keeps time in its contract. Refusing a bad clock is decided (D-9, signed 2026-11-03) and is the next step (FB-093).
 
 note:
 - The owner's principle of 2026-10-18; `docs/PRINCIPLES.md` §2.
@@ -1713,12 +1784,11 @@ Each spoke has a **FACTS specification**: what the system is, what it is allowed
 
 | Contract | State today |
 |---|---|
-| whk-wms, forge-mes, bosc-ims | approved |
-| whk-cmms, whk-erpi, whk-nms, next-trend, scanner-gateway | pending the owner's review after a re-stamp |
-| ot-module | pending; fails schema validation until the OT vocabulary decision |
+| all nine: whk-wms, forge-mes, bosc-ims, whk-cmms, whk-erpi, whk-nms, next-trend, scanner-gateway, ot-module | approved by the owner on 2026-11-13, after every contract gained its time-governance declaration |
+| ot-module | approved, but its contract still fails schema validation until the OT vocabulary is extended (FB-079; decided 2026-11-03) |
 
 note:
-- "Pending" does not mean broken: the runner passes the checks; the owner has not yet re-approved the hash after the specs were corrected.
+- "Approved" means the owner approved this exact content. A contract goes back to pending whenever its content changes (a person or an AI agent re-stamps it) and the owner re-approves; "pending" does not mean broken.
 
 ---
 
@@ -1740,7 +1810,7 @@ Tags, alarms, writes and changeover: how Forge reaches equipment, and why a scre
 - Tag paths are normalised across OPC-UA, Ignition and Forge, so a tag keeps its identity through a migration.
 
 note:
-- Honest: today a tag's source time is what the OPC-UA server sends; correcting it to the master clock by the device's measured offset is designed (D-9) and not yet built.
+- Honest: since 2026-11-13 a tag's source time on OPC UA is corrected to the master clock by the server's measured offset, with the stamp as sent and the offset kept on the record, and a value without a time is refused rather than given the poll time. Refusing a device whose clock cannot be read is the next step (FB-093).
 
 ---
 
@@ -1791,7 +1861,7 @@ sequenceDiagram
 - Whether a screen may write at all depends on the kind of screen: a desktop HMI may; a web page or a phone may not.
 
 note:
-- Multi-party approval (two people) for certain writes is designed and waits on the role model (D-1).
+- Multi-party approval (two people) for certain writes is designed; the role model it needs is signed (D-1, 2026-11-03) and FB-075 builds it.
 
 ---
 
@@ -1803,6 +1873,28 @@ note:
 
 note:
 - Today the manufacturing system on the other side is the interim MES bridge; the Go forge-mes module takes over the changeover later.
+
+---
+
+## Three Layers of Control Above the PLC
+
+| Layer | What it does | Who or what acts |
+|---|---|---|
+| **PC-L1** | the PID control your PLC runs today; it stays in the PLC | the controls engineer; the PLC |
+| **PC-L2** | model-predictive control for the complex loops: holds them steady and acts on a disturbance before it shows in the process; improves its own model and tuning under rules you set | the MPC Supervisor, a Forge module, writing through the same defense chain as every other write |
+| **PC-L3** | expert agents that learn all the processes of an area and work on the whole toward goals you state (for example, 130,000 barrels a year into the warehouses); every number they use comes from a deterministic tool, so it can be checked | the agents, acting only through PC-L2 |
+
+What never changes, whatever is switched on:
+
+- **You can always take over.** A loop leaves MPC mode from the plant's own HMI, immediately, with Forge up or down.
+- **Nothing writes to a safety system, and nothing bypasses an interlock.** The PLC clamps every value the upper layers write.
+- **No layer writes PLC code.** It can recommend; an engineer decides.
+- **Everything starts Off.** Each kind of automatic change begins as a proposal a person approves; it earns autonomy only after it has proved itself for a period you define, against figures you enter, and it loses that autonomy by itself if its record slips. If PC-L2 goes offline, PC-L3 can only write recommendations.
+
+Where it stands: the owner decided the framework on 2026-11-13; nothing of it is built yet, and nothing will be before its specifications are written.
+
+note:
+- `docs/decisions/process-control-framework.md` in plain words: the layers (F-1), the invariants (H-1 to H-8), the autonomy model (AU-1 to AU-16). One vocabulary serves PID and MPC: PV, SP, MV and DV; "CV" is not used.
 
 ---
 
@@ -1961,7 +2053,7 @@ Who may do what, where, and how systems get their credentials.
 - **Separation of duties** is evaluated by the hub: two-step review on a write, an interlock bypass with a recorded reason, approvals.
 - In a multi-site enterprise, roles are assigned at the managing hub and inherited by sites; a site keeps verifying sign-ins while the link to headquarters is down.
 
-Where it stands: the role model is designed and awaits two owner decisions; the hub's authentication is off by default in development, and scoped roles on every route are not yet enforced.
+Where it stands: the role model is decided and signed (2026-11-03); the hub's authentication is off by default in development, and scoped roles on every route are not yet enforced (FB-075).
 
 note:
 - `docs/decisions/roles.md` (R-1 … R-19, signed 2026-11-03); `docs/WHERE-WE-ARE.md` §3.10.
@@ -1997,7 +2089,7 @@ How a site is run, upgraded and, in time, backed up.
 | Health | `/v1/health` probes every component; `/readyz` | service-level objectives and alerts (FOTS) |
 | Upgrades | `forge migrate up` applies versioned database migrations; a migration is never edited after it is applied | an upgrade procedure per hub |
 | Backups | none | scheduled backups of every store and a restore procedure |
-| Clock | offsets measured and warned | enforcement, device-time correction (D-9) |
+| Clock | offsets measured and warned; device time corrected on OPC UA; every connected system declares how it keeps time (2026-11-13) | a clock outside its tolerance is refused (FB-093, D-9) |
 | Multi-site | one hub | hub of hubs with upward audit and offline operation (M6) |
 
 - "Solved when": a site hub can be stood up, upgraded and restored from backup by procedure, and its objectives are visible.

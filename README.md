@@ -51,7 +51,7 @@ Each spoke wraps one production system and produces ContextualRecords that confo
 
 | Component | Technology |
 |-----------|-----------|
-| Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,448 tests) |
+| Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,584 tests) |
 | Management and integration modules (`go/`) | Go 1.26 · `go build`, `go vet`, `go test` in CI; module SDK scaffold (the Go forge-mes is FB-076) |
 | Interim MES bridge (`modules/Forge MES`) | The migrated whk-mes application, NestJS 10 + Next.js 14, kept running only until the Go forge-mes module (FB-076) replaces it |
 | User interfaces | forge-display renders every surface from FVTS specs (not built yet; the FVTS runner and reference renderer exist) |
@@ -365,7 +365,7 @@ uv sync --locked --extra dev --extra ot && uv run pytest   # then commit uv.lock
 ### Test Coverage
 
 ```
-Total:  4,448 tests collected (full suite green on 2026-10-27)
+Total:  4,584 tests collected (full suite green on 2026-11-13)
         259 test files
         354 source files
 
@@ -430,4 +430,4 @@ The published tutorial is at https://reh3376.github.io/forge/. The `Deploy Tutor
 
 ---
 
-*354 Python source files | 259 test files | 4,448 tests | 9 FACTS · 28 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
+*355 Python source files | 267 test files | 4,584 tests | 9 FACTS · 28 FATS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
