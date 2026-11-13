@@ -7,6 +7,8 @@ history queries, and live SSE streaming. Auth is either API key
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
@@ -66,6 +68,16 @@ class NextTrendConfig(BaseModel):
         ge=1000,
         le=120_000,
         description="HTTP request timeout.",
+    )
+
+    source_timestamp_origin: Literal["device", "server", "edge", "forge"] | None = Field(
+        default=None,
+        description=(
+            "Which clock stamps this connection's values (one-clock record P-4). Only "
+            "'forge' lets Forge's own read time stand in for an event that carries no "
+            "timestamp; otherwise such an event is refused (FB-088). FB-090 moves the "
+            "declaration into the FACTS time_governance section."
+        ),
     )
 
     model_config = ConfigDict(frozen=True)

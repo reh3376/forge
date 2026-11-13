@@ -1,9 +1,11 @@
 # One schema registry — design record
 
-**Status:** draft for the owner's signature, round 1 (2026-10-26) · **Backlog:** FB-097 (pairs with FB-009 and the FDTS gate) · **Roadmap:** D-10
+**Status:** approved by reh3376 on 2026-11-03 (round 2: the owner answered Q-1 to Q-8 one at a time on 2026-11-03 and declared the answers the signature; the status line was set on that word; §6 records the answers) · **Backlog:** FB-097 (pairs with FB-009 and the FDTS gate) · **Roadmap:** D-10
 **Participants:** reh3376 (owner, decides and signs), Claude (researches, proposes)
 
-This record designs the convergence of Forge's two schema registries into one: what a schema is, what the hub knows about where its records live and who owns them, how the hub routes by it, who registers schemas and under which gate. Every statement is tagged **[FACT]** (what the code says, with its source in §7), **[PROPOSED]** (Claude's recommendation, not yet approved) or **[OPEN]** (a question the owner must answer). Nothing in §4 to §6 is implemented until the status line reads `approved by reh3376 on <date>`; the owner signs by editing that line, nobody signs on the owner's behalf.
+This record designs the convergence of Forge's two schema registries into one: what a schema is, what the hub knows about where its records live and who owns them, how the hub routes by it, who registers schemas and under which gate. Every statement is tagged **[FACT]** (what the code says, with its source in §7), **[PROPOSED]** (Claude's recommendation, not yet approved) or **[OPEN]** (a question the owner must answer; all answered in §6). Nothing in §4 to §6 was implemented before the status line read `approved by reh3376 on <date>`; the owner signed on 2026-11-03 by declaring the answers in §6 the signature, and the line was set on that word, not on anyone's behalf.
+
+**Round 2 (2026-11-03).** Every **[PROPOSED]** statement in §4 is thereby **[OWNER]** 2026-11-03, as amended by §6: a refusal is never silent (P-7, P-10: the owner must see such a connection error at once), and the owner's standing rule against decisions that pin the platform in applies to every step of §5 (§6 carries a debt note per answer).
 
 ---
 
@@ -59,10 +61,10 @@ This record designs the convergence of Forge's two schema registries into one: w
 | P-4 | **Routing from the registry.** `DataRouter` consults a `PlacementTable`: an in-process snapshot `(spoke, Entity) → placement` built from the schema store when the pipeline starts and rebuilt when the registry service writes (same process: the service invalidates the table; a second hub process, when there is one, learns of it through the same channel FB-092 gives hub-to-hub links). Resolution: an ACTIVE placement; else `DEFAULT_PLACEMENT`, today's `_DEFAULT_ROUTES` moved next to the registry as the hub's default policy; else PostgreSQL. The decision's `reason` names the schema id or the default rule, as today. The default namespace is the spoke's own schema as `forge db access` names it (`mod_<x>`), not `spoke_<id>`. | [PROPOSED] |
 | P-5 | **Entity names.** The FACTS entity names, exact (`Barrel`), are the registry's `<Entity>`. Every record carries `context.extra["entity_type"]` with that exact name; the tag-path fallback stays through the transition, is reported when used, then goes. | [PROPOSED] |
 | P-6 | **Registration.** The manifest grows `schemas: list[SchemaDeclaration]` (entity, JSON Schema document, proposed placement). At `Register` the hub registers each as `forge://schemas/<adapter_id>/<Entity>`, adding a version only when the document changed, under the gate of P-7. The proposed placement is taken only for a schema the hub has not seen; changing a placement afterwards is the operator's `PUT`. The module SDK generates the declarations from the module's models (Go: the FB-016 models; Python: the Pydantic models). | [PROPOSED] |
-| P-7 | **The FDTS gate.** At registration a new version is checked against the latest under the schema's compatibility mode (`forge.registry.compatibility`); an incompatible version is refused, with the diff in the error, and the adapter's registration fails closed. FDTS as a governance suite (spec, runner, `forge governance fdts`) formalises the same check later; this gate is its first instance. | [PROPOSED] |
+| P-7 | **The FDTS gate.** At registration a new version is checked against the latest under the schema's compatibility mode (`forge.registry.compatibility`); an incompatible version is refused, with the diff in the error, and the adapter's registration fails closed. **Never silent** (owner, 2026-11-03): the refusal raises an alarm at once, appears on `AdapterHealth` and in the health report, is visible in the API, the CLI and forge-display, and the adapter receives an explicit error carrying the diff and the compatibility mode it failed; a log line alone does not satisfy the rule. FDTS as a governance suite (spec, runner, `forge governance fdts`) formalises the same check later; this gate is its first instance. | [PROPOSED] |
 | P-8 | **Data products.** A product's output schema registers as `forge://schemas/<product_id>/<Entity>` with `schema_type = data_product` when the product is published (FB-009's engine does it); its placement decides where curated records land. | [PROPOSED] |
 | P-9 | **Retention.** Recorded on the facet now; enforced later by a hub job (per-entity deletion on the shared hypertable, or per-entity hypertables once the FB-076 modules need them). | [PROPOSED] |
-| P-10 | **Unplaced records.** Through the transition the hub routes by defaults and reports every `(spoke, Entity)` seen without an ACTIVE schema in the health report. Once every registered adapter declares its schemas, a hub setting the owner flips makes the hub refuse records whose schema is not ACTIVE: the owner's posture, checks mandatory and fail closed. | [PROPOSED] |
+| P-10 | **Unplaced records.** Through the transition the hub routes by defaults and reports every `(spoke, Entity)` seen without an ACTIVE schema in the health report. Once every registered adapter declares its schemas, a hub setting the owner flips makes the hub refuse records whose schema is not ACTIVE: the owner's posture, checks mandatory and fail closed. The refusal is alarmed and visible the same way as P-7's (owner, 2026-11-03). | [PROPOSED] |
 
 What P-1 to P-4 change for FB-008: the version ref `forge://schemas/<spoke>/<Entity>/v<n>` names a registry version only; the grammar keeps accepting a semantic version there (adapters' contract refs use them) but no role reads it as a routing entry. `forge.core.schema_ref`'s docstring and `SchemaRef.role` say so.
 
@@ -77,20 +79,22 @@ What P-1 to P-4 change for FB-008: the version ref `forge://schemas/<spoke>/<Ent
 7. Unplaced-record reporting, then the refusal setting (Q-8).
 8. The retention job (Q-5), when retention is first needed.
 
-Steps 1 to 3 carry no open question and could start on the signature alone; 4 to 8 need the answers below.
+All eight questions were answered on 2026-11-03; the steps proceed in order, each its own PR.
 
-## 6. Open questions for the owner
+## 6. The owner's answers (2026-11-03)
 
-| # | Question | Proposed answer |
-|---|---|---|
-| Q-1 | Who registers schemas: the adapter's manifest at `Register` (P-6), the operator through the API, or the SDK at build time writing a file the hub loads? | P-6: the manifest, generated by the SDK, registered by the hub at `Register`; the API for operator changes. |
-| Q-2 | Does the compatibility gate refuse an incompatible version from day one, failing the adapter's registration (P-7), or only report it until FDTS exists as a suite? | Refuse from day one; a reported-only check is the kind of warning the one-clock principle rejected. |
-| Q-3 | Does `entity_type` become a required FACTS context field, so every record names its entity exactly (P-5)? | Yes; the FACTS schema and every spec gain it, under the owner's re-approval of each spec hash. |
-| Q-4 | Is placement hub authority: the spoke proposes once, the operator (`schemas:write`) decides afterwards? | Yes (P-6). |
-| Q-5 | Is per-entity retention needed before FB-076's modules land, or is recording it enough for now (P-9)? | Record now, enforce with the modules. |
-| Q-6 | What does `namespace` mean physically while every record lands in one hypertable: the logical owner schema (`mod_<x>`, the one FB-057 grants on), or a future physical location? | The logical owner schema; FB-057 step 2 makes it physical for module-owned tables. |
-| Q-7 | Is the six-state `SchemaStatus` the one lifecycle, with the routing rule of P-3? | Yes. |
-| Q-8 | After the transition, does the hub refuse records whose schema is not ACTIVE (P-10), and who flips the setting? | Yes; the owner flips it per hub once the health report shows no unplaced records. |
+Asked and answered one at a time; the owner declared the answers the signature. The last column is the debt check the owner asked for: does the answer pin the platform in later?
+
+| # | Question | Owner's answer (2026-11-03) | Pins us in? |
+|---|---|---|---|
+| Q-1 | Who registers schemas: the adapter's manifest at `Register` (P-6), the operator through the API, or the SDK at build time writing a file the hub loads? | **The manifest at `Register`, generated by the SDK; the API for operator changes.** | No: one registration path; the SDK generates the declarations from the models, so there is no hand-kept copy. |
+| Q-2 | Does the compatibility gate refuse an incompatible version from day one, failing the adapter's registration (P-7), or only report it until FDTS exists as a suite? | **Refuse from day one.** Condition: never silently; alarm at once, health, explicit error to the adapter. | No: a gate that refuses is the posture everything else assumes; a report-only phase would have had to be unwound. |
+| Q-3 | Does `entity_type` become a required FACTS context field, so every record names its entity exactly (P-5)? | **Yes**; every spec hash is re-approved by the owner. | Bounded: one re-approval round across the nine specs, taken together with D-8's and D-9's re-stamps. |
+| Q-4 | Is placement hub authority: the spoke proposes once, the operator (`schemas:write`) decides afterwards? | **Yes.** | No. |
+| Q-5 | Is per-entity retention needed before FB-076's modules land, or is recording it enough for now (P-9)? | **Record now, enforce with the modules.** | Bounded: the value exists on every schema from day one, so enforcement later reads data that is already there. |
+| Q-6 | What does `namespace` mean physically while every record lands in one hypertable: the logical owner schema (`mod_<x>`, the one FB-057 grants on), or a future physical location? | **The logical owner schema `mod_<x>`**; FB-057 step 2 makes it physical for module-owned tables. | No: the name already matches what `forge db access` grants on. |
+| Q-7 | Is the six-state `SchemaStatus` the one lifecycle, with the routing rule of P-3? | **Yes**: `draft`, `registered`, `active`, `migrating`, `deprecated`, `archived`, routed as P-3 says. Note: the question as put to the owner on 2026-11-03 misnamed the states (it listed pending-review, retired and rejected); the owner approved "the one lifecycle" of this record, this record's states stand, and the discrepancy was reported to the owner in the same session. | No: the lifecycle is data on the schema; a state can be added later without breaking the routing rule. |
+| Q-8 | After the transition, does the hub refuse records whose schema is not ACTIVE (P-10), and who flips the setting? | **Yes**; the owner flips it per hub once the health report shows no unplaced records; the refusal is alarmed and visible. | No. |
 
 ## 7. Sources
 

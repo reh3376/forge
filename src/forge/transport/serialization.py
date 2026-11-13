@@ -37,6 +37,7 @@ from forge.core.models.adapter import (
     AdapterTier,
     ConnectionParam,
     DataContract,
+    TimeGovernance,
 )
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -46,6 +47,7 @@ from forge.core.models.contextual_record import (
     RecordSource,
     RecordTimestamp,
     RecordValue,
+    TimeQuality,
 )
 
 # ---------------------------------------------------------------------------
@@ -180,6 +182,16 @@ def _record_timestamp_to_proto(ts: RecordTimestamp) -> dict[str, Any]:
     }
     if ts.server_time is not None:
         result["server_time"] = _datetime_to_proto(ts.server_time)
+    if ts.source_clock:
+        result["source_clock"] = ts.source_clock
+    if ts.source_uncertainty_seconds is not None:
+        result["source_uncertainty_seconds"] = ts.source_uncertainty_seconds
+    if ts.source_time_as_sent is not None:
+        result["source_time_as_sent"] = _datetime_to_proto(ts.source_time_as_sent)
+    if ts.source_offset_seconds is not None:
+        result["source_offset_seconds"] = ts.source_offset_seconds
+    if ts.time_quality is not None:
+        result["time_quality"] = ts.time_quality.model_dump(exclude_none=True)
     return result
 
 
@@ -286,6 +298,11 @@ def _manifest_to_proto(manifest: AdapterManifest) -> dict[str, Any]:
         "connection_params": [_connection_param_to_proto(p) for p in manifest.connection_params],
         "auth_methods": list(manifest.auth_methods),
         "metadata": manifest.metadata,
+        **(
+            {"time_governance": manifest.time_governance.model_dump(exclude_none=True)}
+            if manifest.time_governance is not None
+            else {}
+        ),
     }
 
 
@@ -326,6 +343,18 @@ def _proto_to_record_timestamp(d: dict[str, Any]) -> RecordTimestamp:
     }
     if ingestion_time is not None:
         kwargs["ingestion_time"] = ingestion_time
+    # The one-clock fields (FB-088): an empty source_clock is "undeclared", and an absent
+    # uncertainty stays None (proto3 optional, so 0.0 on the wire is a real bound).
+    if d.get("source_clock"):
+        kwargs["source_clock"] = d["source_clock"]
+    if d.get("source_uncertainty_seconds") is not None:
+        kwargs["source_uncertainty_seconds"] = float(d["source_uncertainty_seconds"])
+    if d.get("source_time_as_sent"):
+        kwargs["source_time_as_sent"] = _proto_to_datetime(d["source_time_as_sent"])
+    if d.get("source_offset_seconds") is not None:
+        kwargs["source_offset_seconds"] = float(d["source_offset_seconds"])
+    if d.get("time_quality"):
+        kwargs["time_quality"] = TimeQuality.model_validate(d["time_quality"])
     return RecordTimestamp(**kwargs)
 
 
@@ -449,6 +478,11 @@ def _proto_to_manifest(d: dict[str, Any]) -> AdapterManifest:
         connection_params=[_proto_to_connection_param(p) for p in d.get("connection_params", [])],
         auth_methods=list(d.get("auth_methods", ["none"])),
         metadata=d.get("metadata", {}),
+        time_governance=(
+            TimeGovernance.model_validate(d["time_governance"])
+            if d.get("time_governance")
+            else None
+        ),
     )
 
 

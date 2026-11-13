@@ -30,6 +30,32 @@ type RecordTimestamp struct {
 	SourceTime    time.Time  `json:"source_time"`
 	ServerTime    *time.Time `json:"server_time,omitempty"`
 	IngestionTime time.Time  `json:"ingestion_time"`
+	// SourceClock names the clock that stamped SourceTime (one-clock record, P-3/P-4):
+	// "device:<name>", "server:<name>", "edge:<name>", or "forge" when Forge's own read
+	// time stands in for a stamp the protocol does not carry (FB-088). Empty until the
+	// connection declares its origin. Proto field 6.
+	SourceClock string `json:"source_clock,omitempty"`
+	// SourceUncertaintySeconds bounds how far SourceTime may sit from the instant the
+	// value occurred: the poll bound when SourceClock is "forge" (FB-088). Proto field 8.
+	SourceUncertaintySeconds *float64 `json:"source_uncertainty_seconds,omitempty"`
+	// SourceTimeAsSent is the stamp exactly as the stamping clock sent it; SourceTime is
+	// this minus SourceOffsetSeconds once the clock is measured (FB-094). Proto field 5.
+	SourceTimeAsSent *time.Time `json:"source_time_as_sent,omitempty"`
+	// SourceOffsetSeconds is the offset subtracted on entry at the spoke (stamping clock
+	// minus master); nil when no measured clock was applied. Proto field 7.
+	SourceOffsetSeconds *float64 `json:"source_offset_seconds,omitempty"`
+	// TimeQuality is IEC 61850 TimeQuality in Forge's words, set when the stamping clock
+	// is measured. Proto field 9.
+	TimeQuality *TimeQuality `json:"time_quality,omitempty"`
+}
+
+// TimeQuality is IEC 61850 TimeQuality in Forge's words (one-clock record P-3). A nil
+// flag means Forge does not know; AccuracyClass is "T0".."T5" or "unspecified".
+type TimeQuality struct {
+	Synchronized     *bool  `json:"synchronized,omitempty"`
+	ClockFailure     *bool  `json:"clock_failure,omitempty"`
+	LeapSecondsKnown *bool  `json:"leap_seconds_known,omitempty"`
+	AccuracyClass    string `json:"accuracy_class"`
 }
 
 // RecordValue holds the actual value with its engineering context.

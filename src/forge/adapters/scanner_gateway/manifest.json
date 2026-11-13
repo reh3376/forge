@@ -74,7 +74,10 @@
       "default": "500"
     }
   ],
-  "auth_methods": ["device_token", "mtls"],
+  "auth_methods": [
+    "device_token",
+    "mtls"
+  ],
   "metadata": {
     "spoke": "scanner-gateway",
     "hub_module": "forge.adapters.scanner_gateway",
@@ -83,8 +86,20 @@
     "proto_package": "scanner.v1",
     "edge_device_type": "Keyence BT-A500GA handheld scanner",
     "scan_types": 12,
-    "routing_targets": ["whk-wms", "bosc-ims", "qms (future)"],
+    "routing_targets": [
+      "whk-wms",
+      "bosc-ims",
+      "qms (future)"
+    ],
     "offline_capable": true,
     "notes": "First Forge edge device adapter. Two-tier: Android → Gateway → Hub. Multi-spoke routing based on scan type."
+  },
+  "time_governance": {
+    "time_source": "hub-ntp",
+    "sync_protocol": "ntp",
+    "clock_probe_interval_seconds": 30,
+    "source_timestamp_origin": "server",
+    "tolerance_class": "it-lan",
+    "fail_closed": true
   }
 }

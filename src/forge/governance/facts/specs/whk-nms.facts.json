@@ -445,6 +445,14 @@
       "failed_after_failures": 10
     }
   },
+  "time_governance": {
+    "time_source": "hub-ntp",
+    "sync_protocol": "ntp",
+    "clock_probe_interval_seconds": 30,
+    "source_timestamp_origin": "server",
+    "tolerance_class": "it-lan",
+    "fail_closed": true
+  },
   "metadata": {
     "spoke": "nms",
     "hub_module": "forge-adapters",
@@ -480,12 +488,19 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "3cfbd373f3522815e3ad5e6d2a2f9417e7196d9699e3851e67c1eef5eb59d282",
-    "hash_state": "pending_review",
-    "previous_hash": "3bdc2a10aa3603f8b90e9f3786fa444db154ec20ac3490ae3b00514042046709",
-    "approved_by": "reh3376",
-    "approved_at": "2026-04-08T00:00:00Z",
+    "spec_hash": "6b03b3c134b73208ed9e348108c9284fa3c5d9fcbbc536de8c9cf5217b01321c",
+    "hash_state": "approved",
+    "previous_hash": "3cfbd373f3522815e3ad5e6d2a2f9417e7196d9699e3851e67c1eef5eb59d282",
     "change_history": [
+      {
+        "previous_hash": "3cfbd373f3522815e3ad5e6d2a2f9417e7196d9699e3851e67c1eef5eb59d282",
+        "new_hash": "6b03b3c134b73208ed9e348108c9284fa3c5d9fcbbc536de8c9cf5217b01321c",
+        "changed_at": "2026-11-13T18:43:33Z",
+        "source": "agent",
+        "changed_by": "claude-code",
+        "change_type": "structural",
+        "reason": "FB-090: time_governance section (one clock, D-9 step 4). Awaiting owner approval."
+      },
       {
         "previous_hash": "3bdc2a10aa3603f8b90e9f3786fa444db154ec20ac3490ae3b00514042046709",
         "new_hash": "3cfbd373f3522815e3ad5e6d2a2f9417e7196d9699e3851e67c1eef5eb59d282",
@@ -495,6 +510,8 @@
         "change_type": "structural",
         "reason": "FB-080: schema conformance. poll_interval_seconds validation keys renamed minimum/maximum\u2192min/max; the two pre-FHTS change_history entries (null hashes, sources discovery/compliance) moved to metadata.spec_history. Adapter behaviour unchanged. Awaiting owner approval."
       }
-    ]
+    ],
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-13T19:35:05Z"
   }
 }

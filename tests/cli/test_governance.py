@@ -22,7 +22,7 @@ runner = CliRunner()
 SPECS = governance.SPEC_ROOT
 FACTS_OT = SPECS / "facts" / "specs" / "ot-module.facts.json"  # non-ASCII, hand-wrapped
 FACTS_NMS = SPECS / "facts" / "specs" / "whk-nms.facts.json"  # ASCII-escaped
-FACTS_WMS = SPECS / "facts" / "specs" / "whk-wms.facts.json"  # approved
+FACTS_WMS = SPECS / "facts" / "specs" / "whk-wms.facts.json"  # approved in the fixture
 FVTS_OT = SPECS / "fvts" / "specs" / "ot-module.fvts.json"
 STAMP_RE = re.compile(r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
 
@@ -37,11 +37,27 @@ def strip_integrity(text: str) -> str:
 
 @pytest.fixture
 def root(tmp_path: Path) -> Path:
-    """A governance root with copies of real specs."""
+    """A governance root with copies of real specs in a known state.
+
+    The real specs' hash state is the owner's call (an agent never approves, FB-021), so
+    the copies are put where the tests expect them: whk-wms approved by a test owner, the
+    other three awaiting approval.
+    """
     for src in (FACTS_OT, FACTS_NMS, FACTS_WMS, FVTS_OT):
         dest = tmp_path / src.parent.parent.name / "specs" / src.name
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(src, dest)
+        text, spec = governance.load_spec(dest)
+        integrity = spec["integrity"]
+        if src is FACTS_WMS:
+            integrity["hash_state"] = "approved"
+            integrity["approved_by"] = "test-owner"
+            integrity["approved_at"] = "2026-01-01T00:00:00Z"
+        else:
+            integrity["hash_state"] = "pending_review"
+            integrity.pop("approved_by", None)
+            integrity.pop("approved_at", None)
+        governance.write_integrity(dest, text, integrity)
     return tmp_path
 
 
@@ -56,7 +72,7 @@ def run(*args: str) -> tuple[int, str]:
 def test_specs_lists_state_approver_and_verification(root: Path) -> None:
     code, out = run("specs", "--root", str(root))
     assert code == 0, out
-    assert "whk-wms.facts.json" in out and "approved" in out and "reh3376" in out
+    assert "whk-wms.facts.json" in out and "approved" in out and "test-owner" in out
     assert "ot-module.fvts.json" in out and "pending_review" in out
     assert "4 spec(s): 3 awaiting approval, 0 with a hash mismatch." in out
 
@@ -110,8 +126,8 @@ def test_approve_keeps_an_ascii_file_ascii(root: Path) -> None:
 def test_approve_is_idempotent_for_the_same_approver(root: Path) -> None:
     path = root / "facts" / "specs" / "whk-wms.facts.json"
     before = path.read_text()
-    code, out = run("approve", str(path), "--by", "reh3376")
-    assert code == 0 and "already approved by reh3376" in out
+    code, out = run("approve", str(path), "--by", "test-owner")
+    assert code == 0 and "already approved by test-owner" in out
     assert path.read_text() == before
 
 
@@ -231,17 +247,28 @@ def test_validate_spec_knows_fvts_and_ftts() -> None:
 # -- run (FB-083) -----------------------------------------------------------
 
 
-def test_run_facts_by_adapter_id_and_by_file() -> None:
-    code, out = run("run", "facts", "whk-wms")
+def test_run_facts_by_adapter_id_and_by_file(root: Path) -> None:
+    specs = root / "facts" / "specs"
+    code, out = run("run", "facts", "whk-wms", "--specs", str(specs))
     assert code == 0, out
     assert "[PASS] FACTS — whk-wms" in out and "All checks passed." in out
 
-    code, out = run("run", "facts", str(FACTS_WMS), "--format", "json")
+    code, out = run("run", "facts", str(specs / "whk-wms.facts.json"), "--format", "json")
     assert code == 0, out
     report = json.loads(out)
     assert report["framework"] == "FACTS" and report["target"] == "whk-wms"
-    assert report["metadata"]["spec_file"] == str(FACTS_WMS)
+    assert report["metadata"]["spec_file"] == str(specs / "whk-wms.facts.json")
     assert {v["status"] for v in report["verdicts"]} <= {"PASS", "SKIP"}
+
+
+def test_run_facts_reports_a_pending_stamp_as_the_one_failed_check(root: Path) -> None:
+    """A stamp the owner has not approved fails the hash-state check alone, exit 1 (FB-021)."""
+    path = root / "facts" / "specs" / "whk-nms.facts.json"
+    code, out = run("run", "facts", str(path))
+    assert code == 1
+    assert "[FAIL] FACTS — whk-nms" in out and "Failed checks:" in out
+    assert out.count("[FAIL] facts:") == 1 and "facts:integrity-hash-state" in out
+    assert "pending_review" in out and "requires approval" in out
 
 
 def test_run_lists_the_failed_checks_and_exits_1(tmp_path: Path) -> None:

@@ -111,7 +111,8 @@ class OpcUaProvider(BaseProvider):
 
     async def _health(self) -> dict[str, Any]:
         """OPC-UA-specific health metrics."""
-        client_health = self._client.health()
+        health = getattr(self._client, "health", None)
+        client_health = health() if callable(health) else health  # property on OpcUaClient
         return {
             "connection_state": client_health.state.value,
             "endpoint_url": client_health.endpoint_url,
@@ -183,12 +184,15 @@ class OpcUaProvider(BaseProvider):
         self._values_received += 1
         self._last_value_at = datetime.now(UTC)
 
+        # The registry stamps its own read time (``TagValue.timestamp``); the server's
+        # and the source's stamps travel as they came, None included. Nothing is invented
+        # in their place (one clock, FB-088).
         await self._registry.update_value(
             path=tag_path,
             value=data_value.value,
             quality=data_value.quality,
-            timestamp=data_value.server_timestamp or datetime.now(UTC),
             source_timestamp=data_value.source_timestamp,
+            server_timestamp=data_value.server_timestamp,
         )
 
     # ------------------------------------------------------------------
@@ -226,6 +230,7 @@ class OpcUaProvider(BaseProvider):
                 dv.value,
                 dv.quality,
                 source_timestamp=dv.source_timestamp,
+                server_timestamp=dv.server_timestamp,
             )
             return dv
         return None

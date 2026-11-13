@@ -142,6 +142,7 @@ export class ForgeBackfillService implements ForgeBackfillSource {
           adapterVersion: FORGE_MES_MANIFEST.version,
           site: this.config.site,
           area: this.config.area,
+          sourceTimestampOrigin: this.config.sourceTimestampOrigin,
         }
       );
       record.context.extra.replay = "backfill";

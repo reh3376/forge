@@ -38,6 +38,7 @@ from forge.adapters.whk_nms.config import WhkNmsConfig
 from forge.adapters.whk_nms.context import build_record_context
 from forge.adapters.whk_nms.endpoints import NMS_REST_ENDPOINTS, NMS_WEBSOCKET_ENDPOINTS
 from forge.adapters.whk_nms.record_builder import build_contextual_record
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -46,6 +47,7 @@ from forge.core.models.adapter import (
     AdapterTier,
     ConnectionParam,
     DataContract,
+    TimeGovernance,
 )
 
 if TYPE_CHECKING:
@@ -73,6 +75,10 @@ def _load_manifest() -> AdapterManifest:
         connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
+        # the FACTS time_governance section, as the spoke's declaration (one clock, FB-090)
+        time_governance=(
+            TimeGovernance(**raw["time_governance"]) if raw.get("time_governance") else None
+        ),
     )
 
 
@@ -125,6 +131,7 @@ class WhkNmsAdapter(
         Does NOT open any connections — that happens in start().
         """
         self._config = WhkNmsConfig(**params)
+        self.check_time_governance()
         self._state = AdapterState.REGISTERED
 
     async def start(self) -> None:
@@ -169,6 +176,7 @@ class WhkNmsAdapter(
             records_collected=self._records_collected,
             records_failed=self._records_failed,
             uptime_seconds=uptime,
+            **self.refusal_health(),
         )
 
     # ── Collection ─────────────────────────────────────────────
@@ -192,14 +200,22 @@ class WhkNmsAdapter(
             )
 
             # Build record
-            record = build_contextual_record(
-                raw_event=raw_record,
-                context=context,
-                adapter_id=self.adapter_id,
-                adapter_version=self.manifest.version,
-                entity_type=entity_type,
-                event_type=event_type,
-            )
+            try:
+                record = build_contextual_record(
+                    raw_event=raw_record,
+                    context=context,
+                    adapter_id=self.adapter_id,
+                    adapter_version=self.manifest.version,
+                    source_timestamp_origin=self.source_timestamp_origin,
+                    poll_bound_seconds=(
+                        self._config.poll_interval_seconds if self._config else None
+                    ),
+                    entity_type=entity_type,
+                    event_type=event_type,
+                )
+            except SourceStampMissingError as exc:
+                self.refuse(exc)
+                continue
 
             self._records_collected += 1
             yield record

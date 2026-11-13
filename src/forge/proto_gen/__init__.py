@@ -12,5 +12,7 @@ package::
         src/forge/proto_gen/forge/v1/*.py
 
 The Go stubs under ``go/gen`` come from ``cd go && buf generate`` (the same
-proto files under ``go/proto``, differing only in ``go_package``).
+proto files under ``go/proto``, differing only in ``go_package``); ``go/buf.gen.yaml``
+runs the generators at the versions the stubs carry (``go run ...@v1.36.12`` and
+``@v1.21.1``), so a regeneration changes only what the .proto changed.
 """

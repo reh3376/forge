@@ -8,12 +8,19 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from pydantic import ValidationError
 
-from forge.core.clock import SERVER_LINK, SOURCE_LINK, SPOKE_LINK, ClockOffsetTracker
+from forge.core.clock import (
+    SERVER_LINK,
+    SOURCE_LINK,
+    SPOKE_LINK,
+    ClockOffsetTracker,
+    SourceStampMissingError,
+)
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
     AdapterTier,
     DataContract,
+    TimeGovernance,
 )
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -30,7 +37,21 @@ from forge.storage.registry import StorageEngine
 SCHEMA_REF = "forge://schemas/forge-mes/v0.1.0"
 
 
-def make_manifest(adapter_id: str = "forge-mes") -> AdapterManifest:
+def make_manifest(
+    adapter_id: str = "forge-mes", *, source_timestamp_origin: str | None = None
+) -> AdapterManifest:
+    # The FACTS time_governance section declares the origin (one clock, FB-090); a manifest
+    # without the section declares nothing, and a bare reading is refused (FB-088).
+    governance = (
+        TimeGovernance(
+            time_source="hub-ntp",
+            sync_protocol="ntp",
+            source_timestamp_origin=source_timestamp_origin,
+            tolerance_class="it-lan",
+        )
+        if source_timestamp_origin
+        else None
+    )
     return AdapterManifest(
         adapter_id=adapter_id,
         name="Forge MES",
@@ -42,6 +63,7 @@ def make_manifest(adapter_id: str = "forge-mes") -> AdapterManifest:
             schema_ref=SCHEMA_REF,
             context_fields=["batch_id", "event_type"],
         ),
+        time_governance=governance,
     )
 
 
@@ -181,13 +203,34 @@ def test_coerce_wraps_raw_readings_and_accepts_full_records() -> None:
     assert wrapped.lineage.schema_ref == SCHEMA_REF
     assert wrapped.lineage.transformation_chain == ["rest:wrap"]
 
+    assert wrapped.timestamp.source_clock is None  # the reading's own stamp, origin undeclared
+
     full = make_record().model_dump(mode="json")
     parsed = IngestPipeline.coerce(full, adapter_id="forge-mes", manifest=manifest)
     assert str(parsed.record_id) == full["record_id"]
     assert parsed.context.batch_id == "B-1"
 
-    bare = IngestPipeline.coerce({"anything": 1}, adapter_id="forge-mes", manifest=manifest)
+    declared = make_manifest(source_timestamp_origin="forge")
+    bare = IngestPipeline.coerce({"anything": 1}, adapter_id="forge-mes", manifest=declared)
     assert bare.value.raw == {"anything": 1} and bare.value.data_type == "object"
+    # No timestamp in the reading: the hub's read time stands in because the adapter
+    # declared origin forge, and the record says so (FB-088).
+    assert bare.timestamp.source_clock == "forge"
+    assert bare.timestamp.source_uncertainty_seconds is None
+
+
+def test_coerce_refuses_a_reading_without_a_timestamp_unless_origin_forge() -> None:
+    """The hub never lends a reading its own clock silently (one clock, FB-088)."""
+    with pytest.raises(SourceStampMissingError, match=r"tag temp.*without a source timestamp"):
+        IngestPipeline.coerce(
+            {"tag": "temp", "value": 72.5}, adapter_id="forge-mes", manifest=make_manifest()
+        )
+    with pytest.raises(SourceStampMissingError, match="unparseable timestamp"):
+        IngestPipeline.coerce(
+            {"tag": "temp", "value": 1, "timestamp": "yesterday"},
+            adapter_id="forge-mes",
+            manifest=make_manifest(),
+        )
 
 
 def test_in_memory_sink_is_bounded() -> None:
@@ -253,7 +296,9 @@ async def test_replay_keeps_the_first_sent_time() -> None:
 
 def test_coerce_leaves_the_hub_stamp_to_ingest() -> None:
     wrapped = IngestPipeline.coerce(
-        {"tag": "t", "value": 1}, adapter_id="forge-mes", manifest=make_manifest()
+        {"tag": "t", "value": 1},
+        adapter_id="forge-mes",
+        manifest=make_manifest(source_timestamp_origin="forge"),
     )
     assert "ingestion_time" not in wrapped.timestamp.model_fields_set
     assert wrapped.timestamp.sent_time is None

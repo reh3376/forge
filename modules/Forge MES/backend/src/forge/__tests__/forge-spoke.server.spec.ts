@@ -42,7 +42,7 @@ class ChangeoverLikeTarget implements ForgeWriteTarget {
     const readback = ctx.confirm
       ? mapDomainEventToRecord(
           { entityType: "Changeover", eventType: "cip-complete", data: { id: "cooker-changeover", state: "RECIPE_LOADING" } },
-          { adapterId: "forge-mes", adapterVersion: "0.1.0", site: "whk01", area: "distillery01" }
+          { adapterId: "forge-mes", adapterVersion: "0.1.0", site: "whk01", area: "distillery01", sourceTimestampOrigin: "forge" }
         )
       : undefined;
     return { success: true, message: "cooker: AWAITING_CHANGEOVER -> RECIPE_LOADING", ...(readback ? { readback } : {}) };
@@ -105,6 +105,9 @@ describe("ForgeSpokeServer", () => {
       batchesSent: 2,
       recordsDroppedQueueFull: 1,
       recordsDeadLettered: 2,
+      // an event refused for lacking a timestamp (FB-088) counts as failed and names its cause
+      recordsRefused: 1,
+      lastRefusal: "StepExecution/step_started arrived without a timestamp",
       consecutiveFailures: 0,
       lastFlushAt: "2026-06-01T12:00:00.000Z",
     }),
@@ -245,7 +248,8 @@ describe("ForgeSpokeServer", () => {
     expect(health.adapter_id).toBe("forge-mes");
     expect(health.state).toBe("ADAPTER_STATE_HEALTHY");
     expect(health.records_collected).toBe("12");
-    expect(health.records_failed).toBe("3");
+    expect(health.records_failed).toBe("4");
+    expect(health.error_message).toMatch(/without a timestamp/);
     expect(Number(health.last_healthy.seconds)).toBe(Math.floor(Date.parse("2026-06-01T12:00:00Z") / 1000));
   });
 
@@ -327,7 +331,7 @@ describe("ForgeSpokeServer pull RPCs", () => {
       ingest.queue.unshift(...records);
     },
   };
-  const opts = { adapterId: "forge-mes", adapterVersion: "0.1.0", site: "whk01", area: "distillery01" };
+  const opts = { adapterId: "forge-mes", adapterVersion: "0.1.0", site: "whk01", area: "distillery01", sourceTimestampOrigin: "forge" as const };
   const replayed = [1, 2, 3].map((i) =>
     mapDomainEventToRecord(
       { entityType: "ScheduleOrder", eventType: "audit_update", data: { id: `so-${i}`, status: "Active" } },

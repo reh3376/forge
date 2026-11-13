@@ -1,5 +1,7 @@
 """Tests for the BOSC IMS service-specific collectors."""
 
+from typing import TYPE_CHECKING
+
 import pytest
 
 from forge.adapters.bosc_ims.client import MockBoscImsClient
@@ -10,6 +12,9 @@ from forge.adapters.bosc_ims.collectors import (
     collect_locations,
     collect_suppliers,
 )
+
+if TYPE_CHECKING:
+    from forge.core.clock import SourceStampMissingError
 
 _ADAPTER_ID = "bosc-ims"
 _ADAPTER_VERSION = "0.1.0"
@@ -351,10 +356,29 @@ class TestCollectAssetSnapshots:
                 adapter_id=_ADAPTER_ID,
                 adapter_version=_ADAPTER_VERSION,
                 asset_ids=["asset-001"],
+                source_timestamp_origin="forge",  # the seeded assets carry no updated_at
             )
         ]
         assert len(records) == 1
         assert records[0].source.tag_path == "bosc.asset.snapshot"
+
+    @pytest.mark.asyncio()
+    async def test_asset_without_timestamp_is_refused_to_the_adapter(self):
+        """One clock (FB-088): no invented stamp; the refusal reaches the adapter's health."""
+        client = _make_client()
+        refused: list[SourceStampMissingError] = []
+        records = [
+            r
+            async for r in collect_asset_snapshots(
+                client,
+                adapter_id=_ADAPTER_ID,
+                adapter_version=_ADAPTER_VERSION,
+                asset_ids=["asset-001"],
+                on_refusal=refused.append,
+            )
+        ]
+        assert records == []
+        assert len(refused) == 1 and "asset-001" in str(refused[0])
 
     @pytest.mark.asyncio()
     async def test_skips_unknown_asset(self):
@@ -380,6 +404,7 @@ class TestCollectAssetSnapshots:
                 adapter_id=_ADAPTER_ID,
                 adapter_version=_ADAPTER_VERSION,
                 asset_ids=["asset-001"],
+                source_timestamp_origin="forge",  # the seeded assets carry no updated_at
             )
         ]
         assert "bosc.v1.Asset" in records[0].lineage.transformation_chain

@@ -2,6 +2,8 @@
 
 import json
 
+import pytest
+
 from forge.adapters.bosc_ims.context import build_record_context
 from forge.adapters.bosc_ims.record_builder import (
     _event_tag_path,
@@ -10,6 +12,7 @@ from forge.adapters.bosc_ims.record_builder import (
     build_asset_record,
     build_contextual_record,
 )
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.contextual_record import QualityCode
 
 
@@ -30,9 +33,10 @@ class TestParseTimestamp:
         ts = _parse_timestamp({"seconds": 1775661000, "nanos": 0})
         assert ts.tzinfo is not None
 
-    def test_none_returns_now(self):
-        ts = _parse_timestamp(None)
-        assert ts.tzinfo is not None
+    def test_none_returns_none(self):
+        # no stamp is invented for an event without one (one clock, FB-088)
+        assert _parse_timestamp(None) is None
+        assert _parse_timestamp("not a time") is None
 
     def test_unix_float(self):
         ts = _parse_timestamp(1775661000.0)
@@ -179,11 +183,17 @@ class TestBuildAssetRecord:
             "system_state": "SUSPENDED",
             "asset_state": "INSTALLED",
         }
+        # the asset carries no updated_at or created_at: refused unless declared (FB-088)
+        with pytest.raises(SourceStampMissingError, match=r"asset-002.*bosc.asset.snapshot"):
+            build_asset_record(asset=asset, adapter_id="bosc-ims", adapter_version="0.1.0")
         record = build_asset_record(
             asset=asset,
             adapter_id="bosc-ims",
             adapter_version="0.1.0",
+            source_timestamp_origin="forge",
         )
+        assert record.timestamp.source_clock == "forge"
+        assert record.timestamp.server_time is None  # Forge's stamp is not the IMS server's
         parsed = json.loads(record.value.raw)
         assert parsed["disposition"] == "QUARANTINED"
         assert parsed["system_state"] == "SUSPENDED"

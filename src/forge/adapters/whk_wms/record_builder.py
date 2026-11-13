@@ -15,6 +15,7 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
+from forge.core.clock import resolve_source_stamp
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -37,6 +38,7 @@ def build_contextual_record(
     context: RecordContext,
     adapter_id: str,
     adapter_version: str,
+    source_timestamp_origin: str | None = None,
 ) -> ContextualRecord:
     """Assemble a ContextualRecord from a raw WMS event and its context.
 
@@ -45,15 +47,26 @@ def build_contextual_record(
         context: RecordContext produced by build_record_context().
         adapter_id: Adapter identity string (e.g. "whk-wms").
         adapter_version: Adapter version (e.g. "0.1.0").
+        source_timestamp_origin: the origin the connection declared for the clock that
+            stamps its values (device, server, edge or forge); None when undeclared (FB-088)
 
     Returns:
         A fully-formed ContextualRecord ready for the governance pipeline.
     """
     # ── Timestamps ─────────────────────────────────────────────
-    source_time = _extract_source_time(raw_event)
     now = datetime.now(tz=UTC)
+    tag_path = _derive_tag_path(raw_event)
+    # The event's own timestamp is the source time; an event without one is refused
+    # unless the adapter declares source_timestamp_origin: forge (one clock, FB-088).
+    stamp = resolve_source_stamp(
+        _extract_source_time(raw_event),
+        origin=source_timestamp_origin,
+        read_at=now,
+        adapter_id=adapter_id,
+        tag_path=tag_path,
+    )
     timestamp = RecordTimestamp(
-        source_time=source_time or now,
+        **stamp.timestamp_fields(),
         server_time=_extract_server_time(raw_event),
         ingestion_time=now,
     )
@@ -66,7 +79,6 @@ def build_contextual_record(
     )
 
     # ── Source ─────────────────────────────────────────────────
-    tag_path = _derive_tag_path(raw_event)
     source = RecordSource(
         adapter_id=adapter_id,
         system="whk-wms",

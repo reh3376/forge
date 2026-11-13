@@ -1,9 +1,9 @@
 # Where we are
 
-**Status date:** 2026-11-03 · **Branch:** `reh3376_dev01` (last merged PR: 83) · **Owner:** reh3376
+**Status date:** 2026-11-13 · **Branch:** `reh3376_dev01` (last merged PR: 93) · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) · [Where we are going](WHERE-WE-ARE-GOING.md) · [Roadmap](ROADMAP.md) · [Backlog](../BACKLOG.md)
 
-**Pick-up point (2026-11-03):** PR 83 is merged and `reh3376_dev01` is level with `main`. The forge-mes Go design record (D-3, `docs/decisions/forge-mes-go.md`, round 1) was drafted on 2026-11-03 and waits for the owner's signature; FB-076, FB-057 steps 2–5 and the Go SDK scaffold follow it. FB-104 and FB-105 (the vendored tutorial framework's heading-pin and sidebar-label defects, and its vulnerable lockfile that failed the Dependabot security updates on `main` six times per push) were done on 2026-11-03 upstream in mdemg as tutorial-forge 1.1.0 and re-vendored here unchanged: a pin attaches by position to the first heading after it (29 of 34 pins on the mdemg site had been dead), heading text is normalised once for slugs and sidebar labels, reveal-md is gone, puppeteer 25 and mermaid 12 need Node 22 (the Deploy Tutorial workflow moves to it and runs the framework's nine tests), and `npm audit` reports 0 findings. FB-068 (the embedded broker's RETAIN semantics for local subscribers: a live message arrives with RETAIN=0, a new subscription gets the retained store replayed with RETAIN=1) was done on 2026-10-29. No other decision-free backlog item is left: FB-100 waits on FB-057 step 2; FB-097 on D-10 (`decisions/one-schema-registry.md`, Q-1 to Q-8); FB-088 and FB-090 to FB-094 on the owner's signature of the one-clock record (D-9); the rest on D-1, D-3, D-4 and D-8 (§4). FB-103, the Forge tutorial package built with `scripts/tutorial-forge` (two tracks from a landing fork, contributor onboarding and end-user overview; deck `docs/tutorial.md`, config `tutorial.config.json`, output `build/tutorial-static/`), modelled on the MDEMG tutorial at https://reh3376.github.io/mdemg/, was delivered on 2026-10-27 (PR 78) and is live at https://reh3376.github.io/forge/ since 2026-10-28, when the owner enabled GitHub Pages and the Deploy Tutorial workflow published `main`.
+**Pick-up point (2026-11-13): development resumed on `reh3376_dev01` after PR 93**, the owner's own PR: the three-layer process control framework decision record (D-11, `docs/decisions/process-control-framework.md`, signed 2026-11-13; FB-110, FB-111) and its agent context (`docs/personal/Process-Control-Framework-Context-for-Agent.md`). The read-only Forge review the record asked for was done the same day: its facts and proposed answers to O-2, O-3 and O-4 are in the record's §4a and the roadmap's D-11 entry, FB-112 (the controller write path) is recorded, and nine questions wait for the owner. The owner left the pick-up to Claude: FB-090 first, because it is fully specified by the signed one-clock record and the framework's MPC deployment is a spoke that needs that declaration; the process-control FSDs (WS-12) start once the owner has answered the review's questions. **Next step: FB-114** (the owner's direction of 2026-11-13: review both tutorial tracks against the current tree and add the three-layer process control framework to them before any further development), then FB-093 (fail-closed enforcement: the hub refuses Register and Ingest from a party whose measured offset exceeds its tolerance class, three probes in and out, never silent), then FB-092, FB-091, FB-097's eight steps, FB-017 and the forge-mes steps. PR 95 (FB-090, D-9 step 4): every spoke declares how it is time-governed. The FACTS schema has a required `time_governance` section (time source, sync protocol, clock-read method, probe cadence, stamp origin, tolerance class, `fail_closed: true`, optional per-connection entries) and the runner's blocking `facts:time-governed` check refuses a missing section, an undisciplined clock, a cadence under 1 s, a clock-read method the protocol cannot perform or none where it offers one; all nine specs carry it (the OT spec: `opcua-current-time`, 30 s, `server`, `T0`; the IT spokes: `hub-ntp`/`ntp`, `server`, `it-lan`) and were re-stamped and approved by the owner the same day (`forge governance approve <spec> --by reh3376`, nine specs); the section rides on `AdapterManifest.time_governance` (proto field 13; Python, Go, the interim MES bridge) and in every adapter's `manifest.json`, and it is now the one declaration the adapter base, the OT module and the ingest pipeline read for the stamp origin (manifest metadata declares nothing any more); a connection parameter that contradicts it is refused at configure (`time_governance_conflict` on the health, raised); the deployment requirement is `docs/deployment/clock-discipline.md`. Two findings on the way: the whk-nms builder ignored the NMS's own `last_seen`/`detected_at`/`discovered_at` stamps (fixed), and the FACTS runner does not check the change-history chain, which hid a gap in forge-mes's history (FB-113). PR 91 (FB-094 step 6): every tag carries `max_sampling_uncertainty_ms` (one-clock record P-6), a requirement tighter than the acquisition gives (the scan class interval, a Query tag's poll interval; `BaseTag.sampling_bound_ms`) is refused at load, and the acquisition's bound goes on every stamped OT value as `source_uncertainty_seconds`, added to the clock's bound once corrected; with it FB-094 is complete for what the tree has (the Logix, S7 and Modbus readers follow their drivers). PR 90 (FB-094 step 3, the correction on entry): `RecordTimestamp` carries all six fields of the one-clock record's P-3 (`source_time_as_sent`, `source_offset_seconds` and `time_quality` join `source_clock` and `source_uncertainty_seconds`; proto fields 5, 7 and 9 and the `TimeQuality` message, on the Python, Go and bridge models and both serialisers), the OT builder corrects the source and server stamps by the declared clock's filtered estimate (`ClockEstimate` from the tracker, NTP's 1/8 weight) where they enter the spoke and keeps the stamp as sent, the offset, the uncertainty (half the probe round trip plus the scan interval) and the time quality, every builder writes the stamp's fields through `SourceStamp.timestamp_fields()`, and the hub never corrects again (P-10); the FATS/FACTS re-stamp waits for FB-092 (Q-6: once, at the end). PR 89 (FB-094 step 2, clock readers): every OPC-UA response now measures the server's clock (a tap on asyncua's `_send_request` reads `ResponseHeader.Timestamp`, T1/T3/T4 NTP style), the `CurrentTime` probe runs on a per-connection cadence the operator changes at runtime (`POST /control/connections/{name}/clock-probe-interval`, 1 s minimum, value and setter on the status), `ClockOffsetTracker` keys each series by the clock measured (`server:WHK01`, `device:WHK01`; `clocks()`, the `forge.clock.id` metric attribute), `PlcConnectionSpec` declares `source_timestamp_origin` and names the probe cadence `clock_probe_interval_seconds`, and a probe answered without a clock value is counted on the status (`clock_unreadable`) ahead of FB-093's refusal; Logix, S7 and Modbus readers implement the shared `ClockReader` surface when their drivers land, and Sparkplug's one-way publish stamp follows its ingest adapter. PR 88 (FB-088, the first one-clock step): no record builder invents a source time any more (the OPC-UA converter and tag registry, the nine adapters, the BOSC collectors, the Ignition bridge, the REST path and the interim MES bridge); a value without a source stamp is refused unless its connection declares `source_timestamp_origin: forge`, and then Forge's own read time stands in with `source_clock=forge` and the poll bound as `source_uncertainty_seconds` (the first two of the record's six time-quality fields, proto 6 and 8, on the Python, Go and bridge models); a refusal is never silent (the adapter goes DEGRADED, `AdapterHealth.refusals`/`last_refusal`/`error_message`, the `forge.ingest.refused` metric, `forge adapter status`, the REST response and ingest log). Two findings were recorded on the way (FB-108: the hypertable persists only `source_time`; FB-109: a remote spoke's own health never reaches the hub) and one fixed (`forge.clock.offset` is a gauge: the histogram dropped negative offsets). After the one-clock steps come FB-097's eight steps, then FB-017 and the forge-mes steps. On 2026-11-03 the owner answered every open design question one at a time (34 answers: D-3 Q-1 to Q-10, D-9 Q-1 to Q-6, D-10 Q-1 to Q-8, D-1 Q21 and Q22, D-8, the seven FVTS items of D-4) and declared the answers the signature of the four records: `docs/decisions/forge-mes-go.md`, `one-clock-ot-source-time.md`, `one-schema-registry.md` and `roles.md` now read `approved by reh3376 on 2026-11-03`, each with the answers and a debt check per answer in its last section. Two standing rules came with the answers: **no silent failure** (a refusal or fail-closed state raises an alarm at once and is visible on status, health, API, CLI and forge-display) and **no decision that pins the platform in**. Two backlog items were recorded from the answers (FB-106 GraphQL gateway hub module, FB-107 local-model formula assistant). Implementation starts next, one PR each, in the recommended order: the one-clock steps (FB-088 first, then FB-094's clock readers and fields, FB-090, FB-093, FB-092, FB-091), then FB-097's eight steps, then the forge-mes Go steps beginning with the Go SDK scaffold (FB-017), with FB-075 and FB-079 alongside; forge-display design (M4) is unblocked. FB-104 and FB-105 (the vendored tutorial framework's heading-pin and sidebar-label defects, and its vulnerable lockfile that failed the Dependabot security updates on `main` six times per push) were done on 2026-11-03 upstream in mdemg as tutorial-forge 1.1.0 and re-vendored here unchanged: a pin attaches by position to the first heading after it (29 of 34 pins on the mdemg site had been dead), heading text is normalised once for slugs and sidebar labels, reveal-md is gone, puppeteer 25 and mermaid 12 need Node 22 (the Deploy Tutorial workflow moves to it and runs the framework's nine tests), and `npm audit` reports 0 findings. FB-068 (the embedded broker's RETAIN semantics for local subscribers: a live message arrives with RETAIN=0, a new subscription gets the retained store replayed with RETAIN=1) was done on 2026-10-29. No other decision-free backlog item is left: FB-100 waits on FB-057 step 2; FB-097 on D-10 (`decisions/one-schema-registry.md`, Q-1 to Q-8); FB-088 and FB-090 to FB-094 on the owner's signature of the one-clock record (D-9); the rest on D-1, D-3, D-4 and D-8 (§4). FB-103, the Forge tutorial package built with `scripts/tutorial-forge` (two tracks from a landing fork, contributor onboarding and end-user overview; deck `docs/tutorial.md`, config `tutorial.config.json`, output `build/tutorial-static/`), modelled on the MDEMG tutorial at https://reh3376.github.io/mdemg/, was delivered on 2026-10-27 (PR 78) and is live at https://reh3376.github.io/forge/ since 2026-10-28, when the owner enabled GitHub Pages and the Deploy Tutorial workflow published `main`.
 
 This page is the honest snapshot: what exists in the repository today, what is wired end to end, what is governed, and what is missing against [`VISION.md`](VISION.md). It is updated before every push that changes the state it describes (rule of 2026-10-16: documentation is current before every push). Numbers are from the tracked tree at the status date; "exists" means code is present, "wired" means it runs in the deployed hub, "governed" means a spec and a gate cover it.
 
@@ -13,7 +13,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 
 1. The **hub ↔ spoke contract works end to end**: a spoke registers, is checked against its FACTS spec, pushes records that are persisted, is pulled (Collect/Backfill/Subscribe) and receives write-backs, over TLS/mTLS both ways with per-spoke tokens.
 2. The **OT module runs inside the hub** with OPC-UA connections, a tag engine, ISA-18.2 alarms, the full control-write defense chain, and drives the MES changeover sequence including the PLC CIP runner.
-3. **forge-mes is Go and not yet built**: the imported NestJS backend and Next.js frontend stand in as the interim bridge and speak the spoke contract; the Go rewrite (FB-076) is decided but not designed.
+3. **forge-mes is Go and not yet built**: the imported NestJS backend and Next.js frontend stand in as the interim bridge and speak the spoke contract; the Go rewrite (FB-076) is decided and designed (`docs/decisions/forge-mes-go.md`, signed 2026-11-03); the Go SDK scaffold is its first step.
 4. **Governance is real for four frameworks** (FATS, FACTS, FTTS, FVTS) plus FHTS hashing; the other seven are stubs or planned. forge-display does not exist yet; its contract (FVTS) does, with a runner and golden messages.
 5. **Not yet**: scoped roles in the gateway, `mod_mes` in the hub, the Go module SDK, the hub-of-hubs federation, Kubernetes, and any management module in Go.
 
@@ -30,7 +30,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | `AdapterService` RPCs | 12 (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover) |
 | Hub REST routes | 41 on the hub app (20 platform, 12 Context Engine, 9 Schema Registry; state changes behind `adapters:write`, `context:write` or `schemas:write`), plus OT i3X (8) and OT control (15; every POST behind `adapters:write`), plus the curation app mounted at `/curation` |
 | Storage migrations | 12 (core schema, spoke schemas, canonical, TimescaleDB, lineage, contextual records, adapter registry, module permissions, registry and equipment tables, data-product curation spec, contextual-record context columns, spoke roles without login) |
-| FACTS specs | 9 (8 validate against the schema and pass the runner; ot-module fails `facts:schema-valid` + 8 vocabulary checks, FB-079); 6 await owner approval after the FB-080 and FB-074 re-stamps (`forge governance specs --pending`) |
+| FACTS specs | 9, every one with the required `time_governance` section (FB-090); 8 validate against the schema and pass the runner's rule checks, ot-module fails `facts:schema-valid` + 8 vocabulary checks (FB-079); all 9 approved by reh3376 on 2026-11-13 after the FB-090 re-stamp (`forge governance specs`) |
 | FATS specs | 28 (one per route the hub app serves; the hub test holds both directions) |
 | FVTS specs | 1 (ot-module reference, `pending_review`; re-stamped by FB-074 for `REJECTED_REVIEW`) |
 | CI jobs | hub-python (installs from `uv.lock` with `uv sync --locked`, FB-096), hub-go, mes-module, secrets-scan; auto-PR workflow; Deploy Tutorial workflow (Node 22; runs the framework's tests, builds the deck and its two gates on every push that touches it, publishes `main` to GitHub Pages at https://reh3376.github.io/forge/; Pages enabled 2026-10-28) |
@@ -55,8 +55,10 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
 | FTTS transport spec and runner | 🟡 | Schema + runner exist; spec at `specs/grpc-hardened-transport.ftts.json`; no `docs/FxTS/FTTS.md` |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
-| Hub is the time authority for its spokes and child hubs; skew measured at every link and enforced | 🟡 | Measured and exposed since FB-089 (2026-10-20): offset per adapter and link (spoke, server, source) from every record and from the OPC-UA probe's `CurrentTime`, on `AdapterHealth.clock`, `GET /v1/ingest/stats`, the OT connection status and OpenTelemetry (`forge.clock.offset`, `forge.clock.out_of_tolerance`), one warning per entry into breach of the provisional `FORGE_CLOCK_TOLERANCE_SECONDS` (1 s). Not enforced (FB-093) and no hub time in the contract (FB-092): both wait on D-9's tolerances and fields |
-| Hub stamps `ingestion_time` with its own clock on receipt (gRPC push, pull, REST); the spoke's stamp kept as `sent_time`, none invented | ✅ | `IngestPipeline.ingest` → `stamp_receipt`, one hub-clock reading per batch (FB-087, 2026-10-20); `sent_time` is hub-local and provisional until D-9 names the time fields |
+| Hub is the time authority for its spokes and child hubs; skew measured at every link and enforced | 🟡 | Measured and exposed since FB-089 (2026-10-20): offset per adapter and link (spoke, server, source) from every record and from the OPC-UA probe's `CurrentTime`, on `AdapterHealth.clock`, `GET /v1/ingest/stats`, the OT connection status and OpenTelemetry (`forge.clock.offset`, `forge.clock.out_of_tolerance`), one warning per entry into breach of the provisional `FORGE_CLOCK_TOLERANCE_SECONDS` (1 s). Since FB-094 step 2 (2026-11-13) every OPC-UA service response measures the server's clock too (the response-header tap), the probe cadence is a per-connection runtime setting, and each series is keyed by the clock measured (`clock_id`). Not enforced (FB-093) and no hub time in the contract (FB-092); D-9 signed 2026-11-03 (per-link tolerance classes, six record fields, fields first then the exchange, never silent), implementation in the record's step order |
+| Hub stamps `ingestion_time` with its own clock on receipt (gRPC push, pull, REST); the spoke's stamp kept as `sent_time`, none invented | ✅ | `IngestPipeline.ingest` → `stamp_receipt`, one hub-clock reading per batch (FB-087, 2026-10-20); `sent_time` is hub-local and becomes `spoke_time` under D-9 (signed 2026-11-03) when FB-092 lands |
+| No record builder invents a source time: a value without a source stamp is refused unless its connection declares `source_timestamp_origin: forge`; then Forge's read time stands in and the record says so (`source_clock`, `source_uncertainty_seconds`); the refusal is on health, status, API, CLI and the `forge.ingest.refused` metric | ✅ | FB-088 (2026-11-13, D-9 step 1): `forge.core.clock.resolve_source_stamp` behind the OPC-UA converter and tag registry, the nine adapters and the BOSC collectors, the Ignition bridge, `IngestPipeline.coerce` and the interim MES bridge mapper; the declaration is the FACTS `time_governance` section on the manifest since FB-090 (2026-11-13; a connection parameter that contradicts it is refused at configure, the OT module's per-connection spec refines it); at rest the hypertable still keeps only `source_time` (FB-108) |
+| Every spoke declares how it is time-governed (time source, sync protocol, clock-read method, probe cadence, stamp origin, tolerance class, fail closed, per-connection entries); the check is blocking and the deployment requirement is written down | ✅ | FB-090 (2026-11-13, D-9 step 4): required FACTS `time_governance` section and `facts:time-governed`; `AdapterManifest.time_governance` on the wire (proto field 13; Python, Go, bridge) and in every adapter's `manifest.json`; all nine specs re-stamped and approved by the owner; `docs/deployment/clock-discipline.md`; enforcement is FB-093 |
 | Every timestamp Forge stores is UTC and timezone-aware; a naive datetime or an offset-less string is rejected at the model | ✅ | `forge.core.clock` (`utc_now`, `require_utc`, `OneClockModel`) behind `RecordTimestamp`, every manufacturing entity, `DataProduct` and the decision models; no `utcnow` left; ruff `DTZ` blocking (FB-014, 2026-10-20). The OT module's `DataValue`/`TagValue` still coerce naive to UTC (OPC UA `DateTime` is UTC by definition) and the adapters read an offset-less source string as UTC until FB-090 declares it per spoke |
 
 ### 3.2 Hub platform
@@ -78,7 +80,7 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 |---|---|---|
 | Engines: PostgreSQL, TimescaleDB, Neo4j, Redis | ✅ | `forge.storage.engines` |
 | Storage router and factory | ✅ | |
-| Schema references: one grammar (`forge://schemas/<spoke>[/<Entity>][/v<version>]`), three roles, held at every boundary | ✅ | `forge.core.schema_ref` (FB-008, 2026-10-22); the two registries themselves are not converged: FB-097's design record, `docs/decisions/one-schema-registry.md` (round 1, 2026-10-26, D-10), waits for the owner's signature |
+| Schema references: one grammar (`forge://schemas/<spoke>[/<Entity>][/v<version>]`), three roles, held at every boundary | ✅ | `forge.core.schema_ref` (FB-008, 2026-10-22); the two registries themselves are not converged: FB-097's design record, `docs/decisions/one-schema-registry.md` (D-10), signed 2026-11-03; its eight steps follow |
 | Versioned migrations (12) | ✅ | Online runs through asyncpg on SQLAlchemy's async engine (FB-003); 008 replaces the two 001 tables it had collided with; 011 gives `forge_ts.contextual_records` one column per `RecordContext` slot (FB-013); 002's downgrade drops what each spoke role holds before the role, so a full downgrade runs to base (FB-098, 2026-10-26); 002 creates the spoke roles `NOLOGIN` and 012 closes the placeholder login on a database that applied 002's earlier text, unless Forge issued the role (FB-099, 2026-10-26); 006's downgrade removes the `forge_ts` schema, so a downgrade to base leaves only Alembic's version table (FB-101, 2026-10-27; FB-100 recorded, waits on FB-057 step 2) |
 | Forge-issued module database credentials (`forge db access`) | ✅ | FB-057 step 1, migration 008, on the persistent controller since FB-003; password printed once, never stored |
 | `mod_mes` schema in the hub (MES data moves in) | ⬜ | FB-057 steps 2–5, after the FB-076 design |
@@ -88,32 +90,32 @@ Legend: ✅ exists and wired · 🟡 exists, partly wired or partly governed · 
 
 | Spoke | Code | FACTS spec | Notes |
 |---|---|---|---|
-| whk-wms | ✅ 772 lines | approved (reh3376) | reference spec |
-| forge-mes | ✅ 1,078 lines + the NestJS spoke | approved (reh3376) | 18 data sources incl. AuditLog backfill (FB-071) |
-| whk-cmms | ✅ 810 | `pending_review` (FB-080 re-stamp; previous hash approved by reh3376) | cross-module flows and pre-FHTS history moved to `metadata` |
-| whk-erpi | ✅ 769 | `pending_review` (FB-080 re-stamp; previous hash approved by audit) | same |
-| whk-nms | ✅ 853 | `pending_review` (FB-080 re-stamp; previous hash approved by reh3376) | pre-FHTS history moved to `metadata` |
-| bosc-ims | ✅ 1,909 | approved (no approver recorded) | gRPC source types now in the schema |
-| next-trend (historian) | ✅ 801 | `pending_review` (FB-080 re-stamp; was auto-approved) | dead-letter keys renamed to the schema's |
-| scanner-gateway | ✅ 1,403 | `pending_review` (FB-080 re-stamp; was auto-approved) | own proto under `proto/scanner`; routing rules and scan rejection moved to `metadata` |
-| ot-module | ✅ (the OT module itself) | `pending_review` (FB-073) | `facts:schema-valid` (66 violations) + 8 vocabulary failures; three disagreeing identities (FB-079) |
+| whk-wms | ✅ 772 lines | approved (reh3376, 2026-11-13; FB-090 re-stamp) | reference spec |
+| forge-mes | ✅ 1,078 lines + the NestJS spoke | approved (reh3376, 2026-11-13; FB-090 re-stamp) | 18 data sources incl. AuditLog backfill (FB-071) |
+| whk-cmms | ✅ 810 | approved (reh3376, 2026-11-13; FB-090 re-stamp) | cross-module flows and pre-FHTS history moved to `metadata` |
+| whk-erpi | ✅ 769 | approved (reh3376, 2026-11-13; FB-090 re-stamp) | same |
+| whk-nms | ✅ 853 | approved (reh3376, 2026-11-13; FB-090 re-stamp) | pre-FHTS history moved to `metadata` |
+| bosc-ims | ✅ 1,909 | approved (reh3376, 2026-11-13; FB-090 re-stamp) | gRPC source types now in the schema |
+| next-trend (historian) | ✅ 801 | approved (reh3376, 2026-11-13; FB-090 re-stamp) | dead-letter keys renamed to the schema's |
+| scanner-gateway | ✅ 1,403 | approved (reh3376, 2026-11-13; FB-090 re-stamp) | own proto under `proto/scanner`; routing rules and scan rejection moved to `metadata` |
+| ot-module | ✅ (the OT module itself) | approved (reh3376, 2026-11-13; FB-090 re-stamp) | `facts:schema-valid` (66 violations) + 8 vocabulary failures; three disagreeing identities (FB-079) |
 | csv_file, mqtt_sparkplug, opcua, rest_generic | ⬜ | — | package stubs only (one-line `__init__`) |
 
-The FACTS runner validates every spec against the JSON schema first (`facts:schema-valid`, FB-080) and reads its enums from the schema; 8 of 9 specs validate, the OT spec waits on D-8.
+The FACTS runner validates every spec against the JSON schema first (`facts:schema-valid`, FB-080) and reads its enums from the schema; 8 of 9 specs validate, the OT spec waits on FB-079 (D-8 decided 2026-11-03: extend the enums).
 
 ### 3.5 OT module (forge-ot)
 
 | Capability | State | Notes |
 |---|---|---|
 | OPC-UA client (asyncua), tag engine, context resolvers | ✅ | `forge.modules.ot.opcua_client`, `tag_engine`, `context`; asyncua pinned `==2.1.0` (FB-085) |
-| Tag `source_time` is device time corrected to master by the device's measured clock offset, original stamp and offset recorded | ❌ | `SourceTimestamp` stored as the server sends it, invented when absent; no device clock is read, no offset applied (FB-088, FB-094; one-clock principle, owner 2026-10-18); design record drafted 2026-10-21 (`docs/decisions/one-clock-ot-source-time.md`), awaiting the owner's signature |
+| Tag `source_time` is device time corrected to master by the device's measured clock offset, original stamp and offset recorded | ✅ OPC UA | Since FB-094 step 3 (2026-11-13) the OT builder corrects the source and server stamps by the declared clock's filtered offset where they enter the spoke, and the record keeps the stamp as sent, the offset, the uncertainty and the time quality (all six P-3 fields); the clock is read on every OPC-UA response and on the runtime probe cadence (step 2), and no source time is invented (FB-088). Every value carries its sampling bound (step 6: `max_sampling_uncertainty_ms` per tag, a tighter requirement refused at load). Remaining: the FACTS declaration (FB-090), the refusal (FB-093); Logix, S7 and Modbus readers follow their drivers. Design record `docs/decisions/one-clock-ot-source-time.md` drafted 2026-10-21, signed 2026-11-03 |
 | ISA-18.2 alarming (state machine, detector, engine, integrations, API) | ✅ | `forge.modules.ot.alarming` |
 | Control writes: validation → review → interlocks → authorization → write with read-back → audit | ✅ | `forge.modules.ot.control`; audit in the hub store and an external MQTT publisher (FB-066, FB-067) |
 | MES changeover: orchestrator, PLC CIP runner, recipe integration, REST | ✅ | FB-062, FB-065 |
 | Hosted in the hub with PLC connections, supervision, liveness | ✅ | FB-069, FB-070; `forge.modules.ot.host` |
 | i3X REST shape, MQTT ingress, Ignition bridge (read-only parallel run) | ✅ | `i3x`, `mqtt`, `bridge` |
 | Scripting SDK replacing `system.*` | ✅ | `forge.sdk.scripting` |
-| Server-side two-step review and reason codes for writes | ✅ | FB-074 (2026-10-17): `WriteReviewer`, stage/commit REST behind `adapters:write`, `REJECTED_REVIEW`; multi-party approval waits on D-1 |
+| Server-side two-step review and reason codes for writes | ✅ | FB-074 (2026-10-17): `WriteReviewer`, stage/commit REST behind `adapters:write`, `REJECTED_REVIEW`; multi-party approval follows FB-075 (D-1 signed 2026-11-03) |
 | OT control changeover/connection POST endpoints behind a hub scope | ✅ | FB-082 (2026-10-17): `adapters:write` on confirm-start, retry-recipe, resume and connection restart; the hub user is the actor on the MES write, audit record and events |
 | Batch context resolver wired to MES | ⬜ | FB-020 |
 | One adapter identity (code says `forge-ot-module`, manifest and spec say `ot-module`) | ⬜ | FB-079 (includes FB-018) |
@@ -123,7 +125,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Capability | State | Notes |
 |---|---|---|
 | NestJS backend + Next.js frontend imported as the bridge | ✅ | `modules/Forge MES`; spoke speaks the contract (push, pull, Collect, token, TLS) |
-| Go rewrite from the module SDK | ⬜ | FB-076; decided (A-2), design doc not written (D-3) |
+| Go rewrite from the module SDK | ⬜ | FB-076; design record signed 2026-11-03 (D-3, `docs/decisions/forge-mes-go.md`): ten steps, the Go SDK scaffold (FB-017) first |
 | Prisma data into the hub's `mod_mes` | ⬜ | FB-057 steps 2–5 |
 | Frontend retired in favour of forge-display | ⬜ | after forge-display exists |
 
@@ -144,14 +146,14 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | FVTS v0.1.0 schema, 19-check runner, render-profile baseline, reference renderer, golden messages, CI gate | ✅ | FB-077 (PR 36); `src/forge/governance/fvts`, `tests/governance/fvts` |
 | OT reference FVTS spec with real tags, owner-approved | ⬜ | FB-078 (invented fermenter points today; `pending_review`) |
 | forge-display runtime (any profile) | ⬜ | no code; no backlog id until the design lands |
-| FVTS open decisions (name, write authority per profile, mobile acknowledge, transport, layout format) | ⬜ | D-4 |
+| FVTS open decisions (name, write authority per profile, mobile acknowledge, transport, layout format) | ✅ | D-4 decided 2026-11-03, recorded in `docs/FxTS/FVTS.md` ("Decisions") |
 
 ### 3.9 Governance (FxTS)
 
 | Framework | State |
 |---|---|
 | FATS | schema + runner + 28 specs (one per hub-served route) |
-| FACTS | schema + runner (`facts:schema-valid` + 35 rule checks, enums read from the schema) + 9 specs; 8 validate (OT spec: FB-079); 5 re-stamped specs await owner approval |
+| FACTS | schema + runner (`facts:schema-valid` + 35 rule checks, `facts:time-governed` among them since FB-090; enums read from the schema) + 9 specs, each with the required `time_governance` section; 8 validate (OT spec: FB-079); all 9 approved by reh3376 on 2026-11-13 after the FB-090 re-stamp |
 | FHTS | hashing, verification, approval, revert, registry; owner-only approval in practice |
 | FTTS | schema + runner + 1 spec; no doc page |
 | FVTS | schema + runner + reference renderer + 1 spec |
@@ -163,7 +165,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 
 | Capability | State | Notes |
 |---|---|---|
-| Role model designed in dialogue (R-1 … R-17) | 🟡 | `docs/decisions/roles.md`; Q21 (site-hub derived copy of assignments) and Q22 (ladder preset) open |
+| Role model designed in dialogue (R-1 … R-19) | ✅ | `docs/decisions/roles.md`, signed 2026-11-03 (Q21: a derived copy of assignments at the site hub; Q22: the ladder as an optional preset); enforcement is FB-075 |
 | Scoped roles enforced in the gateway | ⬜ | FB-075 (two role enums today: gateway `Role`, OT `WriteRole`) |
 | Identity methods (OIDC, local, service; then LDAP/AD; then SAML) | ⬜ | R-10 |
 | Hub of hubs (site / enterprise / area), upward audit, on-demand data | ⬜ | R-9, R-13, R-14, R-16, R-17; no code |
@@ -177,6 +179,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Docker Compose (postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio, forge-init, forge-hub) | ✅ dev only | `deploy/docker` |
 | Hub container image | ✅ | `deploy/docker/Dockerfile.forge`, built from `uv.lock` with `uv sync --locked` (dependency layer before the source, `ot` extra in, dev tooling out; `.dockerignore` keeps the context to what it copies) since FB-096 (2026-10-24) |
 | Hub health probes (`/v1/health`, `/readyz`) | ✅ | All seven compose-stack components (postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio) since FB-006 (2026-10-22) |
+| Clock discipline requirement (the NTP/PTP chain from the top hub, tolerance classes, what fails closed, the new-site checklist) | ✅ written | `docs/deployment/clock-discipline.md` (FB-090, 2026-11-13); enforcement is FB-093 |
 | Kubernetes production deployment | ⬜ | owner note; no backlog id |
 | Backups, SLOs, performance baselines | ⬜ | FOTS/FPTS planned |
 
@@ -185,7 +188,7 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 | Practice | State |
 |---|---|
 | One backlog item per PR, auto-PR, owner merges on green | ✅ (A-8) |
-| Every finding fixed or recorded in `BACKLOG.md` | ✅ (105 items recorded to date) |
+| Every finding fixed or recorded in `BACKLOG.md` | ✅ (114 items recorded to date) |
 | Documentation current before every push | ✅ rule since 2026-10-16 |
 | Owner-only spec approval | ✅ `forge governance approve <spec> --by reh3376` (FB-021); nobody runs it on the owner's behalf |
 | MDEMG/Jiminy governed memory, local models only | ✅ instance per project (A-10) |
@@ -196,17 +199,33 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 
 ---
 
+### 3.13 Process control (PC-L1 / PC-L2 / PC-L3)
+
+| Item | State | Notes |
+|---|---|---|
+| Decision record, owner-signed | ✅ | `docs/decisions/process-control-framework.md` (D-11, 2026-11-13, the owner's PR 93); agent context in `docs/personal/` |
+| Forge review (read-only) answering what the tree says for O-2 to O-4 | ✅ | 2026-11-13, record §4a; FB-112 recorded; nine questions open for the owner |
+| Framework FSD (vocabulary, invariants, autonomy model, contracts between layers) | ⬜ | FB-110; after the owner's round-4 answers (home and format of FSDs among them) |
+| PC-L1, PC-L2, PC-L3 FSDs; FxTS specs for each contract before code | ⬜ | FB-110 (S-1) |
+| MPC Supervisor module | ⬜ | new build (M-6); language O-2 |
+| Controller write path (origin, cycle write, heartbeat class, timing) | ⬜ | FB-112, designed in the PC-L2 FSD |
+| Prior-art search on F-2 | ⬜ | FB-111, before any IP filing or public positioning |
+
 ## 4. Open decisions (owner)
+
+On 2026-11-03 the owner decided D-1, D-3, D-4, D-8, D-9 and D-10, one question at a time, and signed the four records; on 2026-11-13 the owner signed D-11 (the process control framework) in their own PR 93. D-5 and D-7 remain open.
 
 | # | Decision | Blocks |
 |---|---|---|
-| D-1 | Platform role model (one scoped model vs separate OT write roles) — design in `docs/decisions/roles.md`, Q21/Q22 open | FB-075, FB-078; the multi-party approval step on top of FB-074 |
-| D-3 | forge-mes Go design — record drafted 2026-11-03 in `docs/decisions/forge-mes-go.md` (round 1, P-1 to P-10, Q-1 to Q-10), waiting for the owner's signature | FB-076, FB-057 steps 2–5, the Go SDK scaffold (FB-017) |
-| D-4 | FVTS open items (name, write authority per profile, mobile acknowledge, transport, layout format, server-side enforcement) | forge-display design |
+| D-1 | Platform role model — **signed 2026-11-03** (`docs/decisions/roles.md`, R-1 … R-19) | nothing; FB-075, FB-078 and the multi-party approval step above FB-074 can start |
+| D-3 | forge-mes Go design — **signed 2026-11-03** (`docs/decisions/forge-mes-go.md`, round 2) | nothing; FB-017 (Go half), FB-076, FB-057 steps 2–5 and FB-055 can start, in the record's step order |
+| D-4 | FVTS open items — **decided 2026-11-03** (`docs/FxTS/FVTS.md`, "Decisions") | nothing; forge-display design can start |
 | D-5 | Hub core language (Python vs Rust) — parked | nothing in the current sequence |
 | D-7 | Scope of the Go standard (OT module and Python adapters) | long-term shape of `src/forge/modules` and `src/forge/adapters` |
-| D-8 | FACTS vocabulary for OT adapters (extend the schema vs translate the spec) | FB-079, approval of the OT FACTS spec |
-| D-9 | One clock: which established standards to adopt (NTP/chrony strata mirroring the hub hierarchy, PTP/IEEE 1588 on the plant network, NTP four-timestamp measurement in-band, IEC 61850-5 tolerance classes, IEC 61850 `TimeQuality` and OPC UA `DataValue` fields on the record); the FB-094 design record (`docs/decisions/one-clock-ot-source-time.md`, round 1, 2026-10-21) recommends P-1 to P-10 and asks Q-1 to Q-6, the owner approves (authority chain, fail-closed enforcement and offset correction on entry already settled) | FB-092's shape, FB-093's tolerances, the representation half of FB-087/FB-088, FB-094's fields, FB-089/FB-091 tolerances |
+| D-8 | FACTS vocabulary for OT adapters — **decided 2026-11-03**: extend the enums (option a) | nothing; FB-079 can start, then the OT FACTS spec's approval |
+| D-9 | One clock: which established standards to adopt — **signed 2026-11-03** (`docs/decisions/one-clock-ot-source-time.md`, round 2: tolerance classes, six record fields, `origin: forge` allowed, 30 s default cadence adjustable at runtime, NTP with T0 acceptable, fields first then the exchange, never silent) | nothing; FB-088, FB-094 (steps 2, 3, 6) and FB-090 done 2026-11-13; FB-093, FB-092 and FB-091 follow in the record's step order |
+| D-10 | One schema registry — **signed 2026-11-03** (`docs/decisions/one-schema-registry.md`, round 2) | nothing; FB-097's eight steps |
+| D-11 | Three-layer process control framework (PC-L1/PC-L2/PC-L3) — **signed 2026-11-13** (`docs/decisions/process-control-framework.md`, rounds 1 to 3, Q-1 to Q-50; the owner's PR 93); the Forge review done 2026-11-13 (§4a), nine round-4 questions open, O-2, O-3 and O-4 among them | WS-12: the framework FSD and the layer FSDs (FB-110); nothing is implemented before its FSD |
 
 ---
 
@@ -216,9 +235,9 @@ The FACTS runner validates every spec against the JSON schema first (`facts:sche
 2. **No management module in Go** (vision §3.3): the migrated NestJS/Next.js application stands in for forge-mes until the Go module is built; the SDK template does not exist yet.
 3. **No scoped roles in force** (vision §P-11): the gateway's auth is off by default and the role model is still being designed.
 4. **No federation** (vision §P-10): a single hub only; no hub-of-hubs code.
-5. **Seven governance frameworks are stubs or planned**; FACTS now validates against its own schema, but six of its nine specs await the owner's hash approval.
+5. **Seven governance frameworks are stubs or planned**; FACTS now validates against its own schema and all nine of its specs carry owner-approved hashes (FB-090 re-stamp, approved 2026-11-13).
 6. **No production deployment** (vision §P-12).
-7. **No clock discipline** (principle "one clock", owner 2026-10-18): the hub is not a time authority for anything attached to it, the OPC-UA converter invents a source time when the server sends none, nothing refuses a wrong clock, and a tag's source time is whatever the OPC-UA server chose to send (FB-088, FB-090 to FB-094; naive timestamps are rejected since FB-014, the hub stamps receipt since FB-087 and every link's offset is measured and alerted since FB-089, all 2026-10-20).
+7. **Clock discipline declared, not yet enforced** (principle "one clock", owner 2026-10-18): every spoke declares how it is time-governed since FB-090 (2026-11-13) and the deployment requirement is written down, but the hub is not yet a time authority for anything attached to it and nothing refuses a wrong clock (FB-093 enforcement, FB-092 hub time in the contract; a tag's source time is corrected by the measured server or device clock on OPC UA since FB-094 step 3; no source time is invented since FB-088 on 2026-11-13, a value without one is refused unless the connection declares origin forge; naive timestamps are rejected since FB-014, the hub stamps receipt since FB-087 and every link's offset is measured and alerted since FB-089, all 2026-10-20).
 
 ---
 

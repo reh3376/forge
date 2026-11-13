@@ -54,7 +54,8 @@ class IgnitionTagValue:
     path: str  # Ignition bracket-notation path
     value: Any = None  # Raw value from Ignition
     quality: IgnitionQuality = IgnitionQuality.GOOD
-    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
+    # The gateway's stamp as it came; None when the response carried none (FB-088).
+    timestamp: datetime | None = None
     data_type: str = "Unknown"  # Ignition data type string
 
     @staticmethod
@@ -76,13 +77,15 @@ class IgnitionTagValue:
             quality = IgnitionQuality.BAD
 
         ts = data.get("timestamp")
+        timestamp: datetime | None
         if isinstance(ts, (int, float)):
             # Ignition returns epoch milliseconds
             timestamp = datetime.fromtimestamp(ts / 1000.0, tz=UTC)
         elif isinstance(ts, str):
             timestamp = datetime.fromisoformat(ts.replace("Z", "+00:00"))
         else:
-            timestamp = datetime.now(UTC)
+            # No stamp in the response: none is invented (one clock, FB-088)
+            timestamp = None
 
         return IgnitionTagValue(
             path=path,
@@ -187,6 +190,12 @@ class BridgeConfig:
     include_patterns: list[str] = field(default_factory=list)  # fnmatch include
     exclude_patterns: list[str] = field(default_factory=list)  # fnmatch exclude
     mapping_rules: list[TagMappingRule] = field(default_factory=list)
+
+    # Which clock stamps the values Ignition serves (one-clock record P-4): "server"
+    # for the gateway's own stamp, "forge" when the gateway sends none and Forge's read
+    # time may stand in. A value without a stamp on an undeclared bridge is refused
+    # (FB-088); FB-090 moves the declaration into FACTS.
+    source_timestamp_origin: str | None = None
 
     # Health
     health_check_interval_ms: int = 5000

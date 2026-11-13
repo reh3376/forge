@@ -61,6 +61,41 @@ class TestContextualRecordRoundTrip:
 
         assert restored.timestamp.server_time is not None
 
+    def test_one_clock_fields_round_trip(self, sample_record: ContextualRecord) -> None:
+        """source_clock and source_uncertainty_seconds (FB-088) cross the dict form intact."""
+        plain = proto_to_pydantic(pydantic_to_proto(sample_record), "ContextualRecord")
+        assert plain.timestamp.source_clock is None
+        assert plain.timestamp.source_uncertainty_seconds is None
+        assert "source_clock" not in pydantic_to_proto(sample_record)["timestamp"]
+
+        sample_record.timestamp.source_clock = "device:conn-001"
+        sample_record.timestamp.source_uncertainty_seconds = 0.0
+        restored = proto_to_pydantic(pydantic_to_proto(sample_record), "ContextualRecord")
+        assert restored.timestamp.source_clock == "device:conn-001"
+        assert restored.timestamp.source_uncertainty_seconds == 0.0
+
+    def test_correction_fields_round_trip(self, sample_record: ContextualRecord) -> None:
+        """The stamp as sent, the offset and the time quality (FB-094 step 3), dict form."""
+        from datetime import timedelta
+
+        from forge.core.clock import TimeQuality
+
+        ts = sample_record.timestamp
+        ts.source_time_as_sent = ts.source_time + timedelta(seconds=1)
+        ts.source_offset_seconds = 1.0
+        ts.time_quality = TimeQuality(synchronized=False, accuracy_class="T1")
+        proto_dict = pydantic_to_proto(sample_record)
+        assert proto_dict["timestamp"]["time_quality"] == {
+            "synchronized": False,
+            "accuracy_class": "T1",
+        }
+        restored = proto_to_pydantic(proto_dict, "ContextualRecord")
+        assert restored.timestamp.source_time_as_sent == ts.source_time_as_sent
+        assert restored.timestamp.source_offset_seconds == 1.0
+        assert restored.timestamp.time_quality == TimeQuality(
+            synchronized=False, accuracy_class="T1"
+        )
+
     def test_value_round_trip_float(self, sample_record: ContextualRecord) -> None:
         proto_dict = pydantic_to_proto(sample_record)
         restored = proto_to_pydantic(proto_dict, "ContextualRecord")

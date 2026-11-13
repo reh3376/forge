@@ -1,9 +1,9 @@
 # One clock in OT: device source time — design record
 
-**Status:** draft for the owner's signature, round 1 (2026-10-21) · **Backlog:** FB-094 (with FB-088, FB-090, FB-091, FB-092, FB-093) · **Roadmap:** D-9
+**Status:** approved by reh3376 on 2026-11-03 (round 2: the owner answered Q-1 to Q-6 one at a time on 2026-11-03 and declared the answers the signature; the status line was set on that word; §8 records the answers) · **Backlog:** FB-094 (with FB-088, FB-090, FB-091, FB-092, FB-093) · **Roadmap:** D-9
 **Participants:** reh3376 (owner, decides and signs), Claude (researches, proposes)
 
-This record answers decision D-9 and designs the OT half of the one-clock principle: how Forge learns the clock of every device it pulls from, how it corrects every incoming timestamp by the measured offset on entry, and what it refuses. Every statement is tagged **[OWNER]** (decided by the owner on 2026-10-18), **[FACT]** (what a standard, a vendor document or the code says, with its source in §9), **[PROPOSED]** (Claude's recommendation, not yet approved) or **[OPEN]** (a question the owner must answer). Nothing in §5 to §7 is implemented until the status line reads `approved by reh3376 on <date>`; the owner signs by editing that line, nobody signs on the owner's behalf.
+This record answers decision D-9 and designs the OT half of the one-clock principle: how Forge learns the clock of every device it pulls from, how it corrects every incoming timestamp by the measured offset on entry, and what it refuses. Every statement is tagged **[OWNER]** (decided by the owner on 2026-10-18), **[FACT]** (what a standard, a vendor document or the code says, with its source in §9), **[PROPOSED]** (Claude's recommendation, not yet approved) or **[OPEN]** (a question the owner must answer; all answered in §8). Nothing in §5 to §7 was implemented before the status line read `approved by reh3376 on <date>`; the owner signed on 2026-11-03 by declaring the answers in §8 the signature, and the line was set on that word, not on anyone's behalf.
 
 The owner's framing (2026-10-18): this is a solved problem; the work is research to find the best established solution, not a novel one. The research below found no gap that needs invention. Every part has a deployed standard behind it.
 
@@ -20,6 +20,8 @@ The owner's framing (2026-10-18): this is a solved problem; the work is research
 | O-5 | D-9 chooses among established standards; the design document recommends, the owner approves. | [OWNER] |
 
 Already settled and built on the hub side: every stored timestamp is UTC and timezone-aware, naive values are rejected (FB-014); the hub stamps receipt and keeps the spoke's stamp as `sent_time` (FB-087); the offset at every link is measured, exposed and alerted on a provisional 1 s tolerance (FB-089).
+
+**Round 2 (2026-11-03).** The owner answered Q-1 to Q-6 (§8) one at a time and declared the answers the signature. Every **[PROPOSED]** statement in §5 is thereby **[OWNER]** 2026-11-03, as amended by §8: the probe cadence is a per-connection setting the operator may change at runtime, 30 s being only the default (Q-4), and a refusal is never silent (Q-4: the owner must have visibility of a connection error at once, so entry into either fail-closed state raises the alarm immediately and is visible on the connection status, `AdapterHealth`, the API, the CLI and forge-display, naming its cause). The owner's second standing rule applies to every step of §6: no decision that pins the platform in; §8 carries a debt note per answer.
 
 ## 2. What exists today (2026-10-21)
 
@@ -74,7 +76,7 @@ The top hub is stratum 1 or 2 (GNSS-disciplined, pool fallback); each child hub 
 
 ### P-2 Measurement: every OT connection reads the clock it pulls from, on a cadence, with round-trip compensation — [PROPOSED]
 
-Per connection, a *clock probe* on `clock_probe_interval_seconds` (default 30, the FB-070 cadence; minimum 1), by the method the protocol offers:
+Per connection, a *clock probe* on `clock_probe_interval_seconds` (default 30, the FB-070 cadence; minimum 1), by the method the protocol offers. The cadence is a **dynamic per-connection setting**, changeable by the operator at runtime without a restart (owner, 2026-11-03: "cadence must be a dynamic variable that can be user adjusted as needed"); 30 s is only the default, and the value in force is reported on the connection status:
 
 | Protocol | Method | Stamps obtained | Estimate |
 |---|---|---|---|
@@ -107,7 +109,7 @@ Each connection declares `source_timestamp_origin` in FACTS (P-7): `device` (a P
 
 ### P-5 Fail closed — [PROPOSED]
 
-A connection whose clock cannot be read for three consecutive probes (90 s at the default cadence) enters `CLOCK_UNREADABLE`: its provider is stopped, its tags are not pulled, the connection status says so, an alarm is raised, and the FB-070 restart loop does not apply (this is a refusal, not a recovery). A connection whose offset exceeds its tolerance class (P-8) for three consecutive probes enters `CLOCK_OUT_OF_TOLERANCE` with the same effect (the FB-093 enforcement, applied to OT links). Either state clears after three consecutive good probes. A device-reported `IsSynchronized = 0` or `ClockNotSynchronized` counts as out of tolerance. None of this is a warning: the connection does not deliver data while in either state.
+A connection whose clock cannot be read for three consecutive probes (90 s at the default cadence) enters `CLOCK_UNREADABLE`: its provider is stopped, its tags are not pulled, the connection status says so, an alarm is raised, and the FB-070 restart loop does not apply (this is a refusal, not a recovery). A connection whose offset exceeds its tolerance class (P-8) for three consecutive probes enters `CLOCK_OUT_OF_TOLERANCE` with the same effect (the FB-093 enforcement, applied to OT links). Either state clears after three consecutive good probes. A device-reported `IsSynchronized = 0` or `ClockNotSynchronized` counts as out of tolerance. None of this is a warning: the connection does not deliver data while in either state. **Never silent** (owner, 2026-11-03): entry into either state raises the alarm at once, is written on the connection status and `AdapterHealth`, is visible in the API, the CLI and forge-display, and names its cause (which probe failed, or the measured offset against which tolerance class); a log line alone does not satisfy the rule.
 
 ### P-6 The sampling bound is declared per tag and recorded per value — [PROPOSED]
 
@@ -155,12 +157,12 @@ In the spoke's record builder, at the first point where the stamp and the measur
 
 | Step | Scope | Backlog | Size |
 |---|---|---|---|
-| 1 | No invented stamps: a value without a source stamp is rejected unless the connection declares `origin: forge`, in which case Forge's read time is the stamp with the poll bound as uncertainty | FB-088 | S |
-| 2 | Clock readers: OPC UA response-header wrapper and `CurrentTime` probe on the cadence (extending FB-089's probe), Logix `WallClockTime` + `TimeSynchronize`, S7 clock, Modbus register map, Sparkplug publish-time; `ClockOffsetTracker` keyed by `clock_id` | FB-094 | M |
-| 3 | The six fields of P-3 on `RecordTimestamp`, the proto, the Go models and the interim bridge mapper; correction on entry in the builders (P-10); FATS/FACTS re-stamped for the owner | FB-094, D-9 | M |
-| 4 | FACTS `time_governance` schema, `facts:time-governed` blocking check, the section in all nine specs (the OT spec with D-8), the deployment requirement written down | FB-090 | M |
-| 5 | Fail closed in `PlcConnectionManager`: `CLOCK_UNREADABLE`, `CLOCK_OUT_OF_TOLERANCE`, alarm, no restart loop | FB-093 (OT) | S |
-| 6 | Per-tag `max_sampling_uncertainty_ms`, refusal at load, `source_uncertainty_seconds` on every value, subscription preference | FB-094 | S |
+| 1 | No invented stamps: a value without a source stamp is rejected unless the connection declares `origin: forge`, in which case Forge's read time is the stamp with the poll bound as uncertainty — **done 2026-11-13** (`forge.core.clock.resolve_source_stamp`; `source_clock` and `source_uncertainty_seconds` are proto fields 6 and 8; the declaration is per connection or adapter config until step 4 moves it into FACTS; the refusal is never silent) | FB-088 | S |
+| 2 | Clock readers: OPC UA response-header wrapper and `CurrentTime` probe on the cadence (extending FB-089's probe; the cadence a per-connection setting adjustable at runtime), Logix `WallClockTime` + `TimeSynchronize`, S7 clock, Modbus register map, Sparkplug publish-time; `ClockOffsetTracker` keyed by `clock_id` — **done 2026-11-13 for what the tree has** (the OPC UA tap and probe, the runtime cadence, `clock_id` keying, the `ClockReader` surface; the Logix, S7 and Modbus readers follow their drivers and Sparkplug's one-way measurement its ingest adapter, none of which exist yet) | FB-094 | M |
+| 3 | The six fields of P-3 on `RecordTimestamp`, the proto, the Go models and the interim bridge mapper; correction on entry in the builders (P-10); FATS/FACTS re-stamped for the owner — **done 2026-11-13** (proto fields 5, 7 and 9 and the `TimeQuality` message on the Python, Go and bridge models; the OT builder corrects source and server stamps by the declared clock's filtered estimate, `ClockEstimate`; the FATS/FACTS re-stamp waits for FB-092 per Q-6, once at the end) | FB-094, D-9 | M |
+| 4 | FACTS `time_governance` schema, `facts:time-governed` blocking check, the section in all nine specs (the OT spec with D-8), the deployment requirement written down — **done 2026-11-13** (the required section carries the P-7 fields and per-connection `connections[]`; the check refuses a missing section, `sync_protocol: none`, not failing closed, a cadence under 1 s and a clock-read method the protocol cannot perform; the nine specs were re-stamped and approved by the owner on 2026-11-13; `AdapterManifest.time_governance` carries the section on the wire; a connection parameter that contradicts the declaration is refused at configure; `docs/deployment/clock-discipline.md`) | FB-090 | M |
+| 5 | Fail closed in `PlcConnectionManager`: `CLOCK_UNREADABLE`, `CLOCK_OUT_OF_TOLERANCE`, alarm raised at entry and visible on status, health, API, CLI and forge-display with its cause, no restart loop | FB-093 (OT) | S |
+| 6 | Per-tag `max_sampling_uncertainty_ms`, refusal at load, `source_uncertainty_seconds` on every value, subscription preference — **done 2026-11-13** (`BaseTag.max_sampling_uncertainty_ms` and `sampling_bound_ms`, the scan class interval or a Query tag's poll interval; a tighter requirement fails the tag's validation, so a JSON tag document is refused at load; the bound is on every stamped OT value and added to the clock's bound once corrected; the OPC UA provider subscribes change-driven already, and which tags carry device stamps is FACTS, FB-090) | FB-094 | S |
 | 7 | Hub-to-spoke four-timestamp exchange in the contract; `sent_time` becomes `spoke_time` | FB-092 | M |
 | 8 | Clock agreement as a curation quality dimension from the tracker | FB-091 | S |
 
@@ -178,16 +180,18 @@ In the spoke's record builder, at the first point where the stamp and the measur
 | Sparkplug B edge nodes | the edge at capture (origin `edge`) | publish timestamp, one-way | the edge host's NTP, declared in FACTS | ms | specification |
 | Historians (Canary, PI, Ignition historian) as sources | whatever the collector stored; the origin is whatever the collector's origin was | not applicable (the historian host's clock via its API where it exposes one) | NTP on the host | as stored | declared per spoke; verify per product |
 
-## 8. Open questions for the owner
+## 8. The owner's answers (2026-11-03)
 
-| # | Question | Tag |
-|---|---|---|
-| Q-1 | Approve the tolerance classes and values of P-8, or set different numbers. | [OPEN] |
-| Q-2 | Approve the field names of P-3 (`source_time_as_sent`, `source_clock`, `source_offset_seconds`, `source_uncertainty_seconds`, `time_quality`) and the rename of `sent_time` to `spoke_time`. | [OPEN] |
-| Q-3 | A device that never stamps anything (Modbus without clock registers, S7 or Logix read directly): O-4 says a device whose clock cannot be read is not a valid source. P-4 and step 1 propose that such a device may be pulled with `origin: forge`, because the only stamp that exists is Forge's own governed read time and the poll bound is recorded as uncertainty. Is that acceptable, or is a readable device clock required even when the device does not stamp? | [OPEN] |
-| Q-4 | Default probe cadence 30 s (P-2); the fail-closed thresholds of three consecutive probes (P-5). | [OPEN] |
-| Q-5 | Where a device supports PTP (CIP Sync, PTCP), is PTP required or is NTP-synced acceptable with class T0 declared? | [OPEN] |
-| Q-6 | The exchange of P-9 changes `forge.v1.AdapterService`; the re-stamped FATS/FACTS specs return to you for approval. Proceed in that order (fields first, exchange second), or exchange first? | [OPEN] |
+Asked and answered one at a time; the owner declared the answers the signature. The last column is the debt check the owner asked for: does the answer pin the platform in later?
+
+| # | Question | Owner's answer (2026-11-03) | Pins us in? |
+|---|---|---|---|
+| Q-1 | Approve the tolerance classes and values of P-8, or set different numbers. | **Approved as proposed** (T1 1 ms, T0 10 ms, it-lan 10 ms, it-wan 100 ms, edge-mqtt 500 ms). | No: the classes are data per link in FACTS; a new class is a row, not a code change. |
+| Q-2 | Approve the field names of P-3 (`source_time_as_sent`, `source_clock`, `source_offset_seconds`, `source_uncertainty_seconds`, `time_quality`) and the rename of `sent_time` to `spoke_time`. | **Approved.** | Guarded: proto fields 5–10 are additive; `sent_time` → `spoke_time` is the one rename and lands before any external consumer reads the field. |
+| Q-3 | A device that never stamps anything (Modbus without clock registers, S7 or Logix read directly): O-4 says a device whose clock cannot be read is not a valid source. P-4 and step 1 propose that such a device may be pulled with `origin: forge`, because the only stamp that exists is Forge's own governed read time and the poll bound is recorded as uncertainty. Is that acceptable, or is a readable device clock required even when the device does not stamp? | **`origin: forge` is allowed**; the poll bound is recorded as uncertainty; declared per connection in FACTS. | Guarded: the origin is on every record, so such values can be told apart or excluded by query at any later time; nothing is invented. |
+| Q-4 | Default probe cadence 30 s (P-2); the fail-closed thresholds of three consecutive probes (P-5). | **Approved**: 30 s default, three probes in and three out, no data in either state, no restart loop. Conditions: the cadence is a dynamic per-connection variable the user adjusts at runtime; and no silent failure, the owner must see such a connection error at once. | No: a runtime setting, and an alarm path FB-089's `on_breach` hook already provides. |
+| Q-5 | Where a device supports PTP (CIP Sync, PTCP), is PTP required or is NTP-synced acceptable with class T0 declared? | **NTP is acceptable with class T0 declared**; T1 only where the device reports PTP synchronisation. | No: a device moving to PTP changes its declared class, nothing else. |
+| Q-6 | The exchange of P-9 changes `forge.v1.AdapterService`; the re-stamped FATS/FACTS specs return to you for approval. Proceed in that order (fields first, exchange second), or exchange first? | **Fields first, exchange second.** | No: the specs are re-stamped once, at the end. |
 
 ## 9. Sources
 

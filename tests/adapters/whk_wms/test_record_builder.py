@@ -2,6 +2,8 @@
 
 from datetime import UTC, datetime
 
+import pytest
+
 from forge.adapters.whk_wms.record_builder import (
     _assess_quality,
     _derive_tag_path,
@@ -9,6 +11,7 @@ from forge.adapters.whk_wms.record_builder import (
     _extract_source_time,
     build_contextual_record,
 )
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -122,7 +125,7 @@ class TestDeriveTagPath:
 class TestBuildContextualRecord:
     """Test full ContextualRecord assembly."""
 
-    def _build(self, raw=None, context=None):
+    def _build(self, raw=None, context=None, **kwargs):
         raw = raw or {
             "barrel_id": "BRL-001",
             "event_timestamp": "2026-04-06T14:30:00+00:00",
@@ -134,6 +137,7 @@ class TestBuildContextualRecord:
             context=context,
             adapter_id="whk-wms",
             adapter_version="0.1.0",
+            **kwargs,
         )
 
     def test_returns_contextual_record(self):
@@ -172,7 +176,17 @@ class TestBuildContextualRecord:
         record = self._build()
         assert record.record_id is not None
 
-    def test_no_timestamp_uses_now(self):
+    def test_no_timestamp_is_refused_unless_the_adapter_declared_forge(self):
+        """One clock (FB-088): a WMS event without a timestamp gets no invented one."""
         raw = {"barrel_id": "BRL-001"}
-        record = self._build(raw=raw)
-        assert record.timestamp.source_time is not None
+        with pytest.raises(SourceStampMissingError, match=r"whk-wms.*without a source timestamp"):
+            self._build(raw=raw)
+        record = self._build(raw=raw, source_timestamp_origin="forge")
+        assert record.timestamp.source_clock == "forge"
+        assert record.timestamp.source_time == record.timestamp.ingestion_time
+        assert record.timestamp.source_uncertainty_seconds is None
+
+    def test_own_timestamp_names_the_declared_clock(self):
+        record = self._build(source_timestamp_origin="server")
+        assert record.timestamp.source_clock is None  # no connection name to attach it to
+        assert record.timestamp.source_time.year == 2026

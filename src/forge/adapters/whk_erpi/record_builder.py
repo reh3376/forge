@@ -16,6 +16,7 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
+from forge.core.clock import resolve_source_stamp
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -38,6 +39,7 @@ def build_contextual_record(
     context: RecordContext,
     adapter_id: str,
     adapter_version: str,
+    source_timestamp_origin: str | None = None,
 ) -> ContextualRecord:
     """Assemble a ContextualRecord from a raw ERPI message envelope.
 
@@ -46,6 +48,8 @@ def build_contextual_record(
         context: Pre-built RecordContext from context.build_record_context().
         adapter_id: Adapter manifest ID (whk-erpi).
         adapter_version: Adapter manifest version.
+        source_timestamp_origin: the origin the connection declared for the clock that
+            stamps its values (device, server, edge or forge); None when undeclared (FB-088)
 
     Returns:
         A fully populated ContextualRecord ready for hub ingestion.
@@ -75,6 +79,18 @@ def build_contextual_record(
     # Identify which RabbitMQ exchange this came from
     connection_id = f"wh.whk01.distillery01.{record_name.lower()}"
 
+    # ── Source stamp ───────────────────────────────────────────
+    # The event's own time is the source time; an event without one is refused unless the
+    # adapter declares source_timestamp_origin: forge (one clock, FB-088).
+    stamp = resolve_source_stamp(
+        source_time,
+        origin=source_timestamp_origin,
+        read_at=now,
+        adapter_id=adapter_id,
+        connection=connection_id,
+        tag_path=tag_path,
+    )
+
     # ── Build Record ───────────────────────────────────────────
     return ContextualRecord(
         source=RecordSource(
@@ -83,9 +99,9 @@ def build_contextual_record(
             tag_path=tag_path,
             connection_id=connection_id,
         ),
+        # This system sends no server stamp; none is invented (FB-088).
         timestamp=RecordTimestamp(
-            source_time=source_time,
-            server_time=now,
+            **stamp.timestamp_fields(),
             ingestion_time=now,
         ),
         value=RecordValue(
@@ -108,10 +124,10 @@ def build_contextual_record(
     )
 
 
-def _parse_timestamp(value: Any) -> datetime:
-    """Parse an ISO timestamp string, falling back to now(utc)."""
+def _parse_timestamp(value: Any) -> datetime | None:
+    """Parse an ISO timestamp string; None when there is none or it does not parse (FB-088)."""
     if value is None:
-        return datetime.now(tz=UTC)
+        return None
     if isinstance(value, datetime):
         return value if value.tzinfo else value.replace(tzinfo=UTC)
     try:
@@ -120,5 +136,5 @@ def _parse_timestamp(value: Any) -> datetime:
         dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
         return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
     except (ValueError, TypeError):
-        logger.warning("Could not parse timestamp %r — using now(utc)", value)
-        return datetime.now(tz=UTC)
+        logger.warning("Could not parse timestamp %r: the event carries no source stamp", value)
+        return None

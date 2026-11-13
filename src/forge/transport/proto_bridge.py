@@ -35,7 +35,9 @@ from forge.core.models.adapter import (
     AdapterState,
     AdapterTier,
     ConnectionParam,
+    ConnectionTimeGovernance,
     DataContract,
+    TimeGovernance,
 )
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -45,6 +47,7 @@ from forge.core.models.contextual_record import (
     RecordSource,
     RecordTimestamp,
     RecordValue,
+    TimeQuality,
 )
 from forge.proto_gen.forge.v1 import adapter_pb2 as adapter_msg
 from forge.proto_gen.forge.v1 import contextual_record_pb2 as record_msg
@@ -205,6 +208,23 @@ def record_timestamp_to_proto(ts: RecordTimestamp) -> record_msg.RecordTimestamp
     ingest_ts = _dt_to_timestamp(ts.ingestion_time)
     if ingest_ts is not None:
         proto_ts.ingestion_time.CopyFrom(ingest_ts)
+    if ts.source_clock:
+        proto_ts.source_clock = ts.source_clock
+    if ts.source_uncertainty_seconds is not None:
+        proto_ts.source_uncertainty_seconds = ts.source_uncertainty_seconds
+    if ts.source_time_as_sent is not None:
+        as_sent = _dt_to_timestamp(ts.source_time_as_sent)
+        if as_sent is not None:
+            proto_ts.source_time_as_sent.CopyFrom(as_sent)
+    if ts.source_offset_seconds is not None:
+        proto_ts.source_offset_seconds = ts.source_offset_seconds
+    if ts.time_quality is not None:
+        quality = ts.time_quality
+        proto_ts.time_quality.accuracy_class = quality.accuracy_class
+        for name in ("synchronized", "clock_failure", "leap_seconds_known"):
+            flag = getattr(quality, name)
+            if flag is not None:
+                setattr(proto_ts.time_quality, name, flag)
     return proto_ts
 
 
@@ -316,7 +336,58 @@ def manifest_to_proto(manifest: AdapterManifest) -> adapter_msg.AdapterManifest:
     # metadata → google.protobuf.Struct
     if manifest.metadata:
         proto_manifest.metadata.update(manifest.metadata)
+    if manifest.time_governance is not None:
+        proto_manifest.time_governance.CopyFrom(time_governance_to_proto(manifest.time_governance))
     return proto_manifest
+
+
+def time_governance_to_proto(tg: TimeGovernance) -> adapter_msg.TimeGovernance:
+    """Convert Pydantic TimeGovernance to its proto message (FB-090)."""
+    msg = adapter_msg.TimeGovernance(
+        time_source=tg.time_source,
+        sync_protocol=tg.sync_protocol,
+        clock_read_method=tg.clock_read_method or "",
+        clock_probe_interval_seconds=tg.clock_probe_interval_seconds,
+        source_timestamp_origin=tg.source_timestamp_origin,
+        tolerance_class=tg.tolerance_class,
+        fail_closed=tg.fail_closed,
+    )
+    for entry in tg.connections:
+        conn = msg.connections.add()
+        conn.name = entry.name
+        conn.clock_read_method = entry.clock_read_method or ""
+        if entry.clock_probe_interval_seconds is not None:
+            conn.clock_probe_interval_seconds = entry.clock_probe_interval_seconds
+        conn.source_timestamp_origin = entry.source_timestamp_origin or ""
+        conn.tolerance_class = entry.tolerance_class or ""
+    return msg
+
+
+def proto_to_time_governance(msg: adapter_msg.TimeGovernance) -> TimeGovernance:
+    """Convert a proto TimeGovernance message to the Pydantic model (FB-090)."""
+    return TimeGovernance(
+        time_source=msg.time_source,
+        sync_protocol=msg.sync_protocol,
+        clock_read_method=msg.clock_read_method or None,
+        clock_probe_interval_seconds=msg.clock_probe_interval_seconds,
+        source_timestamp_origin=msg.source_timestamp_origin,
+        tolerance_class=msg.tolerance_class,
+        fail_closed=msg.fail_closed,
+        connections=[
+            ConnectionTimeGovernance(
+                name=c.name,
+                clock_read_method=c.clock_read_method or None,
+                clock_probe_interval_seconds=(
+                    c.clock_probe_interval_seconds
+                    if c.HasField("clock_probe_interval_seconds")
+                    else None
+                ),
+                source_timestamp_origin=c.source_timestamp_origin or None,
+                tolerance_class=c.tolerance_class or None,
+            )
+            for c in msg.connections
+        ],
+    )
 
 
 def health_to_proto(health: AdapterHealth) -> adapter_msg.AdapterHealth:
@@ -370,6 +441,26 @@ def proto_to_record_timestamp(msg: record_msg.RecordTimestamp) -> RecordTimestam
     ingestion_time = _timestamp_to_dt(msg.ingestion_time)
     if ingestion_time is not None:
         kwargs["ingestion_time"] = ingestion_time
+    # The one-clock fields (FB-088): an empty source_clock is "undeclared"; the
+    # uncertainty is proto3 optional, so presence is checked rather than zero.
+    if msg.source_clock:
+        kwargs["source_clock"] = msg.source_clock
+    if msg.HasField("source_uncertainty_seconds"):
+        kwargs["source_uncertainty_seconds"] = msg.source_uncertainty_seconds
+    if msg.HasField("source_time_as_sent"):
+        kwargs["source_time_as_sent"] = _timestamp_to_dt(msg.source_time_as_sent)
+    if msg.HasField("source_offset_seconds"):
+        kwargs["source_offset_seconds"] = msg.source_offset_seconds
+    if msg.HasField("time_quality"):
+        quality = msg.time_quality
+        kwargs["time_quality"] = TimeQuality(
+            synchronized=quality.synchronized if quality.HasField("synchronized") else None,
+            clock_failure=quality.clock_failure if quality.HasField("clock_failure") else None,
+            leap_seconds_known=(
+                quality.leap_seconds_known if quality.HasField("leap_seconds_known") else None
+            ),
+            accuracy_class=quality.accuracy_class or "unspecified",
+        )
     return RecordTimestamp(**kwargs)
 
 
@@ -482,6 +573,11 @@ def proto_to_manifest(msg: adapter_msg.AdapterManifest) -> AdapterManifest:
         connection_params=[proto_to_connection_param(p) for p in msg.connection_params],
         auth_methods=list(msg.auth_methods) if msg.auth_methods else ["none"],
         metadata=dict(msg.metadata) if msg.HasField("metadata") else {},
+        time_governance=(
+            proto_to_time_governance(msg.time_governance)
+            if msg.HasField("time_governance")
+            else None
+        ),
     )
 
 

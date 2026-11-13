@@ -16,6 +16,7 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
+from forge.core.clock import resolve_source_stamp
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -40,6 +41,8 @@ def build_contextual_record(
     adapter_version: str,
     entity_type: str = "network_device",
     event_type: str = "unknown",
+    source_timestamp_origin: str | None = None,
+    poll_bound_seconds: float | None = None,
 ) -> ContextualRecord:
     """Assemble a ContextualRecord from a raw NMS API response.
 
@@ -48,6 +51,10 @@ def build_contextual_record(
         context: Pre-built RecordContext from context.build_record_context().
         adapter_id: Adapter manifest ID (whk-nms).
         adapter_version: Adapter manifest version.
+        source_timestamp_origin: the origin the connection declared for the clock that
+            stamps its values (device, server, edge or forge); None when undeclared (FB-088)
+        poll_bound_seconds: the adapter's poll interval, recorded as the uncertainty when
+            Forge's read time stands in
         entity_type: Type of entity (network_device, security_event, etc.).
         event_type: Type of event (snmp_trap, baseline_anomaly, etc.).
 
@@ -65,6 +72,11 @@ def build_contextual_record(
         or raw_event.get("createdAt")
         or raw_event.get("event_time")
         or raw_event.get("eventTime")
+        # the NMS's own time fields: a device's last_seen, a SPOF's detected_at, an
+        # LLDP/ARP neighbour's discovered_at (net_topo_toolkit's API models)
+        or raw_event.get("last_seen")
+        or raw_event.get("detected_at")
+        or raw_event.get("discovered_at")
     )
     now = datetime.now(tz=UTC)
 
@@ -78,6 +90,20 @@ def build_contextual_record(
     # Identify the NMS system and entity
     connection_id = f"nms.{entity_type.lower()}"
 
+    # ── Source stamp ───────────────────────────────────────────
+    # The event's own time is the source time; an event without one is refused unless the
+    # adapter declares source_timestamp_origin: forge, and then the poll interval is
+    # the uncertainty bound (one clock, FB-088).
+    stamp = resolve_source_stamp(
+        source_time,
+        origin=source_timestamp_origin,
+        read_at=now,
+        poll_bound_seconds=poll_bound_seconds,
+        adapter_id=adapter_id,
+        connection=connection_id,
+        tag_path=tag_path,
+    )
+
     # ── Build Record ───────────────────────────────────────────
     return ContextualRecord(
         source=RecordSource(
@@ -86,9 +112,9 @@ def build_contextual_record(
             tag_path=tag_path,
             connection_id=connection_id,
         ),
+        # This system sends no server stamp; none is invented (FB-088).
         timestamp=RecordTimestamp(
-            source_time=source_time,
-            server_time=now,
+            **stamp.timestamp_fields(),
             ingestion_time=now,
         ),
         value=RecordValue(
@@ -111,10 +137,10 @@ def build_contextual_record(
     )
 
 
-def _parse_timestamp(value: Any) -> datetime:
-    """Parse an ISO timestamp string, falling back to now(utc)."""
+def _parse_timestamp(value: Any) -> datetime | None:
+    """Parse an ISO timestamp string; None when there is none or it does not parse (FB-088)."""
     if value is None:
-        return datetime.now(tz=UTC)
+        return None
     if isinstance(value, datetime):
         return value if value.tzinfo else value.replace(tzinfo=UTC)
     try:
@@ -123,5 +149,5 @@ def _parse_timestamp(value: Any) -> datetime:
         dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
         return dt if dt.tzinfo else dt.replace(tzinfo=UTC)
     except (ValueError, TypeError):
-        logger.warning("Could not parse timestamp %r — using now(utc)", value)
-        return datetime.now(tz=UTC)
+        logger.warning("Could not parse timestamp %r: the event carries no source stamp", value)
+        return None
