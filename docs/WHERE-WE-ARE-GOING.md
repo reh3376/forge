@@ -65,6 +65,8 @@ The decision-free items done so far: FB-022, FB-026, FB-084, FB-085, FB-086, FB-
 
 ---
 
+**Paused (2026-11-13):** after PR 91 (FB-094 complete for what the tree has) the owner adds new functionality in a PR of their own; implementation resumes on the owner's word with FB-090 (the FACTS `time_governance` section), then FB-093, FB-092, FB-091, FB-097's eight steps, FB-017 and the forge-mes steps.
+
 ## 5. What gates the route
 
 A ✅ marks a decision taken on 2026-11-03: its gate is lifted and the listed items can start. D-7 remains open.
