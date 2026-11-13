@@ -38,7 +38,7 @@ import json
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from forge.modules.ot.control.changeover_orchestrator import (
     OT_ADAPTER_ID,
@@ -115,9 +115,23 @@ class PlcConnectionSpec(BaseModel):
     #: Initial restart back-off (doubles up to a minute) when the PLC is unreachable.
     reconnect_interval_ms: int = Field(default=1_000, ge=100)
     max_reconnect_attempts: int = Field(default=0, ge=0)
-    #: Supervisor reads the server clock this often to catch silent link loss (FB-070);
-    #: 0 disables the probe.
-    liveness_interval_seconds: float = Field(default=30.0, ge=0)
+    #: Clock probe cadence (one-clock record P-2): the supervisor reads the server's clock
+    #: this often; the FB-070 liveness check and the FB-089 offset measurement ride on the
+    #: same read. 30 s default; the operator adjusts the value in force at runtime, without
+    #: a restart (``PlcConnectionManager.set_clock_probe_interval``, minimum 1 s). 0
+    #: disables the probe, which FB-093 will refuse: a clock that is not read cannot be
+    #: trusted. ``liveness_interval_seconds`` is the field's older name and still accepted.
+    clock_probe_interval_seconds: float = Field(
+        default=30.0,
+        ge=0,
+        validation_alias=AliasChoices("clock_probe_interval_seconds", "liveness_interval_seconds"),
+    )
+    #: Which clock stamps this connection's values (one-clock record P-4): ``device`` for
+    #: a PLC-embedded server, ``server`` for a host that stamps at poll (Kepware, Ignition,
+    #: Linx). None is undeclared: a value without a source stamp is refused (FB-088). The
+    #: clock the probe measures is named from it (``clock_id``, FB-094 step 2); FB-090
+    #: moves the declaration into FACTS ``time_governance``.
+    source_timestamp_origin: Literal["device", "server"] | None = None
     enabled: bool = True
 
     @model_validator(mode="after")

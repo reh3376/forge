@@ -24,6 +24,8 @@ INGEST_REFUSED = "forge.ingest.refused"
 
 ATTR_ADAPTER_ID = "forge.adapter_id"
 ATTR_CLOCK_LINK = "forge.clock.link"
+#: The clock a probe or tap read (``server:WHK01``), when the sample names one (FB-094).
+ATTR_CLOCK_ID = "forge.clock.id"
 ATTR_REFUSAL_CAUSE = "forge.refusal.cause"
 
 _meter = metrics.get_meter(METER_NAME)
@@ -53,14 +55,23 @@ _ingest_refused = _meter.create_counter(
 )
 
 
-def record_clock_offset(adapter_id: str, link: str, seconds: float) -> None:
+def _clock_attributes(adapter_id: str, link: str, clock_id: str | None) -> dict[str, str]:
+    attributes = {ATTR_ADAPTER_ID: adapter_id, ATTR_CLOCK_LINK: link}
+    if clock_id:
+        attributes[ATTR_CLOCK_ID] = clock_id
+    return attributes
+
+
+def record_clock_offset(
+    adapter_id: str, link: str, seconds: float, *, clock_id: str | None = None
+) -> None:
     """Record one clock-offset sample for ``adapter_id`` on ``link`` (signed)."""
-    _clock_offset.set(seconds, attributes={ATTR_ADAPTER_ID: adapter_id, ATTR_CLOCK_LINK: link})
+    _clock_offset.set(seconds, attributes=_clock_attributes(adapter_id, link, clock_id))
 
 
-def record_clock_breach(adapter_id: str, link: str) -> None:
+def record_clock_breach(adapter_id: str, link: str, *, clock_id: str | None = None) -> None:
     """Count one clock-offset sample outside tolerance for ``adapter_id`` on ``link``."""
-    _clock_out_of_tolerance.add(1, attributes={ATTR_ADAPTER_ID: adapter_id, ATTR_CLOCK_LINK: link})
+    _clock_out_of_tolerance.add(1, attributes=_clock_attributes(adapter_id, link, clock_id))
 
 
 def record_refusal(adapter_id: str, cause: str) -> None:

@@ -9,6 +9,7 @@ from typing import Any
 
 import pytest
 
+from forge.core.clock import ClockSample
 from forge.modules.ot.control import PlcConnectionManager, PlcConnectionSpec, RegistryTagIO
 from forge.modules.ot.control.connections import (
     LIVENESS_NODE,
@@ -48,7 +49,12 @@ class FakeUaClient:
         self.reconnect_count = 0
         self.probe_fail = False
         self.probed = 0
+        self.clock_sink = None
         self._next = 1
+
+    def set_clock_sink(self, sink) -> None:
+        """The manager routes the client's clock samples into its series (FB-094 step 2)."""
+        self.clock_sink = sink
 
     async def connect(self) -> None:
         self.connects += 1
@@ -121,7 +127,8 @@ class Clock:
 def spec(name: str = "WHK01", **kw: Any) -> PlcConnectionSpec:
     kw.setdefault("endpoint", "opc.tcp://10.0.0.1:4840")
     kw.setdefault("reconnect_interval_ms", 1000)
-    kw.setdefault("liveness_interval_seconds", 0)
+    if "clock_probe_interval_seconds" not in kw:
+        kw.setdefault("liveness_interval_seconds", 0)  # the field's older name, still accepted
     return PlcConnectionSpec(name=name, **kw)
 
 
@@ -391,12 +398,94 @@ async def test_liveness_probe_measures_the_server_clock() -> None:
     server_clock = manager.status()["connections"]["WHK01"]["server_clock"]
     assert server_clock["samples"] == 2 and server_clock["within_tolerance"] is True
     assert server_clock["last_seconds"] == pytest.approx(0.02)
-    assert manager.offsets.stats("WHK01")["server"].max_abs_seconds == 3.0
+    # the series is the one of the clock the probe read, named (FB-094 step 2)
+    assert server_clock["clock_id"] == "server:WHK01"
+    assert manager.offsets.clocks("WHK01")["server:WHK01"].max_abs_seconds == 3.0
+    assert manager.offsets.stats("WHK01") == {}
+    conn = manager.status()["connections"]["WHK01"]
+    assert conn["clock_id"] == "server:WHK01" and conn["clock_samples"] == 2
 
 
-async def test_probe_without_a_clock_value_measures_nothing() -> None:
+async def test_probe_without_a_clock_value_is_counted_and_visible() -> None:
+    """The session lives but the clock is unreadable: on the status now, a refusal with FB-093."""
     registry = await registry_with_tags()
     manager, _clients = make([spec(liveness_interval_seconds=10)], registry, clock=Clock())
     await manager.start()
     await manager.check()
-    assert manager.status()["connections"]["WHK01"]["server_clock"] is None
+    conn = manager.status()["connections"]["WHK01"]
+    assert conn["server_clock"] is None and conn["clock_samples"] == 0
+    assert conn["clock_unreadable"] == 1
+    assert conn["last_error"] == "clock probe: the server answered without a clock value"
+
+
+async def test_a_declared_device_origin_names_the_clock_the_probe_reads() -> None:
+    registry = await registry_with_tags()
+    clock = Clock()
+    manager, clients = make(
+        [spec(liveness_interval_seconds=10, source_timestamp_origin="device")],
+        registry,
+        clock=clock,
+    )
+    await manager.start()
+    clients["WHK01"].values[LIVENESS_NODE] = clock.t
+    await manager.check()
+    conn = manager.status()["connections"]["WHK01"]
+    assert conn["clock_id"] == "device:WHK01"
+    assert conn["server_clock"]["clock_id"] == "device:WHK01"
+    assert set(manager.offsets.clocks("WHK01")) == {"device:WHK01"}
+
+
+async def test_the_client_s_own_clock_samples_feed_the_connection_series() -> None:
+    """The response-header tap's samples land in the same series as the probe's."""
+    registry = await registry_with_tags()
+    clock = Clock()
+    manager, clients = make([spec()], registry, clock=clock)
+    client = clients["WHK01"]
+    assert client.clock_sink is not None  # wired at construction
+    client.clock_sink(
+        ClockSample(
+            clock.t,
+            clock.t + timedelta(seconds=1, milliseconds=2),
+            clock.t + timedelta(milliseconds=4),
+        )
+    )
+    conn = manager.status()["connections"]["WHK01"]
+    assert conn["clock_samples"] == 1
+    assert conn["server_clock"]["last_seconds"] == pytest.approx(1.0)
+    assert conn["server_clock"]["round_trip_seconds"] == pytest.approx(0.004)
+
+
+async def test_clock_probe_interval_is_a_runtime_setting_per_connection() -> None:
+    """The owner's condition (2026-11-03): the cadence is adjusted at runtime, no restart."""
+    registry = await registry_with_tags()
+    clock = Clock()
+    manager, clients = make(
+        [spec(clock_probe_interval_seconds=30), spec("WHK02", liveness_interval_seconds=10)],
+        registry,
+        clock=clock,
+    )
+    await manager.start()
+    status = manager.status()["connections"]
+    assert status["WHK01"]["clock_probe_interval_seconds"] == 30.0  # the one-clock name
+    assert status["WHK02"]["clock_probe_interval_seconds"] == 10.0  # the older name, still read
+    assert status["WHK01"]["clock_probe_interval_source"] == "config"
+    client = clients["WHK01"]
+    await manager.check()
+    assert client.probed == 1
+    clock.advance(5)
+    await manager.check()
+    assert client.probed == 1  # 30 s cadence: not due
+
+    changed = manager.set_clock_probe_interval("WHK01", 5, requested_by="reh3376")
+    assert changed["clock_probe_interval_seconds"] == 5.0
+    assert changed["clock_probe_interval_source"] == f"set by reh3376 at {clock.t.isoformat()}"
+    await manager.check()
+    assert client.probed == 2  # due under the new cadence, no restart happened
+    assert client.connects == 1
+    assert manager.status()["connections"]["WHK02"]["clock_probe_interval_seconds"] == 10.0
+
+    with pytest.raises(ValueError, match="at least 1 s"):
+        manager.set_clock_probe_interval("WHK01", 0.5)
+    with pytest.raises(KeyError):
+        manager.set_clock_probe_interval("nope", 5)
+    await manager.stop()

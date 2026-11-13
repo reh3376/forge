@@ -411,6 +411,46 @@ class TestControlComposition:
         assert journal[0]["requestor"] == "forge-ot-module"
 
     @pytest.mark.asyncio
+    async def test_the_connection_spec_declares_the_source_timestamp_origin(self):
+        """The control config's connection is the first home of the declaration (FB-094 step 2)."""
+        from types import SimpleNamespace
+
+        from forge.modules.ot.control import ControlDependencies
+        from forge.modules.ot.tag_engine.models import StandardTag
+        from forge.modules.ot.tag_engine.registry import TagRegistry
+
+        adapter = OTModuleAdapter(
+            registry=TagRegistry(),
+            control=ControlDependencies(
+                write_dispatcher=AsyncMock(),
+                tag_io=self._Plc(),
+                plc_client_factory=lambda spec: SimpleNamespace(name=spec.name),
+            ),
+        )
+        doc = self._control_doc()
+        doc["connections"] = [
+            {
+                "name": "WHK01",
+                "endpoint": "opc.tcp://10.0.0.1:4840",
+                "source_timestamp_origin": "device",
+            },
+            {"name": "WHK02", "endpoint": "opc.tcp://10.0.0.2:4840"},
+        ]
+        doc["connection_poll_seconds"] = 0
+        await adapter.configure({"control_config": doc, "source_timestamp_origin": {"*": "forge"}})
+
+        def tag(connection: str) -> StandardTag:
+            return StandardTag(
+                path=f"WH/{connection}/Cooker01/TIT_2010/PV",
+                opcua_node_id="ns=2;s=x",
+                connection_name=connection,
+            )
+
+        assert adapter.source_timestamp_origin_for(tag("WHK01")) == "device"
+        assert adapter.source_timestamp_origin_for(tag("WHK02")) == "forge"  # the params' default
+        assert adapter.source_timestamp_origin_for(tag("WHK03")) == "forge"
+
+    @pytest.mark.asyncio
     async def test_area_rules_configure_the_area_resolver(self, mock_registry):
         adapter = OTModuleAdapter(registry=mock_registry)
         await adapter.configure(

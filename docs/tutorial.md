@@ -863,12 +863,12 @@ The owner's principle (2026-10-18): records from different sources only reconcil
 | Every stored timestamp is UTC and timezone-aware; naive rejected at the model | ✅ FB-014 |
 | The hub stamps receipt with its own clock | ✅ FB-087 |
 | The offset of every connected clock is measured, recorded and surfaced | ✅ FB-089 (provisional 1 s tolerance, warning only) |
-| A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | 🟡 FB-088 done 2026-11-13 (no invented stamp; the stamping clock named once declared); FB-094 next; design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
+| A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | 🟡 FB-088 done 2026-11-13 (no invented stamp; the stamping clock named once declared); FB-094 step 2 done 2026-11-13 (the server's clock is read on every OPC-UA response and on a runtime probe cadence); step 3, the correction on entry, next; design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
 | Hub time in the contract; a hub, module or spoke outside tolerance is refused | ⬜ FB-092, FB-093 (D-9 signed 2026-11-03) |
 | Per-spoke declaration of source time zones; a quality dimension for time | ⬜ FB-090, FB-091 (D-9 signed 2026-11-03) |
 
 note:
-- The OPC-UA converter stores `SourceTimestamp` as the server sends it and, since FB-088 (2026-11-13), invents nothing when it is absent: the value is refused unless the connection declares origin `forge`. No device clock is read yet (FB-094). That row is marked 🟡 deliberately: the principle says a device whose clock cannot be read is not a valid source.
+- The OPC-UA converter stores `SourceTimestamp` as the server sends it and, since FB-088 (2026-11-13), invents nothing when it is absent: the value is refused unless the connection declares origin `forge`. Since FB-094 step 2 (2026-11-13) the server's clock is read on every response and on the probe cadence, keyed by the clock measured; the correction on entry is step 3. That row is marked 🟡 deliberately: the principle says a device whose clock cannot be read is not a valid source.
 - D-9 chooses among established standards: NTP/chrony strata mirroring the hub hierarchy, PTP/IEEE 1588 on the plant network, NTP four-timestamp measurement in-band, IEC 61850-5 tolerance classes, IEC 61850 `TimeQuality` and OPC UA `DataValue` fields on the record.
 
 ---
@@ -877,7 +877,7 @@ note:
 
 | Gap | Backlog / decision |
 |---|---|
-| Source time is not device time corrected to master | FB-094 (FB-088, the no-invented-stamp step, done 2026-11-13) |
+| Source time is not device time corrected to master | FB-094 step 3 (steps 1 and 2, no invented stamp and the clock readers, done 2026-11-13) |
 | One adapter identity (code `forge-ot-module`, manifest and spec `ot-module`) | FB-079 (includes FB-018) |
 | Batch context resolver wired to MES | FB-020 |
 | OT FACTS vocabulary | D-8 |

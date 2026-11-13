@@ -390,3 +390,10 @@ class ConnectionHealth(BaseModel):
     active_subscriptions: int = 0
     monitored_items_count: int = 0
     latency_ms: float | None = None  # Last measured round-trip time
+    # The server's clock against Forge's, from the response-header tap (one clock,
+    # FB-094 step 2): the last sample's offset, its ±uncertainty (half the round trip),
+    # how many samples the tap has taken and when the last one arrived.
+    server_clock_offset_seconds: float | None = None
+    server_clock_uncertainty_seconds: float | None = None
+    clock_samples: int = 0
+    last_clock_sample_at: datetime | None = None

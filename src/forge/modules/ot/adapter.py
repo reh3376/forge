@@ -251,10 +251,19 @@ class OTModuleAdapter(
         )
 
     def source_timestamp_origin_for(self, tag: BaseTag) -> str | None:
-        """The origin declared for the tag's connection, or None (FB-088)."""
+        """The origin declared for the tag's connection, or None (FB-088).
+
+        The connection's spec in the control config declares it first (FB-094 step 2:
+        the same declaration names the clock the probe measures); the ``configure``
+        params' map is the fallback for a deployment without a control config.
+        """
         connection = getattr(tag, "connection_name", None)
         if not connection:
             return None
+        if self._control is not None:
+            for spec in self._control.config.connections:
+                if spec.name == connection and spec.source_timestamp_origin:
+                    return spec.source_timestamp_origin
         origins = self._source_timestamp_origins
         return origins.get(connection) or origins.get("*")
 

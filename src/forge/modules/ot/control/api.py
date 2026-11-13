@@ -15,6 +15,10 @@ Mounted next to the i3X browse API under ``/api/v1/ot``:
     POST /changeover/{area}/confirm-start     operator go-ahead (READY_TO_START → PRODUCTION)
     POST /changeover/{area}/retry-recipe      re-run a partial recipe download
     POST /changeover/{area}/resume            act on the current (retained) MES state
+    GET  /control/connections                 PLC connections: state, clock, probe cadence, offsets
+    POST /control/connections/{name}/restart  operator restart of one PLC connection
+    POST /control/connections/{name}/clock-probe-interval
+                                              set the clock probe cadence in force (one clock, P-2)
 
 The router takes the runtime, or a callable returning it, so it can be
 mounted before the adapter has been configured.
@@ -52,6 +56,16 @@ RuntimeSource = ControlRuntime | Callable[[], ControlRuntime | None]
 
 #: Hub scope the write endpoints require (FB-063's write scope; FB-075 narrows it).
 WRITE_SCOPE = "adapters:write"
+
+
+class ClockProbeIntervalBody(BaseModel):
+    seconds: float = Field(
+        ge=1,
+        description=(
+            "Clock probe cadence in force for this connection, in seconds (one-clock record "
+            "P-2; 30 s default, 1 s minimum)."
+        ),
+    )
 
 
 class ConfirmStartBody(BaseModel):
@@ -249,6 +263,29 @@ def create_control_router(runtime: RuntimeSource, *, prefix: str = "/api/v1/ot")
             return await current.connections.restart(name, requested_by=user.user_id)
         except KeyError as exc:
             raise HTTPException(404, str(exc.args[0] if exc.args else exc)) from None
+
+    @router.post("/control/connections/{name}/clock-probe-interval")
+    async def set_clock_probe_interval(
+        name: str,
+        body: ClockProbeIntervalBody,
+        user: ForgeUser = Depends(require_scope(WRITE_SCOPE)),  # noqa: B008
+    ) -> dict[str, Any]:
+        """The clock probe cadence in force for one connection, changed at runtime.
+
+        One-clock record P-2 (owner, 2026-11-03): a dynamic per-connection variable the
+        user adjusts as needed; the value and who set it show on the connection status.
+        """
+        current = _runtime()
+        if current.connections is None:
+            raise HTTPException(404, "no PLC connections are configured")
+        try:
+            return current.connections.set_clock_probe_interval(
+                name, body.seconds, requested_by=user.user_id
+            )
+        except KeyError as exc:
+            raise HTTPException(404, str(exc.args[0] if exc.args else exc)) from None
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
 
     # -- changeover -----------------------------------------------------------
 
