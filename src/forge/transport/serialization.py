@@ -37,6 +37,7 @@ from forge.core.models.adapter import (
     AdapterTier,
     ConnectionParam,
     DataContract,
+    TimeGovernance,
 )
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -297,6 +298,11 @@ def _manifest_to_proto(manifest: AdapterManifest) -> dict[str, Any]:
         "connection_params": [_connection_param_to_proto(p) for p in manifest.connection_params],
         "auth_methods": list(manifest.auth_methods),
         "metadata": manifest.metadata,
+        **(
+            {"time_governance": manifest.time_governance.model_dump(exclude_none=True)}
+            if manifest.time_governance is not None
+            else {}
+        ),
     }
 
 
@@ -472,6 +478,11 @@ def _proto_to_manifest(d: dict[str, Any]) -> AdapterManifest:
         connection_params=[_proto_to_connection_param(p) for p in d.get("connection_params", [])],
         auth_methods=list(d.get("auth_methods", ["none"])),
         metadata=d.get("metadata", {}),
+        time_governance=(
+            TimeGovernance.model_validate(d["time_governance"])
+            if d.get("time_governance")
+            else None
+        ),
     )
 
 

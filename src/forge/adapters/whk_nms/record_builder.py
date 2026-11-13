@@ -72,6 +72,11 @@ def build_contextual_record(
         or raw_event.get("createdAt")
         or raw_event.get("event_time")
         or raw_event.get("eventTime")
+        # the NMS's own time fields: a device's last_seen, a SPOF's detected_at, an
+        # LLDP/ARP neighbour's discovered_at (net_topo_toolkit's API models)
+        or raw_event.get("last_seen")
+        or raw_event.get("detected_at")
+        or raw_event.get("discovered_at")
     )
     now = datetime.now(tz=UTC)
 

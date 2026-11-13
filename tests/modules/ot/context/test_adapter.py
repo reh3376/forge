@@ -410,6 +410,22 @@ class TestControlComposition:
         assert [row["status"] for row in journal] == ["REJECTED_VALIDATION", "CONFIRMED"]
         assert journal[0]["requestor"] == "forge-ot-module"
 
+    def test_the_facts_declaration_is_the_default_origin(self, mock_registry):
+        """Without a connection-level declaration the manifest's section answers (FB-090)."""
+        from forge.modules.ot.tag_engine.models import StandardTag
+
+        adapter = OTModuleAdapter(registry=mock_registry)
+        governance = adapter.manifest.time_governance
+        assert governance is not None
+        assert governance.source_timestamp_origin == "server"
+        assert governance.clock_read_method == "opcua-current-time"
+        assert governance.tolerance_class == "T0" and governance.fail_closed is True
+        assert governance.clock_probe_interval_seconds == 30
+        tag = StandardTag(
+            path="WH/WHK09/Cooker01/TIT_2010/PV", opcua_node_id="ns=2;s=x", connection_name="WHK09"
+        )
+        assert adapter.source_timestamp_origin_for(tag) == "server"
+
     @pytest.mark.asyncio
     async def test_the_connection_spec_declares_the_source_timestamp_origin(self):
         """The control config's connection is the first home of the declaration (FB-094 step 2)."""

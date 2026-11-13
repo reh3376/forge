@@ -47,6 +47,7 @@ from forge.core.models.adapter import (
     AdapterTier,
     ConnectionParam,
     DataContract,
+    TimeGovernance,
 )
 
 if TYPE_CHECKING:
@@ -74,6 +75,10 @@ def _load_manifest() -> AdapterManifest:
         connection_params=[ConnectionParam(**p) for p in raw.get("connection_params", [])],
         auth_methods=raw.get("auth_methods", ["none"]),
         metadata=raw.get("metadata", {}),
+        # the FACTS time_governance section, as the spoke's declaration (one clock, FB-090)
+        time_governance=(
+            TimeGovernance(**raw["time_governance"]) if raw.get("time_governance") else None
+        ),
     )
 
 
@@ -126,6 +131,7 @@ class WhkNmsAdapter(
         Does NOT open any connections — that happens in start().
         """
         self._config = WhkNmsConfig(**params)
+        self.check_time_governance()
         self._state = AdapterState.REGISTERED
 
     async def start(self) -> None:

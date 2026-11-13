@@ -20,6 +20,7 @@ from forge.core.models.adapter import (
     AdapterManifest,
     AdapterTier,
     DataContract,
+    TimeGovernance,
 )
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -39,10 +40,17 @@ SCHEMA_REF = "forge://schemas/forge-mes/v0.1.0"
 def make_manifest(
     adapter_id: str = "forge-mes", *, source_timestamp_origin: str | None = None
 ) -> AdapterManifest:
-    # The origin declaration lives on the manifest's metadata until FB-090 puts the FACTS
-    # time_governance section there (one clock, FB-088).
-    metadata = (
-        {"source_timestamp_origin": source_timestamp_origin} if source_timestamp_origin else {}
+    # The FACTS time_governance section declares the origin (one clock, FB-090); a manifest
+    # without the section declares nothing, and a bare reading is refused (FB-088).
+    governance = (
+        TimeGovernance(
+            time_source="hub-ntp",
+            sync_protocol="ntp",
+            source_timestamp_origin=source_timestamp_origin,
+            tolerance_class="it-lan",
+        )
+        if source_timestamp_origin
+        else None
     )
     return AdapterManifest(
         adapter_id=adapter_id,
@@ -55,7 +63,7 @@ def make_manifest(
             schema_ref=SCHEMA_REF,
             context_fields=["batch_id", "event_type"],
         ),
-        metadata=metadata,
+        time_governance=governance,
     )
 
 

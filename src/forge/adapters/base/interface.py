@@ -15,6 +15,7 @@ import abc
 import logging
 from typing import TYPE_CHECKING, Any
 
+from forge.core.clock import TimeGovernanceConflictError
 from forge.core.models.adapter import (
     AdapterHealth,
     AdapterManifest,
@@ -97,13 +98,41 @@ class AdapterBase(AdapterLifecycle):
 
     @property
     def source_timestamp_origin(self) -> str | None:
-        """The origin this adapter's connection declared for the clock that stamps its values.
+        """The origin declared for the clock that stamps this adapter's values.
 
-        Adapters keep the declaration on their config model (``source_timestamp_origin``,
-        one-clock record P-4); None until it is declared. A value without a source stamp is
-        refused unless the origin is ``forge`` (FB-088).
+        The FACTS ``time_governance`` section on the manifest is the governed declaration
+        (one-clock record P-4, FB-090); the config model's ``source_timestamp_origin`` is
+        the fallback for a manifest without it. None until declared. A value without a
+        source stamp is refused unless the origin is ``forge`` (FB-088).
         """
+        governance = getattr(self.manifest, "time_governance", None)
+        if governance is not None:
+            return governance.source_timestamp_origin
         return getattr(getattr(self, "_config", None), "source_timestamp_origin", None)
+
+    def check_time_governance(self) -> None:
+        """Refuse connection parameters that contradict the FACTS declaration (FB-090).
+
+        ``configure`` calls it once the config model is built. A ``source_timestamp_origin``
+        parameter that differs from the manifest's ``time_governance`` declaration is a
+        refusal like any other: counted on the health under ``time_governance_conflict``,
+        logged, and raised so the configure call fails loudly instead of letting one
+        declaration silently win. A parameter that repeats the declaration passes; so does
+        a manifest without the section, where the parameter stands in until FB-093.
+        """
+        governance = getattr(self.manifest, "time_governance", None)
+        configured = getattr(getattr(self, "_config", None), "source_timestamp_origin", None)
+        if governance is None or configured is None:
+            return
+        if configured == governance.source_timestamp_origin:
+            return
+        exc = TimeGovernanceConflictError(
+            adapter_id=self.adapter_id,
+            declared=governance.source_timestamp_origin,
+            configured=configured,
+        )
+        self.refuse(exc)
+        raise exc
 
     @abc.abstractmethod
     async def collect(self) -> AsyncIterator[ContextualRecord]:

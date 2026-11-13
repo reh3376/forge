@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import logging
+from types import SimpleNamespace
 from typing import TYPE_CHECKING
 
 import pytest
 
 from forge.adapters.base.interface import AdapterBase
 from forge.core import telemetry
-from forge.core.clock import SourceStampMissingError
+from forge.core.clock import SourceStampMissingError, TimeGovernanceConflictError
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -17,6 +18,7 @@ from forge.core.models.adapter import (
     AdapterState,
     AdapterTier,
     DataContract,
+    TimeGovernance,
 )
 from tests.otel import metric_reader, metrics_by_name
 
@@ -124,3 +126,42 @@ def test_refusals_reach_opentelemetry() -> None:
     ]
     assert len(points) == 1 and points[0].value == 2
     assert points[0].attributes[telemetry.ATTR_REFUSAL_CAUSE] == "source_stamp_missing"
+
+
+@pytest.mark.asyncio
+async def test_a_parameter_that_contradicts_the_facts_declaration_is_refused() -> None:
+    """The FACTS time_governance section is the governed declaration (FB-090)."""
+
+    class _Governed(_Adapter):
+        manifest = _Adapter.manifest.model_copy(
+            update={
+                "time_governance": TimeGovernance(
+                    time_source="hub-ntp",
+                    sync_protocol="ntp",
+                    source_timestamp_origin="server",
+                    tolerance_class="it-lan",
+                )
+            }
+        )
+
+        async def configure(self, params: dict) -> None:
+            self._config = SimpleNamespace(**params)
+            self.check_time_governance()
+
+    adapter = _Governed()
+    await adapter.configure({"source_timestamp_origin": "server"})  # repeating it is fine
+    assert adapter.source_timestamp_origin == "server"
+    with pytest.raises(TimeGovernanceConflictError) as info:
+        await adapter.configure({"source_timestamp_origin": "forge"})
+    assert info.value.cause == "time_governance_conflict"
+    assert info.value.declared == "server" and info.value.configured == "forge"
+    health = await adapter.health()
+    assert health.refusals == {"time_governance_conflict": 1}
+    assert health.last_refusal == str(info.value) and "FB-090" in health.last_refusal
+    assert health.error_message == health.last_refusal
+
+    # without the section the parameter stands in (an adapter from before FB-093)
+    bare = _Adapter()
+    bare._config = SimpleNamespace(source_timestamp_origin="forge")
+    bare.check_time_governance()
+    assert bare.source_timestamp_origin == "forge"

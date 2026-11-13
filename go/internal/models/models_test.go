@@ -522,3 +522,37 @@ func TestRecordTimestampCorrectionRoundTrip(t *testing.T) {
 		t.Errorf("unset correction fields did not stay unset: %+v", back.Timestamp)
 	}
 }
+
+// The FACTS time_governance section rides on the manifest (FB-090) and comes back whole;
+// a manifest without it stays without it.
+func TestAdapterManifestTimeGovernanceRoundTrip(t *testing.T) {
+	five := 5.0
+	m := &models.AdapterManifest{
+		AdapterID: "forge-ot-module", Name: "OT", Version: "0.1.0", Type: "ACQUISITION",
+		Protocol: "opcua", Tier: models.AdapterTierOT,
+		DataContract: models.DataContract{SchemaRef: "forge://schemas/ot-module/v0.1.0"},
+		TimeGovernance: &models.TimeGovernance{
+			TimeSource: "hub-ntp", SyncProtocol: "ntp", ClockReadMethod: "opcua-current-time",
+			ClockProbeIntervalSeconds: 30, SourceTimestampOrigin: "server", ToleranceClass: "T0",
+			FailClosed: true,
+			Connections: []models.ConnectionTimeGovernance{{
+				Name: "WHK01", SourceTimestampOrigin: "device", ClockProbeIntervalSeconds: &five,
+			}},
+		},
+	}
+	back := models.AdapterManifestFromProto(models.AdapterManifestToProto(m))
+	tg := back.TimeGovernance
+	if tg == nil || tg.TimeSource != "hub-ntp" || tg.ClockReadMethod != "opcua-current-time" || !tg.FailClosed {
+		t.Fatalf("time_governance: got %+v", tg)
+	}
+	if len(tg.Connections) != 1 || tg.Connections[0].Name != "WHK01" || tg.Connections[0].SourceTimestampOrigin != "device" {
+		t.Errorf("connections: got %+v", tg.Connections)
+	}
+	if tg.Connections[0].ClockProbeIntervalSeconds == nil || *tg.Connections[0].ClockProbeIntervalSeconds != 5 {
+		t.Errorf("connection interval: got %v", tg.Connections[0].ClockProbeIntervalSeconds)
+	}
+	m.TimeGovernance = nil
+	if models.AdapterManifestFromProto(models.AdapterManifestToProto(m)).TimeGovernance != nil {
+		t.Error("a manifest without time_governance came back with one")
+	}
+}

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -76,6 +76,56 @@ class DataContract(BaseModel):
         return require_versioned_ref(value, field="schema_ref")
 
 
+#: One-clock record P-8: the tolerance classes a link may declare.
+ToleranceClass = Literal["T0", "T1", "T2", "T3", "T4", "T5", "it-lan", "it-wan", "edge-mqtt"]
+#: One-clock record P-2: how a spoke reads the clock of the source it pulls from.
+ClockReadMethod = Literal[
+    "opcua-response-header",
+    "opcua-current-time",
+    "cip-wall-clock-time",
+    "s7-clock",
+    "modbus-registers",
+    "sparkplug-payload-timestamp",
+]
+SourceTimestampOrigin = Literal["device", "server", "edge", "forge"]
+
+
+class ConnectionTimeGovernance(BaseModel):
+    """A per-connection time-governance declaration (FACTS ``time_governance.connections[]``)."""
+
+    name: str = Field(min_length=1)
+    clock_read_method: ClockReadMethod | None = None
+    clock_probe_interval_seconds: float | None = Field(default=None, ge=1)
+    source_timestamp_origin: SourceTimestampOrigin | None = None
+    tolerance_class: ToleranceClass | None = None
+
+
+class TimeGovernance(BaseModel):
+    """How a spoke is time-governed: the FACTS ``time_governance`` section (FB-090).
+
+    One clock (``docs/decisions/one-clock-ot-source-time.md`` P-7): where the host takes
+    time, what disciplines its clock, how the spoke reads its source's clock, the probe
+    cadence, which clock stamps its values, the tolerance class of the link and that it
+    fails closed. The hub refuses a spoke whose clock is outside its class (FB-093).
+    """
+
+    time_source: Literal["hub-ntp", "site-ptp", "gnss"]
+    sync_protocol: Literal["ntp", "ptp-cip-sync", "ptp-802.1as", "profinet-ptcp", "none"]
+    clock_read_method: ClockReadMethod | None = None
+    clock_probe_interval_seconds: float = Field(default=30.0, ge=1)
+    source_timestamp_origin: SourceTimestampOrigin
+    tolerance_class: ToleranceClass
+    fail_closed: Literal[True] = True
+    connections: list[ConnectionTimeGovernance] = Field(default_factory=list)
+
+    def origin_for(self, connection: str | None) -> str:
+        """The declared origin for ``connection`` (its own entry, else the spoke's default)."""
+        for entry in self.connections:
+            if connection and entry.name == connection and entry.source_timestamp_origin:
+                return entry.source_timestamp_origin
+        return self.source_timestamp_origin
+
+
 class AdapterManifest(BaseModel):
     """Declares an adapter's identity, capabilities, and data contract.
 
@@ -96,6 +146,14 @@ class AdapterManifest(BaseModel):
     connection_params: list[ConnectionParam] = Field(default_factory=list)
     auth_methods: list[str] = Field(default_factory=lambda: ["none"])
     metadata: dict[str, Any] = Field(default_factory=dict)
+    time_governance: TimeGovernance | None = Field(
+        default=None,
+        description=(
+            "The FACTS time_governance section, carried to the hub at Register (one clock, "
+            "FB-090). None only for a manifest built before FB-090; FB-093 refuses a "
+            "registration without it. Proto field 13."
+        ),
+    )
 
 
 class AdapterHealth(BaseModel):

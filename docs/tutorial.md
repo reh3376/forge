@@ -395,7 +395,7 @@ note:
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.1 |
 | Go transport parity tests | FB-055 |
 | Hub time in the contract; refusing an out-of-tolerance clock | FB-092, FB-093 (D-9 signed 2026-11-03) |
-| The spoke's time fields (`sent_time`, source time per spoke) | FB-088 done 2026-11-13 (`source_clock`, `source_uncertainty_seconds`); FB-090 (D-9 signed 2026-11-03) |
+| The spoke's time fields (`sent_time`, source time per spoke) | FB-088 done 2026-11-13 (`source_clock`, `source_uncertainty_seconds`); FB-090 done 2026-11-13 (the FACTS `time_governance` declaration) |
 | Generic adapters (csv_file, mqtt_sparkplug, opcua, rest_generic) | package stubs only |
 
 **Next**: where the records land.
@@ -865,7 +865,7 @@ The owner's principle (2026-10-18): records from different sources only reconcil
 | The offset of every connected clock is measured, recorded and surfaced | ✅ FB-089 (provisional 1 s tolerance, warning only) |
 | A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | 🟡 FB-088 done 2026-11-13 (no invented stamp; the stamping clock named once declared); FB-094 steps 2 and 3 done 2026-11-13 (the server's clock is read on every OPC-UA response and on a runtime probe cadence, and the source and server stamps are corrected by its filtered offset at the spoke, the stamp as sent, the offset and the time quality kept); step 6 done too (every tag declares `max_sampling_uncertainty_ms`, refused at load when the acquisition cannot meet it; the bound is on every value), so FB-094 is complete for what the tree has; FB-090 next; design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
 | Hub time in the contract; a hub, module or spoke outside tolerance is refused | ⬜ FB-092, FB-093 (D-9 signed 2026-11-03) |
-| Per-spoke declaration of source time zones; a quality dimension for time | ⬜ FB-090, FB-091 (D-9 signed 2026-11-03) |
+| Per-spoke declaration of time governance; a quality dimension for time | 🟡 FB-090 done 2026-11-13 (FACTS `time_governance`: clock origin, probe cadence, tolerance class, fail closed); FB-091 (the quality dimension and the offset assumed on an offset-less stamp) |
 
 note:
 - The OPC-UA converter stores `SourceTimestamp` as the server sends it and, since FB-088 (2026-11-13), invents nothing when it is absent: the value is refused unless the connection declares origin `forge`. Since FB-094 steps 2 and 3 (2026-11-13) the server's clock is read on every response and on the probe cadence, keyed by the clock measured, and each stamp is corrected by that clock's filtered offset where it enters, the stamp as sent and the offset kept on the record. That row is marked 🟡 deliberately: the principle says a device whose clock cannot be read is not a valid source.
@@ -877,7 +877,7 @@ note:
 
 | Gap | Backlog / decision |
 |---|---|
-| Source time is corrected to master on OPC UA only; the Logix, S7 and Modbus readers follow their drivers; the FACTS declaration is FB-090 | FB-090 (FB-094 done 2026-11-13) |
+| Source time is corrected to master on OPC UA only; the Logix, S7 and Modbus readers follow their drivers; the FACTS declaration is in place | FB-094 and FB-090 done 2026-11-13; FB-093 enforces |
 | One adapter identity (code `forge-ot-module`, manifest and spec `ot-module`) | FB-079 (includes FB-018) |
 | Batch context resolver wired to MES | FB-020 |
 | OT FACTS vocabulary | D-8 |
@@ -1434,7 +1434,7 @@ note:
 | D-4 | FVTS open items (name, write authority per profile, mobile acknowledge, transport, layout) | decided 2026-11-03; forge-display design next |
 | D-7 | Scope of the Go standard (OT module, Python adapters) | open |
 | D-8 | FACTS vocabulary for OT adapters | decided 2026-11-03: extend the enums; FB-079 can start |
-| D-9 | One clock: which established standards to adopt (`docs/decisions/one-clock-ot-source-time.md`) | signed 2026-11-03; FB-088 done 2026-11-13, FB-090 to FB-094 in the record's step order |
+| D-9 | One clock: which established standards to adopt (`docs/decisions/one-clock-ot-source-time.md`) | signed 2026-11-03; FB-088, FB-094 (steps 2, 3, 6) and FB-090 done 2026-11-13; FB-093, FB-092, FB-091 follow in the record's step order |
 | D-10 | One schema registry (`docs/decisions/one-schema-registry.md`) | signed 2026-11-03; FB-097's eight steps |
 | D-11 | Three-layer process control framework, PC-L1/PC-L2/PC-L3 (`docs/decisions/process-control-framework.md`) | signed 2026-11-13 by the owner; Forge review done; the FSDs follow the owner's round-4 answers (FB-110) |
 

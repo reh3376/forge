@@ -481,6 +481,33 @@ class SourceStampMissingError(ValueError):
         )
 
 
+TIME_GOVERNANCE_CONFLICT = "time_governance_conflict"
+
+
+class TimeGovernanceConflictError(ValueError):
+    """A connection parameter contradicts the spoke's FACTS ``time_governance`` declaration.
+
+    The FACTS section is the governed declaration (one-clock record P-7, FB-090): the
+    owner approved its hash. A ``source_timestamp_origin`` parameter naming a different
+    origin would move the declaration out from under governance, so the adapter refuses
+    the configuration rather than let either side win silently (owner, 2026-11-03). A
+    parameter that repeats the declaration is accepted; the parameter itself retires once
+    registration refuses a manifest without the section (FB-093).
+    """
+
+    cause = TIME_GOVERNANCE_CONFLICT
+
+    def __init__(self, *, adapter_id: str, declared: str, configured: str) -> None:
+        self.adapter_id = adapter_id
+        self.declared = declared
+        self.configured = configured
+        super().__init__(
+            f"{adapter_id}: the connection parameters declare source_timestamp_origin: "
+            f"{configured}, but the FACTS time_governance declaration says {declared}; the "
+            "governed declaration stands and the configuration is refused (one clock, FB-090)"
+        )
+
+
 @dataclass(frozen=True)
 class ClockEstimate:
     """What a record builder needs to correct a stamp: a clock's current offset and bound.

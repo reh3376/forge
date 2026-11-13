@@ -389,12 +389,13 @@ class IngestPipeline:
             detail = f"timestamp of type {type(sent).__name__}"
             sent = None
         # A reading without a timestamp is not given the hub's clock (one clock, FB-088):
-        # the adapter's manifest must declare source_timestamp_origin: forge (in its
-        # metadata until FB-090 puts the FACTS time_governance section there) for the
-        # hub's read time to stand in; otherwise the reading is refused, with the cause.
+        # the adapter's FACTS time_governance section (on the manifest, FB-090) must
+        # declare source_timestamp_origin: forge for the hub's read time to stand in;
+        # otherwise the reading is refused, with the cause.
+        governance = manifest.time_governance
         stamp = resolve_source_stamp(
             sent,
-            origin=manifest.metadata.get("source_timestamp_origin"),
+            origin=governance.source_timestamp_origin if governance is not None else None,
             read_at=now,
             adapter_id=adapter_id,
             tag_path=tag,

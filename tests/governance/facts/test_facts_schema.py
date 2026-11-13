@@ -119,6 +119,14 @@ def _minimal_valid_spec() -> dict:
                 "half_open_after_ms": 30000,
             },
         },
+        "time_governance": {
+            "time_source": "hub-ntp",
+            "sync_protocol": "ntp",
+            "clock_probe_interval_seconds": 30,
+            "source_timestamp_origin": "server",
+            "tolerance_class": "it-lan",
+            "fail_closed": True,
+        },
     }
 
 
@@ -146,12 +154,13 @@ class TestMetaSchemaValidation:
     def test_schema_has_title(self, schema: dict):
         assert "FACTS" in schema["title"]
 
-    def test_schema_has_8_required_fields(self, schema: dict):
-        assert len(schema["required"]) == 8
+    def test_schema_has_9_required_fields(self, schema: dict):
+        # the eight original sections and time_governance (one clock, FB-090)
+        assert len(schema["required"]) == 9
 
-    def test_schema_has_10_properties(self, schema: dict):
-        # 8 required + metadata + integrity
-        assert len(schema["properties"]) == 10
+    def test_schema_has_11_properties(self, schema: dict):
+        # 9 required + metadata + integrity
+        assert len(schema["properties"]) == 11
 
 
 # ---------------------------------------------------------------------------
@@ -236,6 +245,7 @@ class TestMissingRequiredFields:
             "data_contract",
             "context_mapping",
             "error_handling",
+            "time_governance",
         ],
     )
     def test_missing_required_top_level_field(
@@ -714,5 +724,78 @@ class TestIntegrityBlock:
         minimal_spec["integrity"] = {
             "hash_method": "sha256-jcs",
             "spec_hash": "a" * 64,
+        }
+        validator.validate(minimal_spec)
+
+
+# ---------------------------------------------------------------------------
+# Time governance (one clock, FB-090)
+# ---------------------------------------------------------------------------
+
+
+class TestTimeGovernanceSchema:
+    """The required ``time_governance`` section: closed enums, ``fail_closed``, connections."""
+
+    @pytest.mark.parametrize(
+        ("field", "value"),
+        [
+            ("time_source", "wristwatch"),
+            ("sync_protocol", "sundial"),
+            ("clock_read_method", "ask-the-operator"),
+            ("source_timestamp_origin", "guess"),
+            ("tolerance_class", "T9"),
+        ],
+    )
+    def test_enums_are_closed(
+        self, validator: Draft202012Validator, minimal_spec: dict, field: str, value: str
+    ):
+        minimal_spec["time_governance"][field] = value
+        with pytest.raises(ValidationError, match=value):
+            validator.validate(minimal_spec)
+
+    def test_fail_closed_must_be_true(self, validator: Draft202012Validator, minimal_spec: dict):
+        minimal_spec["time_governance"]["fail_closed"] = False
+        with pytest.raises(ValidationError, match="fail_closed"):
+            validator.validate(minimal_spec)
+
+    def test_probe_cadence_is_at_least_one_second(
+        self, validator: Draft202012Validator, minimal_spec: dict
+    ):
+        minimal_spec["time_governance"]["clock_probe_interval_seconds"] = 0.5
+        with pytest.raises(ValidationError, match="minimum"):
+            validator.validate(minimal_spec)
+
+    def test_connection_entries_need_a_name_and_known_keys(
+        self, validator: Draft202012Validator, minimal_spec: dict
+    ):
+        minimal_spec["time_governance"]["connections"] = [{"tolerance_class": "T0"}]
+        with pytest.raises(ValidationError, match="name"):
+            validator.validate(minimal_spec)
+        minimal_spec["time_governance"]["connections"] = [{"name": "WHK01", "timezone": "UTC"}]
+        with pytest.raises(ValidationError, match="timezone"):
+            validator.validate(minimal_spec)
+
+    def test_a_full_declaration_validates(
+        self, validator: Draft202012Validator, minimal_spec: dict
+    ):
+        minimal_spec["adapter_identity"]["protocol"] = "opcua"
+        minimal_spec["time_governance"] = {
+            "time_source": "site-ptp",
+            "sync_protocol": "ptp-802.1as",
+            "clock_read_method": "opcua-current-time",
+            "clock_probe_interval_seconds": 10,
+            "source_timestamp_origin": "server",
+            "tolerance_class": "T0",
+            "fail_closed": True,
+            "connections": [
+                {
+                    "name": "WHK01",
+                    "clock_read_method": "opcua-response-header",
+                    "source_timestamp_origin": "device",
+                    "tolerance_class": "T1",
+                    "clock_probe_interval_seconds": 5,
+                },
+                {"name": "WHK02"},
+            ],
         }
         validator.validate(minimal_spec)

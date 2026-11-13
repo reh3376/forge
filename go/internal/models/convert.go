@@ -355,7 +355,65 @@ func AdapterManifestToProto(m *AdapterManifest) *forgev1.AdapterManifest {
 		pb.Metadata, _ = structpb.NewStruct(m.Metadata)
 	}
 
+	if m.TimeGovernance != nil {
+		pb.TimeGovernance = timeGovernanceToProto(m.TimeGovernance)
+	}
 	return pb
+}
+
+func timeGovernanceToProto(tg *TimeGovernance) *forgev1.TimeGovernance {
+	pb := &forgev1.TimeGovernance{
+		TimeSource:                tg.TimeSource,
+		SyncProtocol:              tg.SyncProtocol,
+		ClockReadMethod:           tg.ClockReadMethod,
+		ClockProbeIntervalSeconds: tg.ClockProbeIntervalSeconds,
+		SourceTimestampOrigin:     tg.SourceTimestampOrigin,
+		ToleranceClass:            tg.ToleranceClass,
+		FailClosed:                tg.FailClosed,
+	}
+	for _, c := range tg.Connections {
+		entry := &forgev1.ConnectionTimeGovernance{
+			Name:                  c.Name,
+			ClockReadMethod:       c.ClockReadMethod,
+			SourceTimestampOrigin: c.SourceTimestampOrigin,
+			ToleranceClass:        c.ToleranceClass,
+		}
+		if c.ClockProbeIntervalSeconds != nil {
+			v := *c.ClockProbeIntervalSeconds
+			entry.ClockProbeIntervalSeconds = &v
+		}
+		pb.Connections = append(pb.Connections, entry)
+	}
+	return pb
+}
+
+func timeGovernanceFromProto(pb *forgev1.TimeGovernance) *TimeGovernance {
+	if pb == nil {
+		return nil
+	}
+	tg := &TimeGovernance{
+		TimeSource:                pb.GetTimeSource(),
+		SyncProtocol:              pb.GetSyncProtocol(),
+		ClockReadMethod:           pb.GetClockReadMethod(),
+		ClockProbeIntervalSeconds: pb.GetClockProbeIntervalSeconds(),
+		SourceTimestampOrigin:     pb.GetSourceTimestampOrigin(),
+		ToleranceClass:            pb.GetToleranceClass(),
+		FailClosed:                pb.GetFailClosed(),
+	}
+	for _, c := range pb.GetConnections() {
+		entry := ConnectionTimeGovernance{
+			Name:                  c.GetName(),
+			ClockReadMethod:       c.GetClockReadMethod(),
+			SourceTimestampOrigin: c.GetSourceTimestampOrigin(),
+			ToleranceClass:        c.GetToleranceClass(),
+		}
+		if c.ClockProbeIntervalSeconds != nil {
+			v := c.GetClockProbeIntervalSeconds()
+			entry.ClockProbeIntervalSeconds = &v
+		}
+		tg.Connections = append(tg.Connections, entry)
+	}
+	return tg
 }
 
 // AdapterManifestFromProto converts a proto AdapterManifest to a domain struct.
@@ -402,6 +460,7 @@ func AdapterManifestFromProto(pb *forgev1.AdapterManifest) *AdapterManifest {
 	if pb.Metadata != nil {
 		m.Metadata = pb.Metadata.AsMap()
 	}
+	m.TimeGovernance = timeGovernanceFromProto(pb.GetTimeGovernance())
 
 	return m
 }

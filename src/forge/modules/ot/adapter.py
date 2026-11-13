@@ -44,6 +44,7 @@ from forge.core.models.adapter import (
     AdapterState,
     AdapterTier,
     DataContract,
+    TimeGovernance,
 )
 from forge.modules.ot.context.record_builder import build_ot_record
 from forge.modules.ot.context.resolvers import AreaResolver, AreaRule, EnrichmentPipeline
@@ -116,6 +117,16 @@ class OTModuleAdapter(
             context_fields=["area", "equipment_id", "operating_mode"],
         ),
         health_check_interval_ms=5000,
+        # One clock (FB-090): the module's defaults; each PLC connection declares its own
+        # origin and cadence in the control config (PlcConnectionSpec), which must agree.
+        time_governance=TimeGovernance(
+            time_source="hub-ntp",
+            sync_protocol="ntp",
+            clock_read_method="opcua-current-time",
+            clock_probe_interval_seconds=30,
+            source_timestamp_origin="server",
+            tolerance_class="T0",
+        ),
     )
 
     def __init__(
@@ -255,8 +266,9 @@ class OTModuleAdapter(
         """The origin declared for the tag's connection, or None (FB-088).
 
         The connection's spec in the control config declares it first (FB-094 step 2:
-        the same declaration names the clock the probe measures); the ``configure``
-        params' map is the fallback for a deployment without a control config.
+        the same declaration names the clock the probe measures), then the ``configure``
+        params' map, then the FACTS ``time_governance`` declaration on the manifest
+        (FB-090): the connection's own entry, else the module's default.
         """
         connection = getattr(tag, "connection_name", None)
         if not connection:
@@ -266,7 +278,12 @@ class OTModuleAdapter(
                 if spec.name == connection and spec.source_timestamp_origin:
                     return spec.source_timestamp_origin
         origins = self._source_timestamp_origins
-        return origins.get(connection) or origins.get("*")
+        declared = origins.get(connection) or origins.get("*")
+        if declared:
+            return declared
+        # the FACTS declaration (FB-090): the spoke's default, or the connection's own entry
+        governance = self.manifest.time_governance
+        return governance.origin_for(connection) if governance is not None else None
 
     def clock_estimate_for(self, tag: BaseTag) -> ClockEstimate | None:
         """The measured estimate of the clock the tag's connection declared (FB-094 step 3).
