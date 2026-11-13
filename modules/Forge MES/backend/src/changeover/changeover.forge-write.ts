@@ -280,6 +280,7 @@ export class ChangeoverForgeWriteTarget implements ForgeWriteTarget, OnModuleIni
         adapterVersion: FORGE_MES_MANIFEST.version,
         site: this.config.site,
         area: this.config.area,
+        sourceTimestampOrigin: this.config.sourceTimestampOrigin,
         now,
       }
     );

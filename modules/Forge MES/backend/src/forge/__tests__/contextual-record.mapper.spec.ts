@@ -5,6 +5,7 @@ import {
   FORGE_MES_SCHEMA_REF,
   mapDomainEventToRecord,
   normalizeEventType,
+  SourceStampMissingError,
   toSnakeCase,
 } from "../contextual-record.mapper";
 import { fromTimestamp, toTimestamp } from "../proto";
@@ -151,10 +152,31 @@ describe("mapDomainEventToRecord", () => {
     });
   });
 
+  it("refuses an event without a timestamp unless the bridge declares origin forge", () => {
+    // One clock (FB-088): the bridge never invents a source time.
+    expect(() =>
+      mapDomainEventToRecord(
+        { entityType: "ProductionEvent", eventType: "PhaseStarted", data: {} },
+        OPTS
+      )
+    ).toThrow(SourceStampMissingError);
+    const r = mapDomainEventToRecord(
+      { entityType: "ProductionEvent", eventType: "PhaseStarted", data: {} },
+      { ...OPTS, sourceTimestampOrigin: "forge" }
+    );
+    expect(fromTimestamp(r.timestamp.source_time)?.toISOString()).toBe(OPTS.now.toISOString());
+    expect(r.timestamp.source_clock).toBe("forge");
+  });
+
+  it("names no clock when the event carries its own timestamp", () => {
+    const r = mapDomainEventToRecord(stepStarted, { ...OPTS, sourceTimestampOrigin: "forge" });
+    expect(r.timestamp.source_clock).toBeUndefined();
+  });
+
   it("omits unknown context instead of sending empty strings", () => {
     const r = mapDomainEventToRecord(
       { entityType: "ProductionEvent", eventType: "PhaseStarted", data: {} },
-      OPTS
+      { ...OPTS, sourceTimestampOrigin: "forge" }
     );
     expect(r.context.batch_id).toBeUndefined();
     expect(r.context.equipment_id).toBeUndefined();
@@ -177,7 +199,7 @@ describe("mapDomainEventToRecord", () => {
         data: { id: "so-1", batchId: "payload-batch", scheduleOrderId: "payload-so" },
         context: { batchId: "ctx-batch", scheduleOrderId: "ctx-so", area: "fermentation" },
       },
-      OPTS
+      { ...OPTS, sourceTimestampOrigin: "forge" }
     );
     expect(r.context.batch_id).toBe("ctx-batch");
     expect(r.context.area).toBe("fermentation");
@@ -187,7 +209,7 @@ describe("mapDomainEventToRecord", () => {
   it("serialises BigInt payload values", () => {
     const r = mapDomainEventToRecord(
       { entityType: "Lot", eventType: "lot_created", data: { id: "l", qty: BigInt(42) } },
-      OPTS
+      { ...OPTS, sourceTimestampOrigin: "forge" }
     );
     expect(JSON.parse(r.value.json_value)).toEqual({ id: "l", qty: "42" });
     expect(deriveTagPath("Lot")).toBe("mes.backend.lot");

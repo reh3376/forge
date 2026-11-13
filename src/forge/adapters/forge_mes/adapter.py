@@ -32,6 +32,7 @@ from forge.adapters.base.interface import (
 from forge.adapters.forge_mes.config import ForgeMesConfig
 from forge.adapters.forge_mes.context import build_record_context
 from forge.adapters.forge_mes.record_builder import build_contextual_record
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -153,6 +154,7 @@ class ForgeMesAdapter(
             last_healthy=self._last_healthy,
             records_collected=self._records_collected,
             records_failed=self._records_failed,
+            **self.refusal_health(),
         )
 
     # -- Core read interface (AdapterBase) -------------------------------
@@ -173,9 +175,12 @@ class ForgeMesAdapter(
                     context=context,
                     adapter_id=self.adapter_id,
                     adapter_version=self.manifest.version,
+                    source_timestamp_origin=self.source_timestamp_origin,
                 )
                 self._records_collected += 1
                 yield record
+            except SourceStampMissingError as exc:
+                self.refuse(exc)
             except Exception:
                 self._records_failed += 1
                 logger.exception("Failed to map MES event")

@@ -1,15 +1,18 @@
 version: v2
 plugins:
+  # Both generators run at the versions the checked-in stubs carry (go.mod: protobuf
+  # v1.36.12, connect v1.21.1), so a regeneration changes only what the .proto changed.
   # Go protobuf stubs
-  - remote: buf.build/protocolbuffers/go
+  - local: ["go", "run", "google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12"]
     out: gen
     opt:
       - paths=source_relative
 
   # Connect-Go service stubs (gRPC + Connect protocol)
-  - remote: buf.build/connectrpc/go
+  - local: ["go", "run", "connectrpc.com/connect/cmd/protoc-gen-connect-go@v1.21.1"]
     out: gen
     opt:
       - paths=source_relative
+
 inputs:
   - directory: proto

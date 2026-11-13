@@ -11,6 +11,7 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
+from forge.core.clock import resolve_source_stamp
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -31,6 +32,8 @@ def build_contextual_record(
     context: RecordContext,
     adapter_id: str = "next-trend",
     adapter_version: str = "0.1.0",
+    source_timestamp_origin: str | None = None,
+    poll_bound_seconds: float | None = None,
 ) -> ContextualRecord:
     """Build a ContextualRecord from a NextTrend tag value point.
 
@@ -40,14 +43,30 @@ def build_contextual_record(
         context: RecordContext built by context.build_record_context().
         adapter_id: Forge adapter identifier.
         adapter_version: Adapter version string.
+        source_timestamp_origin: the origin the connection declared for the clock that
+            stamps its values (device, server, edge or forge); None when undeclared (FB-088)
+        poll_bound_seconds: the adapter's poll interval, recorded as the uncertainty when
+            Forge's read time stands in
 
     Returns:
         A fully formed ContextualRecord.
     """
     tag_name = tag_meta.get("name", "unknown")
     tag_path = _historian_tag_path(tag_name)
-    source_time = _parse_timestamp(value_point.get("ts"))
     now = datetime.now(tz=UTC)
+    tag_id = tag_meta.get("id")
+    # The historian's point time is the source time; a point without one is refused unless
+    # the adapter declares source_timestamp_origin: forge, and then the poll interval is
+    # the uncertainty bound (one clock, FB-088).
+    stamp = resolve_source_stamp(
+        _parse_timestamp(value_point.get("ts")),
+        origin=source_timestamp_origin,
+        read_at=now,
+        poll_bound_seconds=poll_bound_seconds,
+        adapter_id=adapter_id,
+        connection=str(tag_id) if tag_id is not None else None,
+        tag_path=tag_path,
+    )
 
     # Build record value
     raw_value = value_point.get("value")
@@ -67,10 +86,12 @@ def build_contextual_record(
             tag_path=tag_path,
             connection_id=tag_meta.get("id"),
         ),
+        # This system sends no server stamp; none is invented (FB-088).
         timestamp=RecordTimestamp(
-            source_time=source_time,
-            server_time=now,
+            source_time=stamp.source_time,
             ingestion_time=now,
+            source_clock=stamp.source_clock,
+            source_uncertainty_seconds=stamp.source_uncertainty_seconds,
         ),
         value=record_value,
         context=context,
@@ -100,10 +121,10 @@ def _historian_tag_path(tag_name: str) -> str:
     return f"historian.tag.{normalized}"
 
 
-def _parse_timestamp(ts_value: Any) -> datetime:
-    """Parse a NextTrend timestamp (RFC 3339 string) to datetime."""
+def _parse_timestamp(ts_value: Any) -> datetime | None:
+    """Parse a NextTrend timestamp (RFC 3339 string); None when the point carries none."""
     if ts_value is None:
-        return datetime.now(tz=UTC)
+        return None
 
     if isinstance(ts_value, datetime):
         if ts_value.tzinfo is None:
@@ -123,8 +144,8 @@ def _parse_timestamp(ts_value: Any) -> datetime:
     except ValueError:
         pass
 
-    logger.warning("Unparseable timestamp: %s — using now()", ts_str)
-    return datetime.now(tz=UTC)
+    logger.warning("Unparseable NextTrend timestamp %r: the point carries no source stamp", ts_str)
+    return None
 
 
 def _normalize_value(raw: Any, data_type: str | None) -> float | int | str | bool | None:

@@ -226,13 +226,17 @@ class DataValue(BaseModel):
         default=0,
         description="Raw OPC-UA StatusCode (uint32) for protocol-level detail",
     )
-    source_timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(UTC),
-        description="Timestamp from the source (PLC clock)",
+    source_timestamp: datetime | None = Field(
+        default=None,
+        description=(
+            "The stamp the source (the PLC clock) put on the value; None when the server "
+            "sent none. Never invented here (one clock, FB-088): the record builder decides "
+            "what may stand in for it, per the connection's declared origin."
+        ),
     )
-    server_timestamp: datetime = Field(
-        default_factory=lambda: datetime.now(UTC),
-        description="Timestamp from the OPC-UA server",
+    server_timestamp: datetime | None = Field(
+        default=None,
+        description="The OPC-UA server's stamp; None when the server sent none (FB-088).",
     )
 
     @field_validator("source_timestamp", "server_timestamp", mode="before")

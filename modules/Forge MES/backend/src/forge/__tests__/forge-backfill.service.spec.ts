@@ -1,6 +1,7 @@
 /**
  * ForgeBackfillService: replay AuditLog rows as ContextualRecords (FB-061).
  */
+import { toTimestamp } from "../proto";
 import { deriveTagPath } from "../contextual-record.mapper";
 import { loadForgeConfig } from "../forge.config";
 import {
@@ -71,15 +72,16 @@ describe("ForgeBackfillService", () => {
     const record = svc.toRecord(row(1))!;
     expect(record.source.tag_path).toBe(deriveTagPath("ScheduleOrder"));
     expect(record.source.adapter_id).toBe("forge-mes");
+    // event_type and event_timestamp ride in their RecordContext slots since FB-013.
+    expect(record.context.event_type).toBe("audit.update");
+    expect(record.context.event_timestamp).toEqual(toTimestamp(new Date("2026-06-01T12:00:01.000Z")));
     expect(record.context.extra).toMatchObject({
-      event_type: "audit.update",
       entity_type: "ScheduleOrder",
       entity_id: "so-1",
       schedule_order_id: "so-1",
       replay: "backfill",
       audit_log_id: "a001",
       audit_action: "UPDATE",
-      event_timestamp: "2026-06-01T12:00:01.000Z",
     });
     expect(record.context.operator_id).toBe("u1");
     expect(record.context.operating_mode).toBe("Active");
@@ -90,7 +92,7 @@ describe("ForgeBackfillService", () => {
     ]);
 
     const deleted = svc.toRecord(row(2, { action: "DELETE", newValues: null }))!;
-    expect(deleted.context.extra.event_type).toBe("audit.delete");
+    expect(deleted.context.event_type).toBe("audit.delete");
     expect(JSON.parse(deleted.value.json_value)).toMatchObject({ status: "Queued" });
 
     const odd = svc.toRecord(row(3, { newValues: ["not", "an", "object"] }))!;

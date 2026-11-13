@@ -157,7 +157,7 @@ In the spoke's record builder, at the first point where the stamp and the measur
 
 | Step | Scope | Backlog | Size |
 |---|---|---|---|
-| 1 | No invented stamps: a value without a source stamp is rejected unless the connection declares `origin: forge`, in which case Forge's read time is the stamp with the poll bound as uncertainty | FB-088 | S |
+| 1 | No invented stamps: a value without a source stamp is rejected unless the connection declares `origin: forge`, in which case Forge's read time is the stamp with the poll bound as uncertainty — **done 2026-11-13** (`forge.core.clock.resolve_source_stamp`; `source_clock` and `source_uncertainty_seconds` are proto fields 6 and 8; the declaration is per connection or adapter config until step 4 moves it into FACTS; the refusal is never silent) | FB-088 | S |
 | 2 | Clock readers: OPC UA response-header wrapper and `CurrentTime` probe on the cadence (extending FB-089's probe; the cadence a per-connection setting adjustable at runtime), Logix `WallClockTime` + `TimeSynchronize`, S7 clock, Modbus register map, Sparkplug publish-time; `ClockOffsetTracker` keyed by `clock_id` | FB-094 | M |
 | 3 | The six fields of P-3 on `RecordTimestamp`, the proto, the Go models and the interim bridge mapper; correction on entry in the builders (P-10); FATS/FACTS re-stamped for the owner | FB-094, D-9 | M |
 | 4 | FACTS `time_governance` schema, `facts:time-governed` blocking check, the section in all nine specs (the OT spec with D-8), the deployment requirement written down | FB-090 | M |

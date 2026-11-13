@@ -14,6 +14,8 @@ _VALID_CONFIG = {
     "nms_api_url": "http://localhost:8000/api/v1",
     "nms_ws_url": "ws://localhost:8000/api/v1/events/stream",
     "poll_interval_seconds": 60,
+    # the sample messages carry no timestamp: Forge's read time may stand in (FB-088)
+    "source_timestamp_origin": "forge",
 }
 
 _SAMPLE_DEVICE_MESSAGE = {
@@ -335,6 +337,43 @@ class TestSubscription:
 
 
 # ── Record Counting Tests ──────────────────────────────────────
+
+
+class TestRefusals:
+    """A value without a source stamp is refused, never silently (one clock, FB-088)."""
+
+    @pytest.mark.asyncio
+    async def test_timeless_record_is_refused_and_visible_on_health(self):
+        adapter = WhkNmsAdapter()
+        config = {k: v for k, v in _VALID_CONFIG.items() if k != "source_timestamp_origin"}
+        await adapter.configure(config)
+        await adapter.start()
+        adapter.inject_records([_SAMPLE_DEVICE_MESSAGE])
+
+        records = [record async for record in adapter.collect()]
+
+        assert records == []
+        health = await adapter.health()
+        assert health.state == AdapterState.DEGRADED
+        assert health.records_failed == 1
+        assert health.refusals == {"source_stamp_missing": 1}
+        assert health.last_refusal is not None and "FB-088" in health.last_refusal
+        assert health.error_message == health.last_refusal
+
+    @pytest.mark.asyncio
+    async def test_declared_forge_stamps_the_read_time_and_says_so(self):
+        adapter = WhkNmsAdapter()
+        await adapter.configure(_VALID_CONFIG)
+        await adapter.start()
+        adapter.inject_records([_SAMPLE_DEVICE_MESSAGE])
+
+        records = [record async for record in adapter.collect()]
+
+        assert len(records) == 1
+        assert records[0].timestamp.source_clock == "forge"
+        assert records[0].timestamp.source_uncertainty_seconds == 60.0
+        health = await adapter.health()
+        assert health.state == AdapterState.HEALTHY and health.refusals == {}
 
 
 class TestRecordCounting:

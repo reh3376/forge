@@ -30,6 +30,14 @@ type RecordTimestamp struct {
 	SourceTime    time.Time  `json:"source_time"`
 	ServerTime    *time.Time `json:"server_time,omitempty"`
 	IngestionTime time.Time  `json:"ingestion_time"`
+	// SourceClock names the clock that stamped SourceTime (one-clock record, P-3/P-4):
+	// "device:<name>", "server:<name>", "edge:<name>", or "forge" when Forge's own read
+	// time stands in for a stamp the protocol does not carry (FB-088). Empty until the
+	// connection declares its origin. Proto field 6.
+	SourceClock string `json:"source_clock,omitempty"`
+	// SourceUncertaintySeconds bounds how far SourceTime may sit from the instant the
+	// value occurred: the poll bound when SourceClock is "forge" (FB-088). Proto field 8.
+	SourceUncertaintySeconds *float64 `json:"source_uncertainty_seconds,omitempty"`
 }
 
 // RecordValue holds the actual value with its engineering context.

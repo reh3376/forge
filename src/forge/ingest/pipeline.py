@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Protocol
 
-from forge.core.clock import ClockOffsetTracker, utc_now
+from forge.core.clock import ClockOffsetTracker, resolve_source_stamp, utc_now
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -325,6 +325,21 @@ class IngestPipeline:
             outcome.failed += len(batch) - written
             outcome.by_engine[engine.value] = outcome.by_engine.get(engine.value, 0) + written
 
+    def note_refused(self, outcome: IngestOutcome, errors: list[str]) -> IngestOutcome:
+        """Fold readings refused before ingest (a REST reading without a source stamp,
+        FB-088) into ``outcome`` and the cumulative stats, so the refusal shows on the
+        ingest log and ``GET /v1/ingest/stats`` like any other rejection (never silent).
+        """
+        if not errors:
+            return outcome
+        outcome.received += len(errors)
+        outcome.rejected += len(errors)
+        outcome.errors[:0] = errors
+        self.stats.received += len(errors)
+        self.stats.rejected += len(errors)
+        self.stats.last_error = errors[-1]
+        return outcome
+
     async def persist(self, records: list[ContextualRecord]) -> int:
         """Route and write hub-born records (curated outputs) without receipt or validation.
 
@@ -362,17 +377,36 @@ class IngestPipeline:
         )
         tag = raw.get("tag") or raw.get("tag_path")
         now = datetime.now(UTC)
-        source_time = raw.get("timestamp") or raw.get("source_time")
-        if isinstance(source_time, str):
+        sent = raw.get("timestamp") or raw.get("source_time")
+        detail: str | None = None
+        if isinstance(sent, str):
             try:
-                source_time = datetime.fromisoformat(source_time.replace("Z", "+00:00"))
+                sent = datetime.fromisoformat(sent.replace("Z", "+00:00"))
             except ValueError:
-                source_time = None
+                detail = f"unparseable timestamp {sent!r}"
+                sent = None
+        elif sent is not None and not isinstance(sent, datetime):
+            detail = f"timestamp of type {type(sent).__name__}"
+            sent = None
+        # A reading without a timestamp is not given the hub's clock (one clock, FB-088):
+        # the adapter's manifest must declare source_timestamp_origin: forge (in its
+        # metadata until FB-090 puts the FACTS time_governance section there) for the
+        # hub's read time to stand in; otherwise the reading is refused, with the cause.
+        stamp = resolve_source_stamp(
+            sent,
+            origin=manifest.metadata.get("source_timestamp_origin"),
+            read_at=now,
+            adapter_id=adapter_id,
+            tag_path=tag,
+            detail=detail,
+        )
         return ContextualRecord(
             source=RecordSource(adapter_id=adapter_id, system=adapter_id, tag_path=tag),
             # no ingestion_time: the client sent none, the hub stamps receipt in ingest()
             timestamp=RecordTimestamp(
-                source_time=source_time if isinstance(source_time, datetime) else now,
+                source_time=stamp.source_time,
+                source_clock=stamp.source_clock,
+                source_uncertainty_seconds=stamp.source_uncertainty_seconds,
             ),
             value=RecordValue(
                 raw=value,

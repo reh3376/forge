@@ -312,6 +312,7 @@ flowchart TD
 - `RecordContext` carries the context field registry slot for slot, on the proto and in Go, with every producer and the TimescaleDB table following (FB-013).
 - A naive datetime or an offset-less string is rejected at the model (`forge.core.clock`, FB-014); ruff's `DTZ` rules block CI.
 - The hub stamps `ingestion_time` with its own clock on receipt; the spoke's stamp is kept as `sent_time`; nothing is invented (FB-087).
+- No record builder invents a source time either: a value without a source stamp is refused unless its connection declares `source_timestamp_origin: forge`; then Forge's read time stands in and the record says so (`source_clock`, `source_uncertainty_seconds`), and the refusal is on health, status, API and CLI (FB-088, 2026-11-13).
 - Every schema reference uses one grammar, `forge://schemas/<spoke>[/<Entity>][/v<version>]`, held at every boundary (FB-008).
 
 note:
@@ -394,7 +395,7 @@ note:
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.1 |
 | Go transport parity tests | FB-055 |
 | Hub time in the contract; refusing an out-of-tolerance clock | FB-092, FB-093 (D-9 signed 2026-11-03) |
-| The spoke's time fields (`sent_time`, source time per spoke) | FB-088, FB-090 (D-9 signed 2026-11-03) |
+| The spoke's time fields (`sent_time`, source time per spoke) | FB-088 done 2026-11-13 (`source_clock`, `source_uncertainty_seconds`); FB-090 (D-9 signed 2026-11-03) |
 | Generic adapters (csv_file, mqtt_sparkplug, opcua, rest_generic) | package stubs only |
 
 **Next**: where the records land.
@@ -862,12 +863,12 @@ The owner's principle (2026-10-18): records from different sources only reconcil
 | Every stored timestamp is UTC and timezone-aware; naive rejected at the model | ✅ FB-014 |
 | The hub stamps receipt with its own clock | ✅ FB-087 |
 | The offset of every connected clock is measured, recorded and surfaced | ✅ FB-089 (provisional 1 s tolerance, warning only) |
-| A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | ❌ FB-088, FB-094; design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
+| A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | 🟡 FB-088 done 2026-11-13 (no invented stamp; the stamping clock named once declared); FB-094 next; design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
 | Hub time in the contract; a hub, module or spoke outside tolerance is refused | ⬜ FB-092, FB-093 (D-9 signed 2026-11-03) |
 | Per-spoke declaration of source time zones; a quality dimension for time | ⬜ FB-090, FB-091 (D-9 signed 2026-11-03) |
 
 note:
-- Today the OPC-UA converter stores `SourceTimestamp` as the server sends it and invents one when absent; no device clock is read. That row is marked ❌ deliberately: the principle says a device whose clock cannot be read is not a valid source.
+- The OPC-UA converter stores `SourceTimestamp` as the server sends it and, since FB-088 (2026-11-13), invents nothing when it is absent: the value is refused unless the connection declares origin `forge`. No device clock is read yet (FB-094). That row is marked 🟡 deliberately: the principle says a device whose clock cannot be read is not a valid source.
 - D-9 chooses among established standards: NTP/chrony strata mirroring the hub hierarchy, PTP/IEEE 1588 on the plant network, NTP four-timestamp measurement in-band, IEC 61850-5 tolerance classes, IEC 61850 `TimeQuality` and OPC UA `DataValue` fields on the record.
 
 ---
@@ -876,7 +877,7 @@ note:
 
 | Gap | Backlog / decision |
 |---|---|
-| Source time is not device time corrected to master | FB-088, FB-094 (D-9 signature) |
+| Source time is not device time corrected to master | FB-094 (FB-088, the no-invented-stamp step, done 2026-11-13) |
 | One adapter identity (code `forge-ot-module`, manifest and spec `ot-module`) | FB-079 (includes FB-018) |
 | Batch context resolver wired to MES | FB-020 |
 | OT FACTS vocabulary | D-8 |
@@ -1401,7 +1402,7 @@ note:
 4. **No federation**: a single hub only; no hub-of-hubs code.
 5. **Seven governance frameworks are stubs or planned**; six FACTS specs await the owner's hash approval.
 6. **No production deployment**: compose only.
-7. **No clock discipline below the hub**: the hub is not yet a time authority for what is attached to it, the OPC-UA converter invents a source time when the server sends none, nothing refuses a wrong clock.
+7. **No clock discipline below the hub**: the hub is not yet a time authority for what is attached to it and nothing refuses a wrong clock; since FB-088 (2026-11-13) no source time is invented when the server sends none.
 
 note:
 - `docs/WHERE-WE-ARE.md` §5 verbatim in substance. Each gap has backlog ids and a decision it waits on.
@@ -1433,7 +1434,7 @@ note:
 | D-4 | FVTS open items (name, write authority per profile, mobile acknowledge, transport, layout) | decided 2026-11-03; forge-display design next |
 | D-7 | Scope of the Go standard (OT module, Python adapters) | open |
 | D-8 | FACTS vocabulary for OT adapters | decided 2026-11-03: extend the enums; FB-079 can start |
-| D-9 | One clock: which established standards to adopt (`docs/decisions/one-clock-ot-source-time.md`) | signed 2026-11-03; FB-088, FB-090 to FB-094 in the record's step order |
+| D-9 | One clock: which established standards to adopt (`docs/decisions/one-clock-ot-source-time.md`) | signed 2026-11-03; FB-088 done 2026-11-13, FB-090 to FB-094 in the record's step order |
 | D-10 | One schema registry (`docs/decisions/one-schema-registry.md`) | signed 2026-11-03; FB-097's eight steps |
 
 On 2026-11-03 the owner answered the open questions **one at a time** (34 answers) and declared the answers the signature; every gated item can start. Two standing rules came with the answers: no silent failure, and no decision that pins the platform in.

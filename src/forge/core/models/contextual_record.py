@@ -15,7 +15,7 @@ from uuid import UUID, uuid4
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from forge.core.clock import OneClockModel, utc_now
+from forge.core.clock import SOURCE_CLOCK_PATTERN, OneClockModel, utc_now
 from forge.core.schema_ref import require_versioned_ref
 
 
@@ -40,7 +40,11 @@ class RecordTimestamp(OneClockModel):
     a spoke put there arrives as ``sent_time`` and is kept for the clock-offset
     measurement (FB-089). Every field is UTC and timezone-aware (FB-014): a
     naive value, or an ISO string without an offset, is rejected rather than
-    read as UTC.
+    read as UTC. ``source_time`` is never invented (FB-088): a value the source
+    did not stamp is refused unless its connection declared ``origin: forge``,
+    and then ``source_clock`` says so and ``source_uncertainty_seconds`` carries
+    the poll bound (the first two of the six fields of the one-clock record's
+    P-3; the rest come with FB-094).
     """
 
     # The timestamps a view or a quality rule may take as its time axis: the three on
@@ -57,6 +61,26 @@ class RecordTimestamp(OneClockModel):
             "The spoke's clock when it built and sent the record (its ingestion_time as "
             "sent); set by the hub on receipt and kept for the offset measurement (FB-089). "
             "Hub-local, not on the wire; provisional name until D-9 fixes the time fields."
+        ),
+    )
+    source_clock: str | None = Field(
+        default=None,
+        pattern=SOURCE_CLOCK_PATTERN,
+        description=(
+            "Which clock stamped source_time (one-clock record, P-3/P-4): device:<name>, "
+            "server:<name>, edge:<name>, or forge when Forge's own read time stands in for a "
+            "stamp the protocol does not carry (FB-088). None until the connection declares "
+            "its origin; FB-094 names it on every record. Proto field 6."
+        ),
+    )
+    source_uncertainty_seconds: float | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "How far source_time may sit from the instant the value occurred, in seconds: "
+            "the poll bound when source_clock is forge (FB-088); half the probe round trip "
+            "plus the sampling bound once the stamping clock is measured (FB-094). Proto "
+            "field 8."
         ),
     )
 

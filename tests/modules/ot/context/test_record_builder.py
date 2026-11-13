@@ -1,9 +1,10 @@
 """Tests for the OT record builder — tag + enrichment → ContextualRecord."""
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.contextual_record import (
     ContextualRecord,
 )
@@ -39,7 +40,8 @@ def sample_value() -> TagValue:
         value=78.4,
         quality=QualityCode.GOOD,
         timestamp=now,
-        source_timestamp=now,
+        source_timestamp=now - timedelta(milliseconds=40),
+        server_timestamp=now - timedelta(milliseconds=20),
     )
 
 
@@ -81,8 +83,10 @@ class TestBuildOtRecord:
     def test_record_timestamp_fields(self, sample_tag, sample_value, full_enrichment):
         record = build_ot_record(tag=sample_tag, tag_value=sample_value, enrichment=full_enrichment)
         assert record.timestamp.source_time == sample_value.source_timestamp
-        assert record.timestamp.server_time == sample_value.timestamp
+        assert record.timestamp.server_time == sample_value.server_timestamp
         assert record.timestamp.ingestion_time is not None
+        assert record.timestamp.source_clock is None  # the connection has not declared one
+        assert record.timestamp.source_uncertainty_seconds is None
 
     def test_record_value_fields(self, sample_tag, sample_value, full_enrichment):
         record = build_ot_record(tag=sample_tag, tag_value=sample_value, enrichment=full_enrichment)
@@ -132,16 +136,55 @@ class TestBuildOtRecord:
         record = build_ot_record(tag=tag, tag_value=sample_value, enrichment=full_enrichment)
         assert record.source.connection_id is None
 
-    def test_source_timestamp_fallback(self, sample_tag, full_enrichment):
-        """When source_timestamp is None, source_time falls back to timestamp."""
-        val = TagValue(
-            value=100.0,
-            quality=QualityCode.GOOD,
-            timestamp=datetime.now(tz=UTC),
-            source_timestamp=None,
+    def test_value_without_source_stamp_is_refused_unless_the_connection_declared_forge(
+        self, sample_tag, full_enrichment
+    ):
+        """One clock (FB-088): the OT builder never invents a source time."""
+        read_at = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
+        value = TagValue(value=1.0, quality=QualityCode.GOOD, timestamp=read_at)
+        with pytest.raises(SourceStampMissingError, match="connection WHK01, tag WH/WHK01"):
+            build_ot_record(tag=sample_tag, tag_value=value, enrichment=full_enrichment)
+        with pytest.raises(SourceStampMissingError):
+            build_ot_record(
+                tag=sample_tag,
+                tag_value=value,
+                enrichment=full_enrichment,
+                source_timestamp_origin="device",
+            )
+        record = build_ot_record(
+            tag=sample_tag,
+            tag_value=value,
+            enrichment=full_enrichment,
+            source_timestamp_origin="forge",
         )
-        record = build_ot_record(tag=sample_tag, tag_value=val, enrichment=full_enrichment)
-        assert record.timestamp.source_time == val.timestamp
+        # Forge's read time (the registry's timestamp) stands in, the record says so, and
+        # the tag's scan interval (STANDARD, 1 s) is the uncertainty until FB-094's bound
+        assert record.timestamp.source_time == read_at
+        assert record.timestamp.source_clock == "forge"
+        assert record.timestamp.source_uncertainty_seconds == 1.0
+        assert record.timestamp.server_time is None
+
+    def test_declared_origin_names_the_clock_on_a_stamped_value(
+        self, sample_tag, sample_value, full_enrichment
+    ):
+        record = build_ot_record(
+            tag=sample_tag,
+            tag_value=sample_value,
+            enrichment=full_enrichment,
+            source_timestamp_origin="device",
+        )
+        assert record.timestamp.source_time == sample_value.source_timestamp
+        assert record.timestamp.source_clock == "device:WHK01"
+
+    def test_forge_born_tag_has_forge_as_its_source_clock(self, full_enrichment):
+        """A memory tag has no connection: Forge's clock is its source clock by nature."""
+        tag = MemoryTag(path="WH/WHK01/Calc/Setpoint", data_type=DataType.DOUBLE)
+        read_at = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
+        value = TagValue(value=50.0, quality=QualityCode.GOOD, timestamp=read_at)
+        record = build_ot_record(tag=tag, tag_value=value, enrichment=full_enrichment)
+        assert record.timestamp.source_time == read_at
+        assert record.timestamp.source_clock == "forge"
+        assert record.source.connection_id is None
 
     def test_custom_adapter_id(self, sample_tag, sample_value, full_enrichment):
         record = build_ot_record(

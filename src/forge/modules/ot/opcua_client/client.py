@@ -177,22 +177,24 @@ def _convert_data_value(ua_dv: ua.DataValue) -> DataValue:
     # Extract the actual Python value from the Variant
     value = ua_dv.Value.Value if ua_dv.Value is not None else None
 
-    # Timestamps — asyncua gives datetime or None
-    source_ts = ua_dv.SourceTimestamp or datetime.now(UTC)
-    server_ts = ua_dv.ServerTimestamp or datetime.now(UTC)
-    if source_ts.tzinfo is None:
-        source_ts = source_ts.replace(tzinfo=UTC)
-    if server_ts.tzinfo is None:
-        server_ts = server_ts.replace(tzinfo=UTC)
-
+    # Timestamps: asyncua gives a datetime or None. None stays None. A stamp the server
+    # did not send is not invented here (one clock, FB-088); the record builder decides
+    # what may stand in for it, per the connection's declared source_timestamp_origin.
     return DataValue(
         value=value,
         data_type=data_type,
         quality=QualityCode.from_status_code(raw_status),
         status_code=raw_status,
-        source_timestamp=source_ts,
-        server_timestamp=server_ts,
+        source_timestamp=_aware_or_none(ua_dv.SourceTimestamp),
+        server_timestamp=_aware_or_none(ua_dv.ServerTimestamp),
     )
+
+
+def _aware_or_none(stamp: datetime | None) -> datetime | None:
+    """asyncua hands back naive UTC datetimes; make them aware, and keep None as None."""
+    if stamp is None:
+        return None
+    return stamp.replace(tzinfo=UTC) if stamp.tzinfo is None else stamp
 
 
 def _forge_node_id_to_ua(node_id: NodeId) -> ua.NodeId:
@@ -258,13 +260,10 @@ class _ForgeSubHandler:
             if hasattr(data, "monitored_item") and hasattr(data.monitored_item, "Value"):
                 forge_dv = _convert_data_value(data.monitored_item.Value)
             else:
-                # Fallback: construct from raw value
-                forge_dv = DataValue(
-                    value=val,
-                    quality=QualityCode.GOOD,
-                    source_timestamp=datetime.now(UTC),
-                    server_timestamp=datetime.now(UTC),
-                )
+                # Fallback: construct from the raw value. No stamps are invented for it
+                # (FB-088): the record builder refuses it, or stands Forge's read time
+                # in when the connection declares origin forge.
+                forge_dv = DataValue(value=val, quality=QualityCode.GOOD)
 
             self._client_ref._last_data_received = datetime.now(UTC)
             self._callback(node_id_str, forge_dv)

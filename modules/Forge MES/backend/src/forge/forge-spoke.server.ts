@@ -435,10 +435,12 @@ export class ForgeSpokeServer implements OnModuleInit, OnModuleDestroy {
       ...(ingest.lastFlushAt
         ? { last_healthy: toTimestamp(new Date(ingest.lastFlushAt)) }
         : {}),
-      error_message: ingest.lastError ?? "",
+      // A refusal (an event without a time, FB-088) is never silent: it counts as a
+      // failed record and names its cause when nothing else is wrong.
+      error_message: ingest.lastError ?? ingest.lastRefusal ?? "",
       records_collected: String(ingest.recordsSent),
       records_failed: String(
-        ingest.recordsDeadLettered + ingest.recordsDroppedQueueFull
+        ingest.recordsDeadLettered + ingest.recordsDroppedQueueFull + (ingest.recordsRefused ?? 0)
       ),
       uptime_seconds: (Date.now() - this.startedAt) / 1000,
     };

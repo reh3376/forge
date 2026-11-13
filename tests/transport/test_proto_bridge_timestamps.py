@@ -32,3 +32,18 @@ def test_a_sent_stamp_arrives_as_ingestion_time_and_sent_time_stays_off_the_wire
     assert back.ingestion_time == SPOKE
     assert "ingestion_time" in back.model_fields_set
     assert back.sent_time is None  # hub-local: the pipeline sets it on receipt
+
+
+def test_the_one_clock_fields_cross_the_wire_and_absence_stays_absent() -> None:
+    """source_clock and source_uncertainty_seconds (FB-088): present when set, None when not."""
+    ts = RecordTimestamp(source_time=SOURCE, source_clock="forge", source_uncertainty_seconds=0.0)
+    back = proto_to_record_timestamp(record_timestamp_to_proto(ts))
+    assert back.source_clock == "forge"
+    assert back.source_uncertainty_seconds == 0.0  # a real bound of zero, not "unset"
+
+    plain = proto_to_record_timestamp(
+        record_timestamp_to_proto(RecordTimestamp(source_time=SOURCE))
+    )
+    assert plain.source_clock is None and plain.source_uncertainty_seconds is None
+    msg = record_timestamp_to_proto(RecordTimestamp(source_time=SOURCE))
+    assert msg.source_clock == "" and not msg.HasField("source_uncertainty_seconds")

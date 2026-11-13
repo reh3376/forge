@@ -122,6 +122,9 @@ class TestTypeConverters:
         forge_dv = _convert_data_value(ua_dv)
         assert forge_dv.value is None
         assert forge_dv.quality == QualityCode.BAD
+        # the server sent no stamps: none are invented here (one clock, FB-088)
+        assert forge_dv.source_timestamp is None
+        assert forge_dv.server_timestamp is None
 
     def test_forge_node_id_to_ua_numeric(self) -> None:
         forge_nid = NodeId(namespace=0, identifier=85)

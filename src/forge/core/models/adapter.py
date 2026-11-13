@@ -117,3 +117,21 @@ class AdapterHealth(BaseModel):
             "in the contract."
         ),
     )
+    refusals: dict[str, int] = Field(
+        default_factory=dict,
+        description=(
+            "Values this adapter refused rather than invent something about them, by cause: "
+            "source_stamp_missing (a value without a source timestamp on a connection that "
+            "does not declare origin forge, FB-088); the clock refusals of FB-093 join it. "
+            "Hub-side only until the health contract carries it (FB-092); on the wire, "
+            "error_message names the last refusal."
+        ),
+    )
+    last_refusal: str | None = Field(
+        default=None,
+        description=(
+            "The last refusal, with its cause, as the adapter reported it. A refusal is never "
+            "silent (owner, 2026-11-03): it is here, on error_message, on the adapter's state "
+            "(DEGRADED) and on the forge.ingest.refused metric."
+        ),
+    )

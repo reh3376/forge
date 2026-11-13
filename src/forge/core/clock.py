@@ -6,8 +6,9 @@ come from the same master time, so Forge never stores a naive datetime and
 never guesses what a naive one meant. This module is the single source of
 Forge's own stamps (:func:`utc_now`) and the single check that keeps naive
 datetimes out of its models (:func:`require_utc`, :class:`OneClockModel`).
-The hub-side receipt stamp (FB-087), the measured clock offsets (FB-089) and
-the time exchange with the hub above (FB-092) build on it.
+The hub-side receipt stamp (FB-087), the measured clock offsets (FB-089), the
+rule that a source stamp is never invented (FB-088) and the time exchange with
+the hub above (FB-092) build on it.
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ from __future__ import annotations
 import logging
 import os
 from collections import deque
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
@@ -287,3 +289,125 @@ class ClockOffsetTracker:
                 for aid in self.adapters()
             },
         }
+
+
+# ---------------------------------------------------------------------------
+# Source stamps are never invented (one clock, FB-088; D-9 step 1)
+# ---------------------------------------------------------------------------
+
+#: ``source_clock`` when Forge's own read time stands in for a stamp the protocol does
+#: not carry: the one-clock record's origin ``forge`` (P-4), allowed by the owner (Q-3).
+FORGE_CLOCK = "forge"
+#: The origins a connection may declare for the clock that stamps its values (P-4):
+#: ``device`` (the PLC, or a PLC-embedded server), ``server`` (the host that stamps at
+#: poll: Kepware, Ignition, an IT system's own server), ``edge`` (a Sparkplug edge node)
+#: or ``forge`` (nothing on the wire carries a stamp; Forge's read time is the only one).
+SOURCE_TIMESTAMP_ORIGINS: tuple[str, ...] = ("device", "server", "edge", FORGE_CLOCK)
+#: The shape of ``RecordTimestamp.source_clock``: ``forge`` or ``<origin>:<name>``.
+SOURCE_CLOCK_PATTERN = r"^(forge|(device|server|edge):\S+)$"
+#: The cause an adapter counts a refused stampless value under (``AdapterHealth.refusals``).
+SOURCE_STAMP_MISSING = "source_stamp_missing"
+
+
+class SourceStampMissingError(ValueError):
+    """A value arrived without a source timestamp and nothing may stand in for it.
+
+    Forge never invents a source time (FB-088, the first step of the signed one-clock
+    record). A connection whose protocol carries no stamp declares
+    ``source_timestamp_origin: forge``; then Forge's own read time is recorded as the
+    stamp, marked ``source_clock=forge`` with the poll bound as its uncertainty.
+    Without that declaration the value is refused. The refusal is never silent (owner,
+    2026-11-03): the adapter counts it on its health (``refusals``, ``last_refusal``,
+    ``records_failed``), names the cause, goes DEGRADED, and the hub shows it on the
+    API, the CLI and forge-display.
+    """
+
+    cause = SOURCE_STAMP_MISSING
+
+    def __init__(
+        self,
+        *,
+        adapter_id: str,
+        connection: str | None = None,
+        tag_path: str | None = None,
+        detail: str | None = None,
+    ) -> None:
+        self.adapter_id = adapter_id
+        self.connection = connection
+        self.tag_path = tag_path
+        where = ", ".join(
+            part
+            for part in (
+                f"connection {connection}" if connection else "",
+                f"tag {tag_path}" if tag_path else "",
+            )
+            if part
+        )
+        super().__init__(
+            f"{adapter_id}: a value{' on ' + where if where else ''} arrived without a source "
+            f"timestamp{' (' + detail + ')' if detail else ''}; the connection does not declare "
+            "source_timestamp_origin: forge, and Forge does not invent one (one clock, FB-088)"
+        )
+
+
+@dataclass(frozen=True)
+class SourceStamp:
+    """The resolved source stamp of one value: what goes on ``RecordTimestamp``."""
+
+    source_time: datetime
+    source_clock: str | None
+    source_uncertainty_seconds: float | None
+
+
+def source_clock_name(origin: str | None, connection: str | None = None) -> str | None:
+    """``RecordTimestamp.source_clock`` for a declared origin.
+
+    ``forge`` stays ``forge``; ``device``, ``server`` and ``edge`` name the connection
+    (``device:WHK01``) and give None when there is no connection name to attach. None
+    stays None (the connection has not declared its origin). Any other origin is a
+    configuration error and raises ``ValueError``.
+    """
+    if origin is None:
+        return None
+    if origin not in SOURCE_TIMESTAMP_ORIGINS:
+        msg = f"source_timestamp_origin must be one of {SOURCE_TIMESTAMP_ORIGINS}; got {origin!r}"
+        raise ValueError(msg)
+    if origin == FORGE_CLOCK:
+        return FORGE_CLOCK
+    return f"{origin}:{connection}" if connection else None
+
+
+def resolve_source_stamp(
+    stamp: datetime | None,
+    *,
+    origin: str | None,
+    read_at: datetime,
+    poll_bound_seconds: float | None = None,
+    adapter_id: str,
+    connection: str | None = None,
+    tag_path: str | None = None,
+    detail: str | None = None,
+) -> SourceStamp:
+    """The source stamp of one value, never invented (FB-088).
+
+    ``stamp`` is what the source sent: None when it sent nothing, or something that
+    did not parse (``detail`` says which). With a stamp, that is the source time and
+    ``source_clock`` names the declared origin's clock (None while undeclared; a
+    connection declared ``forge`` that nevertheless sends stamps keeps them, the
+    declaration-against-wire check is FB-094's). Without a stamp, only a connection
+    declared ``origin: forge`` may stand in: ``read_at``, Forge's own clock when it
+    read the value, becomes the source time, ``source_clock`` is ``forge`` and
+    ``poll_bound_seconds`` is recorded as the uncertainty. Anything else raises
+    :class:`SourceStampMissingError`, which the adapter counts on its health.
+    """
+    if stamp is not None:
+        # passed through as it came: RecordTimestamp is the one-clock gate (a naive stamp
+        # fails there with the field named)
+        clock = source_clock_name(origin, connection) if origin != FORGE_CLOCK else None
+        return SourceStamp(stamp, clock, None)
+    if origin == FORGE_CLOCK:
+        return SourceStamp(read_at, FORGE_CLOCK, poll_bound_seconds)
+    source_clock_name(origin, connection)  # an unknown origin is a configuration error
+    raise SourceStampMissingError(
+        adapter_id=adapter_id, connection=connection, tag_path=tag_path, detail=detail
+    )

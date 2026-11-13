@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from forge.adapters.whk_erpi.context import build_record_context
 from forge.adapters.whk_erpi.record_builder import build_contextual_record
+from forge.core.clock import SourceStampMissingError
 from forge.core.models.contextual_record import QualityCode
 
 _SAMPLE_EVENT = {
@@ -28,7 +31,7 @@ _SAMPLE_EVENT = {
 
 
 class TestRecordBuilder:
-    def _build(self, raw=None):
+    def _build(self, raw=None, **kwargs):
         raw = raw or _SAMPLE_EVENT
         ctx = build_record_context(raw)
         return build_contextual_record(
@@ -36,6 +39,7 @@ class TestRecordBuilder:
             context=ctx,
             adapter_id="whk-erpi",
             adapter_version="0.1.0",
+            **kwargs,
         )
 
     def test_source_adapter_id(self):
@@ -97,7 +101,8 @@ class TestRecordBuilder:
         assert record.context.extra["cross_system_id"] == "ITEM-NS-00412"
         assert record.context.extra["entity_type"] == "Item"
 
-    def test_missing_timestamp_defaults_to_now(self):
+    def test_missing_timestamp_is_refused_unless_the_adapter_declared_forge(self):
+        """One clock (FB-088): an ERPI event without a timestamp gets no invented one."""
         raw = {
             "data": {
                 "event_type": "create",
@@ -105,8 +110,13 @@ class TestRecordBuilder:
                 "data": {"globalId": "ACC-001"},
             },
         }
-        record = self._build(raw)
-        assert record.timestamp.source_time is not None
+        with pytest.raises(SourceStampMissingError, match=r"erpi.account.create.*FB-088"):
+            self._build(raw)
+        record = self._build(raw, source_timestamp_origin="forge")
+        assert record.timestamp.source_clock == "forge"
+        assert record.timestamp.source_time == record.timestamp.ingestion_time
+        # the ERP's event bus sends no server stamp; none is invented
+        assert record.timestamp.server_time is None
 
     def test_barrel_entity_tag_path(self):
         raw = {

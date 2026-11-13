@@ -199,8 +199,9 @@ class TestDataValue:
         assert dv.data_type == DataType.VARIANT
         assert dv.quality == QualityCode.NOT_AVAILABLE
         assert dv.status_code == 0
-        assert dv.source_timestamp.tzinfo is not None
-        assert dv.server_timestamp.tzinfo is not None
+        # no stamp is invented for a value the server did not stamp (one clock, FB-088)
+        assert dv.source_timestamp is None
+        assert dv.server_timestamp is None
 
     def test_with_value(self) -> None:
         dv = DataValue(
