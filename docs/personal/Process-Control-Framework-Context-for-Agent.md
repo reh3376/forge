@@ -168,7 +168,7 @@ All [FACT] at `cc2c1da`. Re-verify each before you build on it.
 |---|---|---|
 | The repository holds no MPC or process-control-layer code. | Search for "MPC", "mpc-supervisor", "model predictive" | The MPC Supervisor module is a new build (M-6). |
 | The OT module runs inside the hub process. It has OPC UA connections, a tag engine, alarming and a control package that is the PLC write interface: type and range validation, write review, interlocks, role-based authorization, read-back confirmation, audit. | `src/forge/modules/ot/host.py`, `src/forge/modules/ot/control/` (`write_engine.py`, `validation.py`, `review.py`, `interlock.py`, `authorization.py`, `audit.py`, `connections.py`), `src/forge/modules/ot/opcua_client/`, `src/forge/modules/ot/tag_engine/` | Every PC-L2 write goes through this (L2-11). Whether it meets PC-L2's cycle time and heartbeat interval is O-4. |
-| The OT control routes are mounted under `/api/v1/ot`; `AdapterService` has a `Write` RPC for write-backs. | `src/forge/modules/ot/host.py`, `docs/WHERE-WE-ARE.md` §2 | Candidate paths for a deployment's writes. Which one, if either, is O-3. |
+| The OT control routes are mounted under `/api/v1/ot`; `AdapterService` has a `Write` RPC that the hub calls on a spoke (write-back, FB-054). | `src/forge/modules/ot/host.py`, `src/forge/api/main.py` (`/v1/adapters/{id}/write`), `docs/WHERE-WE-ARE.md` §2 | The REST route is the only hub-side write entry a deployment can call; the `Write` RPC runs hub → spoke and is the path PC-L3's schedule requests take to the MES (corrected 2026-11-13 by the Forge review, record §4a). O-3. |
 | The topology is a hub of hubs along ISA-95: an enterprise hub, a site hub per site, optional area hubs. A local operation never waits on another hub. | `docs/decisions/roles.md` §8 (R-9) | "The local hub" in L2-11 is the area or site hub. |
 | The hub-of-hubs federation is not built yet. Neither are scoped roles in the gateway, the Go module SDK, or any management module in Go. forge-display does not exist; its contract (FVTS) does. | `docs/WHERE-WE-ARE.md` §1 | L2-11, L2-13 and UI-2 rest on things that are decided but not built. Sequencing is a question for the owner (§7). |
 | Authorization is the signed role model. The OT write engine's role becomes scopes (`ot:tag:write`, `ot:interlock:bypass`, `ot:recipe:download`) with per-tag and per-area constraints. | `docs/decisions/roles.md` §5, §12 | L2-13 uses it as is. Granting autonomy (AU-8) and rolling back (AU-15) need scopes of their own. |
@@ -196,7 +196,7 @@ These are hypotheses for the Forge review to test. None is decided; the mapping 
 | Baseline PID tuning (L1-4) | The identification tooling of the MPC Supervisor module [PROPOSED] | Nothing to verify yet; it depends on O-2. |
 | PLC contract (L1-8) | A specification of its own, with per-vendor sample logic produced as recommendations [PROPOSED] | Whether an existing FxTS framework fits or a new one is needed. Ask the owner. |
 | MPC Supervisor module (M-1 to M-7) | A new module, with an FVTS spec for its points and actions (UI-2) [PROPOSED] | The state of the module SDK; whether the module is a spoke under FACTS. |
-| A deployment's writes (L2-11) | The OT write engine, through its control routes or the `Write` RPC [UNVERIFIED] | Latency per write, how a non-human identity is authorized, how the review gate treats system writes, the cost of read-back, how a heartbeat write passes. This is O-4. |
+| A deployment's writes (L2-11) | The OT write engine, through its control route `POST /api/v1/ot/control/writes` [FACT, review 2026-11-13] | Reviewed 2026-11-13 (record §4a): one tag per write, pre-read + write + live read-back, one audit record per attempt, no controller origin, no batch write, no timing on the status (FB-112). Still open: how a non-human identity is authorized (FB-075). This is O-4. |
 | A deployment's working copy (L2-12) | Served by the hub; held in the deployment as a cache with a visible age [PROPOSED] | The pattern used for the derived copy of R-18. |
 | Autonomy model (§2.3) | One shared implementation used by PC-L2 and PC-L3, with its records in the decision models [PROPOSED] | `forge.core.models.decision`. |
 | Rollout profile (L3-4), goal spec (L3-10) | Schemas in the one schema registry [PROPOSED] | The registry's state after D-10. |
@@ -234,7 +234,7 @@ Found while writing this document, and not yet put to the owner:
 
 6. **Sequencing.** L2-11 assumes an area or site hub, L2-13 assumes scoped roles, UI-2 assumes forge-display. None is built yet. What the first usable increment of the framework depends on, and what it can do without, is undecided.
 7. **FSDs.** Where they live and in what format. The only FSD in the repository, `scripts/tutorial-forge/FSD.md`, describes a different kind of thing.
-8. **Branch.** Which branch follow-up work uses (ground rule 9).
+8. ~~**Branch.**~~ Answered 2026-11-13: `reh3376_dev01`; `forge-dev03` was deleted after its merge.
 9. **Roadmap placement.** D-11 is not placed in a workstream or in the roadmap's sequence. Whether process control becomes a workstream of its own is undecided.
 10. **Publication.** The repository is public, the record states that the framework is new (F-2), and the owner wants a prior-art search before any IP filing or public positioning (S-3). How much further design detail goes into public branches, and when, is the owner's call. Ask before adding detailed designs.
 
@@ -259,7 +259,7 @@ Not verified:
 
 ## 9. Housekeeping state at the end of the session
 
-- Branch `forge-dev03`, cut from `main` at `62f37fe` and rebased onto `cc2c1da` before the push, holds the record, this document, and the backlog and roadmap entries (FB-110, FB-111, D-11). `docs/WHERE-WE-ARE.md` was not updated for them. Whether it has been pushed and which PR it became was not known when this was written; check the open PRs.
+- Branch `forge-dev03`, cut from `main` at `62f37fe` and rebased onto `cc2c1da` before the push, held the record, this document, and the backlog and roadmap entries (FB-110, FB-111, D-11). It became PR 93, merged 2026-11-13, and was deleted afterwards. `docs/WHERE-WE-ARE.md`, `docs/WHERE-WE-ARE-GOING.md` and the roadmap's WS-12, sequence and backlog table were brought up to date the same day, with the Forge review's findings (record §4a).
 - The owner's claude.ai project "forge" holds a copy of the record as `claude/process-control-framework-decisions.md`. The file in the repository is the authority.
 - The Jiminy check was skipped for these documents on the owner's instruction (ground rule 10).
 - Nothing else in the repository was changed.
