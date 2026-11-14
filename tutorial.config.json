@@ -52,7 +52,17 @@
       "PTP": "Precision Time Protocol",
       "UDT": "User-Defined Type",
       "DDL": "Data Definition Language",
-      "MDEMG": "Multi-Dimensional Emergent Memory Graph"
+      "MDEMG": "Multi-Dimensional Emergent Memory Graph",
+      "MPC": "Model Predictive Control",
+      "APC": "Advanced Process Control",
+      "PID": "Proportional-Integral-Derivative",
+      "SME": "Subject-Matter Expert",
+      "SIS": "Safety Instrumented System",
+      "FSD": "Functional Specification Document",
+      "PV": "Process Variable",
+      "SP": "Setpoint",
+      "MV": "Manipulated Variable",
+      "DV": "Disturbance Variable"
     },
     "disabled": ["Forge", "CMS", "FT"],
     "glossary": {
