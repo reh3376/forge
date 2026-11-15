@@ -1,6 +1,6 @@
 # Where we are going
 
-**Status date:** 2026-10-17 · **Owner:** reh3376
+**Status date:** 2026-11-13 · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) (the destination, in full) · [Where we are](WHERE-WE-ARE.md) (the snapshot) · [Roadmap](ROADMAP.md) (decisions, workstreams, sequence, decision queue) · [Principles](PRINCIPLES.md) (what does not change with the code) · [Backlog](../BACKLOG.md) (the unit of work)
 
 This is the short statement of direction. It names the destination, the principles already decided, the milestones between here and there, what is next, and what gates it. Detail lives in the companions; this page should fit in one reading.
