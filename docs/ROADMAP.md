@@ -1,6 +1,6 @@
 # Forge Roadmap
 
-**Status date:** 2026-10-16 · **Owner:** reh3376 · **Companion:** [`BACKLOG.md`](../BACKLOG.md)
+**Status date:** 2026-11-13 · **Owner:** reh3376 · **Companion:** [`BACKLOG.md`](../BACKLOG.md)
 
 The backlog is the unit of work (one `FB-nnn` per problem, one PR per item). This document is the map above it: what the platform is becoming, which decisions are in force, how the open work groups into workstreams, the order to take it in, and the questions only the owner can answer. Update it whenever an item changes state, a decision is made, or a workstream is added. The destination is [`VISION.md`](VISION.md), the short statement of direction is [`WHERE-WE-ARE-GOING.md`](WHERE-WE-ARE-GOING.md), and the component-by-component snapshot is [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md).
 
