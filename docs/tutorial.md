@@ -28,8 +28,8 @@ Two walkthroughs branch from here.
 | | **Software Dev / Contributor Onboarding** | **End User Overview** |
 |---|---|---|
 | **For** | Engineers and technical PMs who will build on or inside Forge | Operators, supervisors and managers who will run a Forge site or decide from it |
-| **Depth** | ~90 min, engineering-dense, code pointers throughout | ~45 min, plain language, no code required |
-| **Covers** | contract, storage, governance, OT module and the three layers of process control, modules and SDK, context and curation, security, the contributor workflow, where we are | what Forge is for, how data flows, the hub you run, your systems as spokes, the plant floor and the layers of control above it, context and decisions, governance, screens, roles, operations |
+| **Depth** | ~100 min, engineering-dense, code pointers throughout | ~50 min, plain language, no code required |
+| **Covers** | contract, storage, governance, OT module and the three layers of process control, modules and SDK, context and curation, security, one clock across the platform, the contributor workflow, where we are | what Forge is for, how data flows, the hub you run, your systems as spokes, the plant floor and the layers of control above it, context and decisions, governance, screens, roles, one clock, operations |
 | **Next** | Continue below ↓ (Contents → F1 Opening) | [Jump to the End User path →](#end-user-path) |
 
 note:
@@ -42,9 +42,9 @@ note:
 
 ## Table of Contents
 
-**Software Dev Path**: **[F1 Opening](#f1--opening)** → **[F2 The Hub ↔ Spoke Contract](#f2--the-hub-spoke-contract)** → **[F3 Storage](#f3--storage-and-the-hubs-databases)** → **[F4 Spec-First Governance](#f4--governance-fxts)** → **[F5 The Plant-Floor Module](#f5--the-ot-module)** → **[F6 Modules, Module Builder, forge-display](#f6--modules-the-sdk-and-forge-display)** → **[F7 Context, Curation, Decisions](#f7--context-curation-and-decisions)** → **[F8 Security, Identity, Federation](#f8--security-identity-and-federation)** → **[F9 Contributing](#f9--contributing)** → **[F10 Conclusion](#f10--conclusion)**
+**Software Dev Path**: **[F1 Opening](#f1--opening)** → **[F2 The Hub ↔ Spoke Contract](#f2--the-hub-spoke-contract)** → **[F3 Storage](#f3--storage-and-the-hubs-databases)** → **[F4 Spec-First Governance](#f4--governance-fxts)** → **[F5 The Plant-Floor Module](#f5--the-ot-module)** → **[F6 Modules, Module Builder, forge-display](#f6--modules-the-sdk-and-forge-display)** → **[F7 Context, Curation, Decisions](#f7--context-curation-and-decisions)** → **[F8 Security, Identity, Federation](#f8--security-identity-and-federation)** → **[F9 One Clock](#f9--one-clock)** → **[F10 Contributing](#f10--contributing)** → **[F11 Conclusion](#f11--conclusion)**
 
-**End User Path**: **[U1 Start Here](#end-user-path)** → **[U2 How Data Flows](#u2--how-data-flows)** → **[U3 The Hub You Run](#u3--the-hub-you-run)** → **[U4 Your Systems as Spokes](#u4--your-systems-as-spokes)** → **[U5 The Plant Floor](#u5--the-plant-floor)** → **[U6 Context, Products, Decisions](#u6--context-products-and-decisions)** → **[U7 Governance for Users](#u7--governance-for-users)** → **[U8 Screens](#u8--screens)** → **[U9 Identity, Roles, Credentials](#u9--identity-roles-and-credentials)** → **[U10 Operations](#u10--operations)** → **[U11 Where to Go Next](#u11--where-to-go-next)**
+**End User Path**: **[U1 Start Here](#end-user-path)** → **[U2 How Data Flows](#u2--how-data-flows)** → **[U3 The Hub You Run](#u3--the-hub-you-run)** → **[U4 Your Systems as Spokes](#u4--your-systems-as-spokes)** → **[U5 The Plant Floor](#u5--the-plant-floor)** → **[U6 Context, Products, Decisions](#u6--context-products-and-decisions)** → **[U7 Governance for Users](#u7--governance-for-users)** → **[U8 Screens](#u8--screens)** → **[U9 Identity, Roles, Credentials](#u9--identity-roles-and-credentials)** → **[U10 One Clock](#u10--one-clock)** → **[U11 Operations](#u11--operations)** → **[U12 Where to Go Next](#u12--where-to-go-next)**
 
 | § | Section | Target | What you leave with |
 |---|---|---:|---|
@@ -56,14 +56,15 @@ note:
 | [F6](#f6--modules-the-sdk-and-forge-display) | Modules, the module builder and forge-display | ~8 min | how new capability is built and shown |
 | [F7](#f7--context-curation-and-decisions) | Context, curation and decisions | ~8 min | how a value becomes decision-quality |
 | [F8](#f8--security-identity-and-federation) | Security, identity and federation | ~6 min | roles, credentials, hub of hubs, repo posture |
-| [F9](#f9--contributing) | Contributing: setup, the workflow, the rules that bind, where things go | ~10 min | how to land a change |
-| [F10](#f10--conclusion) | Conclusion: honest state, milestones, the decision queue, next | ~6 min | where to go from here |
+| [F9](#f9--one-clock) | One clock: why every timestamp must agree, the time authority at every level, what a record carries, measuring, declaring and failing closed | ~8 min | how time is kept the same from the top hub to a PLC, and how to hold your code to it |
+| [F10](#f10--contributing) | Contributing: setup, the workflow, the rules that bind, where things go | ~10 min | how to land a change |
+| [F11](#f11--conclusion) | Conclusion: honest state, milestones, the decision queue, next | ~6 min | where to go from here |
 
 Use the left-margin sidebar for section and diagram navigation.
 
 note:
 - F4 is the headline section for contributors: everything else either feeds a spec or is gated by one.
-- Natural pauses: after F1's honest state, after F4's hashing rules, after F9's rules that bind.
+- Natural pauses: after F1's honest state, after F4's hashing rules, after F10's rules that bind.
 
 ---
 
@@ -137,7 +138,7 @@ Each is stated as it is experienced in a plant; each has a component that carrie
 | P-12 | There is no production deployment story | Kubernetes per hub; compose is development only |
 
 note:
-- Keep this table in mind through the deck: F2 carries P-1 and P-2, F3 P-11, F4 P-5 and P-7, F5 P-4 and P-6, F6 P-5 and P-8, F7 P-2, P-3 and P-9, F8 P-10 and P-11, F10 P-12.
+- Keep this table in mind through the deck: F2 carries P-1 and P-2, F3 P-11, F4 P-5 and P-7, F5 P-4 and P-6, F6 P-5 and P-8, F7 P-2, P-3 and P-9, F8 P-10 and P-11, F11 P-12.
 
 ---
 
@@ -583,7 +584,7 @@ Rules carried over from MDEMG's UxTS and confirmed in practice:
 - Runners produce structured verdicts with check IDs, spec references, violation details and timing, not bare pass/fail.
 
 note:
-- Lineage: FxTS is adapted from MDEMG's UxTS framework family. The same governed-memory tooling (MDEMG/Jiminy) watches over the agents working on this repository (F9).
+- Lineage: FxTS is adapted from MDEMG's UxTS framework family. The same governed-memory tooling (MDEMG/Jiminy) watches over the agents working on this repository (F10).
 
 ---
 
@@ -858,7 +859,7 @@ flowchart TD
   S -. "outside tolerance" .-> X["refused (fail closed)"]
 ```
 
-The owner's principle (2026-10-18): records from different sources only reconcile if their timestamps come from the same master time.
+The owner's principle (2026-10-18): records from different sources only reconcile if their timestamps come from the same master time. This slide is the plant-floor view; F9 covers one clock across the whole platform.
 
 | Rule | State |
 |---|---|
@@ -1185,7 +1186,7 @@ note:
 
 # F8 · Security, Identity and Federation
 
-**Nav**: [← F7](#f7--context-curation-and-decisions) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [F9 →](#f9--contributing)
+**Nav**: [← F7](#f7--context-curation-and-decisions) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [F9 →](#f9--one-clock)
 
 The gateway as it is, the role model as it is designed, the hub of hubs, Forge-issued credentials, and the repository's own security posture.
 
@@ -1246,7 +1247,7 @@ flowchart TD
 - Nothing communicates *through* a hub; a transfer *occurs at* it.
 - Audit records always flow upward; other data is requested on demand unless a site opts into replication (R-17).
 - A site keeps working when the WAN does not: full operation for the token lifetime, audit complete on reconnection.
-- The time-authority chain follows the hub hierarchy (one clock, F5).
+- The time-authority chain follows the hub hierarchy (one clock, F9).
 - State: no code; milestone M6.
 
 note:
@@ -1292,16 +1293,229 @@ note:
 | Hub of hubs, offline tokens | M6, no code |
 | Security test specification (FSTS) | stub |
 
+**Next**: one clock, across everything the earlier sections touched.
+
+---
+
+<!-- SECTION F9, ONE CLOCK -->
+<!-- .slide: id="f9--one-clock" -->
+
+# F9 · One Clock: Time Across the Platform
+
+**Nav**: [← F8](#f8--security-identity-and-federation) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [F10 →](#f10--contributing)
+
+Why every clock in the system has to agree, and how Forge makes it so: stamps, measurement, correction, declaration and refusal, from the top hub down to a PLC. Earlier sections each showed a piece (the record in F2, the FACTS section in F4, the plant-floor probe in F5, the hub hierarchy in F8); this one puts them together.
+
+note:
+- Source: `docs/decisions/one-clock-ot-source-time.md` (D-9, signed 2026-11-03); `docs/PRINCIPLES.md` §2; `docs/deployment/clock-discipline.md`; `docs/WHERE-WE-ARE.md` §3.1 and §3.5; the code is `src/forge/core/clock.py`.
+
+---
+
+## Why Time Has to Agree
+
+Forge joins records from systems that were never built to agree with each other: a PLC, an OPC UA server, an MES, a warehouse system, a lab system. The timestamp is the one field every join uses.
+
+| The question | What clock skew does to the answer |
+|---|---|
+| Which came first: the alarm, the operator's action, or the valve moving? | Two clocks two seconds apart reverse cause and effect in the sequence of events |
+| What was the temperature when this lot was transferred? | The MES event and the tag value fall into different windows; the join returns the wrong reading, or none |
+| Is this data product fresh? | Age is "now minus source time" across two clocks: a source running behind looks stale, one running ahead looks fresh for ever |
+| Did the controller act inside its cycle? | A model-predictive controller reads, computes and writes on a cycle and proves it is alive with a heartbeat (F5); neither can be judged across clocks that disagree |
+| What happened, for the audit? | A trail whose order depends on which machine stamped each line is not evidence |
+
+- The owner's principle (2026-10-18): **records from different sources only reconcile if their timestamps come from the same master time.** Warnings are not a substitute for correction.
+- Skew fails silently: nothing errors, the numbers are just wrong. So the rule has a second half: a clock that is not on master time is **never silent** (owner, 2026-11-03).
+
+note:
+- "Solved when": every record at rest can be ordered against every other one, and any clock that cannot be trusted has said so and stopped delivering.
+- `docs/PRINCIPLES.md` §2 states the invariant; D-9 chooses the standards that implement it.
+
+---
+
+## A Time Authority at Every Level
+
+```mermaid
+flowchart TD
+  R["External reference<br/>GNSS, or an NTP stratum the installation trusts"] --> E["Top hub<br/>the master clock for everything below it"]
+  E --> S["Site and area hubs<br/>each governs the clocks of what is attached to it"]
+  S --> M["Modules and spokes<br/>their hosts take time from the hub's chain"]
+  M --> D["Sources<br/>PLCs, OPC UA servers, IT systems: clocks read, stamps corrected"]
+```
+
+- The highest hub provides time for every hub and spoke below it; each hub governs the modules and spokes attached directly to it; each spoke governs or measures the clocks of the systems behind it.
+- **The installation distributes time; Forge does not set clocks.** NTP strata mirror the hub hierarchy, and PTP runs on the plant network where the devices support it (D-9, P-1). The requirement and a new-site checklist are `docs/deployment/clock-discipline.md`.
+- Forge does four things with the time it is given: it **stamps** (its own receipt), **measures** (every clock it can reach), **corrects** (a source stamp, once, where it enters) and **refuses** (a clock it cannot trust).
+
+| Class | Links | Tolerance |
+|---|---|---|
+| `T1` | PLC event and alarm stamps, sequence of events; devices that report PTP synchronisation | 1 ms |
+| `T0` | polled process values from NTP-synced devices and servers | 10 ms |
+| `it-lan` | MES, WMS, ERP and other spoke hosts on the site LAN; the OT module's host | 10 ms |
+| `it-wan` | hub to hub, remote spokes | 100 ms |
+| `edge-mqtt` | Sparkplug edge nodes, measured one way | 500 ms |
+
+note:
+- The classes and values are D-9's P-8, approved by the owner as proposed (Q-1); in code they are `TOLERANCE_CLASS_SECONDS` in `forge.core.clock`. The class is data on each link's declaration: a new class is a row, not a code change.
+- `T2` to `T5` exist for devices that report PTP synchronisation; a round-trip probe cannot resolve them (FB-116).
+
+---
+
+## What a Record Carries
+
+Every `ContextualRecord` has a `RecordTimestamp` (F2). These are its fields:
+
+| Field | What it is | Who sets it |
+|---|---|---|
+| `source_time` | when the value occurred at the source, corrected to master time where the clock is measured | the spoke's record builder |
+| `source_time_as_sent` | the stamp exactly as the source sent it | the builder, when it corrects |
+| `source_offset_seconds` | the offset that was applied | the builder |
+| `source_uncertainty_seconds` | the error bound: half the probe's round trip plus the sampling bound of the tag | the builder |
+| `source_clock` | which clock stamped it: `device:<name>`, `server:<name>`, `edge:<name>` or `forge` | the builder, from the declaration |
+| `time_quality` | synchronised, clock failure, leap seconds known, accuracy class (IEC 61850 `TimeQuality`) | the builder |
+| `server_time` | when the source's server processed it | the source |
+| `sent_time` | the spoke's own clock when it sent the record | the spoke |
+| `ingestion_time` | when the hub received it, by the hub's clock | the hub |
+
+- **UTC, with its zone, everywhere.** A naive datetime or an offset-less string is rejected at the model (`OneClockModel`); ruff's `DTZ` rules block one in code.
+- **The hub stamps receipt** with one reading of its own clock per batch (`stamp_receipt`); a spoke's claim about arrival is never used.
+- **No source time is ever invented.** A value that arrives without one is refused, unless its connection declares `source_timestamp_origin: forge`: then Forge's read time stands in, the record says so (`source_clock: forge`) and the poll interval is its uncertainty.
+- **Correction happens once, where the stamp enters** (the spoke's builder, P-10). The hub never corrects a second time.
+
+note:
+- Honest: at rest the hypertable keeps only `source_time`; the other fields travel on the record, the API and into curation (FB-108). `sent_time` becomes `spoke_time` when the time exchange lands (FB-092).
+
+---
+
+## Measuring a Clock
+
+```mermaid
+sequenceDiagram
+  participant F as Forge
+  participant C as The clock being read
+  F->>C: request, sent at T1 by Forge's clock
+  C-->>F: answer, carrying T3 from its own clock
+  Note over F: received at T4 by Forge's clock
+  Note over F: offset = T3 - midpoint of T1 and T4
+  Note over F: uncertainty = half of T4 - T1
+```
+
+- The measurement is NTP's: taking the offset at the midpoint of the round trip cancels the transit delay, and half the round trip bounds the error from an asymmetric path. In code it is `ClockSample`.
+- **On the plant floor** every OPC UA connection reads `ServerStatus.CurrentTime` on a cadence (30 s by default, 1 s at the least, changed per connection while it runs: `POST /control/connections/{name}/clock-probe-interval`) and also reads the timestamp in every response header. Both feed one series, named for the clock that was read (`server:WHK01`, or `device:WHK01` for a PLC-embedded server).
+- **At the hub** every received record is a measurement, one way: `sent_time` against receipt (the spoke), `server_time` against receipt (the source's server), `source_time` against `server_time` (the source). One way includes the delay in transit, which is why the two-way exchange is the next step (FB-092).
+- `ClockOffsetTracker` keeps a rolling window per adapter, link and clock, filters the estimate the correction uses with NTP's one-eighth weight, and puts every sample on `forge.clock.offset`. The statistics are on `AdapterHealth.clock`, `GET /v1/ingest/stats` and the OT connection status.
+
+note:
+- The probe is also the liveness check (FB-070): a dead session cannot answer it. A probe that fails restarts the connection; a probe that answers without a clock value counts toward `CLOCK_UNREADABLE`.
+
+---
+
+## Declaring It · FACTS `time_governance`
+
+Every spoke states how it is time-governed, in its FACTS spec and on the manifest it registers with:
+
+```json
+"time_governance": {
+  "time_source": "hub-ntp",
+  "sync_protocol": "ntp",
+  "clock_read_method": "opcua-current-time",
+  "clock_probe_interval_seconds": 30,
+  "source_timestamp_origin": "server",
+  "tolerance_class": "T0",
+  "fail_closed": true,
+  "connections": [
+    { "name": "WHK02", "source_timestamp_origin": "device", "tolerance_class": "T1" }
+  ]
+}
+```
+
+- The section is **required**, and `facts:time-governed` is a blocking check: it refuses a spec without the section, `sync_protocol: none`, a spec that does not fail closed, a cadence under 1 s, and a clock-read method the protocol cannot perform.
+- All nine specs carry it, approved by the owner on 2026-11-13: the eight IT spokes declare `hub-ntp`, `ntp`, origin `server` and class `it-lan`; the OT module declares class `T0` and reads its servers with `opcua-current-time`.
+- The declaration is what the runtime obeys: the origin decides what happens to a value without a stamp, the class is the tolerance the link is held to, and a connection parameter that contradicts it is refused when the adapter is configured (`time_governance_conflict`).
+
+note:
+- `AdapterManifest.time_governance` is proto field 13; the Python, Go and interim-bridge models all carry it (FB-090).
+
+---
+
+## Failing Closed
+
+```mermaid
+flowchart LR
+  OK["OK<br/>delivering"] -- "3 probes in a row:<br/>no clock value" --> U["CLOCK_UNREADABLE<br/>nothing delivered"]
+  OK -- "3 probes in a row:<br/>offset beyond the class" --> T["CLOCK_OUT_OF_TOLERANCE<br/>nothing delivered"]
+  U -- "3 good probes in a row" --> OK
+  T -- "3 good probes in a row" --> OK
+```
+
+Every PLC connection has a `ClockGate` (D-9's P-5; three in and three out is the owner's answer Q-4). While a connection is refused:
+
+- its provider is stopped: nothing is subscribed and nothing is pulled;
+- reads and writes through it are refused with `ClockRefusedError`, and `collect` skips its tags, its last values included;
+- the supervisor's restart loop does not apply, and an operator restart is answered 409 with the cause: this is a refusal, not a recovery;
+- only the probe goes on, over a session it opens and closes itself.
+
+**Never silent.** The refusal is an error line in the log, on the connection status (`clock_state`, and `clock_gate` with the cause, since when, the class and the counters), on `AdapterHealth` (DEGRADED, `refusals.clock_unreadable` or `clock_out_of_tolerance`, `last_refusal`), on the `forge.ingest.refused` metric, and a HIGH alarm where the host runs an alarm engine. The adapter is HEALTHY again when its last refused connection clears.
+
+note:
+- In force on the OT links since 2026-11-15 (FB-093's OT half). The same refusal of a whole spoke at Register and Ingest needs the two-way measurement and follows FB-092.
+- The probe cannot be switched off: a cadence under 1 s, 0 included, is refused when the configuration is loaded. A clock that is not read cannot be trusted.
+
+---
+
+## Holding Your Code to It
+
+| When you … | Do this |
+|---|---|
+| stamp anything with Forge's own time | `forge.core.clock.utc_now()`; never a naive `datetime.now()` or `utcnow()` |
+| define a model with a datetime field | derive from `OneClockModel` (manufacturing entities already do, through their base) |
+| build a record from a source value | `resolve_source_stamp(...)`, then `SourceStamp.timestamp_fields()`; never fall back to "now"; refuse with `adapter.refuse(exc)` |
+| add a spoke | declare `time_governance` in the FACTS spec and on the manifest; `forge governance run` checks it |
+| add a protocol that can read a device's clock | implement `ClockReader.read_clock()` returning a `ClockSample`; feed `ClockOffsetTracker.observe(...)` with a `clock_id` and the class's tolerance; gate the link with `ClockGate` |
+| change a time field on the wire | proto fields are added, never renumbered; the FATS and FACTS specs are re-stamped for the owner (F4) |
+
+- The tests that hold this are `tests/core/test_clock_gate.py`, `test_clock_offsets.py`, `test_clock_sample.py` and `test_time_governance.py`, and `tests/modules/ot/control/test_connections.py` for the plant floor.
+
+note:
+- A refusal is a first-class outcome, not an exception to swallow: count it, name its cause, show it. That is what `refuse` and the gate do for you.
+
+---
+
+## F9 · Honest State
+
+| In force | Since |
+|---|---|
+| Every stored timestamp UTC and timezone-aware; naive rejected at the model | FB-014 (2026-10-20) |
+| The hub stamps receipt with its own clock | FB-087 (2026-10-20) |
+| The offset of every link measured, exposed and alerted | FB-089 (2026-10-20) |
+| No source time invented | FB-088 (2026-11-13) |
+| OPC UA: the clock read by probe and tap, the stamp corrected on entry, the time-quality fields, the per-tag sampling bound | FB-094 (2026-11-13) |
+| Every spoke declares how it is time-governed | FB-090 (2026-11-13) |
+| A PLC connection fails closed on its clock | FB-093, the OT links (2026-11-15) |
+
+| Missing | Backlog |
+|---|---|
+| Hub time in the contract: the four-timestamp exchange, a spoke measured both ways | FB-092, next |
+| The hub refusing a spoke outside its class at Register and Ingest | FB-093's hub half, after FB-092 |
+| Forge checking its own host's clock before it judges others | FB-119 |
+| Clock agreement as a quality dimension; the offset assumed for an offset-less source stamp | FB-091 |
+| The time fields stored at rest | FB-108 |
+| A remote spoke's refusals visible at the hub | FB-109 |
+| IT spokes reading the clock of the system they pull from | FB-120 |
+| Clock readers for Logix, S7 and Modbus; Sparkplug's one-way measurement | FB-117 |
+| PTP-aware judgement for `T1` and finer | FB-116 |
+| The time chain between hubs | FB-118, with the hub of hubs (M6) |
+| The alarm engine running in the hub; clock state on forge-display | FB-115; M4 |
+
 **Next**: landing a change.
 
 ---
 
-<!-- SECTION F9, CONTRIBUTING -->
-<!-- .slide: id="f9--contributing" -->
+<!-- SECTION F10, CONTRIBUTING -->
+<!-- .slide: id="f10--contributing" -->
 
-# F9 · Contributing
+# F10 · Contributing
 
-**Nav**: [← F8](#f8--security-identity-and-federation) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [F10 →](#f10--conclusion)
+**Nav**: [← F9](#f9--one-clock) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [F11 →](#f11--conclusion)
 
 Setting up, the workflow, the rules that bind, where each kind of change goes, how to add a spoke, and the governed memory that watches over the agents working here.
 
@@ -1439,7 +1653,7 @@ note:
 
 ---
 
-## F9 · Recap
+## F10 · Recap
 
 - `uv sync --locked`, pytest, ruff, go test; the compose stack for services.
 - One item, docs current, gitleaks, push, auto-PR, CI green, the owner merges, fast-forward sync.
@@ -1450,12 +1664,12 @@ note:
 
 ---
 
-<!-- SECTION F10, CONCLUSION -->
-<!-- .slide: id="f10--conclusion" -->
+<!-- SECTION F11, CONCLUSION -->
+<!-- .slide: id="f11--conclusion" -->
 
-# F10 · Conclusion
+# F11 · Conclusion
 
-**Nav**: [← F9](#f9--contributing) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork)
+**Nav**: [← F10](#f10--contributing) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork)
 
 The honest state against the vision, the milestones, the decision queue, what is next, and where to go from here.
 
@@ -1572,11 +1786,12 @@ This track is for the people who will run a Forge site or decide from it: operat
 | [U7 Governance for Users](#u7--governance-for-users) | what "approved" means and why nothing changes silently |
 | [U8 Screens](#u8--screens) | what you will look at, and what you look at today |
 | [U9 Identity, Roles, Credentials](#u9--identity-roles-and-credentials) | who may do what |
-| [U10 Operations](#u10--operations) | how a site is run, backed up and upgraded |
-| [U11 Where to Go Next](#u11--where-to-go-next) | documents, asking for a change, returning to the fork |
+| [U10 One Clock](#u10--one-clock) | why every timestamp must agree, how Forge keeps it so, what you see and do when a clock is wrong |
+| [U11 Operations](#u11--operations) | how a site is run, backed up and upgraded |
+| [U12 Where to Go Next](#u12--where-to-go-next) | documents, asking for a change, returning to the fork |
 
 note:
-- The dev path (F1–F10) covers the same system for engineers. Nothing here depends on it.
+- The dev path (F1–F11) covers the same system for engineers. Nothing here depends on it.
 
 ---
 
@@ -1677,7 +1892,7 @@ Forge exists so that people at every level decide from the same picture, and rec
 Where it stands: timestamps are UTC and receipt is stamped; offsets are measured and warned on; on the plant floor a tag's time is corrected to the master clock by the server's measured offset (OPC UA, since 2026-11-13), no time is ever invented, and every connected system declares how it keeps time in its contract. A plant-floor connection with a bad clock is refused since 2026-11-15 (three checks in, three out, and it says so); refusing a whole connected system on the same rule is decided (D-9, signed 2026-11-03) and follows (FB-092, FB-093).
 
 note:
-- The owner's principle of 2026-10-18; `docs/PRINCIPLES.md` §2.
+- The owner's principle of 2026-10-18; `docs/PRINCIPLES.md` §2. U10 explains why this matters to you and what you see and do when a clock is wrong.
 
 ---
 
@@ -1703,7 +1918,7 @@ What is running on a site hub, how to tell it is healthy, and the command line.
 | **RabbitMQ** and the embedded **MQTT** broker | module events and plant-floor messaging |
 | **MinIO**, **Kafka** | object store; the enterprise bus for later |
 
-Today this runs from **Docker Compose for development**; production is a Kubernetes deployment per hub, which is not built yet (U10).
+Today this runs from **Docker Compose for development**; production is a Kubernetes deployment per hub, which is not built yet (U11).
 
 note:
 - `deploy/docker/docker-compose.yml`; the hub image is built from the locked dependency set.
@@ -2040,7 +2255,7 @@ note:
 
 # U9 · Identity, Roles and Credentials
 
-**Nav**: [← U8](#u8--screens) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [U10 →](#u10--operations)
+**Nav**: [← U8](#u8--screens) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [U10 →](#u10--one-clock)
 
 Who may do what, where, and how systems get their credentials.
 
@@ -2072,11 +2287,107 @@ note:
 
 ---
 
-<!-- .slide: id="u10--operations" -->
+<!-- .slide: id="u10--one-clock" -->
 
-# U10 · Operations
+# U10 · One Clock: Why Every Timestamp Must Agree
 
-**Nav**: [← U9](#u9--identity-roles-and-credentials) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [U11 →](#u11--where-to-go-next)
+**Nav**: [← U9](#u9--identity-roles-and-credentials) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [U11 →](#u11--operations)
+
+Why Forge insists that every clock in your plant agrees, what it does about it, and what you see and do when one does not.
+
+---
+
+## Why It Matters to You
+
+Every question you ask of plant data has a "when" in it.
+
+- **What happened first?** If the PLC's clock and the MES server's clock are two seconds apart, the record can show a valve opening before anyone commanded it.
+- **What was the reading at that moment?** A lab sample, a lot transfer and a temperature only line up if all three were stamped by clocks that agree.
+- **Is this figure current?** A system whose clock runs behind makes fresh data look old; one that runs ahead makes old data look fresh.
+- **Can we stand behind the record?** A batch record or an audit trail is evidence only if its order does not depend on which machine wrote each line.
+
+Nothing breaks loudly when clocks drift apart. The screens keep working and the numbers are quietly wrong. That is why Forge treats time as a rule, not a setting.
+
+note:
+- The owner's principle of 2026-10-18: records from different sources only reconcile if their timestamps come from the same master time, and a warning is not a substitute for correction.
+
+---
+
+## How Forge Keeps One Clock
+
+```mermaid
+flowchart TD
+  R["One time reference<br/>for the whole enterprise"] --> H["Your hub<br/>the master clock for everything attached to it"]
+  H --> S["Connected systems<br/>MES, warehouse, maintenance, the plant-floor module"]
+  S --> D["Servers and PLCs<br/>clocks checked, times corrected"]
+  D -. "a clock that cannot be trusted" .-> X["cut off until it is right"]
+```
+
+| Who | Does what |
+|---|---|
+| Your network (IT and controls) | keeps every server and PLC in step with one reference, using the standard time services (NTP, or PTP where the devices support it). Forge does not set clocks. |
+| The top hub | is the master clock for everything below it; each hub looks after the clocks of what is attached to it |
+| Every connected system | states in its contract how it keeps time and how close it must be: within 10 ms on the site network, 100 ms between sites |
+| Forge, on every record | stamps arrival with the hub's own clock, in UTC, and never makes up a time for a value that arrived without one |
+| Forge, on the plant floor | checks each server's clock every 30 seconds, corrects each tag's time to master time, and keeps the original time and the correction on the record |
+| Forge, when a clock is wrong | cuts that plant-floor connection off after three checks in a row, says why, and reconnects it after three good checks |
+
+- "Cut off" means nothing is collected from that connection and nothing is written to it until its clock is right. A value with a time you cannot trust is worse than no value.
+
+note:
+- `docs/decisions/one-clock-ot-source-time.md` (signed 2026-11-03) in plain words; the site requirement and a checklist for a new site are `docs/deployment/clock-discipline.md`.
+
+---
+
+## What You See and What You Do
+
+When a plant-floor connection is cut off for its clock:
+
+- **You are told at once.** The connection shows `CLOCK_UNREADABLE` (its clock could not be read) or `CLOCK_OUT_OF_TOLERANCE` (it is too far off), with the measured difference, the limit and since when. The plant-floor module's health turns degraded and names the connection.
+- **Its values stop arriving and writes to it are refused.** Every other connection carries on.
+- **Fix the clock, not Forge.** Ask whoever looks after that server or PLC to restore its time service. Restarting the connection does not help and is refused, with the reason.
+- **It comes back by itself.** After three good checks in a row (90 seconds at the usual pace) the connection resumes and the health returns to normal.
+- An engineer can change how often a connection's clock is checked while it runs, from once a second upward. The check cannot be switched off.
+
+Where you see it today: the hub's status pages and command line (U3). On your screens when forge-display exists (U8).
+
+note:
+- Honest: an alarm in the alarm list is raised only where the alarm service is running, which the hub does not yet do by itself (FB-115); the status, the health and the log always carry the refusal.
+
+---
+
+## One Clock · Where It Stands
+
+| In place | Since |
+|---|---|
+| Every stored time is UTC; the hub stamps arrival with its own clock | 2026-10-20 |
+| Every connected clock is measured and shown; a drift raises a warning | 2026-10-20 |
+| No time is ever made up for a value | 2026-11-13 |
+| Plant-floor times corrected to master time (OPC UA) | 2026-11-13 |
+| Every connected system declares how it keeps time | 2026-11-13 |
+| A plant-floor connection with a bad clock is cut off until it is right | 2026-11-15 |
+
+| Not yet | When |
+|---|---|
+| The hub giving time to each connected system and checking it both ways | next (FB-092) |
+| Cutting off a whole connected system with a bad clock, not only a plant-floor connection | after that (FB-093) |
+| Forge checking its own server's clock before it judges the others | recorded (FB-119) |
+| Clock agreement counted in a data product's quality score | planned (FB-091) |
+| Business systems having the clock of their own server checked | recorded (FB-120) |
+| PLCs reached without OPC UA (Logix, S7, Modbus) having their clocks read | with their drivers (FB-117) |
+| The chain of clocks between sites and headquarters | with multi-site hubs (FB-118) |
+| Clock state on your screens | with forge-display |
+
+note:
+- `docs/WHERE-WE-ARE.md` §3.1 and §5 carry the current state.
+
+---
+
+<!-- .slide: id="u11--operations" -->
+
+# U11 · Operations
+
+**Nav**: [← U10](#u10--one-clock) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [U12 →](#u12--where-to-go-next)
 
 How a site is run, upgraded and, in time, backed up.
 
@@ -2100,11 +2411,11 @@ note:
 
 ---
 
-<!-- .slide: id="u11--where-to-go-next" -->
+<!-- .slide: id="u12--where-to-go-next" -->
 
-# U11 · Where to Go Next
+# U12 · Where to Go Next
 
-**Nav**: [← U10](#u10--operations) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork)
+**Nav**: [← U11](#u11--operations) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork)
 
 | If you want to… | Open |
 |---|---|
