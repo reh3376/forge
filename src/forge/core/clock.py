@@ -116,6 +116,36 @@ def clock_tolerance_seconds() -> float:
     return value
 
 
+#: One-clock record P-8: the tolerance of each link class, in seconds. T1, T0, it-lan,
+#: it-wan and edge-mqtt are the values the owner approved (Q-1, 2026-11-03). T2 to T5 are
+#: IEC 61850-5's own figures for the finer classes the record leaves to devices that
+#: report PTP synchronisation; a round-trip probe cannot resolve them, so such a device is
+#: judged by its own synchronisation report when its reader exists (P-5).
+TOLERANCE_CLASS_SECONDS: dict[str, float] = {
+    "T0": 0.010,
+    "T1": 0.001,
+    "T2": 0.0001,
+    "T3": 0.000025,
+    "T4": 0.000004,
+    "T5": 0.000001,
+    "it-lan": 0.010,
+    "it-wan": 0.100,
+    "edge-mqtt": 0.500,
+}
+
+
+def tolerance_for_class(tolerance_class: str) -> float:
+    """The tolerance in seconds of a declared link class (one-clock record P-8)."""
+    try:
+        return TOLERANCE_CLASS_SECONDS[tolerance_class]
+    except KeyError:
+        msg = (
+            f"unknown tolerance class {tolerance_class!r}; the one-clock record's classes "
+            f"are {sorted(TOLERANCE_CLASS_SECONDS)}"
+        )
+        raise ValueError(msg) from None
+
+
 @dataclass(frozen=True)
 class ClockSample:
     """One reading of a remote clock against Forge's own, NTP style (one-clock record P-2).
@@ -288,7 +318,8 @@ class ClockOffsetTracker:
     a sample outside tolerance counts on ``forge.clock.out_of_tolerance``, logs a
     warning when the pair enters breach (and an info line when it recovers) and
     calls ``on_breach``. Measuring and alerting is this class's whole job;
-    refusing the party is FB-093, once D-9 fixes the tolerances.
+    refusing the party is :class:`ClockGate` (FB-093), on the tolerance of the link's
+    declared class (D-9, P-8).
 
     A series is keyed by adapter, link and the clock measured (``clock_id``, FB-094
     step 2): a record's stamps feed the unnamed per-link series (``stats``); a probe
@@ -320,11 +351,14 @@ class ClockOffsetTracker:
         *,
         round_trip: float | None = None,
         clock_id: str | None = None,
+        tolerance_seconds: float | None = None,
     ) -> ClockOffsetStats:
         """Record one offset sample (``measured clock - governing clock``, seconds).
 
         ``clock_id`` names the clock a probe or tap read (``server:WHK01``); a sample
         derived from a record's stamps leaves it None and feeds the per-link series.
+        ``tolerance_seconds`` is the tolerance of the link's declared class (one-clock
+        record P-8, FB-093); a series measured without one keeps the tracker's own.
         """
         from forge.core import telemetry
 
@@ -332,8 +366,10 @@ class ClockOffsetTracker:
         window = self._windows.get(key)
         if window is None:
             window = self._windows[key] = _OffsetWindow(
-                link, self.window, self.tolerance_seconds, clock_id
+                link, self.window, tolerance_seconds or self.tolerance_seconds, clock_id
             )
+        elif tolerance_seconds is not None:
+            window.tolerance = tolerance_seconds
         was_breached = window.breached
         stats = window.observe(seconds, at, round_trip)
         telemetry.record_clock_offset(adapter_id, link, seconds, clock_id=clock_id)
@@ -346,7 +382,7 @@ class ClockOffsetTracker:
                     adapter_id,
                     clock_id or link,
                     seconds,
-                    self.tolerance_seconds,
+                    window.tolerance,
                 )
                 if self._on_breach is not None:
                     self._on_breach(adapter_id, stats)
@@ -419,6 +455,161 @@ class ClockOffsetTracker:
                 for aid in self.adapters()
                 if (clocks := self.clocks(aid))
             },
+        }
+
+
+# ---------------------------------------------------------------------------
+# Fail closed on a clock (one clock, FB-093; D-9 step 5)
+# ---------------------------------------------------------------------------
+
+#: One-clock record P-5 (owner, Q-4): three consecutive probes in, three out.
+FAIL_CLOSED_PROBES = 3
+#: The states of a gated clock. ``OK`` delivers; in the other two the party behind the
+#: clock delivers nothing (P-5). The lower-case form of a refused state is the cause it
+#: is counted under on ``AdapterHealth.refusals``.
+CLOCK_OK = "OK"
+CLOCK_UNREADABLE = "CLOCK_UNREADABLE"
+CLOCK_OUT_OF_TOLERANCE = "CLOCK_OUT_OF_TOLERANCE"
+CLOCK_REFUSED_STATES: tuple[str, ...] = (CLOCK_UNREADABLE, CLOCK_OUT_OF_TOLERANCE)
+
+
+class ClockRefusedError(ValueError):
+    """A party is refused because its clock cannot be trusted (one-clock record P-5).
+
+    ``cause`` is the refusal's key on ``AdapterHealth.refusals``: ``clock_unreadable`` or
+    ``clock_out_of_tolerance``. The message names the clock, what was measured and the
+    tolerance class it was held to; a refusal is never silent (owner, 2026-11-03).
+    """
+
+    def __init__(self, message: str, *, cause: str) -> None:
+        super().__init__(message)
+        self.cause = cause
+
+
+@dataclass(frozen=True)
+class ClockGateTransition:
+    """One change of a gated clock's state: refused, refused for another cause, or cleared."""
+
+    clock_id: str
+    previous: str
+    state: str
+    cause: str
+    at: datetime
+
+    @property
+    def refused(self) -> bool:
+        return self.state in CLOCK_REFUSED_STATES
+
+    @property
+    def refusal_cause(self) -> str:
+        """The key this refusal is counted under (``clock_unreadable``, ...)."""
+        return self.state.lower()
+
+
+class ClockGate:
+    """Fail closed on one clock: three consecutive bad probes in, three good ones out.
+
+    One-clock record P-5, approved by the owner (Q-4, 2026-11-03). A probe is *unreadable*
+    (the clock gave no value), *out of tolerance* (its offset exceeds the tolerance of the
+    link's declared class, P-8) or *good*. Three consecutive unreadable probes enter
+    ``CLOCK_UNREADABLE``, three consecutive out-of-tolerance probes enter
+    ``CLOCK_OUT_OF_TOLERANCE``, and three consecutive good probes clear either state.
+    The gate only decides; whoever owns the link stops it, raises the alarm and shows
+    the cause (``observe`` returns the transition to act on).
+    """
+
+    def __init__(
+        self,
+        clock_id: str,
+        *,
+        tolerance_class: str,
+        tolerance_seconds: float | None = None,
+        threshold: int = FAIL_CLOSED_PROBES,
+    ) -> None:
+        self.clock_id = clock_id
+        self.tolerance_class = tolerance_class
+        self.tolerance_seconds = (
+            tolerance_seconds
+            if tolerance_seconds is not None
+            else tolerance_for_class(tolerance_class)
+        )
+        self.threshold = threshold
+        self.state = CLOCK_OK
+        self.cause: str | None = None
+        self.since: datetime | None = None
+        self.entries = 0
+        self.last_offset_seconds: float | None = None
+        self._unreadable = 0
+        self._out_of_tolerance = 0
+        self._good = 0
+
+    @property
+    def refused(self) -> bool:
+        return self.state in CLOCK_REFUSED_STATES
+
+    def observe(
+        self, offset_seconds: float | None, at: datetime, *, detail: str = ""
+    ) -> ClockGateTransition | None:
+        """Judge one probe; returns the transition when the state changed, else None.
+
+        ``offset_seconds`` is the probe's measured offset, or None when the clock could
+        not be read (``detail`` says why: no value, the probe failed, the probe is off).
+        """
+        self.last_offset_seconds = offset_seconds
+        if offset_seconds is None:
+            self._unreadable += 1
+            self._out_of_tolerance = self._good = 0
+            if self._unreadable >= self.threshold and self.state != CLOCK_UNREADABLE:
+                cause = (
+                    f"clock {self.clock_id} could not be read for {self._unreadable} "
+                    f"consecutive probes" + (f" ({detail})" if detail else "")
+                )
+                return self._enter(CLOCK_UNREADABLE, cause, at)
+            return None
+        if abs(offset_seconds) > self.tolerance_seconds:
+            self._out_of_tolerance += 1
+            self._unreadable = self._good = 0
+            if self._out_of_tolerance >= self.threshold and self.state != CLOCK_OUT_OF_TOLERANCE:
+                cause = (
+                    f"clock {self.clock_id} is {offset_seconds:+.6f} s from Forge's clock "
+                    f"after {self._out_of_tolerance} consecutive probes; tolerance class "
+                    f"{self.tolerance_class} allows {self.tolerance_seconds:g} s"
+                )
+                return self._enter(CLOCK_OUT_OF_TOLERANCE, cause, at)
+            return None
+        self._good += 1
+        self._unreadable = self._out_of_tolerance = 0
+        if self.refused and self._good >= self.threshold:
+            previous, self.state = self.state, CLOCK_OK
+            self.cause, self.since = None, None
+            cause = (
+                f"clock {self.clock_id} is back inside tolerance class {self.tolerance_class} "
+                f"({offset_seconds:+.6f} s) after {self._good} consecutive good probes"
+            )
+            return ClockGateTransition(self.clock_id, previous, CLOCK_OK, cause, at)
+        return None
+
+    def _enter(self, state: str, cause: str, at: datetime) -> ClockGateTransition:
+        previous, self.state = self.state, state
+        self.cause = cause
+        if previous == CLOCK_OK:
+            self.since = at
+            self.entries += 1
+        return ClockGateTransition(self.clock_id, previous, state, cause, at)
+
+    def describe(self) -> dict[str, Any]:
+        return {
+            "state": self.state,
+            "cause": self.cause,
+            "since": self.since.isoformat() if self.since is not None else None,
+            "tolerance_class": self.tolerance_class,
+            "tolerance_seconds": self.tolerance_seconds,
+            "threshold_probes": self.threshold,
+            "consecutive_unreadable": self._unreadable,
+            "consecutive_out_of_tolerance": self._out_of_tolerance,
+            "consecutive_good": self._good,
+            "last_offset_seconds": self.last_offset_seconds,
+            "entries": self.entries,
         }
 
 

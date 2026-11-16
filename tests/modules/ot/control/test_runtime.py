@@ -692,6 +692,112 @@ async def test_connections_are_composed_started_and_served_over_rest() -> None:
     assert client.state is UaConnectionState.DISCONNECTED and not rt.connections.started
 
 
+class FakeAlarmEngine:
+    """The two calls the runtime makes on an ``AlarmEngine`` for a clock refusal."""
+
+    def __init__(self) -> None:
+        self.raised: list[dict[str, Any]] = []
+        self.cleared: list[str] = []
+
+    async def trigger_alarm(self, **kw: Any) -> str:
+        self.raised.append(kw)
+        return f"alarm-{len(self.raised)}"
+
+    async def clear_alarm(self, alarm_id: str) -> bool:
+        self.cleared.append(alarm_id)
+        return True
+
+
+async def test_a_refused_clock_raises_the_alarm_refuses_writes_and_is_not_restarted() -> None:
+    """FB-093 end to end in the runtime: the alarm, the write path and the REST answers."""
+    registry = TagRegistry()
+    await registry.register(
+        StandardTag(
+            path=SP, data_type=UaDataType.FLOAT, opcua_node_id=SP_NODE, connection_name="WHK01"
+        )
+    )
+    await registry.register(
+        StandardTag(
+            path=CIP_STATE,
+            data_type=UaDataType.STRING,
+            opcua_node_id="ns=2;s=Cooker01.CIP.State",
+            connection_name="WHK01",
+        )
+    )
+    clients: dict[str, FakeUaClient] = {}
+
+    def factory(spec):
+        clients[spec.name] = FakeUaClient(spec)
+        return clients[spec.name]
+
+    clock = Clock()
+    alarms = FakeAlarmEngine()
+    doc = document(mqtt={"mode": "none"}, areas=False)
+    doc["connections"] = [
+        {"name": "WHK01", "endpoint": "opc.tcp://10.0.0.1:4840", "clock_probe_interval_seconds": 5}
+    ]
+    doc["connection_poll_seconds"] = 0
+    rt = ControlRuntime(
+        parse_control_config(doc),
+        ControlDependencies(
+            write_dispatcher=FakeMes(),
+            plc_client_factory=factory,
+            now=clock.now,
+            alarm_engine=alarms,
+        ),
+        registry=registry,
+    )
+    assert rt.connections is not None
+    await rt.start()
+    client = clients["WHK01"]
+
+    # the fake server answers CurrentTime without a value: three probes refuse the connection
+    for _ in range(3):
+        await rt.connections.check()
+        await clock.sleep(5)
+    conn = rt.status()["connections"]["connections"]["WHK01"]
+    assert conn["clock_state"] == "CLOCK_UNREADABLE" and conn["connected"] is False
+    assert rt.status()["connections"]["clock_refused"] == ["WHK01"]
+    # the alarm is raised at entry, HIGH, with the cause
+    assert len(alarms.raised) == 1 and alarms.cleared == []
+    assert alarms.raised[0]["name"] == "CLOCK_UNREADABLE WHK01"
+    assert alarms.raised[0]["priority"] == "HIGH"
+    assert "could not be read for 3 consecutive probes" in alarms.raised[0]["description"]
+
+    # a control write to the refused connection does not reach the PLC
+    result = await rt.engine.execute(
+        WriteRequest(tag_path=SP, value=150.0, requestor="test", role=WriteRole.ENGINEER)
+    )
+    assert result.status is not WriteStatus.CONFIRMED and SP_NODE not in client.values
+    assert "refused for its clock" in (
+        result.write_error + result.interlock_error + result.readback_error
+    )
+
+    app = FastAPI()
+    app.include_router(create_control_router(rt))
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://ot") as c:
+        r = await c.get("/api/v1/ot/control/connections")
+        assert r.json()["connections"]["WHK01"]["clock_state"] == "CLOCK_UNREADABLE"
+        assert "could not be read" in r.json()["connections"]["WHK01"]["clock_gate"]["cause"]
+        # an operator restart is refused with the cause, not silently ignored
+        r = await c.post("/api/v1/ot/control/connections/WHK01/restart")
+        assert r.status_code == 409 and "is not restarted" in r.json()["detail"]
+
+    # the clock comes back in step: three good probes clear the alarm and resume the connection
+    for _ in range(3):
+        client.values["i=2258"] = clock.t + timedelta(milliseconds=2)
+        await rt.connections.check()
+        await clock.sleep(5)
+    conn = rt.status()["connections"]["connections"]["WHK01"]
+    assert conn["clock_state"] == "OK" and conn["connected"] is True
+    assert alarms.cleared == ["alarm-1"] and len(alarms.raised) == 1
+    result = await rt.engine.execute(
+        WriteRequest(tag_path=SP, value=151.0, requestor="test", role=WriteRole.ENGINEER)
+    )
+    assert result.status is WriteStatus.CONFIRMED and client.values[SP_NODE] == 151.0
+    await rt.stop()
+
+
 async def test_connections_need_a_registry_and_absent_connections_report_empty() -> None:
     doc = document(mqtt={"mode": "none"}, areas=False)
     doc["connections"] = [{"name": "WHK01", "endpoint": "opc.tcp://10.0.0.1:4840"}]
