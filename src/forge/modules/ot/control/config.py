@@ -40,6 +40,7 @@ from typing import Any, Literal
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from forge.core.models.adapter import ToleranceClass
 from forge.modules.ot.control.changeover_orchestrator import (
     OT_ADAPTER_ID,
     AreaChangeoverConfig,
@@ -118,14 +119,20 @@ class PlcConnectionSpec(BaseModel):
     #: Clock probe cadence (one-clock record P-2): the supervisor reads the server's clock
     #: this often; the FB-070 liveness check and the FB-089 offset measurement ride on the
     #: same read. 30 s default; the operator adjusts the value in force at runtime, without
-    #: a restart (``PlcConnectionManager.set_clock_probe_interval``, minimum 1 s). 0
-    #: disables the probe, which FB-093 will refuse: a clock that is not read cannot be
-    #: trusted. ``liveness_interval_seconds`` is the field's older name and still accepted.
+    #: a restart (``PlcConnectionManager.set_clock_probe_interval``, minimum 1 s). The
+    #: probe cannot be switched off (FB-093): a clock that is not read cannot be trusted,
+    #: so a value under 1 s, 0 included, is refused when the configuration is loaded.
+    #: ``liveness_interval_seconds`` is the field's older name and still accepted.
     clock_probe_interval_seconds: float = Field(
         default=30.0,
-        ge=0,
+        ge=1,
         validation_alias=AliasChoices("clock_probe_interval_seconds", "liveness_interval_seconds"),
     )
+    #: The tolerance class this link is held to (one-clock record P-8): the probe's offset
+    #: against it decides ``CLOCK_OUT_OF_TOLERANCE`` (FB-093). None takes the class the
+    #: module's FACTS ``time_governance`` section declares for the connection, else its
+    #: default (T0: polled values from NTP-synced devices and servers).
+    tolerance_class: ToleranceClass | None = None
     #: Which clock stamps this connection's values (one-clock record P-4): ``device`` for
     #: a PLC-embedded server, ``server`` for a host that stamps at poll (Kepware, Ignition,
     #: Linx). None is undeclared: a value without a source stamp is refused (FB-088). The

@@ -29,6 +29,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from forge.core.broker.broker import BrokerConfig, ForgeMqttBroker
+from forge.core.clock import ClockRefusedError
 from forge.modules.ot.control.audit import (
     ContextualRecordAuditSink,
     LogAuditSink,
@@ -56,6 +57,8 @@ if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Mapping
     from datetime import datetime
 
+    from forge.core.clock import ClockGateTransition
+    from forge.core.models.adapter import TimeGovernance
     from forge.modules.ot.control.config import OTControlConfig
     from forge.modules.ot.tag_engine.registry import TagRegistry
 
@@ -78,6 +81,11 @@ class RegistryTagIO:
             ``get_provider(connection_name)`` when ``providers`` has no entry.
         live_reads: Read Standard tags from the PLC (``read_current``) instead
             of the registry's last value.
+        refusal_for: ``refusal_for(connection_name)`` → why the connection is refused
+            for its clock, or None (``PlcConnectionManager.clock_refusal_cause``). A
+            refused connection is neither read nor written (FB-093): its last value
+            is stale and its clock cannot be trusted, so both raise
+            :class:`~forge.core.clock.ClockRefusedError` with the cause.
     """
 
     def __init__(
@@ -87,11 +95,25 @@ class RegistryTagIO:
         providers: Mapping[str, Any] | None = None,
         acquisition: Any | None = None,
         live_reads: bool = True,
+        refusal_for: Callable[[str], str | None] | None = None,
     ) -> None:
         self._registry = registry
         self._providers: dict[str, Any] = dict(providers or {})
         self._acquisition = acquisition
         self._live_reads = live_reads
+        self._refusal_for = refusal_for
+
+    def _refuse_if_clock_refused(self, tag: Any, tag_path: str, action: str) -> None:
+        name = getattr(tag, "connection_name", None)
+        if not name or self._refusal_for is None:
+            return
+        cause = self._refusal_for(name)
+        if cause:
+            msg = (
+                f"{action} of {tag_path} refused: connection '{name}' is refused for its "
+                f"clock: {cause}"
+            )
+            raise ClockRefusedError(msg, cause="clock_refused")
 
     def add_provider(self, connection_name: str, provider: Any) -> None:
         self._providers[connection_name] = provider
@@ -110,6 +132,8 @@ class RegistryTagIO:
         if tag is None:
             msg = f"unknown tag '{tag_path}'"
             raise LookupError(msg)
+        if isinstance(tag, StandardTag):
+            self._refuse_if_clock_refused(tag, tag_path, "read")
         if self._live_reads and isinstance(tag, StandardTag):
             provider = self._provider_for(tag)
             if provider is not None:
@@ -128,6 +152,7 @@ class RegistryTagIO:
             await self._registry.update_value(tag_path, value, QualityCode.GOOD)
             return
         if isinstance(tag, StandardTag):
+            self._refuse_if_clock_refused(tag, tag_path, "write")
             provider = self._provider_for(tag)
             if provider is None:
                 msg = f"no OPC-UA provider for connection '{tag.connection_name}' ({tag_path})"
@@ -172,6 +197,11 @@ class ControlDependencies:
     ingress_factory: Callable[..., Any] | None = None
     #: Test hook for the external-mode publisher: ``factory(MqttConfig)`` → client.
     mqtt_client_factory: Callable[..., Any] | None = None
+    #: An ``AlarmEngine`` (``trigger_alarm`` / ``clear_alarm``). When given, a connection
+    #: refused for its clock raises a HIGH communication alarm there and clears it on
+    #: recovery (FB-093); without one the refusal is still on the status, the adapter's
+    #: health, the API, the CLI, the log and the ``forge.ingest.refused`` metric.
+    alarm_engine: Any | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -188,6 +218,7 @@ class ControlRuntime:
         deps: ControlDependencies,
         *,
         registry: TagRegistry | None = None,
+        time_governance: TimeGovernance | None = None,
     ) -> None:
         if deps.tag_io is None and registry is None:
             msg = "ControlRuntime needs either deps.tag_io or a TagRegistry"
@@ -213,12 +244,23 @@ class ControlRuntime:
                 provider_factory=deps.plc_provider_factory,
                 poll_interval=config.connection_poll_seconds,
                 now=deps.now,
+                time_governance=time_governance,
             )
+        #: connection name -> the alarm raised for its clock refusal (FB-093).
+        self._clock_alarms: dict[str, str] = {}
+        if self.connections is not None and deps.alarm_engine is not None:
+            self.connections.add_clock_listener(self._on_clock_state)
         acquisition = self.connections.engine if self.connections is not None else deps.acquisition
         self.tag_io = (
             deps.tag_io
             if deps.tag_io is not None
-            else RegistryTagIO(registry, acquisition=acquisition)  # type: ignore[arg-type]
+            else RegistryTagIO(
+                registry,  # type: ignore[arg-type]
+                acquisition=acquisition,
+                refusal_for=(
+                    self.connections.clock_refusal_cause if self.connections is not None else None
+                ),
+            )
         )
 
         # Layers 1-3 + the engine.
@@ -414,6 +456,24 @@ class ControlRuntime:
             await self.connections.stop()
 
     # -- feeding and publishing -----------------------------------------------
+
+    async def _on_clock_state(self, name: str, transition: ClockGateTransition) -> None:
+        """Raise, replace or clear the alarm of a connection's clock refusal (FB-093)."""
+        from forge.modules.ot.alarming.models import AlarmType
+
+        engine = self._deps.alarm_engine
+        if engine is None:
+            return
+        previous = self._clock_alarms.pop(name, None)
+        if previous is not None:
+            await engine.clear_alarm(previous)
+        if transition.refused:
+            self._clock_alarms[name] = await engine.trigger_alarm(
+                name=f"{transition.state} {name}",
+                priority="HIGH",
+                description=transition.cause,
+                alarm_type=AlarmType.COMMUNICATION,
+            )
 
     def _publish_target(self) -> Any | None:
         if self._deps.publisher is not None:

@@ -46,6 +46,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from forge.core.clock import ClockRefusedError
 from forge.gateway.models import ForgeUser, Role
 from forge.gateway.rbac import require_scope
 from forge.modules.ot.control.changeover_orchestrator import ChangeoverSequenceError
@@ -263,6 +264,9 @@ def create_control_router(runtime: RuntimeSource, *, prefix: str = "/api/v1/ot")
             return await current.connections.restart(name, requested_by=user.user_id)
         except KeyError as exc:
             raise HTTPException(404, str(exc.args[0] if exc.args else exc)) from None
+        except ClockRefusedError as exc:
+            # refused for its clock (FB-093): not restarted, and the answer says why
+            raise HTTPException(409, str(exc)) from None
 
     @router.post("/control/connections/{name}/clock-probe-interval")
     async def set_clock_probe_interval(

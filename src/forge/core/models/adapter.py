@@ -125,6 +125,13 @@ class TimeGovernance(BaseModel):
                 return entry.source_timestamp_origin
         return self.source_timestamp_origin
 
+    def tolerance_class_for(self, connection: str | None) -> str:
+        """The tolerance class ``connection`` is held to (its own entry, else the default)."""
+        for entry in self.connections:
+            if connection and entry.name == connection and entry.tolerance_class:
+                return entry.tolerance_class
+        return self.tolerance_class
+
 
 class AdapterManifest(BaseModel):
     """Declares an adapter's identity, capabilities, and data contract.

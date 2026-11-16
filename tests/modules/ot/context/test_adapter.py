@@ -5,6 +5,13 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from forge.core.clock import (
+    CLOCK_OK,
+    CLOCK_OUT_OF_TOLERANCE,
+    CLOCK_UNREADABLE,
+    ClockGateTransition,
+    SourceStampMissingError,
+)
 from forge.core.models.adapter import AdapterState
 from forge.core.models.contextual_record import ContextualRecord
 from forge.modules.ot.adapter import OTModuleAdapter
@@ -139,6 +146,80 @@ class TestCollect:
         async for _ in adapter.collect():
             pass
         assert adapter._records_collected == 1
+
+
+# ---------------------------------------------------------------------------
+# Fail closed on a connection's clock (FB-093)
+# ---------------------------------------------------------------------------
+
+
+def _transition(previous: str, state: str, cause: str) -> ClockGateTransition:
+    return ClockGateTransition("server:WHK01", previous, state, cause, datetime.now(tz=UTC))
+
+
+class TestClockRefusal:
+    @pytest.mark.asyncio
+    async def test_a_refused_clock_is_on_the_health_and_stops_collection(self, adapter):
+        await adapter.configure({})
+        await adapter.start()
+        cause = "clock server:WHK01 could not be read for 3 consecutive probes"
+        adapter._on_clock_state("WHK01", _transition(CLOCK_OK, CLOCK_UNREADABLE, cause))
+
+        health = await adapter.health()
+        assert health.state == AdapterState.DEGRADED
+        assert health.refusals == {"clock_unreadable": 1}
+        assert health.last_refusal == f"connection 'WHK01': {cause}"
+        assert health.error_message == health.last_refusal  # the cause travels on the wire
+
+        # the refused connection delivers nothing, its last values included
+        assert [record async for record in adapter.collect()] == []
+
+        # the cause changes while refused: counted under its own cause, still one standing
+        other = "clock server:WHK01 is +0.250000 s from Forge's clock after 3 consecutive probes"
+        adapter._on_clock_state(
+            "WHK01", _transition(CLOCK_UNREADABLE, CLOCK_OUT_OF_TOLERANCE, other)
+        )
+        health = await adapter.health()
+        assert health.refusals == {"clock_unreadable": 1, "clock_out_of_tolerance": 1}
+        assert health.last_refusal == f"connection 'WHK01': {other}"
+
+        # three good probes cleared it: healthy again, collecting again, the count kept
+        adapter._on_clock_state("WHK01", _transition(CLOCK_OUT_OF_TOLERANCE, CLOCK_OK, "back"))
+        health = await adapter.health()
+        assert health.state == AdapterState.HEALTHY
+        assert health.last_refusal is None and health.error_message is None
+        assert health.refusals == {"clock_unreadable": 1, "clock_out_of_tolerance": 1}
+        assert len([record async for record in adapter.collect()]) == 1
+
+    @pytest.mark.asyncio
+    async def test_recovery_waits_for_every_refused_connection(self, adapter):
+        await adapter.configure({})
+        await adapter.start()
+        adapter._on_clock_state("WHK01", _transition(CLOCK_OK, CLOCK_UNREADABLE, "one"))
+        adapter._on_clock_state("WHK02", _transition(CLOCK_OK, CLOCK_UNREADABLE, "two"))
+        adapter._on_clock_state("WHK02", _transition(CLOCK_UNREADABLE, CLOCK_OK, "back"))
+        health = await adapter.health()
+        # WHK01 is still refused: degraded, and the health names the refusal that stands
+        assert health.state == AdapterState.DEGRADED
+        assert health.last_refusal == "connection 'WHK01': one"
+        adapter._on_clock_state("WHK01", _transition(CLOCK_UNREADABLE, CLOCK_OK, "back"))
+        assert (await adapter.health()).state == AdapterState.HEALTHY
+
+    @pytest.mark.asyncio
+    async def test_a_cleared_clock_does_not_hide_another_refusal(self, adapter):
+        await adapter.configure({})
+        await adapter.start()
+        adapter._on_clock_state("WHK01", _transition(CLOCK_OK, CLOCK_UNREADABLE, "one"))
+        # a value without a source stamp is refused meanwhile (FB-088): that refusal stands
+        adapter.refuse(
+            SourceStampMissingError(
+                adapter_id="forge-ot-module", connection="WHK01", tag_path="WH/WHK01/x"
+            )
+        )
+        adapter._on_clock_state("WHK01", _transition(CLOCK_UNREADABLE, CLOCK_OK, "back"))
+        health = await adapter.health()
+        assert health.state == AdapterState.DEGRADED
+        assert health.last_refusal is not None and "source" in health.last_refusal
 
 
 # ---------------------------------------------------------------------------

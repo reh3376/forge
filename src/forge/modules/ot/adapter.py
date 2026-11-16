@@ -36,7 +36,11 @@ from forge.adapters.base.interface import (
     SubscriptionProvider,
     WritableAdapter,
 )
-from forge.core.clock import SOURCE_TIMESTAMP_ORIGINS, SourceStampMissingError
+from forge.core.clock import (
+    SOURCE_TIMESTAMP_ORIGINS,
+    ClockRefusedError,
+    SourceStampMissingError,
+)
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -56,7 +60,7 @@ from forge.modules.ot.control.runtime import ControlDependencies, ControlRuntime
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Callable
 
-    from forge.core.clock import ClockEstimate
+    from forge.core.clock import ClockEstimate, ClockGateTransition
     from forge.core.models.contextual_record import ContextualRecord
     from forge.modules.ot.tag_engine.models import BaseTag
     from forge.modules.ot.tag_engine.registry import TagRegistry
@@ -151,6 +155,8 @@ class OTModuleAdapter(
         # connection name -> declared source_timestamp_origin ("*" applies to every
         # connection); the FACTS time_governance section takes this over with FB-090.
         self._source_timestamp_origins: dict[str, str] = {}
+        # connection name -> the refusal standing on it for its clock (FB-093).
+        self._clock_refused: dict[str, str] = {}
 
     @property
     def control_runtime(self) -> ControlRuntime | None:
@@ -209,7 +215,15 @@ class OTModuleAdapter(
             if self._control is not None and self._control.started:
                 await self._control.stop()
             config = parse_control_config(document) if document else load_control_config(path)
-            self._control = ControlRuntime(config, self._control_deps, registry=self._registry)
+            self._control = ControlRuntime(
+                config,
+                self._control_deps,
+                registry=self._registry,
+                time_governance=self.manifest.time_governance,
+            )
+            self._clock_refused.clear()
+            if self._control.connections is not None:
+                self._control.connections.add_clock_listener(self._on_clock_state)
             logger.info("OT control runtime composed: %s", config.describe())
 
     async def start(self) -> None:
@@ -262,6 +276,31 @@ class OTModuleAdapter(
             **self.refusal_health(),
         )
 
+    def _on_clock_state(self, name: str, transition: ClockGateTransition) -> None:
+        """A PLC connection's clock was refused or cleared (FB-093, one-clock record P-5).
+
+        A refusal is never silent: it is counted under its cause on ``refusals``, named
+        on ``last_refusal`` and ``error_message``, turns the adapter DEGRADED and counts
+        on the ``forge.ingest.refused`` metric (:meth:`refuse`). The probe-based recovery
+        is here: when the last refused connection clears and no other refusal stands,
+        the adapter is HEALTHY again.
+        """
+        if transition.refused:
+            message = f"connection '{name}': {transition.cause}"
+            self._clock_refused[name] = message
+            self.refuse(ClockRefusedError(message, cause=transition.refusal_cause))
+            return
+        cleared = self._clock_refused.pop(name, None)
+        if cleared is None or self._last_refusal != cleared:
+            return  # another refusal is the one the health names; it stands
+        if self._clock_refused:
+            self._last_refusal = next(reversed(self._clock_refused.values()))
+            return
+        self._last_refusal = None
+        if self._state == AdapterState.DEGRADED:
+            self._state = AdapterState.HEALTHY
+            logger.info("%s: clock refusal on '%s' cleared; healthy again", self.adapter_id, name)
+
     def source_timestamp_origin_for(self, tag: BaseTag) -> str | None:
         """The origin declared for the tag's connection, or None (FB-088).
 
@@ -312,6 +351,10 @@ class OTModuleAdapter(
             tag = await self._registry.get_definition(path)
             tag_value = await self._registry.get_value(path)
             if tag is None or tag_value is None:
+                continue
+            if getattr(tag, "connection_name", None) in self._clock_refused:
+                # The connection is refused for its clock (FB-093): it delivers nothing,
+                # its last values included. The refusal itself is on the health.
                 continue
 
             try:
