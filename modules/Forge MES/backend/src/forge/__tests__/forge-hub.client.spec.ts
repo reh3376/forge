@@ -4,9 +4,18 @@
  */
 import * as grpc from "@grpc/grpc-js";
 import { mapDomainEventToRecord } from "../contextual-record.mapper";
-import { ForgeHubClient } from "../forge-hub.client";
+import {
+  computeExchange,
+  ForgeHubClient,
+  SPOKE_TRANSMIT_TIME_HEADER,
+} from "../forge-hub.client";
 import { toProtoManifest } from "../forge-manifest";
-import { getAdapterService, toTimestamp } from "../proto";
+import {
+  getAdapterService,
+  msToTimestamp,
+  timestampToMs,
+  toTimestamp,
+} from "../proto";
 
 interface Seen {
   manifest?: Record<string, unknown>;
@@ -177,3 +186,141 @@ describe("ForgeHubClient against an in-process AdapterService", () => {
     dead.close();
   });
 });
+
+// ---------------------------------------------------------------------------
+// The hub <-> spoke time exchange (one clock, FB-092)
+// ---------------------------------------------------------------------------
+
+describe("the time exchange with the hub", () => {
+  it("computes offset and round trip by RFC 5905", () => {
+    // the spoke's clock runs 2 s behind the hub's; 4 ms each way; the hub took 250 ms
+    const ex = computeExchange(1_000_000, 1_002_004, 1_002_254, 1_000_258);
+    expect(ex.offsetSeconds).toBeCloseTo(2.0, 6); // hub minus spoke
+    expect(ex.roundTripSeconds).toBeCloseTo(0.008, 6); // the hub's 250 ms drop out
+  });
+
+  it("keeps sub-millisecond time across the Timestamp helpers", () => {
+    const ts = msToTimestamp(1_750_000_000_123.25);
+    expect(ts).toEqual({ seconds: "1750000000", nanos: 123_250_000 });
+    expect(timestampToMs(ts)).toBeCloseTo(1_750_000_000_123.25, 3);
+    expect(timestampToMs(undefined)).toBeUndefined();
+  });
+
+  describe("against an in-process hub that answers with T2 and T3", () => {
+    const HUB_AHEAD_MS = 2_000; // the hub's clock is 2 s ahead of this spoke's
+    let server: grpc.Server;
+    let client: ForgeHubClient;
+    let spokeNow = 1_750_000_000_000;
+    const seen: {
+      register?: any;
+      health: any[];
+      ingestHeader?: string;
+      ingested: any[];
+    } = { health: [], ingested: [] };
+    // every read of either clock moves true time on by 1 ms
+    const tick = () => (spokeNow += 1);
+    const hubTime = () => {
+      const t2 = tick() + HUB_AHEAD_MS;
+      const t3 = tick() + HUB_AHEAD_MS;
+      return { receive_time: msToTimestamp(t2), transmit_time: msToTimestamp(t3) };
+    };
+
+    beforeAll(async () => {
+      const Service = getAdapterService();
+      server = new grpc.Server();
+      server.addService(Service.service, {
+        Register: (call: grpc.ServerUnaryCall<any, any>, cb: grpc.sendUnaryData<any>) => {
+          seen.register = call.request.spoke_time;
+          cb(null, { accepted: true, message: "ok", session_id: "s1", hub_time: hubTime() });
+        },
+        Health: (call: grpc.ServerUnaryCall<any, any>, cb: grpc.sendUnaryData<any>) => {
+          seen.health.push(call.request.spoke_time);
+          cb(null, {
+            adapter_id: call.request.adapter_id,
+            state: "ADAPTER_STATE_HEALTHY",
+            hub_time: hubTime(),
+          });
+        },
+        Ingest: (call: grpc.ServerReadableStream<any, any>, cb: grpc.sendUnaryData<any>) => {
+          seen.ingestHeader = String(call.metadata.get(SPOKE_TRANSMIT_TIME_HEADER)[0]);
+          call.on("data", (record) => seen.ingested.push(record));
+          call.on("end", () =>
+            cb(null, { records_received: "1", success: true, message: "OK", hub_time: hubTime() })
+          );
+        },
+      });
+      const port = await new Promise<number>((resolve, reject) => {
+        server.bindAsync("127.0.0.1:0", grpc.ServerCredentials.createInsecure(), (err, p) =>
+          err ? reject(err) : resolve(p)
+        );
+      });
+      client = new ForgeHubClient({ url: `127.0.0.1:${port}`, rpcTimeoutMs: 5000, now: tick });
+    });
+
+    afterAll(async () => {
+      client.close();
+      await new Promise<void>((r) => server.tryShutdown(() => r()));
+    });
+
+    it("sends T1 on Register and measures the hub's clock from the answer", async () => {
+      expect(client.lastExchange).toBeUndefined();
+      await client.register(toProtoManifest());
+      expect(seen.register.transmit_time.seconds).toBe("1750000000");
+      expect(seen.register.offset_seconds).toBeUndefined(); // nothing to report yet
+      const ex = client.lastExchange!;
+      expect(client.exchanges).toBe(1);
+      expect(ex.offsetSeconds).toBeCloseTo(2.0, 6); // hub minus spoke
+      expect(ex.roundTripSeconds).toBeCloseTo(0.002, 6); // 1 ms each way
+    });
+
+    it("reports the last exchange with the next Health and measures again", async () => {
+      await client.health("forge-mes", "s1");
+      const reported = seen.health[0];
+      expect(reported.offset_seconds).toBeCloseTo(2.0, 6);
+      expect(reported.round_trip_seconds).toBeCloseTo(0.002, 6);
+      expect(reported.measured_at.seconds).toBe("1750000000");
+      expect(client.exchanges).toBe(2);
+    });
+
+    it("carries T1 in the Ingest header and stamps spoke_time on each record", async () => {
+      const record = mapDomainEventToRecord(
+        {
+          entityType: "StepExecution",
+          eventType: "step_started",
+          data: { id: "step-1", batchId: "B-1", createdAt: "2026-06-01T12:00:00Z" },
+          context: { batchId: "B-1", phase: "Mashing" },
+        },
+        { adapterId: "forge-mes", adapterVersion: "0.1.0", site: "whk01", area: "distillery01" }
+      );
+      await client.ingest("forge-mes", "s1", [record]);
+      expect(seen.ingestHeader).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+      expect(seen.ingested[0].timestamp.spoke_time.seconds).toBe("1750000000");
+      expect(client.exchanges).toBe(3);
+      expect(client.lastExchange!.offsetSeconds).toBeCloseTo(2.0, 6);
+    });
+  });
+
+  it("stays unmeasured against a hub that sends no time", async () => {
+    const Service = getAdapterService();
+    const old = new grpc.Server();
+    old.addService(Service.service, {
+      Register: (_call: grpc.ServerUnaryCall<any, any>, cb: grpc.sendUnaryData<any>) =>
+        cb(null, { accepted: true, message: "ok", session_id: "s1" }),
+    });
+    const port = await new Promise<number>((resolve, reject) => {
+      old.bindAsync("127.0.0.1:0", grpc.ServerCredentials.createInsecure(), (err, p) =>
+        err ? reject(err) : resolve(p)
+      );
+    });
+    const c = new ForgeHubClient({ url: `127.0.0.1:${port}`, rpcTimeoutMs: 5000 });
+    try {
+      await c.register(toProtoManifest());
+      expect(c.lastExchange).toBeUndefined();
+      expect(c.exchanges).toBe(0);
+    } finally {
+      c.close();
+      await new Promise<void>((r) => old.tryShutdown(() => r()));
+    }
+  });
+});
+

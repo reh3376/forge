@@ -24,7 +24,7 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncIterator
+    from collections.abc import AsyncIterator, Iterable
 
 import grpc
 import grpc.aio
@@ -38,7 +38,9 @@ from forge.transport.proto_bridge import (
     manifest_to_proto,
     proto_to_contextual_record,
     proto_to_health,
+    proto_to_hub_time,
     set_typed_value,
+    spoke_time_to_proto,
 )
 from forge.transport.spoke_client import ChannelTls, TransportChannel
 
@@ -135,23 +137,24 @@ class GrpcChannel(TransportChannel):
         self,
         method: str,
         records: AsyncIterator[dict[str, Any]],
-    ) -> None:
+        *,
+        metadata: Iterable[tuple[str, str]] | None = None,
+    ) -> dict[str, Any] | None:
         """Send a client-streaming RPC using compiled protobuf messages.
 
         Each record dict is converted to a proto ContextualRecord,
         and the compiled stub handles binary serialization on the wire.
+        ``metadata`` rides on this call only (T1 of the time exchange, FB-092);
+        the hub's ``IngestResponse`` comes back as a proto dict.
         """
         stub = self._ensure_connected()
 
-        if method == "Ingest":
-            await self._call_ingest(stub, records)
-        elif method == "Collect":
-            # Legacy alias for the spoke→hub push; the hub-side pull is
-            # ``receive_stream("Collect")`` (FB-071).
-            await self._call_ingest(stub, records)
-        else:
-            msg = f"Streaming not implemented for method: {method}"
-            raise ValueError(msg)
+        # "Collect" is the legacy alias for the spoke→hub push; the hub-side pull is
+        # ``receive_stream("Collect")`` (FB-071).
+        if method in ("Ingest", "Collect"):
+            return await self._call_ingest(stub, records, metadata)
+        msg = f"Streaming not implemented for method: {method}"
+        raise ValueError(msg)
 
     async def receive_stream(
         self,
@@ -201,14 +204,37 @@ class GrpcChannel(TransportChannel):
         proto_manifest = manifest_to_proto(manifest_model)
 
         proto_request = service_msg.RegisterRequest(manifest=proto_manifest)
+        self._set_spoke_time(proto_request, request)
         response: service_msg.RegisterResponse = await stub.Register(
             proto_request, metadata=self.metadata
         )
-        return {
-            "accepted": response.accepted,
-            "message": response.message,
-            "session_id": response.session_id,
-        }
+        return self._with_hub_time(
+            {
+                "accepted": response.accepted,
+                "message": response.message,
+                "session_id": response.session_id,
+            },
+            response,
+        )
+
+    @staticmethod
+    def _set_spoke_time(proto_request: Any, request: dict[str, Any]) -> None:
+        """Put the request dict's ``spoke_time`` (T1 and the last exchange) on the wire."""
+        from forge.transport.serialization import proto_to_spoke_time
+
+        spoke_time = proto_to_spoke_time(request.get("spoke_time"))
+        if spoke_time is not None:
+            proto_request.spoke_time.CopyFrom(spoke_time_to_proto(spoke_time))
+
+    @staticmethod
+    def _with_hub_time(result: dict[str, Any], response: Any) -> dict[str, Any]:
+        """Add the response's ``hub_time`` (T2, T3) to the dict, when the hub sent one."""
+        from forge.transport.serialization import hub_time_to_proto
+
+        hub_time = proto_to_hub_time(response.hub_time) if response.HasField("hub_time") else None
+        if hub_time is not None:
+            result["hub_time"] = hub_time_to_proto(hub_time)
+        return result
 
     async def _call_configure(
         self,
@@ -269,6 +295,7 @@ class GrpcChannel(TransportChannel):
             adapter_id=request.get("adapter_id", ""),
             session_id=request.get("session_id", ""),
         )
+        self._set_spoke_time(proto_request, request)
         response = await stub.Health(proto_request, metadata=self.metadata)
         # Convert proto AdapterHealth to Pydantic then to dict
         health_model = proto_to_health(response)
@@ -413,10 +440,12 @@ class GrpcChannel(TransportChannel):
         self,
         stub: service_grpc.AdapterServiceStub,
         records: AsyncIterator[dict[str, Any]],
-    ) -> None:
+        metadata: Iterable[tuple[str, str]] | None = None,
+    ) -> dict[str, Any]:
         """Ingest RPC: stream of record dicts → proto ContextualRecords.
 
-        Passes adapter_id and session_id via gRPC metadata headers.
+        Passes adapter_id and session_id via gRPC metadata headers, with the
+        call's own ``metadata`` (T1 of the time exchange) after them.
         """
         from forge.transport.serialization import proto_to_pydantic
 
@@ -427,9 +456,17 @@ class GrpcChannel(TransportChannel):
 
         response: service_msg.IngestResponse = await stub.Ingest(
             _proto_stream(),
-            metadata=self.metadata,
+            metadata=[*self.metadata, *((str(k), str(v)) for k, v in (metadata or ()))],
         )
         logger.info(
             "Ingest RPC completed: %d records acknowledged",
             response.records_received,
+        )
+        return self._with_hub_time(
+            {
+                "records_received": response.records_received,
+                "success": response.success,
+                "message": response.message,
+            },
+            response,
         )

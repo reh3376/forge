@@ -164,15 +164,16 @@ def _context_has(record: ContextualRecord, name: str) -> bool:
 def stamp_receipt(record: ContextualRecord, received_at: datetime) -> None:
     """Stamp the hub's receipt on ``record`` (one clock, FB-087).
 
-    ``ingestion_time`` becomes the hub's clock reading ``received_at``. The
-    value the spoke sent there, if it sent one, moves to ``sent_time`` for the
-    clock-offset measurement (FB-089); a record that arrived without a stamp
-    keeps ``sent_time`` empty rather than inheriting the hub's own parse time.
-    A record already stamped once (replay) keeps its first ``sent_time``.
+    ``ingestion_time`` becomes the hub's clock reading ``received_at``. A spoke
+    states its own send time in ``spoke_time`` (FB-092); one that still puts it in
+    ``ingestion_time``, as every spoke did before, has it moved to ``spoke_time``
+    here. A record that arrived with neither keeps ``spoke_time`` empty rather than
+    inheriting the hub's own parse time, and one already stamped (replay) keeps
+    its first ``spoke_time``.
     """
     ts = record.timestamp
-    if ts.sent_time is None and "ingestion_time" in ts.model_fields_set:
-        ts.sent_time = ts.ingestion_time
+    if ts.spoke_time is None and "ingestion_time" in ts.model_fields_set:
+        ts.spoke_time = ts.ingestion_time
     ts.ingestion_time = received_at
 
 
@@ -202,6 +203,8 @@ class IngestPipeline:
         curation: CurationEngine | None = None,
     ) -> None:
         self._clock: Callable[[], datetime] = clock or utc_now
+        #: The hub clock, for whoever stamps on the hub's behalf (the exchange, FB-092).
+        self.clock = self._clock
         self.offsets: ClockOffsetTracker = offsets or ClockOffsetTracker()
         self.curation: CurationEngine | None = curation
         self._router = router or DataRouter(registry=SchemaRegistry())

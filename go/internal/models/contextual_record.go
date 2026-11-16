@@ -47,6 +47,10 @@ type RecordTimestamp struct {
 	// TimeQuality is IEC 61850 TimeQuality in Forge's words, set when the stamping clock
 	// is measured. Proto field 9.
 	TimeQuality *TimeQuality `json:"time_quality,omitempty"`
+	// SpokeTime is the spoke's own clock when it sent the record (FB-092). The hub stamps
+	// IngestionTime with its own clock on receipt and never takes this for arrival.
+	// Proto field 10.
+	SpokeTime *time.Time `json:"spoke_time,omitempty"`
 }
 
 // TimeQuality is IEC 61850 TimeQuality in Forge's words (one-clock record P-3). A nil

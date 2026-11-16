@@ -146,7 +146,7 @@ class TestObserveRecord:
             source_time=T0,
             server_time=T0 + timedelta(seconds=1),
             ingestion_time=T0 + timedelta(seconds=5),  # the hub's receipt (FB-087)
-            sent_time=T0 + timedelta(seconds=3),  # the spoke's clock at send
+            spoke_time=T0 + timedelta(seconds=3),  # the spoke's clock at send
         )
         observed = tracker.observe_record("a", ts)
         assert observed[SPOKE_LINK].last_seconds == -2.0  # spoke - hub
@@ -162,7 +162,7 @@ class TestObserveRecord:
         )
         assert set(only_server) == {SERVER_LINK, SOURCE_LINK}
         only_spoke = tracker.observe_record(
-            "a", RecordTimestamp(source_time=T0, ingestion_time=T0, sent_time=T0)
+            "a", RecordTimestamp(source_time=T0, ingestion_time=T0, spoke_time=T0)
         )
         assert set(only_spoke) == {SPOKE_LINK}
 

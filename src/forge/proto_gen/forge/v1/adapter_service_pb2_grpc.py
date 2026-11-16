@@ -7,7 +7,7 @@ from forge.proto_gen.forge.v1 import adapter_pb2 as forge_dot_v1_dot_adapter__pb
 from forge.proto_gen.forge.v1 import adapter_service_pb2 as forge_dot_v1_dot_adapter__service__pb2
 from forge.proto_gen.forge.v1 import contextual_record_pb2 as forge_dot_v1_dot_contextual__record__pb2
 
-GRPC_GENERATED_VERSION = '1.85.0'
+GRPC_GENERATED_VERSION = '1.85.1'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -153,6 +153,8 @@ class AdapterServiceServicer:
         Client-streaming: spoke sends a stream of records, hub returns summary.
         adapter_id and session_id are passed via gRPC metadata headers:
         x-forge-adapter-id, x-forge-session-id
+        T1 of the time exchange (FB-092) travels the same way, since the request is a
+        stream of records: x-forge-spoke-transmit-time, an RFC 3339 UTC timestamp.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')

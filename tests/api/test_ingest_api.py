@@ -151,7 +151,7 @@ async def test_full_records_are_validated_against_the_manifest(
 
 @pytest.mark.asyncio
 async def test_hub_stamps_receipt_on_rest_records(client, sink: InMemoryRecordSink) -> None:
-    """ingestion_time is the hub's clock on receipt; what the client sent is kept as sent_time."""
+    """ingestion_time is the hub's clock on receipt; what the client sent is kept as spoke_time."""
     await client.post("/v1/adapters/register", json=_manifest())
     full = {
         "source": {"adapter_id": "whk-wms", "system": "whk-wms-prod", "tag_path": "a.b"},
@@ -174,9 +174,9 @@ async def test_hub_stamps_receipt_on_rest_records(client, sink: InMemoryRecordSi
     assert resp.status_code == 200 and resp.json()["persisted"] == 2
     stamped, bare = sink.records[0].timestamp, sink.records[1].timestamp
     assert stamped.source_clock is None and bare.source_clock == "forge"
-    assert stamped.sent_time == datetime(2026, 6, 1, 12, 0, 2, tzinfo=UTC)
+    assert stamped.spoke_time == datetime(2026, 6, 1, 12, 0, 2, tzinfo=UTC)
     assert before <= stamped.ingestion_time <= datetime.now(UTC)
-    assert bare.sent_time is None and bare.ingestion_time == stamped.ingestion_time
+    assert bare.spoke_time is None and bare.ingestion_time == stamped.ingestion_time
 
 
 @pytest.mark.asyncio

@@ -107,4 +107,42 @@ type AdapterHealth struct {
 	RecordsCollected int64        `json:"records_collected"`
 	RecordsFailed    int64        `json:"records_failed"`
 	UptimeSeconds    float64      `json:"uptime_seconds"`
+	// HubTime is the hub's half of the time exchange, set on the response to Health
+	// (one clock, FB-092). Proto field 9.
+	HubTime *HubTime `json:"hub_time,omitempty"`
+}
+
+// SpokeTime is what a spoke sends with a request in the hub <-> spoke time exchange
+// (docs/decisions/one-clock-ot-source-time.md P-9, FB-092): T1, and the offset and round
+// trip it measured in its last completed exchange, so the hub keeps the two-way series
+// of the spoke's clock. OffsetSeconds is hub clock minus spoke clock.
+type SpokeTime struct {
+	TransmitTime     time.Time  `json:"transmit_time"`
+	OffsetSeconds    *float64   `json:"offset_seconds,omitempty"`
+	RoundTripSeconds *float64   `json:"round_trip_seconds,omitempty"`
+	MeasuredAt       *time.Time `json:"measured_at,omitempty"`
+}
+
+// HubTime is what the hub answers with: T2, its clock when the request arrived, and
+// T3, its clock when it replied.
+type HubTime struct {
+	ReceiveTime  time.Time `json:"receive_time"`
+	TransmitTime time.Time `json:"transmit_time"`
+}
+
+// TimeExchange is one completed exchange, NTP's four timestamps: T1 and T4 by the
+// spoke's clock, T2 and T3 by the hub's.
+type TimeExchange struct {
+	T1, T2, T3, T4 time.Time
+}
+
+// OffsetSeconds is hub clock minus spoke clock by RFC 5905: ((T2-T1) + (T3-T4)) / 2.
+func (e TimeExchange) OffsetSeconds() float64 {
+	return (e.T2.Sub(e.T1) + e.T3.Sub(e.T4)).Seconds() / 2
+}
+
+// RoundTripSeconds is (T4-T1) - (T3-T2): the time the hub spent on the request drops
+// out, and half of it bounds the offset's error on an asymmetric path.
+func (e TimeExchange) RoundTripSeconds() float64 {
+	return (e.T4.Sub(e.T1) - e.T3.Sub(e.T2)).Seconds()
 }

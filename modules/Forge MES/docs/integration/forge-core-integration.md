@@ -59,7 +59,12 @@ MES backend (NestJS)                                forge-core hub (Python)
    becomes the credential inbound write-back calls must present.
 2. **Heartbeat.** `Health` every `FORGE_HEALTH_INTERVAL_MS` (15 s). Three
    consecutive failures mark the session `degraded`, eight mark it `failed`
-   and trigger a fresh handshake (FACTS `health_degradation`).
+   and trigger a fresh handshake (FACTS `health_degradation`). Every `Health`,
+   like `Register` and `Ingest`, is also a time exchange with the hub (one
+   clock, FB-092): the client sends its clock (T1), the hub answers with its
+   own (T2, T3), and the client computes this host's offset from the hub and
+   the round trip and reports them with the next `Health`. Each record leaves
+   with `spoke_time`, this host's clock at send.
 3. **Events.** Every call to `MqttDomainPublisherService.publishDomainEvent`
    (ProductionEvent, StepExecution, MashingExecution, ScheduleOrder,
    BatchDeviation, ProductionOrder today) also calls
@@ -77,8 +82,9 @@ MES backend (NestJS)                                forge-core hub (Python)
 6. **Shutdown.** `onModuleDestroy` drains the queue, calls `Stop(graceful)`
    and closes the channel.
 7. **Observability.** `GET /api/forge/status` (authenticated) returns the
-   session state, last hub health, queue depth, circuit state, write-back
-   server state and counters; `GET /api/forge/tags` lists the writable tags.
+   session state, last hub health, this host's clock against the hub's
+   (`clock`: `hubOffsetSeconds`, `roundTripSeconds`, `measuredAt`), queue
+   depth, circuit state, write-back server state and counters; `GET /api/forge/tags` lists the writable tags.
 
 ## Record mapping
 

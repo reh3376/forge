@@ -556,3 +556,71 @@ func TestAdapterManifestTimeGovernanceRoundTrip(t *testing.T) {
 		t.Error("a manifest without time_governance came back with one")
 	}
 }
+
+// The spoke's send time is proto field 10 since FB-092: it crosses the wire, and a record
+// without one keeps it absent.
+func TestRecordTimestampSpokeTimeRoundTrip(t *testing.T) {
+	now := time.Now().UTC().Round(time.Millisecond)
+	sent := now.Add(-150 * time.Millisecond)
+	rec := &models.ContextualRecord{
+		RecordID:  uuid.New(),
+		Source:    models.RecordSource{AdapterID: "forge-mes", System: "forge-mes"},
+		Timestamp: models.RecordTimestamp{SourceTime: now, IngestionTime: now, SpokeTime: &sent},
+		Value:     models.RecordValue{Raw: 1.0, Quality: models.QualityGood, DataType: "float64"},
+		Lineage:   models.RecordLineage{SchemaRef: "s", AdapterID: "a", AdapterVersion: "v"},
+	}
+	back := models.ContextualRecordFromProto(models.ContextualRecordToProto(rec))
+	if back.Timestamp.SpokeTime == nil || !back.Timestamp.SpokeTime.Equal(sent) {
+		t.Errorf("spoke_time: got %v", back.Timestamp.SpokeTime)
+	}
+	rec.Timestamp.SpokeTime = nil
+	back = models.ContextualRecordFromProto(models.ContextualRecordToProto(rec))
+	if back.Timestamp.SpokeTime != nil {
+		t.Errorf("an unset spoke_time must stay absent: got %v", back.Timestamp.SpokeTime)
+	}
+}
+
+// The time exchange of FB-092: the four timestamps give the offset and the round trip by
+// RFC 5905, and both halves cross the wire with absence kept absent.
+func TestTimeExchange(t *testing.T) {
+	hub := time.Date(2026, 6, 1, 12, 0, 0, 0, time.UTC)
+	skew := 2 * time.Second // the spoke's clock runs 2 s ahead of the hub's
+	t2 := hub.Add(4 * time.Millisecond)
+	t3 := t2.Add(250 * time.Millisecond) // the hub's own time on the request drops out
+	ex := models.TimeExchange{T1: hub.Add(skew), T2: t2, T3: t3, T4: t3.Add(4 * time.Millisecond).Add(skew)}
+	if got := ex.OffsetSeconds(); got < -2.000001 || got > -1.999999 {
+		t.Errorf("offset (hub minus spoke): got %v, want -2", got)
+	}
+	if got := ex.RoundTripSeconds(); got < 0.007999 || got > 0.008001 {
+		t.Errorf("round trip: got %v, want 0.008", got)
+	}
+
+	offset, trip := ex.OffsetSeconds(), ex.RoundTripSeconds()
+	spoke := &models.SpokeTime{TransmitTime: hub, OffsetSeconds: &offset, RoundTripSeconds: &trip, MeasuredAt: &t3}
+	back := models.SpokeTimeFromProto(models.SpokeTimeToProto(spoke))
+	if back == nil || !back.TransmitTime.Equal(hub) || *back.OffsetSeconds != offset ||
+		*back.RoundTripSeconds != trip || !back.MeasuredAt.Equal(t3) {
+		t.Errorf("SpokeTime round trip: got %+v", back)
+	}
+	first := models.SpokeTimeFromProto(models.SpokeTimeToProto(&models.SpokeTime{TransmitTime: hub}))
+	if first == nil || first.OffsetSeconds != nil || first.RoundTripSeconds != nil || first.MeasuredAt != nil {
+		t.Errorf("a first request carries T1 only: got %+v", first)
+	}
+	if models.SpokeTimeFromProto(nil) != nil || models.SpokeTimeToProto(nil) != nil {
+		t.Error("no spoke time must stay nil")
+	}
+
+	health := &models.AdapterHealth{
+		AdapterID: "forge-mes",
+		State:     models.AdapterStateHealthy,
+		HubTime:   &models.HubTime{ReceiveTime: t2, TransmitTime: t3},
+	}
+	h := models.AdapterHealthFromProto(models.AdapterHealthToProto(health))
+	if h.HubTime == nil || !h.HubTime.ReceiveTime.Equal(t2) || !h.HubTime.TransmitTime.Equal(t3) {
+		t.Errorf("AdapterHealth.hub_time: got %+v", h.HubTime)
+	}
+	health.HubTime = nil
+	if models.AdapterHealthFromProto(models.AdapterHealthToProto(health)).HubTime != nil {
+		t.Error("a health without hub_time must keep it absent")
+	}
+}

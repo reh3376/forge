@@ -23,7 +23,8 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
-from forge.core.models.adapter import AdapterHealth, AdapterManifest
+from forge.core.clock import tolerance_for_class
+from forge.core.models.adapter import AdapterHealth, AdapterManifest, SpokeTime
 from forge.ingest.facts_check import FactsCheckResult, check_manifest_against_facts
 from forge.ingest.pipeline import IngestOutcome, IngestPipeline, IngestStats
 from forge.transport.hub_server import AdapterServiceServicer, AdapterSession
@@ -81,6 +82,9 @@ class HubIngestServicer(AdapterServiceServicer):
     ) -> None:
         super().__init__()
         self.pipeline = pipeline if pipeline is not None else IngestPipeline()
+        # One hub clock: T2 and T3 of the time exchange come from the clock that stamps
+        # receipt on every record (FB-087, FB-092).
+        self.clock = self.pipeline.clock
         self.write_dispatcher = write_dispatcher
         self._batch_size = max(1, batch_size)
         self._specs_dir = specs_dir
@@ -135,10 +139,37 @@ class HubIngestServicer(AdapterServiceServicer):
             self.write_dispatcher.forget(session_id)
         return result
 
-    async def health(self, adapter_id: str, session_id: str) -> dict[str, Any]:
+    async def health(
+        self,
+        adapter_id: str,
+        session_id: str,
+        *,
+        spoke_time: SpokeTime | None = None,
+    ) -> dict[str, Any]:
         session = self._get_session(adapter_id, session_id)
         state = self._state.get(session_id)
-        now = datetime.now(UTC)
+        now = self.clock()
+        if (
+            spoke_time is not None
+            and spoke_time.offset_seconds is not None
+            and spoke_time.round_trip_seconds is not None
+        ):
+            # The spoke reports its last completed exchange (one-clock record P-9): from
+            # here on its clock is measured two-way, and its records stop feeding the series.
+            # A two-way measurement is held to the class the spoke declared (P-8); the
+            # alert is FB-089's, the refusal is FB-093's hub half.
+            governance = session.manifest.time_governance
+            self.pipeline.offsets.observe_exchange(
+                adapter_id,
+                offset_seconds=spoke_time.offset_seconds,
+                round_trip_seconds=spoke_time.round_trip_seconds,
+                at=now,
+                tolerance_seconds=(
+                    tolerance_for_class(governance.tolerance_class)
+                    if governance is not None
+                    else None
+                ),
+            )
         stats = state.stats if state else IngestStats()
         failed = stats.rejected + stats.failed + (state.parse_rejected if state else 0)
         health = AdapterHealth(

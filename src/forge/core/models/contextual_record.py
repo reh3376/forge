@@ -34,36 +34,38 @@ class RecordTimestamp(OneClockModel):
     source_time: when the value was generated at the source system
     server_time: when the source system's server processed it
     ingestion_time: when the hub received it, by the hub's clock
-    sent_time: the spoke's own clock when it built and sent the record
+    spoke_time: the spoke's own clock when it sent the record
 
-    The hub stamps ``ingestion_time`` on receipt (one clock, FB-087): whatever
-    a spoke put there arrives as ``sent_time`` and is kept for the clock-offset
-    measurement (FB-089). Every field is UTC and timezone-aware (FB-014): a
-    naive value, or an ISO string without an offset, is rejected rather than
-    read as UTC. ``source_time`` is never invented (FB-088): a value the source
+    The hub stamps ``ingestion_time`` on receipt (one clock, FB-087) and never
+    takes a spoke's stamp for arrival. ``spoke_time`` is on the wire since FB-092
+    (proto field 10); a record from a spoke that still puts its send time in
+    ``ingestion_time`` has it moved there on receipt. Every field is UTC and
+    timezone-aware (FB-014): a naive value, or an ISO string without an offset, is
+    rejected rather than read as UTC. ``source_time`` is never invented (FB-088): a value the source
     did not stamp is refused unless its connection declared ``origin: forge``,
     and then ``source_clock`` says so and ``source_uncertainty_seconds`` carries
     the poll bound. Once the stamping clock is measured (FB-094), ``source_time``
     is the stamp corrected to master time on entry at the spoke, and the record
     keeps what was done: ``source_time_as_sent``, ``source_offset_seconds``,
     ``source_uncertainty_seconds`` and ``time_quality`` (the one-clock record's
-    P-3; ``sent_time`` becomes ``spoke_time`` with FB-092's exchange).
+    P-3).
     """
 
-    # The timestamps a view or a quality rule may take as its time axis: the three on
-    # the wire. The FVTS ``timestampBasis`` enum mirrors this tuple. ``sent_time`` is a
-    # measurement input for the clock-offset check (FB-089), never a basis.
+    # The timestamps a view or a quality rule may take as its time axis: the source's
+    # two and the hub's receipt. The FVTS ``timestampBasis`` enum mirrors this tuple.
+    # ``spoke_time`` is a measurement input for the clock-offset check, never a basis.
     TIME_BASES: ClassVar[tuple[str, ...]] = ("source_time", "server_time", "ingestion_time")
 
     source_time: datetime
     server_time: datetime | None = None
     ingestion_time: datetime = Field(default_factory=utc_now)
-    sent_time: datetime | None = Field(
+    spoke_time: datetime | None = Field(
         default=None,
         description=(
-            "The spoke's clock when it built and sent the record (its ingestion_time as "
-            "sent); set by the hub on receipt and kept for the offset measurement (FB-089). "
-            "Hub-local, not on the wire; provisional name until D-9 fixes the time fields."
+            "The spoke's own clock when it sent the record (one-clock record P-3, the name "
+            "the owner approved in Q-2; ``sent_time`` until FB-092). Set by the spoke; the "
+            "hub keeps it for the one-way offset measurement of a spoke that does not yet "
+            "report the time exchange. Proto field 10."
         ),
     )
     source_clock: str | None = Field(

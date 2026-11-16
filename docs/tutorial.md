@@ -184,9 +184,9 @@ From `docs/WHERE-WE-ARE.md` §1, the snapshot at PR 95:
 
 | Measure | Value (2026-11-13) |
 |---|---|
-| Python hub (`src/forge`) | 355 files, ~71,100 lines |
-| Python tests | 268 files, 4,598 collected, full suite green on the locked dependency set |
-| Go (`go/`) | 32 files, ~10,100 lines; `gofmt`, `go vet`, `go test` gate CI |
+| Python hub (`src/forge`) | 355 files, ~71,500 lines |
+| Python tests | 269 files, 4,608 collected, full suite green on the locked dependency set |
+| Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~248,000 lines of TypeScript, kept until the Go forge-mes lands |
 | Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
 | Storage migrations | 12 |
@@ -302,7 +302,7 @@ flowchart TD
   R["ContextualRecord"]
   R --> V["value · data_type · engineering_units"]
   R --> Q["quality code<br/>GOOD / BAD / UNCERTAIN …"]
-  R --> T["timestamps (UTC, tz-aware)<br/>source_time · sent_time · ingestion_time"]
+  R --> T["timestamps (UTC, tz-aware)<br/>source_time · spoke_time · ingestion_time"]
   R --> S["source identity<br/>adapter_id · system · tag_path · schema_ref · adapter_version"]
   R --> C["RecordContext"]
   C --> C1["site · area · equipment_id · operating_mode"]
@@ -313,13 +313,14 @@ flowchart TD
 
 - `RecordContext` carries the context field registry slot for slot, on the proto and in Go, with every producer and the TimescaleDB table following (FB-013).
 - A naive datetime or an offset-less string is rejected at the model (`forge.core.clock`, FB-014); ruff's `DTZ` rules block CI.
-- The hub stamps `ingestion_time` with its own clock on receipt; the spoke's stamp is kept as `sent_time`; nothing is invented (FB-087).
+- The hub stamps `ingestion_time` with its own clock on receipt; the spoke states its own send time in `spoke_time`; nothing is invented (FB-087, FB-092).
+- Register, Health and Ingest also carry the time exchange (FB-092): the spoke sends T1, the hub answers with T2 and T3, and the spoke measures its clock against the hub's. F9 has the whole picture.
 - No record builder invents a source time either: a value without a source stamp is refused unless its connection declares `source_timestamp_origin: forge`; then Forge's read time stands in and the record says so (`source_clock`, `source_uncertainty_seconds`), and the refusal is on health, status, API and CLI (FB-088, 2026-11-13).
 - Every schema reference uses one grammar, `forge://schemas/<spoke>[/<Entity>][/v<version>]`, held at every boundary (FB-008).
 
 note:
 - The context field registry (`src/forge/core/registry`) and the manufacturing entity catalog (`docs/core/manufacturing-entity-catalog.md`) define what each slot means, so "area" is the same thing in every spoke.
-- `sent_time` becomes `spoke_time` under the one-clock design (D-9, signed 2026-11-03) when the hub-to-spoke time exchange lands (FB-092).
+- `spoke_time` is on the wire (proto field 10) since the hub-to-spoke time exchange landed (FB-092, 2026-11-15); until then it was the hub-local `sent_time`.
 
 ---
 
@@ -333,7 +334,8 @@ note:
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
 | FTTS transport spec and runner | 🟡 | `specs/grpc-hardened-transport.ftts.json`; no `docs/FxTS/FTTS.md` page yet |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
-| Hub time in the contract; a spoke outside its tolerance refused at Register and Ingest | ⬜ | FB-092, then FB-093's hub half (D-9 signed 2026-11-03; the plant-floor links fail closed since 2026-11-15) |
+| Hub time in the contract: the four-timestamp exchange on Register, Health and Ingest; a reporting spoke measured two-way | ✅ | FB-092 (2026-11-15) |
+| A spoke outside its tolerance refused at Register and Ingest | ⬜ | FB-093's hub half (D-9 signed 2026-11-03; the plant-floor links fail closed since 2026-11-15) |
 
 Code: `src/forge/transport/grpc_server.py` (hub), `spoke_client.py` (spoke side), `grpc_channel.py` (retry), `proto_bridge.py` (proto ↔ model), `transport_adapter.py` (adapter base).
 
@@ -367,7 +369,7 @@ sequenceDiagram
 
 - `forge.ingest.facts_check` verifies the spec's hash before trusting it; a spoke whose manifest or hash does not match is refused.
 - One hub-clock reading per batch (`IngestPipeline.ingest` → `stamp_receipt`).
-- Every link's clock offset is measured and exposed on `AdapterHealth.clock`, `GET /v1/ingest/stats`, the OT connection status and OpenTelemetry (`forge.clock.offset`, `forge.clock.out_of_tolerance`); the provisional tolerance on the spoke link is 1 s (FB-089). Enforcement is FB-093 (D-9 signed 2026-11-03: per-link tolerance classes, never silent): on the plant floor since 2026-11-15, at the hub after FB-092.
+- Every link's clock offset is measured and exposed on `AdapterHealth.clock`, `GET /v1/ingest/stats`, the OT connection status and OpenTelemetry (`forge.clock.offset`, `forge.clock.out_of_tolerance`); a spoke that reports the time exchange is held to the class it declared, one that does not to the provisional 1 s (FB-089, FB-092). Enforcement is FB-093 (D-9 signed 2026-11-03: per-link tolerance classes, never silent): on the plant floor since 2026-11-15; at the hub next, on the two-way measurement FB-092 added.
 - Curated records are persisted with the raw ones (FB-009).
 
 note:
@@ -396,8 +398,8 @@ note:
 |---|---|
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.1 |
 | Go transport parity tests | FB-055 |
-| Hub time in the contract; refusing an out-of-tolerance spoke at the hub (a PLC connection is refused since 2026-11-15) | FB-092, FB-093's hub half (D-9 signed 2026-11-03) |
-| The spoke's time fields (`sent_time`, source time per spoke) | FB-088 done 2026-11-13 (`source_clock`, `source_uncertainty_seconds`); FB-090 done 2026-11-13 (the FACTS `time_governance` declaration) |
+| Refusing an out-of-tolerance spoke at the hub (measured two-way since FB-092; a PLC connection is refused since 2026-11-15) | FB-093's hub half (D-9 signed 2026-11-03) |
+| The time fields stored at rest (only `source_time` is; the rest travel on the record) | FB-108 |
 | Generic adapters (csv_file, mqtt_sparkplug, opcua, rest_generic) | package stubs only |
 
 **Next**: where the records land.
@@ -701,7 +703,7 @@ note:
 
 | Gap | Backlog / decision |
 |---|---|
-| The time-governance declaration is in place and a PLC connection outside its class is refused (2026-11-15); a spoke at the hub is not yet | FB-093's hub half, after FB-092 (D-9) |
+| The time-governance declaration is in place and a PLC connection outside its class is refused (2026-11-15); a spoke at the hub is not yet | FB-093's hub half (D-9) |
 | The OT FACTS spec fails `facts:schema-valid` and eight vocabulary checks | FB-079, D-8 |
 | FQTS and FSTS are stubs; FDTS, FLTS, FNTS, FOTS, FPTS are planned | M5 |
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.9 |
@@ -868,7 +870,8 @@ The owner's principle (2026-10-18): records from different sources only reconcil
 | The offset of every connected clock is measured, recorded and surfaced | ✅ FB-089 (provisional 1 s tolerance, warning only) |
 | A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | 🟡 FB-088 done 2026-11-13 (no invented stamp; the stamping clock named once declared); FB-094 steps 2 and 3 done 2026-11-13 (the server's clock is read on every OPC-UA response and on a runtime probe cadence, and the source and server stamps are corrected by its filtered offset at the spoke, the stamp as sent, the offset and the time quality kept); step 6 done too (every tag declares `max_sampling_uncertainty_ms`, refused at load when the acquisition cannot meet it; the bound is on every value), so FB-094 is complete for what the tree has; FB-090 done 2026-11-13 (the FACTS declaration); design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
 | A PLC connection whose clock cannot be read, or is outside its tolerance class, for three consecutive probes stops delivering (`CLOCK_UNREADABLE`, `CLOCK_OUT_OF_TOLERANCE`); three good probes resume it; never silent | ✅ FB-093, the OT links (2026-11-15) |
-| Hub time in the contract; a hub, module or spoke outside tolerance is refused | ⬜ FB-092, then FB-093's hub half (D-9 signed 2026-11-03) |
+| Hub time in the contract: every spoke takes time from its hub and is measured two-way | ✅ FB-092 (2026-11-15) |
+| A hub, module or spoke outside tolerance is refused | ⬜ FB-093's hub half; hub to hub is FB-118 (D-9 signed 2026-11-03) |
 | Per-spoke declaration of time governance; a quality dimension for time | 🟡 FB-090 done 2026-11-13 (FACTS `time_governance`: clock origin, probe cadence, tolerance class, fail closed); FB-091 (the quality dimension and the offset assumed on an offset-less stamp) |
 
 note:
@@ -1011,7 +1014,7 @@ note:
 
 | Piece | State |
 |---|---|
-| `go/internal/models` | ✅ the core models mirrored, 1,800 lines with 1,488 of tests; `Lot.item_id` (FB-010) and the `RecordContext` slots (FB-013); every manufacturing entity has a `New*` constructor with the Python defaults and a `Validate()`, held equal to the Python models by one fixture both suites read (FB-016) |
+| `go/internal/models` | ✅ the core models mirrored, 2,078 lines with 1,665 of tests; `Lot.item_id` (FB-010) and the `RecordContext` slots (FB-013); every manufacturing entity has a `New*` constructor with the Python defaults and a `Validate()`, held equal to the Python models by one fixture both suites read (FB-016) |
 | `go/gen/forge` | ✅ generated bindings from the one proto set (Buf) |
 | `go/internal/scaffold` | 🟡 112 lines; not a module template yet |
 | `forged` daemon, `forgectl` | ⬜ placeholders |
@@ -1373,7 +1376,7 @@ Every `ContextualRecord` has a `RecordTimestamp` (F2). These are its fields:
 | `source_clock` | which clock stamped it: `device:<name>`, `server:<name>`, `edge:<name>` or `forge` | the builder, from the declaration |
 | `time_quality` | synchronised, clock failure, leap seconds known, accuracy class (IEC 61850 `TimeQuality`) | the builder |
 | `server_time` | when the source's server processed it | the source |
-| `sent_time` | the spoke's own clock when it sent the record | the spoke |
+| `spoke_time` | the spoke's own clock when it sent the record | the spoke |
 | `ingestion_time` | when the hub received it, by the hub's clock | the hub |
 
 - **UTC, with its zone, everywhere.** A naive datetime or an offset-less string is rejected at the model (`OneClockModel`); ruff's `DTZ` rules block one in code.
@@ -1382,7 +1385,7 @@ Every `ContextualRecord` has a `RecordTimestamp` (F2). These are its fields:
 - **Correction happens once, where the stamp enters** (the spoke's builder, P-10). The hub never corrects a second time.
 
 note:
-- Honest: at rest the hypertable keeps only `source_time`; the other fields travel on the record, the API and into curation (FB-108). `sent_time` becomes `spoke_time` when the time exchange lands (FB-092).
+- Honest: at rest the hypertable keeps only `source_time`; the other fields travel on the record, the API and into curation (FB-108). `spoke_time` was the hub-local `sent_time` until the time exchange landed (FB-092).
 
 ---
 
@@ -1401,7 +1404,8 @@ sequenceDiagram
 
 - The measurement is NTP's: taking the offset at the midpoint of the round trip cancels the transit delay, and half the round trip bounds the error from an asymmetric path. In code it is `ClockSample`.
 - **On the plant floor** every OPC UA connection reads `ServerStatus.CurrentTime` on a cadence (30 s by default, 1 s at the least, changed per connection while it runs: `POST /control/connections/{name}/clock-probe-interval`) and also reads the timestamp in every response header. Both feed one series, named for the clock that was read (`server:WHK01`, or `device:WHK01` for a PLC-embedded server).
-- **At the hub** every received record is a measurement, one way: `sent_time` against receipt (the spoke), `server_time` against receipt (the source's server), `source_time` against `server_time` (the source). One way includes the delay in transit, which is why the two-way exchange is the next step (FB-092).
+- **Between hub and spoke** the same four timestamps travel in the contract (FB-092): the spoke sends T1 with Register, Health and Ingest, the hub answers with T2 and T3, the spoke takes T4, computes the offset and the round trip (`TimeExchange`) and reports them with its next Health. The hub then keeps that spoke's clock two-way and holds it to its declared class.
+- A spoke that does not report is measured one way from its records (`spoke_time` against receipt), which includes the delay in transit. The source's server and the source are measured from the records as well: `server_time` against receipt, `source_time` against `server_time`.
 - `ClockOffsetTracker` keeps a rolling window per adapter, link and clock, filters the estimate the correction uses with NTP's one-eighth weight, and puts every sample on `forge.clock.offset`. The statistics are on `AdapterHealth.clock`, `GET /v1/ingest/stats` and the OT connection status.
 
 note:
@@ -1457,7 +1461,7 @@ Every PLC connection has a `ClockGate` (D-9's P-5; three in and three out is the
 **Never silent.** The refusal is an error line in the log, on the connection status (`clock_state`, and `clock_gate` with the cause, since when, the class and the counters), on `AdapterHealth` (DEGRADED, `refusals.clock_unreadable` or `clock_out_of_tolerance`, `last_refusal`), on the `forge.ingest.refused` metric, and a HIGH alarm where the host runs an alarm engine. The adapter is HEALTHY again when its last refused connection clears.
 
 note:
-- In force on the OT links since 2026-11-15 (FB-093's OT half). The same refusal of a whole spoke at Register and Ingest needs the two-way measurement and follows FB-092.
+- In force on the OT links since 2026-11-15 (FB-093's OT half). The same refusal of a whole spoke at Register and Ingest is FB-093's hub half; the two-way measurement it needs exists since FB-092.
 - The probe cannot be switched off: a cadence under 1 s, 0 included, is refused when the configuration is loaded. A clock that is not read cannot be trusted.
 
 ---
@@ -1470,6 +1474,7 @@ note:
 | define a model with a datetime field | derive from `OneClockModel` (manufacturing entities already do, through their base) |
 | build a record from a source value | `resolve_source_stamp(...)`, then `SourceStamp.timestamp_fields()`; never fall back to "now"; refuse with `adapter.refuse(exc)` |
 | add a spoke | declare `time_governance` in the FACTS spec and on the manifest; `forge governance run` checks it |
+| write a spoke's client | use `SpokeClient`: it runs the time exchange on Register, Health and Ingest and stamps `spoke_time`; a client in another language sends T1, takes T4 and reports with Health, as the MES bridge's `ForgeHubClient` does |
 | add a protocol that can read a device's clock | implement `ClockReader.read_clock()` returning a `ClockSample`; feed `ClockOffsetTracker.observe(...)` with a `clock_id` and the class's tolerance; gate the link with `ClockGate` |
 | change a time field on the wire | proto fields are added, never renumbered; the FATS and FACTS specs are re-stamped for the owner (F4) |
 
@@ -1491,11 +1496,11 @@ note:
 | OPC UA: the clock read by probe and tap, the stamp corrected on entry, the time-quality fields, the per-tag sampling bound | FB-094 (2026-11-13) |
 | Every spoke declares how it is time-governed | FB-090 (2026-11-13) |
 | A PLC connection fails closed on its clock | FB-093, the OT links (2026-11-15) |
+| Hub time in the contract: the four-timestamp exchange; a reporting spoke measured both ways and held to its class | FB-092 (2026-11-15) |
 
 | Missing | Backlog |
 |---|---|
-| Hub time in the contract: the four-timestamp exchange, a spoke measured both ways | FB-092, next |
-| The hub refusing a spoke outside its class at Register and Ingest | FB-093's hub half, after FB-092 |
+| The hub refusing a spoke outside its class at Register and Ingest | FB-093's hub half, next |
 | Forge checking its own host's clock before it judges others | FB-119 |
 | Clock agreement as a quality dimension; the offset assumed for an offset-less source stamp | FB-091 |
 | The time fields stored at rest | FB-108 |
@@ -1529,7 +1534,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q                         # 4,598 tests, ~1 minute
+uv run pytest tests -q                         # 4,608 tests, ~1 minute
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -1629,7 +1634,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 268 files, 4,598 collected; the full suite runs in about a minute on the locked dependency set.
+- `tests/` mirrors `src/`: 269 files, 4,608 collected; the full suite runs in about a minute on the locked dependency set.
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -1686,7 +1691,7 @@ note:
 4. **No federation**: a single hub only; no hub-of-hubs code.
 5. **Seven governance frameworks are stubs or planned**; FACTS validates against its own schema and all nine of its specs carry owner-approved hashes (2026-11-13).
 6. **No production deployment**: compose only.
-7. **Clock discipline enforced on the plant floor, not yet at the hub**: every spoke declares how it is time-governed (FB-090) and the deployment requirement is written down, and a PLC connection whose clock is unreadable or outside its class is refused (FB-093's OT half, 2026-11-15), but the hub is not yet a time authority for what is attached to it and does not refuse a spoke with a wrong clock (hub time in the contract, FB-092; then FB-093's hub half).
+7. **Clock discipline enforced on the plant floor, measured but not yet enforced at the hub**: every spoke declares how it is time-governed (FB-090) and the deployment requirement is written down, and a PLC connection whose clock is unreadable or outside its class is refused (FB-093's OT half, 2026-11-15), and the hub gives its time to every spoke and measures each one two-way (FB-092, 2026-11-15), but it does not yet refuse a spoke with a wrong clock (FB-093's hub half).
 8. **Process control decided, not built**: the three-layer framework is signed (D-11, 2026-11-13) and waits for its FSDs.
 
 note:
@@ -1719,7 +1724,7 @@ note:
 | D-4 | FVTS open items (name, write authority per profile, mobile acknowledge, transport, layout) | decided 2026-11-03; forge-display design next |
 | D-7 | Scope of the Go standard (OT module, Python adapters) | open |
 | D-8 | FACTS vocabulary for OT adapters | decided 2026-11-03: extend the enums; FB-079 can start |
-| D-9 | One clock: which established standards to adopt (`docs/decisions/one-clock-ot-source-time.md`) | signed 2026-11-03; FB-088, FB-094 (steps 2, 3, 6) and FB-090 done 2026-11-13; FB-093's OT half done 2026-11-15; FB-092, FB-093's hub half and FB-091 follow in the record's step order |
+| D-9 | One clock: which established standards to adopt (`docs/decisions/one-clock-ot-source-time.md`) | signed 2026-11-03; FB-088, FB-094 (steps 2, 3, 6) and FB-090 done 2026-11-13; FB-093's OT half and FB-092 done 2026-11-15; FB-093's hub half and FB-091 follow |
 | D-10 | One schema registry (`docs/decisions/one-schema-registry.md`) | signed 2026-11-03; FB-097's eight steps |
 | D-11 | Three-layer process control framework, PC-L1/PC-L2/PC-L3 (`docs/decisions/process-control-framework.md`) | signed 2026-11-13 by the owner; Forge review done; the FSDs follow the owner's round-4 answers (FB-110) |
 
@@ -1733,7 +1738,7 @@ note:
 ## What Is Next
 
 1. ~~A decision session on D-1, D-3, D-4, D-8, D-9 and D-10~~ (done 2026-11-03, one question at a time) and ~~the FB-076 design document~~ (signed the same day); D-11 signed 2026-11-13.
-2. The one-clock steps in the record's order: FB-088, FB-094 and FB-090 done 2026-11-13; FB-093's OT half done 2026-11-15; **FB-092** (hub time in the contract) next, then FB-093's hub half (a spoke refused at Register and Ingest) and FB-091 (the time-quality dimension); the one-registry steps (FB-097, D-10) before the Go module's first ingest.
+2. The one-clock steps in the record's order: FB-088, FB-094 and FB-090 done 2026-11-13; FB-093's OT half and FB-092 (hub time in the contract) done 2026-11-15; **FB-093's hub half** (a spoke refused at Register and Ingest) next, then FB-091 (the time-quality dimension); the one-registry steps (FB-097, D-10) before the Go module's first ingest.
 3. The module SDK Go scaffold (FB-017); its first consumer is the Go forge-mes.
 4. FB-076 phase 1: the Go module registers, ingests and takes write-backs against the hub.
 5. FB-057 `mod_mes`, with FB-004 and FB-059 as the Go module needs them.
@@ -1857,7 +1862,7 @@ flowchart LR
 6. **Data products** are built from the records and feed screens, decisions and, where a site chooses, training data for its own models.
 
 note:
-- Honest: today the hub measures clock offsets and warns, and every connected system declares how it keeps time in its contract (2026-11-13); a plant-floor connection whose clock cannot be read or is out of tolerance is refused since 2026-11-15; refusing a whole connected system on the same rule is decided (D-9, signed 2026-11-03) and follows the time exchange (FB-092, FB-093).
+- Honest: today the hub measures clock offsets and warns, and every connected system declares how it keeps time in its contract (2026-11-13); a plant-floor connection whose clock cannot be read or is out of tolerance is refused since 2026-11-15; since 2026-11-15 the hub also gives its time to every connected system and checks each one both ways; refusing a whole connected system with a bad clock is decided (D-9, signed 2026-11-03) and is next (FB-093).
 
 ---
 
@@ -1889,7 +1894,7 @@ Forge exists so that people at every level decide from the same picture, and rec
 - A hub, module or spoke **outside tolerance is refused**: warnings are not a substitute for correction.
 - For a plant-floor tag, the time that counts is **when the value occurred at the device**, corrected to master time, never the poll time passed off as device time.
 
-Where it stands: timestamps are UTC and receipt is stamped; offsets are measured and warned on; on the plant floor a tag's time is corrected to the master clock by the server's measured offset (OPC UA, since 2026-11-13), no time is ever invented, and every connected system declares how it keeps time in its contract. A plant-floor connection with a bad clock is refused since 2026-11-15 (three checks in, three out, and it says so); refusing a whole connected system on the same rule is decided (D-9, signed 2026-11-03) and follows (FB-092, FB-093).
+Where it stands: timestamps are UTC and receipt is stamped; offsets are measured and warned on; on the plant floor a tag's time is corrected to the master clock by the server's measured offset (OPC UA, since 2026-11-13), no time is ever invented, and every connected system declares how it keeps time in its contract. A plant-floor connection with a bad clock is refused since 2026-11-15 (three checks in, three out, and it says so); the hub gives its time to every connected system and checks each one both ways (2026-11-15); refusing a whole connected system on the same rule is decided (D-9, signed 2026-11-03) and is next (FB-093).
 
 note:
 - The owner's principle of 2026-10-18; `docs/PRINCIPLES.md` §2. U10 explains why this matters to you and what you see and do when a clock is wrong.
@@ -2328,6 +2333,7 @@ flowchart TD
 | Your network (IT and controls) | keeps every server and PLC in step with one reference, using the standard time services (NTP, or PTP where the devices support it). Forge does not set clocks. |
 | The top hub | is the master clock for everything below it; each hub looks after the clocks of what is attached to it |
 | Every connected system | states in its contract how it keeps time and how close it must be: within 10 ms on the site network, 100 ms between sites |
+| The hub, with every connected system | exchanges time on every contact, so each system knows how far its clock is from the hub's, and the hub knows too |
 | Forge, on every record | stamps arrival with the hub's own clock, in UTC, and never makes up a time for a value that arrived without one |
 | Forge, on the plant floor | checks each server's clock every 30 seconds, corrects each tag's time to master time, and keeps the original time and the correction on the record |
 | Forge, when a clock is wrong | cuts that plant-floor connection off after three checks in a row, says why, and reconnects it after three good checks |
@@ -2366,11 +2372,11 @@ note:
 | Plant-floor times corrected to master time (OPC UA) | 2026-11-13 |
 | Every connected system declares how it keeps time | 2026-11-13 |
 | A plant-floor connection with a bad clock is cut off until it is right | 2026-11-15 |
+| The hub gives its time to each connected system and checks it both ways | 2026-11-15 |
 
 | Not yet | When |
 |---|---|
-| The hub giving time to each connected system and checking it both ways | next (FB-092) |
-| Cutting off a whole connected system with a bad clock, not only a plant-floor connection | after that (FB-093) |
+| Cutting off a whole connected system with a bad clock, not only a plant-floor connection | next (FB-093) |
 | Forge checking its own server's clock before it judges the others | recorded (FB-119) |
 | Clock agreement counted in a data product's quality score | planned (FB-091) |
 | Business systems having the clock of their own server checked | recorded (FB-120) |
@@ -2401,7 +2407,7 @@ How a site is run, upgraded and, in time, backed up.
 | Health | `/v1/health` probes every component; `/readyz` | service-level objectives and alerts (FOTS) |
 | Upgrades | `forge migrate up` applies versioned database migrations; a migration is never edited after it is applied | an upgrade procedure per hub |
 | Backups | none | scheduled backups of every store and a restore procedure |
-| Clock | offsets measured and warned; device time corrected on OPC UA; every connected system declares how it keeps time (2026-11-13); a plant-floor connection with an unreadable or out-of-tolerance clock is refused (2026-11-15) | a connected system outside its tolerance is refused at the hub (FB-092, FB-093's hub half, D-9) |
+| Clock | offsets measured and warned; device time corrected on OPC UA; every connected system declares how it keeps time (2026-11-13); a plant-floor connection with an unreadable or out-of-tolerance clock is refused, and the hub gives time to and checks every connected system both ways (2026-11-15) | a connected system outside its tolerance is refused at the hub (FB-093's hub half, D-9) |
 | Multi-site | one hub | hub of hubs with upward audit and offline operation (M6) |
 
 - "Solved when": a site hub can be stood up, upgraded and restored from backup by procedure, and its objectives are visible.
