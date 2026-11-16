@@ -238,17 +238,17 @@ FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). 
 
 | Workstream | High | Med | Low | Items |
 |---|---|---|---|---|
-| WS-1 transport | FB-092 | FB-072 | FB-055, FB-056, FB-071 | FB-002 to close as superseded; FB-092 is the one-clock time exchange |
-| WS-2 hub platform | FB-093 | FB-004, FB-007, FB-059, FB-075, FB-097 | FB-100 | FB-001, FB-003, FB-005, FB-006, FB-008 and FB-009 done 2026-10-22, FB-098 and FB-099 done 2026-10-26, FB-101 done 2026-10-27 (FB-100 found on the way, waits on FB-057 step 2); FB-093's hub half is the one-clock enforcement at Register and Ingest (its OT half done 2026-11-15) |
+| WS-1 transport | FB-092 | FB-072, FB-118, FB-120 | FB-055, FB-056, FB-071 | FB-002 to close as superseded; FB-092 is the one-clock time exchange; FB-118 (the time chain between hubs) and FB-120 (the IT spokes reading their source system's clock) recorded 2026-11-15 |
+| WS-2 hub platform | FB-093, FB-119 | FB-004, FB-007, FB-059, FB-075, FB-097 | FB-100 | FB-001, FB-003, FB-005, FB-006, FB-008 and FB-009 done 2026-10-22, FB-098 and FB-099 done 2026-10-26, FB-101 done 2026-10-27 (FB-100 found on the way, waits on FB-057 step 2); FB-093's hub half is the one-clock enforcement at Register and Ingest (its OT half done 2026-11-15); FB-119 (no Forge process checks its own host's clock) recorded 2026-11-15 |
 | WS-3 data model | FB-011 | FB-012, FB-091 | — | FB-086, FB-014, FB-087, FB-089, FB-015, FB-010, FB-013, FB-016, FB-088, FB-090 done; the one-clock items follow the owner's 2026-10-18 principle (FB-092 in WS-1, FB-093 in WS-2), D-9 |
-| WS-4 OT module | FB-094 | FB-020, FB-079, FB-115 | FB-018, FB-116 | FB-073, FB-074 done (awaiting approval); FB-082 done; FB-094 is the OT source-time design; FB-093's OT half done 2026-11-15 (FB-115 and FB-116 found on the way) |
+| WS-4 OT module | FB-094 | FB-020, FB-079, FB-115, FB-117 | FB-018, FB-116 | FB-073, FB-074 done (awaiting approval); FB-082 done; FB-094 is the OT source-time design; FB-093's OT half done 2026-11-15 (FB-115 and FB-116 found on the way) |
 | WS-5 forge-mes | FB-028, FB-050, FB-076 | FB-030, FB-031, FB-032, FB-033, FB-036, FB-052, FB-057 | FB-035, FB-045, FB-064 | FB-034 done (bridge link) |
 | WS-6 forge-display | — | — | — | No backlog ids yet; tracked here until the design lands |
 | WS-7 module SDK | — | FB-017 | FB-019 | FB-021 done |
 | WS-8 governance | — | — | FB-048 (jest/tsc follow FB-076) | FB-080, FB-021, FB-083, FB-022, FB-026, FB-085, FB-084, FB-014 done; FTTS doc has no id yet |
 | WS-9 security/ops | FB-029, FB-046 | FB-043, FB-047 | FB-044, FB-049 | public since 2026-10-17; GC still on Support |
 | WS-10 MDEMG | — | FB-038, FB-042 | FB-039, FB-040, FB-041 | |
-| WS-11 docs | — | — | FB-027 | FB-024 and FB-025 done; personal docs refresh; FB-103 (the tutorial package) done 2026-10-27, live on GitHub Pages at https://reh3376.github.io/forge/ since 2026-10-28 |
+| WS-11 docs | — | — | FB-027 | FB-024 and FB-025 done; personal docs refresh; FB-103 (the tutorial package) done 2026-10-27, live on GitHub Pages at https://reh3376.github.io/forge/ since 2026-10-28; FB-121 (a section on one clock in each tutorial track) done 2026-11-15 |
 | WS-12 process control | — | FB-110, FB-112 | FB-111 | D-11 signed 2026-11-13; the Forge review done the same day; the FSDs follow the owner's round-4 answers |
 
 ---

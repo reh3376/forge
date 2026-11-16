@@ -47,6 +47,8 @@
       "REST": "Representational State Transfer",
       "PR": "Pull Request",
       "WAN": "Wide Area Network",
+      "LAN": "Local Area Network",
+      "GNSS": "Global Navigation Satellite System",
       "UTC": "Coordinated Universal Time",
       "NTP": "Network Time Protocol",
       "PTP": "Precision Time Protocol",
