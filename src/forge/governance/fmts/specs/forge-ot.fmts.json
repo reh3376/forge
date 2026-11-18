@@ -69,13 +69,22 @@
   "metadata": {
     "hosting": "hub-hosted Python module",
     "state": "Forge's own OT module: PLC and OPC UA connections, the tag engine, alarms and control writes. It carries one identity since 2026-11-18, the approved FACTS spec's, in its manifest file and in the manifest its code registers with (FB-144).",
-    "time_contract_state": "Its plant-floor connections are declared in the FACTS spec's time_governance (OPC UA current time, class T0). M-4 to M-7 are not checked: the conformance kit drives modules on the Python adapter template only, and this module is not on it (FB-155, FB-146).",
+    "time_contract_state": "Its plant-floor connections are declared in the FACTS spec's time_governance (OPC UA current time, class T0). M-4 to M-7 are run by the conformance kit through the module's own hook (src/forge/modules/ot/conformance.py): the adapter on a real tag registry with two stamped tags, against a reference hub. No PLC or OPC UA server is connected, so a connection's clock gate is not exercised by the kit; its own tests cover it.",
     "note": "The local SQLite store-and-forward buffer is not declared as a database; whether M-8 covers it is the owner's to decide (FB-147)."
   },
   "integrity": {
-    "hash_state": "pending_review",
-    "previous_hash": "ed806fe9578f30688cc0fd58e8a3b7e66ea7d26885322c113ebd5bff283c9e8a",
+    "hash_state": "approved",
+    "previous_hash": "dbc46f93854ce3eda3b053d5ebee261ce2ec27e2e7b2f7994f63d91df01c3653",
     "change_history": [
+      {
+        "previous_hash": "dbc46f93854ce3eda3b053d5ebee261ce2ec27e2e7b2f7994f63d91df01c3653",
+        "new_hash": "4bfc7cf6bc7dd39fc959c1be698fdb590e415b4f3d29dadc6211044e411ab3f5",
+        "changed_at": "2026-11-18T17:18:39Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-155: M-4 to M-7 run by the conformance kit through the module's hook"
+      },
       {
         "previous_hash": "ed806fe9578f30688cc0fd58e8a3b7e66ea7d26885322c113ebd5bff283c9e8a",
         "new_hash": "dbc46f93854ce3eda3b053d5ebee261ce2ec27e2e7b2f7994f63d91df01c3653",
@@ -93,18 +102,11 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
         "reason": "Owner review 2026-11-18: the OT module's one id is forge-ot (FB-144)"
-      },
-      {
-        "previous_hash": "8d17a328e5ea4834704cc545c00a4d9f236df7dd6c880b22ed9bcc8c8ea64a70",
-        "new_hash": "67ef9bfcd2b9929ac5db14306371373ddb8ac407ffc30a84dbfeef0e7fd82227",
-        "changed_at": "2026-11-18T15:32:42Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "structural",
-        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "dbc46f93854ce3eda3b053d5ebee261ce2ec27e2e7b2f7994f63d91df01c3653"
+    "spec_hash": "4bfc7cf6bc7dd39fc959c1be698fdb590e415b4f3d29dadc6211044e411ab3f5",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-18T17:20:53Z"
   }
 }

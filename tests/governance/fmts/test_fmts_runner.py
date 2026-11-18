@@ -310,6 +310,14 @@ class TestM2Facts:
         verdict = await _one(runner, unsigned, repo, "m2")
         assert verdict.status == FAIL and "manifest version" in _messages(verdict)
 
+    async def test_the_manifest_schema_ref_must_match(self, runner, unsigned, repo) -> None:
+        path = repo / "src" / "wms" / "manifest.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        manifest["data_contract"]["schema_ref"] = "forge://schemas/forge-wms/v9.9.9"
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        verdict = await _one(runner, unsigned, repo, "m2")
+        assert verdict.status == FAIL and "the hub refuses that registration" in _messages(verdict)
+
     async def test_a_missing_manifest_fails(self, runner, unsigned, repo) -> None:
         unsigned["references"]["manifest"] = "src/wms/none.json"
         assert (await _one(runner, unsigned, repo, "m2")).status == FAIL

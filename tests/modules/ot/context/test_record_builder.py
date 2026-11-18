@@ -108,7 +108,7 @@ class TestBuildOtRecord:
 
     def test_record_lineage(self, sample_tag, sample_value, full_enrichment):
         record = build_ot_record(tag=sample_tag, tag_value=sample_value, enrichment=full_enrichment)
-        assert record.lineage.schema_ref == "forge://schemas/forge-ot/v0.1.0"
+        assert record.lineage.schema_ref == "forge://schemas/forge-ot/v0.3.0"
         assert record.lineage.adapter_id == "forge-ot"
         assert record.lineage.adapter_version == "0.1.0"
         assert "context_enrichment" in record.lineage.transformation_chain

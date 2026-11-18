@@ -175,6 +175,8 @@ class PythonAdapterDriver:
     #: Raw source events for ``inject_records``; without them the module sends nothing
     #: and M-6 has no record to look at.
     events: list[dict[str, Any]] = field(default_factory=list)
+    #: A module that is not fed by injected events gives itself something to send.
+    load: Callable[[Any], Awaitable[None]] | None = None
     adapter: AdapterBase = field(init=False)
     transport: GrpcTransportAdapter = field(init=False)
 
@@ -200,6 +202,8 @@ class PythonAdapterDriver:
         inject = getattr(self.adapter, "inject_records", None)
         if callable(inject):
             inject([dict(event) for event in self.events])
+        if self.load is not None:
+            await self.load(self.adapter)
         return await self.transport.collect_and_stream()
 
     async def own_health(self) -> dict[str, Any]:
@@ -245,6 +249,26 @@ def find_adapter_class(module_name: str) -> Callable[[], AdapterBase]:
         msg = f"{module_name} defines {len(found)} adapter classes; the template has exactly one"
         raise ValueError(msg)
     return found[0]
+
+
+#: The file a module off the template supplies beside its ``adapter.py`` so the kit can
+#: drive it: ``conformance_adapter()`` and, optionally, ``conformance_load(adapter)``.
+HOOK_FILE = "conformance.py"
+
+
+def load_hook(
+    source_path: str,
+) -> tuple[Callable[[], AdapterBase], Callable[[Any], Awaitable[None]] | None] | None:
+    """The module's own kit hook, or None when its package is not importable Forge code."""
+    name = adapter_module_name(source_path)
+    if name is None:
+        return None
+    module = importlib.import_module(name.rsplit(".", 1)[0] + ".conformance")
+    factory = getattr(module, "conformance_adapter", None)
+    if not callable(factory):
+        msg = f"{module.__name__} defines no conformance_adapter()"
+        raise ValueError(msg)
+    return factory, getattr(module, "conformance_load", None)
 
 
 def load_fixture(repo_root: Path, module_id: str) -> dict[str, Any]:

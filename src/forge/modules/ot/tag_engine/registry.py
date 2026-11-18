@@ -82,6 +82,16 @@ class TagRegistry:
         """All registered tag paths (sorted)."""
         return sorted(self._tags.keys())
 
+    async def list_paths(self) -> list[str]:
+        """All registered tag paths (sorted), for callers that await the registry.
+
+        ``OTModuleAdapter.collect`` and its discovery await this; it was missing here and
+        present only on the test doubles, so a collect against the real registry failed
+        (found by the FMTS conformance kit, FB-155).
+        """
+        async with self._lock:
+            return sorted(self._tags.keys())
+
     # ------------------------------------------------------------------
     # CRUD operations
     # ------------------------------------------------------------------

@@ -1,7 +1,7 @@
 {
   "site": "whk01",
   "topic_root": "whk",
-  "requested_by": "forge-ot-module",
+  "requested_by": "forge-ot",
   "mes_adapter_id": "forge-mes",
   "act_on_retained": false,
   "audit_log": true,
@@ -82,7 +82,7 @@
       "equipment_id": "Cooker01",
       "area": "cooker",
       "default_role": "ENGINEER",
-      "default_requestor": "forge-ot-module",
+      "default_requestor": "forge-ot",
       "mappings": [
         {
           "parameter_name": "target_temp",
