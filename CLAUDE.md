@@ -6,6 +6,8 @@ Guidance for Claude Code and any other coding agent working in the forge reposit
 
 Forge is the industrial data operations platform for a manufacturing enterprise. It connects every operational system a plant runs on (SCADA/PLC, MES, WMS, CMMS, ERP, QMS, historians, network management, lab and scanner devices), turns their output into one governed record type with manufacturing context attached, curates that into decision-quality data products, and renders every operator and management interface from declarative specifications.
 
+Forge is a dynamic framework, not a fixed product (A-19). Manufacturing differs from plant to plant, so every installation is a custom build-out for a facility, site or enterprise. That build-out is done in the forge designer, where users build with tools and widgets that are each governed by an FxTS spec. A user builds only within what the specs allow.
+
 ## Why we are building it
 
 Bad manufacturing decisions come from missing quality, context and correlation, not from missing data. Each plant system is an island with its own data shape, values arrive without context, clocks disagree, integrations are one-off projects that rot, and contracts between components change silently. Forge exists so that every value is validated, carries where, when, what and who it belongs to, and can be joined with every other value by that context. `docs/VISION.md` §2 lists the twelve problems and what "solved" means for each.

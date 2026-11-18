@@ -1,0 +1,123 @@
+{
+  "spec_version": "0.2.0",
+  "module_identity": {
+    "module_id": "forge-integ-erp-netsuite",
+    "name": "Forge NetSuite ERP Integration Adapter",
+    "alias": "netsuite",
+    "version": "0.1.0",
+    "kind": "integration",
+    "language": "python",
+    "source_paths": [
+      "src/forge/adapters/forge_integ_erp_netsuite"
+    ]
+  },
+  "hub_link": {
+    "protocol": "grpc",
+    "service": "forge.v1.AdapterService"
+  },
+  "references": {
+    "facts": {
+      "path": "src/forge/governance/facts/specs/forge-integ-erp-netsuite.facts.json",
+      "adapter_id": "forge-integ-erp-netsuite"
+    },
+    "manifest": "src/forge/adapters/forge_integ_erp_netsuite/manifest.json"
+  },
+  "baseline": {
+    "M-1": "met",
+    "M-2": "met",
+    "M-3": "met",
+    "M-4": "met",
+    "M-5": "met",
+    "M-6": "met",
+    "M-7": "met",
+    "M-8": "met",
+    "M-9": "met",
+    "M-10": "waived",
+    "M-11": "met"
+  },
+  "waivers": [
+    {
+      "requirement": "M-10",
+      "reason": "No module ships a roles file yet: the roles file has no FxTS spec to be written against, and the hub still uses its own flat roles.",
+      "backlog_item": "FB-141"
+    }
+  ],
+  "time_contract": {
+    "hub": {
+      "exchange": "four-timestamp",
+      "fail_closed": true
+    },
+    "plant_floor_devices": "none",
+    "databases": [
+      {
+        "name": "mod_erpi",
+        "owner": "hub",
+        "engine": "PostgreSQL",
+        "access": "read-write",
+        "credential": "forge-issued",
+        "written_time_source": "module-clock",
+        "fail_closed": true
+      }
+    ],
+    "third_party_systems": [
+      {
+        "name": "netsuite",
+        "interface": "amqp+rest+graphql",
+        "clock_read_method": "http-date-header",
+        "tolerance_class": "it-lan",
+        "clock_probe_interval_seconds": 30,
+        "offset_reported": true,
+        "fail_closed": true
+      }
+    ]
+  },
+  "user_interface": {
+    "ships_ui_code": false,
+    "screens": false
+  },
+  "scaffold": {
+    "template": "python-adapter"
+  },
+  "metadata": {
+    "hosting": "hub-hosted Python adapter today",
+    "state": "An integration module for one named product: it connects Forge to a NetSuite ERP (owner, 2026-11-18). Named forge-integ-<function>-<product> (A-17). It is the hand-written forerunner of what the integration builder will let an installation build (D-13).",
+    "time_contract_state": "Nothing reads the ERP's clock yet: the third-party entry is the contract the module is to be built to (FB-139). The hub database mod_erpi holds the ERP-side data; every time the module writes there comes from its own governed clock. M-4 to M-7 are run by the conformance kit through the Python transport, against a reference hub."
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": "4ac9c1b91014a05031734de741af6bafb4397c3851336adc98403e632f07d12a",
+    "change_history": [
+      {
+        "previous_hash": "4ac9c1b91014a05031734de741af6bafb4397c3851336adc98403e632f07d12a",
+        "new_hash": "79a9b8df349d9ff3fe40f478a070b498e329435a0c7f7011ee279957c6f35847",
+        "changed_at": "2026-11-18T16:24:48Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "Owner review 2026-11-18: the ERP module is forge-integ-erp-netsuite, an integration module for a named product"
+      },
+      {
+        "previous_hash": "f2cfc6425b407fca54733dcca8a4befd772ed4ba66694d720391bbfc1f3a119e",
+        "new_hash": "4ac9c1b91014a05031734de741af6bafb4397c3851336adc98403e632f07d12a",
+        "changed_at": "2026-11-18T16:20:22Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "The shape the owner approved for forge-wms on 2026-11-18: the module's hub database declared; the Go target stated"
+      },
+      {
+        "previous_hash": "86e67a3b7810e26c8901c1f7e6418b39333b1b17763d9cf006e3f9436a138670",
+        "new_hash": "f2cfc6425b407fca54733dcca8a4befd772ed4ba66694d720391bbfc1f3a119e",
+        "changed_at": "2026-11-18T15:53:20Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-150: the module's name is Forge NetSuite ERP Integration Adapter"
+      }
+    ],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "79a9b8df349d9ff3fe40f478a070b498e329435a0c7f7011ee279957c6f35847",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-18T16:28:11Z"
+  }
+}

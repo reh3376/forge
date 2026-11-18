@@ -167,13 +167,13 @@ class TestAdapterRegistry:
 
     @pytest.mark.asyncio
     async def test_adapter_health_after_register(self, client):
-        manifest = _make_manifest("forge-erpi")
+        manifest = _make_manifest("forge-integ-erp-netsuite")
         await client.post("/v1/adapters/register", json=manifest)
 
-        resp = await client.get("/v1/adapters/forge-erpi/health")
+        resp = await client.get("/v1/adapters/forge-integ-erp-netsuite/health")
         assert resp.status_code == 200
         data = resp.json()
-        assert data["adapter_id"] == "forge-erpi"
+        assert data["adapter_id"] == "forge-integ-erp-netsuite"
         assert data["state"] == "REGISTERED"
 
     @pytest.mark.asyncio

@@ -108,7 +108,7 @@ src/forge/
 │   │   │   ├── forge-cmms.facts.json
 │   │   │   ├── bosc-ims.facts.json
 │   │   │   ├── forge-nms.facts.json
-│   │   │   ├── forge-erpi.facts.json
+│   │   │   ├── forge-integ-erp-netsuite.facts.json
 │   │   │   ├── next-trend.facts.json
 │   │   │   └── scanner-gateway.facts.json
 │   │   └── runners/facts_runner.py
@@ -262,7 +262,7 @@ Each spoke has a FACTS spec that declares its identity, capabilities, connection
 | `forge-mes` | Manufacturing execution, `modules/Forge MES` (GraphQL, RabbitMQ, MQTT, REST, WebSocket, database; 18 sources) | v0.1.0 — approved 2026-10-15 (reh3376) |
 | `bosc-ims` | Aerospace inventory (gRPC unary and stream; 8 sources) | v0.1.0 — approved (no approver recorded) |
 | `forge-cmms` | Maintenance management (GraphQL, REST, RabbitMQ; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
-| `forge-erpi` | ERP integration, NetSuite (RabbitMQ, REST, GraphQL; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
+| `forge-integ-erp-netsuite` | ERP integration, NetSuite (RabbitMQ, REST, GraphQL; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
 | `forge-nms` | Network management (REST, WebSocket; 11 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
 | `next-trend` | Time-series historian (REST, WebSocket; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
 | `scanner-gateway` | Barcode scanner gateway (gRPC server unary and stream; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
@@ -312,7 +312,7 @@ The scripting SDK provides 11 modules that replace Ignition's `system.*` namespa
 | forge-cmms | `reh3376/forge-cmms` | GraphQL + REST + RabbitMQ | Maintenance Management |
 | BOSC-IMS | `reh3376/bosc_ims` | Go + gRPC | Aerospace Inventory |
 | forge-nms | `WhiskeyHouse/net-topology` | FastAPI + Next.js | Network Management |
-| forge-erpi | `reh3376/forge-erpi` | RabbitMQ + REST + GraphQL | ERP Integration (NetSuite) |
+| forge-integ-erp-netsuite | `reh3376/forge-integ-erp-netsuite` | RabbitMQ + REST + GraphQL | ERP Integration (NetSuite) |
 | NextTrend | `TheThoughtagen/nexttrend` | Rust + Next.js | Time-Series Historian |
 | Scanner Gateway | `WhiskeyHouse/forge-wms-android` | Kotlin | Android Barcode Scanner |
 | Ignition SCADA | `WhiskeyHouse/whk-ignition-scada` | Ignition 8.x | SCADA/HMI (being replaced) |

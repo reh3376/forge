@@ -19,7 +19,7 @@ from forge.core.models.manufacturing.material_item import MaterialItem
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "forge-erpi"
+_SOURCE_SYSTEM = "forge-integ-erp-netsuite"
 
 
 def map_item(raw: dict[str, Any]) -> MaterialItem | None:

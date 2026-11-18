@@ -321,7 +321,7 @@ class AccessController:
         defaults = [
             ("forge-wms", "mod_wms"),
             ("forge-mes", "mod_mes"),
-            ("forge-erpi", "mod_erpi"),
+            ("forge-integ-erp-netsuite", "mod_erpi"),
             ("forge-cmms", "mod_cmms"),
             ("forge-nms", "mod_nms"),
             ("whk-ims", "mod_ims"),

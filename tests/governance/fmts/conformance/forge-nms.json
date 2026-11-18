@@ -1,0 +1,35 @@
+{
+  "note": "What the FMTS conformance kit gives this module: raw source events, taken from the module's own tests. The kit never connects the module to a source.",
+  "events": [
+    {
+      "entity_type": "network_device",
+      "event_type": "device_discovery",
+      "id": "dev-001",
+      "ip_address": "10.0.0.1",
+      "name": "core-router-01",
+      "type": "router",
+      "health_status": "healthy",
+      "is_critical": true,
+      "is_ot_device": false,
+      "location": "data-center-1",
+      "last_seen": "2026-04-07T14:20:00Z",
+      "device_metadata": {
+        "serial_number": "SN-123456",
+        "vendor": "Cisco",
+        "model": "ASR9000",
+        "mac_address": "00:11:22:33:44:55"
+      }
+    },
+    {
+      "entity_type": "network_device",
+      "event_type": "snmp_trap",
+      "id": "trap-001",
+      "device_id": "plc-001",
+      "device_ip": "10.1.0.50",
+      "trap_type": "linkDown",
+      "oid": "1.3.6.1.6.3.1.1.5.3",
+      "severity": "high",
+      "timestamp": "2026-04-07T14:30:00Z"
+    }
+  ]
+}

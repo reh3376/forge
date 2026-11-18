@@ -1,7 +1,7 @@
-# ERPI Spoke Discovery — forge-erpi
+# ERPI Spoke Discovery — forge-integ-erp-netsuite
 
 **Date:** 2026-04-07
-**Source repo:** `WhiskeyHouse/forge-erpi`
+**Source repo:** `WhiskeyHouse/forge-integ-erp-netsuite`
 **Onboarding priority:** P1 (weighted score 41)
 **Status:** Discovery complete, ready for FACTS spec
 
@@ -9,7 +9,7 @@
 
 ## 1. System Overview
 
-forge-erpi is the **bidirectional ERP integration service** connecting WHK's manufacturing systems (WMS, MES, CMMS) to NetSuite ERP. It is the backbone of cross-system data flow — every module that needs financial, inventory, or master data routes through ERPI.
+forge-integ-erp-netsuite is the **bidirectional ERP integration service** connecting WHK's manufacturing systems (WMS, MES, CMMS) to NetSuite ERP. It is the backbone of cross-system data flow — every module that needs financial, inventory, or master data routes through ERPI.
 
 **Architecture:** NestJS 11 backend with RabbitMQ event-driven messaging + NetSuite REST/RESTlet polling. No frontend — this is a headless integration service.
 
@@ -148,7 +148,7 @@ Message schemas are defined in **AsyncAPI format** in a git submodule:
 |----------|-------|
 | Exchange type | **Fanout** (each topic is its own exchange) |
 | Durability | Durable exchanges, durable queues |
-| Consumer group | Named queue per group (default: `forge-erpi`) |
+| Consumer group | Named queue per group (default: `forge-integ-erp-netsuite`) |
 | Acknowledgment | Manual (`channel.ack()` after success) |
 | Persistence | All messages marked persistent |
 | Routing | Empty routing key (fanout broadcasts to all bound queues) |
@@ -330,11 +330,11 @@ ERPI is the bridge between MES and NetSuite ERP. The MES recipe and production s
 
 ### Phase 1: Passive RabbitMQ Consumer (recommended first step)
 
-The Forge ERPI adapter can subscribe to all 33 entity topic exchanges by creating its own durable queue per exchange. Because the exchanges are fanout, this requires **zero changes to forge-erpi**.
+The Forge ERPI adapter can subscribe to all 33 entity topic exchanges by creating its own durable queue per exchange. Because the exchanges are fanout, this requires **zero changes to forge-integ-erp-netsuite**.
 
 **What the adapter does:**
 1. Connect to RabbitMQ
-2. For each of the 33 entity exchanges, assert a new queue (e.g., `forge-erpi-<topic>`)
+2. For each of the 33 entity exchanges, assert a new queue (e.g., `forge-integ-erp-netsuite-<topic>`)
 3. Bind each queue to the corresponding fanout exchange
 4. Consume messages and map payloads to `ContextualRecord` using the AsyncAPI type definitions
 5. Forward ContextualRecords to Forge hub via gRPC

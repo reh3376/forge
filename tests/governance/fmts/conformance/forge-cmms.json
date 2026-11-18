@@ -1,0 +1,21 @@
+{
+  "note": "What the FMTS conformance kit gives this module: raw source events, taken from the module's own tests. The kit never connects the module to a source.",
+  "events": [
+    {
+      "entity_type": "Asset",
+      "event_type": "query",
+      "globalId": "ASSET-WH-001",
+      "id": "asset_001",
+      "assetPath": "Distillery01.Utility01.Neutralization01",
+      "assetType": "Tank",
+      "assetMake": "Tanks-R-Us",
+      "assetModel": "Model X1000",
+      "parentAssetId": "ASSET-WH-000",
+      "active": true,
+      "oemManufacturer": "Vendor-OEM",
+      "inServiceDate": "2020-01-15",
+      "createdAt": "2026-04-07T10:00:00Z",
+      "updatedAt": "2026-04-07T10:00:00Z"
+    }
+  ]
+}

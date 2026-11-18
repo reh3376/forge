@@ -1,0 +1,26 @@
+{
+  "note": "What the FMTS conformance kit gives this module: raw source events, taken from the module's own tests. The kit never connects the module to a source.",
+  "events": [
+    {
+      "data": {
+        "event_type": "create",
+        "recordName": "Item",
+        "data": {
+          "id": "cuid_item_001",
+          "globalId": "ITEM-NS-00412",
+          "name": "Corn - #2 Yellow Dent",
+          "type": "Inventory",
+          "category": "Raw Material",
+          "unitOfMeasure": "LB",
+          "transactionInitiator": "ERP",
+          "transactionStatus": "PENDING",
+          "transactionType": "CREATE",
+          "schemaVersion": "1.0.0",
+          "createdAt": "2026-04-07T10:00:00Z",
+          "updatedAt": "2026-04-07T10:00:00Z"
+        },
+        "messageId": "msg-001"
+      }
+    }
+  ]
+}

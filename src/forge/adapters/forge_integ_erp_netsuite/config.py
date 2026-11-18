@@ -12,10 +12,10 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class ForgeErpiConfig(BaseModel):
+class ForgeIntegErpNetsuiteConfig(BaseModel):
     """Connection parameters for the Forge ERP adapter.
 
-    Maps directly to the connection_params in forge-erpi.facts.json.
+    Maps directly to the connection_params in forge-integ-erp-netsuite.facts.json.
     Required params have no default; optional params have sensible defaults.
     """
 
@@ -39,7 +39,7 @@ class ForgeErpiConfig(BaseModel):
         description="JWT bearer token for authenticated API requests.",
     )
     rabbitmq_consumer_group: str = Field(
-        default="forge-erpi",
+        default="forge-integ-erp-netsuite",
         description="Consumer group for queue naming. Must be unique to Forge.",
     )
     rabbitmq_vhost: str = Field(

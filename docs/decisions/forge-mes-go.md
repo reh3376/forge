@@ -121,7 +121,7 @@ Commands are write tags through the hub (FACTS/FATS-governed, audited, scoped), 
 
 ### P-6 ERP and the other spokes — [OWNER 2026-11-03] (Q-6)
 
-The RabbitMQ consumer (`wh.whk01.distillery01.*`, NetSuite behind it) is spoke work: the hub has the `forge_erpi` adapter (`amqp+rest+graphql`, tier ERP_BUSINESS). The Go module keeps no AMQP client and reads ERP-owned entities through the hub (Subscribe to the ERP adapter's records, or hub queries) under its service identity. Until the ERP spoke carries those entities, the bridge's consumer keeps writing items, vendors, customers and purchase/sales orders into the reference tables of `mod_mes`, and the Go module treats them as read-only reference data.
+The RabbitMQ consumer (`wh.whk01.distillery01.*`, NetSuite behind it) is spoke work: the hub has the `forge_integ_erp_netsuite` adapter (`amqp+rest+graphql`, tier ERP_BUSINESS). The Go module keeps no AMQP client and reads ERP-owned entities through the hub (Subscribe to the ERP adapter's records, or hub queries) under its service identity. Until the ERP spoke carries those entities, the bridge's consumer keeps writing items, vendors, customers and purchase/sales orders into the reference tables of `mod_mes`, and the Go module treats them as read-only reference data.
 
 ### P-7 Identity and authorization — [OWNER 2026-11-03] (Q-10)
 
@@ -156,7 +156,7 @@ One static binary `forge-mes`; `deploy/docker/Dockerfile.forge-mes`; a compose s
 6. **FB-057 step 2**: the `mod_mes` baseline migration, `mod_mes.fdts.json` and the FDTS gate, the grants (FB-100, FB-004).
 7. **FB-057 steps 3 to 5**: registry placement, federation reads, the data move, the bridge read-only.
 8. **Domain services** in the order of P-9 phase 4, one PR each with its FDTS spec and event parity (closes FB-011 and FB-012 piecewise).
-9. **ERP entities through the hub** (`forge_erpi`); the bridge's RabbitMQ consumer retired.
+9. **ERP entities through the hub** (`forge_integ_erp_netsuite`); the bridge's RabbitMQ consumer retired.
 10. **Retire the NestJS backend** (FB-076 done); the Next.js frontend follows forge-display (M4, D-4).
 
 All ten questions were answered on 2026-11-03; the steps proceed in order, each its own PR, and every refusal or failure they introduce is alarmed and visible (the owner's no-silent-failure rule).
@@ -172,7 +172,7 @@ Asked and answered one at a time; the owner declared the answers the signature. 
 | Q-3 | Ignition's interface: the hub's write endpoint replaces the REST changeover routes and the GraphQL queue advance in phase 2 (P-3, P-5)? | **Yes**, the hub's write endpoint. | No: one Ignition configuration change, governed by FACTS/FATS; no module-local API to retire later. |
 | Q-4 | GraphQL: none in the Go module; reads through the hub's REST and FVTS; the bridge's GraphQL survives only for its own UI until M4 (P-5)? | **Amended.** No GraphQL in forge-mes; a **GraphQL gateway as a snap-on module of the hub** serves any client, and the bridge's GraphQL retires into it (P-5 amendment, FB-106). | Guarded: the gateway derives its schema from the one schema registry (D-10); a hand-maintained GraphQL schema would be a second model and is ruled out. |
 | Q-5 | Data layer: pgx and sqlc, no ORM; the module ships no DDL, the hub's Alembic migrations own `mod_mes` (P-4)? | **Yes.** | No: sqlc generates from the hub's DDL, so the two cannot drift silently; an ORM would have hidden who owns the DDL. |
-| Q-6 | ERP: the bridge's RabbitMQ consumer stays until the `forge_erpi` spoke carries the entities, and the Go module treats ERP-owned tables as reference data meanwhile (P-6)? | **Yes.** | Bounded: transitional duplication ends at step 9 when the `forge_erpi` spoke carries the entities; the tables are read-only reference data meanwhile. |
+| Q-6 | ERP: the bridge's RabbitMQ consumer stays until the `forge_integ_erp_netsuite` spoke carries the entities, and the Go module treats ERP-owned tables as reference data meanwhile (P-6)? | **Yes.** | Bounded: transitional duplication ends at step 9 when the `forge_integ_erp_netsuite` spoke carries the entities; the tables are read-only reference data meanwhile. |
 | Q-7 | The formula assistant (OpenAI/OpenRouter) and the Daytona sandbox: dropped from the rewrite, with a future item for a local-model assistant (P-8)? | **Drop both; record the future item** (FB-107, a local-model assistant, never a cloud model). | No. |
 | Q-8 | Site constants (`whk`, `whk01`, `distillery01`, the three areas) become configuration; the two unreachable changeover states are kept for parity (P-3)? | **Yes to both.** | No: configuration, not code; the parity states cost one enum entry each and keep audit-log replay exact. |
 | Q-9 | Cut-over criteria: FB-055 green, the OT suite green against the Go module, audit-log replay parity, and a two-week parallel run before the bridge's writes are disabled (P-9)? | **Yes, all four.** | No. |

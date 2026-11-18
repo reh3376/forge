@@ -1,12 +1,12 @@
-"""Forge ERP Interface Adapter — passive RabbitMQ consumer for ERP integration events.
+"""Forge NetSuite ERP Integration Adapter — passive RabbitMQ consumer for ERP integration events.
 
 This adapter subscribes to ERPI's 33 entity fanout exchanges and maps
 incoming messages to ContextualRecords. It creates its own durable queues
-(named forge-erpi-<entity>) without affecting existing ERPI consumers.
+(named forge-integ-erp-netsuite-<entity>) without affecting existing ERPI consumers.
 
 Phase 1 is read-only: consume existing RabbitMQ messages, map payloads
 to ContextualRecords, and forward to Forge hub via gRPC. No changes to
-forge-erpi are required.
+forge-integ-erp-netsuite are required.
 """
 
 from __future__ import annotations
@@ -23,10 +23,10 @@ from forge.adapters.base.interface import (
     DiscoveryProvider,
     SubscriptionProvider,
 )
-from forge.adapters.forge_erpi.config import ForgeErpiConfig
-from forge.adapters.forge_erpi.context import build_record_context
-from forge.adapters.forge_erpi.record_builder import build_contextual_record
-from forge.adapters.forge_erpi.topics import ERPI_ACK_TOPICS, ERPI_ENTITY_TOPICS
+from forge.adapters.forge_integ_erp_netsuite.config import ForgeIntegErpNetsuiteConfig
+from forge.adapters.forge_integ_erp_netsuite.context import build_record_context
+from forge.adapters.forge_integ_erp_netsuite.record_builder import build_contextual_record
+from forge.adapters.forge_integ_erp_netsuite.topics import ERPI_ACK_TOPICS, ERPI_ENTITY_TOPICS
 from forge.core.clock import SourceStampMissingError
 from forge.core.models.adapter import (
     AdapterCapabilities,
@@ -71,7 +71,7 @@ def _load_manifest() -> AdapterManifest:
     )
 
 
-class ForgeErpiAdapter(
+class ForgeIntegErpNetsuiteAdapter(
     AdapterBase,
     SubscriptionProvider,
     BackfillProvider,
@@ -96,7 +96,7 @@ class ForgeErpiAdapter(
 
     def __init__(self) -> None:
         super().__init__()
-        self._config: ForgeErpiConfig | None = None
+        self._config: ForgeIntegErpNetsuiteConfig | None = None
         self._pending_records: list[dict[str, Any]] = []
         self._subscriptions: dict[str, dict[str, Any]] = {}
         self._last_healthy: datetime | None = None
@@ -109,7 +109,7 @@ class ForgeErpiAdapter(
 
         Does NOT open any connections — that happens in start().
         """
-        self._config = ForgeErpiConfig(**params)
+        self._config = ForgeIntegErpNetsuiteConfig(**params)
         self.check_time_governance()
         self._state = AdapterState.REGISTERED
 
@@ -129,7 +129,7 @@ class ForgeErpiAdapter(
         self._last_healthy = datetime.now(tz=UTC)
         self._startup_time = self._last_healthy
         logger.info(
-            "forge-erpi adapter started (phase 1: inject-only, %d entity topics defined)",
+            "forge-integ-erp-netsuite adapter started (phase 1: inject-only, %d entity topics)",
             len(ERPI_ENTITY_TOPICS),
         )
 
@@ -138,7 +138,7 @@ class ForgeErpiAdapter(
         self._pending_records.clear()
         self._subscriptions.clear()
         self._state = AdapterState.STOPPED
-        logger.info("forge-erpi adapter stopped")
+        logger.info("forge-integ-erp-netsuite adapter stopped")
 
     async def health(self) -> AdapterHealth:
         """Return current health status and record counters."""
@@ -245,7 +245,7 @@ class ForgeErpiAdapter(
         """
         # TODO(Phase 2): Implement REST/GraphQL polling for historical data
         logger.warning(
-            "forge-erpi backfill() stub called: tags=%s (Phase 2 required)",
+            "forge-integ-erp-netsuite backfill() stub called: tags=%s (Phase 2 required)",
             tags,
         )
         return

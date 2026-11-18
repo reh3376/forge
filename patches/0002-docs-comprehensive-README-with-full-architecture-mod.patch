@@ -120,7 +120,7 @@ index e69de29..583aae5 100644
 +│   │   │   ├── forge-cmms.facts.json
 +│   │   │   ├── bosc-ims.facts.json
 +│   │   │   ├── forge-nms.facts.json
-+│   │   │   ├── forge-erpi.facts.json
++│   │   │   ├── forge-integ-erp-netsuite.facts.json
 +│   │   │   ├── next-trend.facts.json
 +│   │   │   └── scanner-gateway.facts.json
 +│   │   └── runners/facts_runner.py
@@ -262,7 +262,7 @@ index e69de29..583aae5 100644
 +| `forge-cmms` | Computerized Maintenance (n8n) | Draft |
 +| `bosc-ims` | Aerospace Inventory (Go gRPC) | Draft |
 +| `forge-nms` | Network Management (FastAPI) | Draft |
-+| `forge-erpi` | ERP Integration (NetSuite) | Draft |
++| `forge-integ-erp-netsuite` | ERP Integration (NetSuite) | Draft |
 +| `next-trend` | Time-Series Historian (Rust) | Draft |
 +| `scanner-gateway` | Android Barcode Scanner | Draft |
 +
@@ -308,7 +308,7 @@ index e69de29..583aae5 100644
 +| forge-cmms | `reh3376/forge-cmms` | n8n + API | Maintenance Management |
 +| BOSC-IMS | `reh3376/bosc_ims` | Go + gRPC | Aerospace Inventory |
 +| forge-nms | `WhiskeyHouse/net-topology` | FastAPI + Next.js | Network Management |
-+| forge-erpi | `reh3376/forge-erpi` | Python | ERP Integration (NetSuite) |
++| forge-integ-erp-netsuite | `reh3376/forge-integ-erp-netsuite` | Python | ERP Integration (NetSuite) |
 +| NextTrend | `TheThoughtagen/nexttrend` | Rust + Next.js | Time-Series Historian |
 +| Scanner Gateway | `WhiskeyHouse/forge-wms-android` | Kotlin | Android Barcode Scanner |
 +| Ignition SCADA | `WhiskeyHouse/whk-ignition-scada` | Ignition 8.x | SCADA/HMI (being replaced) |
