@@ -104,12 +104,11 @@ class TestFullSpecPasses:
         runner: FTTSRunner,
         spec: dict,
     ) -> None:
-        """Real FTTS spec passes every check but the owner's approval, which is pending.
+        """Real FTTS spec passes every check, the owner's approval included (2026-11-18).
 
-        The spec carries a hash since FB-160 (D-14); the owner approves FTTS under FB-161.
-        Nobody writes that approval on the owner's behalf. Empty the set when it lands.
+        The spec carries a hash since FB-160 (D-14). No failure is allowed.
         """
-        allowed = {"ftts:hash-approved", "ftts:integrity-state"}
+        allowed: set[str] = set()
         report = await runner.run(
             target="grpc-hardened-transport",
             spec=spec,
