@@ -22,13 +22,20 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from forge.core.clock import SPOKE_TRANSMIT_TIME_HEADER, TimeExchange, utc_now
+from forge.core.clock import (
+    CLOCK_REFUSED_STATES,
+    ClockRefusedError,
+    TimeExchange,
+    utc_now,
+)
 from forge.core.models.adapter import AdapterManifest, SpokeTime
 from forge.core.models.contextual_record import ContextualRecord
 from forge.transport.serialization import (
+    headers_to_spoke_time,
     proto_to_hub_time,
     proto_to_spoke_time,
     pydantic_to_proto,
+    spoke_time_to_headers,
     spoke_time_to_proto,
 )
 
@@ -187,17 +194,23 @@ class SpokeClient:
             return None
         return self.now() + timedelta(seconds=self._exchange.offset_seconds)
 
-    def _spoke_time(self) -> tuple[datetime, dict[str, Any]]:
-        """T1 for a request, with the last exchange's result for the hub's series."""
-        t1 = self.now()
+    def _spoke_time_now(self) -> SpokeTime:
+        """T1 for a request, with the last exchange's result for the hub's series.
+
+        The measurement is what the hub judges this spoke's clock by (FB-093): every
+        Register, Health and Ingest carries it once the first exchange is complete.
+        """
         last = self._exchange
-        spoke_time = SpokeTime(
-            transmit_time=t1,
+        return SpokeTime(
+            transmit_time=self.now(),
             offset_seconds=last.offset_seconds if last is not None else None,
             round_trip_seconds=last.round_trip_seconds if last is not None else None,
             measured_at=last.t4 if last is not None else None,
         )
-        return t1, spoke_time_to_proto(spoke_time)
+
+    def _spoke_time(self) -> tuple[datetime, dict[str, Any]]:
+        spoke_time = self._spoke_time_now()
+        return spoke_time.transmit_time, spoke_time_to_proto(spoke_time)
 
     def _complete_exchange(self, t1: datetime, response: dict[str, Any] | None) -> None:
         """Take T4 and keep the exchange, when the hub answered with T2 and T3."""
@@ -211,7 +224,11 @@ class SpokeClient:
     async def register(self, manifest: AdapterManifest) -> str:
         """Register the adapter with the hub.
 
-        Returns the hub-assigned session_id.
+        Returns the hub-assigned session_id. Raises :class:`ClockRefusedError` when the
+        hub refuses this spoke for its clock (FB-093). The refused answer still carries
+        the hub's time, so the exchange completes and the next attempt reports a fresh
+        measurement: a spoke whose clock is back inside its class is readmitted by
+        retrying, after three good probes at least a second apart.
         """
         manifest_dict = pydantic_to_proto(manifest)
         t1, spoke_time = self._spoke_time()
@@ -221,7 +238,11 @@ class SpokeClient:
         )
         self._complete_exchange(t1, response)
         if not response.get("accepted"):
-            msg = f"Registration rejected: {response.get('message')}"
+            message = str(response.get("message") or "")
+            cause = clock_refusal_cause(response.get("refusal_cause"), message)
+            if cause is not None:
+                raise ClockRefusedError(f"Registration refused: {message}", cause=cause)
+            msg = f"Registration rejected: {message}"
             raise RuntimeError(msg)
         self._session_id = response["session_id"]
         self._adapter_id = manifest.adapter_id
@@ -311,7 +332,10 @@ class SpokeClient:
         collect() async iterator is serialized to a proto dict and
         streamed over the transport channel.
 
-        Returns the number of records successfully sent.
+        Returns the number of records successfully sent. Raises
+        :class:`ClockRefusedError` when the hub refuses the stream for this spoke's
+        clock (FB-093): nothing of it was taken, and the hub's Health answers still
+        carry its time, so the spoke goes on measuring until it is readmitted.
         """
         if self._session_id is None:
             msg = "Not registered — call register() first"
@@ -328,13 +352,14 @@ class SpokeClient:
                 yield pydantic_to_proto(record)
                 count += 1
 
-        t1 = self.now()
+        spoke_time = self._spoke_time_now()
         response = await self.channel.send_stream(
             "Collect",
             _serialize(),
-            metadata=[(SPOKE_TRANSMIT_TIME_HEADER, t1.isoformat())],
+            # T1 and the last measurement, in headers: the request is a stream of records
+            metadata=spoke_time_to_headers(spoke_time),
         )
-        self._complete_exchange(t1, response)
+        self._complete_exchange(spoke_time.transmit_time, response)
         self._records_sent += count
         logger.info("Streamed %d records to hub (total: %d)", count, self._records_sent)
         return count
@@ -342,6 +367,22 @@ class SpokeClient:
     async def close(self) -> None:
         """Close the transport channel."""
         await self.channel.close()
+
+
+def clock_refusal_cause(cause: Any, message: str = "") -> str | None:
+    """The clock-refusal cause of a refused request, or None for any other refusal.
+
+    ``cause`` is what the hub named (the ``x-forge-refusal-cause`` trailer); a hub
+    answer read without its trailers still says it, since the message begins with the
+    state (``CLOCK_OUT_OF_TOLERANCE: ...``).
+    """
+    causes = {state.lower() for state in CLOCK_REFUSED_STATES}
+    if isinstance(cause, str) and cause in causes:
+        return cause
+    for state in CLOCK_REFUSED_STATES:
+        if message.startswith(f"{state}:"):
+            return state.lower()
+    return None
 
 
 class InMemoryChannel(TransportChannel):
@@ -368,7 +409,11 @@ class InMemoryChannel(TransportChannel):
 
         if method == "Register":
             received_at = self._received_at()
-            result = await self._servicer.register(request["manifest"])
+            spoke_time = proto_to_spoke_time(request.get("spoke_time"))
+            if spoke_time is not None:
+                result = await self._servicer.register(request["manifest"], spoke_time=spoke_time)
+            else:
+                result = await self._servicer.register(request["manifest"])
             return self._with_hub_time(result, received_at)
         if method == "Configure":
             return await self._servicer.configure(
@@ -458,6 +503,11 @@ class InMemoryChannel(TransportChannel):
                 raise RuntimeError(msg)
             session_id = sessions[-1].session_id
 
+            begin = getattr(self._servicer, "begin_ingest", None)
+            if callable(begin):
+                # as the wire does: the measurement in the call's headers is the probe,
+                # and a refused spoke's stream is not read (FB-093)
+                await begin(session_id, spoke_time=headers_to_spoke_time(dict(metadata or ())))
             count = 0
             async for record_dict in records:
                 await self._servicer.receive_record(session_id, record_dict)

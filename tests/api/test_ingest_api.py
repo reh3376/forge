@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from unittest.mock import patch
 
 import pytest
@@ -227,3 +227,29 @@ async def test_ingest_stats_endpoint(client, sink: InMemoryRecordSink) -> None:
     assert body["pipeline"]["fallback_sink"] == "InMemoryRecordSink"
     assert body["pipeline"]["stats"]["persisted"] == 1
     assert body["pipeline"]["stats"]["batches"] == 1
+
+
+@pytest.mark.asyncio
+async def test_a_spoke_refused_for_its_clock_is_refused_on_rest_too(
+    app, client, sink: InMemoryRecordSink, caplog: pytest.LogCaptureFixture
+) -> None:
+    """One clock (FB-093): REST honours the refusal the time exchange established."""
+    await client.post("/v1/adapters/register", json=_manifest())
+    body = {"adapter_id": "whk-wms", "records": [{"tag": "temp", "value": 72.5}]}
+    assert (await client.post("/v1/records", json=body)).status_code == 200
+
+    gates = app.state.ingest_pipeline.gates
+    gates.declare("whk-wms", "it-lan")
+    start = datetime(2026, 6, 1, 12, tzinfo=UTC)
+    for i in range(3):  # three measurements 2 s off, as the gRPC exchange reports them
+        at = start + timedelta(seconds=30 * i)
+        gates.probe("whk-wms", at, offset_seconds=-2.0, round_trip_seconds=0.002, measured_at=at)
+
+    with caplog.at_level(logging.WARNING, logger="forge.api.main"):
+        resp = await client.post("/v1/records", json=body)
+    assert resp.status_code == 409
+    detail = resp.json()["detail"]
+    assert detail.startswith("Ingest refused: CLOCK_OUT_OF_TOLERANCE: clock spoke:whk-wms is +2.0")
+    assert "REST ingest from adapter 'whk-wms' refused" in caplog.text
+    assert len(sink) == 1  # nothing of the refused request was taken
+    assert gates.refused_requests("whk-wms") == {"clock_out_of_tolerance": 1}

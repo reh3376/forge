@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 import grpc
 import grpc.aio
 
-from forge.core.clock import SPOKE_TRANSMIT_TIME_HEADER
+from forge.core.clock import REFUSAL_CAUSE_HEADER, ClockRefusedError
 from forge.core.models.adapter import HubTime
 from forge.proto_gen.forge.v1 import adapter_pb2 as adapter_msg
 from forge.proto_gen.forge.v1 import adapter_service_pb2 as service_msg
@@ -46,6 +46,7 @@ from forge.transport.proto_bridge import (
     proto_to_manifest,
     proto_to_spoke_time,
 )
+from forge.transport.serialization import headers_to_spoke_time
 
 logger = logging.getLogger(__name__)
 
@@ -133,7 +134,16 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
             from forge.transport.serialization import pydantic_to_proto
 
             manifest_dict = pydantic_to_proto(manifest)
-            result = await self._servicer.register(manifest_dict)
+            result = await self._servicer.register(
+                manifest_dict,
+                # T1, and the measurement of a spoke that has completed an exchange: a
+                # refused spoke proves its clock with it and is readmitted (FB-093)
+                spoke_time=proto_to_spoke_time(request.spoke_time),
+            )
+            cause = result.get("refusal_cause")
+            if cause:
+                # the cause by name, for a client that acts on it; the message says it too
+                context.set_trailing_metadata(((REFUSAL_CAUSE_HEADER, str(cause)),))
             return service_msg.RegisterResponse(
                 accepted=result.get("accepted", False),
                 message=result.get("message", ""),
@@ -270,9 +280,10 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
         metadata = dict(context.invocation_metadata())
         session_id = metadata.get("x-forge-session-id")
         _adapter_id = metadata.get("x-forge-adapter-id")  # reserved for future routing
-        # T1 arrives in this header because the request is a stream of records. The hub
-        # has no use for its value: sending it is how a spoke asks for the hub's half.
-        _spoke_transmit_time = metadata.get(SPOKE_TRANSMIT_TIME_HEADER)
+        # T1 and the spoke's last measurement arrive in headers because the request is
+        # a stream of records (FB-092). The measurement is the probe of the spoke's
+        # clock for this call (FB-093); a call without one counts as unreadable.
+        spoke_time = headers_to_spoke_time(metadata)
 
         if not session_id:
             # Fallback: use most recent session
@@ -290,6 +301,10 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
 
         count = 0
         try:
+            begin = getattr(self._servicer, "begin_ingest", None)
+            if callable(begin):
+                # refuses a spoke whose clock is not trusted before a record is read
+                await begin(session_id, spoke_time=spoke_time)
             async for proto_record in request_iterator:
                 # Convert proto message to dict for the existing servicer
                 pydantic_record = proto_to_contextual_record(proto_record)
@@ -314,6 +329,20 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
                 success=True,
                 message=message,
                 hub_time=self._hub_time(received_at),
+            )
+        except ClockRefusedError as exc:
+            # A refusal, not a fault (one-clock record P-5): FAILED_PRECONDITION, so no
+            # client can take it for delivery, with the cause by name in the trailer.
+            # The spoke's Health and Register still return the hub's time, so it goes on
+            # measuring and is readmitted after three good probes.
+            logger.warning("Ingest from session %s refused: %s", session_id, exc)
+            context.set_trailing_metadata(((REFUSAL_CAUSE_HEADER, exc.cause),))
+            context.set_code(grpc.StatusCode.FAILED_PRECONDITION)
+            context.set_details(str(exc))
+            return service_msg.IngestResponse(
+                records_received=count,
+                success=False,
+                message=str(exc),
             )
         except Exception as exc:
             logger.exception("Ingest RPC failed after %d records", count)

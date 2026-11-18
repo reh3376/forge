@@ -19,7 +19,12 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Protocol
 
-from forge.core.clock import ClockOffsetTracker, resolve_source_stamp, utc_now
+from forge.core.clock import (
+    ClockOffsetTracker,
+    SpokeClockGates,
+    resolve_source_stamp,
+    utc_now,
+)
 from forge.core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -185,8 +190,9 @@ class IngestPipeline:
     :func:`stamp_receipt`, and its timestamps feed the clock-offset
     measurement, see :class:`~forge.core.clock.ClockOffsetTracker` (FB-089).
     ``clock`` is the hub clock, ``utc_now`` unless a test or a hub-of-hubs link
-    (FB-092) injects another; ``offsets`` is the tracker, one per pipeline by
-    default. ``curation`` is the curation engine (FB-009): after a batch is
+    (FB-092) injects another; ``offsets`` is the tracker and ``gates`` the hub's
+    gate on each spoke's clock (FB-093), one of each per pipeline by default.
+    ``curation`` is the curation engine (FB-009): after a batch is
     persisted, every published data product fed by the batch's adapter is
     curated with it, and the curated records come back through
     :meth:`persist`.
@@ -200,12 +206,16 @@ class IngestPipeline:
         fallback_sink: RecordSink | None = None,
         clock: Callable[[], datetime] | None = None,
         offsets: ClockOffsetTracker | None = None,
+        gates: SpokeClockGates | None = None,
         curation: CurationEngine | None = None,
     ) -> None:
         self._clock: Callable[[], datetime] = clock or utc_now
         #: The hub clock, for whoever stamps on the hub's behalf (the exchange, FB-092).
         self.clock = self._clock
         self.offsets: ClockOffsetTracker = offsets or ClockOffsetTracker()
+        #: The hub's gate on each spoke's clock (FB-093): one per pipeline, like the
+        #: tracker, so the gRPC servicer and the REST endpoint refuse the same spokes.
+        self.gates: SpokeClockGates = gates or SpokeClockGates()
         self.curation: CurationEngine | None = curation
         self._router = router or DataRouter(registry=SchemaRegistry())
         self._sinks: dict[StorageEngine, RecordSink] = dict(sinks or {})
@@ -237,6 +247,7 @@ class IngestPipeline:
             "fallback_sink": type(self._fallback).__name__,
             "stats": self.stats.to_dict(),
             "clock_offsets": self.offsets.describe(),
+            "clock_gates": self.gates.describe(),
             "curation": self.curation.describe() if self.curation is not None else None,
         }
 

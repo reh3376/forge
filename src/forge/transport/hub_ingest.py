@@ -13,6 +13,10 @@ Replaces ``InMemoryServicer`` in the hub API. Differences:
 * Registration and health callbacks may be coroutines (the durable
   registry persists them, FB-060) and every flushed batch is reported to
   ``ingest_log`` for ``forge_core.records_log``.
+* The hub fails closed on a spoke's clock (FB-093, hub half): every Register,
+  Health and Ingest request is a probe of it, and a spoke whose clock is
+  unreadable or outside its declared class has its Register and its Ingest
+  refused until three good probes (:class:`~forge.core.clock.SpokeClockGates`).
 """
 
 from __future__ import annotations
@@ -23,8 +27,20 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
-from forge.core.clock import tolerance_for_class
-from forge.core.models.adapter import AdapterHealth, AdapterManifest, SpokeTime
+from forge.core import telemetry
+from forge.core.clock import (
+    TIME_GOVERNANCE_MISSING,
+    ClockGateTransition,
+    ClockRefusedError,
+    tolerance_for_class,
+)
+from forge.core.models.adapter import (
+    AdapterHealth,
+    AdapterManifest,
+    AdapterState,
+    SpokeTime,
+    TimeGovernance,
+)
 from forge.ingest.facts_check import FactsCheckResult, check_manifest_against_facts
 from forge.ingest.pipeline import IngestOutcome, IngestPipeline, IngestStats
 from forge.transport.hub_server import AdapterServiceServicer, AdapterSession
@@ -85,6 +101,11 @@ class HubIngestServicer(AdapterServiceServicer):
         # One hub clock: T2 and T3 of the time exchange come from the clock that stamps
         # receipt on every record (FB-087, FB-092).
         self.clock = self.pipeline.clock
+        #: The gate on each spoke's clock (FB-093). The pipeline owns it, so the REST
+        #: endpoint refuses the spokes this servicer refuses.
+        self.gates = self.pipeline.gates
+        #: Registrations refused before a gate existed (no time_governance), by adapter.
+        self._refused_registrations: dict[str, int] = {}
         self.write_dispatcher = write_dispatcher
         self._batch_size = max(1, batch_size)
         self._specs_dir = specs_dir
@@ -96,7 +117,12 @@ class HubIngestServicer(AdapterServiceServicer):
 
     # -- control plane --------------------------------------------------------
 
-    async def register(self, manifest_dict: dict[str, Any]) -> dict[str, Any]:
+    async def register(
+        self,
+        manifest_dict: dict[str, Any],
+        *,
+        spoke_time: SpokeTime | None = None,
+    ) -> dict[str, Any]:
         manifest = proto_to_pydantic(manifest_dict, "AdapterManifest")
         check = check_manifest_against_facts(
             manifest, specs_dir=self._specs_dir, require_spec=self._require_facts
@@ -104,6 +130,29 @@ class HubIngestServicer(AdapterServiceServicer):
         if not check.ok:
             logger.warning("Registration rejected for %s: %s", manifest.adapter_id, check.summary())
             return {"accepted": False, "message": check.summary(), "session_id": ""}
+
+        adapter_id = manifest.adapter_id
+        now = self.clock()
+        governance = manifest.time_governance
+        if governance is None:
+            # No declared class, nothing to hold the spoke's clock to: the check is not
+            # optional, so the registration is refused (one-clock record P-7, FB-093).
+            return await self._refuse_ungoverned(adapter_id, now)
+        self.gates.declare(adapter_id, governance.tolerance_class)
+        # A Register is a probe when it reports a measurement: a refused spoke that lost
+        # its session proves its clock this way, and is readmitted by its own retries.
+        changed = self._probe(adapter_id, governance, spoke_time, now, first_contact=True)
+        refusal = self.gates.refusal(adapter_id)
+        if refusal is not None:
+            await self._refuse_request(adapter_id, refusal, "Register", now)
+            return {
+                "accepted": False,
+                "message": str(refusal),
+                "session_id": "",
+                "refusal_cause": refusal.cause,
+            }
+        if changed:
+            await self._announce(adapter_id, now)
 
         result = await super().register(manifest_dict)
         session_id = result["session_id"]
@@ -147,48 +196,192 @@ class HubIngestServicer(AdapterServiceServicer):
         spoke_time: SpokeTime | None = None,
     ) -> dict[str, Any]:
         session = self._get_session(adapter_id, session_id)
-        state = self._state.get(session_id)
         now = self.clock()
-        if (
-            spoke_time is not None
-            and spoke_time.offset_seconds is not None
-            and spoke_time.round_trip_seconds is not None
-        ):
-            # The spoke reports its last completed exchange (one-clock record P-9): from
-            # here on its clock is measured two-way, and its records stop feeding the series.
-            # A two-way measurement is held to the class the spoke declared (P-8); the
-            # alert is FB-089's, the refusal is FB-093's hub half.
-            governance = session.manifest.time_governance
-            self.pipeline.offsets.observe_exchange(
-                adapter_id,
-                offset_seconds=spoke_time.offset_seconds,
-                round_trip_seconds=spoke_time.round_trip_seconds,
-                at=now,
-                tolerance_seconds=(
-                    tolerance_for_class(governance.tolerance_class)
-                    if governance is not None
-                    else None
-                ),
-            )
-        stats = state.stats if state else IngestStats()
-        failed = stats.rejected + stats.failed + (state.parse_rejected if state else 0)
-        health = AdapterHealth(
-            adapter_id=adapter_id,
-            state=session.state,
-            last_check=now,
-            last_healthy=now if session.state.value == "healthy" else None,
-            error_message=state.last_error if state else None,
-            records_collected=stats.persisted,
-            records_failed=failed,
-            uptime_seconds=(now - session.created_at).total_seconds(),
-            clock=self.pipeline.offsets.stats(adapter_id),
-        )
+        # Every Health is a probe of the spoke's clock (FB-093): it reports the spoke's
+        # last completed exchange (one-clock record P-9), or it reports nothing, which
+        # counts as a clock the hub could not read. A reported measurement also feeds the
+        # two-way series, held to the class the spoke declared (P-8).
+        self._probe(adapter_id, session.manifest.time_governance, spoke_time, now)
+        health = self._health_of(adapter_id, session, now)
         if self._on_health is not None:
             try:
                 await _maybe_await(self._on_health(adapter_id, health))
             except Exception:  # pragma: no cover - callback is best effort
                 logger.exception("on_health callback failed for %s", adapter_id)
         return pydantic_to_proto(health)
+
+    # -- the gate on a spoke's clock (one clock, FB-093 hub half) ---------------
+
+    def _probe(
+        self,
+        adapter_id: str,
+        governance: TimeGovernance | None,
+        spoke_time: SpokeTime | None,
+        at: datetime,
+        *,
+        first_contact: bool = False,
+    ) -> bool:
+        """Take one request as a probe of the spoke's clock; True when its state changed.
+
+        A measurement the hub has not seen goes on the two-way series (FB-092) whether or
+        not the gate counts it as a probe; the gate counts at most one probe a second.
+        """
+        offset = spoke_time.offset_seconds if spoke_time is not None else None
+        round_trip = spoke_time.round_trip_seconds if spoke_time is not None else None
+        measured_at = spoke_time.measured_at if spoke_time is not None else None
+        if offset is None or round_trip is None:
+            offset = round_trip = measured_at = None
+        probe = self.gates.probe(
+            adapter_id,
+            at,
+            offset_seconds=offset,
+            round_trip_seconds=round_trip,
+            measured_at=measured_at,
+            first_contact=first_contact,
+        )
+        if probe.fresh and offset is not None and round_trip is not None:
+            self.pipeline.offsets.observe_exchange(
+                adapter_id,
+                offset_seconds=offset,
+                round_trip_seconds=round_trip,
+                at=at,
+                tolerance_seconds=(
+                    tolerance_for_class(governance.tolerance_class)
+                    if governance is not None
+                    else None
+                ),
+            )
+        if probe.transition is None:
+            return False
+        self._note_transition(adapter_id, probe.transition)
+        return True
+
+    @staticmethod
+    def _note_transition(adapter_id: str, transition: ClockGateTransition) -> None:
+        """Never silent (owner, 2026-11-03): the log and the metric at the moment of entry."""
+        if transition.refused:
+            logger.error(
+                "Spoke %s is refused, %s: %s. The hub refuses its Register and its Ingest "
+                "until three consecutive good measurements (one clock, FB-093)",
+                adapter_id,
+                transition.state,
+                transition.cause,
+            )
+            telemetry.record_refusal(adapter_id, transition.refusal_cause)
+        else:
+            logger.info("Spoke %s is readmitted: %s", adapter_id, transition.cause)
+
+    async def _refuse_request(
+        self, adapter_id: str, refusal: ClockRefusedError, rpc: str, at: datetime
+    ) -> None:
+        """Count, log and announce one request refused for the spoke's clock."""
+        self.gates.note_refused(adapter_id, refusal.cause)
+        telemetry.record_refusal(adapter_id, refusal.cause)
+        logger.warning("%s from spoke %s refused: %s", rpc, adapter_id, refusal)
+        await self._announce(adapter_id, at)
+
+    async def _refuse_ungoverned(self, adapter_id: str, at: datetime) -> dict[str, Any]:
+        """Refuse a registration whose manifest declares no ``time_governance``."""
+        count = self._refused_registrations.get(adapter_id, 0) + 1
+        self._refused_registrations[adapter_id] = count
+        message = (
+            f"{TIME_GOVERNANCE_MISSING}: the manifest of '{adapter_id}' declares no "
+            "time_governance, so the hub has no tolerance class to hold its clock to; "
+            "the registration is refused (one clock, FB-093)"
+        )
+        logger.error("Registration refused for %s: %s", adapter_id, message)
+        telemetry.record_refusal(adapter_id, TIME_GOVERNANCE_MISSING)
+        if self._on_health is not None:
+            health = AdapterHealth(
+                adapter_id=adapter_id,
+                state=AdapterState.DEGRADED,
+                last_check=at,
+                error_message=message,
+                refusals={TIME_GOVERNANCE_MISSING: count},
+                last_refusal=message,
+            )
+            try:
+                await _maybe_await(self._on_health(adapter_id, health))
+            except Exception:  # pragma: no cover - callback is best effort
+                logger.exception("on_health callback failed for %s", adapter_id)
+        return {
+            "accepted": False,
+            "message": message,
+            "session_id": "",
+            "refusal_cause": TIME_GOVERNANCE_MISSING,
+        }
+
+    def _latest_session(self, adapter_id: str) -> AdapterSession | None:
+        for session in reversed(list(self._sessions.values())):
+            if session.adapter_id == adapter_id:
+                return session
+        return None
+
+    def _health_of(
+        self, adapter_id: str, session: AdapterSession | None, at: datetime
+    ) -> AdapterHealth:
+        """The hub's view of a spoke: its session's counters and the gate on its clock.
+
+        A refused spoke is DEGRADED whatever its session says, with the cause on
+        ``error_message`` and ``last_refusal`` (both reach the spoke on the wire), the
+        gate on ``clock_state`` and ``clock_gate``, and the requests refused by cause.
+        """
+        state = self._state.get(session.session_id) if session is not None else None
+        stats = state.stats if state else IngestStats()
+        failed = stats.rejected + stats.failed + (state.parse_rejected if state else 0)
+        refusal = self.gates.refusal(adapter_id)
+        session_state = session.state if session is not None else AdapterState.REGISTERED
+        healthy = refusal is None and session_state == AdapterState.HEALTHY
+        return AdapterHealth(
+            adapter_id=adapter_id,
+            state=AdapterState.DEGRADED if refusal is not None else session_state,
+            last_check=at,
+            last_healthy=at if healthy else None,
+            error_message=(
+                str(refusal) if refusal is not None else (state.last_error if state else None)
+            ),
+            records_collected=stats.persisted,
+            records_failed=failed,
+            uptime_seconds=(
+                (at - session.created_at).total_seconds() if session is not None else 0.0
+            ),
+            clock=self.pipeline.offsets.stats(adapter_id),
+            refusals=self.gates.refused_requests(adapter_id),
+            last_refusal=str(refusal) if refusal is not None else None,
+            clock_state=self.gates.state(adapter_id),
+            clock_gate=self.gates.describe_gate(adapter_id),
+        )
+
+    async def _announce(self, adapter_id: str, at: datetime) -> None:
+        """Push the spoke's health to the registry now, so the API and the CLI show it."""
+        if self._on_health is None:
+            return
+        health = self._health_of(adapter_id, self._latest_session(adapter_id), at)
+        try:
+            await _maybe_await(self._on_health(adapter_id, health))
+        except Exception:  # pragma: no cover - callback is best effort
+            logger.exception("on_health callback failed for %s", adapter_id)
+
+    async def begin_ingest(self, session_id: str, *, spoke_time: SpokeTime | None = None) -> None:
+        """Open an Ingest stream: probe the spoke's clock and refuse a refused spoke.
+
+        The transport calls this before it reads the first record, with the measurement
+        the request's headers carried. Raises :class:`ClockRefusedError` when the spoke is
+        refused, or becomes refused by this very probe; nothing of the stream is read.
+        An unknown session is left to :meth:`receive_record` to report.
+        """
+        session = self._sessions.get(session_id)
+        if session is None:
+            return
+        adapter_id = session.adapter_id
+        now = self.clock()
+        refusal = self.gates.refusal(adapter_id)
+        if refusal is None:
+            self._probe(adapter_id, session.manifest.time_governance, spoke_time, now)
+            refusal = self.gates.refusal(adapter_id)
+        if refusal is not None:
+            await self._refuse_request(adapter_id, refusal, "Ingest", now)
+            raise refusal
 
     # -- data plane -----------------------------------------------------------
 
@@ -201,6 +394,11 @@ class HubIngestServicer(AdapterServiceServicer):
         if not session.started:
             msg = f"Session '{session_id}' is not started"
             raise ValueError(msg)
+        refusal = self.gates.refusal(session.adapter_id)
+        if refusal is not None:
+            # refused while its stream was open, or pushed past begin_ingest
+            await self._refuse_request(session.adapter_id, refusal, "Ingest", self.clock())
+            raise refusal
 
         try:
             record = proto_to_pydantic(record_dict, "ContextualRecord")
@@ -291,6 +489,7 @@ class HubIngestServicer(AdapterServiceServicer):
                     "session_id": session_id,
                     "adapter_id": session.adapter_id,
                     "state": session.state.value,
+                    "clock_state": self.gates.state(session.adapter_id),
                     "started": session.started,
                     "records_received": session.records_received,
                     "buffered": len(state.buffer) if state else 0,
@@ -304,5 +503,7 @@ class HubIngestServicer(AdapterServiceServicer):
         return {
             "batch_size": self._batch_size,
             "sessions": sessions,
+            "clock_gates": self.gates.describe(),
+            "refused_registrations": dict(self._refused_registrations),
             "pipeline": self.pipeline.describe(),
         }

@@ -92,6 +92,8 @@ note:
 - It renders every operator and management interface **from declarative specifications**.
 - Its own management modules (forge-mes, forge-whs, forge-cmms, forge-ot, …) are **optional**: a site can run Forge purely as the integration and governance layer over the software it already has, or replace that software module by module.
 
+**Why it is built, in the owner's words (2026-11-17):** "Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business."
+
 Forge is also a **governed engineering platform**: contracts between components are machine-checked specifications with hash integrity and owner approval, so that neither people nor AI coding agents can change an interface silently.
 
 note:
@@ -184,8 +186,8 @@ From `docs/WHERE-WE-ARE.md` §1, the snapshot at PR 95:
 
 | Measure | Value (2026-11-13) |
 |---|---|
-| Python hub (`src/forge`) | 355 files, ~71,500 lines |
-| Python tests | 269 files, 4,608 collected, full suite green on the locked dependency set |
+| Python hub (`src/forge`) | 355 files, ~72,200 lines |
+| Python tests | 269 files, 4,625 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~248,000 lines of TypeScript, kept until the Go forge-mes lands |
 | Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
@@ -335,7 +337,7 @@ note:
 | FTTS transport spec and runner | 🟡 | `specs/grpc-hardened-transport.ftts.json`; no `docs/FxTS/FTTS.md` page yet |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
 | Hub time in the contract: the four-timestamp exchange on Register, Health and Ingest; a reporting spoke measured two-way | ✅ | FB-092 (2026-11-15) |
-| A spoke outside its tolerance refused at Register and Ingest | ⬜ | FB-093's hub half (D-9 signed 2026-11-03; the plant-floor links fail closed since 2026-11-15) |
+| A spoke outside its tolerance, or one that reports no measurement, refused at Register and Ingest | ✅ | FB-093's hub half (2026-11-17; the plant-floor links fail closed since 2026-11-15) |
 
 Code: `src/forge/transport/grpc_server.py` (hub), `spoke_client.py` (spoke side), `grpc_channel.py` (retry), `proto_bridge.py` (proto ↔ model), `transport_adapter.py` (adapter base).
 
@@ -369,7 +371,7 @@ sequenceDiagram
 
 - `forge.ingest.facts_check` verifies the spec's hash before trusting it; a spoke whose manifest or hash does not match is refused.
 - One hub-clock reading per batch (`IngestPipeline.ingest` → `stamp_receipt`).
-- Every link's clock offset is measured and exposed on `AdapterHealth.clock`, `GET /v1/ingest/stats`, the OT connection status and OpenTelemetry (`forge.clock.offset`, `forge.clock.out_of_tolerance`); a spoke that reports the time exchange is held to the class it declared, one that does not to the provisional 1 s (FB-089, FB-092). Enforcement is FB-093 (D-9 signed 2026-11-03: per-link tolerance classes, never silent): on the plant floor since 2026-11-15; at the hub next, on the two-way measurement FB-092 added.
+- Every link's clock offset is measured and exposed on `AdapterHealth.clock`, `GET /v1/ingest/stats`, the OT connection status and OpenTelemetry (`forge.clock.offset`, `forge.clock.out_of_tolerance`); a spoke that reports the time exchange is held to the class it declared (FB-089, FB-092). Enforcement is FB-093 (D-9 signed 2026-11-03: per-link tolerance classes, never silent): on the plant floor since 2026-11-15, and at the hub since 2026-11-17, where every Register, Health and Ingest request is a probe of the spoke's clock and three probes outside the class, or three with no measurement, refuse the spoke's Register and Ingest.
 - Curated records are persisted with the raw ones (FB-009).
 
 note:
@@ -398,7 +400,8 @@ note:
 |---|---|
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.1 |
 | Go transport parity tests | FB-055 |
-| Refusing an out-of-tolerance spoke at the hub (measured two-way since FB-092; a PLC connection is refused since 2026-11-15) | FB-093's hub half (D-9 signed 2026-11-03) |
+| The hub's REST ingest (`POST /v1/records`) carries no time exchange and is to be retired: every module speaks to the hub over gRPC | FB-123 |
+| The baseline every module must meet (the forge module requirements and their FxTS spec) is not written down | FB-124 |
 | The time fields stored at rest (only `source_time` is; the rest travel on the record) | FB-108 |
 | Generic adapters (csv_file, mqtt_sparkplug, opcua, rest_generic) | package stubs only |
 
@@ -703,7 +706,7 @@ note:
 
 | Gap | Backlog / decision |
 |---|---|
-| The time-governance declaration is in place and a PLC connection outside its class is refused (2026-11-15); a spoke at the hub is not yet | FB-093's hub half (D-9) |
+| The `time_contract` of a module with every database and plant-floor device is not defined; only the spoke's own declaration and its PLC connections are | FB-124 (with FB-117 and FB-120) |
 | The OT FACTS spec fails `facts:schema-valid` and eight vocabulary checks | FB-079, D-8 |
 | FQTS and FSTS are stubs; FDTS, FLTS, FNTS, FOTS, FPTS are planned | M5 |
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.9 |
@@ -871,7 +874,7 @@ The owner's principle (2026-10-18): records from different sources only reconcil
 | A tag's `source_time` is device time corrected to master by the device's measured offset, original stamp and offset recorded | 🟡 FB-088 done 2026-11-13 (no invented stamp; the stamping clock named once declared); FB-094 steps 2 and 3 done 2026-11-13 (the server's clock is read on every OPC-UA response and on a runtime probe cadence, and the source and server stamps are corrected by its filtered offset at the spoke, the stamp as sent, the offset and the time quality kept); step 6 done too (every tag declares `max_sampling_uncertainty_ms`, refused at load when the acquisition cannot meet it; the bound is on every value), so FB-094 is complete for what the tree has; FB-090 done 2026-11-13 (the FACTS declaration); design record `docs/decisions/one-clock-ot-source-time.md` signed 2026-11-03 |
 | A PLC connection whose clock cannot be read, or is outside its tolerance class, for three consecutive probes stops delivering (`CLOCK_UNREADABLE`, `CLOCK_OUT_OF_TOLERANCE`); three good probes resume it; never silent | ✅ FB-093, the OT links (2026-11-15) |
 | Hub time in the contract: every spoke takes time from its hub and is measured two-way | ✅ FB-092 (2026-11-15) |
-| A hub, module or spoke outside tolerance is refused | ⬜ FB-093's hub half; hub to hub is FB-118 (D-9 signed 2026-11-03) |
+| A spoke outside tolerance, or one that reports no measurement, is refused by its hub | ✅ FB-093's hub half (2026-11-17); hub to hub is FB-118 |
 | Per-spoke declaration of time governance; a quality dimension for time | 🟡 FB-090 done 2026-11-13 (FACTS `time_governance`: clock origin, probe cadence, tolerance class, fail closed); FB-091 (the quality dimension and the offset assumed on an offset-less stamp) |
 
 note:
@@ -1458,10 +1461,13 @@ Every PLC connection has a `ClockGate` (D-9's P-5; three in and three out is the
 - the supervisor's restart loop does not apply, and an operator restart is answered 409 with the cause: this is a refusal, not a recovery;
 - only the probe goes on, over a session it opens and closes itself.
 
-**Never silent.** The refusal is an error line in the log, on the connection status (`clock_state`, and `clock_gate` with the cause, since when, the class and the counters), on `AdapterHealth` (DEGRADED, `refusals.clock_unreadable` or `clock_out_of_tolerance`, `last_refusal`), on the `forge.ingest.refused` metric, and a HIGH alarm where the host runs an alarm engine. The adapter is HEALTHY again when its last refused connection clears.
+The hub holds every spoke to the same rule (`SpokeClockGates`). It cannot open a call to a spoke, so the spoke's own requests are the probes: each Register, Health and Ingest carries the spoke's last two-way measurement, or none. After three measurements outside the declared class, or three requests with no measurement, the hub refuses the spoke's Register (`accepted=false`) and its Ingest (`FAILED_PRECONDITION`), each with the cause in the message and in the `x-forge-refusal-cause` trailer. Health is still answered, so the spoke goes on measuring, and three good probes readmit it. At most one probe a second is counted.
+
+**Never silent.** The refusal is an error line in the log, on the connection status (`clock_state`, and `clock_gate` with the cause, since when, the class and the counters), on `AdapterHealth` (DEGRADED, `refusals.clock_unreadable` or `clock_out_of_tolerance`, `last_refusal`), on the `forge.ingest.refused` metric, and a HIGH alarm where the host runs an alarm engine. The adapter is HEALTHY again when its last refused connection clears. A refused spoke shows the same on the hub's health of it, on `GET /v1/adapters/{id}/health` and on `forge adapter health`.
 
 note:
-- In force on the OT links since 2026-11-15 (FB-093's OT half). The same refusal of a whole spoke at Register and Ingest is FB-093's hub half; the two-way measurement it needs exists since FB-092.
+- In force on the OT links since 2026-11-15 and on the hub-to-spoke link since 2026-11-17 (FB-093). A spoke that does not implement the time exchange is refused too: the owner's answer of 2026-11-17, and a case the module requirements are to rule out (FB-124).
+- A manifest without `time_governance` is refused at Register: with no declared class there is nothing to hold the clock to.
 - The probe cannot be switched off: a cadence under 1 s, 0 included, is refused when the configuration is loaded. A clock that is not read cannot be trusted.
 
 ---
@@ -1496,11 +1502,13 @@ note:
 | OPC UA: the clock read by probe and tap, the stamp corrected on entry, the time-quality fields, the per-tag sampling bound | FB-094 (2026-11-13) |
 | Every spoke declares how it is time-governed | FB-090 (2026-11-13) |
 | A PLC connection fails closed on its clock | FB-093, the OT links (2026-11-15) |
+| The hub fails closed on a spoke's clock: outside its class, or no measurement reported, and its Register and Ingest are refused | FB-093, the hub half (2026-11-17) |
 | Hub time in the contract: the four-timestamp exchange; a reporting spoke measured both ways and held to its class | FB-092 (2026-11-15) |
 
 | Missing | Backlog |
 |---|---|
-| The hub refusing a spoke outside its class at Register and Ingest | FB-093's hub half, next |
+| The hub's REST ingest retired: it carries no time exchange, and every module speaks to the hub over gRPC | FB-123 |
+| The forge module requirements and their FxTS spec, with a `time_contract` between each module and every database and device | FB-124 |
 | Forge checking its own host's clock before it judges others | FB-119 |
 | Clock agreement as a quality dimension; the offset assumed for an offset-less source stamp | FB-091 |
 | The time fields stored at rest | FB-108 |
@@ -1534,7 +1542,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q                         # 4,608 tests, ~1 minute
+uv run pytest tests -q                         # 4,625 tests, ~1 minute
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -1559,7 +1567,7 @@ note:
 ```mermaid
 flowchart LR
   B["Branch reh3376_dev01<br/>level with main"] --> I["One backlog item"]
-  I --> D["Docs current<br/>WHERE-WE-ARE status date + last merged PR, counts"]
+  I --> D["Docs and tutorial current<br/>WHERE-WE-ARE status date + last merged PR, counts"]
   D --> G["gitleaks on the commits"]
   G --> P["git push origin HEAD:reh3376_dev01"]
   P --> PR["auto-pr.yml opens the PR<br/>(bot author)"]
@@ -1572,6 +1580,7 @@ flowchart LR
 - **One backlog item per PR.** Never push the next item onto a branch with an open PR: commit locally, push after the merge.
 - The PR is opened by the workflow with the bot as author, so the owner can approve it; nobody opens PRs as the owner.
 - Docs-only commits may ride along with an item; everything else is its own PR.
+- **This tutorial is part of every item.** Both tracks are reviewed against the change and updated before the push, because the push is what opens the PR: the tutorial has to describe the code as it is (owner, 2026-11-17).
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `build:`).
 
 note:
@@ -1585,6 +1594,9 @@ note:
 |---|---|
 | **Every finding is fixed or recorded** in `BACKLOG.md`; nothing is skipped | 2026-10-15 |
 | **Documentation is current before every push**: `docs/WHERE-WE-ARE.md` rows, numbers and status date, `README.md` counts, the roadmap and backlog | 2026-10-16 |
+| **The developer and user tutorial is current before every push**: `docs/tutorial.md` reviewed against the change, updated, rebuilt (`make sync-tutorial-embed`) and checked | 2026-11-17 (owner) |
+| **The repository's documents are the authority**: where Jiminy guidance disagrees, the documents win and the disagreement is reported to the mdemg agent as a defect | A-12, 2026-11-17 |
+| **Every module speaks to the hub over gRPC**; third-party software is reached by an integration module, never by the hub; every module meets the forge module requirements (being written, FB-124) | A-11, 2026-11-17 |
 | **Only the owner approves** a spec hash (`forge governance approve --by reh3376`) and signs a design record, on their explicit word | A-9, FHTS |
 | **Forge-issued passwords are printed once and never stored** | FB-057 |
 | **Local models only** for the project's tooling (MDEMG/Jiminy on `mdemg-llm-v1`); never a cloud model | A-10 |
@@ -1634,7 +1646,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 269 files, 4,608 collected; the full suite runs in about a minute on the locked dependency set.
+- `tests/` mirrors `src/`: 269 files, 4,625 collected; the full suite runs in about a minute on the locked dependency set.
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -1647,7 +1659,8 @@ note:
 
 ## MDEMG and Jiminy · Governed Memory for the Agents
 
-- The repository runs its own MDEMG instance (a local, graph-backed project memory) with Jiminy as the governance layer; constraints, corrections and outcomes live in the graph, not in markdown.
+- The repository runs its own MDEMG instance (a local, graph-backed project memory) with Jiminy as the governance layer; it recalls constraints, corrections and outcomes from a graph built by ingesting the codebase, documentation included.
+- **The repository's documents are the authority (A-12, owner 2026-11-17).** Where Jiminy guidance disagrees with them, follow the documents; the disagreement is a defect in MDEMG and is reported to the mdemg agent, not worked around here (FB-126).
 - The J17 handshake: identify by session, request the constraints for the task at hand, acknowledge them, act under enforcement, report the outcome.
 - The **PreToolUse hook** enforces constraints deterministically at each tool call, whether or not the agent has read anything; a blocked action is the protocol working.
 - Models: the local llama-server model `mdemg-llm-v1`; no cloud model, ever (A-10).
@@ -1691,7 +1704,7 @@ note:
 4. **No federation**: a single hub only; no hub-of-hubs code.
 5. **Seven governance frameworks are stubs or planned**; FACTS validates against its own schema and all nine of its specs carry owner-approved hashes (2026-11-13).
 6. **No production deployment**: compose only.
-7. **Clock discipline enforced on the plant floor, measured but not yet enforced at the hub**: every spoke declares how it is time-governed (FB-090) and the deployment requirement is written down, and a PLC connection whose clock is unreadable or outside its class is refused (FB-093's OT half, 2026-11-15), and the hub gives its time to every spoke and measures each one two-way (FB-092, 2026-11-15), but it does not yet refuse a spoke with a wrong clock (FB-093's hub half).
+7. **Clock discipline enforced on the plant floor and on every spoke the hub registers; not on Forge's own hosts or between hubs**: every spoke declares how it is time-governed (FB-090) and the deployment requirement is written down; a PLC connection whose clock is unreadable or outside its class is refused (FB-093's OT half, 2026-11-15); the hub gives its time to every spoke and measures each one two-way (FB-092, 2026-11-15), and refuses a spoke outside its class or one that reports no measurement (FB-093's hub half, 2026-11-17). The hub's REST ingest carries no exchange until it is retired (FB-123), and no Forge process checks its own host's clock (FB-119).
 8. **Process control decided, not built**: the three-layer framework is signed (D-11, 2026-11-13) and waits for its FSDs.
 
 note:
@@ -1724,7 +1737,7 @@ note:
 | D-4 | FVTS open items (name, write authority per profile, mobile acknowledge, transport, layout) | decided 2026-11-03; forge-display design next |
 | D-7 | Scope of the Go standard (OT module, Python adapters) | open |
 | D-8 | FACTS vocabulary for OT adapters | decided 2026-11-03: extend the enums; FB-079 can start |
-| D-9 | One clock: which established standards to adopt (`docs/decisions/one-clock-ot-source-time.md`) | signed 2026-11-03; FB-088, FB-094 (steps 2, 3, 6) and FB-090 done 2026-11-13; FB-093's OT half and FB-092 done 2026-11-15; FB-093's hub half and FB-091 follow |
+| D-9 | One clock: which established standards to adopt (`docs/decisions/one-clock-ot-source-time.md`) | signed 2026-11-03; FB-088, FB-094 (steps 2, 3, 6) and FB-090 done 2026-11-13; FB-093's OT half and FB-092 done 2026-11-15; FB-093's hub half done 2026-11-17; FB-091 follows |
 | D-10 | One schema registry (`docs/decisions/one-schema-registry.md`) | signed 2026-11-03; FB-097's eight steps |
 | D-11 | Three-layer process control framework, PC-L1/PC-L2/PC-L3 (`docs/decisions/process-control-framework.md`) | signed 2026-11-13 by the owner; Forge review done; the FSDs follow the owner's round-4 answers (FB-110) |
 
@@ -1738,7 +1751,7 @@ note:
 ## What Is Next
 
 1. ~~A decision session on D-1, D-3, D-4, D-8, D-9 and D-10~~ (done 2026-11-03, one question at a time) and ~~the FB-076 design document~~ (signed the same day); D-11 signed 2026-11-13.
-2. The one-clock steps in the record's order: FB-088, FB-094 and FB-090 done 2026-11-13; FB-093's OT half and FB-092 (hub time in the contract) done 2026-11-15; **FB-093's hub half** (a spoke refused at Register and Ingest) next, then FB-091 (the time-quality dimension); the one-registry steps (FB-097, D-10) before the Go module's first ingest.
+2. The one-clock steps in the record's order: FB-088, FB-094 and FB-090 done 2026-11-13; FB-093's OT half and FB-092 (hub time in the contract) done 2026-11-15; FB-093's hub half (a spoke refused at Register and Ingest) done 2026-11-17; **FB-091** (the time-quality dimension) is the next of them, after the items the owner's answers of 2026-11-17 opened (FB-125, FB-124, FB-123, FB-126); the one-registry steps (FB-097, D-10) before the Go module's first ingest.
 3. The module SDK Go scaffold (FB-017); its first consumer is the Go forge-mes.
 4. FB-076 phase 1: the Go module registers, ingests and takes write-backs against the hub.
 5. FB-057 `mod_mes`, with FB-004 and FB-059 as the Go module needs them.
@@ -1804,6 +1817,8 @@ note:
 
 Forge sits between the systems a plant already runs on and the people who need to decide from their data. Every system (the control system on the floor, the manufacturing execution system, the warehouse, maintenance, the ERP, the historian, scanners) connects to one **hub** as a **spoke**. Every value that crosses into the hub is checked, stamped with the hub's clock, and tagged with the **context** it belongs to: which site, area and equipment, which lot and work order, which shift and operator, which operating mode. From those records the hub builds **data products** whose figures carry their sources and a stated quality, renders the screens people use from declared contracts, and records the decisions taken on them. Forge's own modules for MES, warehouse, maintenance and the plant floor are optional: a site can keep its existing software and use Forge as the layer that connects and governs it, or replace that software one module at a time.
 
+The goal, in the owner's words: "Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business."
+
 note:
 - `docs/VISION.md` §1 in plain words. "Hub" is the Forge server for a site; "spoke" is any connected system.
 
@@ -1862,7 +1877,7 @@ flowchart LR
 6. **Data products** are built from the records and feed screens, decisions and, where a site chooses, training data for its own models.
 
 note:
-- Honest: today the hub measures clock offsets and warns, and every connected system declares how it keeps time in its contract (2026-11-13); a plant-floor connection whose clock cannot be read or is out of tolerance is refused since 2026-11-15; since 2026-11-15 the hub also gives its time to every connected system and checks each one both ways; refusing a whole connected system with a bad clock is decided (D-9, signed 2026-11-03) and is next (FB-093).
+- Honest: today the hub measures clock offsets and warns, and every connected system declares how it keeps time in its contract (2026-11-13); a plant-floor connection whose clock cannot be read or is out of tolerance is refused since 2026-11-15; since 2026-11-15 the hub also gives its time to every connected system and checks each one both ways; since 2026-11-17 the hub also refuses a whole connected system whose clock is wrong, or that does not report its clock, until the clock is right.
 
 ---
 
@@ -1894,7 +1909,7 @@ Forge exists so that people at every level decide from the same picture, and rec
 - A hub, module or spoke **outside tolerance is refused**: warnings are not a substitute for correction.
 - For a plant-floor tag, the time that counts is **when the value occurred at the device**, corrected to master time, never the poll time passed off as device time.
 
-Where it stands: timestamps are UTC and receipt is stamped; offsets are measured and warned on; on the plant floor a tag's time is corrected to the master clock by the server's measured offset (OPC UA, since 2026-11-13), no time is ever invented, and every connected system declares how it keeps time in its contract. A plant-floor connection with a bad clock is refused since 2026-11-15 (three checks in, three out, and it says so); the hub gives its time to every connected system and checks each one both ways (2026-11-15); refusing a whole connected system on the same rule is decided (D-9, signed 2026-11-03) and is next (FB-093).
+Where it stands: timestamps are UTC and receipt is stamped; offsets are measured and warned on; on the plant floor a tag's time is corrected to the master clock by the server's measured offset (OPC UA, since 2026-11-13), no time is ever invented, and every connected system declares how it keeps time in its contract. A plant-floor connection with a bad clock is refused since 2026-11-15 (three checks in, three out, and it says so); the hub gives its time to every connected system and checks each one both ways (2026-11-15); a whole connected system is refused on the same rule since 2026-11-17.
 
 note:
 - The owner's principle of 2026-10-18; `docs/PRINCIPLES.md` §2. U10 explains why this matters to you and what you see and do when a clock is wrong.
@@ -2336,9 +2351,9 @@ flowchart TD
 | The hub, with every connected system | exchanges time on every contact, so each system knows how far its clock is from the hub's, and the hub knows too |
 | Forge, on every record | stamps arrival with the hub's own clock, in UTC, and never makes up a time for a value that arrived without one |
 | Forge, on the plant floor | checks each server's clock every 30 seconds, corrects each tag's time to master time, and keeps the original time and the correction on the record |
-| Forge, when a clock is wrong | cuts that plant-floor connection off after three checks in a row, says why, and reconnects it after three good checks |
+| Forge, when a clock is wrong | cuts that plant-floor connection, or that whole connected system, off after three checks in a row, says why, and reconnects it after three good checks |
 
-- "Cut off" means nothing is collected from that connection and nothing is written to it until its clock is right. A value with a time you cannot trust is worse than no value.
+- "Cut off" means nothing is collected from that connection, or accepted from that system, and nothing is written to it until its clock is right. A value with a time you cannot trust is worse than no value.
 
 note:
 - `docs/decisions/one-clock-ot-source-time.md` (signed 2026-11-03) in plain words; the site requirement and a checklist for a new site are `docs/deployment/clock-discipline.md`.
@@ -2354,6 +2369,8 @@ When a plant-floor connection is cut off for its clock:
 - **Fix the clock, not Forge.** Ask whoever looks after that server or PLC to restore its time service. Restarting the connection does not help and is refused, with the reason.
 - **It comes back by itself.** After three good checks in a row (90 seconds at the usual pace) the connection resumes and the health returns to normal.
 - An engineer can change how often a connection's clock is checked while it runs, from once a second upward. The check cannot be switched off.
+
+When a whole connected system (your MES, for example) is cut off for its clock, the same holds. The hub shows the system as degraded with `CLOCK_OUT_OF_TOLERANCE`, or `CLOCK_UNREADABLE` when the system stopped reporting its clock, and it accepts nothing from it. Restarting the system does not bring it back. Its server's clock has to be put right, and after three good checks the hub takes its data again.
 
 Where you see it today: the hub's status pages and command line (U3). On your screens when forge-display exists (U8).
 
@@ -2373,10 +2390,11 @@ note:
 | Every connected system declares how it keeps time | 2026-11-13 |
 | A plant-floor connection with a bad clock is cut off until it is right | 2026-11-15 |
 | The hub gives its time to each connected system and checks it both ways | 2026-11-15 |
+| A whole connected system with a bad clock, or one that does not report its clock, is cut off until it is right | 2026-11-17 |
 
 | Not yet | When |
 |---|---|
-| Cutting off a whole connected system with a bad clock, not only a plant-floor connection | next (FB-093) |
+| A written list of what every module must do, time-keeping first, checked before a module is admitted | recorded (FB-124) |
 | Forge checking its own server's clock before it judges the others | recorded (FB-119) |
 | Clock agreement counted in a data product's quality score | planned (FB-091) |
 | Business systems having the clock of their own server checked | recorded (FB-120) |
@@ -2407,7 +2425,7 @@ How a site is run, upgraded and, in time, backed up.
 | Health | `/v1/health` probes every component; `/readyz` | service-level objectives and alerts (FOTS) |
 | Upgrades | `forge migrate up` applies versioned database migrations; a migration is never edited after it is applied | an upgrade procedure per hub |
 | Backups | none | scheduled backups of every store and a restore procedure |
-| Clock | offsets measured and warned; device time corrected on OPC UA; every connected system declares how it keeps time (2026-11-13); a plant-floor connection with an unreadable or out-of-tolerance clock is refused, and the hub gives time to and checks every connected system both ways (2026-11-15) | a connected system outside its tolerance is refused at the hub (FB-093's hub half, D-9) |
+| Clock | offsets measured and warned; device time corrected on OPC UA; every connected system declares how it keeps time (2026-11-13); a plant-floor connection with an unreadable or out-of-tolerance clock is refused, the hub gives time to and checks every connected system both ways (2026-11-15) and refuses one whose clock is wrong (2026-11-17) | Forge checks its own server's clock (FB-119); the chain of clocks between sites (FB-118) |
 | Multi-site | one hub | hub of hubs with upward audit and offline operation (M6) |
 
 - "Solved when": a site hub can be stood up, upgraded and restored from backup by procedure, and its objectives are visible.

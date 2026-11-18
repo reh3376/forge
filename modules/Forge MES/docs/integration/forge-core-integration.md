@@ -63,8 +63,18 @@ MES backend (NestJS)                                forge-core hub (Python)
    like `Register` and `Ingest`, is also a time exchange with the hub (one
    clock, FB-092): the client sends its clock (T1), the hub answers with its
    own (T2, T3), and the client computes this host's offset from the hub and
-   the round trip and reports them with the next `Health`. Each record leaves
-   with `spoke_time`, this host's clock at send.
+   the round trip and reports them with its next request: on `Register` and
+   `Health` in `spoke_time`, on `Ingest` in three headers
+   (`x-forge-spoke-offset-seconds`, `x-forge-spoke-round-trip-seconds`,
+   `x-forge-spoke-measured-at`). Each record leaves with `spoke_time`, this
+   host's clock at send. The hub judges this host's clock by those reports
+   (FB-093): after three probes outside the declared class, or three requests
+   with no measurement, it refuses `Register` and `Ingest` until three good
+   probes. A refused `Ingest` is raised as `HubClockRefusedError`, a refused
+   registration is retried and each retry reports a fresh measurement, and
+   `Health` is still answered. The cause is logged, is on the status as
+   `clockRefusal`, and the session reads `degraded` while it lasts. The fix is
+   this host's clock, not a restart.
 3. **Events.** Every call to `MqttDomainPublisherService.publishDomainEvent`
    (ProductionEvent, StepExecution, MashingExecution, ScheduleOrder,
    BatchDeviation, ProductionOrder today) also calls
@@ -83,7 +93,9 @@ MES backend (NestJS)                                forge-core hub (Python)
    and closes the channel.
 7. **Observability.** `GET /api/forge/status` (authenticated) returns the
    session state, last hub health, this host's clock against the hub's
-   (`clock`: `hubOffsetSeconds`, `roundTripSeconds`, `measuredAt`), queue
+   (`clock`: `hubOffsetSeconds`, `roundTripSeconds`, `measuredAt`), the
+   hub's refusal of this spoke for its clock when there is one
+   (`clockRefusal`), queue
    depth, circuit state, write-back server state and counters; `GET /api/forge/tags` lists the writable tags.
 
 ## Record mapping

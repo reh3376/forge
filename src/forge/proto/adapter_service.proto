@@ -202,6 +202,14 @@ service AdapterService {
   //   x-forge-adapter-id, x-forge-session-id
   // T1 of the time exchange (FB-092) travels the same way, since the request is a
   // stream of records: x-forge-spoke-transmit-time, an RFC 3339 UTC timestamp.
+  // So does the spoke's last measurement of its clock against the hub's (FB-093):
+  //   x-forge-spoke-offset-seconds, x-forge-spoke-round-trip-seconds,
+  //   x-forge-spoke-measured-at (RFC 3339 UTC)
+  // Every Register, Health and Ingest request is a probe of the spoke's clock. The hub
+  // refuses the Register and the Ingest of a spoke whose clock it cannot read or finds
+  // outside the declared tolerance class: RegisterResponse.accepted = false, and Ingest
+  // fails with FAILED_PRECONDITION. Both name the cause in the x-forge-refusal-cause
+  // trailer (clock_unreadable, clock_out_of_tolerance) and in the message.
   rpc Ingest(stream ContextualRecord) returns (IngestResponse);
 
   // Hub requests records from spoke (pull model). Server-streaming.

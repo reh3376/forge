@@ -19,6 +19,48 @@ import {
 
 /** gRPC metadata header that carries T1 on Ingest, whose request is a stream (FB-092). */
 export const SPOKE_TRANSMIT_TIME_HEADER = "x-forge-spoke-transmit-time";
+/**
+ * Headers that carry this spoke's last measurement on Ingest, beside T1: the offset
+ * (hub clock minus this clock, seconds), the round trip (seconds) and its T4 (RFC 3339).
+ * The hub judges this spoke's clock by them: every request is a probe (FB-093).
+ */
+export const SPOKE_OFFSET_HEADER = "x-forge-spoke-offset-seconds";
+export const SPOKE_ROUND_TRIP_HEADER = "x-forge-spoke-round-trip-seconds";
+export const SPOKE_MEASURED_AT_HEADER = "x-forge-spoke-measured-at";
+/** Trailer of a refused Register or Ingest: the cause by name. */
+export const REFUSAL_CAUSE_HEADER = "x-forge-refusal-cause";
+
+const CLOCK_REFUSED_STATES = ["CLOCK_UNREADABLE", "CLOCK_OUT_OF_TOLERANCE"];
+
+/**
+ * The clock-refusal cause of a refused request (clock_unreadable, clock_out_of_tolerance),
+ * or undefined for any other refusal. `named` is the hub's trailer; the hub's message
+ * says it too, since it begins with the state.
+ */
+export function clockRefusalCause(
+  named: string | undefined,
+  message = ""
+): string | undefined {
+  const causes = CLOCK_REFUSED_STATES.map((s) => s.toLowerCase());
+  if (named && causes.includes(named)) return named;
+  const state = CLOCK_REFUSED_STATES.find((s) => message.startsWith(`${s}:`));
+  return state?.toLowerCase();
+}
+
+/**
+ * The hub refuses this spoke because it does not trust its clock (one-clock record P-5,
+ * FB-093). Nothing of the request was taken. Health and Register still return the hub's
+ * time, so this spoke goes on measuring and is readmitted after three good probes.
+ */
+export class HubClockRefusedError extends Error {
+  constructor(
+    message: string,
+    readonly refusalCause: string
+  ) {
+    super(message);
+    this.name = "HubClockRefusedError";
+  }
+}
 
 /**
  * One hub <-> spoke time exchange: NTP's four timestamps, in epoch milliseconds
@@ -66,6 +108,8 @@ export interface RegisterResult {
   accepted: boolean;
   message: string;
   session_id: string;
+  /** Set when the hub refused the registration for this spoke's clock (FB-093). */
+  refusal_cause?: string;
 }
 export interface AckResult {
   success: boolean;
@@ -205,12 +249,29 @@ export class ForgeHubClient {
       spoke_time: this.spokeTime(t1),
     }).then((r) => {
       this.completeExchange(t1, (r as { hub_time?: HubTimeMessage })?.hub_time);
+      const message = (r as RegisterResult).message ?? "";
+      const accepted = Boolean((r as RegisterResult).accepted);
       return {
-        accepted: Boolean((r as RegisterResult).accepted),
-        message: (r as RegisterResult).message ?? "",
+        accepted,
+        message,
         session_id: (r as RegisterResult).session_id ?? "",
+        // the hub refuses a spoke whose clock it does not trust (FB-093)
+        refusal_cause: accepted ? undefined : clockRefusalCause(undefined, message),
       };
     });
+  }
+
+  /** A FAILED_PRECONDITION that names a clock refusal becomes a HubClockRefusedError. */
+  private asRefusal(err: Error): Error {
+    const status = err as Partial<grpc.ServiceError>;
+    if (status.code !== grpc.status.FAILED_PRECONDITION) return err;
+    const named = status.metadata?.get(REFUSAL_CAUSE_HEADER)[0];
+    const details = status.details ?? err.message;
+    const cause = clockRefusalCause(
+      named === undefined ? undefined : String(named),
+      details
+    );
+    return cause ? new HubClockRefusedError(`hub refused Ingest: ${details}`, cause) : err;
   }
 
   configure(
@@ -297,11 +358,18 @@ export class ForgeHubClient {
     metadata.set("x-forge-session-id", sessionId);
     // T1 of the time exchange: the request is a stream of records, so it rides here.
     metadata.set(SPOKE_TRANSMIT_TIME_HEADER, new Date(t1).toISOString());
+    const last = this.exchange;
+    if (last) {
+      // this spoke's last measurement: the hub judges its clock by it (FB-093)
+      metadata.set(SPOKE_OFFSET_HEADER, String(last.offsetSeconds));
+      metadata.set(SPOKE_ROUND_TRIP_HEADER, String(last.roundTripSeconds));
+      metadata.set(SPOKE_MEASURED_AT_HEADER, new Date(last.t4).toISOString());
+    }
     const sentAt = msToTimestamp(t1);
 
     return new Promise<IngestResult>((resolve, reject) => {
       const call = fn.call(client, metadata, this.deadline(), (err, value) => {
-        if (err) reject(err);
+        if (err) reject(this.asRefusal(err));
         else {
           this.completeExchange(
             t1,
@@ -314,7 +382,7 @@ export class ForgeHubClient {
           });
         }
       });
-      call.on("error", (err: Error) => reject(err));
+      call.on("error", (err: Error) => reject(this.asRefusal(err)));
       for (const record of records) {
         // this spoke's clock as the record leaves it (proto field 10)
         call.write(
