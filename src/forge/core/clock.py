@@ -79,8 +79,9 @@ DEFAULT_CLOCK_TOLERANCE_SECONDS = 1.0
 DEFAULT_CLOCK_WINDOW = 256
 
 #: The links an offset is measured on, each "measured clock - governing clock":
-#: ``spoke``: the spoke's clock against the hub (``sent_time - ingestion_time``; one-way,
-#: so it carries the build-to-receipt delay until FB-092 adds the four-timestamp exchange);
+#: ``spoke``: the spoke's clock against the hub. Two-way from the four-timestamp exchange
+#: once the spoke reports one (FB-092, ``observe_exchange``); until then one-way from each
+#: record (``spoke_time - ingestion_time``), which carries the build-to-receipt delay;
 #: ``server``: the source system's server clock against the hub (``server_time -
 #: ingestion_time`` from records, or the OPC-UA probe's direct read of ``CurrentTime``);
 #: ``source``: the source clock against its server (``source_time - server_time``).
@@ -179,6 +180,40 @@ class ClockSample:
 #: Receives every :class:`ClockSample` a connection measures.
 ClockSink = Callable[[ClockSample], None]
 
+#: gRPC metadata header that carries T1 on ``Ingest``, whose request is a stream of
+#: records and so has no field of its own for it (FB-092). An RFC 3339 UTC timestamp.
+SPOKE_TRANSMIT_TIME_HEADER = "x-forge-spoke-transmit-time"
+
+
+@dataclass(frozen=True)
+class TimeExchange:
+    """One hub <-> spoke time exchange: NTP's four timestamps (one-clock record P-9, FB-092).
+
+    ``t1`` the spoke's clock when it sent the request, ``t2`` the hub's clock when the
+    request arrived, ``t3`` the hub's clock when it answered, ``t4`` the spoke's clock
+    when the answer arrived. By RFC 5905 the offset is ``((t2 - t1) + (t3 - t4)) / 2``
+    and the round trip ``(t4 - t1) - (t3 - t2)``: the time the hub spent on the request
+    drops out, and half the round trip bounds the error from an asymmetric path.
+    """
+
+    t1: datetime
+    t2: datetime
+    t3: datetime
+    t4: datetime
+
+    @property
+    def offset_seconds(self) -> float:
+        """Hub clock minus spoke clock: what the spoke adds to its clock to read hub time."""
+        return ((self.t2 - self.t1) + (self.t3 - self.t4)).total_seconds() / 2
+
+    @property
+    def round_trip_seconds(self) -> float:
+        return ((self.t4 - self.t1) - (self.t3 - self.t2)).total_seconds()
+
+    @property
+    def uncertainty_seconds(self) -> float:
+        return abs(self.round_trip_seconds) / 2
+
 
 class ClockReader(Protocol):
     """A way to read the clock a connection pulls from (one-clock record P-2).
@@ -240,7 +275,11 @@ class ClockOffsetStats(BaseModel):
     breaches: int = Field(description="Samples outside tolerance since the tracker started.")
     measured_at: datetime
     round_trip_seconds: float | None = Field(
-        default=None, description="Round trip of a direct probe (OPC-UA CurrentTime), if any."
+        default=None,
+        description=(
+            "Round trip of a two-way measurement: a direct probe (OPC-UA CurrentTime) or the "
+            "hub-spoke exchange (FB-092). None for a one-way series derived from records."
+        ),
     )
     estimate_seconds: float = Field(
         description=(
@@ -341,6 +380,9 @@ class ClockOffsetTracker:
         self.window = window
         self._on_breach = on_breach
         self._windows: dict[tuple[str, str, str | None], _OffsetWindow] = {}
+        #: Adapters whose spoke link is measured two-way by the exchange (FB-092): their
+        #: records no longer feed that series, the exchange does.
+        self._two_way: set[str] = set()
 
     def observe(
         self,
@@ -395,16 +437,53 @@ class ClockOffsetTracker:
             )
         return stats
 
+    def observe_exchange(
+        self,
+        adapter_id: str,
+        *,
+        offset_seconds: float,
+        round_trip_seconds: float,
+        at: datetime,
+        tolerance_seconds: float | None = None,
+    ) -> ClockOffsetStats:
+        """Record the spoke's clock from a completed time exchange (P-9, FB-092).
+
+        ``offset_seconds`` is what the spoke reports, hub clock minus spoke clock by
+        RFC 5905; the series keeps "measured clock - governing clock", so it stores
+        the negative. From its first exchange on, the adapter's spoke link is the
+        two-way series and its records stop feeding it. ``tolerance_seconds`` is the
+        tolerance of the class the spoke declared (P-8): a two-way measurement can be
+        held to it, where the one-way one could only be held to the provisional value.
+        """
+        if adapter_id not in self._two_way:
+            self._two_way.add(adapter_id)
+            # the one-way samples carried the transit delay: they are not this series
+            self._windows.pop((adapter_id, SPOKE_LINK, None), None)
+        return self.observe(
+            adapter_id,
+            SPOKE_LINK,
+            -offset_seconds,
+            at,
+            round_trip=round_trip_seconds,
+            tolerance_seconds=tolerance_seconds,
+        )
+
+    def measured_two_way(self, adapter_id: str) -> bool:
+        """The adapter's spoke link comes from the exchange, not from its records."""
+        return adapter_id in self._two_way
+
     def observe_record(self, adapter_id: str, ts: RecordTimestamp) -> dict[str, ClockOffsetStats]:
         """Measure every link a received record's timestamps allow.
 
         Called by the ingest pipeline after the hub stamped receipt (FB-087), so
-        ``ingestion_time`` is the hub clock and ``sent_time`` the spoke's.
+        ``ingestion_time`` is the hub clock and ``spoke_time`` the spoke's. The spoke
+        link is measured this way, one-way, only until the spoke reports an exchange
+        (FB-092): the two-way value replaces it.
         """
         at = ts.ingestion_time
         observed: dict[str, ClockOffsetStats] = {}
-        if ts.sent_time is not None:
-            seconds = (ts.sent_time - at).total_seconds()
+        if ts.spoke_time is not None and adapter_id not in self._two_way:
+            seconds = (ts.spoke_time - at).total_seconds()
             observed[SPOKE_LINK] = self.observe(adapter_id, SPOKE_LINK, seconds, at)
         if ts.server_time is not None:
             seconds = (ts.server_time - at).total_seconds()

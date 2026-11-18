@@ -24,7 +24,7 @@ from forge.transport.grpc_channel import GrpcChannel
 from forge.transport.grpc_server import GrpcServer
 from forge.transport.hub_ingest import HubIngestServicer
 from forge.transport.serialization import pydantic_to_proto
-from forge.transport.spoke_client import SpokeClient
+from forge.transport.spoke_client import InMemoryChannel, SpokeClient
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -134,7 +134,7 @@ class TestDataPlane:
         assert servicer._record_queues[sid].qsize() == 0
 
     async def test_hub_stamps_receipt_and_keeps_the_spoke_stamp(self) -> None:
-        """ingestion_time is the hub's clock on receipt; the spoke's stamp survives as sent_time."""
+        """ingestion_time is the hub's clock on receipt; the spoke's stamp is spoke_time."""
         hub_now = datetime(2026, 6, 1, 12, 30, tzinfo=UTC)
         sink = InMemoryRecordSink()
         servicer = HubIngestServicer(
@@ -147,14 +147,14 @@ class TestDataPlane:
         await servicer.receive_record(sid, pydantic_to_proto(spoke))
         stored = sink.records[0].timestamp
         assert stored.ingestion_time == hub_now
-        assert stored.sent_time == spoke_stamp
+        assert stored.spoke_time == spoke_stamp
 
-        # a spoke that sends no stamp: receipt stamped, nothing invented as sent_time
+        # a spoke that sends no stamp: receipt stamped, nothing invented as spoke_time
         wire = pydantic_to_proto(mes_record(1))
         del wire["timestamp"]["ingestion_time"]
         await servicer.receive_record(sid, wire)
         assert sink.records[1].timestamp.ingestion_time == hub_now
-        assert sink.records[1].timestamp.sent_time is None
+        assert sink.records[1].timestamp.spoke_time is None
 
     async def test_health_reports_the_measured_clock_offsets(self) -> None:
         """The hub measures the spoke's clock from its stamps and reports it on AdapterHealth."""
@@ -353,3 +353,136 @@ class TestRegistryHooks:
         sid = await _session(servicer)
         await servicer.receive_record(sid, pydantic_to_proto(mes_record()))
         assert len(sink) == 1
+
+
+# ---------------------------------------------------------------------------
+# The hub <-> spoke time exchange (FB-092, one-clock record P-9)
+# ---------------------------------------------------------------------------
+
+
+class SkewedClocks:
+    """One true time that moves 1 ms each time a clock is read; the spoke's is offset from it."""
+
+    def __init__(self, skew_seconds: float) -> None:
+        self.t = datetime(2026, 6, 1, 12, tzinfo=UTC)
+        self.skew = timedelta(seconds=skew_seconds)
+
+    def _tick(self) -> datetime:
+        self.t += timedelta(milliseconds=1)
+        return self.t
+
+    def hub(self) -> datetime:
+        return self._tick()
+
+    def spoke(self) -> datetime:
+        return self._tick() + self.skew
+
+
+async def _records(n: int) -> AsyncIterator[ContextualRecord]:
+    for i in range(n):
+        yield mes_record(i)
+
+
+class TestTimeExchange:
+    async def test_register_health_and_ingest_each_complete_an_exchange(self) -> None:
+        """T1 out, T2 and T3 back, T4 on arrival; the spoke reports and the hub keeps the series."""
+        clocks = SkewedClocks(2.0)  # the spoke's clock runs 2 s ahead of the hub's
+        sink = InMemoryRecordSink()
+        servicer = HubIngestServicer(
+            IngestPipeline(fallback_sink=sink, clock=clocks.hub),
+            batch_size=1,  # the in-memory channel has no end-of-stream flush
+        )
+        client = SpokeClient(channel=InMemoryChannel(servicer), now=clocks.spoke)
+        offsets = servicer.pipeline.offsets
+
+        assert client.last_exchange is None and client.hub_time() is None
+        await client.register(mes_manifest())
+        measured = client.last_exchange
+        assert measured is not None and client.exchanges == 1
+        assert measured.offset_seconds == pytest.approx(-2.0)  # hub minus spoke
+        assert measured.round_trip_seconds == pytest.approx(0.002)  # 1 ms each way
+        assert client.hub_offset_seconds == pytest.approx(-2.0)
+        # the spoke can now read hub time off its own clock: its reading is the true time
+        assert client.hub_time() == clocks.t
+
+        # the hub learns the spoke's clock when the spoke reports it, with its next Health
+        assert not offsets.measured_two_way("forge-mes")
+        health = await client.health()
+        assert "hub_time" in health and client.exchanges == 2
+        assert offsets.measured_two_way("forge-mes")
+        spoke_clock = offsets.stats("forge-mes")["spoke"]
+        assert spoke_clock.last_seconds == pytest.approx(2.0)  # the series is spoke minus hub
+        assert spoke_clock.round_trip_seconds == pytest.approx(0.002)
+        assert spoke_clock.within_tolerance is False and spoke_clock.samples == 1
+        # two-way, so it is held to the class the spoke declared (it-lan, 10 ms), not to 1 s
+        assert spoke_clock.tolerance_seconds == 0.010
+
+        await client.configure({"graphql_url": "http://mes/graphql"})
+        await client.start()
+        assert await client.stream_records(_records(3)) == 3
+        assert client.exchanges == 3  # the Ingest response carried T2 and T3 too
+        assert len(sink) == 3
+        for record in sink.records:
+            ts = record.timestamp
+            # the spoke stated its own send time; the hub stamped receipt with its own clock
+            assert ts.spoke_time is not None
+            assert (ts.spoke_time - ts.ingestion_time).total_seconds() == pytest.approx(
+                2.0, abs=0.05
+            )
+        # the records did not feed the spoke link: it is the two-way series now
+        assert offsets.stats("forge-mes")["spoke"].samples == 1
+
+        # the next Health reports the newest exchange
+        await client.health()
+        assert offsets.stats("forge-mes")["spoke"].samples == 2
+
+    async def test_the_exchange_crosses_the_real_wire(
+        self, channel: GrpcChannel, servicer: HubIngestServicer, sink: InMemoryRecordSink
+    ) -> None:
+        """RegisterRequest.spoke_time, HubTime on the three responses, T1 in the Ingest header."""
+        client = SpokeClient(channel=channel)
+        await client.register(mes_manifest())
+        first = client.last_exchange
+        assert first is not None and client.exchanges == 1
+        assert first.t1 <= first.t4 and first.t2 <= first.t3
+        assert first.round_trip_seconds >= 0
+        assert abs(first.offset_seconds) < 0.5  # one machine, one clock
+
+        await client.configure({"graphql_url": "http://mes/graphql"})
+        await client.start()
+        health = await client.health()
+        assert "hub_time" in health and client.exchanges == 2
+        offsets = servicer.pipeline.offsets
+        assert offsets.measured_two_way("forge-mes")
+        spoke_clock = offsets.stats("forge-mes")["spoke"]
+        assert spoke_clock.round_trip_seconds == pytest.approx(first.round_trip_seconds)
+        assert spoke_clock.last_seconds == pytest.approx(-first.offset_seconds)
+
+        assert await client.stream_records(_records(4)) == 4
+        assert client.exchanges == 3
+        assert len(sink) == 4 and all(r.timestamp.spoke_time is not None for r in sink.records)
+
+    async def test_a_hub_that_sends_no_time_leaves_the_spoke_unmeasured(self) -> None:
+        """A hub from before FB-092 answers without T2 and T3: no exchange, and nothing breaks."""
+        servicer = HubIngestServicer(IngestPipeline(fallback_sink=InMemoryRecordSink()))
+        servicer.clock = None  # type: ignore[assignment]  # what an older hub's transport lacks
+        client = SpokeClient(channel=InMemoryChannel(servicer))
+        await client.register(mes_manifest())
+        assert client.last_exchange is None and client.exchanges == 0
+        assert client.hub_offset_seconds is None
+
+    async def test_a_spoke_that_sends_no_time_is_still_served(self) -> None:
+        """A spoke from before FB-092 sends no T1 and reports nothing: measured one-way."""
+        hub_now = datetime(2026, 6, 1, 12, 30, tzinfo=UTC)
+        servicer = HubIngestServicer(
+            IngestPipeline(fallback_sink=InMemoryRecordSink(), clock=lambda: hub_now), batch_size=1
+        )
+        sid = await _session(servicer)
+        old = mes_record()
+        old.timestamp.ingestion_time = hub_now - timedelta(seconds=2)  # its send time, the old way
+        await servicer.receive_record(sid, pydantic_to_proto(old))
+        await servicer.health("forge-mes", sid)  # no spoke_time
+        offsets = servicer.pipeline.offsets
+        assert not offsets.measured_two_way("forge-mes")
+        one_way = offsets.stats("forge-mes")["spoke"]
+        assert one_way.last_seconds == -2.0 and one_way.round_trip_seconds is None

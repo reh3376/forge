@@ -10,7 +10,57 @@ import * as fs from "fs";
 import type { ContextualRecordMessage } from "./contextual-record.mapper";
 import type { ForgeTlsConfig } from "./forge.config";
 import type { ProtoAdapterManifest } from "./forge-manifest";
-import { getAdapterService } from "./proto";
+import {
+  getAdapterService,
+  msToTimestamp,
+  ProtoTimestamp,
+  timestampToMs,
+} from "./proto";
+
+/** gRPC metadata header that carries T1 on Ingest, whose request is a stream (FB-092). */
+export const SPOKE_TRANSMIT_TIME_HEADER = "x-forge-spoke-transmit-time";
+
+/**
+ * One hub <-> spoke time exchange: NTP's four timestamps, in epoch milliseconds
+ * (one-clock record P-9, FB-092). t1 and t4 are this spoke's clock, t2 and t3 the hub's.
+ * offsetSeconds is hub clock minus spoke clock, ((t2 - t1) + (t3 - t4)) / 2;
+ * roundTripSeconds is (t4 - t1) - (t3 - t2), so the hub's own time on the request drops out.
+ */
+export interface TimeExchange {
+  t1: number;
+  t2: number;
+  t3: number;
+  t4: number;
+  offsetSeconds: number;
+  roundTripSeconds: number;
+}
+
+export function computeExchange(
+  t1: number,
+  t2: number,
+  t3: number,
+  t4: number
+): TimeExchange {
+  return {
+    t1,
+    t2,
+    t3,
+    t4,
+    offsetSeconds: (t2 - t1 + (t3 - t4)) / 2 / 1000,
+    roundTripSeconds: (t4 - t1 - (t3 - t2)) / 1000,
+  };
+}
+
+interface HubTimeMessage {
+  receive_time?: ProtoTimestamp;
+  transmit_time?: ProtoTimestamp;
+}
+interface SpokeTimeMessage {
+  transmit_time: ProtoTimestamp;
+  offset_seconds?: number;
+  round_trip_seconds?: number;
+  measured_at?: ProtoTimestamp;
+}
 
 export interface RegisterResult {
   accepted: boolean;
@@ -42,6 +92,8 @@ export interface ForgeHubClientOptions {
   url: string;
   tls?: ForgeTlsConfig;
   rpcTimeoutMs: number;
+  /** This spoke's wall clock in epoch milliseconds; T1 and T4 are read from it (FB-092). */
+  now?: () => number;
 }
 
 type UnaryCallback<T> = (err: grpc.ServiceError | null, value?: T) => void;
@@ -53,8 +105,50 @@ type UnaryMethod<Req, Res> = (
 
 export class ForgeHubClient {
   private client?: grpc.Client;
+  private exchange?: TimeExchange;
+  private exchangeCount = 0;
+  private readonly now: () => number;
 
-  constructor(private readonly opts: ForgeHubClientOptions) {}
+  constructor(private readonly opts: ForgeHubClientOptions) {
+    this.now = opts.now ?? (() => Date.now());
+  }
+
+  // -- the time exchange (one clock, FB-092) ----------------------------------
+
+  /** The last completed exchange with the hub, or undefined before the first. */
+  get lastExchange(): TimeExchange | undefined {
+    return this.exchange;
+  }
+
+  /** How many exchanges this client has completed. */
+  get exchanges(): number {
+    return this.exchangeCount;
+  }
+
+  /** T1 for a request, with the last exchange's result for the hub's series. */
+  private spokeTime(t1: number): SpokeTimeMessage {
+    const last = this.exchange;
+    return {
+      transmit_time: msToTimestamp(t1),
+      ...(last
+        ? {
+            offset_seconds: last.offsetSeconds,
+            round_trip_seconds: last.roundTripSeconds,
+            measured_at: msToTimestamp(last.t4),
+          }
+        : {}),
+    };
+  }
+
+  /** Take T4 and keep the exchange, when the hub answered with T2 and T3. */
+  private completeExchange(t1: number, hubTime?: HubTimeMessage | null): void {
+    const t4 = this.now();
+    const t2 = timestampToMs(hubTime?.receive_time);
+    const t3 = timestampToMs(hubTime?.transmit_time);
+    if (t2 === undefined || t3 === undefined) return; // a hub from before FB-092
+    this.exchange = computeExchange(t1, t2, t3, t4);
+    this.exchangeCount++;
+  }
 
   /** Target address as given (host:port). */
   get url(): string {
@@ -105,11 +199,18 @@ export class ForgeHubClient {
   }
 
   register(manifest: ProtoAdapterManifest): Promise<RegisterResult> {
-    return this.unary("Register", { manifest }).then((r) => ({
-      accepted: Boolean((r as RegisterResult).accepted),
-      message: (r as RegisterResult).message ?? "",
-      session_id: (r as RegisterResult).session_id ?? "",
-    }));
+    const t1 = this.now();
+    return this.unary("Register", {
+      manifest,
+      spoke_time: this.spokeTime(t1),
+    }).then((r) => {
+      this.completeExchange(t1, (r as { hub_time?: HubTimeMessage })?.hub_time);
+      return {
+        accepted: Boolean((r as RegisterResult).accepted),
+        message: (r as RegisterResult).message ?? "",
+        session_id: (r as RegisterResult).session_id ?? "",
+      };
+    });
   }
 
   configure(
@@ -146,18 +247,31 @@ export class ForgeHubClient {
     }));
   }
 
+  /**
+   * Health, which is also a time exchange (FB-092): it sends T1 and the offset and
+   * round trip of the last exchange, so the hub keeps this spoke's clock series two-way,
+   * and measures a new one from the hub's answer.
+   */
   health(adapterId: string, sessionId: string): Promise<HubHealth> {
-    return this.unary<unknown, HubHealth>("Health", {
-      adapter_id: adapterId,
-      session_id: sessionId,
-    }).then((h) => ({
-      adapter_id: h?.adapter_id ?? adapterId,
-      state: h?.state ?? "ADAPTER_STATE_UNSPECIFIED",
-      error_message: h?.error_message,
-      records_collected: numberOr(h?.records_collected),
-      records_failed: numberOr(h?.records_failed),
-      uptime_seconds: numberOr(h?.uptime_seconds),
-    }));
+    const t1 = this.now();
+    return this.unary<unknown, HubHealth & { hub_time?: HubTimeMessage }>(
+      "Health",
+      {
+        adapter_id: adapterId,
+        session_id: sessionId,
+        spoke_time: this.spokeTime(t1),
+      }
+    ).then((h) => {
+      this.completeExchange(t1, h?.hub_time);
+      return {
+        adapter_id: h?.adapter_id ?? adapterId,
+        state: h?.state ?? "ADAPTER_STATE_UNSPECIFIED",
+        error_message: h?.error_message,
+        records_collected: numberOr(h?.records_collected),
+        records_failed: numberOr(h?.records_failed),
+        uptime_seconds: numberOr(h?.uptime_seconds),
+      };
+    });
   }
 
   /** Client-streaming Ingest: one stream per batch, resolved by IngestResponse. */
@@ -177,22 +291,38 @@ export class ForgeHubClient {
     if (typeof fn !== "function") {
       return Promise.reject(new Error("AdapterService has no method Ingest"));
     }
+    const t1 = this.now();
     const metadata = new grpc.Metadata();
     metadata.set("x-forge-adapter-id", adapterId);
     metadata.set("x-forge-session-id", sessionId);
+    // T1 of the time exchange: the request is a stream of records, so it rides here.
+    metadata.set(SPOKE_TRANSMIT_TIME_HEADER, new Date(t1).toISOString());
+    const sentAt = msToTimestamp(t1);
 
     return new Promise<IngestResult>((resolve, reject) => {
       const call = fn.call(client, metadata, this.deadline(), (err, value) => {
         if (err) reject(err);
-        else
+        else {
+          this.completeExchange(
+            t1,
+            (value as { hub_time?: HubTimeMessage } | undefined)?.hub_time
+          );
           resolve({
             records_received: Number(value?.records_received ?? 0),
             success: Boolean(value?.success),
             message: value?.message ?? "",
           });
+        }
       });
       call.on("error", (err: Error) => reject(err));
-      for (const record of records) call.write(record);
+      for (const record of records) {
+        // this spoke's clock as the record leaves it (proto field 10)
+        call.write(
+          record.timestamp.spoke_time
+            ? record
+            : { ...record, timestamp: { ...record.timestamp, spoke_time: sentAt } }
+        );
+      }
       call.end();
     });
   }

@@ -27,10 +27,13 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
+    from datetime import datetime
 
 import grpc
 import grpc.aio
 
+from forge.core.clock import SPOKE_TRANSMIT_TIME_HEADER
+from forge.core.models.adapter import HubTime
 from forge.proto_gen.forge.v1 import adapter_pb2 as adapter_msg
 from forge.proto_gen.forge.v1 import adapter_service_pb2 as service_msg
 from forge.proto_gen.forge.v1 import adapter_service_pb2_grpc as service_grpc
@@ -38,8 +41,10 @@ from forge.proto_gen.forge.v1 import contextual_record_pb2 as record_msg
 from forge.transport.hub_server import AdapterServiceServicer
 from forge.transport.proto_bridge import (
     health_to_proto,
+    hub_time_to_proto,
     proto_to_contextual_record,
     proto_to_manifest,
+    proto_to_spoke_time,
 )
 
 logger = logging.getLogger(__name__)
@@ -108,6 +113,12 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
     def __init__(self, servicer: AdapterServiceServicer) -> None:
         self._servicer = servicer
 
+    def _hub_time(self, received_at: datetime) -> adapter_msg.HubTime:
+        """T2 (``received_at``) and T3 (now) for a response (one clock, FB-092)."""
+        return hub_time_to_proto(
+            HubTime(receive_time=received_at, transmit_time=self._servicer.clock())
+        )
+
     # ── Control plane ────────────────────────────────────────────────────
 
     async def Register(
@@ -116,6 +127,7 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
         context: grpc.aio.ServicerContext,
     ) -> service_msg.RegisterResponse:
         """Register an adapter with the hub."""
+        received_at = self._servicer.clock()  # T2 of the time exchange (FB-092)
         try:
             manifest = proto_to_manifest(request.manifest)
             from forge.transport.serialization import pydantic_to_proto
@@ -126,6 +138,7 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
                 accepted=result.get("accepted", False),
                 message=result.get("message", ""),
                 session_id=result.get("session_id", ""),
+                hub_time=self._hub_time(received_at),
             )
         except Exception as exc:
             logger.exception("Register RPC failed")
@@ -218,17 +231,22 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
         context: grpc.aio.ServicerContext,
     ) -> adapter_msg.AdapterHealth:
         """Return adapter health status."""
+        received_at = self._servicer.clock()  # T2 of the time exchange (FB-092)
         try:
             result_dict = await self._servicer.health(
                 request.adapter_id,
                 request.session_id,
+                # T1, and the offset and round trip the spoke measured in its last exchange
+                spoke_time=proto_to_spoke_time(request.spoke_time),
             )
             # result_dict is already a proto-compatible dict from hub_server
             # Convert it to a proper proto message via the Pydantic model
             from forge.transport.serialization import proto_to_pydantic
 
             health_model = proto_to_pydantic(result_dict, "AdapterHealth")
-            return health_to_proto(health_model)
+            response = health_to_proto(health_model)
+            response.hub_time.CopyFrom(self._hub_time(received_at))
+            return response
         except Exception as exc:
             logger.exception("Health RPC failed")
             context.set_code(grpc.StatusCode.INTERNAL)
@@ -247,10 +265,14 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
         adapter_id and session_id are passed via gRPC metadata headers:
             x-forge-adapter-id, x-forge-session-id
         """
+        received_at = self._servicer.clock()  # T2 of the time exchange (FB-092)
         # Extract metadata
         metadata = dict(context.invocation_metadata())
         session_id = metadata.get("x-forge-session-id")
         _adapter_id = metadata.get("x-forge-adapter-id")  # reserved for future routing
+        # T1 arrives in this header because the request is a stream of records. The hub
+        # has no use for its value: sending it is how a spoke asks for the hub's half.
+        _spoke_transmit_time = metadata.get(SPOKE_TRANSMIT_TIME_HEADER)
 
         if not session_id:
             # Fallback: use most recent session
@@ -291,6 +313,7 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
                 records_received=count,
                 success=True,
                 message=message,
+                hub_time=self._hub_time(received_at),
             )
         except Exception as exc:
             logger.exception("Ingest RPC failed after %d records", count)

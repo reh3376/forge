@@ -16,14 +16,21 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from collections.abc import AsyncIterator, Iterable
+from collections.abc import AsyncIterator, Callable, Iterable
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from forge.core.models.adapter import AdapterManifest
+from forge.core.clock import SPOKE_TRANSMIT_TIME_HEADER, TimeExchange, utc_now
+from forge.core.models.adapter import AdapterManifest, SpokeTime
 from forge.core.models.contextual_record import ContextualRecord
-from forge.transport.serialization import pydantic_to_proto
+from forge.transport.serialization import (
+    proto_to_hub_time,
+    proto_to_spoke_time,
+    pydantic_to_proto,
+    spoke_time_to_proto,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -96,8 +103,16 @@ class TransportChannel(ABC):
         self,
         method: str,
         records: AsyncIterator[dict[str, Any]],
-    ) -> None:
-        """Send a client-streaming RPC with a stream of record dicts."""
+        *,
+        metadata: Iterable[tuple[str, str]] | None = None,
+    ) -> dict[str, Any] | None:
+        """Send a client-streaming RPC with a stream of record dicts.
+
+        ``metadata`` is sent with this call only, on top of the channel's own (the
+        spoke's T1 of the time exchange, FB-092). Returns the hub's response as a
+        proto dict (``records_received``, ``success``, ``message``, ``hub_time``),
+        or None from a channel that has none to give.
+        """
 
     @abstractmethod
     async def close(self) -> None:
@@ -133,9 +148,13 @@ class SpokeClient:
     """
 
     channel: TransportChannel
+    #: The spoke's own clock: T1 and T4 of the time exchange are read from it (FB-092).
+    now: Callable[[], datetime] = utc_now
     _session_id: str | None = field(default=None, init=False)
     _adapter_id: str | None = field(default=None, init=False)
     _records_sent: int = field(default=0, init=False)
+    _exchange: TimeExchange | None = field(default=None, init=False)
+    _exchanges: int = field(default=0, init=False)
 
     @property
     def session_id(self) -> str | None:
@@ -145,16 +164,62 @@ class SpokeClient:
     def records_sent(self) -> int:
         return self._records_sent
 
+    # -- the time exchange (one clock, FB-092) ---------------------------------
+
+    @property
+    def last_exchange(self) -> TimeExchange | None:
+        """The last completed exchange with the hub, or None before the first."""
+        return self._exchange
+
+    @property
+    def exchanges(self) -> int:
+        """How many exchanges this client has completed."""
+        return self._exchanges
+
+    @property
+    def hub_offset_seconds(self) -> float | None:
+        """Hub clock minus this spoke's clock, from the last exchange (RFC 5905)."""
+        return self._exchange.offset_seconds if self._exchange is not None else None
+
+    def hub_time(self) -> datetime | None:
+        """The hub's time as this spoke reads it now: its own clock plus the offset."""
+        if self._exchange is None:
+            return None
+        return self.now() + timedelta(seconds=self._exchange.offset_seconds)
+
+    def _spoke_time(self) -> tuple[datetime, dict[str, Any]]:
+        """T1 for a request, with the last exchange's result for the hub's series."""
+        t1 = self.now()
+        last = self._exchange
+        spoke_time = SpokeTime(
+            transmit_time=t1,
+            offset_seconds=last.offset_seconds if last is not None else None,
+            round_trip_seconds=last.round_trip_seconds if last is not None else None,
+            measured_at=last.t4 if last is not None else None,
+        )
+        return t1, spoke_time_to_proto(spoke_time)
+
+    def _complete_exchange(self, t1: datetime, response: dict[str, Any] | None) -> None:
+        """Take T4 and keep the exchange, when the hub answered with T2 and T3."""
+        t4 = self.now()
+        hub = proto_to_hub_time((response or {}).get("hub_time"))
+        if hub is None:
+            return  # a hub from before FB-092: nothing to measure
+        self._exchange = TimeExchange(t1, hub.receive_time, hub.transmit_time, t4)
+        self._exchanges += 1
+
     async def register(self, manifest: AdapterManifest) -> str:
         """Register the adapter with the hub.
 
         Returns the hub-assigned session_id.
         """
         manifest_dict = pydantic_to_proto(manifest)
+        t1, spoke_time = self._spoke_time()
         response = await self.channel.send_unary(
             "Register",
-            {"manifest": manifest_dict},
+            {"manifest": manifest_dict, "spoke_time": spoke_time},
         )
+        self._complete_exchange(t1, response)
         if not response.get("accepted"):
             msg = f"Registration rejected: {response.get('message')}"
             raise RuntimeError(msg)
@@ -215,17 +280,26 @@ class SpokeClient:
         return response.get("records_flushed", 0)
 
     async def health(self) -> dict[str, Any]:
-        """Get adapter health from hub."""
+        """Get adapter health from hub.
+
+        Every call is also a time exchange (FB-092): it sends T1 and the offset and
+        round trip of the last exchange, so the hub keeps this spoke's clock series
+        two-way, and it measures a new one from the hub's answer.
+        """
         if self._session_id is None:
             msg = "Not registered"
             raise RuntimeError(msg)
-        return await self.channel.send_unary(
+        t1, spoke_time = self._spoke_time()
+        response = await self.channel.send_unary(
             "Health",
             {
                 "adapter_id": self._adapter_id,
                 "session_id": self._session_id,
+                "spoke_time": spoke_time,
             },
         )
+        self._complete_exchange(t1, response)
+        return response
 
     async def stream_records(
         self,
@@ -248,10 +322,19 @@ class SpokeClient:
         async def _serialize() -> AsyncIterator[dict[str, Any]]:
             nonlocal count
             async for record in records:
+                if record.timestamp.spoke_time is None:
+                    # this spoke's clock as the record leaves it (proto field 10)
+                    record.timestamp.spoke_time = self.now()
                 yield pydantic_to_proto(record)
                 count += 1
 
-        await self.channel.send_stream("Collect", _serialize())
+        t1 = self.now()
+        response = await self.channel.send_stream(
+            "Collect",
+            _serialize(),
+            metadata=[(SPOKE_TRANSMIT_TIME_HEADER, t1.isoformat())],
+        )
+        self._complete_exchange(t1, response)
         self._records_sent += count
         logger.info("Streamed %d records to hub (total: %d)", count, self._records_sent)
         return count
@@ -284,7 +367,9 @@ class InMemoryChannel(TransportChannel):
             raise RuntimeError(msg)
 
         if method == "Register":
-            return await self._servicer.register(request["manifest"])
+            received_at = self._received_at()
+            result = await self._servicer.register(request["manifest"])
+            return self._with_hub_time(result, received_at)
         if method == "Configure":
             return await self._servicer.configure(
                 request["adapter_id"],
@@ -303,10 +388,15 @@ class InMemoryChannel(TransportChannel):
                 request.get("graceful", True),
             )
         if method == "Health":
-            return await self._servicer.health(
-                request["adapter_id"],
-                request["session_id"],
-            )
+            received_at = self._received_at()
+            spoke_time = proto_to_spoke_time(request.get("spoke_time"))
+            if spoke_time is not None:
+                result = await self._servicer.health(
+                    request["adapter_id"], request["session_id"], spoke_time=spoke_time
+                )
+            else:
+                result = await self._servicer.health(request["adapter_id"], request["session_id"])
+            return self._with_hub_time(result, received_at)
         if method == "Unsubscribe":
             handler = getattr(self._servicer, "unsubscribe", None)
             if handler is None:
@@ -334,16 +424,33 @@ class InMemoryChannel(TransportChannel):
         msg = f"Unknown RPC method: {method}"
         raise ValueError(msg)
 
+    def _received_at(self) -> datetime | None:
+        """T2: the servicer's clock as a request arrives, when it keeps one (FB-092)."""
+        clock = getattr(self._servicer, "clock", None)
+        return clock() if callable(clock) else None
+
+    def _with_hub_time(
+        self, result: dict[str, Any], received_at: datetime | None
+    ) -> dict[str, Any]:
+        """The response with the hub's half of the exchange (T2, T3), as the wire adds it."""
+        stamp = getattr(self._servicer, "hub_time", None)
+        if received_at is None or not callable(stamp):
+            return result
+        return {**result, "hub_time": stamp(received_at)}
+
     async def send_stream(
         self,
         method: str,
         records: AsyncIterator[dict[str, Any]],
-    ) -> None:
+        *,
+        metadata: Iterable[tuple[str, str]] | None = None,
+    ) -> dict[str, Any] | None:
         if self._closed:
             msg = "Channel is closed"
             raise RuntimeError(msg)
 
         if method == "Collect":
+            received_at = self._received_at()
             # Find the session to receive records
             sessions = list(self._servicer._sessions.values())
             if not sessions:
@@ -351,11 +458,15 @@ class InMemoryChannel(TransportChannel):
                 raise RuntimeError(msg)
             session_id = sessions[-1].session_id
 
+            count = 0
             async for record_dict in records:
                 await self._servicer.receive_record(session_id, record_dict)
-        else:
-            msg = f"Streaming not implemented for method: {method}"
-            raise ValueError(msg)
+                count += 1
+            return self._with_hub_time(
+                {"records_received": count, "success": True, "message": "OK"}, received_at
+            )
+        msg = f"Streaming not implemented for method: {method}"
+        raise ValueError(msg)
 
     async def receive_stream(
         self,

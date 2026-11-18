@@ -20,20 +20,20 @@
       },
       {
         "file": "contextual_record.proto",
-        "purpose": "ContextualRecord and its component messages (RecordSource, RecordTimestamp, RecordValue, RecordContext, RecordLineage)",
-        "message_count": 6,
+        "purpose": "ContextualRecord and its component messages (RecordSource, RecordTimestamp, TimeQuality, RecordValue, RecordContext, RecordLineage)",
+        "message_count": 7,
         "enum_count": 0
       },
       {
         "file": "adapter.proto",
-        "purpose": "Adapter domain messages (AdapterManifest, AdapterHealth, AdapterCapabilities, ConnectionParam, DataContract)",
-        "message_count": 5,
+        "purpose": "Adapter domain messages (AdapterManifest, AdapterHealth, AdapterCapabilities, ConnectionParam, DataContract), the time-governance declaration (TimeGovernance, ConnectionTimeGovernance) and the time exchange (SpokeTime, HubTime)",
+        "message_count": 9,
         "enum_count": 0
       },
       {
         "file": "adapter_service.proto",
         "purpose": "AdapterService gRPC service definition with all RPC methods and request/response messages",
-        "message_count": 17,
+        "message_count": 20,
         "enum_count": 0
       }
     ],
@@ -42,10 +42,15 @@
       "ContextualRecord",
       "RecordSource",
       "RecordTimestamp",
+      "TimeQuality",
       "RecordValue",
       "RecordContext",
       "RecordLineage",
       "AdapterManifest",
+      "TimeGovernance",
+      "ConnectionTimeGovernance",
+      "SpokeTime",
+      "HubTime",
       "AdapterHealth",
       "AdapterCapabilities",
       "ConnectionParam",
@@ -222,7 +227,7 @@
         "request_type": "RegisterRequest",
         "response_type": "RegisterResponse",
         "plane": "control",
-        "description": "Register an adapter with the hub, providing its manifest"
+        "description": "Register an adapter with the hub, providing its manifest. Carries the time exchange: RegisterRequest.spoke_time (T1), RegisterResponse.hub_time (T2, T3)"
       },
       {
         "method": "Configure",
@@ -254,7 +259,7 @@
         "request_type": "HealthRequest",
         "response_type": "AdapterHealth",
         "plane": "control",
-        "description": "Query adapter health status"
+        "description": "Query adapter health status. Carries the time exchange: HealthRequest.spoke_time (T1 and the offset and round trip of the spoke's last exchange), AdapterHealth.hub_time (T2, T3)"
       },
       {
         "method": "Collect",
@@ -310,7 +315,7 @@
         "request_type": "ContextualRecord",
         "response_type": "IngestResponse",
         "plane": "data",
-        "description": "Client-streaming: spoke pushes ContextualRecords to hub"
+        "description": "Client-streaming: spoke pushes ContextualRecords to hub. Carries the time exchange: T1 in the x-forge-spoke-transmit-time header, IngestResponse.hub_time (T2, T3)"
       }
     ],
     "metadata_protocol": {
@@ -323,6 +328,11 @@
         {
           "key": "x-forge-session-id",
           "purpose": "Identifies the active session for record routing",
+          "required": false
+        },
+        {
+          "key": "x-forge-spoke-transmit-time",
+          "purpose": "T1 of the hub-spoke time exchange on Ingest, an RFC 3339 UTC timestamp: the request is a stream of records and has no field for it",
           "required": false
         }
       ]

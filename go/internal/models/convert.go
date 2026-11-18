@@ -95,6 +95,9 @@ func recordTimestampToProto(ts *RecordTimestamp) *forgev1.RecordTimestamp {
 			AccuracyClass:    ts.TimeQuality.AccuracyClass,
 		}
 	}
+	if ts.SpokeTime != nil {
+		pb.SpokeTime = timestamppb.New(*ts.SpokeTime)
+	}
 	return pb
 }
 
@@ -145,6 +148,10 @@ func recordTimestampFromProto(pb *forgev1.RecordTimestamp) RecordTimestamp {
 			LeapSecondsKnown: copyBool(q.LeapSecondsKnown),
 			AccuracyClass:    class,
 		}
+	}
+	if pb.SpokeTime != nil {
+		t := pb.SpokeTime.AsTime()
+		ts.SpokeTime = &t
 	}
 	return ts
 }
@@ -519,6 +526,7 @@ func AdapterHealthToProto(h *AdapterHealth) *forgev1.AdapterHealth {
 	if h.LastHealthy != nil {
 		pb.LastHealthy = timestamppb.New(*h.LastHealthy)
 	}
+	pb.HubTime = HubTimeToProto(h.HubTime)
 	return pb
 }
 
@@ -540,7 +548,72 @@ func AdapterHealthFromProto(pb *forgev1.AdapterHealth) *AdapterHealth {
 		t := pb.LastHealthy.AsTime()
 		h.LastHealthy = &t
 	}
+	h.HubTime = HubTimeFromProto(pb.GetHubTime())
 	return h
+}
+
+// ---------------------------------------------------------------------------
+// The hub <-> spoke time exchange (one clock, FB-092)
+// ---------------------------------------------------------------------------
+
+// SpokeTimeToProto converts the spoke's half of an exchange; nil stays nil.
+func SpokeTimeToProto(s *SpokeTime) *forgev1.SpokeTime {
+	if s == nil {
+		return nil
+	}
+	pb := &forgev1.SpokeTime{TransmitTime: timestamppb.New(s.TransmitTime)}
+	if s.OffsetSeconds != nil {
+		o := *s.OffsetSeconds
+		pb.OffsetSeconds = &o
+	}
+	if s.RoundTripSeconds != nil {
+		r := *s.RoundTripSeconds
+		pb.RoundTripSeconds = &r
+	}
+	if s.MeasuredAt != nil {
+		pb.MeasuredAt = timestamppb.New(*s.MeasuredAt)
+	}
+	return pb
+}
+
+// SpokeTimeFromProto returns nil when the spoke sent no T1 (a spoke from before FB-092).
+func SpokeTimeFromProto(pb *forgev1.SpokeTime) *SpokeTime {
+	if pb == nil || pb.TransmitTime == nil {
+		return nil
+	}
+	s := &SpokeTime{TransmitTime: pb.TransmitTime.AsTime()}
+	if pb.OffsetSeconds != nil {
+		o := pb.GetOffsetSeconds()
+		s.OffsetSeconds = &o
+	}
+	if pb.RoundTripSeconds != nil {
+		r := pb.GetRoundTripSeconds()
+		s.RoundTripSeconds = &r
+	}
+	if pb.MeasuredAt != nil {
+		t := pb.MeasuredAt.AsTime()
+		s.MeasuredAt = &t
+	}
+	return s
+}
+
+// HubTimeToProto converts the hub's half of an exchange; nil stays nil.
+func HubTimeToProto(h *HubTime) *forgev1.HubTime {
+	if h == nil {
+		return nil
+	}
+	return &forgev1.HubTime{
+		ReceiveTime:  timestamppb.New(h.ReceiveTime),
+		TransmitTime: timestamppb.New(h.TransmitTime),
+	}
+}
+
+// HubTimeFromProto returns nil when the hub sent no T2 and T3 (a hub from before FB-092).
+func HubTimeFromProto(pb *forgev1.HubTime) *HubTime {
+	if pb == nil || pb.ReceiveTime == nil || pb.TransmitTime == nil {
+		return nil
+	}
+	return &HubTime{ReceiveTime: pb.ReceiveTime.AsTime(), TransmitTime: pb.TransmitTime.AsTime()}
 }
 
 func adapterStateToProto(s AdapterState) forgev1.AdapterState {

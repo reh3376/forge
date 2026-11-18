@@ -47,6 +47,14 @@ export interface HubStatus {
   registeredAt?: string;
   lastHealthAt?: string;
   lastHealth?: HubHealth;
+  /** This spoke's clock against the hub's, from the last time exchange (FB-092):
+   *  hubOffsetSeconds is hub clock minus this host's clock. */
+  clock?: {
+    hubOffsetSeconds: number;
+    roundTripSeconds: number;
+    measuredAt: string;
+    exchanges: number;
+  };
   healthFailures: number;
   reconnects: number;
   lastError?: string;
@@ -131,9 +139,21 @@ export class ForgeHubService implements OnApplicationBootstrap, OnModuleDestroy 
       registeredAt: this.registeredAt?.toISOString(),
       lastHealthAt: this.lastHealthAt?.toISOString(),
       lastHealth: this.lastHealth,
+      clock: this.clockStatus(),
       healthFailures: this.healthFailures,
       reconnects: this.reconnects,
       lastError: this.lastError,
+    };
+  }
+
+  private clockStatus(): HubStatus["clock"] {
+    const last = this.client.lastExchange;
+    if (!last) return undefined;
+    return {
+      hubOffsetSeconds: last.offsetSeconds,
+      roundTripSeconds: last.roundTripSeconds,
+      measuredAt: new Date(last.t4).toISOString(),
+      exchanges: this.client.exchanges,
     };
   }
 

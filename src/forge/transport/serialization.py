@@ -37,6 +37,8 @@ from forge.core.models.adapter import (
     AdapterTier,
     ConnectionParam,
     DataContract,
+    HubTime,
+    SpokeTime,
     TimeGovernance,
 )
 from forge.core.models.contextual_record import (
@@ -192,6 +194,8 @@ def _record_timestamp_to_proto(ts: RecordTimestamp) -> dict[str, Any]:
         result["source_offset_seconds"] = ts.source_offset_seconds
     if ts.time_quality is not None:
         result["time_quality"] = ts.time_quality.model_dump(exclude_none=True)
+    if ts.spoke_time is not None:
+        result["spoke_time"] = _datetime_to_proto(ts.spoke_time)
     return result
 
 
@@ -306,8 +310,50 @@ def _manifest_to_proto(manifest: AdapterManifest) -> dict[str, Any]:
     }
 
 
-def _health_to_proto(health: AdapterHealth) -> dict[str, Any]:
+def spoke_time_to_proto(spoke_time: SpokeTime) -> dict[str, Any]:
+    """The spoke's half of the time exchange as a proto dict (FB-092)."""
+    result: dict[str, Any] = {"transmit_time": _datetime_to_proto(spoke_time.transmit_time)}
+    if spoke_time.offset_seconds is not None:
+        result["offset_seconds"] = spoke_time.offset_seconds
+    if spoke_time.round_trip_seconds is not None:
+        result["round_trip_seconds"] = spoke_time.round_trip_seconds
+    if spoke_time.measured_at is not None:
+        result["measured_at"] = _datetime_to_proto(spoke_time.measured_at)
+    return result
+
+
+def proto_to_spoke_time(d: dict[str, Any] | None) -> SpokeTime | None:
+    """A proto dict's ``spoke_time``, or None when the spoke sent no T1."""
+    if not d or not d.get("transmit_time"):
+        return None
+    return SpokeTime(
+        transmit_time=_proto_to_datetime(d["transmit_time"]),
+        offset_seconds=d.get("offset_seconds"),
+        round_trip_seconds=d.get("round_trip_seconds"),
+        measured_at=_proto_to_datetime(d.get("measured_at")),
+    )
+
+
+def hub_time_to_proto(hub_time: HubTime) -> dict[str, Any]:
+    """The hub's half of the time exchange (T2, T3) as a proto dict (FB-092)."""
     return {
+        "receive_time": _datetime_to_proto(hub_time.receive_time),
+        "transmit_time": _datetime_to_proto(hub_time.transmit_time),
+    }
+
+
+def proto_to_hub_time(d: dict[str, Any] | None) -> HubTime | None:
+    """A proto dict's ``hub_time``, or None when the hub sent none (a hub before FB-092)."""
+    if not d or not d.get("receive_time") or not d.get("transmit_time"):
+        return None
+    return HubTime(
+        receive_time=_proto_to_datetime(d["receive_time"]),
+        transmit_time=_proto_to_datetime(d["transmit_time"]),
+    )
+
+
+def _health_to_proto(health: AdapterHealth) -> dict[str, Any]:
+    result: dict[str, Any] = {
         "adapter_id": health.adapter_id,
         "state": _ADAPTER_STATE_TO_INT.get(health.state.value, 0),
         "last_check": _datetime_to_proto(health.last_check),
@@ -317,6 +363,9 @@ def _health_to_proto(health: AdapterHealth) -> dict[str, Any]:
         "records_failed": health.records_failed,
         "uptime_seconds": health.uptime_seconds,
     }
+    if health.hub_time is not None:
+        result["hub_time"] = hub_time_to_proto(health.hub_time)
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -335,7 +384,7 @@ def _proto_to_record_source(d: dict[str, Any]) -> RecordSource:
 
 def _proto_to_record_timestamp(d: dict[str, Any]) -> RecordTimestamp:
     # ingestion_time is left unset when the spoke sent none: the hub stamps it on
-    # receipt (FB-087) and only a stamp the spoke actually sent becomes sent_time.
+    # receipt (FB-087). The spoke's own send time is spoke_time (FB-092).
     ingestion_time = _proto_to_datetime(d.get("ingestion_time"))
     kwargs: dict[str, Any] = {
         "source_time": _proto_to_datetime(d["source_time"]),
@@ -355,6 +404,8 @@ def _proto_to_record_timestamp(d: dict[str, Any]) -> RecordTimestamp:
         kwargs["source_offset_seconds"] = float(d["source_offset_seconds"])
     if d.get("time_quality"):
         kwargs["time_quality"] = TimeQuality.model_validate(d["time_quality"])
+    if d.get("spoke_time"):
+        kwargs["spoke_time"] = _proto_to_datetime(d["spoke_time"])
     return RecordTimestamp(**kwargs)
 
 
@@ -499,6 +550,7 @@ def _proto_to_health(d: dict[str, Any]) -> AdapterHealth:
         records_collected=d.get("records_collected", 0),
         records_failed=d.get("records_failed", 0),
         uptime_seconds=d.get("uptime_seconds", 0.0),
+        hub_time=proto_to_hub_time(d.get("hub_time")),
     )
 
 

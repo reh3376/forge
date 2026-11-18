@@ -563,6 +563,135 @@ func (x *ConnectionTimeGovernance) GetToleranceClass() string {
 	return ""
 }
 
+// What a spoke sends with a request.
+type SpokeTime struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// T1: the spoke's clock when it sent this request.
+	TransmitTime *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=transmit_time,json=transmitTime,proto3" json:"transmit_time,omitempty"`
+	// The spoke's last completed exchange. offset = hub clock minus spoke clock,
+	// ((T2 - T1) + (T3 - T4)) / 2, in seconds.
+	OffsetSeconds *float64 `protobuf:"fixed64,2,opt,name=offset_seconds,json=offsetSeconds,proto3,oneof" json:"offset_seconds,omitempty"`
+	// round trip = (T4 - T1) - (T3 - T2), in seconds; half of it bounds the offset's error.
+	RoundTripSeconds *float64 `protobuf:"fixed64,3,opt,name=round_trip_seconds,json=roundTripSeconds,proto3,oneof" json:"round_trip_seconds,omitempty"`
+	// T4 of that exchange, by the spoke's clock: when the measurement was taken.
+	MeasuredAt    *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=measured_at,json=measuredAt,proto3" json:"measured_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SpokeTime) Reset() {
+	*x = SpokeTime{}
+	mi := &file_forge_v1_adapter_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SpokeTime) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SpokeTime) ProtoMessage() {}
+
+func (x *SpokeTime) ProtoReflect() protoreflect.Message {
+	mi := &file_forge_v1_adapter_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SpokeTime.ProtoReflect.Descriptor instead.
+func (*SpokeTime) Descriptor() ([]byte, []int) {
+	return file_forge_v1_adapter_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *SpokeTime) GetTransmitTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.TransmitTime
+	}
+	return nil
+}
+
+func (x *SpokeTime) GetOffsetSeconds() float64 {
+	if x != nil && x.OffsetSeconds != nil {
+		return *x.OffsetSeconds
+	}
+	return 0
+}
+
+func (x *SpokeTime) GetRoundTripSeconds() float64 {
+	if x != nil && x.RoundTripSeconds != nil {
+		return *x.RoundTripSeconds
+	}
+	return 0
+}
+
+func (x *SpokeTime) GetMeasuredAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.MeasuredAt
+	}
+	return nil
+}
+
+// What the hub answers with.
+type HubTime struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// T2: the hub's clock when the request arrived.
+	ReceiveTime *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=receive_time,json=receiveTime,proto3" json:"receive_time,omitempty"`
+	// T3: the hub's clock when it sent the response.
+	TransmitTime  *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=transmit_time,json=transmitTime,proto3" json:"transmit_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HubTime) Reset() {
+	*x = HubTime{}
+	mi := &file_forge_v1_adapter_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HubTime) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HubTime) ProtoMessage() {}
+
+func (x *HubTime) ProtoReflect() protoreflect.Message {
+	mi := &file_forge_v1_adapter_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HubTime.ProtoReflect.Descriptor instead.
+func (*HubTime) Descriptor() ([]byte, []int) {
+	return file_forge_v1_adapter_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *HubTime) GetReceiveTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ReceiveTime
+	}
+	return nil
+}
+
+func (x *HubTime) GetTransmitTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.TransmitTime
+	}
+	return nil
+}
+
 type AdapterHealth struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	AdapterId        string                 `protobuf:"bytes,1,opt,name=adapter_id,json=adapterId,proto3" json:"adapter_id,omitempty"`
@@ -573,13 +702,15 @@ type AdapterHealth struct {
 	RecordsCollected int64                  `protobuf:"varint,6,opt,name=records_collected,json=recordsCollected,proto3" json:"records_collected,omitempty"`
 	RecordsFailed    int64                  `protobuf:"varint,7,opt,name=records_failed,json=recordsFailed,proto3" json:"records_failed,omitempty"`
 	UptimeSeconds    float64                `protobuf:"fixed64,8,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// The hub's half of the time exchange, set on the response to Health (FB-092).
+	HubTime       *HubTime `protobuf:"bytes,9,opt,name=hub_time,json=hubTime,proto3" json:"hub_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *AdapterHealth) Reset() {
 	*x = AdapterHealth{}
-	mi := &file_forge_v1_adapter_proto_msgTypes[6]
+	mi := &file_forge_v1_adapter_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -591,7 +722,7 @@ func (x *AdapterHealth) String() string {
 func (*AdapterHealth) ProtoMessage() {}
 
 func (x *AdapterHealth) ProtoReflect() protoreflect.Message {
-	mi := &file_forge_v1_adapter_proto_msgTypes[6]
+	mi := &file_forge_v1_adapter_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -604,7 +735,7 @@ func (x *AdapterHealth) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdapterHealth.ProtoReflect.Descriptor instead.
 func (*AdapterHealth) Descriptor() ([]byte, []int) {
-	return file_forge_v1_adapter_proto_rawDescGZIP(), []int{6}
+	return file_forge_v1_adapter_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *AdapterHealth) GetAdapterId() string {
@@ -663,6 +794,13 @@ func (x *AdapterHealth) GetUptimeSeconds() float64 {
 	return 0
 }
 
+func (x *AdapterHealth) GetHubTime() *HubTime {
+	if x != nil {
+		return x.HubTime
+	}
+	return nil
+}
+
 var File_forge_v1_adapter_proto protoreflect.FileDescriptor
 
 const file_forge_v1_adapter_proto_rawDesc = "" +
@@ -718,7 +856,18 @@ const file_forge_v1_adapter_proto_rawDesc = "" +
 	"\x1cclock_probe_interval_seconds\x18\x03 \x01(\x01H\x00R\x19clockProbeIntervalSeconds\x88\x01\x01\x126\n" +
 	"\x17source_timestamp_origin\x18\x04 \x01(\tR\x15sourceTimestampOrigin\x12'\n" +
 	"\x0ftolerance_class\x18\x05 \x01(\tR\x0etoleranceClassB\x1f\n" +
-	"\x1d_clock_probe_interval_seconds\"\xf6\x02\n" +
+	"\x1d_clock_probe_interval_seconds\"\x92\x02\n" +
+	"\tSpokeTime\x12?\n" +
+	"\rtransmit_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\ftransmitTime\x12*\n" +
+	"\x0eoffset_seconds\x18\x02 \x01(\x01H\x00R\roffsetSeconds\x88\x01\x01\x121\n" +
+	"\x12round_trip_seconds\x18\x03 \x01(\x01H\x01R\x10roundTripSeconds\x88\x01\x01\x12;\n" +
+	"\vmeasured_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"measuredAtB\x11\n" +
+	"\x0f_offset_secondsB\x15\n" +
+	"\x13_round_trip_seconds\"\x89\x01\n" +
+	"\aHubTime\x12=\n" +
+	"\freceive_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\vreceiveTime\x12?\n" +
+	"\rtransmit_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ftransmitTime\"\xa4\x03\n" +
 	"\rAdapterHealth\x12\x1d\n" +
 	"\n" +
 	"adapter_id\x18\x01 \x01(\tR\tadapterId\x12,\n" +
@@ -729,7 +878,8 @@ const file_forge_v1_adapter_proto_rawDesc = "" +
 	"\rerror_message\x18\x05 \x01(\tR\ferrorMessage\x12+\n" +
 	"\x11records_collected\x18\x06 \x01(\x03R\x10recordsCollected\x12%\n" +
 	"\x0erecords_failed\x18\a \x01(\x03R\rrecordsFailed\x12%\n" +
-	"\x0euptime_seconds\x18\b \x01(\x01R\ruptimeSecondsB/Z-github.com/reh3376/forge/gen/forge/v1;forgev1b\x06proto3"
+	"\x0euptime_seconds\x18\b \x01(\x01R\ruptimeSeconds\x12,\n" +
+	"\bhub_time\x18\t \x01(\v2\x11.forge.v1.HubTimeR\ahubTimeB/Z-github.com/reh3376/forge/gen/forge/v1;forgev1b\x06proto3"
 
 var (
 	file_forge_v1_adapter_proto_rawDescOnce sync.Once
@@ -743,7 +893,7 @@ func file_forge_v1_adapter_proto_rawDescGZIP() []byte {
 	return file_forge_v1_adapter_proto_rawDescData
 }
 
-var file_forge_v1_adapter_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_forge_v1_adapter_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_forge_v1_adapter_proto_goTypes = []any{
 	(*AdapterCapabilities)(nil),      // 0: forge.v1.AdapterCapabilities
 	(*ConnectionParam)(nil),          // 1: forge.v1.ConnectionParam
@@ -751,28 +901,35 @@ var file_forge_v1_adapter_proto_goTypes = []any{
 	(*AdapterManifest)(nil),          // 3: forge.v1.AdapterManifest
 	(*TimeGovernance)(nil),           // 4: forge.v1.TimeGovernance
 	(*ConnectionTimeGovernance)(nil), // 5: forge.v1.ConnectionTimeGovernance
-	(*AdapterHealth)(nil),            // 6: forge.v1.AdapterHealth
-	(AdapterTier)(0),                 // 7: forge.v1.AdapterTier
-	(*structpb.Struct)(nil),          // 8: google.protobuf.Struct
-	(AdapterState)(0),                // 9: forge.v1.AdapterState
-	(*timestamppb.Timestamp)(nil),    // 10: google.protobuf.Timestamp
+	(*SpokeTime)(nil),                // 6: forge.v1.SpokeTime
+	(*HubTime)(nil),                  // 7: forge.v1.HubTime
+	(*AdapterHealth)(nil),            // 8: forge.v1.AdapterHealth
+	(AdapterTier)(0),                 // 9: forge.v1.AdapterTier
+	(*structpb.Struct)(nil),          // 10: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),    // 11: google.protobuf.Timestamp
+	(AdapterState)(0),                // 12: forge.v1.AdapterState
 }
 var file_forge_v1_adapter_proto_depIdxs = []int32{
-	7,  // 0: forge.v1.AdapterManifest.tier:type_name -> forge.v1.AdapterTier
+	9,  // 0: forge.v1.AdapterManifest.tier:type_name -> forge.v1.AdapterTier
 	0,  // 1: forge.v1.AdapterManifest.capabilities:type_name -> forge.v1.AdapterCapabilities
 	2,  // 2: forge.v1.AdapterManifest.data_contract:type_name -> forge.v1.DataContract
 	1,  // 3: forge.v1.AdapterManifest.connection_params:type_name -> forge.v1.ConnectionParam
-	8,  // 4: forge.v1.AdapterManifest.metadata:type_name -> google.protobuf.Struct
+	10, // 4: forge.v1.AdapterManifest.metadata:type_name -> google.protobuf.Struct
 	4,  // 5: forge.v1.AdapterManifest.time_governance:type_name -> forge.v1.TimeGovernance
 	5,  // 6: forge.v1.TimeGovernance.connections:type_name -> forge.v1.ConnectionTimeGovernance
-	9,  // 7: forge.v1.AdapterHealth.state:type_name -> forge.v1.AdapterState
-	10, // 8: forge.v1.AdapterHealth.last_check:type_name -> google.protobuf.Timestamp
-	10, // 9: forge.v1.AdapterHealth.last_healthy:type_name -> google.protobuf.Timestamp
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	11, // 7: forge.v1.SpokeTime.transmit_time:type_name -> google.protobuf.Timestamp
+	11, // 8: forge.v1.SpokeTime.measured_at:type_name -> google.protobuf.Timestamp
+	11, // 9: forge.v1.HubTime.receive_time:type_name -> google.protobuf.Timestamp
+	11, // 10: forge.v1.HubTime.transmit_time:type_name -> google.protobuf.Timestamp
+	12, // 11: forge.v1.AdapterHealth.state:type_name -> forge.v1.AdapterState
+	11, // 12: forge.v1.AdapterHealth.last_check:type_name -> google.protobuf.Timestamp
+	11, // 13: forge.v1.AdapterHealth.last_healthy:type_name -> google.protobuf.Timestamp
+	7,  // 14: forge.v1.AdapterHealth.hub_time:type_name -> forge.v1.HubTime
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_forge_v1_adapter_proto_init() }
@@ -782,13 +939,14 @@ func file_forge_v1_adapter_proto_init() {
 	}
 	file_forge_v1_enums_proto_init()
 	file_forge_v1_adapter_proto_msgTypes[5].OneofWrappers = []any{}
+	file_forge_v1_adapter_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_forge_v1_adapter_proto_rawDesc), len(file_forge_v1_adapter_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

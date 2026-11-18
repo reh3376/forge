@@ -43,7 +43,8 @@ message RecordTimestamp {
 
   // One clock (docs/decisions/one-clock-ot-source-time.md, P-3): fields 5 to 10 are the
   // record's time-quality fields. 6 and 8 landed with FB-088; 5, 7 and 9 with FB-094
-  // step 3; 10 (spoke_time, the renamed sent_time) comes with FB-092. Field 4 stays free.
+  // step 3; 10 (spoke_time, the hub-local sent_time until then) with FB-092. Field 4
+  // stays free.
 
   // The stamp exactly as the stamping clock sent it. source_time is this minus
   // source_offset_seconds once the stamping clock is measured, and equal to it until then;
@@ -66,6 +67,10 @@ message RecordTimestamp {
 
   // IEC 61850 TimeQuality in Forge's words, set when the stamping clock is measured.
   TimeQuality time_quality = 9;
+
+  // The spoke's own clock when it sent the record (FB-092). The hub stamps
+  // ingestion_time with its own clock on receipt and never takes this for arrival.
+  google.protobuf.Timestamp spoke_time = 10;
 }
 
 // IEC 61850 TimeQuality in Forge's words (one-clock record P-3). An unset bool means

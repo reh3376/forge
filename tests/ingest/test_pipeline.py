@@ -264,7 +264,7 @@ async def test_ingest_stamps_receipt_with_the_hub_clock() -> None:
     await pipeline.ingest([_spoke_record()], adapter_id="forge-mes", manifest=make_manifest())
     ts = sink.records[0].timestamp
     assert ts.ingestion_time == HUB_NOW
-    assert ts.sent_time == SPOKE_NOW
+    assert ts.spoke_time == SPOKE_NOW
 
 
 async def test_ingest_shares_one_receipt_stamp_per_batch() -> None:
@@ -280,7 +280,7 @@ async def test_record_without_a_spoke_stamp_keeps_sent_time_empty() -> None:
     record = make_record()  # ingestion_time left to its default: the spoke sent none
     await pipeline.ingest([record], adapter_id="forge-mes", manifest=make_manifest())
     assert record.timestamp.ingestion_time == HUB_NOW
-    assert record.timestamp.sent_time is None
+    assert record.timestamp.spoke_time is None
 
 
 async def test_replay_keeps_the_first_sent_time() -> None:
@@ -290,7 +290,7 @@ async def test_replay_keeps_the_first_sent_time() -> None:
     record = _spoke_record()
     await pipeline.ingest([record], adapter_id="forge-mes", manifest=make_manifest())
     await pipeline.ingest([record], adapter_id="forge-mes", manifest=make_manifest())
-    assert record.timestamp.sent_time == SPOKE_NOW
+    assert record.timestamp.spoke_time == SPOKE_NOW
     assert record.timestamp.ingestion_time == later
 
 
@@ -301,7 +301,7 @@ def test_coerce_leaves_the_hub_stamp_to_ingest() -> None:
         manifest=make_manifest(source_timestamp_origin="forge"),
     )
     assert "ingestion_time" not in wrapped.timestamp.model_fields_set
-    assert wrapped.timestamp.sent_time is None
+    assert wrapped.timestamp.spoke_time is None
 
 
 # ── Clock-offset measurement (one clock, FB-089) ─────────────────────

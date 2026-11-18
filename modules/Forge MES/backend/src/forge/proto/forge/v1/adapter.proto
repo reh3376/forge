@@ -102,6 +102,38 @@ message ConnectionTimeGovernance {
 }
 
 // ---------------------------------------------------------------------------
+// One clock: the hub <-> spoke time exchange
+// (docs/decisions/one-clock-ot-source-time.md P-9, FB-092)
+//
+// NTP's four timestamps, in band on Register, Health and Ingest. The spoke sends T1
+// with its request, the hub answers with T2 and T3, the spoke takes T4 on receipt and
+// computes the offset and the round trip by RFC 5905, and reports them with its next
+// Health so the hub keeps the series. No new RPC.
+// Maps to: forge.core.models.adapter.SpokeTime / HubTime
+// ---------------------------------------------------------------------------
+
+// What a spoke sends with a request.
+message SpokeTime {
+  // T1: the spoke's clock when it sent this request.
+  google.protobuf.Timestamp transmit_time = 1;
+  // The spoke's last completed exchange. offset = hub clock minus spoke clock,
+  // ((T2 - T1) + (T3 - T4)) / 2, in seconds.
+  optional double offset_seconds = 2;
+  // round trip = (T4 - T1) - (T3 - T2), in seconds; half of it bounds the offset's error.
+  optional double round_trip_seconds = 3;
+  // T4 of that exchange, by the spoke's clock: when the measurement was taken.
+  google.protobuf.Timestamp measured_at = 4;
+}
+
+// What the hub answers with.
+message HubTime {
+  // T2: the hub's clock when the request arrived.
+  google.protobuf.Timestamp receive_time = 1;
+  // T3: the hub's clock when it sent the response.
+  google.protobuf.Timestamp transmit_time = 2;
+}
+
+// ---------------------------------------------------------------------------
 // AdapterHealth — current health status of an adapter instance
 // Maps to: forge.core.models.adapter.AdapterHealth
 // ---------------------------------------------------------------------------
@@ -115,4 +147,6 @@ message AdapterHealth {
   int64 records_collected = 6;
   int64 records_failed = 7;
   double uptime_seconds = 8;
+  // The hub's half of the time exchange, set on the response to Health (FB-092).
+  HubTime hub_time = 9;
 }

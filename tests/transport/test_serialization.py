@@ -253,16 +253,19 @@ class TestTimestampEdgeCases:
         )
         assert "ingestion_time" not in ts.model_fields_set
         assert ts.ingestion_time.tzinfo == timezone.utc
-        assert ts.sent_time is None
+        assert ts.spoke_time is None
 
-    def test_sent_time_is_hub_local_and_never_on_the_wire(self) -> None:
-        ts = RecordTimestamp(
-            source_time=datetime(2026, 1, 1, tzinfo=timezone.utc),
-            sent_time=datetime(2026, 1, 1, 0, 0, 1, tzinfo=timezone.utc),
-        )
+    def test_spoke_time_is_on_the_wire(self) -> None:
+        """The spoke's send time is proto field 10 since FB-092 (hub-local sent_time before)."""
+        sent = datetime(2026, 1, 1, 0, 0, 1, tzinfo=timezone.utc)
+        ts = RecordTimestamp(source_time=datetime(2026, 1, 1, tzinfo=timezone.utc), spoke_time=sent)
         wire = pydantic_to_proto(ts)
-        assert "sent_time" not in wire
-        assert proto_to_pydantic(wire, "RecordTimestamp").sent_time is None
+        assert "spoke_time" in wire
+        assert proto_to_pydantic(wire, "RecordTimestamp").spoke_time == sent
+        plain = pydantic_to_proto(
+            RecordTimestamp(source_time=datetime(2026, 1, 1, tzinfo=timezone.utc))
+        )
+        assert "spoke_time" not in plain
 
     def test_none_server_time(self) -> None:
         """server_time is optional — should survive round-trip as None."""

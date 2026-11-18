@@ -32,12 +32,14 @@ option go_package = "github.com/reh3376/forge/gen/forge/v1;forgev1";
 
 message RegisterRequest {
   AdapterManifest manifest = 1;
+  SpokeTime spoke_time = 2;      // T1 of the time exchange (one clock, FB-092)
 }
 
 message RegisterResponse {
   bool accepted = 1;
   string message = 2;            // human-readable status or rejection reason
   string session_id = 3;         // hub-assigned session ID for this adapter
+  HubTime hub_time = 4;          // T2 and T3 of the time exchange (FB-092)
 }
 
 message ConfigureRequest {
@@ -77,6 +79,9 @@ message StopResponse {
 message HealthRequest {
   string adapter_id = 1;
   string session_id = 2;
+  // T1 of this exchange, and the offset and round trip the spoke measured in its last
+  // one: the hub keeps the two-way series of the spoke's clock from it (FB-092).
+  SpokeTime spoke_time = 3;
 }
 
 // --- Data plane ---
@@ -110,6 +115,7 @@ message IngestResponse {
   int64 records_received = 1;
   bool success = 2;
   string message = 3;
+  HubTime hub_time = 4;          // T2 and T3 of the time exchange (FB-092)
 }
 
 // --- Capabilities ---
@@ -194,6 +200,8 @@ service AdapterService {
   // Client-streaming: spoke sends a stream of records, hub returns summary.
   // adapter_id and session_id are passed via gRPC metadata headers:
   //   x-forge-adapter-id, x-forge-session-id
+  // T1 of the time exchange (FB-092) travels the same way, since the request is a
+  // stream of records: x-forge-spoke-transmit-time, an RFC 3339 UTC timestamp.
   rpc Ingest(stream ContextualRecord) returns (IngestResponse);
 
   // Hub requests records from spoke (pull model). Server-streaming.
