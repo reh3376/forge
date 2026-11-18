@@ -83,8 +83,8 @@ export function useEntraIntegration() {
 
         setData({
           isConnected: true,
-          tenantId,
-          clientId,
+          tenantId: tenantId ?? null,
+          clientId: clientId ?? null,
           totalUsers: mockUserData.totalUsers,
           activeUsers: mockUserData.activeUsers,
           adminUsers: mockUserData.adminUsers,

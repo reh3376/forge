@@ -380,7 +380,7 @@ export function RouteGuard({ children, config, loading, fallback }: RouteGuardPr
         reason={accessResult.reason!}
         missingRoles={accessResult.missingRoles || []}
         missingPermissions={accessResult.missingPermissions || []}
-        currentPath={pathname}
+        currentPath={pathname ?? ''}
         onRetry={() => window.location.reload()}
       />
     )

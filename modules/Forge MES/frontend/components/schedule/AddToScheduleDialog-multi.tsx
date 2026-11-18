@@ -21,8 +21,8 @@ interface ProductionOrder {
   containerType: string | null
   customer: {
     id: string
-    name?: string
-    customerCode?: string
+    name?: string | null
+    customerCode?: string | null
   }
   recipe: {
     id: string
@@ -62,10 +62,11 @@ export function AddToScheduleDialogMulti({
 
   // Initialize form
   useEffect(() => {
-    if (productionOrders.length > 0) {
+    const firstOrder = productionOrders[0]
+    if (firstOrder) {
       // Generate default name from recipe
-      const recipe = productionOrders[0].recipe.Recipe
-      const mashBill = productionOrders[0].recipe.recipeGroup?.recipe || recipe
+      const recipe = firstOrder.recipe.Recipe
+      const mashBill = firstOrder.recipe.recipeGroup?.recipe || recipe
       setScheduleName(`${mashBill} Run - ${new Date().toLocaleDateString()}`)
 
       // Set default dates to today
@@ -85,16 +86,23 @@ export function AddToScheduleDialogMulti({
       toast.error('Please fill in all required fields')
       return
     }
+    const firstOrder = productionOrders[0]
+    if (!firstOrder) {
+      toast.error('No production orders selected')
+      return
+    }
 
     setIsSubmitting(true)
 
     try {
-      const result = await graphqlClient.mutate(CREATE_SCHEDULE_FROM_ORDERS, {
+      const result = await graphqlClient.mutate<{
+        createScheduleOrderFromProductionOrders?: { id: string } | null
+      }>(CREATE_SCHEDULE_FROM_ORDERS, {
         variables: {
           productionOrderIds: productionOrders.map(o => o.id),
           data: {
             name: scheduleName,
-            recipeName: productionOrders[0].recipe.Recipe,
+            recipeName: firstOrder.recipe.Recipe,
             estimatedStart: new Date(estimatedStart).toISOString(),
             estimatedEnd: new Date(estimatedEnd).toISOString(),
             createdBy,
@@ -104,7 +112,6 @@ export function AddToScheduleDialogMulti({
       })
 
       if (result?.createScheduleOrderFromProductionOrders) {
-        const scheduleOrder = result.createScheduleOrderFromProductionOrders
         toast.success(`Created "${scheduleName}" with ${productionOrders.length} order(s)`)
         onSuccess?.()
         onClose()
@@ -127,12 +134,13 @@ export function AddToScheduleDialogMulti({
     }
   }
 
-  if (productionOrders.length === 0) return null
+  const firstOrder = productionOrders[0]
+  if (!firstOrder) return null
 
   // Calculate totals
   const totalQuantity = productionOrders.reduce((sum, o) => sum + o.quantity, 0)
   const uniqueCustomers = new Set(productionOrders.map(o => o.customer.name || o.customer.customerCode))
-  const mashBill = productionOrders[0].recipe.recipeGroup?.recipe || productionOrders[0].recipe.Recipe
+  const mashBill = firstOrder.recipe.recipeGroup?.recipe || firstOrder.recipe.Recipe
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

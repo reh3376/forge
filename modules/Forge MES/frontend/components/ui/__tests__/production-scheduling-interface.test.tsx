@@ -158,7 +158,7 @@ describe('ProductionSchedulingInterface', () => {
     })
 
     const createButtons = screen.getAllByText('Create Schedule')
-    await user.click(createButtons[0])
+    await user.click(createButtons[0]!)
 
     expect(screen.getByText('Create Production Schedule')).toBeInTheDocument()
   })

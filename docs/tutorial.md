@@ -189,7 +189,7 @@ From `docs/WHERE-WE-ARE.md` §1, the snapshot at PR 95:
 | Python hub (`src/forge`) | 355 files, ~72,200 lines |
 | Python tests | 269 files, 4,625 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
-| Interim MES bridge (`modules/Forge MES`) | ~248,000 lines of TypeScript, kept until the Go forge-mes lands |
+| Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend, kept until the Go forge-mes and forge-display land |
 | Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
 | Storage migrations | 12 |
 | FACTS specs · FATS specs · FVTS specs | 9 · 28 · 1 |
@@ -1040,7 +1040,8 @@ note:
 | Prisma data into the hub's `mod_mes` | ⬜ FB-057 steps 2–5 |
 | Frontend retired in favour of forge-display | ⬜ after forge-display exists |
 
-- The bridge's jest and tsc gates are advisory in CI (FB-048) and go away when FB-076 retires that code.
+- The bridge's frontend type check is clean and blocks in CI since 2026-11-17 (FB-028: 228 errors that came with the import, 93 unused files removed, none of the strict compiler flags relaxed). Its backend jest step is still advisory (FB-048, FB-036). Both go away when FB-076 and forge-display retire that code.
+- The frontend is the MES user interface only until forge-display exists: forge-display renders every Forge frontend from the modules' FVTS specs (A-3).
 - The bridge was imported from `WhiskeyHouse/whk-mes` on 2026-10-15; the import's credential leak is why the repository's history was purged and the hardening of F8 exists.
 
 note:

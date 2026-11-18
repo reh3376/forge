@@ -29,6 +29,10 @@ interface WizardData {
   };
   bom?: {
     ingredients?: Array<{
+      // the wizard may send these three; the transform below supplies an id and a name when it does not
+      id?: string;
+      name?: string;
+      notes?: string;
       itemCode: string;
       quantity: number;
       unit: string;

@@ -12,6 +12,7 @@ import {
   Clock,
   RotateCcw,
   StopCircle,
+  type LucideIcon,
 } from "lucide-react";
 import type { S88StepState } from "@/lib/api/graphql/mashing-execution";
 
@@ -30,7 +31,7 @@ interface MashingStepStateBadgeProps {
 const stateConfig: Record<
   S88StepState,
   {
-    icon: React.ComponentType<{ className?: string }>;
+    icon: LucideIcon;
     label: string;
     color: string;
     pulse: boolean;

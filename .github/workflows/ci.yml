@@ -91,10 +91,11 @@ jobs:
         run: npx jest --ci --passWithNoTests --forceExit
         working-directory: modules/Forge MES/backend
         continue-on-error: true
-      - name: frontend type-check (advisory until BACKLOG FB-028 is fixed)
+      - name: frontend type-check
+        # Blocking since BACKLOG FB-028 (2026-11-17): the interim frontend type-checks clean
+        # under its strict flags, and a new type error fails the job.
         run: npx tsc --noEmit -p tsconfig.json
         working-directory: modules/Forge MES/frontend
-        continue-on-error: true
 
   secrets-scan:
     name: secrets-scan

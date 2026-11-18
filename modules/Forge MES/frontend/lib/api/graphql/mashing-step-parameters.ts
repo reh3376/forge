@@ -47,30 +47,30 @@ export interface CreateMashingStepParameterDefinitionInput {
   parameterName: string;
   displayName: string;
   parameterType: MashingParameterType;
-  description?: string;
-  unit?: string;
+  description?: string | undefined;
+  unit?: string | undefined;
   isRequired: boolean;
-  defaultValue?: string;
-  validationMin?: number;
-  validationMax?: number;
-  deviationThreshold?: number;
-  displayOrder?: number;
-  category?: string;
-  enumValues?: string[];
+  defaultValue?: string | undefined;
+  validationMin?: number | undefined;
+  validationMax?: number | undefined;
+  deviationThreshold?: number | undefined;
+  displayOrder?: number | undefined;
+  category?: string | undefined;
+  enumValues?: string[] | undefined;
 }
 
 export interface UpdateMashingStepParameterDefinitionInput {
-  displayName?: string;
-  description?: string;
-  unit?: string;
-  isRequired?: boolean;
-  defaultValue?: string;
-  validationMin?: number;
-  validationMax?: number;
-  deviationThreshold?: number;
-  displayOrder?: number;
-  category?: string;
-  enumValues?: string[];
+  displayName?: string | undefined;
+  description?: string | undefined;
+  unit?: string | undefined;
+  isRequired?: boolean | undefined;
+  defaultValue?: string | undefined;
+  validationMin?: number | undefined;
+  validationMax?: number | undefined;
+  deviationThreshold?: number | undefined;
+  displayOrder?: number | undefined;
+  category?: string | undefined;
+  enumValues?: string[] | undefined;
 }
 
 // ===== Queries =====

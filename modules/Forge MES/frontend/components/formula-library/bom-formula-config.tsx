@@ -67,8 +67,8 @@ export type ConfigurableCategory = typeof CONFIGURABLE_CATEGORIES[number]['value
 export interface CategoryFormulaConfig {
   category: ConfigurableCategory
   calculationMode: BomCalculationMode
-  formulaLibraryId?: string
-  formulaName?: string
+  formulaLibraryId?: string | undefined
+  formulaName?: string | undefined
 }
 
 interface BomFormulaConfigProps {
@@ -302,7 +302,7 @@ export function BomFormulaConfig({
             <div className="grid gap-2">
               <Label>Ingredient Category</Label>
               <Select
-                value={formData.category}
+                {...(formData.category !== undefined ? { value: formData.category } : {})}
                 onValueChange={(value) => setFormData({ ...formData, category: value as ConfigurableCategory })}
                 disabled={!!editingConfig}
               >
@@ -326,7 +326,7 @@ export function BomFormulaConfig({
             <div className="grid gap-2">
               <Label>Calculation Mode</Label>
               <Select
-                value={formData.calculationMode}
+                {...(formData.calculationMode !== undefined ? { value: formData.calculationMode } : {})}
                 onValueChange={(value) => setFormData({
                   ...formData,
                   calculationMode: value as BomCalculationMode,
@@ -357,7 +357,7 @@ export function BomFormulaConfig({
               <div className="grid gap-2">
                 <Label>Formula Library Expression</Label>
                 <Select
-                  value={formData.formulaLibraryId}
+                  {...(formData.formulaLibraryId !== undefined ? { value: formData.formulaLibraryId } : {})}
                   onValueChange={handleFormulaSelect}
                 >
                   <SelectTrigger>

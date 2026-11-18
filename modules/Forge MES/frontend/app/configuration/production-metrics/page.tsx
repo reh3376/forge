@@ -141,8 +141,8 @@ export default function ProductionMetricsPage() {
 
   // Group metrics by category
   const grouped = metrics.reduce<Record<string, ProductionMetric[]>>((acc, m) => {
-    if (!acc[m.category]) acc[m.category] = []
-    acc[m.category].push(m)
+    const bucket = acc[m.category] ?? (acc[m.category] = [])
+    bucket.push(m)
     return acc
   }, {})
 

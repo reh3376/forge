@@ -42,29 +42,29 @@ import { ScheduleOrderChangeHistory } from './ScheduleOrderChangeHistory'
 interface ScheduleOrder {
   id: string
   name: string
-  recipeName?: string
+  recipeName?: string | null
   status: string
-  estimatedStart?: string
-  estimatedEnd?: string
-  actualStart?: string
-  actualEnd?: string
-  totalBarrels?: number
-  totalProofGallons?: number
-  duration?: number
-  durationUnits?: string
-  estimatedMashingDuration?: number
-  estimatedMashingStartTime?: string
-  estimatedFermentationDuration?: number
-  estimatedFermentationStartTime?: string
-  estimatedDistillationDuration?: number
-  estimatedDistillationStartTime?: string
-  estimatedBarrelingStartTime?: string
-  estimatedProcessingStartTime?: string
-  estimatedTotalProductionDuration?: number
-  totalGrainWeight?: number
-  totalWaterVolume?: number
-  totalCooks?: number
-  totalFermenters?: number
+  estimatedStart?: string | null
+  estimatedEnd?: string | null
+  actualStart?: string | null
+  actualEnd?: string | null
+  totalBarrels?: number | null
+  totalProofGallons?: number | null
+  duration?: number | null
+  durationUnits?: string | null
+  estimatedMashingDuration?: number | null
+  estimatedMashingStartTime?: string | null
+  estimatedFermentationDuration?: number | null
+  estimatedFermentationStartTime?: string | null
+  estimatedDistillationDuration?: number | null
+  estimatedDistillationStartTime?: string | null
+  estimatedBarrelingStartTime?: string | null
+  estimatedProcessingStartTime?: string | null
+  estimatedTotalProductionDuration?: number | null
+  totalGrainWeight?: number | null
+  totalWaterVolume?: number | null
+  totalCooks?: number | null
+  totalFermenters?: number | null
   productionOrders?: Array<{
     id: string
     name: string | null
@@ -79,16 +79,16 @@ interface ScheduleOrder {
     }
     customer?: {
       id: string
-      name?: string
-      customerCode?: string
+      name?: string | null
+      customerCode?: string | null
     }
   }>
 }
 
 interface ScheduleOrderQueue {
   id: string
-  queueIndex: number
-  areas: { id: string; name: string }[]
+  queueIndex: number | null
+  areas?: { id: string; name: string }[]
   scheduleOrder: ScheduleOrder
 }
 
@@ -1227,15 +1227,16 @@ export function UnifiedScheduleOrderEditModal({
                       <h3 className="text-lg font-semibold mb-4 text-amber-700 dark:text-amber-400">Yield Estimation</h3>
                       {(() => {
                         // Derive yield values from schedule order data
-                        const whiskeyType = productionOrders[0]?.recipe?.whiskeyType || 'RyeBourbon'
+                        const scheduleOrder = orderQueue?.scheduleOrder
+                        const whiskeyType = scheduleOrder?.productionOrders?.[0]?.recipe?.whiskeyType || 'RyeBourbon'
                         const isBourbon = ['RyeBourbon', 'WheatedBourbon', 'FourGrainBourbon'].includes(whiskeyType)
                         const yieldRate = isBourbon ? 5.2 : 4.9
                         const avgBarrelFill = 53.07
                         const lbsPerBushel = 56
                         const cooksPerFerm = 3
                         const totalBarrels = formData.totalBarrels ? parseFloat(formData.totalBarrels) : 0
-                        const totalCooks = formData.totalCooks ?? 0
-                        const totalFermenters = formData.totalFermenters ?? 0
+                        const totalCooks = scheduleOrder?.totalCooks ?? 0
+                        const totalFermenters = scheduleOrder?.totalFermenters ?? 0
 
                         // Derive grain per cook from solver-computed totals on the SO
                         const totalGrainWeight = formData.totalGrainWeight ? parseFloat(formData.totalGrainWeight) : 0
@@ -1337,7 +1338,8 @@ export function UnifiedScheduleOrderEditModal({
                                     value={po.name || ''}
                                     onChange={(e) => {
                                       const updated = [...productionOrders]
-                                      updated[index].name = e.target.value || null
+                                      const target = updated[index]
+                                      if (target) target.name = e.target.value || null
                                       setProductionOrders(updated)
                                     }}
                                   />
@@ -1348,7 +1350,8 @@ export function UnifiedScheduleOrderEditModal({
                                     value={po.status}
                                     onValueChange={(v) => {
                                       const updated = [...productionOrders]
-                                      updated[index].status = v
+                                      const target = updated[index]
+                                      if (target) target.status = v
                                       setProductionOrders(updated)
                                     }}
                                   >
@@ -1372,7 +1375,8 @@ export function UnifiedScheduleOrderEditModal({
                                     value={po.quantity?.toString() || ''}
                                     onChange={(e) => {
                                       const updated = [...productionOrders]
-                                      updated[index].quantity = e.target.value ? parseFloat(e.target.value) : null
+                                      const target = updated[index]
+                                      if (target) target.quantity = e.target.value ? parseFloat(e.target.value) : null
                                       setProductionOrders(updated)
                                     }}
                                   />
@@ -1383,7 +1387,8 @@ export function UnifiedScheduleOrderEditModal({
                                     value={po.containerType || 'LargeBarrel'}
                                     onValueChange={(v) => {
                                       const updated = [...productionOrders]
-                                      updated[index].containerType = v
+                                      const target = updated[index]
+                                      if (target) target.containerType = v
                                       setProductionOrders(updated)
                                     }}
                                   >

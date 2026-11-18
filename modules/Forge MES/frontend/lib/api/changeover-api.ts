@@ -144,8 +144,9 @@ class ChangeoverAPI {
     )
 
     const errors = results.filter((r) => r.result.error)
-    if (errors.length === results.length) {
-      return { error: errors[0].result.error }
+    const firstError = errors[0]?.result.error
+    if (errors.length === results.length && firstError) {
+      return { error: firstError }
     }
 
     const states = {} as Record<ChangeoverArea, AreaChangeoverState>

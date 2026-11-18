@@ -56,7 +56,10 @@ export function validateOrderGrouping(
   }
 
   // Set the validated mash bill
-  result.mashBill = Array.from(mashBills)[0]
+  const [mashBill] = mashBills
+  if (mashBill !== undefined) {
+    result.mashBill = mashBill
+  }
 
   // Check if all orders have the same customer (warning only)
   const customers = new Set(
@@ -80,11 +83,12 @@ export function isOrderCompatible(
   order: ProductionOrderWithRecipeGroup,
   selectedOrders: ProductionOrderWithRecipeGroup[]
 ): boolean {
-  if (selectedOrders.length === 0) {
+  const firstSelected = selectedOrders[0]
+  if (!firstSelected) {
     return true // First selection is always compatible
   }
 
-  const selectedMashBill = getMashBill(selectedOrders[0])
+  const selectedMashBill = getMashBill(firstSelected)
   const orderMashBill = getMashBill(order)
 
   return selectedMashBill === orderMashBill
@@ -100,14 +104,15 @@ export function filterCompatibleOrders(
   compatible: ProductionOrderWithRecipeGroup[]
   incompatible: ProductionOrderWithRecipeGroup[]
 } {
-  if (selectedOrders.length === 0) {
+  const firstSelected = selectedOrders[0]
+  if (!firstSelected) {
     return {
       compatible: allOrders,
       incompatible: []
     }
   }
 
-  const selectedMashBill = getMashBill(selectedOrders[0])
+  const selectedMashBill = getMashBill(firstSelected)
 
   const compatible: ProductionOrderWithRecipeGroup[] = []
   const incompatible: ProductionOrderWithRecipeGroup[] = []

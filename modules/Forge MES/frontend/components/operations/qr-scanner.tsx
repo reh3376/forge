@@ -190,10 +190,10 @@ export function QrScanner({
               {scanMode === "camera" && !permissionDenied && (
                 <div className="relative">
                   <div className="aspect-square w-full overflow-hidden rounded-lg bg-muted">
-                    {console.log("[QrScanner] Rendering Scanner component with onScan callback")}
                     <Scanner
                       onScan={handleScan}
                       onError={handleError}
+                      sound={false}
                       constraints={{
                         facingMode: "environment",
                         aspectRatio: 1,
@@ -208,7 +208,6 @@ export function QrScanner({
                         },
                       }}
                       components={{
-                        audio: false,
                         onOff: false,
                         torch: true,
                         zoom: false,

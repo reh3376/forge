@@ -17,7 +17,7 @@ interface UseNavigationOptions {
 }
 
 export function useNavigation(options: UseNavigationOptions = {}) {
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ''
   const router = useRouter()
   const { userPermissions = [] } = options
   const { navigateWithGuard } = useNavigationGuards()

@@ -242,12 +242,12 @@ export function RecipeBOMStep({ data, onDataChange, onValidationChange, onWizard
 
             if (mode === 'create' && formattedMashBill) {
               console.log('🧪 RecipeBOMStep - passing mashBill prop:', formattedMashBill)
-              props.mashBill = formattedMashBill
+              props['mashBill'] = formattedMashBill
             }
 
             // Pass mashBillData for validation
             if (mashBill) {
-              props.mashBillData = {
+              props['mashBillData'] = {
                 corn: mashBill.corn,
                 rye: mashBill.rye,
                 wheat: mashBill.wheat,

@@ -13,7 +13,8 @@ import {
   CheckCircle,
   AlertTriangle,
   Clock,
-  ExternalLink
+  ExternalLink,
+  type LucideIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -25,7 +26,7 @@ interface DiagnosticTool {
   title: string
   description: string
   href: string
-  icon: React.ComponentType<{ className?: string }>
+  icon: LucideIcon
   status: 'healthy' | 'warning' | 'error' | 'unknown'
   category: 'health' | 'auth' | 'api' | 'config' | 'database'
 }

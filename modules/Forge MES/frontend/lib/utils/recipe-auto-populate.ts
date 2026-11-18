@@ -19,8 +19,8 @@ export interface RecipeParameter {
   description: string
   type: 'numeric' | 'boolean' | 'text'
   value: string | number | boolean
-  unit?: string
-  operation?: string
+  unit?: string | undefined
+  operation?: string | undefined
   createdAt: Date
 }
 

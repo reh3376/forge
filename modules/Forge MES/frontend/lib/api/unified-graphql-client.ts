@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, HttpLink, from, DocumentNode, FetchPolicy, ErrorPolicy, OperationVariables } from '@apollo/client'
+import { ApolloClient, InMemoryCache, HttpLink, from, DocumentNode, FetchPolicy, ErrorPolicy, OperationVariables, NormalizedCacheObject } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
 import { RetryLink } from '@apollo/client/link/retry'
@@ -40,7 +40,7 @@ export interface MutationOptions {
  * with proper JWT and MSAL authentication support.
  */
 export class UnifiedGraphQLClient {
-  private apolloClient: ApolloClient<unknown>
+  private apolloClient: ApolloClient<NormalizedCacheObject>
   private backendConfig = getCurrentBackendConfig()
   private config: GraphQLClientConfig
   private lastQueryFailed = false
@@ -65,7 +65,7 @@ export class UnifiedGraphQLClient {
   /**
    * Create the Apollo Client with all necessary links and configuration
    */
-  private createApolloClient(): ApolloClient<unknown> {
+  private createApolloClient(): ApolloClient<NormalizedCacheObject> {
     // Use the Next.js GraphQL proxy endpoint instead of direct backend
     // This ensures all requests go through our authentication proxy
     const graphqlProxyUrl = '/api/graphql'
@@ -481,7 +481,7 @@ export class UnifiedGraphQLClient {
   /**
    * Get the underlying Apollo Client instance
    */
-  getApolloClient(): ApolloClient<unknown> {
+  getApolloClient(): ApolloClient<NormalizedCacheObject> {
     return this.apolloClient
   }
 

@@ -267,7 +267,7 @@ export function HealthEndpointTester() {
                       </div>
                     )}
 
-                    {result.data && (
+                    {Boolean(result.data) && (
                       <div>
                         <h4 className="font-medium mb-2">Response Data</h4>
                         <div className="bg-muted rounded p-3 max-h-96 overflow-auto">

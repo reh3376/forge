@@ -52,7 +52,7 @@ export interface WizardStepProps {
   // Add mode prop to distinguish between create and edit contexts
   mode?: 'create' | 'edit'
   // Add callback for switching to a different recipe revision
-  onSelectRevision?: (recipeId: string) => void
+  onSelectRevision?: ((recipeId: string) => void) | undefined
 }
 
 export function RecipeWizard({

@@ -13,6 +13,7 @@ import {
   FileCheck,
   Rocket,
   AlertTriangle,
+  type LucideIcon,
 } from 'lucide-react'
 import { ChangeoverState } from '@/lib/api/changeover-api'
 
@@ -26,7 +27,7 @@ interface ChangeoverStateBadgeProps {
 const stateConfig: Record<
   ChangeoverState,
   {
-    icon: React.ComponentType<{ className?: string }>
+    icon: LucideIcon
     label: string
     color: string
     pulse: boolean
