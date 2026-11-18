@@ -78,7 +78,7 @@ _VALID_CONFIG = {
     "gateway_listen_host": "0.0.0.0",
     "gateway_listen_port": 50060,
     "wms_adapter_id": "forge-wms",
-    "ims_adapter_id": "bosc-ims",
+    "ims_adapter_id": "forge-ims",
     "device_token_secret": "test-secret-key-for-device-auth",
 }
 
@@ -111,7 +111,7 @@ class TestLifecycle:
         assert adapter._router is not None
         ids = adapter._router.target_adapter_ids()
         assert "forge-wms" in ids
-        assert "bosc-ims" in ids
+        assert "forge-ims" in ids
 
     @pytest.mark.asyncio()
     async def test_start_sets_healthy(self, adapter):
@@ -256,7 +256,7 @@ class TestCollect:
         records = [r async for r in adapter.collect()]
         routed_to = records[0].context.extra["_routed_to"]
         assert "forge-wms" in routed_to
-        assert "bosc-ims" in routed_to
+        assert "forge-ims" in routed_to
 
     @pytest.mark.asyncio()
     async def test_collect_increments_counter(self):
@@ -436,7 +436,7 @@ class TestQueueCollection:
         records = [r async for r in adapter.collect()]
         routed = records[0].context.extra["_routed_to"]
         assert "forge-wms" in routed
-        assert "bosc-ims" in routed
+        assert "forge-ims" in routed
 
     @pytest.mark.asyncio()
     async def test_collect_queue_takes_priority_over_injected(self):
@@ -534,7 +534,7 @@ class TestEndToEnd:
                 {
                     "scan_id": "flow-s2",
                     "scan_type": "SCAN_TYPE_ASSET_RECEIVE",
-                    "barcode_value": "BOSC-AST-67890",
+                    "barcode_value": "IMS-AST-67890",
                     "scanned_at": "2026-04-06T14:31:00+00:00",
                     "operator_id": "OP-01",
                 },
@@ -556,7 +556,7 @@ class TestEndToEnd:
         # Verify second record (asset receive → IMS)
         asset_record = records[1]
         assert asset_record.source.tag_path == "scanner.scan.asset_receive"
-        assert "bosc-ims" in asset_record.context.extra["_routed_to"]
+        assert "forge-ims" in asset_record.context.extra["_routed_to"]
 
     @pytest.mark.asyncio()
     async def test_rejected_device_no_records(self):

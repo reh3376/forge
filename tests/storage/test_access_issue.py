@@ -32,10 +32,12 @@ def test_naming_matches_migration_002() -> None:
     assert module_schema("forge-mes") == "mod_mes"
     assert module_schema("forge-wms") == "mod_wms"
     assert module_schema("Forge-CMMS") == "mod_cmms"
-    assert module_schema("bosc-ims") == "mod_bosc_ims"
+    assert module_schema("forge-ims") == "mod_ims"
+    assert module_schema("scanner-gateway") == "mod_scanner_gateway"  # no prefix to drop
+    assert module_schema("forge-integ-erp-netsuite") == "mod_erpi"  # by explicit mapping
     assert schema_role("mod_mes") == "forge_mod_mes"
     with pytest.raises(ValueError, match="schema name"):
-        module_schema("whk-")
+        module_schema("forge-")
     with pytest.raises(ValueError, match="unsafe"):
         schema_role("mod_mes; DROP ROLE forge")
 

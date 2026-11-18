@@ -145,7 +145,7 @@ class HistoryConfig(BaseModel):
     """Per-tag history recording configuration.
 
     Controls whether and how the tag's values are sent to the historian
-    (NextTrend).  Deadband prevents recording of noise.
+    (Forge Historian).  Deadband prevents recording of noise.
     """
 
     enabled: bool = True
@@ -481,12 +481,12 @@ class EventTag(BaseTag):
 class VirtualTag(BaseTag):
     """Virtual★ — federated read from external systems.
 
-    Forge-exclusive.  Reads values from external sources (NextTrend
+    Forge-exclusive.  Reads values from external sources (Forge Historian
     history API, external databases, REST APIs, other Forge modules)
     with a TTL cache.  Unlike QueryTag (SQL-only, poll-based), Virtual
     tags support any data source and use a cache-first strategy.
 
-    Example: read the latest 24h average temperature from NextTrend's
+    Example: read the latest 24h average temperature from Forge Historian's
     historian without duplicating the data in the tag engine.
 
     No Ignition equivalent.
@@ -494,7 +494,7 @@ class VirtualTag(BaseTag):
 
     tag_type: Literal[TagType.VIRTUAL] = TagType.VIRTUAL
     source_type: str = Field(
-        description="Source type: 'nexttrend', 'rest', 'database', 'forge_module'"
+        description="Source type: 'forge_historian', 'rest', 'database', 'forge_module'"
     )
     source_config: dict[str, Any] = Field(
         description="Source-specific configuration (URL, query, module_id, etc.)"

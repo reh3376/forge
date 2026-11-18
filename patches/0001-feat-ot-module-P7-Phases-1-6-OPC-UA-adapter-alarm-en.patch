@@ -3803,22 +3803,22 @@ index 0000000..be1c876
 +        *,
 +        max_records: int | None = None,
 +    ) -> AsyncIterator[ContextualRecord]:
-+        """Backfill is delegated to NextTrend historian.
++        """Backfill is delegated to Forge Historian historian.
 +
 +        The OT Module does not store history locally — it delegates
-+        historical queries to the NextTrend time-series historian
++        historical queries to the Forge Historian time-series historian
 +        via its REST API.
 +        """
-+        # Stub — NextTrend integration in Phase 2B
++        # Stub — Forge Historian integration in Phase 2B
 +        logger.info(
-+            "Backfill requested for %d tags [%s → %s] — delegating to NextTrend",
++            "Backfill requested for %d tags [%s → %s] — delegating to Forge Historian",
 +            len(tags), start, end,
 +        )
 +        return
 +        yield  # pragma: no cover — makes this an async generator
 +
 +    async def get_earliest_timestamp(self, tag: str) -> datetime | None:
-+        """Earliest timestamp delegated to NextTrend."""
++        """Earliest timestamp delegated to Forge Historian."""
 +        return None
 +
 +    # ------------------------------------------------------------------
@@ -5215,7 +5215,7 @@ index 0000000..db138ac
 +- MQTT (retained messages on alarm topics, QoS 1)
 +- RabbitMQ (structured events for cross-module workflows)
 +- CMMS (auto-create work requests for CRITICAL/HIGH alarms)
-+- NextTrend (annotations on tag history)
++- Forge Historian (annotations on tag history)
 +- Scripting (@forge.on_alarm handler dispatch)
 +- ContextualRecord (Forge decision-quality pipeline)
 +
@@ -5270,7 +5270,7 @@ index 0000000..db138ac
 +
 +
 +class HistorianAnnotator(Protocol):
-+    """Protocol for NextTrend annotation writing."""
++    """Protocol for Forge Historian annotation writing."""
 +
 +    async def write_annotation(self, tag_path: str, timestamp: str, text: str, **kwargs: Any) -> None: ...
 +
@@ -5470,12 +5470,12 @@ index 0000000..db138ac
 +
 +
 +# ---------------------------------------------------------------------------
-+# NextTrend Annotation Writer (3.3.4)
++# Forge Historian Annotation Writer (3.3.4)
 +# ---------------------------------------------------------------------------
 +
 +
 +class AlarmHistorianAnnotation:
-+    """Writes alarm events as annotations on NextTrend tag history."""
++    """Writes alarm events as annotations on Forge Historian tag history."""
 +
 +    def __init__(self, historian: HistorianAnnotator) -> None:
 +        self._historian = historian
@@ -7745,7 +7745,7 @@ index 0000000..f74db88
 +        ),
 +        OperatorChecklistItem(
 +            id="historian-data",
-+            description="NextTrend receiving OT Module data at expected rates",
++            description="Forge Historian receiving OT Module data at expected rates",
 +        ),
 +        OperatorChecklistItem(
 +            id="mqtt-parity",
@@ -12227,7 +12227,7 @@ index 0000000..9c4b206
 +"""SparkplugB encoding — BIRTH/DATA/DEATH message encoding.
 +
 +Encodes OT Module tag data into Sparkplug B format for consumers
-+that expect the Sparkplug B specification (like NextTrend's
++that expect the Sparkplug B specification (like Forge Historian's
 +SparkplugB connector).
 +
 +Design decisions:
@@ -12805,7 +12805,7 @@ index 0000000..804d6d2
 +
 +Design decisions:
 +    D1: Payload format is a flat JSON object — no wrapping, no nesting.
-+        This keeps payloads small and compatible with NextTrend, MES,
++        This keeps payloads small and compatible with Forge Historian, MES,
 +        and any MQTT-consuming dashboard.
 +    D2: Health messages are published as retained messages with QoS 1.
 +        New subscribers immediately get the last-known PLC state.
@@ -14897,7 +14897,7 @@ index 0000000..4f2e2fc
 +    """Per-tag history recording configuration.
 +
 +    Controls whether and how the tag's values are sent to the historian
-+    (NextTrend).  Deadband prevents recording of noise.
++    (Forge Historian).  Deadband prevents recording of noise.
 +    """
 +
 +    enabled: bool = True
@@ -15194,12 +15194,12 @@ index 0000000..4f2e2fc
 +class VirtualTag(BaseTag):
 +    """Virtual★ — federated read from external systems.
 +
-+    Forge-exclusive.  Reads values from external sources (NextTrend
++    Forge-exclusive.  Reads values from external sources (Forge Historian
 +    history API, external databases, REST APIs, other Forge modules)
 +    with a TTL cache.  Unlike QueryTag (SQL-only, poll-based), Virtual
 +    tags support any data source and use a cache-first strategy.
 +
-+    Example: read the latest 24h average temperature from NextTrend's
++    Example: read the latest 24h average temperature from Forge Historian's
 +    historian without duplicating the data in the tag engine.
 +
 +    No Ignition equivalent.
@@ -15207,7 +15207,7 @@ index 0000000..4f2e2fc
 +
 +    tag_type: Literal[TagType.VIRTUAL] = TagType.VIRTUAL
 +    source_type: str = Field(
-+        description="Source type: 'nexttrend', 'rest', 'database', 'forge_module'"
++        description="Source type: 'forge_historian', 'rest', 'database', 'forge_module'"
 +    )
 +    source_config: dict[str, Any] = Field(
 +        description="Source-specific configuration (URL, query, module_id, etc.)"
@@ -16389,11 +16389,11 @@ index 0000000..f137be5
 +"""Virtual tag provider — federated reads from external systems.
 +
 +Forge-exclusive tag type.  VirtualTags read from external sources
-+(NextTrend historian, external databases, REST APIs, other Forge
++(Forge Historian historian, external databases, REST APIs, other Forge
 +modules) with a TTL cache.  Unlike QueryTags (SQL-only, poll-based),
 +Virtual tags support any data source and use a cache-first strategy.
 +
-+Phase 2A.2 stub: Source-specific fetchers (NextTrend, REST, DB)
++Phase 2A.2 stub: Source-specific fetchers (Forge Historian, REST, DB)
 +will be wired in Phase 2A.4 (Context Enrichment).
 +"""
 +
@@ -16416,9 +16416,9 @@ index 0000000..f137be5
 +    """Provider for Virtual tags — federated external data access.
 +
 +    Currently a structural stub.  Full implementation requires:
-+        - Source-type registry (nexttrend, rest, database, forge_module)
++        - Source-type registry (forge_historian, rest, database, forge_module)
 +        - Async HTTP client for REST sources
-+        - NextTrend client for historian queries
++        - Forge Historian client for historian queries
 +        - TTL-based cache with background refresh
 +    """
 +
@@ -32887,7 +32887,7 @@ index 0000000..4354ccc
 +    def test_creation(self):
 +        tag = VirtualTag(
 +            path="test/virtual",
-+            source_type="nexttrend",
++            source_type="forge_historian",
 +            source_config={"tag_path": "WH/WHK01/temp", "aggregation": "avg_24h"},
 +        )
 +        assert tag.tag_type == TagType.VIRTUAL
@@ -32946,7 +32946,7 @@ index 0000000..4354ccc
 +        tag = self.adapter.validate_python({
 +            "tag_type": "virtual",
 +            "path": "WH/avg",
-+            "source_type": "nexttrend",
++            "source_type": "forge_historian",
 +            "source_config": {"tag": "WH/temp"},
 +        })
 +        assert isinstance(tag, VirtualTag)

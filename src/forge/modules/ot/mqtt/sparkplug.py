@@ -1,7 +1,7 @@
 """SparkplugB encoding — BIRTH/DATA/DEATH message encoding.
 
 Encodes OT Module tag data into Sparkplug B format for consumers
-that expect the Sparkplug B specification (like NextTrend's
+that expect the Sparkplug B specification (like Forge Historian's
 SparkplugB connector).
 
 Design decisions:

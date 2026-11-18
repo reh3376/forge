@@ -4,7 +4,7 @@ Registers listeners on the AlarmEngine to propagate alarm state changes to:
 - MQTT (retained messages on alarm topics, QoS 1)
 - RabbitMQ (structured events for cross-module workflows)
 - CMMS (auto-create work requests for CRITICAL/HIGH alarms)
-- NextTrend (annotations on tag history)
+- Forge Historian (annotations on tag history)
 - Scripting (@forge.on_alarm handler dispatch)
 - ContextualRecord (Forge decision-quality pipeline)
 
@@ -65,7 +65,7 @@ class CmmsAdapter(Protocol):
 
 
 class HistorianAnnotator(Protocol):
-    """Protocol for NextTrend annotation writing."""
+    """Protocol for Forge Historian annotation writing."""
 
     async def write_annotation(
         self, tag_path: str, timestamp: str, text: str, **kwargs: Any
@@ -273,12 +273,12 @@ class AlarmCmmsIntegration:
 
 
 # ---------------------------------------------------------------------------
-# NextTrend Annotation Writer (3.3.4)
+# Forge Historian Annotation Writer (3.3.4)
 # ---------------------------------------------------------------------------
 
 
 class AlarmHistorianAnnotation:
-    """Writes alarm events as annotations on NextTrend tag history."""
+    """Writes alarm events as annotations on Forge Historian tag history."""
 
     def __init__(self, historian: HistorianAnnotator) -> None:
         self._historian = historian

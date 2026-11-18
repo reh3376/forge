@@ -38,9 +38,9 @@ State on 2026-10-17 (`FACTSRunner` over `src/forge/governance/facts/specs/`; "Ru
 
 | Spec | Tier | Data sources | Context mappings | Capabilities | Hash state | Runner |
 |------|------|--------------|------------------|--------------|------------|--------|
-| `bosc-ims.facts.json` | MES_MOM | 8 (7 gRPC unary, 1 gRPC stream) | 12 + 2 enrichment | read, subscribe, backfill, discover | approved (no approver recorded) | pass |
+| `forge-ims.facts.json` | MES_MOM | 8 (7 gRPC unary, 1 gRPC stream) | 12 + 2 enrichment | read, subscribe, backfill, discover | approved (no approver recorded) | pass |
 | `forge-mes.facts.json` | MES_MOM | 18 (10 GraphQL, 1 mutation, 1 RabbitMQ, 2 MQTT, 1 WS, 2 REST, 1 database) | 15 + 3 enrichment | read, **write**, subscribe, backfill, discover | approved (reh3376) | pass |
-| `next-trend.facts.json` | HISTORIAN | 5 (4 REST, 1 WS) | 8 | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; was auto-approved, no approver) | pass |
+| `forge-historian.facts.json` | HISTORIAN | 5 (4 REST, 1 WS) | 8 | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; was auto-approved, no approver) | pass |
 | `ot-module.facts.json` | OT_SCADA (not a FACTS tier) | 21 (OPC-UA, alarm, control-write, Ignition bridge, scripting) | 9 + 10 enrichment | read, **write**, subscribe, backfill, discover | pending_review (FB-073) | 9 failures: `facts:schema-valid` (66 violations) + 8 vocabulary checks (FB-079) |
 | `scanner-gateway.facts.json` | OT | 5 (3 gRPC server unary, 2 gRPC server stream) | 9 | read, subscribe, discover | pending_review (FB-080 re-stamp; was auto-approved, no approver) | pass |
 | `forge-cmms.facts.json` | MES_MOM | 5 (3 GraphQL, 1 REST, 1 RabbitMQ) | 19 + 2 enrichment | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; previous hash approved by reh3376) | pass |

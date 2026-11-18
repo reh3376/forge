@@ -247,7 +247,7 @@ def _default_checklist() -> list[OperatorChecklistItem]:
         ),
         OperatorChecklistItem(
             id="historian-data",
-            description="NextTrend receiving OT Module data at expected rates",
+            description="Forge Historian receiving OT Module data at expected rates",
         ),
         OperatorChecklistItem(
             id="mqtt-parity",

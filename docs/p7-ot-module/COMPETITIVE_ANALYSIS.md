@@ -18,10 +18,10 @@ Ignition is not a single product — it's an **11-module industrial application 
 | 1 | **Tag System** (built-in) | Tag engine: OPC, Memory, Expression, Query, Derived, Reference tags. UDTs for templated structures. Tag folders, providers, history configuration per-tag. | **Forge OT Module Tag Engine** (P7 — must match and exceed) |
 | 2 | **Perspective** | HTML5/CSS web-based HMI. Responsive design, mobile-first, component palette, Perspective Symbols (P&ID, Simple, Mimic), drag-and-drop screen builder. | **OT UI Builder** (P9 — future, separate module) |
 | 3 | **Vision** | Java Swing desktop HMI client. Legacy but still widely used. Rich component library. | **Not replicated** — Perspective replacement (P9) is web-only |
-| 4 | **Tag Historian** | Bidirectional SQL time-series logging. Per-tag history config (sample rate, mode, deadband). Store-and-forward buffering. | **NextTrend** (existing — Rust/QuestDB, already superior) |
+| 4 | **Tag Historian** | Bidirectional SQL time-series logging. Per-tag history config (sample rate, mode, deadband). Store-and-forward buffering. | **Forge Historian** (existing — Rust/QuestDB, already superior) |
 | 5 | **SQL Bridge** | Bidirectional OPC ↔ SQL database transaction manager. Transaction groups: historical logging, DB-to-OPC sync, recipe loading. Store-and-forward. | **Forge OT Module Query Tags + Data Bridge** (P7 Phase 2–4) |
 | 6 | **Alarm Notification** | ISA-18.2 alarm state machine. Notification pipelines (email, SMS, voice). Alarm journal (SQL). Shelving, acknowledgment, escalation. | **Forge OT Module Alarm Engine** (P7 Phase 3) |
-| 7 | **Reporting** | Dynamic PDF report generation from templates. Scheduled or on-demand. Data from tags, databases, or scripts. | **Forge Reporting Module** (future, or NextTrend dashboards) |
+| 7 | **Reporting** | Dynamic PDF report generation from templates. Scheduled or on-demand. Data from tags, databases, or scripts. | **Forge Reporting Module** (future, or Forge Historian dashboards) |
 | 8 | **SFC (Sequential Function Charts)** | IEC 61131-3 visual logic programming. ISA-88 batch control. Steps, transitions, parallel blocks. 5 charts per phase (run, hold, restart, abort, stop). | **Forge SFC/Batch Engine** (future consideration, or MES-side) |
 | 9 | **WebDev** | Custom REST API endpoints on the gateway. Python scripting for HTTP methods. Serve JSON, HTML, static resources. | **Forge OT Module REST/i3X API** (P7 built-in) |
 | 10 | **EAM (Enterprise Administration)** | Multi-gateway management from one controller. Agent/controller architecture. Centralized backup, updates, monitoring. | **Forge Hub** (existing — centralized management is core architecture) |
@@ -83,7 +83,7 @@ The tag system is Ignition's core. Every other module depends on it.
 | **Tag Providers** | Multiple providers per gateway (Internal, Remote). Each provider is an independent tag database. | **Tag Providers** — OPC-UA providers (per PLC), Memory provider, Expression provider, Query provider |
 | **UDTs (User Defined Types)** | Parameterized tag templates. Define once, instantiate many times. Changes propagate to all instances. Parameters for dynamic OPC paths. | **Tag Templates** — Parameterized templates with inheritance. Changes propagate. Parameters for dynamic source resolution. |
 | **Tag Properties** | Each tag has: Value, Quality, Timestamp, DataType, EngUnit, Tooltip, Documentation, FormatString, ScaleMode, RawMin/Max, ScaledMin/Max, ClampMode, etc. | Each tag has: value, quality, timestamp, data_type, engineering_units, description, metadata dict, scale config, clamp config |
-| **Tag History** | Per-tag: history provider, sample rate, sample mode (on-change/periodic), deadband, tag group. | Per-tag: history_enabled, sample_mode, deadband, publish_to (NextTrend, MQTT, both) |
+| **Tag History** | Per-tag: history provider, sample rate, sample mode (on-change/periodic), deadband, tag group. | Per-tag: history_enabled, sample_mode, deadband, publish_to (Forge Historian, MQTT, both) |
 | **Tag Alarms** | Per-tag: multiple alarm modes (High, HiHi, Low, LoLo, Bad Quality, Bit Pattern, Any Change). Each alarm has priority, notes, display path. | Per-tag: alarm configs (threshold, digital, ROC, quality, communication). Each with priority, description, notification routing. |
 | **Tag Groups** | Configurable execution rates. Tags in same group poll at same interval. Default, leased, dedicated. | **Scan Classes** — configurable execution rates per group |
 
@@ -146,7 +146,7 @@ These are non-negotiable — without them, the OT Module is not a credible Ignit
 6. **AI/ML native** — ContextualRecords feed directly into Forge AI agents for predictive maintenance.
 7. **No per-tag licensing** — Truly unlimited. No "unlimited but actually limited by gateway performance."
 8. **Open architecture** — Any Python library, any protocol adapter, any database.
-9. **Tag types Ignition doesn't have** — Computed tags (multi-source aggregation), Event tags (triggered by external events), Virtual tags (from external databases like NextTrend virtual connections).
+9. **Tag types Ignition doesn't have** — Computed tags (multi-source aggregation), Event tags (triggered by external events), Virtual tags (from external databases like Forge Historian virtual connections).
 10. **First-class SparkplugB** — Not a $4,000 add-on from Cirrus Link.
 
 ---
@@ -167,7 +167,7 @@ Based on competitive analysis, the Forge OT Module Tag Engine must support:
 | 6 | **Reference Tag** | Alias to another tag (any type) | Source tag change | Pass-through | Reference Tag |
 | 7 | **Computed Tag** ★ | Multi-source aggregation (avg, sum, min, max, count across tag set) | Any source change | Computed | **NEW** — no Ignition equivalent |
 | 8 | **Event Tag** ★ | Value set by external event (MQTT message, RabbitMQ event, webhook) | Event arrival | Last event value | **NEW** — no Ignition equivalent |
-| 9 | **Virtual Tag** ★ | Value from external data source (NextTrend history, external DB, REST API) | Configurable poll or on-demand | Cached with TTL | **NEW** — similar to NextTrend virtual connections |
+| 9 | **Virtual Tag** ★ | Value from external data source (Forge Historian history, external DB, REST API) | Configurable poll or on-demand | Cached with TTL | **NEW** — similar to Forge Historian virtual connections |
 
 ★ = Forge-exclusive tag types that exceed Ignition's capabilities
 
@@ -197,8 +197,8 @@ Template: VFD_Drive
     fault:        digital on fault_active, priority=HIGH
 
   History:
-    speed_feedback:  sample_mode=on_change, deadband=0.5, publish_to=[nexttrend, mqtt]
-    output_current:  sample_mode=periodic, interval=5s, publish_to=[nexttrend]
+    speed_feedback:  sample_mode=on_change, deadband=0.5, publish_to=[forge_historian, mqtt]
+    output_current:  sample_mode=periodic, interval=5s, publish_to=[forge_historian]
 ```
 
 ### 4.3 Tag Provider Architecture
@@ -225,7 +225,7 @@ Tag Engine
 │   ├── rabbitmq_events/
 │   └── webhook_events/
 └── Virtual Provider
-    ├── nexttrend_history/
+    ├── forge_historian_history/
     └── external_databases/
 ```
 
@@ -263,7 +263,7 @@ The OT Module must **expose the full PLC tag structure** to users via an API mod
 
 | Ignition Capability | Forge Solution | Status |
 |---------------------|---------------|--------|
-| Tag Historian | NextTrend (Rust/QuestDB) | Complete (P5) |
+| Tag Historian | Forge Historian (Rust/QuestDB) | Complete (P5) |
 | MES/Batch | whk-mes (NestJS) | Complete |
 | CMMS | forge-cmms (NestJS) | Complete (P2) |
 | HMI/Visualization | OT UI Builder | P9 (future) |

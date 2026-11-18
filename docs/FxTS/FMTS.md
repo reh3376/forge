@@ -117,17 +117,17 @@ Every run gives 19 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:h
 
 | Module | Kind | Waived | State |
 |---|---|---|---|
-| forge-wms, forge-cmms, forge-nms | management | M-10 (FB-141) | **approved by the owner 2026-11-18**; every other requirement passes, M-4 to M-7 run by the kit |
+| forge-wms, forge-cmms, forge-nms, forge-historian, forge-ims | management | M-10 (FB-141) | **approved by the owner 2026-11-18**; every other requirement passes, M-4 to M-7 run by the kit |
 | forge-integ-erp-netsuite | integration | M-10 (FB-141) | **approved by the owner 2026-11-18**; the same |
-| next-trend, bosc-ims, scanner-gateway | integration | M-10 (FB-141) | `pending_review`; M-6 not checked (no sample events) |
+| scanner-gateway | integration | M-10 (FB-141) | `pending_review`; M-6 not checked (no sample events) |
 | ot-module | ot | M-10 (FB-141), M-11 (FB-146) | `pending_review`; fails `m2` (FB-144); M-4 to M-7 not checked (FB-155) |
 | forge-mes (the interim bridge) | management | M-3 (FB-145), M-8 (FB-057), M-9 (FB-143), M-10 (FB-141), M-11 (FB-076) | `pending_review`; `waivers` fails until approved (the M-3 waiver needs admin privileges); M-4 to M-7 not checked (FB-155) |
 
-forge-wms, forge-cmms and forge-nms are Forge's own management modules (owner, 2026-11-18). An existing application was the example each is built from; today each is a Python adapter that holds the data contract taken from that example, and its own logic, storage and screens are not built. The target is a Go module with Python scripting for customization. Each declares its hub database (`mod_wms`, `mod_cmms`, `mod_nms`) as the rule it is built to.
+The five management modules are Forge's own (owner, 2026-11-18). An existing application was the example each is built from; today each is a Python adapter that holds the data contract taken from that example, and its own logic, storage and screens are not built. The target is a Go module with Python scripting for customization. Each declares its hub database as the rule it is built to: `mod_wms`, `mod_cmms`, `mod_nms`, `mod_ims`, and for forge-historian the hub's time-series store (what forge-historian is to become: FB-157).
 
 forge-integ-erp-netsuite is an integration module for one named product. It keeps the hub schema `mod_erpi` through an explicit mapping in `forge.storage.access`, because its id no longer derives that name. Nothing reads the product's clock yet (FB-139).
 
-Module names (A-17): a module Forge builds is `forge-<service>`; a module that integrates an existing system is `forge-integ-<function>-<product>`. Whether next-trend, bosc-ims and the scanner gateway are builds or integrations is still to be settled with the owner (FB-150).
+Module names (A-17): a module Forge builds is `forge-<service>`; a module that integrates an existing system is `forge-integ-<function>-<product>`.
 
 ## Running it
 

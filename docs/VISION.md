@@ -185,7 +185,7 @@ Docker Compose on a laptop is not a plant. Backups, health, upgrades and multi-n
 
 ### 3.2 Spokes
 
-An adapter per external system, each with a manifest and an approved FACTS spec: forge-wms, forge-cmms, forge-integ-erp-netsuite, forge-nms, bosc-ims, next-trend (historian), scanner-gateway, and generic adapters (REST, CSV/file, MQTT Sparkplug, OPC-UA) for systems without a dedicated one. Spokes are Python inside the hub or external processes in any language that speaks the proto.
+An adapter per external system, each with a manifest and an approved FACTS spec: forge-wms, forge-cmms, forge-integ-erp-netsuite, forge-nms, forge-ims, forge-historian (historian), scanner-gateway, and generic adapters (REST, CSV/file, MQTT Sparkplug, OPC-UA) for systems without a dedicated one. Spokes are Python inside the hub or external processes in any language that speaks the proto.
 
 ### 3.3 Modules
 

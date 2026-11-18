@@ -324,7 +324,7 @@ class AccessController:
             ("forge-integ-erp-netsuite", "mod_erpi"),
             ("forge-cmms", "mod_cmms"),
             ("forge-nms", "mod_nms"),
-            ("whk-ims", "mod_ims"),
+            ("forge-ims", "mod_ims"),
         ]
 
         grants = []

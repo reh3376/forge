@@ -6,7 +6,7 @@ published to the topic resolved by the TopicRouter.
 
 Design decisions:
     D1: Payload format is a flat JSON object — no wrapping, no nesting.
-        This keeps payloads small and compatible with NextTrend, MES,
+        This keeps payloads small and compatible with Forge Historian, MES,
         and any MQTT-consuming dashboard.
     D2: Health messages are published as retained messages with QoS 1.
         New subscribers immediately get the last-known PLC state.

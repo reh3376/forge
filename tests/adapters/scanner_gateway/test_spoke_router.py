@@ -11,7 +11,7 @@ class TestDefaultRouting:
     def setup_method(self):
         self.router = SpokeRouter(
             wms_adapter_id="forge-wms",
-            ims_adapter_id="bosc-ims",
+            ims_adapter_id="forge-ims",
             qms_adapter_id=None,
         )
 
@@ -43,27 +43,27 @@ class TestDefaultRouting:
     def test_inspection_routes_to_wms_and_ims(self):
         targets = self.router.route("INSPECTION")
         ids = {t.adapter_id for t in targets}
-        assert ids == {"forge-wms", "bosc-ims"}
+        assert ids == {"forge-wms", "forge-ims"}
 
     def test_inventory_routes_to_wms_and_ims(self):
         targets = self.router.route("INVENTORY")
         ids = {t.adapter_id for t in targets}
-        assert ids == {"forge-wms", "bosc-ims"}
+        assert ids == {"forge-wms", "forge-ims"}
 
     def test_asset_receive_routes_to_ims(self):
         targets = self.router.route("ASSET_RECEIVE")
         assert len(targets) == 1
-        assert targets[0].adapter_id == "bosc-ims"
+        assert targets[0].adapter_id == "forge-ims"
 
     def test_asset_move_routes_to_ims(self):
         targets = self.router.route("ASSET_MOVE")
         assert len(targets) == 1
-        assert targets[0].adapter_id == "bosc-ims"
+        assert targets[0].adapter_id == "forge-ims"
 
     def test_asset_install_routes_to_ims(self):
         targets = self.router.route("ASSET_INSTALL")
         assert len(targets) == 1
-        assert targets[0].adapter_id == "bosc-ims"
+        assert targets[0].adapter_id == "forge-ims"
 
     def test_unknown_type_returns_empty(self):
         targets = self.router.route("NONEXISTENT")
@@ -84,7 +84,7 @@ class TestQmsRouting:
     def setup_method(self):
         self.router = SpokeRouter(
             wms_adapter_id="forge-wms",
-            ims_adapter_id="bosc-ims",
+            ims_adapter_id="forge-ims",
             qms_adapter_id="whk-qms",
         )
 
@@ -101,7 +101,7 @@ class TestQmsRouting:
     def test_sample_ops_not_routed_without_qms(self):
         router = SpokeRouter(
             wms_adapter_id="forge-wms",
-            ims_adapter_id="bosc-ims",
+            ims_adapter_id="forge-ims",
             qms_adapter_id=None,
         )
         assert router.route("SAMPLE_COLLECT") == []
@@ -146,7 +146,7 @@ class TestUtilityMethods:
     def test_all_routes_returns_full_table(self):
         router = SpokeRouter(
             wms_adapter_id="forge-wms",
-            ims_adapter_id="bosc-ims",
+            ims_adapter_id="forge-ims",
         )
         table = router.all_routes()
         assert isinstance(table, dict)
@@ -156,19 +156,19 @@ class TestUtilityMethods:
     def test_target_adapter_ids_with_ims(self):
         router = SpokeRouter(
             wms_adapter_id="forge-wms",
-            ims_adapter_id="bosc-ims",
+            ims_adapter_id="forge-ims",
         )
         ids = router.target_adapter_ids()
-        assert ids == {"forge-wms", "bosc-ims"}
+        assert ids == {"forge-wms", "forge-ims"}
 
     def test_target_adapter_ids_with_all_spokes(self):
         router = SpokeRouter(
             wms_adapter_id="forge-wms",
-            ims_adapter_id="bosc-ims",
+            ims_adapter_id="forge-ims",
             qms_adapter_id="whk-qms",
         )
         ids = router.target_adapter_ids()
-        assert ids == {"forge-wms", "bosc-ims", "whk-qms"}
+        assert ids == {"forge-wms", "forge-ims", "whk-qms"}
 
     def test_route_target_is_frozen(self):
         target = RouteTarget(adapter_id="test", transform_hint="hint")

@@ -798,7 +798,7 @@ forge module init my-app \
     --auth azure_entra_id
 ```
 
-### Pattern: gRPC Adapter (like BOSC-IMS)
+### Pattern: gRPC Adapter (like IMS-IMS)
 
 ```bash
 forge module init my-grpc \

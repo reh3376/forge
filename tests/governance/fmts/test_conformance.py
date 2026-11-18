@@ -173,5 +173,5 @@ class TestTheKitsOwnParts:
         fixture = load_fixture(REPO_ROOT, "forge-wms")
         assert len(fixture["events"]) == 2
         assert load_fixture(REPO_ROOT, "no-such-module") == {}
-        raw = (REPO_ROOT / "tests/governance/fmts/conformance/next-trend.json").read_text()
+        raw = (REPO_ROOT / "tests/governance/fmts/conformance/forge-historian.json").read_text()
         assert json.loads(raw)["params"] == {"api_key": "conformance-kit-placeholder"}

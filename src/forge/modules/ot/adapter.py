@@ -486,15 +486,15 @@ class OTModuleAdapter(
         *,
         max_records: int | None = None,
     ) -> AsyncIterator[ContextualRecord]:
-        """Backfill is delegated to NextTrend historian.
+        """Backfill is delegated to Forge Historian historian.
 
         The OT Module does not store history locally — it delegates
-        historical queries to the NextTrend time-series historian
+        historical queries to the Forge Historian time-series historian
         via its REST API.
         """
-        # Stub — NextTrend integration in Phase 2B
+        # Stub — Forge Historian integration in Phase 2B
         logger.info(
-            "Backfill requested for %d tags [%s → %s] — delegating to NextTrend",
+            "Backfill requested for %d tags [%s → %s] — delegating to Forge Historian",
             len(tags),
             start,
             end,
@@ -503,7 +503,7 @@ class OTModuleAdapter(
         yield  # pragma: no cover — makes this an async generator
 
     async def get_earliest_timestamp(self, tag: str) -> datetime | None:
-        """Earliest timestamp delegated to NextTrend."""
+        """Earliest timestamp delegated to Forge Historian."""
         return None
 
     # ------------------------------------------------------------------

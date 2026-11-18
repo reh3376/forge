@@ -333,7 +333,7 @@ class TestAccessControllerSetupDefaults:
         assert ac.check("forge-integ-erp-netsuite", "mod_erpi", AccessLevel.WRITE)
         assert ac.check("forge-cmms", "mod_cmms", AccessLevel.WRITE)
         assert ac.check("forge-nms", "mod_nms", AccessLevel.WRITE)
-        assert ac.check("whk-ims", "mod_ims", AccessLevel.WRITE)
+        assert ac.check("forge-ims", "mod_ims", AccessLevel.WRITE)
 
     def test_setup_each_module_gets_read_on_canonical(self):
         ac = AccessController()
@@ -344,7 +344,7 @@ class TestAccessControllerSetupDefaults:
             "forge-integ-erp-netsuite",
             "forge-cmms",
             "forge-nms",
-            "whk-ims",
+            "forge-ims",
         ):
             assert ac.check(mod, "forge_canonical", AccessLevel.READ)
 

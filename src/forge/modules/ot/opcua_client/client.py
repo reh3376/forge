@@ -1031,7 +1031,7 @@ class OpcUaClient:
         Note: Allen-Bradley ControlLogix PLCs do NOT natively support
         HistoryRead.  This method is provided for completeness and will
         work against OPC-UA servers that have a historian module
-        (e.g., Ignition, KEPServerEX, or NextTrend with OPC-UA HA).
+        (e.g., Ignition, KEPServerEX, or Forge Historian with OPC-UA HA).
 
         Args:
             node_id: Node to read history for.

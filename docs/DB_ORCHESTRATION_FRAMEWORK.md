@@ -49,9 +49,9 @@ This means the standards in this spec — historical completeness, single-writer
 | **ERPI** | PostgreSQL | Prisma ORM | 35 models | CUID + erpId | ERP sync patterns, outbox, raw staging |
 | **CMMS** | PostgreSQL | Prisma ORM | 11 models | CUID + int IDs | Dual ID strategy, soft deletes |
 | **NMS** | PostgreSQL 16 + Neo4j 5 + Redis 7 | yoyo-migrations | 48 tables | UUID | Python-native, SNMP/LLDP, TimescaleDB-ready |
-| **BOSC IMS** | TimescaleDB (PG16) + Neo4j 5 + Redpanda + Redis 7 | golang-migrate | 24 tables | CUIDv2 | Aerospace compliance, event sourcing |
+| **Forge IMS** | TimescaleDB (PG16) + Neo4j 5 + Redpanda + Redis 7 | golang-migrate | 24 tables | CUIDv2 | Aerospace compliance, event sourcing |
 | **Scanner** | None (stateless) | — | 0 | — | Events only, no persistence |
-| **NextTrend** | QuestDB + PostgreSQL | Rust (custom) | ~10 tables | — | Time-series historian, ILP writes |
+| **Forge Historian** | QuestDB + PostgreSQL | Rust (custom) | ~10 tables | — | Time-series historian, ILP writes |
 
 **Total:** ~290 models/tables across 6 independent PostgreSQL instances, 2 Neo4j instances, 2 Redis instances, plus QuestDB and Redpanda.
 
@@ -188,7 +188,7 @@ CREATE SCHEMA IF NOT EXISTS mod_mes;          -- MES recipe, production order, s
 CREATE SCHEMA IF NOT EXISTS mod_erpi;         -- ERPI sync, outbox, ERP staging data
 CREATE SCHEMA IF NOT EXISTS mod_cmms;         -- CMMS asset, work order, maintenance data
 CREATE SCHEMA IF NOT EXISTS mod_nms;          -- NMS device, interface, alert data
-CREATE SCHEMA IF NOT EXISTS mod_ims;          -- BOSC IMS asset, compliance, event data
+CREATE SCHEMA IF NOT EXISTS mod_ims;          -- Forge IMS asset, compliance, event data
 
 -- Curated data schemas (read-only for modules, written by curation pipeline)
 CREATE SCHEMA IF NOT EXISTS curated;          -- Data products, materialized views
@@ -326,7 +326,7 @@ The Backfill Engine performs historical ETL from existing spoke databases into F
 | **WMS** | Prisma PG (88 models) | Phased: core 15 entities first, then auxiliary | ~5M | High (largest schema) |
 | **MES** | Prisma PG (84 models) | Phased: recipe hierarchy first, then operational | ~2M | High (deep nesting) |
 | **NMS** | PG + Neo4j + Redis | Multi-engine: PG→PG, Neo4j→Neo4j, Redis→Redis | ~1M (PG) + graph | High (polyglot) |
-| **BOSC IMS** | TimescaleDB + Neo4j + Redpanda | Multi-engine + event replay | ~500K + events | High (event sourcing) |
+| **Forge IMS** | TimescaleDB + Neo4j + Redpanda | Multi-engine + event replay | ~500K + events | High (event sourcing) |
 
 ### 6.4 Backfill Process
 
@@ -488,7 +488,7 @@ type Query {
 
 ### 11.1 Migration Order
 
-CMMS first (smallest, proves pattern), then ERPI (data backbone), then WMS (largest), then MES, then NMS (polyglot), then BOSC IMS.
+CMMS first (smallest, proves pattern), then ERPI (data backbone), then WMS (largest), then MES, then NMS (polyglot), then Forge IMS.
 
 ### 11.2 CMMS (11 Prisma models → Forge Pod) — Proof of Concept
 
@@ -539,7 +539,7 @@ CMMS first (smallest, proves pattern), then ERPI (data backbone), then WMS (larg
 | B.2 | Multi-engine backfill: PG→PG, Neo4j→Neo4j, Redis→Redis | 2026 Q4-2027 Q1 |
 | C | NMS app switches to Forge pods | 2027 Q2 |
 
-### 11.7 BOSC IMS (24 tables + Neo4j + Redpanda → Forge Pods)
+### 11.7 Forge IMS (24 tables + Neo4j + Redpanda → Forge Pods)
 
 | Step | Action | Timeline |
 |------|--------|----------|
