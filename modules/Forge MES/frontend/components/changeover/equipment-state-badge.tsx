@@ -11,13 +11,14 @@ import {
   Wrench,
   XCircle,
   RefreshCw,
+  type LucideIcon,
 } from 'lucide-react'
 import { EquipmentOperationalState } from '@/lib/api/equipment-state-api'
 
 const stateConfig: Record<
   EquipmentOperationalState,
   {
-    icon: React.ComponentType<{ className?: string }>
+    icon: LucideIcon
     label: string
     color: string
     dotColor: string

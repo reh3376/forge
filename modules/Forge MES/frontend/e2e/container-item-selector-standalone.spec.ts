@@ -179,7 +179,7 @@ test.describe('ContainerItemSelector Component (Standalone)', () => {
     // Wait for loading to complete
     await page.waitForFunction(() => {
       const select = document.querySelector('[data-testid="container-item-select"]');
-      return !select.textContent.includes('Loading...');
+      return !select?.textContent?.includes('Loading...');
     });
 
     // Check that container items are loaded
@@ -198,7 +198,7 @@ test.describe('ContainerItemSelector Component (Standalone)', () => {
     // Wait for loading
     await page.waitForFunction(() => {
       const select = document.querySelector('[data-testid="container-item-select"]');
-      return !select.textContent.includes('Loading...');
+      return !select?.textContent?.includes('Loading...');
     });
 
     await expect(page.getByTestId('container-item-select')).toContainText('30-Gallon Oak Barrel');

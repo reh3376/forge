@@ -168,7 +168,7 @@ export async function GET() {
     // Helper function to extract enzyme name from itemNumber (e.g., "Laminex C2K" from "ENZ-GUS01-Enzyme (Laminex C2K)")
     const extractEnzymeName = (itemNumber: string): string | null => {
       const match = itemNumber?.match(/\(([^)]+)\)/)
-      return match ? match[1] : null
+      return match?.[1] ?? null
     }
 
     // Transform the data to use actual enzyme names from the database

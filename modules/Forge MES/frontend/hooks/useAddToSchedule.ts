@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
+import type { ProductionOrderStatus } from '@/types/common'
 
 // Types for the production order and schedule creation
 interface ProductionOrder {
   id: string
   name: string | null
-  status: 'Complete' | 'Initiated' | 'InProgress' | 'Planned' | 'Committed'
+  status: ProductionOrderStatus
   startDate: string
   endDate: string
   quantity: number
@@ -17,8 +18,8 @@ interface ProductionOrder {
   }
   customer: {
     id: string
-    name?: string
-    customerCode?: string
+    name?: string | null
+    customerCode?: string | null
   }
 }
 

@@ -119,7 +119,7 @@ interface Recipe {
 function extractEnzymeName(itemNumber: string | undefined | null): string | null {
   if (!itemNumber) return null
   const match = itemNumber.match(/\(([^)]+)\)/)
-  return match ? match[1] : null
+  return match?.[1] ?? null
 }
 
 // Convert pounds to metric tons and calculate dose

@@ -31,7 +31,7 @@ import { cn } from '@/lib/utils'
 interface FormulaLibraryBrowserProps {
   formulas: FormulaLibrary[]
   isLoading?: boolean
-  selectedId?: string
+  selectedId?: string | undefined
   onSelect: (formula: FormulaLibrary) => void
   onCreateNew: () => void
   onEdit: (formula: FormulaLibrary) => void

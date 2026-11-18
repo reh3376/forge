@@ -110,19 +110,18 @@ export function parseNewFormatRecipe(recipeString: string): ParsedRecipe {
     if (!part) continue
 
     // Check for revision (R##)
-    const revMatch = part.match(/^[Rv](\d+)$/)
-    if (revMatch) {
-      revision = parseInt(revMatch[1], 10)
+    const revDigits = part.match(/^[Rv](\d+)$/)?.[1]
+    if (revDigits !== undefined) {
+      revision = parseInt(revDigits, 10)
       continue
     }
 
     // Parse component: percentage + char + optional variety
     // e.g., "75C", "30R1", "68.5C"
     const compMatch = part.match(/^(\d+(?:\.\d+)?)([A-Z])(\d+)?$/)
-    if (compMatch) {
-      const percentage = parseFloat(compMatch[1])
-      const char = compMatch[2]
-      const variety = compMatch[3]
+    const [, percentageText, char, variety] = compMatch ?? []
+    if (percentageText !== undefined && char !== undefined) {
+      const percentage = parseFloat(percentageText)
 
       components.push({
         char,
@@ -161,17 +160,17 @@ export function parseLegacyFormatRecipe(recipeString: string): ParsedRecipe {
 
   // Legacy format: CCC-corn-rye-wheat-malt-v##
   if (parts.length >= 6) {
-    const corn = parseInt(parts[1], 10)
-    const rye = parseInt(parts[2], 10)
-    const wheat = parseInt(parts[3], 10)
-    const malt = parseInt(parts[4], 10)
+    const corn = parseInt(parts[1] ?? '', 10)
+    const rye = parseInt(parts[2] ?? '', 10)
+    const wheat = parseInt(parts[3] ?? '', 10)
+    const malt = parseInt(parts[4] ?? '', 10)
 
     // Parse revision
     const revPart = parts[5]
     if (revPart) {
-      const revMatch = revPart.match(/^[Rv](\d+)$/)
-      if (revMatch) {
-        revision = parseInt(revMatch[1], 10)
+      const revDigits = revPart.match(/^[Rv](\d+)$/)?.[1]
+      if (revDigits !== undefined) {
+        revision = parseInt(revDigits, 10)
       }
     }
 
@@ -597,9 +596,9 @@ export function getRecipeRevision(recipeName: string): number {
   if (!recipeName) return 1
 
   const cleaned = removeRunPrefix(recipeName)
-  const match = cleaned.match(/-[Rv](\d+)$/)
+  const digits = cleaned.match(/-[Rv](\d+)$/)?.[1]
 
-  return match ? parseInt(match[1], 10) : 1
+  return digits !== undefined ? parseInt(digits, 10) : 1
 }
 
 /**

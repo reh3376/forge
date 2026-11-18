@@ -193,7 +193,7 @@ export default function RecipeManagementPage() {
         active: recipe.active || true,
         whiskeyType: recipe.whiskeyType || '',
         revision: recipe.revision?.toString() || '1',
-        customerCode: recipe.customerCode || recipe.customer?.customerCode || '',
+        customerCode: recipe.customerCode || '',
         cooksPerFerm: recipe.cooksPerFerm || 4,
         createdAt: recipe.createdAt instanceof Date ? recipe.createdAt.toISOString() :
                    typeof recipe.createdAt === 'string' ? recipe.createdAt :

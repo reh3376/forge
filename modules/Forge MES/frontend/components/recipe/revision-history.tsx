@@ -38,7 +38,7 @@ interface RecipeRevision {
 interface RevisionHistoryProps {
   recipeId: string
   currentRevision?: number
-  onSelectRevision?: (recipeId: string) => void
+  onSelectRevision?: ((recipeId: string) => void) | undefined
 }
 
 export function RevisionHistory({ recipeId, currentRevision, onSelectRevision }: RevisionHistoryProps) {

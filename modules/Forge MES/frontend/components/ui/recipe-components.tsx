@@ -72,9 +72,9 @@ export interface RecipeParameter {
 	description: string
 	type: 'numeric' | 'boolean' | 'text'
 	value: string | number | boolean
-	unit?: string
-	operation?: string
-	category?: 'Input' | 'Output' | 'Calculated'
+	unit?: string | undefined
+	operation?: string | undefined
+	category?: 'Input' | 'Output' | 'Calculated' | 'ProcessingActual' | undefined
 	createdAt: Date
 }
 
@@ -82,19 +82,19 @@ export interface MashingStep {
 	id: string
 	index: number
 	stepType: string
-	holdType?: 'Heat' | 'Cool' | 'None'
+	holdType?: 'Heat' | 'Cool' | 'None' | undefined
 	included: boolean
-	notes?: string
-	heatTempSp?: number
-	coolTempSp?: number
-	timeDuration?: number
-	waterBacksetSP?: number
-	additiveType?: string
-	selectedItemId?: string
-	itemQuantity?: number
-	waterQuantity?: number
-	backsetQuantity?: number
-	recipeBomItems?: RecipeBomItem[]
+	notes?: string | undefined
+	heatTempSp?: number | undefined
+	coolTempSp?: number | undefined
+	timeDuration?: number | undefined
+	waterBacksetSP?: number | undefined
+	additiveType?: string | undefined
+	selectedItemId?: string | undefined
+	itemQuantity?: number | undefined
+	waterQuantity?: number | undefined
+	backsetQuantity?: number | undefined
+	recipeBomItems?: RecipeBomItem[] | undefined
 }
 
 export interface RecipeBomItem {
@@ -102,7 +102,7 @@ export interface RecipeBomItem {
 	item: {
 		id: string
 		itemName: string
-		itemNumber?: string
+		itemNumber?: string | undefined
 		itemType: string
 		itemClass: string
 		itemGroup: string | null

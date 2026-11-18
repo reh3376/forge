@@ -70,6 +70,11 @@ interface MashingStepExecutionSheetProps {
   onSuccess?: () => void;
 }
 
+/** A consumption entry while the operator is still typing: the quantity may not be there yet. */
+type MaterialConsumptionDraft = Omit<MaterialConsumptionInput, 'quantityActual'> & {
+  quantityActual?: number;
+};
+
 export function MashingStepExecutionSheet({
   step,
   isOpen,
@@ -84,7 +89,7 @@ export function MashingStepExecutionSheet({
   });
   const [elapsedTime, setElapsedTime] = useState(0);
   const [parameterValues, setParameterValues] = useState<Record<string, any>>({});
-  const [materialConsumptions, setMaterialConsumptions] = useState<Record<string, MaterialConsumptionInput>>({});
+  const [materialConsumptions, setMaterialConsumptions] = useState<Record<string, MaterialConsumptionDraft>>({});
 
   // Determine if this is a material step type
   const isMaterialStep = step.stepType && MATERIAL_STEP_TYPES.includes(step.stepType);
@@ -302,7 +307,7 @@ export function MashingStepExecutionSheet({
   // Build material consumption array
   const buildMaterialConsumptions = (): MaterialConsumptionInput[] => {
     return Object.values(materialConsumptions).filter(
-      (mc) => mc.quantityActual > 0
+      (mc): mc is MaterialConsumptionInput => mc.quantityActual !== undefined && mc.quantityActual > 0
     );
   };
 
@@ -577,9 +582,8 @@ export function MashingStepExecutionSheet({
                             type="number"
                             step="0.01"
                             placeholder="Actual quantity"
-                            value={materialConsumptions[bom.id]?.quantityActual !== undefined
-                              ? materialConsumptions[bom.id].quantityActual
-                              : (bom.quantityPlanned ? Number(bom.quantityPlanned.toFixed(2)) : '')}
+                            value={materialConsumptions[bom.id]?.quantityActual
+                              ?? (bom.quantityPlanned ? Number(bom.quantityPlanned.toFixed(2)) : '')}
                             onChange={(e) =>
                               setMaterialConsumptions((prev) => ({
                                 ...prev,

@@ -16,11 +16,12 @@ import { toast } from 'sonner'
 import { validateOrderGrouping, isOrderCompatible, generateGroupingSuggestion } from '@/lib/scheduling/grouping-validation'
 import { calculateProductionAggregates, formatAggregates } from '@/lib/scheduling/aggregate-calculator'
 import type { ProductionOrderWithRecipeGroup } from '@/types'
+import type { ProductionOrderStatus } from '@/types/common'
 
 interface ProductionOrder {
   id: string
   name: string | null
-  status: string
+  status: ProductionOrderStatus
   quantity: number
   finalProof: number | null
   containerType: string | null

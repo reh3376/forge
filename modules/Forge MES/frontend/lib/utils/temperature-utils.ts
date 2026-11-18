@@ -3,10 +3,10 @@
  */
 
 export interface TemperatureStep {
-  holdType?: 'Heat' | 'Cool' | 'None'
-  heatTempSp?: number
-  coolTempSp?: number
-  temperatureSetpoint?: number // Legacy field for backward compatibility
+  holdType?: 'Heat' | 'Cool' | 'None' | undefined
+  heatTempSp?: number | undefined
+  coolTempSp?: number | undefined
+  temperatureSetpoint?: number | undefined // Legacy field for backward compatibility
 }
 
 /**

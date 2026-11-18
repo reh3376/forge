@@ -359,7 +359,7 @@ export default function FormulaConfigPage() {
                         <TableCell className="font-mono font-medium">
                           {variable.name}
                           {variable.isSystem && (
-                            <Shield className="h-3 w-3 inline ml-1 text-blue-500" title="System variable" />
+                            <span title="System variable"><Shield className="h-3 w-3 inline ml-1 text-blue-500" aria-hidden="true" /></span>
                           )}
                         </TableCell>
                         <TableCell>{variable.displayName}</TableCell>
@@ -446,7 +446,7 @@ export default function FormulaConfigPage() {
                         <TableCell className="font-mono font-medium">
                           {func.name}
                           {func.isSystem && (
-                            <Shield className="h-3 w-3 inline ml-1 text-blue-500" title="System function" />
+                            <span title="System function"><Shield className="h-3 w-3 inline ml-1 text-blue-500" aria-hidden="true" /></span>
                           )}
                         </TableCell>
                         <TableCell>
@@ -682,7 +682,7 @@ export default function FormulaConfigPage() {
               <Select
                 value={functionForm.implementationType}
                 onValueChange={(value: string) => setFunctionForm({ ...functionForm, implementationType: value as ImplementationType })}
-                disabled={editingFunction?.isSystem}
+                disabled={editingFunction?.isSystem ?? false}
               >
                 <SelectTrigger>
                   <SelectValue />

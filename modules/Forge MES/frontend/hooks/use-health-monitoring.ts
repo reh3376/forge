@@ -3,6 +3,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useHealthSocket, HealthData } from '@/lib/websocket/health-socket-client'
 
+const SERVICE_STATUSES = ['up', 'down', 'degraded', 'unknown'] as const
+type ServiceStatus = (typeof SERVICE_STATUSES)[number]
+const CONNECTION_STATES = ['active', 'inactive', 'unknown'] as const
+type ConnectionState = (typeof CONNECTION_STATES)[number]
+
+function asServiceStatus(value: string): ServiceStatus {
+  return (SERVICE_STATUSES as readonly string[]).includes(value) ? (value as ServiceStatus) : 'unknown'
+}
+
+function asConnectionState(value: string): ConnectionState {
+  return (CONNECTION_STATES as readonly string[]).includes(value) ? (value as ConnectionState) : 'unknown'
+}
+
 export interface HealthStatus {
   status: 'up' | 'down' | 'degraded' | 'unknown'
   lastUpdated: Date | null
@@ -80,16 +93,16 @@ export function useHealthMonitoring(options: UseHealthMonitoringOptions = {}) {
       lastUpdated: new Date(data.timestamp),
       responseTime: data.details.responseTime,
       database: {
-        status: data.details.database.status,
+        status: asServiceStatus(data.details.database.status),
         responseTime: data.details.database.responseTime,
-        connection: data.details.database.connection
+        connection: asConnectionState(data.details.database.connection)
       },
       api: {
-        status: data.details.api.status,
+        status: asServiceStatus(data.details.api.status),
         responseTime: data.details.api.responseTime,
         endpoints: data.details.api.endpoints.map(endpoint => ({
           name: endpoint.name,
-          status: endpoint.status,
+          status: asServiceStatus(endpoint.status),
           responseTime: endpoint.responseTime
         }))
       },

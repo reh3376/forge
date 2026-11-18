@@ -44,7 +44,6 @@ async function getServiceAccountToken(): Promise<string | null> {
   try {
     console.log('🔐 Authenticating proxy as MES service account:', MES_USERNAME)
     console.log('🔐 Login URL:', `${MES_API_BASE.replace('/api', '')}/api/login`)
-    console.log('🔐 Password length:', MES_PASSWORD.length, 'chars')
     console.log('🔐 Env vars available:', {
       MES_USERNAME: process.env['MES_USERNAME'] ? 'set' : 'not set',
       MES_PASSWORD: process.env['MES_PASSWORD'] ? 'set' : 'not set'
@@ -119,7 +118,6 @@ export async function POST(request: NextRequest) {
           MES_USERNAME_SET: !!process.env['MES_USERNAME'],
           MES_PASSWORD_SET: !!process.env['MES_PASSWORD'],
           MES_USERNAME_VALUE: MES_USERNAME,
-          MES_PASSWORD_LENGTH: MES_PASSWORD.length,
           GRAPHQL_ENDPOINT,
           MES_API_BASE
         })

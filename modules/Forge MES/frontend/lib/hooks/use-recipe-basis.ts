@@ -104,6 +104,7 @@ interface RecipeQueryResponse {
           id: string
           item?: {
             id: string
+            itemNumber?: string
             itemName: string
             itemType: string
             itemClass: string

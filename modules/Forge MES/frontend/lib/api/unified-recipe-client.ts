@@ -147,10 +147,12 @@ export class UnifiedRecipeClient {
       console.log('🔍 DEBUG countRecipes array length:', countRecipes.length)
 
       // DEBUG: Log raw recipe data to check displayUnits
-      if (recipes.length > 0) {
-        console.log('🔍 RAW RECIPE DATA from GraphQL:', JSON.stringify(recipes[0], null, 2))
-        if (recipes[0].recipeBoms && recipes[0].recipeBoms[0]?.recipeBomITem) {
-          console.log('🔍 FIRST BOM ITEM from GraphQL:', JSON.stringify(recipes[0].recipeBoms[0].recipeBomITem[0], null, 2))
+      const firstRecipe = recipes[0]
+      if (firstRecipe) {
+        console.log('🔍 RAW RECIPE DATA from GraphQL:', JSON.stringify(firstRecipe, null, 2))
+        const firstBom = firstRecipe.recipeBoms?.[0]
+        if (firstBom?.recipeBomITem) {
+          console.log('🔍 FIRST BOM ITEM from GraphQL:', JSON.stringify(firstBom.recipeBomITem[0], null, 2))
         }
       } else {
         console.log('🔍 DEBUG: No recipes returned! recipesResult.recipes is:', recipesResult?.recipes)

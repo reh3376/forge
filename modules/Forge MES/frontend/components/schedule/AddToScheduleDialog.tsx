@@ -9,11 +9,12 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { CalendarIcon, ClockIcon, BarChart3Icon, FlaskConicalIcon } from 'lucide-react'
 import { useAddToSchedule } from '@/hooks/useAddToSchedule'
+import type { ProductionOrderStatus } from '@/types/common'
 
 interface ProductionOrder {
   id: string
   name: string | null
-  status: 'Complete' | 'Initiated' | 'InProgress' | 'Planned' | 'Committed'
+  status: ProductionOrderStatus
   startDate: string
   endDate: string
   quantity: number
@@ -25,8 +26,8 @@ interface ProductionOrder {
   }
   customer: {
     id: string
-    name?: string
-    customerCode?: string
+    name?: string | null
+    customerCode?: string | null
   }
 }
 

@@ -113,7 +113,8 @@ export function calculateProductionAggregates(
   orders: ProductionOrderWithRecipeGroup[],
   metrics?: YieldMetrics,
 ): ProductionAggregates | null {
-  if (orders.length === 0) {
+  const firstOrder = orders[0]
+  if (!firstOrder) {
     return null
   }
 
@@ -141,7 +142,7 @@ export function calculateProductionAggregates(
   ).size
 
   // Get mash bill
-  const mashBill = orders[0].recipe.recipeGroup?.recipe || orders[0].recipe.Recipe
+  const mashBill = firstOrder.recipe.recipeGroup?.recipe || firstOrder.recipe.Recipe
 
   // Calculate production requirements
   const estimatedFermenters = calculateEstimatedFermenters(totalBarrels, undefined, metrics)

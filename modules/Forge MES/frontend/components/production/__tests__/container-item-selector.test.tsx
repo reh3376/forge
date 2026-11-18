@@ -243,8 +243,7 @@ describe('ContainerItemSelector', () => {
   });
 
   it('should show development info when in development mode', async () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    const nodeEnv = jest.replaceProperty(process.env, 'NODE_ENV', 'development');
     
     const mockGetContainerItemsByType = unifiedSchedulingClient.getContainerItemsByType as jest.Mock;
     mockGetContainerItemsByType.mockResolvedValue(mockContainerItems);
@@ -255,7 +254,7 @@ describe('ContainerItemSelector', () => {
       expect(screen.getByText(/Found 2 compatible container item\(s\) for LargeBarrel/)).toBeInTheDocument();
     });
     
-    process.env.NODE_ENV = originalEnv;
+    nodeEnv.restore();
   });
 
   it('should handle SmallBarrel container type correctly', async () => {

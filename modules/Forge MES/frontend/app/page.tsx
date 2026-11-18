@@ -631,7 +631,7 @@ export default function Home() {
                     {Object.entries(test.results).map(([key, value]) => (
                       <div key={key} className="text-center p-3 border rounded-lg">
                         <p className="text-sm text-muted-foreground capitalize">{key.replace('_', ' ')}</p>
-                        <p className="text-lg font-bold">{value}</p>
+                        <p className="text-lg font-bold">{String(value)}</p>
                       </div>
                     ))}
                   </div>

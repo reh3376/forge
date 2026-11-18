@@ -45,7 +45,7 @@ function mapManufacturingPermissionsToNavGuards(manufacturingPermissions: Manufa
 
 export function useNavigationGuards() {
   const router = useRouter()
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ''
   const auth = useAuth()
   
   // Map real authentication permissions to navigation guard permissions
