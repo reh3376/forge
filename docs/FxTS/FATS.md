@@ -154,3 +154,7 @@ Examples:
 - JSONPath body assertions for response validation
 - Request/response schema validation against JSON Schema definitions
 - Makefile targets: `make test-api`, `make test-api-{spec}`
+
+## Integrity
+
+Every FATS spec carries an FHTS integrity block since 2026-11-18 (D-14, F-4); the 28 specs were stamped `pending_review` and await the owner's approval (FB-161). The shared runner gives `fats:hash-verified` and `fats:hash-approved` on every run. The schema gained the `integrity` property for this under its existing version; laying out schema versions is FB-151.

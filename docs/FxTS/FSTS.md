@@ -3,7 +3,7 @@
 **Framework ID:** FSTS
 **Full Name:** Forge Security Test Specification
 **CI Gate:** Hard-fail (merge-blocking)
-**Status:** Stub (directory structure exists)
+**Status:** Planned. No code and no specs exist (the empty package was removed on 2026-11-18: a framework is either planned or meets the whole baseline, D-14)
 **Phase:** F14
 **MDEMG Analog:** USTS
 
@@ -67,4 +67,4 @@ fsts.schema.json
 
 ## Implementation Status
 
-Stub exists at `src/forge/governance/fsts/`. Schema, runner, and specs not yet created. Will be built as part of phase F14.
+Nothing exists in the code. Schema, runner and specs are created together, to the baseline of `docs/decisions/fxts-framework-baseline.md`, as part of phase F14.

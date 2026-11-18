@@ -1,0 +1,105 @@
+"""The two hash verdicts every framework gives (D-14, F-4; BACKLOG FB-159)."""
+
+from __future__ import annotations
+
+import json
+from typing import Any
+
+import pytest
+
+from forge.governance.facts import SCHEMA_PATH as FACTS_SCHEMA
+from forge.governance.facts.runners.facts_runner import FACTSRunner
+from forge.governance.fats.runners.fats_runner import FATSRunner
+from forge.governance.shared.runner import (
+    FxTSRunner,
+    FxTSVerdict,
+    VerdictStatus,
+    add_spec_hash,
+    approve_spec_hash,
+)
+
+PASS, FAIL = VerdictStatus.PASS, VerdictStatus.FAIL
+FACTS_SPEC = FACTS_SCHEMA.parent.parent / "specs" / "forge-wms.facts.json"
+FATS_DIR = FACTS_SCHEMA.parent.parent.parent / "fats"
+
+
+class BareRunner(FxTSRunner):
+    """A framework that writes nothing of its own about integrity."""
+
+    framework = "FXTS"
+
+    def implemented_fields(self) -> set[str]:
+        return set()
+
+    async def _run_checks(self, target: str, **kwargs: Any) -> list[FxTSVerdict]:
+        return []
+
+
+def _statuses(report: Any, prefix: str) -> dict[str, VerdictStatus]:
+    return {
+        v.check_id: v.status
+        for v in report.verdicts
+        if v.check_id in (f"{prefix}:hash-verified", f"{prefix}:hash-approved")
+    }
+
+
+class TestEveryFrameworkGetsThem:
+    async def test_a_new_framework_gets_both_without_writing_anything(self) -> None:
+        spec: dict[str, Any] = {"name": "x"}
+        add_spec_hash(spec, changed_by="test")
+        approve_spec_hash(spec, approved_by="owner")
+        report = await BareRunner().run(target="x", spec=spec)
+        assert _statuses(report, "fxts") == {"fxts:hash-verified": PASS, "fxts:hash-approved": PASS}
+        assert report.passed
+
+    async def test_a_spec_without_a_hash_fails_both(self) -> None:
+        report = await BareRunner().run(target="x", spec={"name": "x"})
+        assert _statuses(report, "fxts") == {"fxts:hash-verified": FAIL, "fxts:hash-approved": FAIL}
+        assert not report.passed
+        assert "no integrity block" in report.verdicts[0].message
+
+    async def test_an_edited_spec_fails_its_hash(self) -> None:
+        spec: dict[str, Any] = {"name": "x"}
+        add_spec_hash(spec, changed_by="test")
+        approve_spec_hash(spec, approved_by="owner")
+        spec["name"] = "changed after approval"
+        report = await BareRunner().run(target="x", spec=spec)
+        assert _statuses(report, "fxts")["fxts:hash-verified"] == FAIL and not report.passed
+
+    async def test_an_unapproved_spec_fails_approval_only(self) -> None:
+        spec: dict[str, Any] = {"name": "x"}
+        add_spec_hash(spec, changed_by="test")
+        report = await BareRunner().run(target="x", spec=spec)
+        assert _statuses(report, "fxts") == {"fxts:hash-verified": PASS, "fxts:hash-approved": FAIL}
+
+    async def test_no_spec_no_verdicts(self) -> None:
+        report = await BareRunner().run(target="x")
+        assert report.verdicts == []
+
+
+class TestTheFrameworksThatDidNotFail:
+    async def test_facts_fails_a_spec_edited_after_approval(self) -> None:
+        """Before FB-159 this was a side signal and the run could still pass."""
+        spec = json.loads(FACTS_SPEC.read_text(encoding="utf-8"))
+        runner = FACTSRunner(schema_path=FACTS_SCHEMA)
+        clean = await runner.run(target="forge-wms", spec=spec)
+        assert _statuses(clean, "facts") == {
+            "facts:hash-verified": PASS,
+            "facts:hash-approved": PASS,
+        }
+        spec["adapter_identity"]["name"] += " (edited)"
+        edited = await runner.run(target="forge-wms", spec=spec)
+        assert _statuses(edited, "facts")["facts:hash-verified"] == FAIL and not edited.passed
+
+    @pytest.mark.parametrize(
+        "path", sorted((FATS_DIR / "specs").glob("*.json")), ids=lambda p: p.stem
+    )
+    async def test_every_fats_spec_carries_a_hash_that_verifies(self, path: Any) -> None:
+        """28 FATS specs had no hash before FB-160. Approval is the owner's (FB-161)."""
+        spec = json.loads(path.read_text(encoding="utf-8"))
+        integrity = spec["integrity"]
+        assert integrity["spec_hash"] and integrity["hash_state"] in ("pending_review", "approved")
+        runner = FATSRunner(schema_path=FATS_DIR / "schema" / "fats.schema.json")
+        report = await runner.run(target=spec["endpoint"], spec=spec)
+        assert _statuses(report, "fats")["fats:hash-verified"] == PASS
+        assert report.hash_verified is True

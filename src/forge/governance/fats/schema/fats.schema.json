@@ -26,12 +26,21 @@
     },
     "method": {
       "type": "string",
-      "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      "enum": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
       "description": "HTTP method."
     },
     "authentication": {
       "type": "object",
-      "required": ["required", "schemes"],
+      "required": [
+        "required",
+        "schemes"
+      ],
       "properties": {
         "required": {
           "type": "boolean",
@@ -41,7 +50,12 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["bearer", "api_key", "basic", "none"]
+            "enum": [
+              "bearer",
+              "api_key",
+              "basic",
+              "none"
+            ]
           },
           "minItems": 1,
           "description": "Accepted authentication schemes."
@@ -63,12 +77,16 @@
         },
         "required_headers": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": []
         },
         "required_query_params": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": []
         }
       },
@@ -77,7 +95,10 @@
     },
     "response": {
       "type": "object",
-      "required": ["success_status", "error_format"],
+      "required": [
+        "success_status",
+        "error_format"
+      ],
       "properties": {
         "success_status": {
           "type": "integer",
@@ -89,11 +110,16 @@
         },
         "error_format": {
           "type": "object",
-          "required": ["type"],
+          "required": [
+            "type"
+          ],
           "properties": {
             "type": {
               "type": "string",
-              "enum": ["rfc7807", "forge_standard"],
+              "enum": [
+                "rfc7807",
+                "forge_standard"
+              ],
               "description": "Error response format."
             }
           },
@@ -110,7 +136,9 @@
     },
     "rate_limit": {
       "type": "object",
-      "required": ["requests_per_minute"],
+      "required": [
+        "requests_per_minute"
+      ],
       "properties": {
         "requests_per_minute": {
           "type": "integer",
@@ -126,6 +154,109 @@
       },
       "additionalProperties": false,
       "description": "Rate limiting requirements."
+    },
+    "integrity": {
+      "type": "object",
+      "description": "Self-contained spec integrity block (FHTS Layer 1). Hash governance for AI agent oversight.",
+      "properties": {
+        "hash_method": {
+          "type": "string",
+          "enum": [
+            "sha256-c14n-v1",
+            "sha256-jcs"
+          ],
+          "default": "sha256-c14n-v1",
+          "description": "Hash algorithm. sha256-c14n-v1 is normative."
+        },
+        "spec_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hex digest of canonical JSON (excluding this field)."
+        },
+        "hash_state": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "modified",
+            "pending_review",
+            "reverted",
+            "unknown"
+          ],
+          "default": "unknown",
+          "description": "Governance state — tracks whether changes have been reviewed and approved."
+        },
+        "previous_hash": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Hash before most recent change. Enables single-step drift detection."
+        },
+        "approved_by": {
+          "type": "string",
+          "description": "Identifier of actor who approved current hash state."
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO8601 timestamp of approval."
+        },
+        "change_history": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": [
+              "previous_hash",
+              "new_hash",
+              "changed_at",
+              "source"
+            ],
+            "properties": {
+              "previous_hash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "new_hash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "changed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "type": "string",
+                "enum": [
+                  "manual",
+                  "ci",
+                  "agent",
+                  "revert",
+                  "spec_update"
+                ]
+              },
+              "changed_by": {
+                "type": "string"
+              },
+              "change_type": {
+                "type": "string",
+                "enum": [
+                  "structural",
+                  "content",
+                  "config",
+                  "revert"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Last 3 hash changes for audit trail and AI agent governance."
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

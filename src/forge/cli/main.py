@@ -402,7 +402,7 @@ def governance_validate_spec(
     # Determine framework from spec or filename
     framework = None
     fname = spec_file.stem.lower()
-    for fw in ("fats", "facts", "fvts", "ftts", "fmts", "fhts", "fqts", "fsts"):
+    for fw in ("fats", "facts", "fvts", "ftts", "fmts"):
         if fw in fname:
             framework = fw
             break

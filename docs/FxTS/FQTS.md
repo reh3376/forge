@@ -3,7 +3,7 @@
 **Framework ID:** FQTS
 **Full Name:** Forge Quality Test Specification
 **CI Gate:** Hard-fail (merge-blocking for production data products)
-**Status:** Stub (directory structure exists)
+**Status:** Planned. No code and no specs exist (the empty package was removed on 2026-11-18: a framework is either planned or meets the whole baseline, D-14)
 **Phase:** F13
 **MDEMG Analog:** None (new for Forge)
 
@@ -101,4 +101,8 @@ fqts.schema.json
 
 ## Implementation Status
 
-Stub exists at `src/forge/governance/fqts/`. Schema, runner, and specs not yet created. Will be built as part of phase F13.
+Nothing exists in the code. Schema, runner and specs are created together, to the baseline of `docs/decisions/fxts-framework-baseline.md`, as part of phase F13.
+
+## Input kept for when this is built
+
+A data-quality file written in April 2026 was removed on 2026-11-18 because nothing checked it. It described three data products (production context; inventory to production linkage; equipment utilization), each with rules of four kinds: completeness (named context fields present in 90 to 98% of records), freshness (the newest record within 30 minutes to 1 hour), range (a temperature within -40 to 200 °C for 99% of values) and consistency (when one context field is set, a related one is set 90 to 95% of the time), evaluated continuously with alerts to one channel. `BACKLOG.md` FB-160 records the same.

@@ -46,6 +46,8 @@ class FATSRunner(FxTSRunner):
         "request",
         "response",
         "rate_limit",
+        # the FHTS block every spec carries; the shared runner gives its two verdicts
+        "integrity",
     }
 
     def __init__(

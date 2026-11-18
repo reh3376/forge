@@ -20,5 +20,12 @@
   "rate_limit": {
     "requests_per_minute": 30,
     "burst": 5
+  },
+  "integrity": {
+    "hash_state": "pending_review",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "fc7f5c8dceedb09946a9c3a86ac21a2c06789aec0480c46c50c60b949c916c1e"
   }
 }

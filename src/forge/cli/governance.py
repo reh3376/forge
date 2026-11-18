@@ -316,7 +316,7 @@ FRAMEWORKS: dict[str, Framework] = {
     ),
     "ftts": Framework(
         "FTTS",
-        REPO_ROOT / "specs",
+        SPEC_ROOT / "ftts" / "specs",
         "*.ftts.json",
         SPEC_ROOT / "ftts" / "schema" / "ftts.schema.json",
         ("transport_identity", "transport_id"),

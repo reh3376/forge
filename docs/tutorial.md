@@ -180,14 +180,14 @@ From `docs/WHERE-WE-ARE.md` §1, the snapshot at PR 95:
 1. The **hub ↔ spoke contract works end to end**: a spoke registers, is checked against its FACTS spec, pushes records that are persisted, is pulled (Collect, Backfill, Subscribe) and receives write-backs, over TLS/mTLS both ways with per-spoke tokens.
 2. The **OT module runs inside the hub** with OPC-UA connections, a tag engine, the full control-write defense chain (the ISA-18.2 alarm package exists but the host does not compose it yet, FB-115), and drives the MES changeover sequence including the PLC CIP runner. Since the one-clock steps of 2026-11-13 no record builder invents a source time, the OPC-UA server's clock is read and every stamp corrected by its measured offset, and every spoke declares how it is time-governed in its FACTS contract (FB-088, FB-094, FB-090).
 3. **forge-mes is Go and not yet built**: the imported NestJS backend and Next.js frontend stand in as the interim bridge and speak the spoke contract; the Go rewrite (FB-076) is decided and designed (`docs/decisions/forge-mes-go.md`, signed 2026-11-03); the Go SDK scaffold is its first step.
-4. **Governance is real for five frameworks** (FATS, FACTS, FTTS, FVTS, and FMTS since 2026-11-17, with a spec for each of the nine modules, eight of them approved by the owner on 2026-11-18) plus FHTS hashing; the other seven are stubs or planned. forge-display does not exist yet, and it is the first module to be built (owner, 2026-11-17: it builds the frontend of the whole platform, the hub's UI included); its contract (FVTS) does, with a runner and golden messages.
+4. **Governance is real for five frameworks** (FATS, FACTS, FTTS, FVTS, and FMTS since 2026-11-17, with a spec for each of the nine modules, eight of them approved by the owner on 2026-11-18) plus FHTS hashing; the other seven are planned. forge-display does not exist yet, and it is the first module to be built (owner, 2026-11-17: it builds the frontend of the whole platform, the hub's UI included); its contract (FVTS) does, with a runner and golden messages.
 5. **Not yet**: scoped roles in the gateway, `mod_mes` in the hub, the Go module SDK, the hub-of-hubs federation, Kubernetes, and any management module in Go.
 6. **The three-layer process control framework** (PC-L1 PID in the PLC, PC-L2 MPC, PC-L3 SME agents) is decided and signed by the owner (D-11, 2026-11-13); nothing of it is built, and nothing is built before its FSDs (F5).
 
 | Measure | Value (2026-11-13) |
 |---|---|
-| Python hub (`src/forge`) | 362 files, ~74,100 lines |
-| Python tests | 275 files, 4,756 collected, full suite green on the locked dependency set |
+| Python hub (`src/forge`) | 354 files, ~74,100 lines |
+| Python tests | 276 files, 4,790 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend, kept until the Go forge-mes and forge-display land |
 | Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
@@ -334,7 +334,7 @@ note:
 | Per-spoke callback token, scoped hub endpoints | ✅ | FB-063 |
 | Hub → spoke write-back over a session-bound callback | ✅ | FB-054 |
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
-| FTTS transport spec and runner | 🟡 | `specs/grpc-hardened-transport.ftts.json`; no `docs/FxTS/FTTS.md` page yet |
+| FTTS transport spec and runner | 🟡 | `src/forge/governance/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and awaiting the owner's approval; no `docs/FxTS/FTTS.md` page yet |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
 | Hub time in the contract: the four-timestamp exchange on Register, Health and Ingest; a reporting spoke measured two-way | ✅ | FB-092 (2026-11-15) |
 | A spoke outside its tolerance, or one that reports no measurement, refused at Register and Ingest | ✅ | FB-093's hub half (2026-11-17; the plant-floor links fail closed since 2026-11-15) |
@@ -710,7 +710,7 @@ note:
 |---|---|
 | The `time_contract` of a module with its hub, every database, every plant-floor device and every third-party system can be declared and is checked for form (FMTS, FB-135); no module declares one yet and nothing reads the clocks of databases or third-party systems | FB-136, FB-138, FB-139 (with FB-117 and FB-120) |
 | The OT FACTS spec fails `facts:schema-valid` and eight vocabulary checks | FB-079, D-8 |
-| Only FMTS and FVTS meet everything a framework must provide (decided and signed 2026-11-18, D-14: ten requirements). 28 FATS specs and the FTTS spec carry no hash; no schema is hashed; FACTS and FTTS do not fail a spec whose hash no longer verifies; FQTS and FSTS are half-built and FDTS, FLTS, FNTS, FOTS, FPTS are planned | FB-159, FB-160, FB-149, FB-161, FB-151 |
+| What a framework must provide is decided and signed (2026-11-18, D-14: ten requirements). Done: every spec carries a hash, and a run fails in every framework when the hash does not verify or is not approved. Not done: the owner's approval of the 28 FATS specs and the FTTS spec; no schema is hashed or versioned beyond its id; FTTS has no page; the test that checks a framework against the ten | FB-161, FB-151, FB-149 |
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.9 |
 | The OT reference FVTS spec uses invented points and is `pending_review` | FB-078 |
 
@@ -1181,7 +1181,7 @@ note:
 
 | Gap | Backlog / decision |
 |---|---|
-| FQTS, FNTS, FLTS as gates | stubs or planned (M5) |
+| FQTS, FNTS, FLTS as gates | planned (M5) |
 | Step/phase execution, electronic batch records; typed ISA-88 hierarchy | FB-011, FB-012 |
 | Decision-support module with the 13-point frame as a workflow | the models exist; the module does not |
 | Routing registry convergence (which store a schema lives in) | FB-097 (D-10) |
@@ -1545,7 +1545,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q                         # 4,756 tests, ~1 minute
+uv run pytest tests -q                         # 4,790 tests, ~1 minute
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -1649,7 +1649,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 275 files, 4,756 collected; the full suite runs in about a minute on the locked dependency set.
+- `tests/` mirrors `src/`: 276 files, 4,790 collected; the full suite runs in about a minute on the locked dependency set.
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -1706,7 +1706,7 @@ note:
 2. **No management module in Go**: the interim MES bridge stands in for forge-mes; the SDK template does not exist yet.
 3. **No scoped roles in force**: the gateway's auth is off by default; the role model is signed (D-1, 2026-11-03) and not yet enforced (FB-075).
 4. **No federation**: a single hub only; no hub-of-hubs code.
-5. **Seven governance frameworks are stubs or planned**; FACTS validates against its own schema and all nine of its specs carry owner-approved hashes (2026-11-13).
+5. **Seven governance frameworks are planned** (none is half-built since 2026-11-18); FACTS validates against its own schema and all nine of its specs carry owner-approved hashes (2026-11-13).
 6. **No production deployment**: compose only.
 7. **Clock discipline enforced on the plant floor and on every spoke the hub registers; not on Forge's own hosts or between hubs**: every spoke declares how it is time-governed (FB-090) and the deployment requirement is written down; a PLC connection whose clock is unreadable or outside its class is refused (FB-093's OT half, 2026-11-15); the hub gives its time to every spoke and measures each one two-way (FB-092, 2026-11-15), and refuses a spoke outside its class or one that reports no measurement (FB-093's hub half, 2026-11-17). The hub's REST ingest carries no exchange until it is retired (FB-123), and no Forge process checks its own host's clock (FB-119).
 8. **Process control decided, not built**: the three-layer framework is signed (D-11, 2026-11-13) and waits for its FSDs.

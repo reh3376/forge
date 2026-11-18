@@ -4,7 +4,10 @@
   "method": "POST",
   "authentication": {
     "required": true,
-    "schemes": ["bearer", "api_key"]
+    "schemes": [
+      "bearer",
+      "api_key"
+    ]
   },
   "request": {
     "content_type": "application/json"
@@ -19,5 +22,12 @@
   "rate_limit": {
     "requests_per_minute": 30,
     "burst": 5
+  },
+  "integrity": {
+    "hash_state": "pending_review",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "78497774e3c29add2ec992cf0bb5aeceb74bf9d67b1dd61c5b69645966a43676"
   }
 }
