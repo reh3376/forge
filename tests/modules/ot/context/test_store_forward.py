@@ -38,7 +38,7 @@ def _make_record(tag_path: str = "WH/WHK01/Distillery01/TIT_2010/Out_PV") -> Con
         value=RecordValue(raw=78.4, quality=QualityCode.GOOD, data_type="DOUBLE"),
         context=RecordContext(area="Distillery01", equipment_id="TIT_2010"),
         lineage=RecordLineage(
-            schema_ref="forge://schemas/forge-ot/v0.1.0",
+            schema_ref="forge://schemas/forge-ot/v0.3.0",
             adapter_id="forge-ot",
             adapter_version="0.1.0",
         ),

@@ -13,7 +13,7 @@
     "discover": true
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/forge-ot/v0.1.0",
+    "schema_ref": "forge://schemas/forge-ot/v0.3.0",
     "output_format": "tag_value",
     "context_fields": [
       "tag_path",

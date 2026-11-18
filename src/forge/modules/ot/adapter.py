@@ -118,7 +118,7 @@ class OTModuleAdapter(
             discover=True,
         ),
         data_contract=DataContract(
-            schema_ref="forge://schemas/forge-ot/v0.1.0",
+            schema_ref="forge://schemas/forge-ot/v0.3.0",
             output_format="contextual_record",
             context_fields=["area", "equipment_id", "operating_mode"],
         ),
@@ -534,8 +534,13 @@ class OTModuleAdapter(
     # Internal: tag change dispatch
     # ------------------------------------------------------------------
 
-    async def _on_tag_change(self, path: str, value: Any, quality: Any) -> None:
+    async def _on_tag_change(self, path: str, value: Any = None, quality: Any = None) -> None:
         """Called by TagRegistry when any tag value changes.
+
+        The registry calls ``callback(path, value)``; ``quality`` is optional because the
+        value carries it. It was required here, so every change raised inside the real
+        registry's notify loop and no subscription fired (found by the FMTS conformance
+        kit, FB-155). The definition and value are read from the registry either way.
 
         Builds a ContextualRecord and dispatches to:
             1. Active subscriptions

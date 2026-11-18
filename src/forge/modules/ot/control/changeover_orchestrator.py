@@ -69,7 +69,7 @@ logger = logging.getLogger(__name__)
 
 OT_ADAPTER_ID = "forge-ot"
 OT_ADAPTER_VERSION = "0.1.0"
-OT_SCHEMA_REF = "forge://schemas/forge-ot/v0.1.0"
+OT_SCHEMA_REF = "forge://schemas/forge-ot/v0.3.0"
 
 #: MES changeover states (mirrors backend ``ChangeoverState``).
 PRODUCTION = "PRODUCTION"

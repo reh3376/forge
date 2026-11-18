@@ -10,9 +10,9 @@ when the gap is closed:
   approved (2026-11-18) and has no allowed failure.
 * ``fmts:waivers`` on ``forge-mes``: its waiver of M-3 is a time-keeping waiver, which
   counts only with admin privileges, that is once the owner approves the spec (Q-10).
-* ``forge-ot`` and ``forge-mes`` stay ``pending_review``: the owner approves a module spec
-  only when the conformance kit has run M-4 to M-7 against the module, and the kit cannot
-  drive these two yet (FB-155).
+* ``forge-mes`` stays ``pending_review``: the owner approves a module spec only when the
+  conformance kit has run M-4 to M-7 against the module, and the kit cannot drive the
+  interim bridge, a TypeScript process (FB-155).
 
 M-4 to M-7 are run by the conformance kit for the modules on the Python adapter template.
 ``NOT_RUN`` names what the kit did not check and why: M-6 where a module has no sample
@@ -43,6 +43,7 @@ ALLOWED_FAILURES: dict[str, frozenset[str]] = {
     "forge-historian": frozenset(),
     "forge-ims": frozenset(),
     "forge-scanner": frozenset(),  # its M-3 waiver counts: approved with admin privileges
+    "forge-ot": frozenset(),
     "forge-mes": PENDING_APPROVAL | {"fmts:waivers"},
 }
 WAIVED: dict[str, dict[str, str]] = {
@@ -69,7 +70,7 @@ NOT_RUN: dict[str, frozenset[str]] = {
     "forge-historian": frozenset(),
     "forge-ims": frozenset(),
     "forge-mes": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # TypeScript, another process
-    "forge-ot": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # not on the adapter template
+    "forge-ot": frozenset(),  # off the template; driven through its own conformance.py hook
 }
 
 SPEC_FILES = sorted(SPECS_DIR.glob("*.fmts.json"))

@@ -41,7 +41,7 @@ def _manifest(governance: TimeGovernance | None) -> AdapterManifest:
         protocol="opcua",
         tier=AdapterTier.OT,
         capabilities=AdapterCapabilities(read=True),
-        data_contract=DataContract(schema_ref="forge://schemas/forge-ot/v0.1.0"),
+        data_contract=DataContract(schema_ref="forge://schemas/forge-ot/v0.3.0"),
         time_governance=governance,
     )
 

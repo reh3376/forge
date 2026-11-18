@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 # Schema ref for OT Module records (matches FACTS spec data_contract)
-_SCHEMA_REF = "forge://schemas/forge-ot/v0.1.0"
+_SCHEMA_REF = "forge://schemas/forge-ot/v0.3.0"
 _ADAPTER_ID = "forge-ot"
 _ADAPTER_VERSION = "0.1.0"
 

@@ -180,7 +180,7 @@ class TestContextualRecordAuditSink:
         assert cr.context.extra["target_tag_path"] == "WH/WHK01/Distillery01/TIT_2010/SP"
         assert cr.context.extra["write_status"] == record["status"]
         assert cr.value.raw["requested_value"] == record["requested_value"]
-        assert cr.lineage.schema_ref == "forge://schemas/forge-ot/v0.1.0"
+        assert cr.lineage.schema_ref == "forge://schemas/forge-ot/v0.3.0"
         assert cr.lineage.transformation_chain == ["ot:control-write-engine"]
         assert cr.timestamp.source_time.isoformat() == record["timestamp"]
 

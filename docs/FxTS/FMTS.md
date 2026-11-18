@@ -26,7 +26,7 @@ A module without an approved FMTS spec is not a Forge module. The hub does not e
 | # | Requirement | Checked by this runner |
 |---|---|---|
 | M-1 | Speaks `forge.v1.AdapterService` to the hub over gRPC and nothing else. | Yes: `hub_link` is fixed by the schema, and no source file names a hub REST route. |
-| M-2 | Has an approved FACTS spec, and its manifest matches it. | Yes: the FACTS spec exists, its hash verifies, the owner approved it, and the manifest's `adapter_id`, `version`, `type`, `tier` and `protocol` equal the FACTS identity. |
+| M-2 | Has an approved FACTS spec, and its manifest matches it. | Yes: the FACTS spec exists, its hash verifies, the owner approved it, the manifest's `adapter_id`, `version`, `type`, `tier` and `protocol` equal the FACTS identity, and its `schema_ref` equals the spec's (the hub refuses a registration where it does not). |
 | M-3 | Declares a time contract for every counterpart it exchanges data with. | Yes: see "The time contract". |
 | M-4 | Implements the time exchange on Register, Health and Ingest and reports its measurement. | By the conformance kit, for a Python module: every request carries T1 and, after the first, the measurement of the exchange before it; the hub holds a two-way measurement. |
 | M-5 | Fails closed on a clock it cannot trust and on a refusal from the hub, with the cause on its health. | By the kit: with the module's clock 5 s out the hub refuses it, nothing is delivered, the module's own health counts the refusal under its cause, and it is readmitted when the clock is put right. |
@@ -62,7 +62,10 @@ The fields the offset and the uncertainty travel in already exist on the record 
 - **A driver** is how the kit reaches a module, and is the only part written per kind of module. `PythonAdapterDriver` drives any `AdapterBase` through the transport Python modules ship with.
 - **The runner runs the kit** for every module on the `python-adapter` template. It finds the one adapter class in the module's `adapter.py`, gives it placeholder connection parameters (hosts under `.invalid`, so nothing is reached) and the module's fixture, if it has one.
 - **A fixture** is `tests/governance/fmts/conformance/<module_id>.json`: optional `params` and raw source `events`. Without events the module sends nothing and M-6 is reported as not checked.
+- **A Python module off the template supplies a hook**, `conformance.py` beside its `adapter.py`: `conformance_adapter()` builds the adapter as the module builds it, and `conformance_load(adapter)` gives it something to send. The OT module has one: its adapter on a real tag registry, with two stamped tags.
 - A module the kit cannot drive (another language, another process) is reported as `NOT CHECKED` for all four (FB-155).
+
+What the kit found on the OT module, fixed with its hook (2026-11-18): collect awaited a registry method only the test doubles had; the tag-change callback's signature did not match the registry's call, so no subscription fired; the manifest and three record producers carried an older schema reference than the approved FACTS spec, so the hub would have refused the registration and rejected every record.
 
 What the kit found on its first run, fixed with it: the Python transport did not put a refusal by the hub on the module's own health; one adapter left refusals out of its health; one returned to HEALTHY whenever its API answered, hiding a standing refusal.
 
@@ -120,8 +123,8 @@ Every run gives 19 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:h
 | forge-wms, forge-cmms, forge-nms, forge-historian, forge-ims | management | M-10 (FB-141) | **approved by the owner 2026-11-18**; every other requirement passes, M-4 to M-7 run by the kit |
 | forge-integ-erp-netsuite | integration | M-10 (FB-141) | **approved by the owner 2026-11-18**; the same |
 | forge-scanner | management | M-3 (FB-117), M-10 (FB-141) | **approved by the owner 2026-11-18**, which is what makes its time-keeping waiver count; M-6 not checked (no sample events) |
-| forge-ot | ot | M-10 (FB-141), M-11 (FB-146) | `pending_review` by the owner's decision: M-4 to M-7 are not checked, because the kit cannot drive it yet (FB-155). Everything else passes |
-| forge-mes (the interim bridge) | management | M-3 (FB-145), M-8 (FB-057), M-9 (FB-143), M-10 (FB-141), M-11 (FB-076) | `pending_review` by the owner's decision, for the same reason; `waivers` fails until approved (the M-3 waiver needs admin privileges) |
+| forge-ot | ot | M-10 (FB-141), M-11 (FB-146) | **approved by the owner 2026-11-18**; M-4 to M-7 run by the kit through the module's own hook |
+| forge-mes (the interim bridge) | management | M-3 (FB-145), M-8 (FB-057), M-9 (FB-143), M-10 (FB-141), M-11 (FB-076) | `pending_review` by the owner's decision: M-4 to M-7 are not checked, because the kit cannot drive a TypeScript process (FB-155); `waivers` fails until approved (the M-3 waiver needs admin privileges) |
 
 The owner reviewed all nine on 2026-11-18, the first line by line, and approves a module spec only when the conformance kit has run M-4 to M-7 against the module.
 
@@ -144,7 +147,8 @@ forge governance approve path/to/x.fmts.json --by reh3376    # the owner only
 
 | Gap | Backlog |
 |---|---|
-| Two module specs (forge-ot, forge-mes) wait for a kit driver before the owner approves them | FB-155 |
+| The interim MES bridge's module spec waits for a kit driver for a TypeScript process | FB-155 |
+| The OT manifest's data contract differs from its FACTS spec in tier vocabulary, output format and context fields (the hub warns) | FB-158 |
 | The interim MES bridge cannot state a governed time source; M-3 is waived | FB-145 |
 | The OT module is not built from a template (M-11 waived), and its local SQLite buffer is not declared | FB-146, FB-147 |
 | No clock-read method exists for a gRPC server | FB-139 |

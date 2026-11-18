@@ -18,8 +18,10 @@ refusals by cause) need a running module. The conformance kit
 (``forge.governance.fmts.conformance``, FB-137) runs them: for a module on
 the ``python-adapter`` template the runner finds the adapter class in the
 module's ``adapter.py``, drives it against a reference hub and reports what
-happened. A module the kit cannot drive (another language, another process:
-FB-155) is reported as SKIP "NOT CHECKED" with that cause, never as passed.
+happened. A Python module off the template supplies a ``conformance.py`` hook
+beside its ``adapter.py`` (the OT module does). A module the kit cannot drive
+(another language, another process: FB-155) is reported as SKIP "NOT CHECKED" with
+that cause, never as passed.
 
 A requirement the spec waives is reported as SKIP with the waiver's reason
 and backlog item on every run. A waiver whose backlog item is closed or
@@ -338,19 +340,31 @@ class FMTSRunner(FxTSRunner):
         from forge.governance.fmts import conformance
 
         template = spec["scaffold"]["template"]
-        if template != "python-adapter":
-            return {}, f"it is not on the python-adapter template (template '{template}')"
-        module_name = None
-        for rel in spec["module_identity"]["source_paths"]:
-            if (repo_root / rel / "adapter.py").is_file():
-                module_name = conformance.adapter_module_name(rel)
-                break
-        if module_name is None:
-            return {}, "its adapter.py is not in an importable Forge package under src/forge"
+        paths = spec["module_identity"]["source_paths"]
         manifest, _ = _load_json(repo_root / spec["references"]["manifest"])
+        load = None
         try:
-            factory = conformance.find_adapter_class(module_name)
             fixture = conformance.load_fixture(repo_root, spec["module_identity"]["module_id"])
+            if template == "python-adapter":
+                found = [rel for rel in paths if (repo_root / rel / "adapter.py").is_file()]
+                module_name = conformance.adapter_module_name(found[0]) if found else None
+                if module_name is None:
+                    return {}, (
+                        "its adapter.py is not in an importable Forge package under src/forge"
+                    )
+                factory = conformance.find_adapter_class(module_name)
+            else:
+                # off the template: the module supplies its own hook beside its adapter.py
+                hooked = [
+                    rel for rel in paths if (repo_root / rel / conformance.HOOK_FILE).is_file()
+                ]
+                hook = conformance.load_hook(hooked[0]) if hooked else None
+                if hook is None:
+                    return {}, (
+                        f"it is not on the python-adapter template (template '{template}') "
+                        f"and supplies no {conformance.HOOK_FILE} hook"
+                    )
+                factory, load = hook
         except Exception as exc:
             return {}, f"it could not be loaded ({type(exc).__name__}: {exc})"
         params = {
@@ -359,7 +373,9 @@ class FMTSRunner(FxTSRunner):
         }
         events = list(fixture.get("events", []))
         results = await conformance.run_conformance(
-            lambda hub: conformance.PythonAdapterDriver(hub, factory, params=params, events=events)
+            lambda hub: conformance.PythonAdapterDriver(
+                hub, factory, params=params, events=events, load=load
+            )
         )
         return results, ""
 
@@ -721,6 +737,21 @@ class FMTSRunner(FxTSRunner):
                 for key in ("adapter_id", "version", "type", "tier", "protocol")
                 if manifest.get(key) != identity.get(key)
             )
+            # the hub refuses a registration whose schema_ref differs from the spec's
+            spec_ref = (facts_spec.get("data_contract") or {}).get("schema_ref")
+            manifest_ref = (manifest.get("data_contract") or {}).get("schema_ref")
+            if spec_ref and spec_ref != manifest_ref:
+                violations.append(
+                    SpecViolation(
+                        field="references.manifest:data_contract.schema_ref",
+                        expected=spec_ref,
+                        actual=manifest_ref,
+                        message=(
+                            f"manifest schema_ref is {manifest_ref!r} but the FACTS spec "
+                            f"declares {spec_ref!r}; the hub refuses that registration"
+                        ),
+                    )
+                )
         return self._verdict(
             "m2",
             "baseline/M-2",

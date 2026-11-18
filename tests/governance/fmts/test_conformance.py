@@ -16,6 +16,7 @@ from forge.governance.fmts.conformance import (
     adapter_module_name,
     find_adapter_class,
     load_fixture,
+    load_hook,
     placeholder_params,
     run_conformance,
 )
@@ -175,3 +176,54 @@ class TestTheKitsOwnParts:
         assert load_fixture(REPO_ROOT, "no-such-module") == {}
         raw = (REPO_ROOT / "tests/governance/fmts/conformance/forge-historian.json").read_text()
         assert json.loads(raw)["params"] == {"api_key": "conformance-kit-placeholder"}
+
+
+class TestAModuleOffTheTemplate:
+    """The OT module is not on the adapter template: it supplies its own kit hook."""
+
+    def test_the_hook_is_found_beside_the_adapter(self) -> None:
+        from forge.modules.ot import conformance as ot_hook
+
+        factory, load = load_hook("src/forge/modules/ot")
+        assert factory is ot_hook.conformance_adapter and load is ot_hook.conformance_load
+        assert load_hook("src/wms") is None  # not importable Forge code
+        with pytest.raises(ModuleNotFoundError):
+            load_hook("src/forge/adapters/forge_wms")  # on the template: it has no hook
+
+    async def test_the_ot_module_conforms_on_a_real_registry(self) -> None:
+        from forge.modules.ot.conformance import conformance_adapter, conformance_load
+
+        results = await run_conformance(
+            lambda hub: PythonAdapterDriver(hub, conformance_adapter, load=conformance_load)
+        )
+        assert {k: v.status for k, v in results.items()} == {
+            "M-4": PASS,
+            "M-5": PASS,
+            "M-6": PASS,
+            "M-7": PASS,
+        }
+        assert results["M-6"].evidence == {"records": 2}
+
+    async def test_the_ot_adapter_collects_from_the_real_registry(self) -> None:
+        """What the kit found: collect awaited a method only the test doubles had, the
+        change callback's signature did not match the registry's call, and the records
+        carried a schema_ref the hub rejects."""
+        from forge.modules.ot.conformance import conformance_adapter, conformance_load
+
+        adapter = conformance_adapter()
+        seen: list[Any] = []
+        await adapter.configure({})
+        await adapter.start()
+        await adapter.subscribe(
+            ["Site01/Area01/Unit01/TIT_2010/Out_PV"], lambda record: seen.append(record)
+        )
+        await conformance_load(adapter)
+        records = [record async for record in adapter.collect()]
+        assert len(records) == 2 and len(seen) == 1  # the subscription fired
+        assert {r.lineage.schema_ref for r in records} == {
+            adapter.manifest.data_contract.schema_ref
+        }
+        assert adapter.manifest.data_contract.schema_ref == "forge://schemas/forge-ot/v0.3.0"
+        assert all(r.timestamp.source_time.utcoffset().total_seconds() == 0 for r in records)
+        health = await adapter.health()
+        assert health.records_failed == 0 and health.refusals == {}
