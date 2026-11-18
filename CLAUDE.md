@@ -33,9 +33,9 @@ These documents are the authority (A-12). Where Jiminy or MDEMG guidance injecte
 - **Hub and spoke (A-1).** forge-core (`src/forge`, Python) is the hub. Every module is a spoke that speaks `forge.v1.AdapterService` to the hub over gRPC. Nothing reaches the hub any other way.
 - **Third-party software is never integrated with the hub directly (A-4, A-11).** An integration module handles that system's API and is the middleware back to the hub.
 - **Modules are Go (A-2)**, built from the module SDK. The NestJS/Next.js code under `modules/Forge MES` is the interim MES bridge; forge-mes is Go and is not built yet. Say "the interim MES bridge", never "the TypeScript forge-mes".
-- **All user interfaces come from forge-display (A-3)**, for every module. No module ships its own UI. The bridge's Next.js frontend stays only until forge-display exists.
+- **All user interfaces come from forge-display (A-3)**, for every module, and the hub's own UI. No module ships its own UI. forge-display is the first module to be built (A-14). The bridge's Next.js frontend stays only until forge-display exists.
 - **One clock.** The top hub is the time authority. Every stored time is UTC and timezone-aware, time checks are mandatory and fail closed, and a module that does not implement the time exchange is refused (`docs/decisions/one-clock-ot-source-time.md`).
-- **Every module meets the forge module requirements (A-11, D-12)**: `docs/decisions/forge-module-requirements.md`, signed 2026-11-17. Eleven baseline requirements and a time contract, to be checked by the FMTS framework, which is not built yet (FB-135).
+- **Every module meets the forge module requirements (A-11, D-12)**: `docs/decisions/forge-module-requirements.md`, signed 2026-11-17. Eleven baseline requirements and a time contract, checked by the FMTS framework (`docs/FxTS/FMTS.md`).
 - **No silent failure.** A refusal or a fail-closed state is visible on status, health, API and CLI with its cause. A log line alone is not enough.
 - **Production runs on Kubernetes.** Docker Compose is for development only.
 - **Configuration comes from the environment.** Never hardcode credentials, addresses or keys.
@@ -58,6 +58,7 @@ Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `build:`)
 
 - **Every finding is fixed or written to `BACKLOG.md`.** Nothing is skipped.
 - **Only the owner approves a spec hash** (`forge governance approve <spec> --by reh3376`) **or signs a decision record**, on their explicit word. When a decision is the owner's, ask one question at a time.
+- **FxTS specs are the standard for repeatable work (A-13).** Every highly repeatable process has an FxTS spec, and the work is built to it. A repeatable process without one is a finding.
 - **Confirm with the owner before installing packages** or changing a manifest or lock file.
 - **Local models only** for the project's own tooling (`mdemg-llm-v1`). No cloud model.
 - **The repository is public.** Nothing is imported without a secrets scan of its history, and no secret enters a commit. Ask the owner before committing design material for work that is not yet public.

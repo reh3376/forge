@@ -19,9 +19,10 @@ Writes replace only the top-level ``integrity`` block in the file: the rest
 keeps its bytes (key order, line wrapping, escaping), so the review diff of
 an approval is the approval.
 
-``run`` takes the framework (``fats``, ``facts``, ``fvts``, ``ftts``) and a
+``run`` takes the framework (``fats``, ``facts``, ``fvts``, ``ftts``, ``fmts``) and a
 target that is either a spec file or the id the framework checks identity
-against (endpoint path, ``adapter_id``, ``view_id``, ``transport_id``); an
+against (endpoint path, ``adapter_id``, ``view_id``, ``transport_id``,
+``module_id``); an
 id is looked up in the framework's spec directory.  The runner gets the
 packaged schema, and the report prints as text or JSON (``--format``,
 ``--output``).  Exit status 1 when a check fails.
@@ -266,6 +267,12 @@ def _ftts_runner(schema: Path) -> FxTSRunner:
     return FTTSRunner(schema_path=schema)
 
 
+def _fmts_runner(schema: Path) -> FxTSRunner:
+    from forge.governance.fmts.runners.fmts_runner import FMTSRunner
+
+    return FMTSRunner(schema_path=schema)
+
+
 @dataclass(frozen=True)
 class Framework:
     """How the CLI finds, identifies and runs one framework's specs."""
@@ -315,6 +322,15 @@ FRAMEWORKS: dict[str, Framework] = {
         ("transport_identity", "transport_id"),
         _ftts_runner,
         live=True,
+    ),
+    "fmts": Framework(
+        "FMTS",
+        SPEC_ROOT / "fmts" / "specs",
+        "*.fmts.json",
+        SPEC_ROOT / "fmts" / "schema" / "fmts.schema.json",
+        ("module_identity", "module_id"),
+        _fmts_runner,
+        live=False,
     ),
 }
 
@@ -382,5 +398,12 @@ def emit_report(report: FxTSReport, fmt: str, output: Path | None) -> None:
                     typer.echo(f"    -> {violation.field}: {violation.message}")
     else:
         typer.echo("All checks passed.")
+    skipped = [v for v in report.verdicts if v.status == "SKIP"]
+    if skipped:
+        # A skipped check is not a passed one: a waiver or an unverified claim is
+        # named on every run, never folded into "passed".
+        typer.echo("\nNot checked:")
+        for v in skipped:
+            typer.echo(f"  [SKIP] {v.check_id}: {v.message}")
     if output is not None:
         typer.echo(f"JSON report written to {output}")

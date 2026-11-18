@@ -233,7 +233,7 @@ governance_app.command("approve")(governance_cli.approve)
 
 @governance_app.command("run")
 def governance_run(
-    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts")],
+    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts")],
     target: Annotated[
         str,
         typer.Argument(
@@ -402,7 +402,7 @@ def governance_validate_spec(
     # Determine framework from spec or filename
     framework = None
     fname = spec_file.stem.lower()
-    for fw in ("fats", "facts", "fvts", "ftts", "fhts", "fqts", "fsts"):
+    for fw in ("fats", "facts", "fvts", "ftts", "fmts", "fhts", "fqts", "fsts"):
         if fw in fname:
             framework = fw
             break

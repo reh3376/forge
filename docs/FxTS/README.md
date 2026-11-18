@@ -117,10 +117,11 @@ forge governance approve src/forge/governance/facts/specs/whk-wms.facts.json --b
 forge governance validate-spec src/forge/governance/fvts/specs/ot-module.fvts.json
 
 # Run one framework's checks on one spec: a spec file, or its id looked up in the
-# framework's spec directory (endpoint path, adapter_id, view_id, transport_id)
+# framework's spec directory (endpoint path, adapter_id, view_id, transport_id, module_id)
 forge governance run facts whk-wms
 forge governance run fvts ot-module-views --format json --output reports/fvts-ot-module.json
 forge governance run ftts grpc-hardened-transport
+forge governance run fmts path/to/module.fmts.json # the module requirements; skipped checks are listed
 forge governance run fats /v1/health --live        # live checks: FATS, FACTS, FTTS
 ```
 
@@ -173,7 +174,7 @@ Every FxTS framework follows the same structure:
 | [FPTS](FPTS.md) | Forge Performance Test Specification | Throughput and latency benchmarks | Soft-fail | Planned |
 | [FHTS](FHTS.md) | Forge Hash Test Specification | Cross-cutting hash integrity and AI agent governance | Hard-fail | Implemented |
 | [FVTS](FVTS.md) | Forge View Test Specification | Module ↔ forge-display contract: bindings, alarms, actions, surfaces, render profiles | Hard-fail | Schema + Runner + reference renderer implemented; reference spec awaits owner approval (FB-078) |
-| FMTS | Forge Module Test Specification | The requirements every module meets: the baseline, the time contract, references to its other specs, waivers (`docs/decisions/forge-module-requirements.md`, D-12) | Hard-fail | Decided 2026-11-17, not built (FB-135) |
+| [FMTS](FMTS.md) | Forge Module Test Specification | The requirements every module meets: the baseline, the time contract, references to its other specs, waivers (`docs/decisions/forge-module-requirements.md`, D-12) | Hard-fail | Schema + Runner implemented (FB-135); no module spec yet (FB-136) |
 
 ## Shared Infrastructure
 
@@ -208,7 +209,7 @@ src/forge/governance/
 
 ## Writing a New Spec
 
-1. Choose the appropriate framework (FATS for APIs, FACTS for adapters, FQTS for quality, etc.)
+1. Choose the appropriate framework (FATS for APIs, FACTS for adapters, FMTS for a module's requirements, FQTS for quality, etc.). Every highly repeatable process has a spec (A-13, owner 2026-11-17); if no framework fits, that is a finding for `BACKLOG.md`
 2. Read the framework's documentation (linked above) and JSON Schema
 3. Create a new spec file in the framework's `specs/` directory
 4. Validate against the schema: `forge governance validate-spec <path>`
