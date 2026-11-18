@@ -49,7 +49,7 @@ The OT Module (Priority 7) replaces Inductive Automation's Ignition SCADA platfo
 | Protocol | Current Use | OT Module Relevance |
 |----------|-------------|---------------------|
 | OPC-UA | Primary PLC connectivity (Ignition built-in server) | **Direct replacement** — Forge connects to PLC native OPC-UA |
-| MQTT | Ignition MQTT Engine/Transmission (SparkplugB) | **OT Module becomes the new MQTT source** — replaces Ignition as publisher. Pub/sub for observability dashboards, decision systems, NextTrend, and cross-module event fan-out |
+| MQTT | Ignition MQTT Engine/Transmission (SparkplugB) | **OT Module becomes the new MQTT source** — replaces Ignition as publisher. Pub/sub for observability dashboards, decision systems, Forge Historian, and cross-module event fan-out |
 | Modbus TCP | Trane chillers (BAS/EXT/FP mode) | **Phase 2+ consideration** — secondary protocol |
 | HTTP/REST | MES GraphQL, CoLOS, printer APIs | **Kept** — OT Module publishes events; MES consumes |
 | FTP | Inventory CSV imports from WMS | **Replaced** — Forge adapter handles WMS data |
@@ -184,24 +184,24 @@ The MES already has sophisticated MQTT/UNS integration:
 3. **Subscribe to recipe/changeover topics** to receive MES commands and apply them via OPC-UA writes to PLCs
 4. **Eventually provide a direct OPC-UA-based recipe download path** (Phase 4, replaces MQTT recipe flow)
 
-### 4.2 NextTrend Historian ↔ OT
+### 4.2 Forge Historian ↔ OT
 
-NextTrend already supports three OT ingestion paths:
+Forge Historian already supports three OT ingestion paths:
 
 1. **MQTT connector** (rumqttc) — JSON/raw payloads, topic-to-tag mapping
 2. **SparkplugB connector** (srad library) — Structured BIRTH/DATA/DEATH
 3. **OPC-UA connector** (opcua Rust crate) — Subscription or polling mode
 
 Plus the Ignition module (Java OSGi):
-- NextTrendCollector: Pattern-based bulk tag subscription
-- NextTrendStorageEngine: Per-tag historian extension point
-- NextTrendConnection: Health-checked REST client to NextTrend API
+- ForgeHistorianCollector: Pattern-based bulk tag subscription
+- ForgeHistorianStorageEngine: Per-tag historian extension point
+- ForgeHistorianConnection: Health-checked REST client to Forge Historian API
 
-**Impact on OT Module:** The OT Module publishes to NextTrend via three complementary paths:
-- **MQTT** (primary for real-time) — OT Module publishes tag values to `whk/whk01/{area}/ot/tags/#`; NextTrend's MQTT connector subscribes and ingests. Zero coupling between the two systems.
-- **REST API** (batch write for backfill) — Historical data or batch uploads via NextTrend's `/api/v1/tags/values` endpoint
-- **SparkplugB** (optional) — OT Module can encode SparkplugB BIRTH/DATA/DEATH for NextTrend's SparkplugB connector, giving structured metadata (data type, engineering units) alongside values
-- The Ignition bridge period uses the existing Ignition→NextTrend path as fallback
+**Impact on OT Module:** The OT Module publishes to Forge Historian via three complementary paths:
+- **MQTT** (primary for real-time) — OT Module publishes tag values to `whk/whk01/{area}/ot/tags/#`; Forge Historian's MQTT connector subscribes and ingests. Zero coupling between the two systems.
+- **REST API** (batch write for backfill) — Historical data or batch uploads via Forge Historian's `/api/v1/tags/values` endpoint
+- **SparkplugB** (optional) — OT Module can encode SparkplugB BIRTH/DATA/DEATH for Forge Historian's SparkplugB connector, giving structured metadata (data type, engineering units) alongside values
+- The Ignition bridge period uses the existing Ignition→Forge Historian path as fallback
 
 ### 4.3 CMMS ↔ OT
 
@@ -312,7 +312,7 @@ forge/
 
 - NOT the HMI/UI (that's P9 — OT UI Builder)
 - NOT the CMMS (that's forge-cmms, already P2)
-- NOT the historian (that's NextTrend)
+- NOT the historian (that's Forge Historian)
 - NOT the MES recipe engine (that's whk-mes)
 - NOT a wrapper around Ignition (Ignition bridge is a temporary migration shim, not the module itself)
 
@@ -325,13 +325,13 @@ PLC (ControlLogix L82E/L83, OPC-UA server port 4840)
       → Context enrichment (equipment → area, batch, recipe)
         → ContextualRecord creation
           ├─→ Forge Hub (gRPC protobuf binary)
-          │     → Data Router → NextTrend, MES, CMMS, NMS
+          │     → Data Router → Forge Historian, MES, CMMS, NMS
           ├─→ MQTT publisher (JSON + optional SparkplugB)
           │     → whk/whk01/{area}/ot/tags/{path} (real-time values)
           │     → whk/whk01/{area}/ot/alarms/{id} (alarm state)
           │     → whk/whk01/{area}/ot/health/{plc} (connection health)
           │     → whk/whk01/{area}/equipment/* (takeover from Ignition)
-          │     → Consumers: dashboards, decision systems, NextTrend MQTT connector
+          │     → Consumers: dashboards, decision systems, Forge Historian MQTT connector
           ├─→ RabbitMQ (structured events for cross-module workflows)
           └─→ Alarm engine (ISA-18.2 state tracking)
 
@@ -353,7 +353,7 @@ Full analysis in `COMPETITIVE_ANALYSIS.md`. Key findings:
 
 Ignition is not a single product — it's a platform with Tag System, Perspective, Vision, Tag Historian, SQL Bridge, Alarm Notification, Reporting, SFC, WebDev, EAM, and Gateway Network. Plus third-party modules from Sepasoft (Batch, OEE, Track & Trace) and Cirrus Link (MQTT Engine/Transmission/Distributor).
 
-**Forge's response:** Most Ignition modules map to existing or planned Forge modules. The OT Module specifically replaces: Tag System, SQL Bridge, Alarm Notification, WebDev, and the Cirrus Link MQTT stack. Perspective/Vision → P9 OT UI Builder. Tag Historian → NextTrend. Batch → whk-mes. EAM → Forge Hub. Gateway Network → gRPC transport.
+**Forge's response:** Most Ignition modules map to existing or planned Forge modules. The OT Module specifically replaces: Tag System, SQL Bridge, Alarm Notification, WebDev, and the Cirrus Link MQTT stack. Perspective/Vision → P9 OT UI Builder. Tag Historian → Forge Historian. Batch → whk-mes. EAM → Forge Hub. Gateway Network → gRPC transport.
 
 ### 7.2 Ignition's Weaknesses (Forge Advantages)
 
@@ -398,7 +398,7 @@ Based on competitive analysis, the Forge OT Module implements a **9-type tag eng
 | 6 | **Reference** | Alias to another tag | Source tag change | Reference Tag |
 | 7 | **Computed** ★ | Multi-source aggregation (avg, sum, min, max across tag set) | Any source change | **No equiv** |
 | 8 | **Event** ★ | External event (MQTT message, RabbitMQ, webhook) | Event arrival | **No equiv** |
-| 9 | **Virtual** ★ | External data source (NextTrend, REST API, external DB) | Poll or on-demand | **No equiv** |
+| 9 | **Virtual** ★ | External data source (Forge Historian, REST API, external DB) | Poll or on-demand | **No equiv** |
 
 ★ = Forge-exclusive tag types
 
@@ -427,8 +427,8 @@ Template: VFD_Drive
     stall:       threshold on speed_feedback, priority=CRITICAL, setpoint=0.0, delay=5s
 
   History:
-    speed_feedback:  sample_mode=on_change, deadband=0.5, publish_to=[nexttrend, mqtt]
-    output_current:  sample_mode=periodic, interval=5s, publish_to=[nexttrend]
+    speed_feedback:  sample_mode=on_change, deadband=0.5, publish_to=[forge_historian, mqtt]
+    output_current:  sample_mode=periodic, interval=5s, publish_to=[forge_historian]
 ```
 
 ### 8.3 Tag Provider Architecture
@@ -444,7 +444,7 @@ Tag Engine
 +-- Expression Provider
 +-- Query Provider
 +-- Event Provider (MQTT/RabbitMQ/webhook triggers)
-+-- Virtual Provider (NextTrend/external DB/REST API)
++-- Virtual Provider (Forge Historian/external DB/REST API)
 ```
 
 ### 8.4 OPC-UA Address Space Exposure (i3X-Compliant)
@@ -457,7 +457,7 @@ The OT Module exposes the full PLC tag structure via a REST API modeled on the *
 2. **Object Types** — `GET /api/v1/ot/objecttypes?namespace=plc200` → equipment types from address space (e.g., VFD_Drive, AnalogInstrument)
 3. **Browse/Objects** — `GET /api/v1/ot/objects?namespace=plc200&path=Fermentation/` → child nodes, data types, access levels (i3X object instances)
 4. **Values** — `GET /api/v1/ot/objects/value?path=...` → live value preview without creating subscription
-5. **History** — `GET /api/v1/ot/objects/history?path=...&start=...&end=...` → historical values (delegated to NextTrend)
+5. **History** — `GET /api/v1/ot/objects/history?path=...&start=...&end=...` → historical values (delegated to Forge Historian)
 6. **Subscriptions** — `GET /api/v1/ot/subscriptions` (SSE) → real-time value streaming for consuming apps
 
 **Additional Forge-specific capabilities:**
@@ -644,7 +644,7 @@ The `forge.sdk.scripting` engine handles: decorator discovery, handler registrat
 | Control write causes equipment damage | CRITICAL | LOW | Safety interlock layer, audit trail, role-based auth, phased rollout by area |
 | Ignition decommission too aggressive | HIGH | MEDIUM | Ignition bridge adapter allows parallel operation |
 | Tag structure mismatch (Ignition ↔ OPC-UA native) | MEDIUM | HIGH | Tag mapping phase with automated discovery |
-| NextTrend data gap during transition | MEDIUM | MEDIUM | Dual-write: both Ignition→NextTrend and OT Module→NextTrend during bridge period |
+| Forge Historian data gap during transition | MEDIUM | MEDIUM | Dual-write: both Ignition→Forge Historian and OT Module→Forge Historian during bridge period |
 | Operator resistance to new HMI | HIGH | HIGH | P9 (OT UI Builder) is separate and later; operators keep Ignition screens during OT Module build |
 | Network security (IEC 62443) gaps | HIGH | HIGH | FortiGate OT license activation, zone enforcement hardening |
 | Scripting engine complexity underestimated | HIGH | MEDIUM | Phase 2B dedicated to scripting engine; `forge.*` SDK designed incrementally (tag, db, net modules first) |
@@ -706,7 +706,7 @@ The `forge.sdk.scripting` engine handles: decorator discovery, handler registrat
 - ISA-18.2 alarm state machine implementation
 - Alarm priorities, acknowledgment, suppression, shelving
 - Alarm → CMMS work order integration (RabbitMQ event)
-- Alarm → NextTrend annotation, Alarm → MQTT topic publishing
+- Alarm → Forge Historian annotation, Alarm → MQTT topic publishing
 - Alarm pipeline scripts via @forge.on_alarm
 - **Gate:** Alarm lifecycle tests pass, CMMS receives work order events
 
@@ -742,7 +742,7 @@ The `forge.sdk.scripting` engine handles: decorator discovery, handler registrat
 
 1. **Deployment model:** On-premise Docker container? Edge gateway? Both?
 2. **Certificate management:** Internal PKI or third-party CA for OPC-UA TLS?
-3. **Tag retention policy:** How much L83 history to backfill into NextTrend?
+3. **Tag retention policy:** How much L83 history to backfill into Forge Historian?
 4. **Alarm notification routing:** Email? SMS? Mobile push? Web dashboard?
 5. **Safety interlock validation:** Requires WHK safety team sign-off — when?
 6. **IEC 62443 compliance scope:** Is this P7 or separate initiative?
@@ -774,8 +774,8 @@ The `forge.sdk.scripting` engine handles: decorator discovery, handler registrat
 ### Cross-Module Integration
 - `/whk-mes/docs/features/mqtt-integration/uns-mqtt-specification.md` — MES UNS architecture
 - `/whk-mes/docs/features/changeover/ignition-changeover-integration.md` — S88 changeover
-- `/next-trend/crates/nexttrend-ingest/src/opcua/connector.rs` — Rust OPC-UA connector
-- `/next-trend/ignition/gateway/` — Ignition historian module (Java)
+- `/forge-historian/crates/forge_historian-ingest/src/opcua/connector.rs` — Rust OPC-UA connector
+- `/forge-historian/ignition/gateway/` — Ignition historian module (Java)
 - `/net-topology/` — 922 devices, OT network topology
 
 ### Infrastructure Documentation

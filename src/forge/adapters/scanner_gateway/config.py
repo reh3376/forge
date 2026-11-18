@@ -36,7 +36,7 @@ class ScannerGatewayConfig(BaseModel):
         description="Adapter ID of the WMS spoke for barrel scan routing.",
     )
     ims_adapter_id: str | None = Field(
-        default="bosc-ims",
+        default="forge-ims",
         description="Adapter ID of the IMS spoke for asset scan routing.",
     )
     qms_adapter_id: str | None = Field(

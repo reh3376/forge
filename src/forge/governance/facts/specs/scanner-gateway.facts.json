@@ -109,7 +109,7 @@
         "required": false,
         "secret": false,
         "description": "Adapter ID of the IMS spoke for asset scan routing. When null, INSPECTION/INVENTORY route to WMS only and asset operations are unroutable.",
-        "default": "bosc-ims"
+        "default": "forge-ims"
       },
       {
         "name": "qms_adapter_id",
@@ -386,10 +386,19 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "f692cd5caa38a5239a26709e3ec5372f9ece53f83e2213762e2dbc2332eff85e",
+    "spec_hash": "5710afeb7910e8dd720f69b2a9e9f4692bdb7f47b4a2828fbbff35e352673a85",
     "hash_state": "approved",
-    "previous_hash": "615a953528ce0d474995fbbb6f765be781b2cb620075e18a008e7175827d7cf4",
+    "previous_hash": "f692cd5caa38a5239a26709e3ec5372f9ece53f83e2213762e2dbc2332eff85e",
     "change_history": [
+      {
+        "previous_hash": "f692cd5caa38a5239a26709e3ec5372f9ece53f83e2213762e2dbc2332eff85e",
+        "new_hash": "5710afeb7910e8dd720f69b2a9e9f4692bdb7f47b4a2828fbbff35e352673a85",
+        "changed_at": "2026-11-18T16:45:23Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "Owner review 2026-11-18: the inventory module is Forge's own, forge-ims"
+      },
       {
         "previous_hash": "615a953528ce0d474995fbbb6f765be781b2cb620075e18a008e7175827d7cf4",
         "new_hash": "f692cd5caa38a5239a26709e3ec5372f9ece53f83e2213762e2dbc2332eff85e",
@@ -407,18 +416,9 @@
         "changed_by": "claude-code",
         "change_type": "structural",
         "reason": "FB-090: time_governance section (one clock, D-9 step 4). Awaiting owner approval."
-      },
-      {
-        "previous_hash": "b5ffbfaa4b7b4e4bbd7eb4a75135aecce494f2528e95b80f4b8f2d3c3ce15827",
-        "new_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",
-        "changed_at": "2026-10-17T04:48:26Z",
-        "source": "agent",
-        "changed_by": "claude-code",
-        "change_type": "structural",
-        "reason": "FB-080: schema conformance. context_mapping.routing_rules and error_handling.scan_rejection moved to metadata (adapter-specific, outside the FACTS contract); dead_letter fields renamed to the schema's (destination\u2192topic, retention_days\u2192max_age_hours = days\u00d724); draft-era integrity notes (state 'draft', created_at, spec_author, notes) moved to metadata.spec_*. Adapter behaviour unchanged. Awaiting owner approval."
       }
     ],
     "approved_by": "reh3376",
-    "approved_at": "2026-11-18T15:34:28Z"
+    "approved_at": "2026-11-18T16:48:53Z"
   }
 }

@@ -576,7 +576,7 @@ const doc = new Document({
           { text: "Method: ", bold: true },
           { text: "history_read(node_id, start_time, end_time, num_values)", font: "Consolas", size: 20 },
         ]),
-        bodyText("Delegates to asyncua\u2019s Node.read_raw_history() for retrieving historical data from PLCs that support the OPC-UA History service. Each returned DataValue passes through the converter layer. In practice, most historical data comes from NextTrend rather than PLC-side history, but this service provides direct PLC access when needed."),
+        bodyText("Delegates to asyncua\u2019s Node.read_raw_history() for retrieving historical data from PLCs that support the OPC-UA History service. Each returned DataValue passes through the converter layer. In practice, most historical data comes from Forge Historian rather than PLC-side history, but this service provides direct PLC access when needed."),
 
         new Paragraph({ children: [new PageBreak()] }),
 
@@ -680,7 +680,7 @@ const doc = new Document({
         ], "numbers3"),
         numberedRuns([
           { text: "Publishes to MQTT ", bold: true },
-          "for fan-out to downstream consumers (MES, WMS, NextTrend, dashboards) as enriched ContextualRecords.",
+          "for fan-out to downstream consumers (MES, WMS, Forge Historian, dashboards) as enriched ContextualRecords.",
         ], "numbers3"),
 
         bodyText("The gRPC transport is bidirectional but asymmetric: the hub sends commands (request/response), while the spoke streams telemetry (server-streaming). This maps naturally to the OPC-UA client\u2019s role as a protocol bridge between PLC wire protocol and the Forge data plane."),
@@ -760,7 +760,7 @@ const doc = new Document({
             new TableRow({ children: [
               cell(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "5", font: "Arial", size: 20, color: C.darkGray })] }), 800),
               cell(new Paragraph({ children: [new TextRun({ text: "GET /api/v1/ot/objects/history", font: "Consolas", size: 18, color: C.darkGray })] }), 2600),
-              cell(new Paragraph({ children: [new TextRun({ text: "Historical values, delegated to NextTrend historian for time-series data. Falls back to OpcUaClient.history_read() for PLC-side history.", font: "Arial", size: 20, color: C.darkGray })] }), 5960),
+              cell(new Paragraph({ children: [new TextRun({ text: "Historical values, delegated to Forge Historian historian for time-series data. Falls back to OpcUaClient.history_read() for PLC-side history.", font: "Arial", size: 20, color: C.darkGray })] }), 5960),
             ] }),
             new TableRow({ children: [
               cell(new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "6", font: "Arial", size: 20, color: C.darkGray })] }), 800),
@@ -845,7 +845,7 @@ const doc = new Document({
 
         bodyText("The 9-type tag engine sits between the OPC-UA client and the i3X API, providing the semantic enrichment layer that transforms raw protocol data into meaningful manufacturing context. The Standard (OPC) tag type maps directly to OpcUaClient operations, while the other 8 types (Memory, Expression, Query, Derived, Reference, Computed, Event, Virtual) add intelligence that doesn\u2019t exist at the protocol layer."),
 
-        bodyText("The i3X browse API never calls the OpcUaClient directly. It queries the tag engine, which may fulfill the request from cache, from a live OPC-UA read, from a computed expression, or from an entirely different source (NextTrend, external database, MQTT event). This indirection is what makes the i3X API general-purpose: it exposes the full tag space, not just the OPC-UA address space."),
+        bodyText("The i3X browse API never calls the OpcUaClient directly. It queries the tag engine, which may fulfill the request from cache, from a live OPC-UA read, from a computed expression, or from an entirely different source (Forge Historian, external database, MQTT event). This indirection is what makes the i3X API general-purpose: it exposes the full tag space, not just the OPC-UA address space."),
 
         new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("8.3 The Converter Layer as Replaceable Seam")] }),
 
@@ -975,8 +975,8 @@ const doc = new Document({
           "Threshold alarms, state-change events, notification routing, alarm shelving.",
         ], "bullets6"),
         bulletRuns([
-          { text: "Phase 3 \u2014 History & NextTrend Integration: ", bold: true },
-          "Tag history configuration, NextTrend historian publish pipeline, LTTB downsampling.",
+          { text: "Phase 3 \u2014 History & Forge Historian Integration: ", bold: true },
+          "Tag history configuration, Forge Historian historian publish pipeline, LTTB downsampling.",
         ], "bullets6"),
         bulletRuns([
           { text: "Phase 4 \u2014 Python Scripting Engine: ", bold: true },

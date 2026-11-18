@@ -311,7 +311,7 @@ class TestVirtualTag:
     def test_creation(self):
         tag = VirtualTag(
             path="test/virtual",
-            source_type="nexttrend",
+            source_type="forge_historian",
             source_config={"tag_path": "WH/WHK01/temp", "aggregation": "avg_24h"},
         )
         assert tag.tag_type == TagType.VIRTUAL
@@ -382,7 +382,7 @@ class TestTagUnion:
             {
                 "tag_type": "virtual",
                 "path": "WH/avg",
-                "source_type": "nexttrend",
+                "source_type": "forge_historian",
                 "source_config": {"tag": "WH/temp"},
             }
         )

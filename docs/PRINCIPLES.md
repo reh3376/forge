@@ -105,7 +105,7 @@ The FACTS schema is the source of truth for the vocabulary (`adapter_identity.ti
 | OT | PLC, SCADA, HMI, DCS, RTU | OPC UA, MQTT Sparkplug B, Modbus TCP, EtherNet/IP, PROFINET | High-frequency time series, real-time, deterministic |
 | MES/MOM | MES, QMS, WMS, LIMS, CMMS, EBR | REST, GraphQL, database, OData, message topics | Transactions with batch/lot context, quality records |
 | ERP/Business | ERP, SCM, CRM, PLM, BI, HRM | REST, OData, RFC/BAPI, database, GraphQL | Master data, financial transactions, planning, low frequency |
-| Historian | PI, AVEVA, PHD, Canary, InfluxDB, NextTrend | Vendor APIs, REST, bulk export | Time-series archive, high-volume backfill |
+| Historian | PI, AVEVA, PHD, Canary, InfluxDB, Forge Historian | Vendor APIs, REST, bulk export | Time-series archive, high-volume backfill |
 | Document | SharePoint, file shares, DMS, email | WebDAV, Graph API, IMAP, filesystem | Unstructured; metadata extraction, classification |
 
 The OT tier's vocabulary gap in FACTS v0.1.0 is decision D-8 (FB-079).
@@ -146,8 +146,8 @@ Forge is industry-general; the Whiskey House (WHK) deployment is its reference i
 | forge-qms | New build (Intellect QMS integration service and the ISO planning repo as scope references) | Intellect QMS: document control, CAPA, audits, GRC |
 | ERP connector | `forge-integ-erp-netsuite` (bidirectional NetSuite sync, 38 RabbitMQ topics, outbox pattern) | — |
 | NMS | `net-topology` (SNMP/LLDP discovery, topology, FortiAnalyzer) | — |
-| NextTrend (historian) | `nexttrend` (Rust, QuestDB; MQTT/Sparkplug/OPC-UA ingestion) | Canary / PI |
-| IMS | `bosc_ims` (Go + gRPC, Python sidecar) | Aerospace supply-chain inventory; the compliance-enforcing spoke |
+| Forge Historian (historian) | `forge_historian` (Rust, QuestDB; MQTT/Sparkplug/OPC-UA ingestion) | Canary / PI |
+| IMS | `forge_ims` (Go + gRPC, Python sidecar) | Aerospace supply-chain inventory; the compliance-enforcing spoke |
 | Scanner gateway | `forge-wms-android` | OT-tier QR scanner spoke |
 | OT UI builder | Future, after the OT module matures | Ignition Perspective (user-built HMI screens) |
 
@@ -166,8 +166,8 @@ Spokes were ranked in April 2026 on five weighted factors: business value (×3),
 | 2 | CMMS (forge-cmms) | 36 | Adapter done; spec re-stamped, awaiting approval |
 | 3 | NMS (net-topology) | 35 | Adapter done; spec re-stamped, awaiting approval |
 | 4 | Scanner gateway | 26 | Adapter done; spec re-stamped, awaiting approval |
-| 5 | NextTrend | 27 | Adapter done; spec re-stamped, awaiting approval |
-| 6 | IMS (bosc_ims) | 23 | Adapter done; spec approved (no approver recorded) |
+| 5 | Forge Historian | 27 | Adapter done; spec re-stamped, awaiting approval |
+| 6 | IMS (forge_ims) | 23 | Adapter done; spec approved (no approver recorded) |
 | 7 | OT module (new build) | 30 | Built as forge-ot; spec waits on FB-079 (D-8 decided 2026-11-03) |
 | 8 | QMS module (new build) | 28 | Not started |
 | 9 | OT UI builder | 17 | Superseded by forge-display (A-3) |

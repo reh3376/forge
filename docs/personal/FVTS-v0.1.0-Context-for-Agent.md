@@ -145,7 +145,7 @@ The OT module (`src/forge/modules/ot/`) already has an ISA-18.2 alarm state mach
 - MDEMG (Roger's Go-based memory/reasoning system) sits **alongside** `forge_core`, federated by entity reference.
 - Normal Forge principle: **the hub owns all databases; modules never own DB connections** (MDEMG is a deliberate exception). → FVTS history queries go through forge-core, not module-owned stores.
 - Transport between `forge_core` and MDEMG uses FxTS frameworks extended for bidirectional messaging.
-- TimescaleDB CE is the dev-stage time-series DB; NextTrend's QuestDB consolidates into `forge_core`. → FVTS server-side decimation will run against forge-core's TSDB.
+- TimescaleDB CE is the dev-stage time-series DB; Forge Historian's QuestDB consolidates into `forge_core`. → FVTS server-side decimation will run against forge-core's TSDB.
 - **Temporal coherence is a hard requirement**: bitemporal stamping (valid vs transaction time) and as-of queries across the graph↔TSDB boundary. → FVTS includes `history.as_of_queries`.
 - A prior naming collision ("adapter" meaning both LoRA adapter and Forge spoke adapter) taught that new FxTS suites need distinct names early. → FVTS name check (D-1).
 

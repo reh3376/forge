@@ -1,0 +1,42 @@
+{
+  "note": "What the FMTS conformance kit gives this module: a placeholder credential, which its configuration requires and which reaches nothing, and raw source events in the shape of its own tests.",
+  "params": {
+    "api_key": "conformance-kit-placeholder"
+  },
+  "events": [
+    {
+      "tag_meta": {
+        "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "name": "Site01/Area01/Unit01/Temperature",
+        "data_type": "Float64",
+        "unit": "°F",
+        "description": "Column top temperature",
+        "source": "OPC-UA:ns=2;s=Unit01.TIC_100",
+        "retention_tier": "critical-90d",
+        "asset_id": "asset-001"
+      },
+      "value_point": {
+        "ts": "2026-04-07T12:00:00+00:00",
+        "value": 145.7,
+        "quality": 192
+      }
+    },
+    {
+      "tag_meta": {
+        "id": "f47ac10b-58cc-4372-a567-0e02b2c3d480",
+        "name": "Site01/Area01/Unit01/Pressure",
+        "data_type": "Float64",
+        "unit": "psi",
+        "description": "Column pressure",
+        "source": "OPC-UA:ns=2;s=Unit01.PIC_100",
+        "retention_tier": "critical-90d",
+        "asset_id": "asset-001"
+      },
+      "value_point": {
+        "ts": "2026-04-07T07:00:00-05:00",
+        "value": 14.2,
+        "quality": 192
+      }
+    }
+  ]
+}

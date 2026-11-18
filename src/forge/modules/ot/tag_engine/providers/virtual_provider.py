@@ -1,11 +1,11 @@
 """Virtual tag provider — federated reads from external systems.
 
 Forge-exclusive tag type.  VirtualTags read from external sources
-(NextTrend historian, external databases, REST APIs, other Forge
+(Forge Historian historian, external databases, REST APIs, other Forge
 modules) with a TTL cache.  Unlike QueryTags (SQL-only, poll-based),
 Virtual tags support any data source and use a cache-first strategy.
 
-Phase 2A.2 stub: Source-specific fetchers (NextTrend, REST, DB)
+Phase 2A.2 stub: Source-specific fetchers (Forge Historian, REST, DB)
 will be wired in Phase 2A.4 (Context Enrichment).
 """
 
@@ -30,9 +30,9 @@ class VirtualProvider(BaseProvider):
     """Provider for Virtual tags — federated external data access.
 
     Currently a structural stub.  Full implementation requires:
-        - Source-type registry (nexttrend, rest, database, forge_module)
+        - Source-type registry (forge_historian, rest, database, forge_module)
         - Async HTTP client for REST sources
-        - NextTrend client for historian queries
+        - Forge Historian client for historian queries
         - TTL-based cache with background refresh
     """
 

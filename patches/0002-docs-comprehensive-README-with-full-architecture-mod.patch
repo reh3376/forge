@@ -118,10 +118,10 @@ index e69de29..583aae5 100644
 +│   │   │   ├── forge-wms.facts.json
 +│   │   │   ├── whk-mes.facts.json
 +│   │   │   ├── forge-cmms.facts.json
-+│   │   │   ├── bosc-ims.facts.json
++│   │   │   ├── forge-ims.facts.json
 +│   │   │   ├── forge-nms.facts.json
 +│   │   │   ├── forge-integ-erp-netsuite.facts.json
-+│   │   │   ├── next-trend.facts.json
++│   │   │   ├── forge-historian.facts.json
 +│   │   │   └── scanner-gateway.facts.json
 +│   │   └── runners/facts_runner.py
 +│   ├── ftts/                      # Forge Transport Test Suite
@@ -260,10 +260,10 @@ index e69de29..583aae5 100644
 +| `forge-wms` | Warehouse Management (NestJS) | Draft |
 +| `whk-mes` | Manufacturing Execution (NestJS) | Draft |
 +| `forge-cmms` | Computerized Maintenance (n8n) | Draft |
-+| `bosc-ims` | Aerospace Inventory (Go gRPC) | Draft |
++| `forge-ims` | Aerospace Inventory (Go gRPC) | Draft |
 +| `forge-nms` | Network Management (FastAPI) | Draft |
 +| `forge-integ-erp-netsuite` | ERP Integration (NetSuite) | Draft |
-+| `next-trend` | Time-Series Historian (Rust) | Draft |
++| `forge-historian` | Time-Series Historian (Rust) | Draft |
 +| `scanner-gateway` | Android Barcode Scanner | Draft |
 +
 +## OT Module (Phases 1-6)
@@ -306,10 +306,10 @@ index e69de29..583aae5 100644
 +| forge-wms | `WhiskeyHouse/forge-wms` | NestJS + Next.js | Warehouse Management |
 +| WHK-MES | `WhiskeyHouse/whk-mes` | NestJS + Next.js | Manufacturing Execution |
 +| forge-cmms | `reh3376/forge-cmms` | n8n + API | Maintenance Management |
-+| BOSC-IMS | `reh3376/bosc_ims` | Go + gRPC | Aerospace Inventory |
++| IMS-IMS | `reh3376/forge_ims` | Go + gRPC | Aerospace Inventory |
 +| forge-nms | `WhiskeyHouse/net-topology` | FastAPI + Next.js | Network Management |
 +| forge-integ-erp-netsuite | `reh3376/forge-integ-erp-netsuite` | Python | ERP Integration (NetSuite) |
-+| NextTrend | `TheThoughtagen/nexttrend` | Rust + Next.js | Time-Series Historian |
++| Forge Historian | a reference application | Rust + Next.js | Time-Series Historian |
 +| Scanner Gateway | `WhiskeyHouse/forge-wms-android` | Kotlin | Android Barcode Scanner |
 +| Ignition SCADA | `WhiskeyHouse/whk-ignition-scada` | Ignition 8.x | SCADA/HMI (being replaced) |
 +| Ignition Global | `WhiskeyHouse/whk-distillery01-ignition-global` | Jython 2.7 | Middleware scripts (being migrated) |

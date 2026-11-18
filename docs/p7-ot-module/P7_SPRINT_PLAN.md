@@ -15,7 +15,7 @@
 | **Scripting Language** | Python 3.12+ (replaces Ignition's Jython 2.7) |
 | **Estimated Sprints** | 22–26 (across 7 phases) |
 | **Estimated Duration** | 10–14 months |
-| **Dependencies** | opcua-asyncio (reference only), Forge core models, NextTrend historian, forge-mes MQTT, forge-cmms asset registry |
+| **Dependencies** | opcua-asyncio (reference only), Forge core models, Forge Historian historian, forge-mes MQTT, forge-cmms asset registry |
 | **FACTS Spec** | `ot-module.facts.json` (to be created in Phase 1) |
 | **FTTS Spec** | `grpc-hardened-transport.ftts.json` (existing, shared) |
 | **Research Doc** | `docs/p7-ot-module/P7_RESEARCH_SUMMARY.md` |
@@ -69,7 +69,7 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 | HMI/Operator UI | OT UI Builder (P9) | Future — depends on OT Module maturity |
 | CMMS (work orders, equipment registry) | forge-cmms | Existing (P2 adapter done) |
 | MES (recipes, production orders, changeover) | forge-mes | Existing (adapter done) |
-| Time-series historian | NextTrend | Existing (P5 adapter done) |
+| Time-series historian | Forge Historian | Existing (P5 adapter done) |
 | Barrel printing / WMS | forge-wms | Existing (adapter done) |
 | Network monitoring | net-topology (NMS) | Existing (P3 adapter done) |
 
@@ -101,7 +101,7 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 | FACTS runner (vocabulary enforcement) | ✅ Complete | Phase 1 |
 | FTTS transport (grpc-hardened-transport) | ✅ Complete | Phase 2 |
 | forge-cmms adapter (equipment context) | ✅ Complete (P2) | Phase 3 (alarm→work order) |
-| NextTrend historian (time-series storage) | ✅ Complete (P5) | Phase 2 (data flow validation) |
+| Forge Historian historian (time-series storage) | ✅ Complete (P5) | Phase 2 (data flow validation) |
 | forge-mes MQTT integration (changeover) | ✅ Complete | Phase 5 (bridge period) |
 
 ### External (must be arranged)
@@ -119,7 +119,7 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 |----------|------------------|------|
 | OT UI Builder (P9) | i3X API, live tag values, alarm state, forge.* SDK | After Phase 3 |
 | CMMS auto-work-orders | Alarm events via RabbitMQ + @forge.on_alarm scripts | Phase 3 |
-| NextTrend direct ingestion | MQTT tag value publishing + REST batch write | Phase 2B |
+| Forge Historian direct ingestion | MQTT tag value publishing + REST batch write | Phase 2B |
 | MES recipe loading | Direct OPC-UA write path (replaces MQTT) | Phase 4 |
 | Custom integrations | forge.api.route REST endpoints (replaces WebDev) | Phase 2B |
 | Dashboards/decision systems | MQTT tag value/alarm/health topics | Phase 2B |
@@ -195,7 +195,7 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 | 2A.2.4 | Expression Provider | `ExpressionProvider`: evaluates Python expressions referencing other tags. Dependency tracking for re-evaluation on change |
 | 2A.2.5 | Query Provider | `QueryProvider`: executes SQL queries against configured databases on poll interval. Async with connection pooling |
 | 2A.2.6 | Event Provider | `EventProvider`: receives values from MQTT messages, RabbitMQ events, or webhooks. Sets tag value on event arrival |
-| 2A.2.7 | Virtual Provider | `VirtualProvider`: fetches from external sources (NextTrend history API, external DBs, REST APIs) with TTL cache |
+| 2A.2.7 | Virtual Provider | `VirtualProvider`: fetches from external sources (Forge Historian history API, external DBs, REST APIs) with TTL cache |
 
 #### Epic 2A.3: Tag Templates & i3X-Compliant Browse API (Sprint 6)
 
@@ -207,7 +207,7 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 | 2A.3.4 | i3X Namespaces API | `GET /api/v1/ot/namespaces` → list PLC connections as i3X namespaces. Based on CESMII i3X spec (https://github.com/cesmii/i3X), adapted to FxTS governance. Avoids inventing a custom browse API |
 | 2A.3.5 | i3X Object Types API | `GET /api/v1/ot/objecttypes?namespace=plc200` → equipment types from OPC-UA address space (maps to i3X ObjectType model) |
 | 2A.3.6 | i3X Browse/Objects API | `GET /api/v1/ot/objects?namespace=plc200&path=Fermentation/` → child nodes, data types, access levels (i3X object instances). Address space cache with configurable refresh (default 5min), invalidate on reconnect |
-| 2A.3.7 | i3X Values/History API | `GET /api/v1/ot/objects/value?path=...` → live value preview. `GET /api/v1/ot/objects/history?path=...` → delegated to NextTrend |
+| 2A.3.7 | i3X Values/History API | `GET /api/v1/ot/objects/value?path=...` → live value preview. `GET /api/v1/ot/objects/history?path=...` → delegated to Forge Historian |
 | 2A.3.8 | i3X Subscriptions (SSE) | `GET /api/v1/ot/subscriptions` → SSE stream for real-time value changes. Standard i3X subscription model for consuming apps |
 | 2A.3.9 | Tag discovery | `POST /api/v1/ot/discover?namespace=plc200&recursive=true` → auto-create Standard tag definitions from PLC address space using i3X browse results |
 
@@ -269,7 +269,7 @@ The scripting engine is a new sub-package within the existing `forge.sdk` — NO
 | 2B.3.3 | Tag value publishing | On each tag value change → publish JSON payload `{value, quality, timestamp, engineering_units, equipment_id}` to tag topic. Configurable QoS (default 0 for high-freq, 1 for critical), configurable retain |
 | 2B.3.4 | Health topic publishing | PLC connection state → `whk/whk01/{area}/ot/health/{plc_id}` (retained, QoS 1) |
 | 2B.3.5 | Equipment status takeover | Publish to `whk/whk01/{area}/equipment/cipState`, `mode`, `faultActive` etc. — taking over Ignition's current role |
-| 2B.3.6 | Optional SparkplugB encoding | BIRTH/DATA/DEATH message encoding for NextTrend SparkplugB connector |
+| 2B.3.6 | Optional SparkplugB encoding | BIRTH/DATA/DEATH message encoding for Forge Historian SparkplugB connector |
 | 2B.3.7 | MQTT subscriber | Subscribe to MES topics (`recipe/next`, `changeover/state`) — command ingestion for Phase 4 write translation |
 | 2B.3.8 | Publish rate limiting | Configurable per-tag throttle to prevent broker overload with 1000+ tag subscriptions |
 
@@ -279,11 +279,11 @@ The scripting engine is a new sub-package within the existing `forge.sdk` — NO
 |---|------|---------|
 | 2B.4.1 | Async record pipeline | `collect()` → async generator yielding ContextualRecords from all tag types (not just OPC-UA) |
 | 2B.4.2 | Hub transport integration | gRPC protobuf binary transport to Forge hub (via GrpcTransportAdapter) |
-| 2B.4.3 | NextTrend dual-path | Publish to NextTrend via both REST API (batch write) AND MQTT (for NextTrend MQTT connector) |
+| 2B.4.3 | Forge Historian dual-path | Publish to Forge Historian via both REST API (batch write) AND MQTT (for Forge Historian MQTT connector) |
 | 2B.4.4 | SQL Bridge equivalent | Bidirectional DB ↔ tag sync: Query tags read from DB, timer scripts write tags to DB. Replaces Ignition SQL Bridge transaction groups |
 | 2B.4.5 | MQTT fan-out integration test | Mock PLC → OT Module → MQTT broker → test subscriber validates correct topics/payloads |
 | 2B.4.6 | Script integration test | Script with @forge.on_tag_change → reads tag → writes Memory tag → triggers Expression tag re-eval |
-| 2B.4.7 | End-to-end pipeline test | Mock PLC → Tag Engine → Scripts → ContextualRecord → Hub + MQTT + NextTrend (all output paths) |
+| 2B.4.7 | End-to-end pipeline test | Mock PLC → Tag Engine → Scripts → ContextualRecord → Hub + MQTT + Forge Historian (all output paths) |
 | 2B.4.8 | Performance test | 100+ tags, 10+ scripts, measure: latency, throughput, script execution time, memory |
 
 **Gate 2B:** forge.* SDK functional with all 6 modules. Scripts register via decorators, execute on triggers, produce correct side effects. MQTT fan-out working with tag values on correct topics. SQL Bridge equivalent demonstrated (DB ↔ tag bidirectional sync). Scripts testable via pytest outside the runtime. MQTT publish latency <100ms (p95).
@@ -322,7 +322,7 @@ The scripting engine is a new sub-package within the existing `forge.sdk` — NO
 | 3.3.1 | Alarm → MQTT publishing | Publish alarm state changes to `whk/whk01/{area}/ot/alarms/{alarm_id}` (retained, QoS 1). Payload includes: state, priority, tag_path, value, setpoint, timestamp, equipment_id. Enables dashboards to show live alarm status |
 | 3.3.2 | Alarm → RabbitMQ events | Structured alarm events to RabbitMQ for cross-module workflows |
 | 3.3.3 | Alarm → CMMS work order | CRITICAL/HIGH alarms auto-create work requests in CMMS via adapter |
-| 3.3.4 | Alarm → NextTrend annotation | Alarm events written as annotations on corresponding tag history |
+| 3.3.4 | Alarm → Forge Historian annotation | Alarm events written as annotations on corresponding tag history |
 | 3.3.5 | Alarm REST API | CRUD for alarm config, query for active/historical alarms, acknowledge endpoint |
 | 3.3.6 | Alarm ContextualRecord | Alarm events produce ContextualRecords with alarm-specific context fields |
 | 3.3.7 | Alarm MQTT acknowledge | Subscribe to `whk/whk01/{area}/ot/alarms/{alarm_id}/ack` — allows remote alarm acknowledgment from dashboard/mobile (with auth token in payload) |
@@ -502,7 +502,7 @@ Each area follows the same pattern as Epic 7.1: subscribe → migrate alarms →
 - MQTT subscriber → command parser → control write queue
 - Alarm engine → MQTT alarm topic + RabbitMQ → CMMS adapter → @forge.on_alarm script
 - Control write → OPC-UA write → read-back confirmation → MQTT audit topic
-- Full pipeline: mock PLC → Tag Engine → Scripts → ContextualRecord → Hub + MQTT + NextTrend
+- Full pipeline: mock PLC → Tag Engine → Scripts → ContextualRecord → Hub + MQTT + Forge Historian
 
 **Target:** 75+ integration tests. All gates require integration test passage.
 
@@ -514,7 +514,7 @@ Each area follows the same pattern as Epic 7.1: subscribe → migrate alarms →
 - Dual-write data consistency (OT Module vs. Ignition bridge)
 - Alarm lifecycle: trigger → acknowledge → clear cycle on real equipment
 - Control write: operator action on real PLC via OT Module
-- Data continuity: NextTrend trending shows no gap between Ignition and OT Module data
+- Data continuity: Forge Historian trending shows no gap between Ignition and OT Module data
 - Performance: 1000+ tags at <500ms latency (p95)
 - Script migration parity: converted scripts produce identical outputs to Ignition Jython originals
 
@@ -577,7 +577,7 @@ Each area follows the same pattern as Epic 7.1: subscribe → migrate alarms →
 | R1 | OPC-UA library fails on L82E firmware edge case | HIGH | MEDIUM | Phase 1 dedicated to library hardening; fallback to opcua-asyncio direct dependency if custom fork too costly |
 | R2 | Control write causes equipment damage | CRITICAL | LOW | Safety interlock layer, write-back confirmation, role-based auth, phased area rollout, operator training |
 | R3 | Tag path mapping errors (Ignition ↔ OPC-UA native) | MEDIUM | HIGH | Automated discovery comparison tool (Epic 5.2.3), dual-write validation |
-| R4 | NextTrend data gap during migration | MEDIUM | MEDIUM | Dual-write: both Ignition→NextTrend and OT Module→NextTrend during bridge period |
+| R4 | Forge Historian data gap during migration | MEDIUM | MEDIUM | Dual-write: both Ignition→Forge Historian and OT Module→Forge Historian during bridge period |
 | R5 | Operator resistance to change | HIGH | HIGH | OT UI Builder (P9) is separate; operators keep Ignition HMI screens until P9 delivers replacement |
 | R6 | PLC network access denied (firewall/security) | HIGH | MEDIUM | Coordinate with WHK IT early; document FortiGate rule requirements in Phase 1 |
 | R7 | Alarm flood on initial connection | MEDIUM | HIGH | Alarm flood suppression in Phase 3; configurable shelving on first connect |
@@ -605,8 +605,8 @@ Each area follows the same pattern as Epic 7.1: subscribe → migrate alarms →
 | Ignition Global | `/whk-distillery01-ignition-global/` | 57 modules, 1,539 Python files |
 | MES UNS Spec | `/forge-mes/docs/features/mqtt-integration/uns-mqtt-specification.md` | MQTT integration |
 | MES Changeover | `/forge-mes/docs/features/changeover/ignition-changeover-integration.md` | S88 state machine |
-| NextTrend OPC-UA | `/next-trend/crates/nexttrend-ingest/src/opcua/connector.rs` | Rust OPC-UA reference |
-| NextTrend Ignition Module | `/next-trend/ignition/gateway/` | Java collector/connection patterns |
+| Forge Historian OPC-UA | `/forge-historian/crates/forge_historian-ingest/src/opcua/connector.rs` | Rust OPC-UA reference |
+| Forge Historian Ignition Module | `/forge-historian/ignition/gateway/` | Java collector/connection patterns |
 | OT Architecture | `/iso-planning/10-infra-discovery/01-ot-architecture.md` | PLC inventory, network layout |
 | Network Topology | `/iso-planning/10-infra-discovery/03-network-topology.md` | VLAN segmentation |
 | OPC-UA/i3X Memory | `.auto-memory/reference_opcua_i3x_stack.md` | Library selection, L82E firmware |
@@ -631,7 +631,7 @@ curl -s http://localhost:9999/v1/health | jq '.ot_module'
 ### Phase 7 (Area Cutover): Revert to Ignition
 Per-area revert procedure:
 1. Re-enable Ignition tag subscriptions for the area
-2. Verify Ignition data flowing to NextTrend
+2. Verify Ignition data flowing to Forge Historian
 3. Disable OT Module subscription for the area
 4. Notify operations team of revert
 5. Investigate root cause before re-attempting cutover

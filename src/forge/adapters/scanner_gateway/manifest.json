@@ -52,7 +52,7 @@
       "description": "Adapter ID of the IMS spoke for asset scan routing",
       "required": false,
       "secret": false,
-      "default": "bosc-ims"
+      "default": "forge-ims"
     },
     {
       "name": "qms_adapter_id",
@@ -88,7 +88,7 @@
     "scan_types": 12,
     "routing_targets": [
       "forge-wms",
-      "bosc-ims",
+      "forge-ims",
       "qms (future)"
     ],
     "offline_capable": true,

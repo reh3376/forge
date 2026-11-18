@@ -121,7 +121,7 @@ _PROTECTED_SCHEMAS = frozenset(
 )
 
 # Module id → schema naming, shared with migration 002 (BACKLOG FB-004)
-_MODULE_PREFIXES = ("forge-", "whk-")
+_MODULE_PREFIXES = ("forge-",)
 _IDENT = re.compile(r"[a-z_][a-z0-9_]*")
 #: Modules whose schema is not derived from their id. An integration module is named
 #: for its product (``forge-integ-<function>-<product>``, A-17) and keeps the schema of
@@ -472,7 +472,7 @@ class AccessController:
             "forge-integ-erp-netsuite",
             "forge-cmms",
             "forge-nms",
-            "whk-ims",
+            "forge-ims",
         )
         defaults = [(module_id, module_schema(module_id)) for module_id in modules]
 

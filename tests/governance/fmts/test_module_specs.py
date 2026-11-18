@@ -39,6 +39,8 @@ ALLOWED_FAILURES: dict[str, frozenset[str]] = {
     "forge-cmms": frozenset(),
     "forge-integ-erp-netsuite": frozenset(),
     "forge-nms": frozenset(),
+    "forge-historian": frozenset(),
+    "forge-ims": frozenset(),
     "forge-mes": PENDING_APPROVAL | {"fmts:waivers"},
     "ot-module": PENDING_APPROVAL | {"fmts:m2"},
 }
@@ -62,6 +64,8 @@ NOT_RUN: dict[str, frozenset[str]] = {
     "forge-cmms": frozenset(),
     "forge-integ-erp-netsuite": frozenset(),
     "forge-nms": frozenset(),
+    "forge-historian": frozenset(),
+    "forge-ims": frozenset(),
     "forge-mes": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # TypeScript, another process
     "ot-module": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # not on the adapter template
 }
@@ -131,11 +135,16 @@ def test_only_the_interim_bridge_is_not_python_from_the_template() -> None:
     assert {m for m, t in templates.items() if t == "none"} == {"forge-mes", "ot-module"}
     kinds = {m: _load(m)["module_identity"]["kind"] for m in MODULE_IDS}
     assert kinds["forge-mes"] == "management" and kinds["ot-module"] == "ot"
-    management = {"forge-mes", "forge-wms", "forge-cmms", "forge-nms"}
+    management = {
+        "forge-mes",
+        "forge-wms",
+        "forge-cmms",
+        "forge-nms",
+        "forge-historian",
+        "forge-ims",
+    }
     assert {m for m, k in kinds.items() if k == "management"} == management
     assert {m for m, k in kinds.items() if k == "integration"} == {
-        "bosc-ims",
         "forge-integ-erp-netsuite",
-        "next-trend",
         "scanner-gateway",
     }

@@ -33,7 +33,7 @@ class SpokeRouter:
     """
 
     wms_adapter_id: str = "forge-wms"
-    ims_adapter_id: str | None = "bosc-ims"
+    ims_adapter_id: str | None = "forge-ims"
     qms_adapter_id: str | None = None
     _routing_table: dict[str, list[RouteTarget]] = field(
         default_factory=dict,
