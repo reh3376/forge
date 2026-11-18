@@ -90,7 +90,7 @@ note:
 - It turns their output into **one governed record type with manufacturing context attached**.
 - It curates that into **decision-quality data products** with lineage and quality objectives.
 - It renders every operator and management interface **from declarative specifications**.
-- Its own management modules (forge-mes, forge-whs, forge-cmms, forge-ot, …) are **optional**: a site can run Forge purely as the integration and governance layer over the software it already has, or replace that software module by module.
+- Its own management modules (forge-mes, forge-wms, forge-cmms, forge-ot, …) are **optional**: a site can run Forge purely as the integration and governance layer over the software it already has, or replace that software module by module.
 
 **Why it is built, in the owner's words (2026-11-17):** "Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business."
 
@@ -152,7 +152,7 @@ flowchart TD
   S["Site hub (forge-core)<br/>transport · ingest · storage · context · registry<br/>curation · gateway · observer · governance · CLI"]
   E -- "audit up / on demand down" --- S
   S -- "gRPC" --> SP["Spokes<br/>WMS, CMMS, ERP, NMS, scanners, historian"]
-  S -- "gRPC" --> M["Management modules (Go)<br/>forge-mes, forge-whs, forge-cmms"]
+  S -- "gRPC" --> M["Management modules (Go)<br/>forge-mes, forge-wms, forge-cmms"]
   S -- "in-process" --> OT["forge-ot<br/>OPC-UA, alarms, writes, scripting"]
   S -- "FVTS" --> D["forge-display<br/>4 render profiles"]
   OT -. "optional" .- I["Integration modules<br/>forge-ignition · forge-hmi-scada"]
@@ -239,7 +239,7 @@ note:
 | `src/forge/gateway` · `api` · `observer` · `cli` | auth and RBAC middleware, the hub FastAPI app, health, the `forge` CLI |
 | `src/forge/modules/ot` | the OT module: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
 | `src/forge/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
-| `src/forge/adapters` | the eight in-repo spoke adapters (forge-wms, forge-mes, whk-cmms, whk-erpi, whk-nms, bosc-ims, next-trend, scanner-gateway), each with its manifest and config, and four generic adapter stubs |
+| `src/forge/adapters` | the eight in-repo spoke adapters (forge-wms, forge-mes, forge-cmms, forge-erpi, forge-nms, bosc-ims, next-trend, scanner-gateway), each with its manifest and config, and four generic adapter stubs |
 | `go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js) that FB-076 retires |
 | `tests/` | 267 files mirroring `src/`; migration tests read the migration source |
@@ -673,7 +673,7 @@ note:
 | `sample_records` | records the runner validates against the data contract |
 | `integrity` | the FHTS block |
 
-- Nine specs today: forge-wms (the reference), forge-mes, bosc-ims, whk-cmms, whk-erpi, whk-nms, next-trend, scanner-gateway, ot-module.
+- Nine specs today: forge-wms (the reference), forge-mes, bosc-ims, forge-cmms, forge-erpi, forge-nms, next-trend, scanner-gateway, ot-module.
 - The runner validates every spec against the JSON schema first (`facts:schema-valid`) and reads its enums from the schema (FB-080).
 - The developer guide, `docs/governance/facts-developer-guide.md`, walks the schema, how to write a spec, running the runner, common failures and cross-spoke consistency.
 
@@ -1007,7 +1007,7 @@ flowchart LR
 
 - `docs/MODULE_BUILDER.md` is the from-first-principles guide (~20 minutes, no prior Forge knowledge assumed): manifest, config, adapter class, context mapper, record builder, the FACTS spec, testing, CLI and API reference, common patterns, troubleshooting.
 - `src/forge/sdk/module_builder`: manifest builder, scaffolder, generators and its CLI.
-- The reference spoke is `src/forge/adapters/whk_cmms` (adapter, config, context, record builder, topics, entity mappers).
+- The reference spoke is `src/forge/adapters/forge_cmms` (adapter, config, context, record builder, topics, entity mappers).
 
 note:
 - Honest: the templates are adapter-style and backend-only (FB-017), and duplicate SDK copies drift (FB-019). The Go module template does not exist yet (M3).
@@ -1724,7 +1724,7 @@ note:
 | **M3 · Go SDK and the first Go module** | Go module template; forge-mes phase 1 against the hub; `mod_mes`; changeover and MQTT in Go; cut-over | not started |
 | **M4 · forge-display** | renderer scaffold and spike; MES surfaces first, then OT HMI | unblocked 2026-11-03 (D-4 decided) |
 | **M5 · Hub platform hardening** | Context Engine and Schema Registry (done), scoped roles, persistent access control (done), FDTS/FQTS/FSTS from stub to gate | started |
-| **M6 · Enterprise** | hub of hubs, identity methods, offline tokens, Kubernetes, backups and SLOs; forge-cmms and forge-whs in Go; forge-ignition | not started |
+| **M6 · Enterprise** | hub of hubs, identity methods, offline tokens, Kubernetes, backups and SLOs; forge-cmms and forge-wms in Go; forge-ignition | not started |
 
 note:
 - **The order changed on 2026-11-17 (A-14):** forge-display is the first module built, because it builds the frontend of the whole platform, the hub's UI included. The table above and the list below are in the old order until they are redone with the owner (FB-143).
@@ -1998,9 +1998,9 @@ Which systems connect, and what the contract behind each one means to the people
 |---|---|---|
 | forge-wms | warehouse management | inventory, movements, receipts; 14 data sources |
 | forge-mes | manufacturing execution (the interim bridge today, the Go module to come) | orders, batches, recipes, changeover, audit; 18 sources |
-| whk-cmms | maintenance management | equipment, work orders, maintenance events |
-| whk-erpi | ERP integration (NetSuite) | master data, orders, finance |
-| whk-nms | network management | the plant network's topology and health |
+| forge-cmms | maintenance management | equipment, work orders, maintenance events |
+| forge-erpi | ERP integration (NetSuite) | master data, orders, finance |
+| forge-nms | network management | the plant network's topology and health |
 | bosc-ims | aerospace inventory | parts and stock over gRPC |
 | next-trend | time-series historian | archived process history, bulk backfill |
 | scanner-gateway | Android barcode scanners | scans as events |
@@ -2023,7 +2023,7 @@ Each spoke has a **FACTS specification**: what the system is, what it is allowed
 
 | Contract | State today |
 |---|---|
-| all nine: forge-wms, forge-mes, bosc-ims, whk-cmms, whk-erpi, whk-nms, next-trend, scanner-gateway, ot-module | approved by the owner on 2026-11-13, after every contract gained its time-governance declaration |
+| all nine: forge-wms, forge-mes, bosc-ims, forge-cmms, forge-erpi, forge-nms, next-trend, scanner-gateway, ot-module | approved by the owner on 2026-11-13, after every contract gained its time-governance declaration |
 | ot-module | approved, but its contract still fails schema validation until the OT vocabulary is extended (FB-079; decided 2026-11-03) |
 
 note:

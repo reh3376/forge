@@ -1,4 +1,4 @@
-"""Typed configuration for the WHK NMS adapter.
+"""Typed configuration for the Forge NMS adapter.
 
 Connection parameters are declared in the FACTS spec and validated
 by the hub before being passed to configure(). This module provides
@@ -10,10 +10,10 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class WhkNmsConfig(BaseModel):
-    """Connection parameters for the WHK NMS adapter.
+class ForgeNmsConfig(BaseModel):
+    """Connection parameters for the Forge NMS adapter.
 
-    Maps directly to the connection_params in whk-nms.facts.json.
+    Maps directly to the connection_params in forge-nms.facts.json.
     Required params have no default; optional params have sensible defaults.
     """
 

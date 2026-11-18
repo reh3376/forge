@@ -9,8 +9,8 @@ Mappers transform NMS API responses into Forge core models:
 
 from __future__ import annotations
 
-from forge.adapters.whk_nms.mappers.device import map_device
-from forge.adapters.whk_nms.mappers.events import (
+from forge.adapters.forge_nms.mappers.device import map_device
+from forge.adapters.forge_nms.mappers.events import (
     map_alert,
     map_baseline_anomaly,
     map_security_event,

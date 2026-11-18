@@ -99,6 +99,7 @@ def test_every_module_has_an_alias_of_its_own() -> None:
     assert len(set(aliases.values())) == len(MODULE_IDS), aliases
     assert not set(aliases.values()) & set(MODULE_IDS)  # an alias is never another module's id
     assert aliases["forge-wms"] == "wms" and aliases["forge-mes"] == "mes"
+    assert aliases["forge-erpi"] == "erpi"
 
 
 def test_only_the_interim_bridge_is_not_python_from_the_template() -> None:
@@ -106,4 +107,10 @@ def test_only_the_interim_bridge_is_not_python_from_the_template() -> None:
     assert {m for m, t in templates.items() if t == "none"} == {"forge-mes", "ot-module"}
     kinds = {m: _load(m)["module_identity"]["kind"] for m in MODULE_IDS}
     assert kinds["forge-mes"] == "management" and kinds["ot-module"] == "ot"
-    assert {k for m, k in kinds.items() if m not in ("forge-mes", "ot-module")} == {"integration"}
+    management = {"forge-mes", "forge-wms", "forge-cmms", "forge-erpi", "forge-nms"}
+    assert {m for m, k in kinds.items() if k == "management"} == management
+    assert {m for m, k in kinds.items() if k == "integration"} == {
+        "bosc-ims",
+        "next-trend",
+        "scanner-gateway",
+    }

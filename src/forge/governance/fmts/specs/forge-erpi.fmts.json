@@ -1,0 +1,101 @@
+{
+  "spec_version": "0.2.0",
+  "module_identity": {
+    "module_id": "forge-erpi",
+    "name": "Forge ERP Interface Adapter",
+    "alias": "erpi",
+    "version": "0.1.0",
+    "kind": "management",
+    "language": "python",
+    "source_paths": [
+      "src/forge/adapters/forge_erpi"
+    ]
+  },
+  "hub_link": {
+    "protocol": "grpc",
+    "service": "forge.v1.AdapterService"
+  },
+  "references": {
+    "facts": {
+      "path": "src/forge/governance/facts/specs/forge-erpi.facts.json",
+      "adapter_id": "forge-erpi"
+    },
+    "manifest": "src/forge/adapters/forge_erpi/manifest.json"
+  },
+  "baseline": {
+    "M-1": "met",
+    "M-2": "met",
+    "M-3": "met",
+    "M-4": "met",
+    "M-5": "met",
+    "M-6": "met",
+    "M-7": "met",
+    "M-8": "met",
+    "M-9": "met",
+    "M-10": "waived",
+    "M-11": "met"
+  },
+  "waivers": [
+    {
+      "requirement": "M-10",
+      "reason": "No module ships a roles file yet: the roles file has no FxTS spec to be written against, and the hub still uses its own flat roles.",
+      "backlog_item": "FB-141"
+    }
+  ],
+  "time_contract": {
+    "hub": {
+      "exchange": "four-timestamp",
+      "fail_closed": true
+    },
+    "plant_floor_devices": "none",
+    "databases": [],
+    "third_party_systems": []
+  },
+  "user_interface": {
+    "ships_ui_code": false,
+    "screens": false
+  },
+  "scaffold": {
+    "template": "python-adapter"
+  },
+  "metadata": {
+    "hosting": "hub-hosted Python adapter",
+    "state": "This is Forge's own management module for this service, not an integration with another system. An existing application was the example it is built from: the Python adapter holds the data contract taken from that example (sources, context mapping, record shapes). The module's own logic, storage and screens are not built.",
+    "time_contract_state": "No third-party system: the module's only time link is to its hub. M-4 to M-7 are unverified until the conformance kit exists (FB-137)."
+  },
+  "integrity": {
+    "hash_state": "pending_review",
+    "previous_hash": "86e67a3b7810e26c8901c1f7e6418b39333b1b17763d9cf006e3f9436a138670",
+    "change_history": [
+      {
+        "previous_hash": "86e67a3b7810e26c8901c1f7e6418b39333b1b17763d9cf006e3f9436a138670",
+        "new_hash": "f2cfc6425b407fca54733dcca8a4befd772ed4ba66694d720391bbfc1f3a119e",
+        "changed_at": "2026-11-18T15:53:20Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-150: the module's name is Forge ERP Interface Adapter"
+      },
+      {
+        "previous_hash": "04078883cde20cc004ff48f5b7f489591250393bbe3927f31d18416c2df380a6",
+        "new_hash": "86e67a3b7810e26c8901c1f7e6418b39333b1b17763d9cf006e3f9436a138670",
+        "changed_at": "2026-11-18T15:51:55Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-150: the ERP module's id is forge-erpi, matching its database schema mod_erpi"
+      },
+      {
+        "previous_hash": "fcbeaf8248952d1197eece1965cf96dff67d733a47c2bb2a48c41c8175118b38",
+        "new_hash": "04078883cde20cc004ff48f5b7f489591250393bbe3927f31d18416c2df380a6",
+        "changed_at": "2026-11-18T15:50:07Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-150: module ids renamed and the company's name removed; a management module, not an integration (owner 2026-11-18)"
+      }
+    ],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "f2cfc6425b407fca54733dcca8a4befd772ed4ba66694d720391bbfc1f3a119e"
+  }
+}

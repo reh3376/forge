@@ -26,7 +26,7 @@ from forge.core.models.manufacturing.operational_event import OperationalEvent
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-cmms"
+_SOURCE_SYSTEM = "forge-cmms"
 
 
 def map_item(raw: dict[str, Any]) -> dict[str, Any]:

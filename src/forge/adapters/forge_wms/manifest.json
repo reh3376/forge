@@ -91,7 +91,7 @@
   "metadata": {
     "spoke": "forge-wms",
     "hub_module": "forge.adapters.forge_wms",
-    "source_repo": "https://github.com/WhiskeyHouse/forge-wms",
+    "source_repo": "reference application, in a private repository",
     "source_lines": 507000
   },
   "time_governance": {

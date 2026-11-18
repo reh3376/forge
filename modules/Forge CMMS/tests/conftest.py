@@ -1,4 +1,4 @@
-"""Test configuration for WHK CMMS adapter tests."""
+"""Test configuration for Forge CMMS adapter tests."""
 
 import sys
 from pathlib import Path

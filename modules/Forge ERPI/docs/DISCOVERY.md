@@ -1,7 +1,7 @@
-# ERPI Spoke Discovery — whk-erpi
+# ERPI Spoke Discovery — forge-erpi
 
 **Date:** 2026-04-07
-**Source repo:** `WhiskeyHouse/whk-erpi`
+**Source repo:** `WhiskeyHouse/forge-erpi`
 **Onboarding priority:** P1 (weighted score 41)
 **Status:** Discovery complete, ready for FACTS spec
 
@@ -9,7 +9,7 @@
 
 ## 1. System Overview
 
-whk-erpi is the **bidirectional ERP integration service** connecting WHK's manufacturing systems (WMS, MES, CMMS) to NetSuite ERP. It is the backbone of cross-system data flow — every module that needs financial, inventory, or master data routes through ERPI.
+forge-erpi is the **bidirectional ERP integration service** connecting WHK's manufacturing systems (WMS, MES, CMMS) to NetSuite ERP. It is the backbone of cross-system data flow — every module that needs financial, inventory, or master data routes through ERPI.
 
 **Architecture:** NestJS 11 backend with RabbitMQ event-driven messaging + NetSuite REST/RESTlet polling. No frontend — this is a headless integration service.
 
@@ -148,7 +148,7 @@ Message schemas are defined in **AsyncAPI format** in a git submodule:
 |----------|-------|
 | Exchange type | **Fanout** (each topic is its own exchange) |
 | Durability | Durable exchanges, durable queues |
-| Consumer group | Named queue per group (default: `whk-erpi`) |
+| Consumer group | Named queue per group (default: `forge-erpi`) |
 | Acknowledgment | Manual (`channel.ack()` after success) |
 | Persistence | All messages marked persistent |
 | Routing | Empty routing key (fanout broadcasts to all bound queues) |
@@ -330,7 +330,7 @@ ERPI is the bridge between MES and NetSuite ERP. The MES recipe and production s
 
 ### Phase 1: Passive RabbitMQ Consumer (recommended first step)
 
-The Forge ERPI adapter can subscribe to all 33 entity topic exchanges by creating its own durable queue per exchange. Because the exchanges are fanout, this requires **zero changes to whk-erpi**.
+The Forge ERPI adapter can subscribe to all 33 entity topic exchanges by creating its own durable queue per exchange. Because the exchanges are fanout, this requires **zero changes to forge-erpi**.
 
 **What the adapter does:**
 1. Connect to RabbitMQ

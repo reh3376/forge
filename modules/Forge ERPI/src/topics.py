@@ -1,7 +1,7 @@
 """ERPI RabbitMQ topic definitions.
 
 All 36 topics (33 entity + 3 acknowledgment) as documented in the
-ERPI discovery and whk-erpi.facts.json. Entity topics follow the
+ERPI discovery and forge-erpi.facts.json. Entity topics follow the
 UNS pattern: wh.whk01.distillery01.<entityname>.
 
 The fanout exchange architecture means each topic is its own exchange.

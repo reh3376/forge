@@ -5,7 +5,7 @@
     "name": "Forge Warehouse Management System Adapter",
     "alias": "wms",
     "version": "0.1.0",
-    "kind": "integration",
+    "kind": "management",
     "language": "python",
     "source_paths": [
       "src/forge/adapters/forge_wms"
@@ -49,17 +49,7 @@
     },
     "plant_floor_devices": "none",
     "databases": [],
-    "third_party_systems": [
-      {
-        "name": "forge-wms",
-        "interface": "graphql+amqp",
-        "clock_read_method": "http-date-header",
-        "tolerance_class": "it-lan",
-        "clock_probe_interval_seconds": 30,
-        "offset_reported": true,
-        "fail_closed": true
-      }
-    ]
+    "third_party_systems": []
   },
   "user_interface": {
     "ships_ui_code": false,
@@ -70,13 +60,22 @@
   },
   "metadata": {
     "hosting": "hub-hosted Python adapter",
-    "time_contract_state": "Nothing reads this system's clock yet: the entry is the contract the module is to be built to (FB-139). M-4 to M-7 are unverified until the conformance kit exists (FB-137).",
-    "note": "The optional `redis_url` connection parameter is declared in the manifest and used nowhere in the adapter's code; it is not declared as a database."
+    "state": "This is Forge's own management module for this service, not an integration with another system. An existing application was the example it is built from: the Python adapter holds the data contract taken from that example (sources, context mapping, record shapes). The module's own logic, storage and screens are not built.",
+    "time_contract_state": "No third-party system: the module's only time link is to its hub. M-4 to M-7 are unverified until the conformance kit exists (FB-137)."
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": "f4b14d145e7b59d107d0a799e5cab1da6be7084559fd91e1671bccdc71cef5c2",
+    "previous_hash": "6ec66b593f8f13732607452dd42408b85a24837d13455e98d9779ca022c98048",
     "change_history": [
+      {
+        "previous_hash": "6ec66b593f8f13732607452dd42408b85a24837d13455e98d9779ca022c98048",
+        "new_hash": "932735f9544660e6579b2625e09879a57eb85d6b0143b12fcc9eaa5477d93500",
+        "changed_at": "2026-11-18T15:50:07Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-150: module ids renamed and the company's name removed; a management module, not an integration (owner 2026-11-18)"
+      },
       {
         "previous_hash": "f4b14d145e7b59d107d0a799e5cab1da6be7084559fd91e1671bccdc71cef5c2",
         "new_hash": "6ec66b593f8f13732607452dd42408b85a24837d13455e98d9779ca022c98048",
@@ -93,10 +92,10 @@
         "source": "agent",
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
-        "reason": "FB-150: whk-wms renamed forge-wms (owner 2026-11-18: no existing company named in the public repository)"
+        "reason": "FB-150: module id renamed (owner 2026-11-18: no existing company named in the public repository)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "6ec66b593f8f13732607452dd42408b85a24837d13455e98d9779ca022c98048"
+    "spec_hash": "932735f9544660e6579b2625e09879a57eb85d6b0143b12fcc9eaa5477d93500"
   }
 }

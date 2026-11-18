@@ -1,6 +1,6 @@
-"""WHK NMS Adapter — REST polling + WebSocket streaming for network management.
+"""Forge NMS Adapter — REST polling + WebSocket streaming for network management.
 
-This adapter integrates the Whiskey House Network Management System (NMS)
+This adapter integrates the Forge Network Management System (NMS)
 with Forge, providing network infrastructure visibility to manufacturing
 decision-making. It collects device inventory, network topology, SNMP traps,
 security events, baseline anomalies, and SPOF detections.
@@ -34,10 +34,10 @@ from forge.adapters.base.interface import (
     DiscoveryProvider,
     SubscriptionProvider,
 )
-from forge.adapters.whk_nms.config import WhkNmsConfig
-from forge.adapters.whk_nms.context import build_record_context
-from forge.adapters.whk_nms.endpoints import NMS_REST_ENDPOINTS, NMS_WEBSOCKET_ENDPOINTS
-from forge.adapters.whk_nms.record_builder import build_contextual_record
+from forge.adapters.forge_nms.config import ForgeNmsConfig
+from forge.adapters.forge_nms.context import build_record_context
+from forge.adapters.forge_nms.endpoints import NMS_REST_ENDPOINTS, NMS_WEBSOCKET_ENDPOINTS
+from forge.adapters.forge_nms.record_builder import build_contextual_record
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -76,13 +76,13 @@ def _load_manifest() -> AdapterManifest:
     )
 
 
-class WhkNmsAdapter(
+class ForgeNmsAdapter(
     AdapterBase,
     SubscriptionProvider,
     BackfillProvider,
     DiscoveryProvider,
 ):
-    """REST + WebSocket adapter for WHK NMS network infrastructure monitoring.
+    """REST + WebSocket adapter for Forge NMS network infrastructure monitoring.
 
     Polls NMS REST endpoints for:
         - Devices (discovered_hosts + device_metadata)
@@ -111,7 +111,7 @@ class WhkNmsAdapter(
 
     def __init__(self) -> None:
         super().__init__()
-        self._config: WhkNmsConfig | None = None
+        self._config: ForgeNmsConfig | None = None
         self._pending_records: list[dict[str, Any]] = []
         self._subscriptions: dict[str, dict[str, Any]] = {}
         self._last_healthy: datetime | None = None
@@ -124,7 +124,7 @@ class WhkNmsAdapter(
 
         Does NOT open any connections — that happens in start().
         """
-        self._config = WhkNmsConfig(**params)
+        self._config = ForgeNmsConfig(**params)
         self._state = AdapterState.REGISTERED
 
     async def start(self) -> None:
@@ -143,7 +143,7 @@ class WhkNmsAdapter(
         self._last_healthy = datetime.now(tz=UTC)
         self._startup_time = self._last_healthy
         logger.info(
-            "whk-nms adapter started "
+            "forge-nms adapter started "
             "(phase 1: inject-only, %d rest endpoints, %d ws subscriptions defined)",
             len(NMS_REST_ENDPOINTS),
             len(NMS_WEBSOCKET_ENDPOINTS),
@@ -154,7 +154,7 @@ class WhkNmsAdapter(
         self._pending_records.clear()
         self._subscriptions.clear()
         self._state = AdapterState.STOPPED
-        logger.info("whk-nms adapter stopped")
+        logger.info("forge-nms adapter stopped")
 
     async def health(self) -> AdapterHealth:
         """Return current health status and record counters."""
@@ -214,13 +214,13 @@ class WhkNmsAdapter(
         """
         if topic not in self._subscriptions:
             self._subscriptions[topic] = {}
-            logger.info("whk-nms adapter subscribed to topic: %s", topic)
+            logger.info("forge-nms adapter subscribed to topic: %s", topic)
 
     async def unsubscribe(self, topic: str) -> None:
         """Unsubscribe from a WebSocket topic."""
         if topic in self._subscriptions:
             del self._subscriptions[topic]
-            logger.info("whk-nms adapter unsubscribed from topic: %s", topic)
+            logger.info("forge-nms adapter unsubscribed from topic: %s", topic)
 
     # ── Backfill (BackfillProvider) ────────────────────────────
 
@@ -285,4 +285,4 @@ class WhkNmsAdapter(
     def inject_records(self, raw_records: list[dict[str, Any]]) -> None:
         """Inject raw records for testing (Phase 1 development)."""
         self._pending_records.extend(raw_records)
-        logger.debug("whk-nms adapter injected %d test records", len(raw_records))
+        logger.debug("forge-nms adapter injected %d test records", len(raw_records))

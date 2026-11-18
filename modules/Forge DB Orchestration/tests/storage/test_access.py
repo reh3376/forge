@@ -330,21 +330,21 @@ class TestAccessControllerSetupDefaults:
         ac.setup_default_grants()
         assert ac.check("forge-wms", "mod_wms", AccessLevel.WRITE)
         assert ac.check("forge-mes", "mod_mes", AccessLevel.WRITE)
-        assert ac.check("whk-erpi", "mod_erpi", AccessLevel.WRITE)
-        assert ac.check("whk-cmms", "mod_cmms", AccessLevel.WRITE)
-        assert ac.check("whk-nms", "mod_nms", AccessLevel.WRITE)
+        assert ac.check("forge-erpi", "mod_erpi", AccessLevel.WRITE)
+        assert ac.check("forge-cmms", "mod_cmms", AccessLevel.WRITE)
+        assert ac.check("forge-nms", "mod_nms", AccessLevel.WRITE)
         assert ac.check("whk-ims", "mod_ims", AccessLevel.WRITE)
 
     def test_setup_each_module_gets_read_on_canonical(self):
         ac = AccessController()
         ac.setup_default_grants()
-        for mod in ("forge-wms", "forge-mes", "whk-erpi", "whk-cmms", "whk-nms", "whk-ims"):
+        for mod in ("forge-wms", "forge-mes", "forge-erpi", "forge-cmms", "forge-nms", "whk-ims"):
             assert ac.check(mod, "forge_canonical", AccessLevel.READ)
 
     def test_setup_modules_cannot_write_canonical(self):
         ac = AccessController()
         ac.setup_default_grants()
-        for mod in ("forge-wms", "forge-mes", "whk-erpi"):
+        for mod in ("forge-wms", "forge-mes", "forge-erpi"):
             assert ac.check(mod, "forge_canonical", AccessLevel.WRITE) is False
 
     def test_setup_cross_module_isolation(self):

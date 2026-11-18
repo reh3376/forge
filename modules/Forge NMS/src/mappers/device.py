@@ -67,7 +67,7 @@ def map_device(raw_device: dict) -> ManufacturingUnit | None:
 
     return ManufacturingUnit(
         source_id=str(device_id),
-        source_system="whk-nms",
+        source_system="forge-nms",
         unit_type="network_device",
         serial_number=effective_serial,
         location_id=location_id,

@@ -1,4 +1,4 @@
-"""Typed configuration for the WHK CMMS adapter.
+"""Typed configuration for the Forge CMMS adapter.
 
 Connection parameters are declared in the FACTS spec and validated
 by the hub before being passed to configure(). This module provides
@@ -10,10 +10,10 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class WhkCmmsConfig(BaseModel):
-    """Connection parameters for the WHK CMMS adapter.
+class ForgeCmmsConfig(BaseModel):
+    """Connection parameters for the Forge CMMS adapter.
 
-    Maps directly to the connection_params in whk-cmms.facts.json.
+    Maps directly to the connection_params in forge-cmms.facts.json.
     Required params have no default; optional params have sensible defaults.
 
     CMMS is a hybrid GraphQL + RabbitMQ source:

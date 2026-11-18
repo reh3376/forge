@@ -66,7 +66,7 @@
             "ot",
             "display"
           ],
-          "description": "management: a forge-<service> module that runs a business function (forge-mes, forge-whs, forge-cmms). integration: a module whose counterpart is third-party software; the only place that system's API is called (A-4, O-5). ot: the module that talks to plant-floor devices. display: forge-display, the one module that renders user interfaces (A-3)."
+          "description": "management: a forge-<service> module that runs a business function (forge-mes, forge-wms, forge-cmms). integration: a module whose counterpart is third-party software; the only place that system's API is called (A-4, O-5). ot: the module that talks to plant-floor devices. display: forge-display, the one module that renders user interfaces (A-3)."
         },
         "language": {
           "type": "string",

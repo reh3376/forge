@@ -15,7 +15,7 @@
 | **Scripting Language** | Python 3.12+ (replaces Ignition's Jython 2.7) |
 | **Estimated Sprints** | 22–26 (across 7 phases) |
 | **Estimated Duration** | 10–14 months |
-| **Dependencies** | opcua-asyncio (reference only), Forge core models, NextTrend historian, forge-mes MQTT, whk-cmms asset registry |
+| **Dependencies** | opcua-asyncio (reference only), Forge core models, NextTrend historian, forge-mes MQTT, forge-cmms asset registry |
 | **FACTS Spec** | `ot-module.facts.json` (to be created in Phase 1) |
 | **FTTS Spec** | `grpc-hardened-transport.ftts.json` (existing, shared) |
 | **Research Doc** | `docs/p7-ot-module/P7_RESEARCH_SUMMARY.md` |
@@ -67,7 +67,7 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 | Capability | Responsible Module | Status |
 |------------|-------------------|--------|
 | HMI/Operator UI | OT UI Builder (P9) | Future — depends on OT Module maturity |
-| CMMS (work orders, equipment registry) | whk-cmms | Existing (P2 adapter done) |
+| CMMS (work orders, equipment registry) | forge-cmms | Existing (P2 adapter done) |
 | MES (recipes, production orders, changeover) | forge-mes | Existing (adapter done) |
 | Time-series historian | NextTrend | Existing (P5 adapter done) |
 | Barrel printing / WMS | forge-wms | Existing (adapter done) |
@@ -100,7 +100,7 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 | Forge core models (AdapterBase, ContextualRecord, etc.) | ✅ Complete | Phase 1 |
 | FACTS runner (vocabulary enforcement) | ✅ Complete | Phase 1 |
 | FTTS transport (grpc-hardened-transport) | ✅ Complete | Phase 2 |
-| whk-cmms adapter (equipment context) | ✅ Complete (P2) | Phase 3 (alarm→work order) |
+| forge-cmms adapter (equipment context) | ✅ Complete (P2) | Phase 3 (alarm→work order) |
 | NextTrend historian (time-series storage) | ✅ Complete (P5) | Phase 2 (data flow validation) |
 | forge-mes MQTT integration (changeover) | ✅ Complete | Phase 5 (bridge period) |
 
@@ -409,7 +409,7 @@ The scripting engine is a new sub-package within the existing `forge.sdk` — NO
 | # | Task | Details |
 |---|------|---------|
 | 6.1.1 | Inventory Ignition scripts | Catalog all 1,539 Jython files by category: tag change, timer, WebDev, project library, alarm pipeline |
-| 6.1.2 | Identify migration scope | Many scripts are already replaced by dedicated modules (CMMS→whk-cmms, MES→forge-mes, barrel printing→forge-wms). Identify only scripts that need OT Module equivalents |
+| 6.1.2 | Identify migration scope | Many scripts are already replaced by dedicated modules (CMMS→forge-cmms, MES→forge-mes, barrel printing→forge-wms). Identify only scripts that need OT Module equivalents |
 | 6.1.3 | Convert system.* to forge.* | `system.tag.readBlocking()` → `await forge.tag.read()`, `system.db.runPrepQuery()` → `await forge.db.query()`, etc. |
 | 6.1.4 | Convert WebDev endpoints | `doGet(request, session)` → `@forge.api.route("/path", methods=["GET"])` handlers |
 | 6.1.5 | Add type hints and async | Convert synchronous Jython to async Python 3.12+ with proper type annotations |

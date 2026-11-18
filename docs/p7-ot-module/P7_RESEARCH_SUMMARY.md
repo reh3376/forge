@@ -124,7 +124,7 @@ Key capabilities that MUST be accounted for (but NOT all go into OT Module):
 
 | Capability | Current Location | Replacement Target |
 |------------|-----------------|-------------------|
-| CMMS (work orders, equipment, inventory) | `exchange/cmms/` (8 DB tables, 100+ files) | **whk-cmms NestJS app** (already exists, P2) |
+| CMMS (work orders, equipment, inventory) | `exchange/cmms/` (8 DB tables, 100+ files) | **forge-cmms NestJS app** (already exists, P2) |
 | MES API client | `mes_api_client/` (1,007 model files) | **whk-mes** (already exists) |
 | Recipe/BOM management | `RecipeManagement/`, `RecipeBOM/` | **whk-mes recipe module** |
 | Mashing protocols | `MashingProtocol/` | **whk-mes** |
@@ -311,7 +311,7 @@ forge/
 ### 6.2 What the OT Module is NOT
 
 - NOT the HMI/UI (that's P9 — OT UI Builder)
-- NOT the CMMS (that's whk-cmms, already P2)
+- NOT the CMMS (that's forge-cmms, already P2)
 - NOT the historian (that's NextTrend)
 - NOT the MES recipe engine (that's whk-mes)
 - NOT a wrapper around Ignition (Ignition bridge is a temporary migration shim, not the module itself)

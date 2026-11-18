@@ -26,7 +26,7 @@ from forge.core.models.manufacturing.manufacturing_unit import ManufacturingUnit
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-cmms"
+_SOURCE_SYSTEM = "forge-cmms"
 
 
 def map_asset(raw: dict[str, Any]) -> ManufacturingUnit | None:

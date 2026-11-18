@@ -460,7 +460,7 @@ class AccessController:
 
         Each module gets WRITE on its own schema and READ on forge_canonical.
         """
-        modules = ("forge-wms", "forge-mes", "whk-erpi", "whk-cmms", "whk-nms", "whk-ims")
+        modules = ("forge-wms", "forge-mes", "forge-erpi", "forge-cmms", "forge-nms", "whk-ims")
         defaults = [(module_id, module_schema(module_id)) for module_id in modules]
 
         grants = []

@@ -126,12 +126,12 @@ class TestSchemaRegistry:
         registry.register(self._make_entry("forge-wms", "Barrel"))
         registry.register(
             SchemaEntry(
-                schema_id="forge://schemas/whk-nms/Device/v1.0.0",
-                spoke_id="whk-nms",
+                schema_id="forge://schemas/forge-nms/Device/v1.0.0",
+                spoke_id="forge-nms",
                 entity_name="Device",
                 version="1.0.0",
                 schema_json={"type": "object"},
-                authoritative_spoke="whk-nms",
+                authoritative_spoke="forge-nms",
                 storage_engine=StorageEngine.NEO4J,
                 storage_namespace="forge_graph",
             )
@@ -184,7 +184,7 @@ class TestSchemaRegistry:
         registry = SchemaRegistry()
         registry.register(self._make_entry("forge-wms", "Barrel"))
         registry.register(self._make_entry("forge-mes", "Recipe"))
-        registry.register(self._make_entry("whk-cmms", "Asset"))
+        registry.register(self._make_entry("forge-cmms", "Asset"))
         assert registry.spoke_count == 3
 
     def test_entry_count(self):

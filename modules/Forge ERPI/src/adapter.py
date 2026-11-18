@@ -1,4 +1,4 @@
-"""WHK ERPI Adapter — passive RabbitMQ consumer for ERP integration events.
+"""Forge ERP Interface Adapter — passive RabbitMQ consumer for ERP integration events.
 
 This adapter subscribes to ERPI's 33 entity fanout exchanges and maps
 incoming messages to ContextualRecords. It creates its own durable queues
@@ -6,7 +6,7 @@ incoming messages to ContextualRecords. It creates its own durable queues
 
 Phase 1 is read-only: consume existing RabbitMQ messages, map payloads
 to ContextualRecords, and forward to Forge hub via gRPC. No changes to
-whk-erpi are required.
+forge-erpi are required.
 """
 
 from __future__ import annotations
@@ -23,10 +23,10 @@ from forge.adapters.base.interface import (
     DiscoveryProvider,
     SubscriptionProvider,
 )
-from forge.adapters.whk_erpi.config import WhkErpiConfig
-from forge.adapters.whk_erpi.context import build_record_context
-from forge.adapters.whk_erpi.record_builder import build_contextual_record
-from forge.adapters.whk_erpi.topics import ERPI_ACK_TOPICS, ERPI_ENTITY_TOPICS
+from forge.adapters.forge_erpi.config import ForgeErpiConfig
+from forge.adapters.forge_erpi.context import build_record_context
+from forge.adapters.forge_erpi.record_builder import build_contextual_record
+from forge.adapters.forge_erpi.topics import ERPI_ACK_TOPICS, ERPI_ENTITY_TOPICS
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -65,13 +65,13 @@ def _load_manifest() -> AdapterManifest:
     )
 
 
-class WhkErpiAdapter(
+class ForgeErpiAdapter(
     AdapterBase,
     SubscriptionProvider,
     BackfillProvider,
     DiscoveryProvider,
 ):
-    """Passive RabbitMQ consumer for WHK ERPI entity events.
+    """Passive RabbitMQ consumer for Forge ERP entity events.
 
     Subscribes to 33 entity fanout exchanges on wh.whk01.distillery01.*
     and 3 acknowledgment topics. Maps ERPI message envelopes to Forge
@@ -90,7 +90,7 @@ class WhkErpiAdapter(
 
     def __init__(self) -> None:
         super().__init__()
-        self._config: WhkErpiConfig | None = None
+        self._config: ForgeErpiConfig | None = None
         self._pending_records: list[dict[str, Any]] = []
         self._subscriptions: dict[str, dict[str, Any]] = {}
         self._last_healthy: datetime | None = None
@@ -103,7 +103,7 @@ class WhkErpiAdapter(
 
         Does NOT open any connections — that happens in start().
         """
-        self._config = WhkErpiConfig(**params)
+        self._config = ForgeErpiConfig(**params)
         self._state = AdapterState.REGISTERED
 
     async def start(self) -> None:
@@ -122,7 +122,7 @@ class WhkErpiAdapter(
         self._last_healthy = datetime.now(tz=UTC)
         self._startup_time = self._last_healthy
         logger.info(
-            "whk-erpi adapter started (phase 1: inject-only, %d entity topics defined)",
+            "forge-erpi adapter started (phase 1: inject-only, %d entity topics defined)",
             len(ERPI_ENTITY_TOPICS),
         )
 
@@ -131,7 +131,7 @@ class WhkErpiAdapter(
         self._pending_records.clear()
         self._subscriptions.clear()
         self._state = AdapterState.STOPPED
-        logger.info("whk-erpi adapter stopped")
+        logger.info("forge-erpi adapter stopped")
 
     async def health(self) -> AdapterHealth:
         """Return current health status and record counters."""
@@ -234,7 +234,7 @@ class WhkErpiAdapter(
         """
         # TODO(Phase 2): Implement REST/GraphQL polling for historical data
         logger.warning(
-            "whk-erpi backfill() stub called: tags=%s (Phase 2 required)",
+            "forge-erpi backfill() stub called: tags=%s (Phase 2 required)",
             tags,
         )
         return

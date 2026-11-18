@@ -22,7 +22,7 @@ from forge.core.models.manufacturing.work_order import WorkOrder
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-erpi"
+_SOURCE_SYSTEM = "forge-erpi"
 
 
 def map_production_order(raw: dict[str, Any]) -> ProductionOrder | None:

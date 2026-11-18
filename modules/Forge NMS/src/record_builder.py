@@ -28,8 +28,8 @@ from forge.core.models.contextual_record import (
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-nms"
-_SCHEMA_REF = "forge://schemas/whk-nms/v0.1.0"
+_SOURCE_SYSTEM = "forge-nms"
+_SCHEMA_REF = "forge://schemas/forge-nms/v0.1.0"
 
 
 def build_contextual_record(
@@ -46,7 +46,7 @@ def build_contextual_record(
     Args:
         raw_event: Full NMS API response dict (device, trap, alert, etc.).
         context: Pre-built RecordContext from context.build_record_context().
-        adapter_id: Adapter manifest ID (whk-nms).
+        adapter_id: Adapter manifest ID (forge-nms).
         adapter_version: Adapter manifest version.
         entity_type: Type of entity (network_device, security_event, etc.).
         event_type: Type of event (snmp_trap, baseline_anomaly, etc.).
@@ -104,8 +104,8 @@ def build_contextual_record(
             adapter_version=adapter_version,
             transformation_chain=[
                 f"nms.v1.{entity_type}",
-                "forge.adapters.whk_nms.context.build_record_context",
-                "forge.adapters.whk_nms.record_builder.build_contextual_record",
+                "forge.adapters.forge_nms.context.build_record_context",
+                "forge.adapters.forge_nms.record_builder.build_contextual_record",
             ],
         ),
     )
