@@ -700,7 +700,7 @@ forge governance approve <spec.json> --by reh3376   # the owner, on their own wo
 - The FVTS runner has a render-profile baseline and golden messages; a module can only tighten the baseline, never loosen it.
 
 note:
-- When you add a hub route you add a FATS spec; when you add a spoke you add a FACTS spec; when a module exposes a surface it adds an FVTS spec; every module has an FMTS spec. The owner's rule (A-13, 2026-11-17): every highly repeatable process has an FxTS spec and is built to it. The gate is where you find out you forgot.
+- When you add a hub route you add a FATS spec; when you add a spoke you add a FACTS spec; when a module exposes a surface it adds an FVTS spec; every module has an FMTS spec. The owner's rule (A-13, 2026-11-17): every highly repeatable process has an FxTS spec and is built to it. What every framework itself must provide is a signed record since 2026-11-18 (`docs/decisions/fxts-framework-baseline.md`): a stated purpose, a versioned and hashed schema, a runner that enforces every field, every spec hashed and approved, a blocking gate, and honest reporting of what was not checked. The gate is where you find out you forgot.
 
 ---
 
@@ -710,7 +710,7 @@ note:
 |---|---|
 | The `time_contract` of a module with its hub, every database, every plant-floor device and every third-party system can be declared and is checked for form (FMTS, FB-135); no module declares one yet and nothing reads the clocks of databases or third-party systems | FB-136, FB-138, FB-139 (with FB-117 and FB-120) |
 | The OT FACTS spec fails `facts:schema-valid` and eight vocabulary checks | FB-079, D-8 |
-| FQTS and FSTS are stubs; FDTS, FLTS, FNTS, FOTS, FPTS are planned | M5 |
+| Only FMTS and FVTS meet everything a framework must provide (decided and signed 2026-11-18, D-14: ten requirements). 28 FATS specs and the FTTS spec carry no hash; no schema is hashed; FACTS and FTTS do not fail a spec whose hash no longer verifies; FQTS and FSTS are half-built and FDTS, FLTS, FNTS, FOTS, FPTS are planned | FB-159, FB-160, FB-149, FB-161, FB-151 |
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.9 |
 | The OT reference FVTS spec uses invented points and is `pending_review` | FB-078 |
 
