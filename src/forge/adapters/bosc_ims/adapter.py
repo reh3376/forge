@@ -206,6 +206,7 @@ class BoscImsAdapter(
             last_healthy=self._last_healthy,
             records_collected=self._records_collected,
             records_failed=self._records_failed,
+            **self.refusal_health(),
         )
 
     # ── Core read interface (AdapterBase) ───────────────────────

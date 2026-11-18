@@ -14,9 +14,12 @@ checked without running the module:
     M-11  built from the module SDK template
 
 M-4 to M-7 (the time exchange, failing closed, UTC stamps, health with
-refusals by cause) need a running module. They are checked by the
-conformance kit (FB-137), which is not built; this runner reports them as
-SKIP with that cause, never as passed.
+refusals by cause) need a running module. The conformance kit
+(``forge.governance.fmts.conformance``, FB-137) runs them: for a module on
+the ``python-adapter`` template the runner finds the adapter class in the
+module's ``adapter.py``, drives it against a reference hub and reports what
+happened. A module the kit cannot drive (another language, another process:
+FB-155) is reported as SKIP "NOT CHECKED" with that cause, never as passed.
 
 A requirement the spec waives is reported as SKIP with the waiver's reason
 and backlog item on every run. A waiver whose backlog item is closed or
@@ -72,9 +75,10 @@ REQUIREMENTS: dict[str, str] = {
 # covers this check only: the hub still refuses a module that does not exchange time (O-2).
 ADMIN_WAIVABLE = frozenset({"M-3", "M-4"})
 
-# Checked against a running module by the conformance kit, which is not built (FB-137).
+# Checked against a running module by the conformance kit (FB-137). The kit drives a
+# Python adapter in this process; a driver for any other module is FB-155.
 CONFORMANCE_KIT = ("M-4", "M-5", "M-6", "M-7")
-CONFORMANCE_KIT_ITEM = "FB-137"
+CONFORMANCE_KIT_ITEM = "FB-155"
 
 # The hub's REST routes a module must not call (M-1; the routes themselves retire with FB-123).
 HUB_REST_ROUTES = ("/v1/records", "/v1/adapters/register")
@@ -250,11 +254,17 @@ class FMTSRunner(FxTSRunner):
             self._check_source_paths(spec, repo_root),
             self._check_waivers(spec, backlog),
         ]
+        wanted = [
+            r for r in CONFORMANCE_KIT if not (spec["baseline"][r] == "waived" and r in waived)
+        ]
+        kit, kit_blocked = await self._run_kit(spec, repo_root) if wanted else ({}, "")
         for requirement in REQUIREMENTS:
             if spec["baseline"][requirement] == "waived" and requirement in waived:
                 verdicts.append(self._waived(requirement, waived[requirement]))
             elif requirement in CONFORMANCE_KIT:
-                verdicts.append(self._needs_conformance_kit(requirement))
+                verdicts.append(
+                    kit.get(requirement) or self._needs_conformance_kit(requirement, kit_blocked)
+                )
             else:
                 verdicts.append(requirement_checks[requirement]())
         verdicts.append(self._check_metadata(spec))
@@ -308,18 +318,50 @@ class FMTSRunner(FxTSRunner):
             evidence={"waived": True, "backlog_item": waiver["backlog_item"]},
         )
 
-    def _needs_conformance_kit(self, requirement: str) -> FxTSVerdict:
+    def _needs_conformance_kit(self, requirement: str, why: str) -> FxTSVerdict:
         return FxTSVerdict(
             check_id=f"fmts:{self._check_id(requirement)}",
             spec_ref=f"FMTS/baseline/{requirement}",
             status=VerdictStatus.SKIP,
             message=(
                 f"NOT CHECKED: {requirement} ({REQUIREMENTS[requirement]}) needs a running "
-                f"module and is checked by the conformance kit, which is not built "
+                f"module, and the conformance kit cannot drive this one: {why} "
                 f"({CONFORMANCE_KIT_ITEM}). The claim 'met' is unverified."
             ),
             evidence={"waived": False, "unverified": True, "blocked_on": CONFORMANCE_KIT_ITEM},
         )
+
+    async def _run_kit(
+        self, spec: dict[str, Any], repo_root: Path
+    ) -> tuple[dict[str, FxTSVerdict], str]:
+        """Run the conformance kit on the module; the verdicts, or why it could not run."""
+        from forge.governance.fmts import conformance
+
+        template = spec["scaffold"]["template"]
+        if template != "python-adapter":
+            return {}, f"it is not on the python-adapter template (template '{template}')"
+        module_name = None
+        for rel in spec["module_identity"]["source_paths"]:
+            if (repo_root / rel / "adapter.py").is_file():
+                module_name = conformance.adapter_module_name(rel)
+                break
+        if module_name is None:
+            return {}, "its adapter.py is not in an importable Forge package under src/forge"
+        manifest, _ = _load_json(repo_root / spec["references"]["manifest"])
+        try:
+            factory = conformance.find_adapter_class(module_name)
+            fixture = conformance.load_fixture(repo_root, spec["module_identity"]["module_id"])
+        except Exception as exc:
+            return {}, f"it could not be loaded ({type(exc).__name__}: {exc})"
+        params = {
+            **conformance.placeholder_params(manifest if isinstance(manifest, dict) else {}),
+            **fixture.get("params", {}),
+        }
+        events = list(fixture.get("events", []))
+        results = await conformance.run_conformance(
+            lambda hub: conformance.PythonAdapterDriver(hub, factory, params=params, events=events)
+        )
+        return results, ""
 
     # ------------------------------------------------------------------
     # fmts:schema-valid, fmts:identity-match, fmts:hash-*, fmts:enum-parity

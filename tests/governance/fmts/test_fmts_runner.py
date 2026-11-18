@@ -83,16 +83,26 @@ class TestAModuleThatMeetsTheBaseline:
         ):
             assert verdicts[f"fmts:{check}"].status == PASS, verdicts[f"fmts:{check}"]
 
-    async def test_running_requirements_are_reported_as_not_checked(
+    async def test_a_module_the_kit_cannot_drive_is_reported_as_not_checked(
         self, runner, spec, repo
     ) -> None:
+        """The fixture module lives outside ``src/forge``, so the kit cannot import it."""
         verdicts = _by_id(await _run(runner, spec, repo))
         assert CONFORMANCE_KIT == ("M-4", "M-5", "M-6", "M-7")
         for requirement in ("m4", "m5", "m6", "m7"):
             verdict = verdicts[f"fmts:{requirement}"]
             assert verdict.status == SKIP
-            assert "NOT CHECKED" in verdict.message and "FB-137" in verdict.message
-            assert verdict.evidence == {"waived": False, "unverified": True, "blocked_on": "FB-137"}
+            assert "NOT CHECKED" in verdict.message and "FB-155" in verdict.message
+            assert "not in an importable Forge package" in verdict.message
+            assert verdict.evidence == {"waived": False, "unverified": True, "blocked_on": "FB-155"}
+
+    async def test_a_module_off_the_python_template_is_reported_as_not_checked(
+        self, runner, unsigned, repo
+    ) -> None:
+        unsigned["scaffold"]["template"] = "none"
+        _waive(unsigned, "M-11")
+        verdict = await _one(runner, unsigned, repo, "m4")
+        assert verdict.status == SKIP and "not on the python-adapter template" in verdict.message
 
     async def test_one_verdict_per_requirement(self, runner, spec, repo) -> None:
         verdicts = _by_id(await _run(runner, spec, repo))

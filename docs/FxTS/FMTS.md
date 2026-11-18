@@ -3,7 +3,7 @@
 **Framework ID:** FMTS
 **Full Name:** Forge Module Test Specification
 **CI Gate:** Hard-fail (merge-blocking): `tests/governance/fmts/` runs in the `hub-python` job
-**Status:** v0.2.0 (0.1.0 plus the module alias, 2026-11-18; no spec had been approved under 0.1.0). Schema, runner (`fmts_runner.py`, 19 verdicts per spec) and nine module specs, all `pending_review` until the owner approves them (FB-136). Four of the eleven requirements are reported as not checked until the conformance kit exists (FB-137)
+**Status:** v0.2.0 (0.1.0 plus the module alias, 2026-11-18; no spec had been approved under 0.1.0). Schema, runner (`fmts_runner.py`, 19 verdicts per spec) and nine module specs, all `pending_review` until the owner approves them (FB-136). The conformance kit runs four of the eleven requirements against every module on the Python adapter template (FB-137, 2026-11-18); for the two modules it cannot drive they are reported as not checked (FB-155)
 **Decided in:** [`docs/decisions/forge-module-requirements.md`](../decisions/forge-module-requirements.md) (D-12, signed by the owner on 2026-11-17)
 **MDEMG Analog:** None
 
@@ -28,16 +28,16 @@ A module without an approved FMTS spec is not a Forge module. The hub does not e
 | M-1 | Speaks `forge.v1.AdapterService` to the hub over gRPC and nothing else. | Yes: `hub_link` is fixed by the schema, and no source file names a hub REST route. |
 | M-2 | Has an approved FACTS spec, and its manifest matches it. | Yes: the FACTS spec exists, its hash verifies, the owner approved it, and the manifest's `adapter_id`, `version`, `type`, `tier` and `protocol` equal the FACTS identity. |
 | M-3 | Declares a time contract for every counterpart it exchanges data with. | Yes: see "The time contract". |
-| M-4 | Implements the time exchange on Register, Health and Ingest and reports its measurement. | **No.** Needs a running module: the conformance kit (FB-137). |
-| M-5 | Fails closed on a clock it cannot trust and on a refusal from the hub, with the cause on its health. | **No.** FB-137. |
-| M-6 | Stamps UTC, timezone-aware, and never invents a source time. | **No.** FB-137. |
-| M-7 | Reports health, with refusals by cause. | **No.** FB-137. |
+| M-4 | Implements the time exchange on Register, Health and Ingest and reports its measurement. | By the conformance kit, for a Python module: every request carries T1 and, after the first, the measurement of the exchange before it; the hub holds a two-way measurement. |
+| M-5 | Fails closed on a clock it cannot trust and on a refusal from the hub, with the cause on its health. | By the kit: with the module's clock 5 s out the hub refuses it, nothing is delivered, the module's own health counts the refusal under its cause, and it is readmitted when the clock is put right. |
+| M-6 | Stamps UTC, timezone-aware, and never invents a source time. | By the kit, when the module has sample events: every stamp on every record sent is UTC and each record carries the module's send time. A source event without a stamp is not covered yet. |
+| M-7 | Reports health, with refusals by cause. | By the kit: the health has `state`, `refusals` and `last_refusal`; none before a refusal; after one, the cause is counted, the last refusal is named and the state is not HEALTHY. |
 | M-8 | Holds only Forge-issued credentials and owns no database connection of its own. | Yes, for databases: none is the module's own, a hub database takes a Forge-issued credential. Credentials for a third-party system's API are not declared or checked (FB-142). |
 | M-9 | Ships no user interface code; describes its screens in FVTS specs. | Yes: no `.tsx`, `.jsx`, `.vue` or `.svelte` file in the module's source; a module with screens names FVTS specs that exist and belong to it. The display module is the one kind this does not bind. |
 | M-10 | Declares its roles and scopes. | Yes: the roles file exists and each role has a kebab-case id, scopes of the form `domain:resource:action`, and inherits only roles the file defines. The roles file has no FxTS spec of its own (FB-141). |
 | M-11 | Is built from the module SDK template for its language. | Yes, by layout: the six files of the Python adapter template, or the Go module layout. |
 
-A requirement the runner cannot check is reported on every run as `SKIP` with the text `NOT CHECKED`. It is never counted as passed, and `forge governance run fmts` prints it under "Not checked:".
+A requirement that was not checked is reported on every run as `SKIP` with the text `NOT CHECKED` and the reason. It is never counted as passed, and `forge governance run fmts` prints it under "Not checked:".
 
 ## The time contract
 
@@ -53,6 +53,18 @@ One entry for every counterpart, and every entry fails closed.
 | An unreadable clock | `clock_read_method: unreadable`, `polling_interval_seconds` | This is a declaration, not an exemption: the module's own governed read time is the stamp and the polling interval is recorded as the uncertainty on every record. It may not also claim a tolerance class. |
 
 The fields the offset and the uncertainty travel in already exist on the record (`source_offset_seconds`, `source_time_as_sent`, `source_clock`, `source_uncertainty_seconds`; one-clock record P-3). Reading the clocks is FB-139.
+
+## The conformance kit
+
+`src/forge/governance/fmts/conformance.py`. M-4 to M-7 can only be checked on a running module, so the kit runs one:
+
+- **The reference hub** is the real hub servicer on clocks the kit controls. A refusal that takes three probes a second apart on a plant network takes no time here, and the hub that judges the module is the one in production.
+- **A driver** is how the kit reaches a module, and is the only part written per kind of module. `PythonAdapterDriver` drives any `AdapterBase` through the transport Python modules ship with.
+- **The runner runs the kit** for every module on the `python-adapter` template. It finds the one adapter class in the module's `adapter.py`, gives it placeholder connection parameters (hosts under `.invalid`, so nothing is reached) and the module's fixture, if it has one.
+- **A fixture** is `tests/governance/fmts/conformance/<module_id>.json`: optional `params` and raw source `events`. Without events the module sends nothing and M-6 is reported as not checked.
+- A module the kit cannot drive (another language, another process) is reported as `NOT CHECKED` for all four (FB-155).
+
+What the kit found on its first run, fixed with it: the Python transport did not put a refusal by the hub on the module's own health; one adapter left refusals out of its health; one returned to HEALTHY whenever its API answered, hiding a standing refusal.
 
 ## Waivers
 
@@ -132,7 +144,8 @@ forge governance approve path/to/x.fmts.json --by reh3376    # the owner only
 | The interim MES bridge cannot state a governed time source; M-3 is waived | FB-145 |
 | The OT module is not built from a template (M-11 waived), and its local SQLite buffer is not declared | FB-146, FB-147 |
 | No clock-read method exists for a gRPC server | FB-139 |
-| M-4 to M-7 are not checked; the conformance kit does that | FB-137 |
+| M-4 to M-7 are not checked for a module in another process or language (ot-module, forge-mes) | FB-155 |
+| M-6 is checked only where a module has sample events (forge-wms); a source event without a stamp is not covered | FB-137 |
 | The hub does not probe its own databases' clocks | FB-138 |
 | No integration module reads its third-party system's clock | FB-139 |
 | The hub does not require an approved FMTS spec at Register; the scaffold does not generate one | FB-140 |

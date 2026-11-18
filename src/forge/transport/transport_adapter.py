@@ -23,10 +23,15 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from forge.adapters.base.interface import AdapterBase
+from forge.core.clock import ClockRefusedError, utc_now
 from forge.transport.spoke_client import SpokeClient, TransportChannel
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -41,11 +46,22 @@ class GrpcTransportAdapter:
 
     adapter: AdapterBase
     channel: TransportChannel
+    #: The module's own clock, read for the time exchange with the hub (FB-092).
+    now: Callable[[], datetime] = utc_now
     _client: SpokeClient = field(init=False)
     _total_sent: int = field(default=0, init=False)
 
     def __post_init__(self) -> None:
-        self._client = SpokeClient(channel=self.channel)
+        self._client = SpokeClient(channel=self.channel, now=self.now)
+
+    def _refused(self, exc: ClockRefusedError) -> None:
+        """Put a refusal by the hub on the module's own health (module requirement M-5).
+
+        The hub refuses a module whose clock it cannot trust (FB-093). The refusal is
+        never silent on the module's side either: it is counted under its cause on the
+        adapter's health, which names it as the last refusal, and it is raised.
+        """
+        self.adapter.refuse(exc, cause=exc.cause)
 
     @property
     def adapter_id(self) -> str:
@@ -57,7 +73,11 @@ class GrpcTransportAdapter:
 
     async def register(self) -> str:
         """Register the wrapped adapter with the hub."""
-        session_id = await self._client.register(self.adapter.manifest)
+        try:
+            session_id = await self._client.register(self.adapter.manifest)
+        except ClockRefusedError as exc:
+            self._refused(exc)
+            raise
         logger.info(
             "Transport registered adapter %s (session: %s)",
             self.adapter_id,
@@ -94,7 +114,11 @@ class GrpcTransportAdapter:
 
         Returns the number of records streamed in this cycle.
         """
-        sent = await self._client.stream_records(self.adapter.collect())
+        try:
+            sent = await self._client.stream_records(self.adapter.collect())
+        except ClockRefusedError as exc:
+            self._refused(exc)
+            raise
         self._total_sent += sent
         logger.info(
             "Collect cycle: %d records streamed (total: %d)",

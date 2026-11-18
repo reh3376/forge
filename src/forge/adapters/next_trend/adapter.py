@@ -184,7 +184,14 @@ class NextTrendAdapter(
                 if healthy:
                     self._consecutive_failures = 0
                     self._last_healthy = datetime.now(tz=UTC)
-                    self._state = AdapterState.HEALTHY
+                    # A reachable API does not undo a refusal: a module the hub has
+                    # refused, or that refused a value, stays DEGRADED with the cause on
+                    # its health until it is restarted (module requirement M-7).
+                    self._state = (
+                        AdapterState.HEALTHY
+                        if self._last_refusal is None
+                        else AdapterState.DEGRADED
+                    )
                 else:
                     self._consecutive_failures += 1
                     if self._consecutive_failures >= 10:

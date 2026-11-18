@@ -11,6 +11,10 @@ when the gap is closed:
   counts only with admin privileges, that is once the owner approves the spec (Q-10).
 * ``fmts:m2`` on ``ot-module``: the OT module's manifests disagree with its approved
   FACTS spec (FB-144).
+
+M-4 to M-7 are run by the conformance kit for the modules on the Python adapter template.
+``NOT_RUN`` names what the kit did not check and why: M-6 where a module has no sample
+events for the kit, and all four for the two modules the kit cannot drive (FB-155).
 """
 
 from __future__ import annotations
@@ -43,6 +47,14 @@ WAIVED: dict[str, dict[str, str]] = {
     "ot-module": {"M-10": "FB-141", "M-11": "FB-146"},
 }
 ROLES_ONLY = {"M-10": "FB-141"}
+#: Requirements the conformance kit did not check, per module. Everything else of
+#: M-4 to M-7 was run against the module and passed.
+NO_SAMPLE_EVENTS = frozenset({"M-6"})
+NOT_RUN: dict[str, frozenset[str]] = {
+    "forge-wms": frozenset(),  # has sample events: all four are checked
+    "forge-mes": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # TypeScript, another process
+    "ot-module": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # not on the adapter template
+}
 
 SPEC_FILES = sorted(SPECS_DIR.glob("*.fmts.json"))
 MODULE_IDS = [path.name.removesuffix(".fmts.json") for path in SPEC_FILES]
@@ -82,8 +94,10 @@ async def test_module_meets_its_spec(runner: FMTSRunner, module_id: str) -> None
     )
 
     waived = WAIVED.get(module_id, ROLES_ONLY)
-    unverified = {_check(r) for r in CONFORMANCE_KIT if r not in waived}
-    assert by_status.get(VerdictStatus.SKIP, set()) == unverified | {_check(r) for r in waived}
+    not_run = {_check(r) for r in NOT_RUN.get(module_id, NO_SAMPLE_EVENTS) if r not in waived}
+    assert by_status.get(VerdictStatus.SKIP, set()) == not_run | {_check(r) for r in waived}
+    ran = {_check(r) for r in CONFORMANCE_KIT} - not_run - {_check(r) for r in waived}
+    assert ran <= by_status.get(VerdictStatus.PASS, set())
     assert {w["requirement"]: w["backlog_item"] for w in spec["waivers"]} == waived
 
 
