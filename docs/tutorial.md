@@ -334,7 +334,7 @@ note:
 | Per-spoke callback token, scoped hub endpoints | ✅ | FB-063 |
 | Hub → spoke write-back over a session-bound callback | ✅ | FB-054 |
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
-| FTTS transport spec and runner | 🟡 | `src/forge/governance/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and awaiting the owner's approval; no `docs/FxTS/FTTS.md` page yet |
+| FTTS transport spec and runner | 🟡 | `src/forge/governance/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18; no `docs/FxTS/FTTS.md` page yet |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
 | Hub time in the contract: the four-timestamp exchange on Register, Health and Ingest; a reporting spoke measured two-way | ✅ | FB-092 (2026-11-15) |
 | A spoke outside its tolerance, or one that reports no measurement, refused at Register and Ingest | ✅ | FB-093's hub half (2026-11-17; the plant-floor links fail closed since 2026-11-15) |
@@ -710,7 +710,7 @@ note:
 |---|---|
 | The `time_contract` of a module with its hub, every database, every plant-floor device and every third-party system can be declared and is checked for form (FMTS, FB-135); no module declares one yet and nothing reads the clocks of databases or third-party systems | FB-136, FB-138, FB-139 (with FB-117 and FB-120) |
 | The OT FACTS spec fails `facts:schema-valid` and eight vocabulary checks | FB-079, D-8 |
-| What a framework must provide is decided and signed (2026-11-18, D-14: ten requirements). Done: every spec carries a hash, and a run fails in every framework when the hash does not verify or is not approved. Not done: the owner's approval of the 28 FATS specs and the FTTS spec; no schema is hashed or versioned beyond its id; FTTS has no page; the test that checks a framework against the ten | FB-161, FB-151, FB-149 |
+| What a framework must provide is decided and signed (2026-11-18, D-14: ten requirements). Done: every spec carries a hash the owner approved (all but two), and a run fails in every framework when a hash does not verify or is not approved. Not done: no schema is hashed or versioned beyond its id; FTTS has no page; the FATS specs declare no request or response shapes; the transport spec is still to be thought through for edge cases; the test that checks a framework against the ten | FB-151, FB-149, FB-162, FB-163 |
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.9 |
 | The OT reference FVTS spec uses invented points and is `pending_review` | FB-078 |
 

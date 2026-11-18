@@ -95,11 +95,12 @@ class TestTheFrameworksThatDidNotFail:
         "path", sorted((FATS_DIR / "specs").glob("*.json")), ids=lambda p: p.stem
     )
     async def test_every_fats_spec_carries_a_hash_that_verifies(self, path: Any) -> None:
-        """28 FATS specs had no hash before FB-160. Approval is the owner's (FB-161)."""
+        """28 FATS specs had no hash before FB-160; the owner approved them on 2026-11-18."""
         spec = json.loads(path.read_text(encoding="utf-8"))
         integrity = spec["integrity"]
-        assert integrity["spec_hash"] and integrity["hash_state"] in ("pending_review", "approved")
+        assert integrity["spec_hash"] and integrity["hash_state"] == "approved"
+        assert integrity["approved_by"] == "reh3376"
         runner = FATSRunner(schema_path=FATS_DIR / "schema" / "fats.schema.json")
         report = await runner.run(target=spec["endpoint"], spec=spec)
-        assert _statuses(report, "fats")["fats:hash-verified"] == PASS
+        assert _statuses(report, "fats") == {"fats:hash-verified": PASS, "fats:hash-approved": PASS}
         assert report.hash_verified is True

@@ -22,10 +22,12 @@
     "burst": 50
   },
   "integrity": {
-    "hash_state": "pending_review",
+    "hash_state": "approved",
     "previous_hash": null,
     "change_history": [],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "90a8c27fcfc8e1374913028ebd777a304a732d553f0f78692759efe6ec5bb30e"
+    "spec_hash": "90a8c27fcfc8e1374913028ebd777a304a732d553f0f78692759efe6ec5bb30e",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-18T18:30:15Z"
   }
 }

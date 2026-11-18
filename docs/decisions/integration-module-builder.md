@@ -15,6 +15,8 @@ Every statement is tagged **[OWNER]** (decided by the owner, with the date), **[
 
 **[OWNER]** (2026-11-18, after the signature) "Users can request modifications that will then go into the forge support CI/CD pipeline for review."
 
+**[OWNER]** (2026-11-18, after the signature, on all integration modules) "They will all have the ability to access 3rd party software data in one or more using a dynamic list of communications protocols: RESTful API, GraphQL, MQTT, OPC-UA, SQL, ... (list enum is dynamic so new protocols can be added if / when needed). The Module to hub side is gRPC only, but the Module to application side can have one or more options."
+
 Also in force: integration modules are named `forge-integ-<system>` (A-17); management modules are built before integration modules, and forge-display before both (A-14); every module meets the forge module requirements (D-12); every repeatable process has an FxTS spec (A-13).
 
 ## 2. What exists today
@@ -41,6 +43,7 @@ From the owner's answers in §4 (2026-11-18). All of it is **[OWNER]**.
 | B-9 | **Lifecycle.** Test mode with nothing reaching the hub's stores; promotion of an exact approved hash; rollback by promoting the previous one; all audited (Q-8). |
 | B-11 | **The specs bound the builder.** The FxTS schemas for a module type define what can be built. The person designing an integration module works inside them and cannot change them: only a hub admin, a dev or the super admin can change an FxTS schema. The designer offers only what the schema of that module type allows, and a flow outside it is not a valid spec. |
 | B-12 | **Changes outside the specs are requested, not made.** A user who needs something the specs of a module type do not allow requests the modification; the request goes into the Forge support CI/CD pipeline for review. The pipeline and where a request is filed are not designed. |
+| B-13 | **Two sides.** An integration module's hub side is gRPC only. Its application side reaches the third-party software through one or more communication protocols from a list that can grow: REST, GraphQL, MQTT, OPC UA, SQL, and others added when needed. The block library's sources follow the list, and the module's spec declares which it uses (B-10). |
 | B-10 | **The integration section of the FMTS spec.** Product and vendor, supported versions, interfaces, direction, site owner, credential name, clock read (Q-9, FB-153). |
 
 **Order.** Nothing here is built before forge-display (A-14) and the management modules. What it needs from work already planned: forge-display's design record covers design mode (FB-143); the conformance kit can drive a module in another process (FB-155); the role model gives per-hub scopes, the super admin, and the hub admin and dev roles that may change a schema (FB-075); a schema change is versioned and changes a hash (FB-151); forge-creds has its own record (FB-142); the FMTS schema's next version carries the integration section (FB-153) under the versioning rules (FB-151).

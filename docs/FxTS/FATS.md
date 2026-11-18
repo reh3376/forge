@@ -157,4 +157,4 @@ Examples:
 
 ## Integrity
 
-Every FATS spec carries an FHTS integrity block since 2026-11-18 (D-14, F-4); the 28 specs were stamped `pending_review` and await the owner's approval (FB-161). The shared runner gives `fats:hash-verified` and `fats:hash-approved` on every run. The schema gained the `integrity` property for this under its existing version; laying out schema versions is FB-151.
+Every FATS spec carries an FHTS integrity block since 2026-11-18 (D-14, F-4); the 28 specs were stamped and the owner approved all of them that day. They are thin: none declares a request or response body, and the owner asked for them to be built out (FB-162). The shared runner gives `fats:hash-verified` and `fats:hash-approved` on every run. The schema gained the `integrity` property for this under its existing version; laying out schema versions is FB-151.

@@ -299,12 +299,10 @@ def test_run_fvts_reference_only_waits_on_the_owner(tmp_path: Path) -> None:
 
 
 def test_run_ftts_and_fats_load_their_specs() -> None:
-    # The FTTS spec is hashed since FB-160 and awaits the owner's approval (FB-161), so
-    # the one check that fails is the approval; everything else passes.
+    # The FTTS spec is hashed since FB-160 and the owner approved it on 2026-11-18.
     code, out = run("run", "ftts", "grpc-hardened-transport")
-    assert code == 1, out
-    assert "FTTS — grpc-hardened-transport: 39/40 checks passed" in out
-    assert out.count("[FAIL] ftts:") == 1 and "[FAIL] ftts:hash-approved" in out
+    assert code == 0, out
+    assert "[PASS] FTTS — grpc-hardened-transport: 40/40 checks passed" in out
 
     code, out = run("run", "fats", "/v1/health", "--format", "json")
     report = json.loads(out)
@@ -313,7 +311,7 @@ def test_run_ftts_and_fats_load_their_specs() -> None:
     assert not [v for v in report["verdicts"] if v["check_id"] == "fats:spec-load"]
     by_id = {v["check_id"]: v["status"] for v in report["verdicts"]}
     assert by_id["fats:hash-verified"] == "PASS"  # every FATS spec carries a hash (FB-160)
-    assert by_id["fats:hash-approved"] == "FAIL"  # until the owner approves FATS (FB-161)
+    assert by_id["fats:hash-approved"] == "PASS"  # the owner approved all 28 on 2026-11-18
 
 
 def test_run_rejects_unknown_frameworks_targets_and_formats(tmp_path: Path) -> None:

@@ -211,7 +211,7 @@ src/forge/governance/
 
 Signed by the owner on 2026-11-18: [`docs/decisions/fxts-framework-baseline.md`](../decisions/fxts-framework-baseline.md) (D-14), ten requirements, F-1 to F-10. A framework is either **planned** (a documentation page that says so; no code, no specs) or it meets the whole baseline. In force today:
 
-- **Every spec carries a hash** (F-4). The 28 FATS specs and the FTTS spec were stamped on 2026-11-18; they await the owner's approval (FB-161).
+- **Every spec carries a hash** (F-4). The 28 FATS specs and the FTTS spec were stamped on 2026-11-18, and the owner approved them the same day. Two specs await approval: `forge-mes.fmts.json` (FB-155) and `forge-ot.fvts.json` (FB-078).
 - **Every run gives two verdicts for it**, in every framework, from the shared runner: `<framework>:hash-verified` fails when the spec's content does not match its recorded hash, `<framework>:hash-approved` when the owner has not approved it. A spec with no hash fails both.
 - **Every spec lives in its framework's `specs/` directory** and is listed by `forge governance specs` (F-5). There is no other place for a spec.
 

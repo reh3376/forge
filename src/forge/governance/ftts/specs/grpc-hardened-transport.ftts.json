@@ -405,9 +405,11 @@
   "integrity": {
     "hash_method": "sha256-c14n-v1",
     "spec_hash": "9e4b1e20257c5c52145e9ae11f1aca303a227e6884710531de55c75fc6bd6cfd",
-    "hash_state": "pending_review",
+    "hash_state": "approved",
     "previous_hash": null,
-    "change_history": []
+    "change_history": [],
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-18T18:40:47Z"
   },
 
   "metadata": {
