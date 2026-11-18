@@ -315,7 +315,9 @@ class TestBackfillEngineAsync:
     def test_run_table_nonexistent_raises(self):
         engine = BackfillEngine()
         with pytest.raises(ValueError, match="No backfill plan"):
-            asyncio.get_event_loop().run_until_complete(engine.run_table("forge-wms", "nonexistent"))
+            asyncio.get_event_loop().run_until_complete(
+                engine.run_table("forge-wms", "nonexistent")
+            )
 
     def test_run_spoke(self):
         engine = BackfillEngine()
