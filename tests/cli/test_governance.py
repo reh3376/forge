@@ -314,3 +314,62 @@ def test_run_rejects_unknown_frameworks_targets_and_formats(tmp_path: Path) -> N
     assert code == 1 and str(tmp_path) in out
     code, _ = run("run", "facts", "whk-wms", "--format", "yaml")
     assert code == 2
+
+
+# -- fmts -------------------------------------------------------------------
+
+
+def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
+    """A skipped requirement is printed on every run, and a failed one fails the run."""
+    from forge.governance.shared.runner import add_spec_hash, approve_spec_hash
+
+    spec = {
+        "spec_version": "0.1.0",
+        "module_identity": {
+            "module_id": "whk-wms",
+            "name": "Warehouse management integration",
+            "version": "0.1.0",
+            "kind": "integration",
+            "language": "python",
+            "source_paths": ["src/forge/adapters/whk_wms"],
+        },
+        "hub_link": {"protocol": "grpc", "service": "forge.v1.AdapterService"},
+        "references": {
+            "facts": {
+                "path": "src/forge/governance/facts/specs/whk-wms.facts.json",
+                "adapter_id": "whk-wms",
+            },
+            "manifest": "src/forge/adapters/whk_wms/manifest.json",
+        },
+        "baseline": {f"M-{n}": "met" for n in range(1, 12)},
+        "waivers": [],
+        "time_contract": {
+            "hub": {"exchange": "four-timestamp", "fail_closed": True},
+            "plant_floor_devices": "none",
+            "databases": [],
+            "third_party_systems": [
+                {
+                    "name": "whk-wms",
+                    "interface": "graphql",
+                    "clock_read_method": "unreadable",
+                    "polling_interval_seconds": 30,
+                    "fail_closed": True,
+                }
+            ],
+        },
+        "user_interface": {"ships_ui_code": False, "screens": False},
+        "scaffold": {"template": "python-adapter"},
+    }
+    add_spec_hash(spec, changed_by="test")
+    approve_spec_hash(spec, approved_by="test-owner")
+    path = tmp_path / "whk-wms.fmts.json"
+    path.write_text(json.dumps(spec, indent=2) + "\n")
+
+    code, out = run("run", "fmts", str(path))
+    assert code == 1, out
+    assert "[FAIL] fmts:m10" in out and "names no roles file" in out
+    assert "Not checked:" in out
+    for requirement in ("m4", "m5", "m6", "m7"):
+        assert f"[SKIP] fmts:{requirement}: NOT CHECKED" in out
+    assert "[FAIL] fmts:m1:" not in out and "[FAIL] fmts:m2:" not in out
+    assert "[FAIL] fmts:m3:" not in out and "[FAIL] fmts:m11:" not in out

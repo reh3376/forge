@@ -21,7 +21,7 @@ From [`ROADMAP.md`](ROADMAP.md) §1 and [`docs/decisions/roles.md`](decisions/ro
 |---|---|
 | A-1 | **Hub and spoke.** One contract, `forge.v1.AdapterService` over gRPC, governed by FACTS and FTTS. |
 | A-2 | **Management modules are Go**, generated from the module SDK. forge-mes (NestJS/Next.js) is a bridge to be rewritten. |
-| A-3 | **All UI comes from forge-display.** Modules describe (FVTS); the renderer renders on four profiles. |
+| A-3 | **All UI comes from forge-display.** Modules describe (FVTS); the renderer renders on four profiles. forge-display is the first module built (A-14, 2026-11-17): it builds the frontend of the whole platform, the hub's UI included, so it must exist before any other module can be completed. |
 | A-4 | **HMI/SCADA is optional and pluggable.** Vendor software stays behind an integration module where a site wants it. |
 | A-5 | **A module SDK is required**; management and integration modules are built the same way. |
 | A-6 | **The hub owns the databases.** Modules hold only Forge-issued credentials. |
@@ -46,7 +46,7 @@ From [`ROADMAP.md`](ROADMAP.md) §1 and [`docs/decisions/roles.md`](decisions/ro
 | **M5 · Hub platform hardening** | Context Engine and Schema Registry served by the hub (FB-001, done 2026-10-22); scoped roles enforced in the gateway (FB-075); persistent access control (FB-003, done 2026-10-22) and registries (FB-005, done 2026-10-22); server-side write review (FB-074, done 2026-10-17); FACTS schema validation (FB-080, done 2026-10-17); FDTS, FQTS, FSTS from stub to gate. | Started (FB-074, FB-080, FB-001, FB-003, FB-005 done) |
 | **M6 · Enterprise** | Hub of hubs (the time-authority chain follows it), identity methods, offline tokens, Kubernetes deployment, backups and SLOs; forge-cmms and forge-whs in Go; forge-ignition. | Not started |
 
-Milestones overlap where the roadmap's sequence allows (forge-display work can start now that D-4 is answered, in parallel with M3).
+**Order changed on 2026-11-17 (A-14):** forge-display is the first module built, so M4 comes before the forge-mes part of M3; the Go SDK it is built from still comes first. The table and the list in §4 are in the old order until they are redone with the owner (FB-143).
 
 ---
 
@@ -68,7 +68,7 @@ The decision-free items done so far: FB-022, FB-026, FB-084, FB-085, FB-086, FB-
 
 ---
 
-**Resumed (2026-11-13):** PR 93, the owner's own, added D-11, the three-layer process control framework (`ROADMAP.md` WS-12). Development continues on `reh3376_dev01`: FB-090 first (done 2026-11-13: no open question, and the framework's MPC deployment is a spoke under the one-clock rules that now declares its time governance like every spoke), then FB-114 (done 2026-11-13: the tutorial review the owner asked for, both tracks against the tree, the process control framework added), FB-093's OT half and FB-092 (both done 2026-11-15), FB-093's hub half (done 2026-11-17), then the items the owner's answers of 2026-11-17 opened (FB-125 the root `CLAUDE.md`, done 2026-11-17; FB-124 the forge module requirements record, signed as D-12 on 2026-11-17, with its framework FMTS to build in FB-135 to FB-140, FB-123 retiring the hub's REST ingest, FB-126 the report for the mdemg agent), FB-091; the process-control FSDs start once the owner has answered the Forge review's nine questions (`ROADMAP.md` §5, D-11); FB-097's eight steps, FB-017 and the forge-mes steps follow.
+**Resumed (2026-11-13):** PR 93, the owner's own, added D-11, the three-layer process control framework (`ROADMAP.md` WS-12). Development continues on `reh3376_dev01`: FB-090 first (done 2026-11-13: no open question, and the framework's MPC deployment is a spoke under the one-clock rules that now declares its time governance like every spoke), then FB-114 (done 2026-11-13: the tutorial review the owner asked for, both tracks against the tree, the process control framework added), FB-093's OT half and FB-092 (both done 2026-11-15), FB-093's hub half (done 2026-11-17), then the items the owner's answers of 2026-11-17 opened (FB-125 the root `CLAUDE.md`, done 2026-11-17; FB-124 the forge module requirements record, signed as D-12 on 2026-11-17, with its framework FMTS built on 2026-11-17 (FB-135) and the rest in FB-136 to FB-140, FB-123 retiring the hub's REST ingest, FB-126 the report for the mdemg agent), FB-091; the process-control FSDs start once the owner has answered the Forge review's nine questions (`ROADMAP.md` §5, D-11); FB-097's eight steps, FB-017 and the forge-mes steps follow.
 
 ## 5. What gates the route
 
