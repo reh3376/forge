@@ -11,7 +11,7 @@ option java_multiple_files = true;
 // ScannerService — lightweight edge device contract.
 //
 // This is intentionally minimal. Edge devices (Android scanners) speak
-// this simple contract; the Scanner Gateway Adapter handles translation
+// this simple contract; the Forge Scanner Adapter handles translation
 // to forge.v1.AdapterService for the hub and routes scan events to the
 // appropriate spoke (WMS, IMS, QMS) based on scan context.
 service ScannerService {

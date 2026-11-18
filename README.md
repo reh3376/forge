@@ -102,7 +102,7 @@ src/forge/
 │   ├── facts/                     # Forge Adapter Compliance Test Suite
 │   │   ├── schema/facts.schema.json
 │   │   ├── specs/                 # Per-spoke compliance specs (9 spokes)
-│   │   │   ├── ot-module.facts.json      (v0.5.0 — 21 data sources)
+│   │   │   ├── forge-ot.facts.json      (v0.5.0 — 21 data sources)
 │   │   │   ├── forge-wms.facts.json
 │   │   │   ├── forge-mes.facts.json
 │   │   │   ├── forge-cmms.facts.json
@@ -110,7 +110,7 @@ src/forge/
 │   │   │   ├── forge-nms.facts.json
 │   │   │   ├── forge-integ-erp-netsuite.facts.json
 │   │   │   ├── forge-historian.facts.json
-│   │   │   └── scanner-gateway.facts.json
+│   │   │   └── forge-scanner.facts.json
 │   │   └── runners/facts_runner.py
 │   ├── ftts/                      # Forge Transport Test Suite
 │   ├── fats/                      # Forge Adapter Test Suite
@@ -265,8 +265,8 @@ Each spoke has a FACTS spec that declares its identity, capabilities, connection
 | `forge-integ-erp-netsuite` | ERP integration, NetSuite (RabbitMQ, REST, GraphQL; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
 | `forge-nms` | Network management (REST, WebSocket; 11 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
 | `forge-historian` | Time-series historian (REST, WebSocket; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
-| `scanner-gateway` | Barcode scanner gateway (gRPC server unary and stream; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
-| `ot-module` | OPC-UA, MQTT, alarms, control writes, scripting (21 sources) | v0.5.0 — pending review; fails schema validation until FB-079 (D-8 decided 2026-11-03: extend the enums) |
+| `forge-scanner` | Barcode scanner gateway (gRPC server unary and stream; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
+| `forge-ot` | OPC-UA, MQTT, alarms, control writes, scripting (21 sources) | v0.5.0 — pending review; fails schema validation until FB-079 (D-8 decided 2026-11-03: extend the enums) |
 
 `forge governance specs --pending` lists what awaits the owner; `forge governance run facts <spoke>` runs one spec.
 
@@ -314,7 +314,7 @@ The scripting SDK provides 11 modules that replace Ignition's `system.*` namespa
 | forge-nms | `WhiskeyHouse/net-topology` | FastAPI + Next.js | Network Management |
 | forge-integ-erp-netsuite | `reh3376/forge-integ-erp-netsuite` | RabbitMQ + REST + GraphQL | ERP Integration (NetSuite) |
 | Forge Historian | a reference application | Rust + Next.js | Time-Series Historian |
-| Scanner Gateway | `WhiskeyHouse/forge-wms-android` | Kotlin | Android Barcode Scanner |
+| Forge Scanner | `WhiskeyHouse/forge-wms-android` | Kotlin | Android Barcode Scanner |
 | Ignition SCADA | `WhiskeyHouse/whk-ignition-scada` | Ignition 8.x | SCADA/HMI (being replaced) |
 | Ignition Global | `WhiskeyHouse/whk-distillery01-ignition-global` | Jython 2.7 | Middleware scripts (being migrated) |
 
@@ -410,10 +410,10 @@ The published tutorial is at https://reh3376.github.io/forge/. The `Deploy Tutor
 | Roadmap | `docs/ROADMAP.md` | Decisions in force, workstreams, sequence and the owner decision queue (companion to `BACKLOG.md`) |
 | Principles | `docs/PRINCIPLES.md` | Design principles, technical invariants, the governance pattern, the decision frame, technology decisions, origins, spoke priorities, lessons |
 | Tutorial | `docs/tutorial.md` | The onboarding deck (contributor and end-user tracks) rendered by tutorial-forge; see "Tutorial" above |
-| Sprint Plan | `docs/p7-ot-module/P7_SPRINT_PLAN.md` | P7 OT Module 24-sprint plan |
-| API Mapping | `docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md` | All 52 system.* → forge.* conversions |
-| Conversion Targets | `docs/p7-ot-module/TIER1_CONVERSION_TARGETS.md` | 82 scripts classified (42 convert, 18 replace, 14 defer, 8 drop) |
-| HMI Latency | `docs/p7-ot-module/HMI_LATENCY_CONTRACT.md` | UI response time contracts |
+| Sprint Plan | `docs/p7-forge-ot/P7_SPRINT_PLAN.md` | P7 OT Module 24-sprint plan |
+| API Mapping | `docs/p7-forge-ot/SYSTEM_TO_FORGE_API_MAP.md` | All 52 system.* → forge.* conversions |
+| Conversion Targets | `docs/p7-forge-ot/TIER1_CONVERSION_TARGETS.md` | 82 scripts classified (42 convert, 18 replace, 14 defer, 8 drop) |
+| HMI Latency | `docs/p7-forge-ot/HMI_LATENCY_CONTRACT.md` | UI response time contracts |
 
 ## Design Decisions
 

@@ -1,6 +1,6 @@
-"""Tests for the Scanner Gateway context builder."""
+"""Tests for the Forge Scanner context builder."""
 
-from forge.adapters.scanner_gateway.context import (
+from forge.adapters.forge_scanner.context import (
     _normalize_scan_type,
     build_record_context,
 )

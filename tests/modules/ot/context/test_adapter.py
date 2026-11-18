@@ -74,7 +74,7 @@ def adapter(mock_registry):
 
 class TestManifest:
     def test_manifest_id(self, adapter):
-        assert adapter.manifest.adapter_id == "forge-ot-module"
+        assert adapter.manifest.adapter_id == "forge-ot"
 
     def test_all_capabilities_enabled(self, adapter):
         caps = adapter.manifest.capabilities
@@ -114,7 +114,7 @@ class TestLifecycle:
         await adapter.configure({})
         await adapter.start()
         health = await adapter.health()
-        assert health.adapter_id == "forge-ot-module"
+        assert health.adapter_id == "forge-ot"
         assert health.state == AdapterState.HEALTHY
         assert health.uptime_seconds >= 0
 
@@ -213,7 +213,7 @@ class TestClockRefusal:
         # a value without a source stamp is refused meanwhile (FB-088): that refusal stands
         adapter.refuse(
             SourceStampMissingError(
-                adapter_id="forge-ot-module", connection="WHK01", tag_path="WH/WHK01/x"
+                adapter_id="forge-ot", connection="WHK01", tag_path="WH/WHK01/x"
             )
         )
         adapter._on_clock_state("WHK01", _transition(CLOCK_UNREADABLE, CLOCK_OK, "back"))
@@ -489,7 +489,7 @@ class TestControlComposition:
         assert plc.values[self.SP] == 150.0
         journal = adapter.control_runtime.engine.get_journal()
         assert [row["status"] for row in journal] == ["REJECTED_VALIDATION", "CONFIRMED"]
-        assert journal[0]["requestor"] == "forge-ot-module"
+        assert journal[0]["requestor"] == "forge-ot"
 
     def test_the_facts_declaration_is_the_default_origin(self, mock_registry):
         """Without a connection-level declaration the manifest's section answers (FB-090)."""

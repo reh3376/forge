@@ -3,7 +3,7 @@
 **Framework ID:** FVTS
 **Full Name:** Forge View Test Specification
 **CI Gate:** Hard-fail (merge-blocking) — `tests/governance/fvts/` runs in the `hub-python` job
-**Status:** v0.1.0 — Schema, runner (`fvts_runner.py`, 19 checks), reference renderer, golden set and reference spec (`ot-module.fvts.json`, `pending_review` until FB-078)
+**Status:** v0.1.0 — Schema, runner (`fvts_runner.py`, 19 checks), reference renderer, golden set and reference spec (`forge-ot.fvts.json`, `pending_review` until FB-078)
 **Phase:** TBD (forge-display)
 **MDEMG Analog:** None — new for forge-display
 
@@ -162,17 +162,17 @@ Schema-runner parity holds: `implemented_fields()` lists every top-level propert
 | `action_result` | Action declared and permitted on this profile; status is a `writeStatus`, handled by `tag_write` actions; `REJECTED_INTERLOCK` carries the blocking rule and message |
 | `surface_render` | Surface offered on the profile; points declared; actions split into visible/hidden per `fvts:profile-action-filter` |
 
-A golden message may carry `"profiles": [...]` to apply to some renderers only (the setpoint write results apply to `desktop_hmi`). The OT reference set lives in `tests/governance/fvts/golden/ot-module/` (twelve messages in eight files, rendered in name order; the renderer keeps the last good value per point across files).
+A golden message may carry `"profiles": [...]` to apply to some renderers only (the setpoint write results apply to `desktop_hmi`). The OT reference set lives in `tests/governance/fvts/golden/forge-ot/` (twelve messages in eight files, rendered in name order; the renderer keeps the last good value per point across files).
 
 ### CI gate
 
-`forge governance run fvts ot-module-views` runs the 19 checks from the CLI (exit 1 while `fvts:hash-approved` fails). `tests/governance/fvts/test_ot_module_views.py` is the suite the reference spec declares in `conformance_tests.suite_path`. It runs the full runner and allows exactly one failure, `fvts:hash-approved`, until the owner approves the hash under FB-078. Every other FAIL, ERROR or NOT_IMPLEMENTED verdict blocks the merge.
+`forge governance run fvts forge-ot-views` runs the 19 checks from the CLI (exit 1 while `fvts:hash-approved` fails). `tests/governance/fvts/test_ot_module_views.py` is the suite the reference spec declares in `conformance_tests.suite_path`. It runs the full runner and allows exactly one failure, `fvts:hash-approved`, until the owner approves the hash under FB-078. Every other FAIL, ERROR or NOT_IMPLEMENTED verdict blocks the merge.
 
 ## Specs
 
 | Spec | Status | Notes |
 |------|--------|-------|
-| `ot-module.fvts.json` | `hash_state: pending_review` (FB-078) | Reference contract: fermenter HMI screen, trend, alarm summary, settings; setpoint write via two-step review. Passes every runner check except `fvts:hash-approved`; with the OT write config (`deploy/ot/ot-control.example.json`) `fvts:action-target` fails because the fermenter points are invented — FB-078 replaces them. |
+| `forge-ot.fvts.json` | `hash_state: pending_review` (FB-078) | Reference contract: fermenter HMI screen, trend, alarm summary, settings; setpoint write via two-step review. Passes every runner check except `fvts:hash-approved`; with the OT write config (`deploy/ot/ot-control.example.json`) `fvts:action-target` fails because the fermenter points are invented — FB-078 replaces them. |
 
 ## Relationship to other FxTS frameworks
 

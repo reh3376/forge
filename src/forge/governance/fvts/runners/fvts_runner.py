@@ -12,7 +12,7 @@ Schema-runner parity: every field of ``fvts.schema.json`` — top level and
 schema itself; the other checks add the rules the schema cannot express.
 
     runner = FVTSRunner(schema_path=SCHEMA_PATH)
-    report = await runner.run(target="ot-module-views", spec=spec)
+    report = await runner.run(target="forge-ot-views", spec=spec)
 
 Keyword arguments to ``run`` (all optional):
     facts_specs     {adapter_id: FACTS spec}; default: every spec under facts/specs

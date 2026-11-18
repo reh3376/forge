@@ -61,7 +61,7 @@ logger = logging.getLogger(__name__)
 
 # Schema ref for bridge-sourced records (distinct from OT Module direct)
 # Version ref of the module's bridge schema (forge.core.schema_ref, FB-008).
-_BRIDGE_SCHEMA_REF = "forge://schemas/ot-module/bridge/v0.3.0"
+_BRIDGE_SCHEMA_REF = "forge://schemas/forge-ot/bridge/v0.3.0"
 _BRIDGE_ADAPTER_ID = "ignition-bridge"
 _BRIDGE_ADAPTER_VERSION = "0.1.0"
 

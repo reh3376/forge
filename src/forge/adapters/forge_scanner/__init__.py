@@ -1,4 +1,4 @@
-"""Scanner Gateway Adapter — edge device ingestion for QR/barcode scanners.
+"""Forge Scanner Adapter — edge device ingestion for QR/barcode scanners.
 
 This adapter implements a two-tier architecture:
   - Android devices speak a lightweight scanner.v1 ScannerService gRPC contract
@@ -10,6 +10,6 @@ The gateway is the first Forge adapter that serves multiple spokes
 from a single edge device input stream.
 """
 
-from forge.adapters.scanner_gateway.adapter import ScannerGatewayAdapter
+from forge.adapters.forge_scanner.adapter import ForgeScannerAdapter
 
-__all__ = ["ScannerGatewayAdapter"]
+__all__ = ["ForgeScannerAdapter"]

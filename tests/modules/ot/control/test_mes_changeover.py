@@ -71,7 +71,7 @@ async def test_commands_map_to_tags_and_rest_payloads() -> None:
     start = datetime(2026, 6, 1, 8, tzinfo=UTC)
     end = datetime(2026, 6, 1, 9, tzinfo=UTC)
 
-    await mes.request("cooker", "ot-module", force=True, reason="cooks done")
+    await mes.request("cooker", "forge-ot", force=True, reason="cooks done")
     await mes.cip_complete("cooker", start, end, duration_seconds=3600, reported_by="ot")
     await mes.recipe_loaded("cooker", "sori-1", "2026-06-01T07:00:00.000Z", "3", loaded_by="ot")
     await mes.start_production("cooker", "operator-7", notes="go")
@@ -86,7 +86,7 @@ async def test_commands_map_to_tags_and_rest_payloads() -> None:
         "mes.changeover.fermentation.reset",
     ]
     payloads = [c["value"] for c in dispatcher.calls]
-    assert payloads[0] == {"requestedBy": "ot-module", "force": True, "reason": "cooks done"}
+    assert payloads[0] == {"requestedBy": "forge-ot", "force": True, "reason": "cooks done"}
     assert payloads[1] == {
         "cipStartTime": "2026-06-01T08:00:00+00:00",
         "cipEndTime": "2026-06-01T09:00:00+00:00",

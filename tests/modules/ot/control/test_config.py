@@ -114,7 +114,7 @@ def test_parses_into_control_objects() -> None:
 def test_defaults_are_minimal() -> None:
     cfg = parse_control_config({})
     assert cfg.mqtt.mode == "local" and cfg.mqtt.port == 1883
-    assert cfg.requested_by == "forge-ot-module"
+    assert cfg.requested_by == "forge-ot"
     assert cfg.changeover_areas == [] and cfg.cip_specs() == {}
     assert cfg.review_timeout_seconds == 120.0 and cfg.reason_codes == []
     assert cfg.describe()["review"] == {

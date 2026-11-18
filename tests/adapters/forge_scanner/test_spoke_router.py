@@ -1,6 +1,6 @@
-"""Tests for the Scanner Gateway spoke router."""
+"""Tests for the Forge Scanner spoke router."""
 
-from forge.adapters.scanner_gateway.spoke_router import RouteTarget, SpokeRouter
+from forge.adapters.forge_scanner.spoke_router import RouteTarget, SpokeRouter
 
 # ── Default Configuration ─────────────────────────────────────────
 

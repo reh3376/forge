@@ -328,7 +328,7 @@ async def test_full_sequence_with_cip_skipped_and_operator_confirmation() -> Non
     await orch.on_state("cooker", state_payload("AWAITING_CHANGEOVER"))
     assert mes.calls[0][1] == "cip-complete"
     cip = mes.calls[0][2]
-    assert cip["cipDurationSeconds"] == 0 and cip["reportedBy"] == "forge-ot-module"
+    assert cip["cipDurationSeconds"] == 0 and cip["reportedBy"] == "forge-ot"
     assert cip["cipStartTime"] == cip["cipEndTime"]
     # the read-back moved the local view without waiting for the MQTT echo
     assert orch.area("cooker").mes_state == "RECIPE_LOADING"
@@ -342,7 +342,7 @@ async def test_full_sequence_with_cip_skipped_and_operator_confirmation() -> Non
             "parameters": {"target_temp": 180, "ramp_rate": 2.5, "agitator": True},
             "production_order_id": "so-2",
             "recipe_id": "recipe-1",
-            "requestor": "forge-ot-module",
+            "requestor": "forge-ot",
             "reason": "Changeover recipe download Bourbon Mash",
         }
     ]
@@ -351,7 +351,7 @@ async def test_full_sequence_with_cip_skipped_and_operator_confirmation() -> Non
         "scheduleOrderRecipeInstanceId": "sori-9",
         "sourceUpdatedAt": "2026-06-01T09:00:00.000Z",
         "cookerNumber": "1",
-        "loadedBy": "forge-ot-module",
+        "loadedBy": "forge-ot",
     }
     rt = orch.area("cooker")
     assert rt.mes_state == "READY_TO_START"
@@ -398,7 +398,7 @@ async def test_full_sequence_with_cip_skipped_and_operator_confirmation() -> Non
     assert rec.context.event_type == "changeover.recipe-loaded"
     assert rec.context.extra["changeover_area"] == "cooker"
     assert rec.context.equipment_id == "Distillery01/COOKER_01"
-    assert rec.lineage.adapter_id == "forge-ot-module"
+    assert rec.lineage.adapter_id == "forge-ot"
     assert rec.lineage.transformation_chain == ["ot:changeover-orchestrator"]
 
     snap = orch.snapshot()
@@ -422,7 +422,7 @@ async def test_cip_runner_policy_reports_the_runner_times() -> None:
         "cipStartTime": "2026-06-01T08:00:00+00:00",
         "cipEndTime": "2026-06-01T08:45:00+00:00",
         "cipDurationSeconds": 2700.0,
-        "reportedBy": "forge-ot-module",
+        "reportedBy": "forge-ot",
     }
     assert kinds(orch) == ["state", "cip_started", "cip_finished", "write"]
     assert orch.area("cooker").cip_in_progress is False

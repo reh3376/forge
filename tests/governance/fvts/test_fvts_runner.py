@@ -47,7 +47,7 @@ class TestParity:
         assert check_schema_runner_parity(schema, runner.implemented_fields()) == []
 
     async def test_reference_run_has_no_parity_or_error_verdicts(self, runner, spec) -> None:
-        report = await runner.run(target="ot-module-views", spec=spec)
+        report = await runner.run(target="forge-ot-views", spec=spec)
         statuses = {v.status for v in report.verdicts}
         assert VerdictStatus.NOT_IMPLEMENTED not in statuses
         assert VerdictStatus.ERROR not in statuses
@@ -61,7 +61,7 @@ class TestParity:
         ]
 
     async def test_runner_without_schema_reports_errors_not_passes(self, spec: dict) -> None:
-        report = await FVTSRunner().run(target="ot-module-views", spec=spec)
+        report = await FVTSRunner().run(target="forge-ot-views", spec=spec)
         errored = {v.check_id for v in report.verdicts if v.status is VerdictStatus.ERROR}
         assert errored == {"fvts:schema-valid", "fvts:enum-parity"}
 
@@ -139,7 +139,7 @@ class TestEnumParity:
         path = tmp_path / "fvts.schema.json"
         path.write_text(json.dumps(drifted), encoding="utf-8")
         report = await FVTSRunner(schema_path=path).run(
-            target="ot-module-views", spec=spec, facts_specs=facts_specs
+            target="forge-ot-views", spec=spec, facts_specs=facts_specs
         )
         verdict = next(v for v in report.verdicts if v.check_id == "fvts:enum-parity")
         assert verdict.status is FAIL
@@ -156,7 +156,7 @@ class TestOwnerInFacts:
     async def test_reference_owner_and_bindings(self, check, spec) -> None:
         verdict = await check(spec, "fvts:owner-in-facts")
         assert verdict.status is PASS
-        assert verdict.evidence == {"owner_module": "ot-module", "bound_adapters": ["ot-module"]}
+        assert verdict.evidence == {"owner_module": "forge-ot", "bound_adapters": ["forge-ot"]}
 
     async def test_unknown_owner(self, check, spec) -> None:
         spec["view_identity"]["owner_module"] = "ghost-module"
@@ -169,7 +169,7 @@ class TestOwnerInFacts:
         assert "bound adapter 'ghost-adapter' has no FACTS spec" in _messages(verdict)
 
     async def test_facts_ref_must_exist(self, check, spec) -> None:
-        spec["view_identity"]["facts_spec_ref"] = "src/nowhere/ot-module.facts.json"
+        spec["view_identity"]["facts_spec_ref"] = "src/nowhere/forge-ot.facts.json"
         verdict = await check(spec, "fvts:owner-in-facts")
         assert verdict.status is FAIL and "does not exist" in _messages(verdict)
 
@@ -209,14 +209,14 @@ class TestActionTarget:
 
     async def test_owner_without_write_capability(self, check, spec, facts_specs) -> None:
         facts = copy.deepcopy(facts_specs)
-        facts["ot-module"]["capabilities"]["write"] = False
+        facts["forge-ot"]["capabilities"]["write"] = False
         verdict = await check(spec, "fvts:action-target", facts_specs=facts)
         assert verdict.status is FAIL and "capabilities.write=false" in _messages(verdict)
 
     async def test_point_bound_to_another_adapter(self, check, spec) -> None:
         spec["data_bindings"]["points"][1]["source"]["adapter_id"] = "forge-mes"
         verdict = await check(spec, "fvts:action-target")
-        assert "bound to adapter 'forge-mes', not the owner 'ot-module'" in _messages(verdict)
+        assert "bound to adapter 'forge-mes', not the owner 'forge-ot'" in _messages(verdict)
 
     async def test_alarm_operation_needs_alarms(self, check, spec) -> None:
         spec["alarms"] = {"enabled": False}

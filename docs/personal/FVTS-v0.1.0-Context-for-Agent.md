@@ -135,7 +135,7 @@ The OT module (`src/forge/modules/ot/`) already has an ISA-18.2 alarm state mach
 
 ### 2.4 Other repo observations
 
-- `src/forge/governance/facts/specs/ot-module.facts.json` has `integrity.spec_hash: "pending-rehash-after-script-migration-additions"` and `hash_state: "draft"` — a pre-existing state not in the FHTS enum. Not touched by FVTS.
+- `src/forge/governance/facts/specs/forge-ot.facts.json` has `integrity.spec_hash: "pending-rehash-after-script-migration-additions"` and `hash_state: "draft"` — a pre-existing state not in the FHTS enum. Not touched by FVTS.
 - `tests/governance` on `main`: 374 passed, 33 failed **with and without** the FVTS changes. [UNVERIFIED] cause; failures were in `tests/governance/ftts/` among others and may be missing optional dependencies (pytest was not even installed in the session sandbox).
 
 ### 2.5 Prior project context (from Roger's saved notes)
@@ -278,11 +278,11 @@ Four profiles: `desktop_hmi`, `desktop_app`, `web`, `mobile`. Specs may **tighte
 
 ## 5. The reference spec — what is real and what is invented
 
-`ot-module.fvts.json` exists to exercise every schema section. **Most of its content is illustrative.**
+`forge-ot.fvts.json` exists to exercise every schema section. **Most of its content is illustrative.**
 
 | Element | Status |
 |---------|--------|
-| `owner_module: ot-module`, `facts_spec_ref` | [REPO] real |
+| `owner_module: forge-ot`, `facts_spec_ref` | [REPO] real |
 | Enum values (states, priorities, roles, statuses) | [REPO] mirror real models |
 | Point `ferm.temperature` path `{area}/{equipment_id}/Temperature`, units °F | Modeled on the `ContextualRecord` example (`Area1/Fermenter3/Temperature`, `FERM-003`) [REPO] — not a confirmed real tag |
 | Points `TemperatureSP`, `Agitator/Running`, `Mode` and the mode labels Idle/Startup/Production/CIP | **Invented** [PLACEHOLDER] |

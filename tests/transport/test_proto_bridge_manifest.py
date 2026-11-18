@@ -35,13 +35,13 @@ GOVERNANCE = TimeGovernance(
 
 def _manifest(governance: TimeGovernance | None) -> AdapterManifest:
     return AdapterManifest(
-        adapter_id="ot-module",
+        adapter_id="forge-ot",
         name="OT module",
         version="0.1.0",
         protocol="opcua",
         tier=AdapterTier.OT,
         capabilities=AdapterCapabilities(read=True),
-        data_contract=DataContract(schema_ref="forge://schemas/ot-module/v0.1.0"),
+        data_contract=DataContract(schema_ref="forge://schemas/forge-ot/v0.1.0"),
         time_governance=governance,
     )
 

@@ -1,8 +1,8 @@
-"""Tests for the Scanner Gateway device registry."""
+"""Tests for the Forge Scanner device registry."""
 
 from datetime import UTC, datetime, timedelta
 
-from forge.adapters.scanner_gateway.device_registry import (
+from forge.adapters.forge_scanner.device_registry import (
     DeviceRecord,
     DeviceRegistry,
 )

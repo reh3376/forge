@@ -1,4 +1,4 @@
-"""Record builder for the Scanner Gateway adapter.
+"""Record builder for the Forge Scanner adapter.
 
 Transforms scanner.v1 ScanEvent dicts into Forge ContextualRecords.
 Each scan event becomes one ContextualRecord with the barcode value
@@ -108,7 +108,7 @@ def build_contextual_record(
     return ContextualRecord(
         source=RecordSource(
             adapter_id=adapter_id,
-            system="scanner-gateway",
+            system="forge-scanner",
             tag_path=tag_path,
             connection_id=scan_event.get("device_id"),
         ),
@@ -125,13 +125,13 @@ def build_contextual_record(
         ),
         context=context,
         lineage=RecordLineage(
-            schema_ref="forge://schemas/scanner-gateway/v0.1.0",
+            schema_ref="forge://schemas/forge-scanner/v0.1.0",
             adapter_id=adapter_id,
             adapter_version=adapter_version,
             transformation_chain=[
                 "scanner.v1.ScanEvent",
-                "forge.adapters.scanner_gateway.context.build_record_context",
-                "forge.adapters.scanner_gateway.record_builder.build_contextual_record",
+                "forge.adapters.forge_scanner.context.build_record_context",
+                "forge.adapters.forge_scanner.record_builder.build_contextual_record",
             ],
         ),
     )

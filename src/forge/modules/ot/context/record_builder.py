@@ -35,8 +35,8 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 # Schema ref for OT Module records (matches FACTS spec data_contract)
-_SCHEMA_REF = "forge://schemas/ot-module/v0.1.0"
-_ADAPTER_ID = "forge-ot-module"
+_SCHEMA_REF = "forge://schemas/forge-ot/v0.1.0"
+_ADAPTER_ID = "forge-ot"
 _ADAPTER_VERSION = "0.1.0"
 
 
@@ -75,7 +75,7 @@ def build_ot_record(
         tag: Tag definition (path, data_type, engineering_units, etc.)
         tag_value: Current runtime value (value, quality, timestamps)
         enrichment: Operational context from EnrichmentPipeline.enrich()
-        adapter_id: Adapter identity (default: forge-ot-module)
+        adapter_id: Adapter identity (default: forge-ot)
         adapter_version: Adapter version (default: 0.1.0)
         source_timestamp_origin: the origin the tag's connection declared
             (``device``, ``server``, ``edge`` or ``forge``), None when undeclared

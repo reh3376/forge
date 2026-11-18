@@ -20,10 +20,10 @@ if TYPE_CHECKING:
 runner = CliRunner()
 
 SPECS = governance.SPEC_ROOT
-FACTS_OT = SPECS / "facts" / "specs" / "ot-module.facts.json"  # non-ASCII, hand-wrapped
+FACTS_OT = SPECS / "facts" / "specs" / "forge-ot.facts.json"  # non-ASCII, hand-wrapped
 FACTS_NMS = SPECS / "facts" / "specs" / "forge-nms.facts.json"  # ASCII-escaped
 FACTS_WMS = SPECS / "facts" / "specs" / "forge-wms.facts.json"  # approved in the fixture
-FVTS_OT = SPECS / "fvts" / "specs" / "ot-module.fvts.json"
+FVTS_OT = SPECS / "fvts" / "specs" / "forge-ot.fvts.json"
 STAMP_RE = re.compile(r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
 
 
@@ -73,7 +73,7 @@ def test_specs_lists_state_approver_and_verification(root: Path) -> None:
     code, out = run("specs", "--root", str(root))
     assert code == 0, out
     assert "forge-wms.facts.json" in out and "approved" in out and "test-owner" in out
-    assert "ot-module.fvts.json" in out and "pending_review" in out
+    assert "forge-ot.fvts.json" in out and "pending_review" in out
     assert "4 spec(s): 3 awaiting approval, 0 with a hash mismatch." in out
 
     code, out = run("specs", "--root", str(root), "--pending")
@@ -97,7 +97,7 @@ def test_specs_flags_a_hash_mismatch(root: Path) -> None:
 
 
 def test_approve_records_the_owner_and_touches_only_the_integrity_block(root: Path) -> None:
-    path = root / "facts" / "specs" / "ot-module.facts.json"
+    path = root / "facts" / "specs" / "forge-ot.facts.json"
     before = path.read_text(encoding="utf-8")
     code, out = run("approve", str(path), "--by", "reh3376")
     assert code == 0, out
@@ -132,7 +132,7 @@ def test_approve_is_idempotent_for_the_same_approver(root: Path) -> None:
 
 
 def test_approve_refuses_when_the_hash_does_not_cover_the_content(root: Path) -> None:
-    path = root / "fvts" / "specs" / "ot-module.fvts.json"
+    path = root / "fvts" / "specs" / "forge-ot.fvts.json"
     spec = json.loads(path.read_text(encoding="utf-8"))
     spec["scope"]["description"] = "edited after the stamp"
     path.write_text(json.dumps(spec, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -284,7 +284,7 @@ def test_run_lists_the_failed_checks_and_exits_1(tmp_path: Path) -> None:
 
 def test_run_fvts_reference_only_waits_on_the_owner(tmp_path: Path) -> None:
     out_file = tmp_path / "fvts.json"
-    code, out = run("run", "fvts", "ot-module-views", "--format", "json", "--output", str(out_file))
+    code, out = run("run", "fvts", "forge-ot-views", "--format", "json", "--output", str(out_file))
     report = json.loads(out)
     assert report == json.loads(out_file.read_text(encoding="utf-8"))
     assert report["framework"] == "FVTS" and len(report["verdicts"]) == 19

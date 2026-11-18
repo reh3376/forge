@@ -228,7 +228,7 @@ Limited to:
 
 ### 5.1 FACTS Specification
 
-The OT Module requires a FACTS spec (`ot-module.facts.json`) with:
+The OT Module requires a FACTS spec (`forge-ot.facts.json`) with:
 - `adapter_tier`: OT
 - `capabilities`: read, write, subscribe, backfill, discover
 - `auth_methods`: certificate, api_key, none
@@ -756,8 +756,8 @@ The `forge.sdk.scripting` engine handles: decorator discovery, handler registrat
 ## 14. Files Referenced
 
 ### P7 Planning Documents
-- `docs/p7-ot-module/COMPETITIVE_ANALYSIS.md` — Full competitive analysis, Ignition module inventory, tag engine design
-- `docs/p7-ot-module/P7_SPRINT_PLAN.md` — Sprint development plan (v2.0, 7 phases, 22+ sprints)
+- `docs/p7-forge-ot/COMPETITIVE_ANALYSIS.md` — Full competitive analysis, Ignition module inventory, tag engine design
+- `docs/p7-forge-ot/P7_SPRINT_PLAN.md` — Sprint development plan (v2.0, 7 phases, 22+ sprints)
 
 ### Existing Forge Infrastructure
 - `src/forge/adapters/opcua/__init__.py` — Empty stub (to be built)

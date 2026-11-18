@@ -1,4 +1,4 @@
-"""Typed configuration for the Scanner Gateway adapter.
+"""Typed configuration for the Forge Scanner adapter.
 
 The gateway serves two roles:
   1. gRPC server (ScannerService) — accepts scans from Android devices
@@ -12,8 +12,8 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class ScannerGatewayConfig(BaseModel):
-    """Connection parameters for the Scanner Gateway adapter.
+class ForgeScannerConfig(BaseModel):
+    """Connection parameters for the Forge Scanner adapter.
 
     Maps directly to the 7 connection_params in the manifest.
     """

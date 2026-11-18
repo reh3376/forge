@@ -1,4 +1,4 @@
-"""Scanner Gateway Adapter — edge device ingestion hub.
+"""Forge Scanner Adapter — edge device ingestion hub.
 
 Two-tier architecture:
   1. Android devices connect to a ScannerService gRPC server (gateway)
@@ -29,15 +29,15 @@ from forge.adapters.base.interface import (
     DiscoveryProvider,
     SubscriptionProvider,
 )
-from forge.adapters.scanner_gateway.config import ScannerGatewayConfig
-from forge.adapters.scanner_gateway.context import build_record_context
-from forge.adapters.scanner_gateway.device_registry import DeviceRegistry
-from forge.adapters.scanner_gateway.record_builder import build_contextual_record
-from forge.adapters.scanner_gateway.server import (
+from forge.adapters.forge_scanner.config import ForgeScannerConfig
+from forge.adapters.forge_scanner.context import build_record_context
+from forge.adapters.forge_scanner.device_registry import DeviceRegistry
+from forge.adapters.forge_scanner.record_builder import build_contextual_record
+from forge.adapters.forge_scanner.server import (
     MockScannerServiceHandler,
     ScannerServiceHandler,
 )
-from forge.adapters.scanner_gateway.spoke_router import SpokeRouter
+from forge.adapters.forge_scanner.spoke_router import SpokeRouter
 from forge.core.clock import SourceStampMissingError
 from forge.core.models.adapter import (
     AdapterCapabilities,
@@ -78,7 +78,7 @@ def _load_manifest() -> AdapterManifest:
     )
 
 
-class ScannerGatewayAdapter(
+class ForgeScannerAdapter(
     AdapterBase,
     SubscriptionProvider,
     DiscoveryProvider,
@@ -105,7 +105,7 @@ class ScannerGatewayAdapter(
 
     def __init__(self) -> None:
         super().__init__()
-        self._config: ScannerGatewayConfig | None = None
+        self._config: ForgeScannerConfig | None = None
         self._router: SpokeRouter | None = None
         self._registry: DeviceRegistry = DeviceRegistry()
         self._handler: ScannerServiceHandler | None = None
@@ -142,7 +142,7 @@ class ScannerGatewayAdapter(
         If no handler has been injected via set_handler(), creates a
         MockScannerServiceHandler as a fallback for testing/conformance.
         """
-        self._config = ScannerGatewayConfig(**params)
+        self._config = ForgeScannerConfig(**params)
         self.check_time_governance()
         self._router = SpokeRouter(
             wms_adapter_id=self._config.wms_adapter_id,
@@ -158,7 +158,7 @@ class ScannerGatewayAdapter(
 
         self._state = AdapterState.REGISTERED
         logger.info(
-            "Scanner Gateway configured: listen=%s, routes=%s",
+            "Forge Scanner configured: listen=%s, routes=%s",
             self._config.listen_address,
             sorted(self._router.target_adapter_ids()),
         )
@@ -182,7 +182,7 @@ class ScannerGatewayAdapter(
         self._state = AdapterState.HEALTHY
         self._last_healthy = datetime.now(tz=UTC)
         logger.info(
-            "Scanner Gateway started (state=%s, listen=%s, devices=%d)",
+            "Forge Scanner started (state=%s, listen=%s, devices=%d)",
             self._state,
             self._config.listen_address,
             self._registry.device_count,
@@ -194,7 +194,7 @@ class ScannerGatewayAdapter(
             await self._handler.stop()
         self._subscriptions.clear()
         self._state = AdapterState.STOPPED
-        logger.info("Scanner Gateway stopped")
+        logger.info("Forge Scanner stopped")
 
     async def health(self) -> AdapterHealth:
         """Return current health status.
@@ -336,7 +336,7 @@ class ScannerGatewayAdapter(
             "tags": tags,
             "callback": callback,
         }
-        logger.info("Scanner Gateway subscription %s: tags=%s", sub_id, tags)
+        logger.info("Forge Scanner subscription %s: tags=%s", sub_id, tags)
         return sub_id
 
     async def unsubscribe(self, subscription_id: str) -> None:

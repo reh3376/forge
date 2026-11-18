@@ -10,8 +10,9 @@ when the gap is closed:
   approved (2026-11-18) and has no allowed failure.
 * ``fmts:waivers`` on ``forge-mes``: its waiver of M-3 is a time-keeping waiver, which
   counts only with admin privileges, that is once the owner approves the spec (Q-10).
-* ``fmts:m2`` on ``ot-module``: the OT module's manifests disagree with its approved
-  FACTS spec (FB-144).
+* ``forge-ot`` and ``forge-mes`` stay ``pending_review``: the owner approves a module spec
+  only when the conformance kit has run M-4 to M-7 against the module, and the kit cannot
+  drive these two yet (FB-155).
 
 M-4 to M-7 are run by the conformance kit for the modules on the Python adapter template.
 ``NOT_RUN`` names what the kit did not check and why: M-6 where a module has no sample
@@ -41,8 +42,8 @@ ALLOWED_FAILURES: dict[str, frozenset[str]] = {
     "forge-nms": frozenset(),
     "forge-historian": frozenset(),
     "forge-ims": frozenset(),
+    "forge-scanner": frozenset(),  # its M-3 waiver counts: approved with admin privileges
     "forge-mes": PENDING_APPROVAL | {"fmts:waivers"},
-    "ot-module": PENDING_APPROVAL | {"fmts:m2"},
 }
 WAIVED: dict[str, dict[str, str]] = {
     "forge-mes": {
@@ -52,7 +53,8 @@ WAIVED: dict[str, dict[str, str]] = {
         "M-10": "FB-141",
         "M-11": "FB-076",
     },
-    "ot-module": {"M-10": "FB-141", "M-11": "FB-146"},
+    "forge-ot": {"M-10": "FB-141", "M-11": "FB-146"},
+    "forge-scanner": {"M-3": "FB-117", "M-10": "FB-141"},
 }
 ROLES_ONLY = {"M-10": "FB-141"}
 #: Requirements the conformance kit did not check, per module. Everything else of
@@ -67,7 +69,7 @@ NOT_RUN: dict[str, frozenset[str]] = {
     "forge-historian": frozenset(),
     "forge-ims": frozenset(),
     "forge-mes": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # TypeScript, another process
-    "ot-module": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # not on the adapter template
+    "forge-ot": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # not on the adapter template
 }
 
 SPEC_FILES = sorted(SPECS_DIR.glob("*.fmts.json"))
@@ -132,9 +134,9 @@ def test_every_module_has_an_alias_of_its_own() -> None:
 
 def test_only_the_interim_bridge_is_not_python_from_the_template() -> None:
     templates = {m: _load(m)["scaffold"]["template"] for m in MODULE_IDS}
-    assert {m for m, t in templates.items() if t == "none"} == {"forge-mes", "ot-module"}
+    assert {m for m, t in templates.items() if t == "none"} == {"forge-mes", "forge-ot"}
     kinds = {m: _load(m)["module_identity"]["kind"] for m in MODULE_IDS}
-    assert kinds["forge-mes"] == "management" and kinds["ot-module"] == "ot"
+    assert kinds["forge-mes"] == "management" and kinds["forge-ot"] == "ot"
     management = {
         "forge-mes",
         "forge-wms",
@@ -142,9 +144,7 @@ def test_only_the_interim_bridge_is_not_python_from_the_template() -> None:
         "forge-nms",
         "forge-historian",
         "forge-ims",
+        "forge-scanner",
     }
     assert {m for m, k in kinds.items() if k == "management"} == management
-    assert {m for m, k in kinds.items() if k == "integration"} == {
-        "forge-integ-erp-netsuite",
-        "scanner-gateway",
-    }
+    assert {m for m, k in kinds.items() if k == "integration"} == {"forge-integ-erp-netsuite"}

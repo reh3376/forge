@@ -1,10 +1,10 @@
-"""Tests for the Scanner Gateway adapter lifecycle, manifest, and data flow."""
+"""Tests for the Forge Scanner adapter lifecycle, manifest, and data flow."""
 
 import pytest
 
-from forge.adapters.scanner_gateway.adapter import ScannerGatewayAdapter
-from forge.adapters.scanner_gateway.device_registry import DeviceRegistry
-from forge.adapters.scanner_gateway.server import MockScannerServiceHandler
+from forge.adapters.forge_scanner.adapter import ForgeScannerAdapter
+from forge.adapters.forge_scanner.device_registry import DeviceRegistry
+from forge.adapters.forge_scanner.server import MockScannerServiceHandler
 from forge.core.models.adapter import AdapterState, AdapterTier
 
 # ── Manifest Tests ─────────────────────────────────────────────────
@@ -14,22 +14,22 @@ class TestManifest:
     """Verify manifest loads correctly from manifest.json."""
 
     def test_adapter_id(self):
-        assert ScannerGatewayAdapter.manifest.adapter_id == "scanner-gateway"
+        assert ForgeScannerAdapter.manifest.adapter_id == "forge-scanner"
 
     def test_version(self):
-        assert ScannerGatewayAdapter.manifest.version == "0.1.0"
+        assert ForgeScannerAdapter.manifest.version == "0.1.0"
 
     def test_type_is_ingestion(self):
-        assert ScannerGatewayAdapter.manifest.type == "INGESTION"
+        assert ForgeScannerAdapter.manifest.type == "INGESTION"
 
     def test_protocol_is_grpc(self):
-        assert ScannerGatewayAdapter.manifest.protocol == "grpc+protobuf"
+        assert ForgeScannerAdapter.manifest.protocol == "grpc+protobuf"
 
     def test_tier_is_ot(self):
-        assert ScannerGatewayAdapter.manifest.tier == AdapterTier.OT
+        assert ForgeScannerAdapter.manifest.tier == AdapterTier.OT
 
     def test_capabilities(self):
-        caps = ScannerGatewayAdapter.manifest.capabilities
+        caps = ForgeScannerAdapter.manifest.capabilities
         assert caps.read is True
         assert caps.write is False
         assert caps.subscribe is True
@@ -37,10 +37,10 @@ class TestManifest:
         assert caps.discover is True
 
     def test_connection_params_count(self):
-        assert len(ScannerGatewayAdapter.manifest.connection_params) == 7
+        assert len(ForgeScannerAdapter.manifest.connection_params) == 7
 
     def test_required_params(self):
-        required = [p.name for p in ScannerGatewayAdapter.manifest.connection_params if p.required]
+        required = [p.name for p in ForgeScannerAdapter.manifest.connection_params if p.required]
         assert sorted(required) == [
             "device_token_secret",
             "gateway_listen_port",
@@ -48,27 +48,27 @@ class TestManifest:
         ]
 
     def test_auth_methods(self):
-        assert "device_token" in ScannerGatewayAdapter.manifest.auth_methods
-        assert "mtls" in ScannerGatewayAdapter.manifest.auth_methods
+        assert "device_token" in ForgeScannerAdapter.manifest.auth_methods
+        assert "mtls" in ForgeScannerAdapter.manifest.auth_methods
 
     def test_data_contract_schema_ref(self):
         assert (
-            ScannerGatewayAdapter.manifest.data_contract.schema_ref
-            == "forge://schemas/scanner-gateway/v0.1.0"
+            ForgeScannerAdapter.manifest.data_contract.schema_ref
+            == "forge://schemas/forge-scanner/v0.1.0"
         )
 
     def test_data_contract_context_fields(self):
-        fields = ScannerGatewayAdapter.manifest.data_contract.context_fields
+        fields = ForgeScannerAdapter.manifest.data_contract.context_fields
         assert "scan_id" in fields
         assert "scan_type" in fields
         assert "barcode_value" in fields
         assert "device_id" in fields
 
     def test_metadata_proto_package(self):
-        assert ScannerGatewayAdapter.manifest.metadata["proto_package"] == "scanner.v1"
+        assert ForgeScannerAdapter.manifest.metadata["proto_package"] == "scanner.v1"
 
     def test_metadata_scan_types(self):
-        assert ScannerGatewayAdapter.manifest.metadata["scan_types"] == 12
+        assert ForgeScannerAdapter.manifest.metadata["scan_types"] == 12
 
 
 # ── Lifecycle Tests ────────────────────────────────────────────────
@@ -88,7 +88,7 @@ class TestLifecycle:
 
     @pytest.fixture()
     def adapter(self):
-        return ScannerGatewayAdapter()
+        return ForgeScannerAdapter()
 
     @pytest.mark.asyncio()
     async def test_initial_state_is_registered(self, adapter):
@@ -136,7 +136,7 @@ class TestLifecycle:
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         health = await adapter.health()
-        assert health.adapter_id == "scanner-gateway"
+        assert health.adapter_id == "forge-scanner"
         assert health.state == AdapterState.HEALTHY
 
     @pytest.mark.asyncio()
@@ -192,7 +192,7 @@ class TestCollect:
     """Verify the collect() async generator yields ContextualRecords."""
 
     async def _make_adapter(self):
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         return adapter
@@ -221,8 +221,8 @@ class TestCollect:
         )
         records = [r async for r in adapter.collect()]
         assert len(records) == 1
-        assert records[0].source.adapter_id == "scanner-gateway"
-        assert records[0].source.system == "scanner-gateway"
+        assert records[0].source.adapter_id == "forge-scanner"
+        assert records[0].source.system == "forge-scanner"
 
     @pytest.mark.asyncio()
     async def test_collect_tag_path(self):
@@ -296,9 +296,9 @@ class TestCollect:
         )
         records = [r async for r in adapter.collect()]
         lineage = records[0].lineage
-        assert lineage.adapter_id == "scanner-gateway"
+        assert lineage.adapter_id == "forge-scanner"
         assert lineage.adapter_version == "0.1.0"
-        assert lineage.schema_ref == "forge://schemas/scanner-gateway/v0.1.0"
+        assert lineage.schema_ref == "forge://schemas/forge-scanner/v0.1.0"
         assert "scanner.v1.ScanEvent" in lineage.transformation_chain
 
 
@@ -310,7 +310,7 @@ class TestSubscription:
 
     @pytest.mark.asyncio()
     async def test_subscribe_returns_id(self):
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         sub_id = await adapter.subscribe(
             tags=["scanner.scan.entry"],
             callback=lambda msg: None,
@@ -320,7 +320,7 @@ class TestSubscription:
 
     @pytest.mark.asyncio()
     async def test_unsubscribe_removes(self):
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         sub_id = await adapter.subscribe(
             tags=["scanner.scan.dump"],
             callback=lambda m: None,
@@ -338,13 +338,13 @@ class TestDiscovery:
 
     @pytest.mark.asyncio()
     async def test_discover_returns_sources(self):
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         sources = await adapter.discover()
         assert len(sources) == 14
 
     @pytest.mark.asyncio()
     async def test_discover_sources_have_tag_path(self):
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         sources = await adapter.discover()
         for source in sources:
             assert "tag_path" in source
@@ -352,7 +352,7 @@ class TestDiscovery:
 
     @pytest.mark.asyncio()
     async def test_discover_includes_barrel_scans(self):
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         sources = await adapter.discover()
         tags = [s["tag_path"] for s in sources]
         assert "scanner.scan.entry" in tags
@@ -361,7 +361,7 @@ class TestDiscovery:
 
     @pytest.mark.asyncio()
     async def test_discover_includes_device_events(self):
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         sources = await adapter.discover()
         tags = [s["tag_path"] for s in sources]
         assert "scanner.device.heartbeat" in tags
@@ -375,7 +375,7 @@ class TestQueueCollection:
     """Verify collect() drains the server handler queue."""
 
     async def _make_adapter(self):
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         return adapter
@@ -496,7 +496,7 @@ class TestEndToEnd:
     @pytest.mark.asyncio()
     async def test_full_flow(self):
         """Device registration, batch submission, and adapter collection."""
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
 
@@ -561,7 +561,7 @@ class TestEndToEnd:
     @pytest.mark.asyncio()
     async def test_rejected_device_no_records(self):
         """Scans from unregistered devices don't produce records."""
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
 
@@ -578,7 +578,7 @@ class TestEndToEnd:
     @pytest.mark.asyncio()
     async def test_health_degrades_with_offline_devices(self):
         """Health degrades when all registered devices go offline."""
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
 
@@ -595,7 +595,7 @@ class TestEndToEnd:
     @pytest.mark.asyncio()
     async def test_health_recovers_with_heartbeat(self):
         """Health recovers when devices come back online."""
-        adapter = ScannerGatewayAdapter()
+        adapter = ForgeScannerAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
 

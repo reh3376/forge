@@ -1,0 +1,100 @@
+{
+  "spec_version": "0.2.0",
+  "module_identity": {
+    "module_id": "forge-scanner",
+    "name": "Forge Scanner Adapter",
+    "alias": "scanner",
+    "version": "0.1.0",
+    "kind": "management",
+    "language": "python",
+    "source_paths": [
+      "src/forge/adapters/forge_scanner"
+    ]
+  },
+  "hub_link": {
+    "protocol": "grpc",
+    "service": "forge.v1.AdapterService"
+  },
+  "references": {
+    "facts": {
+      "path": "src/forge/governance/facts/specs/forge-scanner.facts.json",
+      "adapter_id": "forge-scanner"
+    },
+    "manifest": "src/forge/adapters/forge_scanner/manifest.json"
+  },
+  "baseline": {
+    "M-1": "met",
+    "M-2": "met",
+    "M-3": "waived",
+    "M-4": "met",
+    "M-5": "met",
+    "M-6": "met",
+    "M-7": "met",
+    "M-8": "met",
+    "M-9": "met",
+    "M-10": "waived",
+    "M-11": "met"
+  },
+  "waivers": [
+    {
+      "requirement": "M-3",
+      "reason": "The handheld scanners are plant-floor devices that push scan events over gRPC, and no clock reader exists for a device of that kind: the module cannot declare how their clocks are read. Waived with admin privileges until a reader exists.",
+      "backlog_item": "FB-117"
+    },
+    {
+      "requirement": "M-10",
+      "reason": "No module ships a roles file yet: the roles file has no FxTS spec to be written against, and the hub still uses its own flat roles.",
+      "backlog_item": "FB-141"
+    }
+  ],
+  "time_contract": {
+    "hub": {
+      "exchange": "four-timestamp",
+      "fail_closed": true
+    },
+    "plant_floor_devices": "declared-in-facts",
+    "databases": [],
+    "third_party_systems": []
+  },
+  "user_interface": {
+    "ships_ui_code": false,
+    "screens": false
+  },
+  "scaffold": {
+    "template": "python-adapter"
+  },
+  "metadata": {
+    "hosting": "hub-hosted Python adapter today",
+    "state": "Forge's own module for handheld scanning: it runs the gRPC server the scanner devices connect to, turns scan events into records and routes them to the warehouse and inventory modules by scan type. The devices are plant-floor equipment, not third-party software.",
+    "target": "A Go module built from the module SDK, with Python scripting for customization (owner, 2026-11-18). Its source path, language and template change in this spec when that code exists.",
+    "time_contract_state": "The scanners' clocks are not read: the FACTS spec names no clock-read method for them, because none exists for a device that pushes over gRPC (FB-117). M-3 is waived for that, which counts only once the owner approves this spec. M-4, M-5 and M-7 are run by the conformance kit; M-6 has no sample events."
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": "dacbfada3f1189d4ceab191c684fc9a442d365e881bd2a3d4d6607efca4ef03e",
+    "change_history": [
+      {
+        "previous_hash": "dacbfada3f1189d4ceab191c684fc9a442d365e881bd2a3d4d6607efca4ef03e",
+        "new_hash": "06afa74ab9961f7b85a1f11e1718c7a26f6c835fecc89947e6dac102310dfb5f",
+        "changed_at": "2026-11-18T16:52:40Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "Owner review 2026-11-18: the scanner module is Forge's own, forge-scanner"
+      },
+      {
+        "previous_hash": "ab0ab789b23d0aa9f0fa3a67ed78eacbaaf859b91e9e76dcb18f95b3bab4fbf2",
+        "new_hash": "dacbfada3f1189d4ceab191c684fc9a442d365e881bd2a3d4d6607efca4ef03e",
+        "changed_at": "2026-11-18T15:32:42Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
+      }
+    ],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "06afa74ab9961f7b85a1f11e1718c7a26f6c835fecc89947e6dac102310dfb5f",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-18T16:58:52Z"
+  }
+}

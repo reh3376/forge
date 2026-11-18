@@ -1,6 +1,6 @@
 """Tests for the OT module FACTS spec's integrity block (BACKLOG FB-073).
 
-``ot-module.facts.json`` is written in an OPC-UA vocabulary that FACTS v0.1.0
+``forge-ot.facts.json`` is written in an OPC-UA vocabulary that FACTS v0.1.0
 does not have (BACKLOG FB-079), so this module does not assert full
 conformance the way the WMS and MES spec tests do. It asserts what FB-073
 delivered: an integrity block FHTS can verify, an honest hash state, and a
@@ -28,7 +28,7 @@ from forge.ingest.facts_check import check_manifest_against_facts
 from forge.modules.ot.adapter import OTModuleAdapter
 
 SPEC_PATH = (
-    Path(__file__).resolve().parents[3] / "src/forge/governance/facts/specs/ot-module.facts.json"
+    Path(__file__).resolve().parents[3] / "src/forge/governance/facts/specs/forge-ot.facts.json"
 )
 FHTS_STATES = frozenset({"approved", "modified", "pending_review", "reverted", "unknown"})
 
@@ -67,7 +67,7 @@ def verdicts(spec: dict) -> dict[str, object]:
     import asyncio
 
     runner = FACTSRunner(schema_path=SCHEMA_PATH)
-    report = asyncio.run(runner.run("ot-module", spec=spec))
+    report = asyncio.run(runner.run("forge-ot", spec=spec))
     return {v.check_id: v for v in report.verdicts}
 
 
@@ -146,9 +146,9 @@ class TestHubRegistrationCheck:
     """`forge.ingest.facts_check` is what the hub runs at Register."""
 
     def test_spec_hash_verifies_for_the_hub(self) -> None:
-        # The adapter class still identifies as 'forge-ot-module' (BACKLOG FB-079);
-        # the spec is filed under 'ot-module'.
-        manifest = OTModuleAdapter.manifest.model_copy(update={"adapter_id": "ot-module"})
+        # The adapter class still identifies as 'forge-ot' (BACKLOG FB-079);
+        # the spec is filed under 'forge-ot'.
+        manifest = OTModuleAdapter.manifest.model_copy(update={"adapter_id": "forge-ot"})
         result = check_manifest_against_facts(manifest)
         assert result.spec_found is True
         assert not [p for p in result.problems + result.warnings if "integrity" in p]

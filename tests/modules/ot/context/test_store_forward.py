@@ -26,7 +26,7 @@ def _make_record(tag_path: str = "WH/WHK01/Distillery01/TIT_2010/Out_PV") -> Con
     now = datetime.now(tz=UTC)
     return ContextualRecord(
         source=RecordSource(
-            adapter_id="forge-ot-module",
+            adapter_id="forge-ot",
             system="forge-ot",
             tag_path=tag_path,
         ),
@@ -38,8 +38,8 @@ def _make_record(tag_path: str = "WH/WHK01/Distillery01/TIT_2010/Out_PV") -> Con
         value=RecordValue(raw=78.4, quality=QualityCode.GOOD, data_type="DOUBLE"),
         context=RecordContext(area="Distillery01", equipment_id="TIT_2010"),
         lineage=RecordLineage(
-            schema_ref="forge://schemas/ot-module/v0.1.0",
-            adapter_id="forge-ot-module",
+            schema_ref="forge://schemas/forge-ot/v0.1.0",
+            adapter_id="forge-ot",
             adapter_version="0.1.0",
         ),
     )

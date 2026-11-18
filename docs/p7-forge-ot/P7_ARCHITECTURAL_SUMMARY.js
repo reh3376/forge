@@ -647,7 +647,7 @@ const doc = new Document({
 
         bodyText("FxTS (Forge Execution Test Specification) is a governance framework, not a testing framework. Specifications define what must exist; code conforms to specifications. The distinction matters: tests verify behavior, but FxTS specs declare capabilities, interfaces, and compliance requirements that the module must satisfy."),
 
-        bodyText("The OT Module\u2019s FACTS specification (ot-module.facts.json) declares:"),
+        bodyText("The OT Module\u2019s FACTS specification (forge-ot.facts.json) declares:"),
 
         bulletRuns([
           { text: "Adapter capabilities: ", bold: true },

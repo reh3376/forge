@@ -455,7 +455,7 @@ func TestRecordTimestampSourceClockRoundTrip(t *testing.T) {
 	bound := 1.0
 	rec := &models.ContextualRecord{
 		RecordID: uuid.New(),
-		Source:   models.RecordSource{AdapterID: "forge-ot-module", System: "forge-ot"},
+		Source:   models.RecordSource{AdapterID: "forge-ot", System: "forge-ot"},
 		Timestamp: models.RecordTimestamp{
 			SourceTime:               now,
 			IngestionTime:            now,
@@ -490,7 +490,7 @@ func TestRecordTimestampCorrectionRoundTrip(t *testing.T) {
 	synced := true
 	rec := &models.ContextualRecord{
 		RecordID: uuid.New(),
-		Source:   models.RecordSource{AdapterID: "forge-ot-module", System: "forge-ot"},
+		Source:   models.RecordSource{AdapterID: "forge-ot", System: "forge-ot"},
 		Timestamp: models.RecordTimestamp{
 			SourceTime:          now,
 			IngestionTime:       now,
@@ -528,9 +528,9 @@ func TestRecordTimestampCorrectionRoundTrip(t *testing.T) {
 func TestAdapterManifestTimeGovernanceRoundTrip(t *testing.T) {
 	five := 5.0
 	m := &models.AdapterManifest{
-		AdapterID: "forge-ot-module", Name: "OT", Version: "0.1.0", Type: "ACQUISITION",
+		AdapterID: "forge-ot", Name: "OT", Version: "0.1.0", Type: "ACQUISITION",
 		Protocol: "opcua", Tier: models.AdapterTierOT,
-		DataContract: models.DataContract{SchemaRef: "forge://schemas/ot-module/v0.1.0"},
+		DataContract: models.DataContract{SchemaRef: "forge://schemas/forge-ot/v0.1.0"},
 		TimeGovernance: &models.TimeGovernance{
 			TimeSource: "hub-ntp", SyncProtocol: "ntp", ClockReadMethod: "opcua-current-time",
 			ClockProbeIntervalSeconds: 30, SourceTimestampOrigin: "server", ToleranceClass: "T0",

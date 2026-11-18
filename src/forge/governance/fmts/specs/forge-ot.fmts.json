@@ -1,7 +1,7 @@
 {
   "spec_version": "0.2.0",
   "module_identity": {
-    "module_id": "ot-module",
+    "module_id": "forge-ot",
     "name": "Forge OT/SCADA Module — OPC-UA Adapter",
     "alias": "ot",
     "version": "0.5.0",
@@ -17,12 +17,12 @@
   },
   "references": {
     "facts": {
-      "path": "src/forge/governance/facts/specs/ot-module.facts.json",
-      "adapter_id": "ot-module"
+      "path": "src/forge/governance/facts/specs/forge-ot.facts.json",
+      "adapter_id": "forge-ot"
     },
     "manifest": "src/forge/modules/ot/manifest.json",
     "fvts": [
-      "src/forge/governance/fvts/specs/ot-module.fvts.json"
+      "src/forge/governance/fvts/specs/forge-ot.fvts.json"
     ]
   },
   "baseline": {
@@ -68,13 +68,32 @@
   },
   "metadata": {
     "hosting": "hub-hosted Python module",
-    "known_failure": "fmts:m2 fails: the manifest file and the manifest in the code disagree with the approved FACTS spec (FB-144).",
+    "state": "Forge's own OT module: PLC and OPC UA connections, the tag engine, alarms and control writes. It carries one identity since 2026-11-18, the approved FACTS spec's, in its manifest file and in the manifest its code registers with (FB-144).",
+    "time_contract_state": "Its plant-floor connections are declared in the FACTS spec's time_governance (OPC UA current time, class T0). M-4 to M-7 are not checked: the conformance kit drives modules on the Python adapter template only, and this module is not on it (FB-155, FB-146).",
     "note": "The local SQLite store-and-forward buffer is not declared as a database; whether M-8 covers it is the owner's to decide (FB-147)."
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": "8d17a328e5ea4834704cc545c00a4d9f236df7dd6c880b22ed9bcc8c8ea64a70",
+    "previous_hash": "ed806fe9578f30688cc0fd58e8a3b7e66ea7d26885322c113ebd5bff283c9e8a",
     "change_history": [
+      {
+        "previous_hash": "ed806fe9578f30688cc0fd58e8a3b7e66ea7d26885322c113ebd5bff283c9e8a",
+        "new_hash": "dbc46f93854ce3eda3b053d5ebee261ce2ec27e2e7b2f7994f63d91df01c3653",
+        "changed_at": "2026-11-18T17:02:48Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "Owner review 2026-11-18: one identity (FB-144); the notes brought to date"
+      },
+      {
+        "previous_hash": "67ef9bfcd2b9929ac5db14306371373ddb8ac407ffc30a84dbfeef0e7fd82227",
+        "new_hash": "ed806fe9578f30688cc0fd58e8a3b7e66ea7d26885322c113ebd5bff283c9e8a",
+        "changed_at": "2026-11-18T17:01:10Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "Owner review 2026-11-18: the OT module's one id is forge-ot (FB-144)"
+      },
       {
         "previous_hash": "8d17a328e5ea4834704cc545c00a4d9f236df7dd6c880b22ed9bcc8c8ea64a70",
         "new_hash": "67ef9bfcd2b9929ac5db14306371373ddb8ac407ffc30a84dbfeef0e7fd82227",
@@ -86,6 +105,6 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "67ef9bfcd2b9929ac5db14306371373ddb8ac407ffc30a84dbfeef0e7fd82227"
+    "spec_hash": "dbc46f93854ce3eda3b053d5ebee261ce2ec27e2e7b2f7994f63d91df01c3653"
   }
 }

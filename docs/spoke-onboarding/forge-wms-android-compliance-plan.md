@@ -72,7 +72,7 @@ The Android scanner is a **constrained edge device** — it cannot run a full Fo
 
 ```
 ┌──────────────┐    gRPC (forge.v1)    ┌────────────────────┐    gRPC (forge.v1)    ┌─────────────┐
-│  Android App  │ ◄───────────────────► │  Scanner Gateway    │ ◄───────────────────► │  Forge Hub   │
+│  Android App  │ ◄───────────────────► │  Forge Scanner    │ ◄───────────────────► │  Forge Hub   │
 │  (Kotlin)     │   ScannerService      │  Adapter (Python)   │   AdapterService      │  (Python)    │
 └──────────────┘                       └────────────────────┘                       └─────────────┘
                                               │
@@ -129,11 +129,11 @@ This is intentionally minimal — edge devices speak a simple contract, and the 
 
 ---
 
-## 4. Forge Adapter Design (Scanner Gateway)
+## 4. Forge Adapter Design (Forge Scanner)
 
 ### 4.1 Adapter Location
 ```
-forge-platform/src/forge/adapters/scanner_gateway/
+forge-platform/src/forge/adapters/forge_scanner/
 ├── __init__.py
 ├── adapter.py             # ForgeAdapter subclass
 ├── scanner_grpc_server.py # ScannerService gRPC server (Android-facing)
@@ -168,7 +168,7 @@ New scan types will be added as IMS and QMS come online — the gateway's routin
 
 ### 4.4 FACTS Spec
 
-A new FACTS spec (`specs/scanner-gateway-adapter.facts.json`) will declare the gateway adapter's identity, capabilities, routing rules, and supported scan types.
+A new FACTS spec (`specs/forge-scanner-adapter.facts.json`) will declare the gateway adapter's identity, capabilities, routing rules, and supported scan types.
 
 ### 4.5 FTTS Compliance
 
@@ -185,7 +185,7 @@ A new FACTS spec (`specs/scanner-gateway-adapter.facts.json`) will declare the g
 
 - Define `scanner.v1` proto package (ScannerService, ScanEvent, DeviceIdentity messages)
 - Generate Python stubs (gateway side) and Kotlin stubs (Android side — build but don't integrate yet)
-- Create gateway adapter scaffold under `forge-platform/src/forge/adapters/scanner_gateway/`
+- Create gateway adapter scaffold under `forge-platform/src/forge/adapters/forge_scanner/`
 - Write FACTS spec for the gateway adapter
 - Unit tests for routing logic and proto mapping
 

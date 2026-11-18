@@ -26,8 +26,8 @@ class TestGrammar:
             ("forge://schemas/opcua-generic/v1", "opcua-generic", None, "1", "contract"),
             ("forge://schemas/forge-wms/Barrel", "forge-wms", "Barrel", None, "schema"),
             ("forge://schemas/forge-wms/Barrel/v1.0.0", "forge-wms", "Barrel", "1.0.0", "version"),
-            ("forge://schemas/ot-module/settings/v1", "ot-module", "settings", "1", "version"),
-            ("forge://schemas/ot-module/bridge/v0.3.0", "ot-module", "bridge", "0.3.0", "version"),
+            ("forge://schemas/forge-ot/settings/v1", "forge-ot", "settings", "1", "version"),
+            ("forge://schemas/forge-ot/bridge/v0.3.0", "forge-ot", "bridge", "0.3.0", "version"),
             (
                 "forge://schemas/forge-mes/v0.11.0-beta.1",
                 "forge-mes",
@@ -106,12 +106,12 @@ class TestModelsHoldTheGrammar:
 
     def test_record_lineage_needs_a_versioned_ref(self):
         ok = RecordLineage(
-            schema_ref="forge://schemas/ot-module/bridge/v0.3.0",
-            adapter_id="ot-module",
+            schema_ref="forge://schemas/forge-ot/bridge/v0.3.0",
+            adapter_id="forge-ot",
             adapter_version="0.3.0",
         )
         assert ok.schema_ref.endswith("/bridge/v0.3.0")
         with pytest.raises(ValidationError, match=r"lineage\.schema_ref must name a version"):
             RecordLineage(
-                schema_ref="forge://schemas/ot-module/bridge", adapter_id="ot", adapter_version="1"
+                schema_ref="forge://schemas/forge-ot/bridge", adapter_id="ot", adapter_version="1"
             )

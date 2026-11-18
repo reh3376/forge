@@ -1,7 +1,7 @@
 From d6db522c432c9d72ab3b138946aefea48296f2cf Mon Sep 17 00:00:00 2001
 From: Roger Henley <rogerhenley345@gmail.com>
 Date: Thu, 9 Apr 2026 08:53:33 -0400
-Subject: [PATCH 1/2] =?UTF-8?q?feat(ot-module):=20P7=20Phases=201-6=20?=
+Subject: [PATCH 1/2] =?UTF-8?q?feat(forge-ot):=20P7=20Phases=201-6=20?=
  =?UTF-8?q?=E2=80=94=20OPC-UA=20adapter,=20alarm=20engine,=20control=20wri?=
  =?UTF-8?q?tes,=20bridge,=20scripting=20SDK?=
 MIME-Version: 1.0
@@ -29,9 +29,9 @@ FACTS spec v0.5.0: 21 data sources, 5 new script migration sources.
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 ---
  README.md                                     |   0
- docs/p7-ot-module/HMI_LATENCY_CONTRACT.md     |  84 ++
- docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md  | 283 ++++++
- docs/p7-ot-module/TIER1_CONVERSION_TARGETS.md | 193 ++++
+ docs/p7-forge-ot/HMI_LATENCY_CONTRACT.md     |  84 ++
+ docs/p7-forge-ot/SYSTEM_TO_FORGE_API_MAP.md  | 283 ++++++
+ docs/p7-forge-ot/TIER1_CONVERSION_TARGETS.md | 193 ++++
  src/forge/core/__init__.py                    |   6 +-
  src/forge/core/broker/__init__.py             |  51 +
  src/forge/core/broker/broker.py               | 439 +++++++++
@@ -39,7 +39,7 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
  src/forge/core/broker/protocol.py             | 403 ++++++++
  src/forge/core/broker/session.py              | 414 ++++++++
  src/forge/core/broker/topic_engine.py         | 307 ++++++
- .../facts/specs/ot-module.facts.json          | 834 ++++++++++++++++
+ .../facts/specs/forge-ot.facts.json          | 834 ++++++++++++++++
  src/forge/modules/ot/adapter.py               | 381 ++++++++
  src/forge/modules/ot/alarming/__init__.py     |  51 +
  src/forge/modules/ot/alarming/api.py          | 232 +++++
@@ -180,16 +180,16 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
  tests/sdk/scripting/test_util_module.py       | 182 ++++
  150 files changed, 35802 insertions(+), 157 deletions(-)
  create mode 100644 README.md
- create mode 100644 docs/p7-ot-module/HMI_LATENCY_CONTRACT.md
- create mode 100644 docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md
- create mode 100644 docs/p7-ot-module/TIER1_CONVERSION_TARGETS.md
+ create mode 100644 docs/p7-forge-ot/HMI_LATENCY_CONTRACT.md
+ create mode 100644 docs/p7-forge-ot/SYSTEM_TO_FORGE_API_MAP.md
+ create mode 100644 docs/p7-forge-ot/TIER1_CONVERSION_TARGETS.md
  create mode 100644 src/forge/core/broker/__init__.py
  create mode 100644 src/forge/core/broker/broker.py
  create mode 100644 src/forge/core/broker/local_client.py
  create mode 100644 src/forge/core/broker/protocol.py
  create mode 100644 src/forge/core/broker/session.py
  create mode 100644 src/forge/core/broker/topic_engine.py
- create mode 100644 src/forge/governance/facts/specs/ot-module.facts.json
+ create mode 100644 src/forge/governance/facts/specs/forge-ot.facts.json
  create mode 100644 src/forge/modules/ot/adapter.py
  create mode 100644 src/forge/modules/ot/alarming/__init__.py
  create mode 100644 src/forge/modules/ot/alarming/api.py
@@ -330,11 +330,11 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 diff --git a/README.md b/README.md
 new file mode 100644
 index 0000000..e69de29
-diff --git a/docs/p7-ot-module/HMI_LATENCY_CONTRACT.md b/docs/p7-ot-module/HMI_LATENCY_CONTRACT.md
+diff --git a/docs/p7-forge-ot/HMI_LATENCY_CONTRACT.md b/docs/p7-forge-ot/HMI_LATENCY_CONTRACT.md
 new file mode 100644
 index 0000000..8d14cfd
 --- /dev/null
-+++ b/docs/p7-ot-module/HMI_LATENCY_CONTRACT.md
++++ b/docs/p7-forge-ot/HMI_LATENCY_CONTRACT.md
 @@ -0,0 +1,84 @@
 +# HMI Latency Contract — OT Module Tag Access Performance
 +
@@ -420,11 +420,11 @@ index 0000000..8d14cfd
 +| SLOW | 5000ms | Ambient, utility, rarely-changing |
 +
 +The HMI must handle tags at all scan classes. The 300ms budget applies to the time from value change to screen update, not the scan interval itself.
-diff --git a/docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md b/docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md
+diff --git a/docs/p7-forge-ot/SYSTEM_TO_FORGE_API_MAP.md b/docs/p7-forge-ot/SYSTEM_TO_FORGE_API_MAP.md
 new file mode 100644
 index 0000000..85ea705
 --- /dev/null
-+++ b/docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md
++++ b/docs/p7-forge-ot/SYSTEM_TO_FORGE_API_MAP.md
 @@ -0,0 +1,283 @@
 +# system.* → forge.* API Mapping Reference
 +
@@ -709,11 +709,11 @@ index 0000000..85ea705
 +| ORM layer (`plastic/`) | 14 | **EVALUATE** — May be replaced by forge.db patterns |
 +| Integration scripts (Atlassian, Azure) | 5 | **SKIP** — external integrations handled by dedicated services |
 +| WebDev endpoints (`com.inductiveautomation.webdev/`) | 192 | **CONVERT** — Tier 2 (via `@forge.api.route` decorators) |
-diff --git a/docs/p7-ot-module/TIER1_CONVERSION_TARGETS.md b/docs/p7-ot-module/TIER1_CONVERSION_TARGETS.md
+diff --git a/docs/p7-forge-ot/TIER1_CONVERSION_TARGETS.md b/docs/p7-forge-ot/TIER1_CONVERSION_TARGETS.md
 new file mode 100644
 index 0000000..2dbefab
 --- /dev/null
-+++ b/docs/p7-ot-module/TIER1_CONVERSION_TARGETS.md
++++ b/docs/p7-forge-ot/TIER1_CONVERSION_TARGETS.md
 @@ -0,0 +1,193 @@
 +# Tier 1 Script Conversion Targets
 +
@@ -2690,16 +2690,16 @@ index 0000000..5c52ddc
 +
 +    # Both must be fully consumed
 +    return fi == len(filter_parts) and ti == len(topic_parts)
-diff --git a/src/forge/governance/facts/specs/ot-module.facts.json b/src/forge/governance/facts/specs/ot-module.facts.json
+diff --git a/src/forge/governance/facts/specs/forge-ot.facts.json b/src/forge/governance/facts/specs/forge-ot.facts.json
 new file mode 100644
 index 0000000..a9eb2c8
 --- /dev/null
-+++ b/src/forge/governance/facts/specs/ot-module.facts.json
++++ b/src/forge/governance/facts/specs/forge-ot.facts.json
 @@ -0,0 +1,834 @@
 +{
 +  "spec_version": "0.1.0",
 +  "adapter_identity": {
-+    "adapter_id": "ot-module",
++    "adapter_id": "forge-ot",
 +    "name": "Forge OT/SCADA Module — OPC-UA Adapter",
 +    "version": "0.5.0",
 +    "type": "BIDIRECTIONAL",
@@ -2908,7 +2908,7 @@ index 0000000..a9eb2c8
 +    ]
 +  },
 +  "data_contract": {
-+    "schema_ref": "forge://schemas/ot-module/v0.3.0",
++    "schema_ref": "forge://schemas/forge-ot/v0.3.0",
 +    "output_format": "tag_value",
 +    "context_fields": [
 +      "tag_path",
@@ -3168,8 +3168,8 @@ index 0000000..a9eb2c8
 +      }
 +    ],
 +    "sample_alarm_record": {
-+      "record_id": "ot-module:alarm:evt-20260409-001",
-+      "source_adapter": "ot-module",
++      "record_id": "forge-ot:alarm:evt-20260409-001",
++      "source_adapter": "forge-ot",
 +      "collected_at": "2026-04-09T14:30:00Z",
 +      "context": {
 +        "alarm_id": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
@@ -3194,8 +3194,8 @@ index 0000000..a9eb2c8
 +      }
 +    },
 +    "sample_control_write_record": {
-+      "record_id": "ot-module:write:evt-20260409-002",
-+      "source_adapter": "ot-module",
++      "record_id": "forge-ot:write:evt-20260409-002",
++      "source_adapter": "forge-ot",
 +      "collected_at": "2026-04-09T15:00:00Z",
 +      "context": {
 +        "write_request_id": "f1e2d3c4-5678-90ab-cdef-1234567890ef",
@@ -3223,8 +3223,8 @@ index 0000000..a9eb2c8
 +      }
 +    },
 +    "sample_record": {
-+      "record_id": "ot-module:tag:evt-20260408-001",
-+      "source_adapter": "ot-module",
++      "record_id": "forge-ot:tag:evt-20260408-001",
++      "source_adapter": "forge-ot",
 +      "collected_at": "2026-04-08T10:30:00Z",
 +      "context": {
 +        "tag_path": "WH/WHK01/Distillery01/Utility01/LIT_6050B/Out_PV",
@@ -3412,7 +3412,7 @@ index 0000000..a9eb2c8
 +    },
 +    "dead_letter": {
 +      "enabled": true,
-+      "topic": "forge.dead-letter.ot-module",
++      "topic": "forge.dead-letter.forge-ot",
 +      "max_age_hours": 168
 +    },
 +    "health_degradation": {
@@ -3459,7 +3459,7 @@ index 0000000..a9eb2c8
 +    }
 +  },
 +  "metadata": {
-+    "spoke": "ot-module",
++    "spoke": "forge-ot",
 +    "hub_module": "forge-modules",
 +    "source_repo": "https://github.com/reh3376/forge",
 +    "source_loc": "8000+",
@@ -3525,7 +3525,7 @@ index 0000000..a9eb2c8
 +        "source": "manual",
 +        "changed_by": "claude-opus",
 +        "change_type": "feature",
-+        "reason": "Phase 6 Script Migration: Python 3.12+ scripting engine replacing Ignition Jython 2.7. ScriptEngine (importlib discovery, TriggerRegistry decorators, hot-reload file watcher), ScriptSandbox (PEP 302 import allowlist, CPU/memory limits), ScriptRBAC (area+tag-pattern permissions, default DENY), ScriptAuditTrail (append-only 10K ring buffer), 6 new forge.* SDK modules (date, dataset, perspective, file, util, security) completing the 11-module API surface covering all 52 unique system.* calls. 120 new tests. Added 5 new data sources (script_engine, script_sandbox, script_rbac, script_audit, script_api_routes). API mapping reference: docs/p7-ot-module/SYSTEM_TO_FORGE_API_MAP.md."
++        "reason": "Phase 6 Script Migration: Python 3.12+ scripting engine replacing Ignition Jython 2.7. ScriptEngine (importlib discovery, TriggerRegistry decorators, hot-reload file watcher), ScriptSandbox (PEP 302 import allowlist, CPU/memory limits), ScriptRBAC (area+tag-pattern permissions, default DENY), ScriptAuditTrail (append-only 10K ring buffer), 6 new forge.* SDK modules (date, dataset, perspective, file, util, security) completing the 11-module API surface covering all 52 unique system.* calls. 120 new tests. Added 5 new data sources (script_engine, script_sandbox, script_rbac, script_audit, script_api_routes). API mapping reference: docs/p7-forge-ot/SYSTEM_TO_FORGE_API_MAP.md."
 +      }
 +    ]
 +  }
@@ -3601,7 +3601,7 @@ index 0000000..be1c876
 +    """
 +
 +    manifest = AdapterManifest(
-+        adapter_id="forge-ot-module",
++        adapter_id="forge-ot",
 +        name="Forge OT Module",
 +        version="0.1.0",
 +        type="ACQUISITION",
@@ -3615,7 +3615,7 @@ index 0000000..be1c876
 +            discover=True,
 +        ),
 +        data_contract=DataContract(
-+            schema_ref="forge://schemas/ot-module/v0.1.0",
++            schema_ref="forge://schemas/forge-ot/v0.1.0",
 +            output_format="contextual_record",
 +            context_fields=["area", "equipment_id", "operating_mode"],
 +        ),
@@ -6373,7 +6373,7 @@ index 0000000..e31f616
 +logger = logging.getLogger(__name__)
 +
 +# Schema ref for bridge-sourced records (distinct from OT Module direct)
-+_BRIDGE_SCHEMA_REF = "forge://schemas/ot-module/v0.3.0/bridge"
++_BRIDGE_SCHEMA_REF = "forge://schemas/forge-ot/v0.3.0/bridge"
 +_BRIDGE_ADAPTER_ID = "ignition-bridge"
 +_BRIDGE_ADAPTER_VERSION = "0.1.0"
 +
@@ -8331,8 +8331,8 @@ index 0000000..23d587b
 +logger = logging.getLogger(__name__)
 +
 +# Schema ref for OT Module records (matches FACTS spec data_contract)
-+_SCHEMA_REF = "forge://schemas/ot-module/v0.1.0"
-+_ADAPTER_ID = "forge-ot-module"
++_SCHEMA_REF = "forge://schemas/forge-ot/v0.1.0"
++_ADAPTER_ID = "forge-ot"
 +_ADAPTER_VERSION = "0.1.0"
 +
 +
@@ -8351,7 +8351,7 @@ index 0000000..23d587b
 +        tag: Tag definition (path, data_type, engineering_units, etc.)
 +        tag_value: Current runtime value (value, quality, timestamps)
 +        enrichment: Operational context from EnrichmentPipeline.enrich()
-+        adapter_id: Adapter identity (default: forge-ot-module)
++        adapter_id: Adapter identity (default: forge-ot)
 +        adapter_version: Adapter version (default: 0.1.0)
 +
 +    Returns:
@@ -11386,7 +11386,7 @@ index 0000000..bda6705
 +++ b/src/forge/modules/ot/manifest.json
 @@ -0,0 +1,86 @@
 +{
-+  "adapter_id": "ot-module",
++  "adapter_id": "forge-ot",
 +  "name": "Forge OT/SCADA Module — OPC-UA Adapter",
 +  "version": "0.1.0",
 +  "type": "ACQUISITION",
@@ -11400,7 +11400,7 @@ index 0000000..bda6705
 +    "discover": true
 +  },
 +  "data_contract": {
-+    "schema_ref": "forge://schemas/ot-module/v0.1.0",
++    "schema_ref": "forge://schemas/forge-ot/v0.1.0",
 +    "output_format": "tag_value",
 +    "context_fields": [
 +      "tag_path",
@@ -11461,9 +11461,9 @@ index 0000000..bda6705
 +    ],
 +    "note": "9-type tag engine — 6 standard types matching Ignition + 3 Forge-exclusive (Computed, Event, Virtual)"
 +  },
-+  "facts_spec_ref": "forge://governance/facts/specs/ot-module.facts.json",
++  "facts_spec_ref": "forge://governance/facts/specs/forge-ot.facts.json",
 +  "metadata": {
-+    "spoke": "ot-module",
++    "spoke": "forge-ot",
 +    "hub_module": "forge.modules.ot",
 +    "source_repo": "https://github.com/reh3376/forge",
 +    "source_lines": 2000,
@@ -26127,7 +26127,7 @@ index 0000000..6c49854
 +class TestManifest:
 +
 +    def test_manifest_id(self, adapter):
-+        assert adapter.manifest.adapter_id == "forge-ot-module"
++        assert adapter.manifest.adapter_id == "forge-ot"
 +
 +    def test_all_capabilities_enabled(self, adapter):
 +        caps = adapter.manifest.capabilities
@@ -26168,7 +26168,7 @@ index 0000000..6c49854
 +        await adapter.configure({})
 +        await adapter.start()
 +        health = await adapter.health()
-+        assert health.adapter_id == "forge-ot-module"
++        assert health.adapter_id == "forge-ot"
 +        assert health.state == AdapterState.HEALTHY
 +        assert health.uptime_seconds >= 0
 +
@@ -26465,7 +26465,7 @@ index 0000000..dc58f19
 +
 +    def test_record_source_fields(self, sample_tag, sample_value, full_enrichment):
 +        record = build_ot_record(tag=sample_tag, tag_value=sample_value, enrichment=full_enrichment)
-+        assert record.source.adapter_id == "forge-ot-module"
++        assert record.source.adapter_id == "forge-ot"
 +        assert record.source.system == "forge-ot"
 +        assert record.source.tag_path == "WH/WHK01/Distillery01/TIT_2010/Out_PV"
 +        assert record.source.connection_id == "WHK01"
@@ -26495,8 +26495,8 @@ index 0000000..dc58f19
 +
 +    def test_record_lineage(self, sample_tag, sample_value, full_enrichment):
 +        record = build_ot_record(tag=sample_tag, tag_value=sample_value, enrichment=full_enrichment)
-+        assert record.lineage.schema_ref == "forge://schemas/ot-module/v0.1.0"
-+        assert record.lineage.adapter_id == "forge-ot-module"
++        assert record.lineage.schema_ref == "forge://schemas/forge-ot/v0.1.0"
++        assert record.lineage.adapter_id == "forge-ot"
 +        assert record.lineage.adapter_version == "0.1.0"
 +        assert "context_enrichment" in record.lineage.transformation_chain
 +
@@ -26877,7 +26877,7 @@ index 0000000..e7716a4
 +    now = datetime.now(tz=timezone.utc)
 +    return ContextualRecord(
 +        source=RecordSource(
-+            adapter_id="forge-ot-module",
++            adapter_id="forge-ot",
 +            system="forge-ot",
 +            tag_path=tag_path,
 +        ),
@@ -26889,8 +26889,8 @@ index 0000000..e7716a4
 +        value=RecordValue(raw=78.4, quality=QualityCode.GOOD, data_type="DOUBLE"),
 +        context=RecordContext(area="Distillery01", equipment_id="TIT_2010"),
 +        lineage=RecordLineage(
-+            schema_ref="forge://schemas/ot-module/v0.1.0",
-+            adapter_id="forge-ot-module",
++            schema_ref="forge://schemas/forge-ot/v0.1.0",
++            adapter_id="forge-ot",
 +            adapter_version="0.1.0",
 +        ),
 +    )
