@@ -20,7 +20,8 @@ SKIP with that cause, never as passed.
 
 A requirement the spec waives is reported as SKIP with the waiver's reason
 and backlog item on every run. A waiver whose backlog item is closed or
-missing fails.
+missing fails. A waiver of M-3 or M-4 (time-keeping) needs admin privileges:
+it fails until the spec's hash is approved.
 
     runner = FMTSRunner(schema_path=SCHEMA_PATH)
     report = await runner.run(target="whk-wms", spec=spec)
@@ -64,9 +65,12 @@ REQUIREMENTS: dict[str, str] = {
     "M-11": "is built from the module SDK template for its language",
 }
 
-# Time-keeping is the core requirement (owner, O-1) and the hub refuses a module that
-# does not exchange time whatever its spec says (O-2), so these two cannot be waived.
-NOT_WAIVABLE = frozenset({"M-3", "M-4"})
+# Time-keeping is the core requirement (owner, O-1). Its two requirements can be waived
+# only with admin privileges (owner, Q-10, 2026-11-18): the waiver counts once the spec's
+# hash is approved, and until then it fails by name. Only the owner approves a hash today;
+# the admin scope of the role model takes that place when it exists (FB-075). A waiver
+# covers this check only: the hub still refuses a module that does not exchange time (O-2).
+ADMIN_WAIVABLE = frozenset({"M-3", "M-4"})
 
 # Checked against a running module by the conformance kit, which is not built (FB-137).
 CONFORMANCE_KIT = ("M-4", "M-5", "M-6", "M-7")
@@ -480,6 +484,10 @@ class FMTSRunner(FxTSRunner):
 
     def _check_waivers(self, spec: dict[str, Any], backlog: dict[str, bool]) -> FxTSVerdict:
         baseline, waivers = spec["baseline"], spec["waivers"]
+        integrity = spec.get("integrity") or {}
+        approved_by = (
+            integrity.get("approved_by") if integrity.get("hash_state") == "approved" else ""
+        ) or ""
         violations = []
         seen: set[str] = set()
         for index, waiver in enumerate(waivers):
@@ -490,13 +498,14 @@ class FMTSRunner(FxTSRunner):
                     SpecViolation(field=field, message=f"{requirement} is waived more than once")
                 )
             seen.add(requirement)
-            if requirement in NOT_WAIVABLE:
+            if requirement in ADMIN_WAIVABLE and not approved_by:
                 violations.append(
                     SpecViolation(
                         field=field,
                         message=(
-                            f"{requirement} cannot be waived: time-keeping is the core "
-                            "requirement and the hub refuses a module without it"
+                            f"{requirement} is a time-keeping requirement and is waived "
+                            "only with admin privileges: the waiver does not count until "
+                            "the spec's hash is approved"
                         ),
                     )
                 )
@@ -544,6 +553,8 @@ class FMTSRunner(FxTSRunner):
             evidence={
                 "waived": sorted(seen),
                 "backlog_items": {w["requirement"]: w["backlog_item"] for w in waivers},
+                "admin_waivers": sorted(seen & ADMIN_WAIVABLE),
+                "approved_by": approved_by,
             },
         )
 

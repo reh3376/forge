@@ -3,7 +3,7 @@
 **Framework ID:** FMTS
 **Full Name:** Forge Module Test Specification
 **CI Gate:** Hard-fail (merge-blocking): `tests/governance/fmts/` runs in the `hub-python` job
-**Status:** v0.1.0. Schema and runner (`fmts_runner.py`, 19 verdicts per spec). No module has a spec yet (FB-136), and four of the eleven requirements are reported as not checked until the conformance kit exists (FB-137)
+**Status:** v0.1.0. Schema, runner (`fmts_runner.py`, 19 verdicts per spec) and nine module specs, all `pending_review` until the owner approves them (FB-136). Four of the eleven requirements are reported as not checked until the conformance kit exists (FB-137)
 **Decided in:** [`docs/decisions/forge-module-requirements.md`](../decisions/forge-module-requirements.md) (D-12, signed by the owner on 2026-11-17)
 **MDEMG Analog:** None
 
@@ -73,7 +73,7 @@ A module that cannot yet meet a requirement says so in its spec:
 - A waived requirement is reported on every run as `SKIP` with the text `WAIVED until FB-nnn` and the reason.
 - The backlog item must be in `BACKLOG.md` and open. When it is closed (its description starts with `**Done` or `**Fixed`), the waiver has expired and the run fails until the requirement is met and the waiver removed.
 - A claim of `waived` with no waiver, or a waiver for a requirement claimed `met`, fails. In both cases the requirement is still enforced.
-- **M-3 and M-4 cannot be waived.** Time-keeping is the core requirement, and the hub refuses a module that does not exchange time whatever its spec says.
+- **M-3 and M-4 are waived only with admin privileges** (owner, 2026-11-18, Q-10 of the record). They are the time-keeping requirements. A waiver of either counts only once the spec's hash is approved; on a spec that is not approved, `fmts:waivers` fails and names it. Only the owner approves a hash today. The waiver covers this check only: the hub still refuses at runtime a module that does not exchange time.
 
 ## Spec sections
 
@@ -99,6 +99,19 @@ Every run gives 19 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:h
 
 `fmts:enum-parity` fails if the tolerance classes drift from FACTS `time_governance.tolerance_class`, or the schema's baseline from the runner's eleven requirements.
 
+## The module specs
+
+`src/forge/governance/fmts/specs/` holds one spec for each module that has a FACTS spec. `tests/governance/fmts/test_module_specs.py` runs all of them in CI and names every failure it allows.
+
+| Module | Kind | Waived | Fails today |
+|---|---|---|---|
+| whk-wms, whk-cmms, whk-erpi, whk-nms, next-trend | integration | M-10 (FB-141) | `hash-approved` |
+| bosc-ims, scanner-gateway | integration | M-10 (FB-141) | `hash-approved` |
+| ot-module | ot | M-10 (FB-141), M-11 (FB-146) | `hash-approved`, `m2` (FB-144) |
+| forge-mes (the interim bridge) | management | M-3 (FB-145), M-8 (FB-057), M-9 (FB-143), M-10 (FB-141), M-11 (FB-076) | `hash-approved`, `waivers` (the M-3 waiver needs the owner's approval) |
+
+The time contract entries of the seven integration modules state the contract they are to be built to. Nothing reads those systems' clocks yet (FB-139).
+
 ## Running it
 
 ```bash
@@ -112,7 +125,11 @@ forge governance approve path/to/x.fmts.json --by reh3376    # the owner only
 
 | Gap | Backlog |
 |---|---|
-| No module has an FMTS spec | FB-136 |
+| The nine module specs await the owner's approval | FB-136 |
+| The OT module's manifests disagree with its FACTS spec, so its spec fails `fmts:m2` | FB-144 |
+| The interim MES bridge cannot state a governed time source; M-3 is waived | FB-145 |
+| The OT module is not built from a template (M-11 waived), and its local SQLite buffer is not declared | FB-146, FB-147 |
+| No clock-read method exists for a gRPC server | FB-139 |
 | M-4 to M-7 are not checked; the conformance kit does that | FB-137 |
 | The hub does not probe its own databases' clocks | FB-138 |
 | No integration module reads its third-party system's clock | FB-139 |

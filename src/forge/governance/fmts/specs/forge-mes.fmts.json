@@ -1,0 +1,113 @@
+{
+  "spec_version": "0.1.0",
+  "module_identity": {
+    "module_id": "forge-mes",
+    "name": "Forge MES (the interim MES bridge)",
+    "version": "0.1.0",
+    "kind": "management",
+    "language": "typescript",
+    "source_paths": [
+      "modules/Forge MES/backend/src",
+      "modules/Forge MES/frontend",
+      "modules/Forge MES/shared/src",
+      "src/forge/adapters/forge_mes"
+    ]
+  },
+  "hub_link": {
+    "protocol": "grpc",
+    "service": "forge.v1.AdapterService"
+  },
+  "references": {
+    "facts": {
+      "path": "src/forge/governance/facts/specs/forge-mes.facts.json",
+      "adapter_id": "forge-mes"
+    },
+    "manifest": "modules/Forge MES/backend/src/forge/forge-mes.manifest.json"
+  },
+  "baseline": {
+    "M-1": "met",
+    "M-2": "met",
+    "M-3": "waived",
+    "M-4": "met",
+    "M-5": "met",
+    "M-6": "met",
+    "M-7": "met",
+    "M-8": "waived",
+    "M-9": "waived",
+    "M-10": "waived",
+    "M-11": "waived"
+  },
+  "waivers": [
+    {
+      "requirement": "M-3",
+      "reason": "The interim bridge's database stamps rows with its own clock, so no permitted written_time_source can be declared, and its FACTS time_governance does not cover the plant MQTT brokers it reads. Waived with admin privileges until the bridge is fixed or replaced.",
+      "backlog_item": "FB-145"
+    },
+    {
+      "requirement": "M-8",
+      "reason": "The interim bridge owns its PostgreSQL database and holds its own credential until the data moves into the hub's mod_mes schema.",
+      "backlog_item": "FB-057"
+    },
+    {
+      "requirement": "M-9",
+      "reason": "The interim bridge ships its own Next.js frontend as the MES user interface until forge-display exists.",
+      "backlog_item": "FB-143"
+    },
+    {
+      "requirement": "M-10",
+      "reason": "No module ships a roles file yet: the roles file has no FxTS spec to be written against, and the hub still uses its own flat roles.",
+      "backlog_item": "FB-141"
+    },
+    {
+      "requirement": "M-11",
+      "reason": "The interim bridge is the imported NestJS application, not built from the module SDK; the Go forge-mes replaces it.",
+      "backlog_item": "FB-076"
+    }
+  ],
+  "time_contract": {
+    "hub": {
+      "exchange": "four-timestamp",
+      "fail_closed": true
+    },
+    "plant_floor_devices": "declared-in-facts",
+    "databases": [
+      {
+        "name": "mes-postgres",
+        "owner": "module",
+        "engine": "PostgreSQL (Prisma)",
+        "access": "read-write",
+        "credential": "module-held",
+        "fail_closed": true
+      }
+    ],
+    "third_party_systems": []
+  },
+  "user_interface": {
+    "ships_ui_code": true,
+    "screens": true
+  },
+  "scaffold": {
+    "template": "none"
+  },
+  "metadata": {
+    "hosting": "interim: NestJS backend and Next.js frontend under modules/Forge MES, with the hub-side spoke under src/forge/adapters/forge_mes",
+    "note": "M-3 is a time-keeping requirement: its waiver counts only once the owner approves this spec (Q-10). The bridge's Redis cache and RabbitMQ broker were not assessed (FB-145). No FVTS spec describes the MES screens; M-9 is waived."
+  },
+  "integrity": {
+    "hash_state": "pending_review",
+    "previous_hash": "143c13540a8f2b404171283c78ccdd586dcf18840f7cfa44769bf35862f6bad9",
+    "change_history": [
+      {
+        "previous_hash": "143c13540a8f2b404171283c78ccdd586dcf18840f7cfa44769bf35862f6bad9",
+        "new_hash": "15c1953615c0dea524b872aa426ae38b11d64f6e4d29f2a370c564e1684cae47",
+        "changed_at": "2026-11-18T15:12:26Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-136: M-3 waived against FB-145 (owner, Q-10: time-keeping waivers with admin privileges)"
+      }
+    ],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "15c1953615c0dea524b872aa426ae38b11d64f6e4d29f2a370c564e1684cae47"
+  }
+}

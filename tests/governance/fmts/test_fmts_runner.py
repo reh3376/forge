@@ -6,8 +6,8 @@ import json
 from typing import TYPE_CHECKING, Any
 
 from forge.governance.fmts.runners.fmts_runner import (
+    ADMIN_WAIVABLE,
     CONFORMANCE_KIT,
-    NOT_WAIVABLE,
     REQUIREMENTS,
     FMTSRunner,
     load_backlog,
@@ -160,7 +160,12 @@ class TestWaivers:
         verdicts = _by_id(report)
         assert report.passed
         assert verdicts["fmts:waivers"].status == PASS
-        assert verdicts["fmts:waivers"].evidence["backlog_items"] == {"M-11": "FB-900"}
+        assert verdicts["fmts:waivers"].evidence == {
+            "waived": ["M-11"],
+            "backlog_items": {"M-11": "FB-900"},
+            "admin_waivers": [],
+            "approved_by": "reh3376",
+        }
         waived = verdicts["fmts:m11"]
         assert waived.status == SKIP and waived.message.startswith("WAIVED until FB-900")
         assert REASON in waived.message and waived.evidence["waived"] is True
@@ -186,13 +191,39 @@ class TestWaivers:
         report = await _run(runner, sign(unsigned), repo, backlog={"FB-999": True})
         assert _by_id(report)["fmts:waivers"].status == PASS
 
-    async def test_time_keeping_cannot_be_waived(self, runner, unsigned, repo) -> None:
-        assert frozenset({"M-3", "M-4"}) == NOT_WAIVABLE
-        for requirement in sorted(NOT_WAIVABLE):
+    async def test_time_keeping_is_waived_only_with_admin_privileges(
+        self, runner, unsigned, repo
+    ) -> None:
+        from forge.governance.shared.runner import add_spec_hash
+
+        assert frozenset({"M-3", "M-4"}) == ADMIN_WAIVABLE
+        for requirement in sorted(ADMIN_WAIVABLE):
             spec = json.loads(json.dumps(unsigned))
             _waive(spec, requirement)
-            verdict = await _one(runner, spec, repo, "waivers")
-            assert verdict.status == FAIL and "cannot be waived" in _messages(verdict)
+            # Stamped but not approved: the waiver does not count yet.
+            add_spec_hash(spec, changed_by="test")
+            verdicts = _by_id(await _run(runner, spec, repo))
+            assert verdicts["fmts:waivers"].status == FAIL
+            assert "admin privileges" in _messages(verdicts["fmts:waivers"])
+            # Approved: it counts, and is named on the run like any other waiver.
+            verdicts = _by_id(await _run(runner, sign(spec), repo))
+            waivers = verdicts["fmts:waivers"]
+            assert waivers.status == PASS
+            assert waivers.evidence["admin_waivers"] == [requirement]
+            assert waivers.evidence["approved_by"] == "reh3376"
+            skipped = verdicts[f"fmts:{requirement.lower().replace('-', '')}"]
+            assert skipped.status == SKIP and skipped.message.startswith("WAIVED until FB-900")
+
+    async def test_an_ordinary_waiver_does_not_wait_for_approval(
+        self, runner, unsigned, repo
+    ) -> None:
+        from forge.governance.shared.runner import add_spec_hash
+
+        _waive(unsigned, "M-9")
+        add_spec_hash(unsigned, changed_by="test")
+        verdicts = _by_id(await _run(runner, unsigned, repo))
+        assert verdicts["fmts:waivers"].status == PASS
+        assert verdicts["fmts:hash-approved"].status == FAIL
 
     async def test_a_running_requirement_can_be_waived(self, runner, unsigned, repo) -> None:
         _waive(unsigned, "M-7")
