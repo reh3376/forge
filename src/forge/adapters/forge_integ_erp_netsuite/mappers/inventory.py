@@ -20,7 +20,7 @@ from forge.core.models.manufacturing.operational_event import OperationalEvent
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "forge-erpi"
+_SOURCE_SYSTEM = "forge-integ-erp-netsuite"
 
 
 def map_barrel(raw: dict[str, Any]) -> ManufacturingUnit | None:

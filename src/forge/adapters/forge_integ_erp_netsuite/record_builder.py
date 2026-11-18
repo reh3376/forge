@@ -29,8 +29,8 @@ from forge.core.models.contextual_record import (
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "forge-erpi"
-_SCHEMA_REF = "forge://schemas/forge-erpi/v0.1.0"
+_SOURCE_SYSTEM = "forge-integ-erp-netsuite"
+_SCHEMA_REF = "forge://schemas/forge-integ-erp-netsuite/v0.1.0"
 
 
 def build_contextual_record(
@@ -46,7 +46,7 @@ def build_contextual_record(
     Args:
         raw_event: Full ERPI RabbitMQ message envelope.
         context: Pre-built RecordContext from context.build_record_context().
-        adapter_id: Adapter manifest ID (forge-erpi).
+        adapter_id: Adapter manifest ID (forge-integ-erp-netsuite).
         adapter_version: Adapter manifest version.
         source_timestamp_origin: the origin the connection declared for the clock that
             stamps its values (device, server, edge or forge); None when undeclared (FB-088)
@@ -117,8 +117,8 @@ def build_contextual_record(
             adapter_version=adapter_version,
             transformation_chain=[
                 f"erpi.v1.{record_name}",
-                "forge.adapters.forge_erpi.context.build_record_context",
-                "forge.adapters.forge_erpi.record_builder.build_contextual_record",
+                "forge.adapters.forge_integ_erp_netsuite.context.build_record_context",
+                "forge.adapters.forge_integ_erp_netsuite.record_builder.build_contextual_record",
             ],
         ),
     )

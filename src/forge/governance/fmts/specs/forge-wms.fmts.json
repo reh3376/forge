@@ -48,7 +48,17 @@
       "fail_closed": true
     },
     "plant_floor_devices": "none",
-    "databases": [],
+    "databases": [
+      {
+        "name": "mod_wms",
+        "owner": "hub",
+        "engine": "PostgreSQL",
+        "access": "read-write",
+        "credential": "forge-issued",
+        "written_time_source": "module-clock",
+        "fail_closed": true
+      }
+    ],
     "third_party_systems": []
   },
   "user_interface": {
@@ -59,14 +69,24 @@
     "template": "python-adapter"
   },
   "metadata": {
-    "hosting": "hub-hosted Python adapter",
+    "hosting": "hub-hosted Python adapter today",
     "state": "This is Forge's own management module for this service, not an integration with another system. An existing application was the example it is built from: the Python adapter holds the data contract taken from that example (sources, context mapping, record shapes). The module's own logic, storage and screens are not built.",
-    "time_contract_state": "No third-party system: the module's only time link is to its hub. M-4 to M-7 are unverified until the conformance kit exists (FB-137)."
+    "target": "A Go module built from the module SDK, with Python scripting for customization (owner, 2026-11-18). Its source path, language and template change in this spec when that code exists.",
+    "time_contract_state": "The hub database mod_wms is declared as the rule the module is built to: every time it writes there comes from its own governed clock. The adapter does not use the database yet. M-4 to M-7 are run by the conformance kit through the Python transport, against a reference hub."
   },
   "integrity": {
-    "hash_state": "pending_review",
-    "previous_hash": "6ec66b593f8f13732607452dd42408b85a24837d13455e98d9779ca022c98048",
+    "hash_state": "approved",
+    "previous_hash": "932735f9544660e6579b2625e09879a57eb85d6b0143b12fcc9eaa5477d93500",
     "change_history": [
+      {
+        "previous_hash": "932735f9544660e6579b2625e09879a57eb85d6b0143b12fcc9eaa5477d93500",
+        "new_hash": "d23c612ebdc8b01e02e999551bc636dd5e55868228c1fdcdbf5d1d46227e9650",
+        "changed_at": "2026-11-18T16:19:44Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "Owner review 2026-11-18: the hub database mod_wms declared; the Go target stated"
+      },
       {
         "previous_hash": "6ec66b593f8f13732607452dd42408b85a24837d13455e98d9779ca022c98048",
         "new_hash": "932735f9544660e6579b2625e09879a57eb85d6b0143b12fcc9eaa5477d93500",
@@ -84,18 +104,11 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "structural",
         "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
-      },
-      {
-        "previous_hash": "769703de2ce51fae1f78547b283b0b9cf55da20fca2648d301cbe7d613575ced",
-        "new_hash": "f4b14d145e7b59d107d0a799e5cab1da6be7084559fd91e1671bccdc71cef5c2",
-        "changed_at": "2026-11-18T15:30:57Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "content",
-        "reason": "FB-150: module id renamed (owner 2026-11-18: no existing company named in the public repository)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "932735f9544660e6579b2625e09879a57eb85d6b0143b12fcc9eaa5477d93500"
+    "spec_hash": "d23c612ebdc8b01e02e999551bc636dd5e55868228c1fdcdbf5d1d46227e9650",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-18T16:20:07Z"
   }
 }

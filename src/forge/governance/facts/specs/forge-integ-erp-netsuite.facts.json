@@ -1,8 +1,8 @@
 {
   "spec_version": "0.1.0",
   "adapter_identity": {
-    "adapter_id": "forge-erpi",
-    "name": "Forge ERP Interface Adapter",
+    "adapter_id": "forge-integ-erp-netsuite",
+    "name": "Forge NetSuite ERP Integration Adapter",
     "version": "0.1.0",
     "type": "INGESTION",
     "tier": "ERP_BUSINESS",
@@ -118,7 +118,7 @@
         "required": false,
         "secret": false,
         "description": "Consumer group ID for RabbitMQ queue naming. Must be unique to Forge to avoid stealing messages from ERPI's own consumers.",
-        "default": "forge-erpi"
+        "default": "forge-integ-erp-netsuite"
       },
       {
         "name": "rabbitmq_vhost",
@@ -130,12 +130,12 @@
       }
     ],
     "auth_methods": [
-      "jwt_bearer",
-      "none (rabbitmq auth is in connection URL)"
+      "bearer_token",
+      "none"
     ]
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/forge-erpi/v0.1.0",
+    "schema_ref": "forge://schemas/forge-integ-erp-netsuite/v0.1.0",
     "external_contract_ref": "asyncapi://whk-asyncapi-types/v1.0.0",
     "output_format": "contextual_record",
     "context_fields": [
@@ -165,7 +165,7 @@
       {
         "source_type": "rabbitmq",
         "endpoint": "wh.whk01.distillery01.*",
-        "description": "33 entity fanout exchanges following UNS pattern. Primary data source \u2014 covers all entities in real-time. Exchange type: fanout with durable queues. Adapter creates its own queue per exchange (forge-erpi-<entity>) without affecting existing ERPI consumers.",
+        "description": "33 entity fanout exchanges following UNS pattern. Primary data source \u2014 covers all entities in real-time. Exchange type: fanout with durable queues. Adapter creates its own queue per exchange (forge-integ-erp-netsuite-<entity>) without affecting existing ERPI consumers.",
         "entities": [
           "PurchaseOrder",
           "ProductionOrder",
@@ -238,63 +238,9 @@
         "collection_mode": "poll"
       }
     ],
-    "cross_module_data_flows": [
-      {
-        "flow_name": "erp_master_data_to_mes",
-        "direction": "NetSuite \u2192 ERPI \u2192 MES",
-        "entities": [
-          "Recipe",
-          "RecipeParameter",
-          "RecipeGroup",
-          "Bom",
-          "BomItem",
-          "Item",
-          "ItemGroup",
-          "Vendor",
-          "Customer"
-        ],
-        "indicator_field": "transactionInitiator",
-        "indicator_value": "ERP",
-        "description": "ERP-originated master data that MES depends on for recipe definitions and production planning. The Forge adapter preserves the ERP origin to maintain decision context."
-      },
-      {
-        "flow_name": "mes_execution_to_erp",
-        "direction": "MES \u2192 ERPI \u2192 NetSuite",
-        "entities": [
-          "ProductionOrderUnitProcedure",
-          "UnitProcedure",
-          "Operation",
-          "EquipmentPhase",
-          "ProductionSchedule",
-          "ScheduleOrder",
-          "ScheduleQueue",
-          "ItemReceipt"
-        ],
-        "indicator_field": "transactionInitiator",
-        "indicator_value": "WH",
-        "description": "Manufacturing execution data flowing to ERP for financial posting. ProductionOrderUnitProcedure has a special handler that posts directly to NetSuite. ItemReceipt has a 1-week delayed posting threshold."
-      },
-      {
-        "flow_name": "wms_inventory_to_erp",
-        "direction": "WMS \u2192 ERPI \u2192 NetSuite",
-        "entities": [
-          "Barrel",
-          "BarrelEvent",
-          "BarrelReceipt",
-          "Lot",
-          "Kit",
-          "Inventory",
-          "InventoryTransfer",
-          "Location"
-        ],
-        "indicator_field": "transactionInitiator",
-        "indicator_value": "WH",
-        "description": "Warehouse inventory movements flowing to ERP for stock reconciliation and financial tracking."
-      }
-    ],
     "sample_record": {
-      "record_id": "forge-erpi:item:evt-20260407-001",
-      "source_adapter": "forge-erpi",
+      "record_id": "forge-integ-erp-netsuite:item:evt-20260407-001",
+      "source_adapter": "forge-integ-erp-netsuite",
       "collected_at": "2026-04-07T10:30:00Z",
       "context": {
         "cross_system_id": "ITEM-NS-00412",
@@ -305,6 +251,8 @@
         "sync_state": "PENDING",
         "event_timestamp": "2026-04-07T10:29:55Z",
         "transaction_initiator": "ERP",
+        "data_flow_direction": "inbound_from_erp",
+        "entity_category": "inventory",
         "schema_version": "1.0.0"
       },
       "payload": {
@@ -371,12 +319,23 @@
         "source_field": "data.data.recipe.id OR data.data.recipeId",
         "context_field": "recipe_id",
         "description": "Recipe reference for recipe-related entities (RecipeParameter, RecipeGroup, Bom)."
+      },
+      {
+        "source_field": "data.data.category",
+        "context_field": "entity_category",
+        "description": "Business category of the entity (e.g., 'Raw Material', 'Finished Good', 'WIP'). Used for decision routing and cross-module classification."
+      },
+      {
+        "source_field": "(static)",
+        "context_field": "source_system",
+        "transform": "static:erpi",
+        "description": "Identifies the originating spoke adapter. Always 'erpi' for records from this adapter."
       }
     ],
     "enrichment_rules": [
       {
         "target_field": "netsuite_record_id",
-        "rule_type": "outbox_lookup",
+        "rule_type": "lookup",
         "config": {
           "source_field": "cross_system_id",
           "lookup_source": "NetSuiteOutbox",
@@ -387,7 +346,7 @@
       },
       {
         "target_field": "data_flow_direction",
-        "rule_type": "derived",
+        "rule_type": "computed",
         "config": {
           "source_field": "transaction_initiator",
           "mapping": {
@@ -413,7 +372,7 @@
     },
     "dead_letter": {
       "enabled": true,
-      "topic": "forge.dead-letter.forge-erpi",
+      "topic": "forge.dead-letter.forge-integ-erp-netsuite",
       "max_age_hours": 168
     },
     "health_degradation": {
@@ -421,10 +380,18 @@
       "failed_after_failures": 10
     }
   },
+  "time_governance": {
+    "time_source": "hub-ntp",
+    "sync_protocol": "ntp",
+    "clock_probe_interval_seconds": 30,
+    "source_timestamp_origin": "server",
+    "tolerance_class": "it-lan",
+    "fail_closed": true
+  },
   "metadata": {
     "spoke": "erpi",
     "hub_module": "forge-adapters",
-    "source_repo": "https://github.com/WhiskeyHouse/forge-erpi",
+    "source_repo": "reference application, in a private repository",
     "source_language": "TypeScript",
     "source_framework": "NestJS 11",
     "source_database": "PostgreSQL (Prisma ORM, 40 models)",
@@ -433,16 +400,62 @@
     "external_contract": "AsyncAPI (whk-asyncapi-types submodule, compile-time type generation)",
     "deployment": "Docker Compose (PostgreSQL, Redis, RabbitMQ, Jaeger)",
     "cross_module_dependencies": "MES (recipe/production data), WMS (barrel/inventory data)",
-    "notes": "ERPI is the enterprise data backbone \u2014 33 entity topics carrying all cross-system data. Phase 1 adapter is passive (read-only RabbitMQ consumer). The existing fanout exchange architecture means Forge binds its own queues without touching ERPI. ERPI's own AsyncAPI contract is functionally equivalent to a FACTS data contract and should be referenced rather than duplicated."
-  },
-  "integrity": {
-    "hash_method": "sha256-c14n-v1",
-    "spec_hash": "aef433522673556137018acf7c71a3203b75450638cb935ab43ab077d960bdc3",
-    "hash_state": "pending_review",
-    "previous_hash": null,
-    "approved_by": null,
-    "approved_at": null,
-    "change_history": [
+    "notes": "ERPI is the enterprise data backbone \u2014 33 entity topics carrying all cross-system data. Phase 1 adapter is passive (read-only RabbitMQ consumer). The existing fanout exchange architecture means Forge binds its own queues without touching ERPI. ERPI's own AsyncAPI contract is functionally equivalent to a FACTS data contract and should be referenced rather than duplicated.",
+    "cross_module_data_flows": [
+      {
+        "flow_name": "erp_master_data_to_mes",
+        "direction": "NetSuite \u2192 ERPI \u2192 MES",
+        "entities": [
+          "Recipe",
+          "RecipeParameter",
+          "RecipeGroup",
+          "Bom",
+          "BomItem",
+          "Item",
+          "ItemGroup",
+          "Vendor",
+          "Customer"
+        ],
+        "indicator_field": "transactionInitiator",
+        "indicator_value": "ERP",
+        "description": "ERP-originated master data that MES depends on for recipe definitions and production planning. The Forge adapter preserves the ERP origin to maintain decision context."
+      },
+      {
+        "flow_name": "mes_execution_to_erp",
+        "direction": "MES \u2192 ERPI \u2192 NetSuite",
+        "entities": [
+          "ProductionOrderUnitProcedure",
+          "UnitProcedure",
+          "Operation",
+          "EquipmentPhase",
+          "ProductionSchedule",
+          "ScheduleOrder",
+          "ScheduleQueue",
+          "ItemReceipt"
+        ],
+        "indicator_field": "transactionInitiator",
+        "indicator_value": "WH",
+        "description": "Manufacturing execution data flowing to ERP for financial posting. ProductionOrderUnitProcedure has a special handler that posts directly to NetSuite. ItemReceipt has a 1-week delayed posting threshold."
+      },
+      {
+        "flow_name": "wms_inventory_to_erp",
+        "direction": "WMS \u2192 ERPI \u2192 NetSuite",
+        "entities": [
+          "Barrel",
+          "BarrelEvent",
+          "BarrelReceipt",
+          "Lot",
+          "Kit",
+          "Inventory",
+          "InventoryTransfer",
+          "Location"
+        ],
+        "indicator_field": "transactionInitiator",
+        "indicator_value": "WH",
+        "description": "Warehouse inventory movements flowing to ERP for stock reconciliation and financial tracking."
+      }
+    ],
+    "spec_history": [
       {
         "previous_hash": null,
         "new_hash": null,
@@ -462,5 +475,42 @@
         "reason": "D3.8 FTTS compliance: added missing context fields (transaction_initiator, data_flow_direction, entity_category, message_id) to match implemented adapter code. Moved event_timestamp to optional (not always present in RabbitMQ messages)."
       }
     ]
+  },
+  "integrity": {
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "03573976cf220279d11d73d57c73d160f9e16fedb23070a05f5844b560767ab1",
+    "hash_state": "approved",
+    "previous_hash": "6439540c90ade3031cdf8ff60b1ae37e33b1e569b7f5f7b24a0df045284bebd5",
+    "change_history": [
+      {
+        "previous_hash": "6439540c90ade3031cdf8ff60b1ae37e33b1e569b7f5f7b24a0df045284bebd5",
+        "new_hash": "03573976cf220279d11d73d57c73d160f9e16fedb23070a05f5844b560767ab1",
+        "changed_at": "2026-11-18T16:24:47Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "Owner review 2026-11-18: the ERP module is forge-integ-erp-netsuite, an integration module for a named product"
+      },
+      {
+        "previous_hash": "b26f173725e25f01147d8c2da04e13372b4c91eedf631e250f73259eb650f32e",
+        "new_hash": "6439540c90ade3031cdf8ff60b1ae37e33b1e569b7f5f7b24a0df045284bebd5",
+        "changed_at": "2026-11-18T15:53:20Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-150: the module's name is Forge NetSuite ERP Integration Adapter"
+      },
+      {
+        "previous_hash": "a9a292813c9197b3f981c986b2cf3fb95862f0993054a37b5949670ab74145c4",
+        "new_hash": "b26f173725e25f01147d8c2da04e13372b4c91eedf631e250f73259eb650f32e",
+        "changed_at": "2026-11-18T15:51:55Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-150: the ERP module's id is forge-integ-erp-netsuite, matching its database schema mod_erpi"
+      }
+    ],
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-18T16:28:11Z"
   }
 }

@@ -1,12 +1,12 @@
 """ERPI RabbitMQ topic definitions.
 
 All 36 topics (33 entity + 3 acknowledgment) as documented in the
-ERPI discovery and forge-erpi.facts.json. Entity topics follow the
+ERPI discovery and forge-integ-erp-netsuite.facts.json. Entity topics follow the
 UNS pattern: wh.whk01.distillery01.<entityname>.
 
 The fanout exchange architecture means each topic is its own exchange.
 The Forge adapter creates a separate durable queue per exchange
-(forge-erpi-<entity>) without affecting existing ERPI consumers.
+(forge-integ-erp-netsuite-<entity>) without affecting existing ERPI consumers.
 """
 
 from __future__ import annotations

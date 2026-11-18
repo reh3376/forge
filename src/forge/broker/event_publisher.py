@@ -11,7 +11,7 @@ Usage::
 
     publisher = ForgeEventPublisher(producer)
     await publisher.adapter_registered("forge-wms", "WMS Adapter")
-    await publisher.record_ingested("forge-erpi", count=42)
+    await publisher.record_ingested("forge-integ-erp-netsuite", count=42)
 """
 
 from __future__ import annotations

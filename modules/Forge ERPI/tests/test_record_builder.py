@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import json
 
-from forge.adapters.forge_erpi.context import build_record_context
-from forge.adapters.forge_erpi.record_builder import build_contextual_record
+from forge.adapters.forge_integ_erp_netsuite.context import build_record_context
+from forge.adapters.forge_integ_erp_netsuite.record_builder import build_contextual_record
 from forge.core.models.contextual_record import QualityCode
 
 _SAMPLE_EVENT = {
@@ -34,17 +34,17 @@ class TestRecordBuilder:
         return build_contextual_record(
             raw_event=raw,
             context=ctx,
-            adapter_id="forge-erpi",
+            adapter_id="forge-integ-erp-netsuite",
             adapter_version="0.1.0",
         )
 
     def test_source_adapter_id(self):
         record = self._build()
-        assert record.source.adapter_id == "forge-erpi"
+        assert record.source.adapter_id == "forge-integ-erp-netsuite"
 
     def test_source_system(self):
         record = self._build()
-        assert record.source.system == "forge-erpi"
+        assert record.source.system == "forge-integ-erp-netsuite"
 
     def test_tag_path_format(self):
         record = self._build()
@@ -77,11 +77,11 @@ class TestRecordBuilder:
 
     def test_lineage_schema_ref(self):
         record = self._build()
-        assert record.lineage.schema_ref == "forge://schemas/forge-erpi/v0.1.0"
+        assert record.lineage.schema_ref == "forge://schemas/forge-integ-erp-netsuite/v0.1.0"
 
     def test_lineage_adapter(self):
         record = self._build()
-        assert record.lineage.adapter_id == "forge-erpi"
+        assert record.lineage.adapter_id == "forge-integ-erp-netsuite"
         assert record.lineage.adapter_version == "0.1.0"
 
     def test_lineage_transformation_chain(self):

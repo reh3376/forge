@@ -389,7 +389,7 @@
   },
   "related_adapters": [
     {
-      "adapter_id": "forge-erpi",
+      "adapter_id": "forge-integ-erp-netsuite",
       "relationship": "ERPI provides master item and vendor data via RabbitMQ topics; CMMS enriches maintenance cost tracking with this data",
       "data_flow": "ERPI item/vendor topics → CMMS RabbitMQ subscriptions"
     },

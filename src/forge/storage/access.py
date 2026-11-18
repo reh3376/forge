@@ -123,11 +123,17 @@ _PROTECTED_SCHEMAS = frozenset(
 # Module id → schema naming, shared with migration 002 (BACKLOG FB-004)
 _MODULE_PREFIXES = ("forge-", "whk-")
 _IDENT = re.compile(r"[a-z_][a-z0-9_]*")
+#: Modules whose schema is not derived from their id. An integration module is named
+#: for its product (``forge-integ-<function>-<product>``, A-17) and keeps the schema of
+#: the function it serves; the schemas are those of migration 002.
+_MODULE_SCHEMAS = {"forge-integ-erp-netsuite": "mod_erpi"}
 
 
 def module_schema(module_id: str) -> str:
     """``forge-mes`` → ``mod_mes``, ``forge-wms`` → ``mod_wms`` (the schemas of migration 002)."""
     name = module_id.strip().lower()
+    if name in _MODULE_SCHEMAS:
+        return _MODULE_SCHEMAS[name]
     for prefix in _MODULE_PREFIXES:
         if name.startswith(prefix):
             name = name[len(prefix) :]
@@ -460,7 +466,14 @@ class AccessController:
 
         Each module gets WRITE on its own schema and READ on forge_canonical.
         """
-        modules = ("forge-wms", "forge-mes", "forge-erpi", "forge-cmms", "forge-nms", "whk-ims")
+        modules = (
+            "forge-wms",
+            "forge-mes",
+            "forge-integ-erp-netsuite",
+            "forge-cmms",
+            "forge-nms",
+            "whk-ims",
+        )
         defaults = [(module_id, module_schema(module_id)) for module_id in modules]
 
         grants = []

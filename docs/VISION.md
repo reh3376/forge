@@ -185,11 +185,11 @@ Docker Compose on a laptop is not a plant. Backups, health, upgrades and multi-n
 
 ### 3.2 Spokes
 
-An adapter per external system, each with a manifest and an approved FACTS spec: forge-wms, forge-cmms, forge-erpi, forge-nms, bosc-ims, next-trend (historian), scanner-gateway, and generic adapters (REST, CSV/file, MQTT Sparkplug, OPC-UA) for systems without a dedicated one. Spokes are Python inside the hub or external processes in any language that speaks the proto.
+An adapter per external system, each with a manifest and an approved FACTS spec: forge-wms, forge-cmms, forge-integ-erp-netsuite, forge-nms, bosc-ims, next-trend (historian), scanner-gateway, and generic adapters (REST, CSV/file, MQTT Sparkplug, OPC-UA) for systems without a dedicated one. Spokes are Python inside the hub or external processes in any language that speaks the proto.
 
 ### 3.3 Modules
 
-- **Management modules** (`forge-<management service>`): forge-mes, forge-wms, forge-cmms, and later forge-qms, forge-erpi, … — all Go, generated from the module SDK template (A-2, A-5), each with a manifest, FACTS spec, FVTS spec, its `mod_<name>` schema in the hub's PostgreSQL, and no UI of its own.
+- **Management modules** (`forge-<management service>`): forge-mes, forge-wms, forge-cmms, and later forge-qms, forge-integ-erp-netsuite, … — all Go, generated from the module SDK template (A-2, A-5), each with a manifest, FACTS spec, FVTS spec, its `mod_<name>` schema in the hub's PostgreSQL, and no UI of its own.
 - **forge-ot**: the OT module (§P-4), hosted by the hub, with PLC connections, supervision and liveness.
 - **Integration modules**: forge-ignition (and successors) for sites that keep vendor software.
 - **forge-hmi-scada**: optional, activated per site.

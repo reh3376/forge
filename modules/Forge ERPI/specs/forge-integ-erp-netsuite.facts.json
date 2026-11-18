@@ -1,8 +1,8 @@
 {
   "spec_version": "0.1.0",
   "adapter_identity": {
-    "adapter_id": "forge-erpi",
-    "name": "Forge ERP Interface Adapter",
+    "adapter_id": "forge-integ-erp-netsuite",
+    "name": "Forge NetSuite ERP Integration Adapter",
     "version": "0.1.0",
     "type": "INGESTION",
     "tier": "ERP_BUSINESS",
@@ -118,7 +118,7 @@
         "required": false,
         "secret": false,
         "description": "Consumer group ID for RabbitMQ queue naming. Must be unique to Forge to avoid stealing messages from ERPI's own consumers.",
-        "default": "forge-erpi"
+        "default": "forge-integ-erp-netsuite"
       },
       {
         "name": "rabbitmq_vhost",
@@ -135,7 +135,7 @@
     ]
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/forge-erpi/v0.1.0",
+    "schema_ref": "forge://schemas/forge-integ-erp-netsuite/v0.1.0",
     "external_contract_ref": "asyncapi://whk-asyncapi-types/v1.0.0",
     "output_format": "contextual_record",
     "context_fields": [
@@ -162,7 +162,7 @@
       {
         "source_type": "rabbitmq",
         "endpoint": "wh.whk01.distillery01.*",
-        "description": "33 entity fanout exchanges following UNS pattern. Primary data source — covers all entities in real-time. Exchange type: fanout with durable queues. Adapter creates its own queue per exchange (forge-erpi-<entity>) without affecting existing ERPI consumers.",
+        "description": "33 entity fanout exchanges following UNS pattern. Primary data source — covers all entities in real-time. Exchange type: fanout with durable queues. Adapter creates its own queue per exchange (forge-integ-erp-netsuite-<entity>) without affecting existing ERPI consumers.",
         "entities": [
           "PurchaseOrder",
           "ProductionOrder",
@@ -262,8 +262,8 @@
       }
     ],
     "sample_record": {
-      "record_id": "forge-erpi:item:evt-20260407-001",
-      "source_adapter": "forge-erpi",
+      "record_id": "forge-integ-erp-netsuite:item:evt-20260407-001",
+      "source_adapter": "forge-integ-erp-netsuite",
       "collected_at": "2026-04-07T10:30:00Z",
       "context": {
         "cross_system_id": "ITEM-NS-00412",
@@ -382,7 +382,7 @@
     },
     "dead_letter": {
       "enabled": true,
-      "topic": "forge.dead-letter.forge-erpi",
+      "topic": "forge.dead-letter.forge-integ-erp-netsuite",
       "max_age_hours": 168
     },
     "health_degradation": {
@@ -393,7 +393,7 @@
   "metadata": {
     "spoke": "erpi",
     "hub_module": "forge-adapters",
-    "source_repo": "https://github.com/WhiskeyHouse/forge-erpi",
+    "source_repo": "https://github.com/WhiskeyHouse/forge-integ-erp-netsuite",
     "source_language": "TypeScript",
     "source_framework": "NestJS 11",
     "source_database": "PostgreSQL (Prisma ORM, 40 models)",

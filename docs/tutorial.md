@@ -239,7 +239,7 @@ note:
 | `src/forge/gateway` · `api` · `observer` · `cli` | auth and RBAC middleware, the hub FastAPI app, health, the `forge` CLI |
 | `src/forge/modules/ot` | the OT module: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
 | `src/forge/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
-| `src/forge/adapters` | the eight in-repo spoke adapters (forge-wms, forge-mes, forge-cmms, forge-erpi, forge-nms, bosc-ims, next-trend, scanner-gateway), each with its manifest and config, and four generic adapter stubs |
+| `src/forge/adapters` | the eight in-repo spoke adapters (forge-wms, forge-mes, forge-cmms, forge-integ-erp-netsuite, forge-nms, bosc-ims, next-trend, scanner-gateway), each with its manifest and config, and four generic adapter stubs |
 | `go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js) that FB-076 retires |
 | `tests/` | 267 files mirroring `src/`; migration tests read the migration source |
@@ -673,7 +673,7 @@ note:
 | `sample_records` | records the runner validates against the data contract |
 | `integrity` | the FHTS block |
 
-- Nine specs today: forge-wms (the reference), forge-mes, bosc-ims, forge-cmms, forge-erpi, forge-nms, next-trend, scanner-gateway, ot-module.
+- Nine specs today: forge-wms (the reference), forge-mes, bosc-ims, forge-cmms, forge-integ-erp-netsuite, forge-nms, next-trend, scanner-gateway, ot-module.
 - The runner validates every spec against the JSON schema first (`facts:schema-valid`) and reads its enums from the schema (FB-080).
 - The developer guide, `docs/governance/facts-developer-guide.md`, walks the schema, how to write a spec, running the runner, common failures and cross-spoke consistency.
 
@@ -2000,7 +2000,7 @@ Which systems connect, and what the contract behind each one means to the people
 | forge-wms | warehouse management | inventory, movements, receipts; 14 data sources |
 | forge-mes | manufacturing execution (the interim bridge today, the Go module to come) | orders, batches, recipes, changeover, audit; 18 sources |
 | forge-cmms | maintenance management | equipment, work orders, maintenance events |
-| forge-erpi | ERP integration (NetSuite) | master data, orders, finance |
+| forge-integ-erp-netsuite | ERP integration (NetSuite) | master data, orders, finance |
 | forge-nms | network management | the plant network's topology and health |
 | bosc-ims | aerospace inventory | parts and stock over gRPC |
 | next-trend | time-series historian | archived process history, bulk backfill |
@@ -2024,7 +2024,7 @@ Each spoke has a **FACTS specification**: what the system is, what it is allowed
 
 | Contract | State today |
 |---|---|
-| all nine: forge-wms, forge-mes, bosc-ims, forge-cmms, forge-erpi, forge-nms, next-trend, scanner-gateway, ot-module | approved by the owner on 2026-11-13, after every contract gained its time-governance declaration |
+| all nine: forge-wms, forge-mes, bosc-ims, forge-cmms, forge-integ-erp-netsuite, forge-nms, next-trend, scanner-gateway, ot-module | approved by the owner on 2026-11-13, after every contract gained its time-governance declaration |
 | ot-module | approved, but its contract still fails schema validation until the OT vocabulary is extended (FB-079; decided 2026-11-03) |
 
 note:

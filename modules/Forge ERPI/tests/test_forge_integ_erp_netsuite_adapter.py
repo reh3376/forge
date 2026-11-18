@@ -9,7 +9,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from forge.adapters.forge_erpi import ForgeErpiAdapter
+from forge.adapters.forge_integ_erp_netsuite import ForgeIntegErpNetsuiteAdapter
 from forge.core.models.adapter import AdapterState
 
 # ── Test Fixtures ──────────────────────────────────────────────
@@ -18,7 +18,7 @@ _VALID_CONFIG = {
     "rabbitmq_url": "amqp://guest:guest@localhost:5672",
     "erpi_rest_url": "http://localhost:3000/api",
     "erpi_graphql_url": "http://localhost:3000/graphql",
-    "rabbitmq_consumer_group": "forge-erpi-test",
+    "rabbitmq_consumer_group": "forge-integ-erp-netsuite-test",
 }
 
 _SAMPLE_ITEM_MESSAGE = {
@@ -102,23 +102,23 @@ _SAMPLE_PRODUCTION_ORDER_MESSAGE = {
 
 class TestManifest:
     def test_adapter_id(self):
-        adapter = ForgeErpiAdapter()
-        assert adapter.manifest.adapter_id == "forge-erpi"
+        adapter = ForgeIntegErpNetsuiteAdapter()
+        assert adapter.manifest.adapter_id == "forge-integ-erp-netsuite"
 
     def test_adapter_name(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         assert "ERP Interface" in adapter.manifest.name
 
     def test_tier(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         assert adapter.manifest.tier.value == "ERP_BUSINESS"
 
     def test_protocol(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         assert adapter.manifest.protocol == "amqp+rest+graphql"
 
     def test_capabilities(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         caps = adapter.manifest.capabilities
         assert caps.read is True
         assert caps.write is False
@@ -127,11 +127,14 @@ class TestManifest:
         assert caps.discover is True
 
     def test_data_contract_schema_ref(self):
-        adapter = ForgeErpiAdapter()
-        assert adapter.manifest.data_contract.schema_ref == "forge://schemas/forge-erpi/v0.1.0"
+        adapter = ForgeIntegErpNetsuiteAdapter()
+        assert (
+            adapter.manifest.data_contract.schema_ref
+            == "forge://schemas/forge-integ-erp-netsuite/v0.1.0"
+        )
 
     def test_data_contract_context_fields(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         fields = adapter.manifest.data_contract.context_fields
         assert "cross_system_id" in fields
         assert "source_system" in fields
@@ -142,19 +145,19 @@ class TestManifest:
         assert "event_timestamp" in fields
 
     def test_connection_params_count(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         assert len(adapter.manifest.connection_params) == 6
 
     def test_required_connection_params(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         required = [p.name for p in adapter.manifest.connection_params if p.required]
         assert "rabbitmq_url" in required
         assert "erpi_rest_url" in required
 
     def test_metadata(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         assert adapter.manifest.metadata["spoke"] == "erpi"
-        assert "reference application" in adapter.manifest.metadata["source_repo"]
+        assert "forge-integ-erp-netsuite" in adapter.manifest.metadata["source_repo"]
 
 
 # ── Lifecycle Tests ────────────────────────────────────────────
@@ -163,38 +166,38 @@ class TestManifest:
 class TestLifecycle:
     @pytest.mark.asyncio
     async def test_initial_state(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         assert adapter.state == AdapterState.REGISTERED
 
     @pytest.mark.asyncio
     async def test_configure(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         assert adapter.state == AdapterState.REGISTERED
 
     @pytest.mark.asyncio
     async def test_configure_validates_required(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         with pytest.raises(ValidationError):  # pydantic ValidationError
             await adapter.configure({"rabbitmq_url": "amqp://localhost"})
             # missing erpi_rest_url
 
     @pytest.mark.asyncio
     async def test_start(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         assert adapter.state == AdapterState.HEALTHY
 
     @pytest.mark.asyncio
     async def test_start_without_configure_raises(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         with pytest.raises(RuntimeError, match="not configured"):
             await adapter.start()
 
     @pytest.mark.asyncio
     async def test_stop(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         await adapter.stop()
@@ -202,11 +205,11 @@ class TestLifecycle:
 
     @pytest.mark.asyncio
     async def test_health_after_start(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         health = await adapter.health()
-        assert health.adapter_id == "forge-erpi"
+        assert health.adapter_id == "forge-integ-erp-netsuite"
         assert health.state == AdapterState.HEALTHY
         assert health.records_collected == 0
         assert health.records_failed == 0
@@ -214,7 +217,7 @@ class TestLifecycle:
 
     @pytest.mark.asyncio
     async def test_health_records_collected(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_ITEM_MESSAGE])
@@ -230,7 +233,7 @@ class TestLifecycle:
 class TestCollect:
     @pytest.mark.asyncio
     async def test_collect_empty(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         records = [r async for r in adapter.collect()]
@@ -238,7 +241,7 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_collect_single_item(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_ITEM_MESSAGE])
@@ -247,19 +250,19 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_record_source(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_ITEM_MESSAGE])
         records = [r async for r in adapter.collect()]
         record = records[0]
-        assert record.source.adapter_id == "forge-erpi"
-        assert record.source.system == "forge-erpi"
+        assert record.source.adapter_id == "forge-integ-erp-netsuite"
+        assert record.source.system == "forge-integ-erp-netsuite"
         assert "erpi.item.create" in record.source.tag_path
 
     @pytest.mark.asyncio
     async def test_record_context_cross_system_id(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_ITEM_MESSAGE])
@@ -269,7 +272,7 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_record_context_transaction_initiator(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_ITEM_MESSAGE])
@@ -279,7 +282,7 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_record_context_data_flow_direction(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_ITEM_MESSAGE])
@@ -288,7 +291,7 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_record_context_wh_direction(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_BARREL_MESSAGE])
@@ -299,7 +302,7 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_record_context_entity_type(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_RECIPE_MESSAGE])
@@ -310,7 +313,7 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_record_context_sync_state(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_ITEM_MESSAGE])
@@ -319,7 +322,7 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_record_context_lot_id(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_BARREL_MESSAGE])
@@ -328,20 +331,20 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_record_lineage(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_ITEM_MESSAGE])
         records = [r async for r in adapter.collect()]
         lineage = records[0].lineage
-        assert lineage.adapter_id == "forge-erpi"
-        assert lineage.schema_ref == "forge://schemas/forge-erpi/v0.1.0"
+        assert lineage.adapter_id == "forge-integ-erp-netsuite"
+        assert lineage.schema_ref == "forge://schemas/forge-integ-erp-netsuite/v0.1.0"
         assert len(lineage.transformation_chain) == 3
         assert "erpi.v1.Item" in lineage.transformation_chain[0]
 
     @pytest.mark.asyncio
     async def test_record_value_is_json(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_ITEM_MESSAGE])
@@ -351,7 +354,7 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_collect_multiple_entities(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records(
@@ -369,7 +372,7 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_collect_clears_pending(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_ITEM_MESSAGE])
@@ -379,7 +382,7 @@ class TestCollect:
 
     @pytest.mark.asyncio
     async def test_records_collected_counter(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         adapter.inject_records([_SAMPLE_ITEM_MESSAGE, _SAMPLE_BARREL_MESSAGE])
@@ -393,13 +396,13 @@ class TestCollect:
 class TestDiscover:
     @pytest.mark.asyncio
     async def test_discover_returns_topics(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         items = await adapter.discover()
         assert len(items) > 30  # 33 entity + 3 ack
 
     @pytest.mark.asyncio
     async def test_discover_entity_format(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         items = await adapter.discover()
         entity_items = [i for i in items if i["data_type"] == "entity_event"]
         assert len(entity_items) == 31  # 31 entity topics defined in topics.py
@@ -410,7 +413,7 @@ class TestDiscover:
 
     @pytest.mark.asyncio
     async def test_discover_ack_topics(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         items = await adapter.discover()
         ack_items = [i for i in items if i["data_type"] == "acknowledgment"]
         assert len(ack_items) == 3
@@ -426,20 +429,20 @@ class TestDiscover:
 class TestSubscription:
     @pytest.mark.asyncio
     async def test_subscribe_returns_id(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         sub_id = await adapter.subscribe(["wh.whk01.distillery01.item"], callback=lambda x: x)
         assert sub_id is not None
         assert len(sub_id) > 0
 
     @pytest.mark.asyncio
     async def test_unsubscribe(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         sub_id = await adapter.subscribe(["wh.whk01.distillery01.item"], callback=lambda x: x)
         await adapter.unsubscribe(sub_id)
         assert sub_id not in adapter._subscriptions
 
     @pytest.mark.asyncio
     async def test_unsubscribe_nonexistent(self):
-        adapter = ForgeErpiAdapter()
+        adapter = ForgeIntegErpNetsuiteAdapter()
         # Should not raise
         await adapter.unsubscribe("nonexistent-id")

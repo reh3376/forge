@@ -5,8 +5,9 @@ this checkout. Every check must pass or be a named skip, except the failures lis
 here. Each listed failure is a known gap with a backlog item, and its entry is removed
 when the gap is closed:
 
-* ``fmts:hash-approved`` on every spec: the specs are ``pending_review`` until the owner
-  approves each hash. Nobody writes that approval on the owner's behalf.
+* ``fmts:hash-approved`` on every spec the owner has not approved yet: they are
+  ``pending_review``. Nobody writes that approval on the owner's behalf. ``forge-wms`` is
+  approved (2026-11-18) and has no allowed failure.
 * ``fmts:waivers`` on ``forge-mes``: its waiver of M-3 is a time-keeping waiver, which
   counts only with admin privileges, that is once the owner approves the spec (Q-10).
 * ``fmts:m2`` on ``ot-module``: the OT module's manifests disagree with its approved
@@ -33,6 +34,11 @@ FACTS_SPECS_DIR = FACTS_SCHEMA_PATH.parent.parent / "specs"
 
 PENDING_APPROVAL = frozenset({"fmts:hash-approved"})
 ALLOWED_FAILURES: dict[str, frozenset[str]] = {
+    # approved by the owner on 2026-11-18: no failure is allowed
+    "forge-wms": frozenset(),
+    "forge-cmms": frozenset(),
+    "forge-integ-erp-netsuite": frozenset(),
+    "forge-nms": frozenset(),
     "forge-mes": PENDING_APPROVAL | {"fmts:waivers"},
     "ot-module": PENDING_APPROVAL | {"fmts:m2"},
 }
@@ -51,7 +57,11 @@ ROLES_ONLY = {"M-10": "FB-141"}
 #: M-4 to M-7 was run against the module and passed.
 NO_SAMPLE_EVENTS = frozenset({"M-6"})
 NOT_RUN: dict[str, frozenset[str]] = {
-    "forge-wms": frozenset(),  # has sample events: all four are checked
+    # these four have sample events for the kit, so all four requirements are checked
+    "forge-wms": frozenset(),
+    "forge-cmms": frozenset(),
+    "forge-integ-erp-netsuite": frozenset(),
+    "forge-nms": frozenset(),
     "forge-mes": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # TypeScript, another process
     "ot-module": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # not on the adapter template
 }
@@ -113,7 +123,7 @@ def test_every_module_has_an_alias_of_its_own() -> None:
     assert len(set(aliases.values())) == len(MODULE_IDS), aliases
     assert not set(aliases.values()) & set(MODULE_IDS)  # an alias is never another module's id
     assert aliases["forge-wms"] == "wms" and aliases["forge-mes"] == "mes"
-    assert aliases["forge-erpi"] == "erpi"
+    assert aliases["forge-integ-erp-netsuite"] == "netsuite"
 
 
 def test_only_the_interim_bridge_is_not_python_from_the_template() -> None:
@@ -121,10 +131,11 @@ def test_only_the_interim_bridge_is_not_python_from_the_template() -> None:
     assert {m for m, t in templates.items() if t == "none"} == {"forge-mes", "ot-module"}
     kinds = {m: _load(m)["module_identity"]["kind"] for m in MODULE_IDS}
     assert kinds["forge-mes"] == "management" and kinds["ot-module"] == "ot"
-    management = {"forge-mes", "forge-wms", "forge-cmms", "forge-erpi", "forge-nms"}
+    management = {"forge-mes", "forge-wms", "forge-cmms", "forge-nms"}
     assert {m for m, k in kinds.items() if k == "management"} == management
     assert {m for m, k in kinds.items() if k == "integration"} == {
         "bosc-ims",
+        "forge-integ-erp-netsuite",
         "next-trend",
         "scanner-gateway",
     }

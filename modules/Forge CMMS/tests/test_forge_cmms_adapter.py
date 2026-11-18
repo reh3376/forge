@@ -1,6 +1,7 @@
 """Tests for the Forge CMMS adapter lifecycle, collection, discovery, and capabilities.
 
-Follows the same testing pattern as test_forge_erpi_adapter.py: inject raw message dicts,
+Follows the testing pattern of test_forge_integ_erp_netsuite_adapter.py: inject raw message
+dicts,
 verify ContextualRecords with CMMS-specific maintenance context fields.
 """
 

@@ -1,6 +1,6 @@
 {
-  "adapter_id": "forge-erpi",
-  "name": "Forge ERP Interface Adapter",
+  "adapter_id": "forge-integ-erp-netsuite",
+  "name": "Forge NetSuite ERP Integration Adapter",
   "version": "0.1.0",
   "type": "INGESTION",
   "protocol": "amqp+rest+graphql",
@@ -13,7 +13,7 @@
     "discover": true
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/forge-erpi/v0.1.0",
+    "schema_ref": "forge://schemas/forge-integ-erp-netsuite/v0.1.0",
     "output_format": "contextual_record",
     "context_fields": [
       "cross_system_id",
@@ -56,7 +56,7 @@
       "description": "Consumer group for queue naming. Must be unique to Forge.",
       "required": false,
       "secret": false,
-      "default": "forge-erpi"
+      "default": "forge-integ-erp-netsuite"
     },
     {
       "name": "rabbitmq_vhost",
@@ -72,8 +72,8 @@
   ],
   "metadata": {
     "spoke": "erpi",
-    "hub_module": "forge.adapters.forge_erpi",
-    "source_repo": "https://github.com/WhiskeyHouse/forge-erpi",
+    "hub_module": "forge.adapters.forge_integ_erp_netsuite",
+    "source_repo": "https://github.com/WhiskeyHouse/forge-integ-erp-netsuite",
     "external_contract": "asyncapi://whk-asyncapi-types/v1.0.0"
   }
 }
