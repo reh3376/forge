@@ -1,10 +1,10 @@
-"""Tests for the Scanner Gateway record builder."""
+"""Tests for the Forge Scanner record builder."""
 
 from datetime import UTC, datetime
 
 import pytest
 
-from forge.adapters.scanner_gateway.record_builder import (
+from forge.adapters.forge_scanner.record_builder import (
     _parse_timestamp,
     _scan_tag_path,
     build_contextual_record,
@@ -105,11 +105,11 @@ class TestBuildContextualRecord:
                 "scanned_at": "2026-04-06T14:30:00+00:00",
             },
             context=self._make_context(),
-            adapter_id="scanner-gateway",
+            adapter_id="forge-scanner",
             adapter_version="0.1.0",
         )
-        assert record.source.adapter_id == "scanner-gateway"
-        assert record.source.system == "scanner-gateway"
+        assert record.source.adapter_id == "forge-scanner"
+        assert record.source.system == "forge-scanner"
         assert record.source.tag_path == "scanner.scan.entry"
         assert record.source.connection_id == "DEV-001"
 
@@ -121,7 +121,7 @@ class TestBuildContextualRecord:
                 "scanned_at": "2026-04-06T15:00:00+00:00",
             },
             context=self._make_context(),
-            adapter_id="scanner-gateway",
+            adapter_id="forge-scanner",
             adapter_version="0.1.0",
         )
         assert record.value.data_type == "json"
@@ -135,12 +135,12 @@ class TestBuildContextualRecord:
                 "scanned_at": "2026-04-06T14:30:00+00:00",
             },
             context=self._make_context(),
-            adapter_id="scanner-gateway",
+            adapter_id="forge-scanner",
             adapter_version="0.1.0",
         )
-        assert record.lineage.adapter_id == "scanner-gateway"
+        assert record.lineage.adapter_id == "forge-scanner"
         assert record.lineage.adapter_version == "0.1.0"
-        assert record.lineage.schema_ref == "forge://schemas/scanner-gateway/v0.1.0"
+        assert record.lineage.schema_ref == "forge://schemas/forge-scanner/v0.1.0"
         assert "scanner.v1.ScanEvent" in record.lineage.transformation_chain
 
     def test_timestamps_populated(self):
@@ -150,7 +150,7 @@ class TestBuildContextualRecord:
                 "scanned_at": "2026-04-06T14:30:00+00:00",
             },
             context=self._make_context(),
-            adapter_id="scanner-gateway",
+            adapter_id="forge-scanner",
             adapter_version="0.1.0",
         )
         assert record.timestamp.source_time.year == 2026
@@ -168,13 +168,13 @@ class TestBuildContextualRecord:
             build_contextual_record(
                 scan_event=event,
                 context=self._make_context(),
-                adapter_id="scanner-gateway",
+                adapter_id="forge-scanner",
                 adapter_version="0.1.0",
             )
         record = build_contextual_record(
             scan_event=event,
             context=self._make_context(),
-            adapter_id="scanner-gateway",
+            adapter_id="forge-scanner",
             adapter_version="0.1.0",
             source_timestamp_origin="forge",
         )
@@ -190,7 +190,7 @@ class TestBuildContextualRecord:
                 "scanned_at": "2026-04-06T14:30:00+00:00",
             },
             context=self._make_context(),
-            adapter_id="scanner-gateway",
+            adapter_id="forge-scanner",
             adapter_version="0.1.0",
         )
         assert "_routed_to" not in record.value.raw

@@ -1,8 +1,8 @@
 {
   "spec_version": "0.1.0",
   "adapter_identity": {
-    "adapter_id": "scanner-gateway",
-    "name": "Scanner Gateway Adapter",
+    "adapter_id": "forge-scanner",
+    "name": "Forge Scanner Adapter",
     "version": "0.1.0",
     "type": "INGESTION",
     "tier": "OT",
@@ -144,7 +144,7 @@
     ]
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/scanner-gateway/v0.1.0",
+    "schema_ref": "forge://schemas/forge-scanner/v0.1.0",
     "output_format": "contextual_record",
     "context_fields": [
       "scan_id",
@@ -223,8 +223,8 @@
       }
     ],
     "sample_record": {
-      "record_id": "scanner-gateway:scan-20260406-001",
-      "source_adapter": "scanner-gateway",
+      "record_id": "forge-scanner:scan-20260406-001",
+      "source_adapter": "forge-scanner",
       "collected_at": "2026-04-06T14:30:00Z",
       "context": {
         "scan_id": "scan-20260406-001",
@@ -314,7 +314,7 @@
     },
     "dead_letter": {
       "enabled": true,
-      "topic": "forge://dead-letter/scanner-gateway",
+      "topic": "forge://dead-letter/forge-scanner",
       "max_age_hours": 720,
       "description": "Undeliverable scan events (unroutable scan type, all target spokes down) are sent to dead letter queue for manual review."
     }
@@ -386,10 +386,19 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "5710afeb7910e8dd720f69b2a9e9f4692bdb7f47b4a2828fbbff35e352673a85",
+    "spec_hash": "c4bbfd2e35c11df47ac3faa7e11a7e1230d2fbff21daaef2551788498f910140",
     "hash_state": "approved",
-    "previous_hash": "f692cd5caa38a5239a26709e3ec5372f9ece53f83e2213762e2dbc2332eff85e",
+    "previous_hash": "5710afeb7910e8dd720f69b2a9e9f4692bdb7f47b4a2828fbbff35e352673a85",
     "change_history": [
+      {
+        "previous_hash": "5710afeb7910e8dd720f69b2a9e9f4692bdb7f47b4a2828fbbff35e352673a85",
+        "new_hash": "c4bbfd2e35c11df47ac3faa7e11a7e1230d2fbff21daaef2551788498f910140",
+        "changed_at": "2026-11-18T16:52:40Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "Owner review 2026-11-18: the scanner module is Forge's own, forge-scanner"
+      },
       {
         "previous_hash": "f692cd5caa38a5239a26709e3ec5372f9ece53f83e2213762e2dbc2332eff85e",
         "new_hash": "5710afeb7910e8dd720f69b2a9e9f4692bdb7f47b4a2828fbbff35e352673a85",
@@ -407,18 +416,9 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
         "reason": "FB-150: module id renamed (owner 2026-11-18: no existing company named in the public repository)"
-      },
-      {
-        "previous_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",
-        "new_hash": "615a953528ce0d474995fbbb6f765be781b2cb620075e18a008e7175827d7cf4",
-        "changed_at": "2026-11-13T18:43:32Z",
-        "source": "agent",
-        "changed_by": "claude-code",
-        "change_type": "structural",
-        "reason": "FB-090: time_governance section (one clock, D-9 step 4). Awaiting owner approval."
       }
     ],
     "approved_by": "reh3376",
-    "approved_at": "2026-11-18T16:48:53Z"
+    "approved_at": "2026-11-18T16:58:52Z"
   }
 }

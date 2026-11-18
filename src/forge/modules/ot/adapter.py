@@ -102,11 +102,13 @@ class OTModuleAdapter(
     """
 
     manifest = AdapterManifest(
-        adapter_id="forge-ot-module",
-        name="Forge OT Module",
-        version="0.1.0",
-        type="ACQUISITION",
-        protocol="opcua",
+        # one identity, the approved FACTS spec's (FB-144): the manifest file beside this
+        # module and the specs carry the same five values
+        adapter_id="forge-ot",
+        name="Forge OT/SCADA Module — OPC-UA Adapter",
+        version="0.5.0",
+        type="BIDIRECTIONAL",
+        protocol="opcua+mqtt+amqp",
         tier=AdapterTier.OT,
         capabilities=AdapterCapabilities(
             read=True,
@@ -116,7 +118,7 @@ class OTModuleAdapter(
             discover=True,
         ),
         data_contract=DataContract(
-            schema_ref="forge://schemas/ot-module/v0.1.0",
+            schema_ref="forge://schemas/forge-ot/v0.1.0",
             output_format="contextual_record",
             context_fields=["area", "equipment_id", "operating_mode"],
         ),

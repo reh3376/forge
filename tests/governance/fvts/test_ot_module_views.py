@@ -1,8 +1,8 @@
 """FVTS gate for the OT module's view contract.
 
-This is the ``conformance_tests.suite_path`` of ``ot-module.fvts.json``. It runs the full
+This is the ``conformance_tests.suite_path`` of ``forge-ot.fvts.json``. It runs the full
 FVTSRunner over the reference spec with the real FACTS specs and the golden set under
-``tests/governance/fvts/golden/ot-module/``. Every check must pass except
+``tests/governance/fvts/golden/forge-ot/``. Every check must pass except
 ``fvts:hash-approved``: the reference spec stays ``pending_review`` until the owner approves it
 under BACKLOG FB-078 (after the invented fermenter points are replaced by real OT tags). Nobody
 writes that approval on the owner's behalf. Empty ``ALLOWED_FAILURES`` when it lands.
@@ -25,7 +25,7 @@ ALLOWED_FAILURES = frozenset({"fvts:hash-approved"})
 async def test_reference_contract_passes_every_check(
     runner: FVTSRunner, reference_spec: dict[str, Any]
 ) -> None:
-    report = await runner.run(target="ot-module-views", spec=reference_spec)
+    report = await runner.run(target="forge-ot-views", spec=reference_spec)
     by_status: dict[VerdictStatus, list[str]] = {}
     for verdict in report.verdicts:
         by_status.setdefault(verdict.status, []).append(verdict.check_id)
@@ -43,9 +43,9 @@ def test_approval_state_is_honest(reference_spec: dict[str, Any]) -> None:
     integrity = reference_spec["integrity"]
     assert integrity["hash_state"] in ("pending_review", "approved")
     if integrity["hash_state"] == "approved":
-        assert integrity["approved_by"], "an approved hash names its approver"
+        assert integrity.get("approved_by"), "an approved hash names its approver"
     else:
-        assert not integrity["approved_by"], "pending_review carries no approver"
+        assert not integrity.get("approved_by"), "pending_review carries no approver"
 
 
 def test_every_renderer_under_test_renders_the_golden_set(reference_spec: dict[str, Any]) -> None:
@@ -62,6 +62,6 @@ def test_owner_is_the_ot_module_with_write_capability(
 ) -> None:
     owner = reference_spec["view_identity"]["owner_module"]
     facts = facts_specs[owner]
-    assert facts["adapter_identity"]["adapter_id"] == "ot-module"
+    assert facts["adapter_identity"]["adapter_id"] == "forge-ot"
     assert facts["capabilities"]["write"] is True
-    assert reference_spec["view_identity"]["facts_spec_ref"].endswith("ot-module.facts.json")
+    assert reference_spec["view_identity"]["facts_spec_ref"].endswith("forge-ot.facts.json")

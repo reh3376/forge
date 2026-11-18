@@ -26,7 +26,7 @@ from abc import ABC, abstractmethod
 from datetime import UTC, datetime
 from typing import Any
 
-from forge.adapters.scanner_gateway.device_registry import DeviceRegistry  # noqa: TC001
+from forge.adapters.forge_scanner.device_registry import DeviceRegistry  # noqa: TC001
 
 logger = logging.getLogger(__name__)
 

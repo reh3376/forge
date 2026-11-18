@@ -97,7 +97,7 @@ def test_ot_module_is_mounted_started_and_stopped(tmp_path, monkeypatch, no_grpc
         assert body["engine"]["tag_configs"] == 1
 
         adapters = client.get("/v1/adapters").json()
-        assert "forge-ot-module" in {a["adapter_id"] for a in adapters}
+        assert "forge-ot" in {a["adapter_id"] for a in adapters}
         info = client.get("/v1/info").json()
         assert info["ot_module"]["started"] is True and info["ot_module"]["tags_loaded"] == 2
 

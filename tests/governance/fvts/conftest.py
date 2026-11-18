@@ -17,8 +17,8 @@ if TYPE_CHECKING:
 
     from forge.governance.shared.runner import FxTSVerdict
 
-REFERENCE_SPEC_PATH = SPECS_DIR / "ot-module.fvts.json"
-GOLDEN_DIR = Path(__file__).parent / "golden" / "ot-module"
+REFERENCE_SPEC_PATH = SPECS_DIR / "forge-ot.fvts.json"
+GOLDEN_DIR = Path(__file__).parent / "golden" / "forge-ot"
 
 
 @pytest.fixture(scope="session")

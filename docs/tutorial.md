@@ -42,7 +42,7 @@ note:
 
 ## Table of Contents
 
-**Software Dev Path**: **[F1 Opening](#f1--opening)** → **[F2 The Hub ↔ Spoke Contract](#f2--the-hub-spoke-contract)** → **[F3 Storage](#f3--storage-and-the-hubs-databases)** → **[F4 Spec-First Governance](#f4--governance-fxts)** → **[F5 The Plant-Floor Module](#f5--the-ot-module)** → **[F6 Modules, Module Builder, forge-display](#f6--modules-the-sdk-and-forge-display)** → **[F7 Context, Curation, Decisions](#f7--context-curation-and-decisions)** → **[F8 Security, Identity, Federation](#f8--security-identity-and-federation)** → **[F9 One Clock](#f9--one-clock)** → **[F10 Contributing](#f10--contributing)** → **[F11 Conclusion](#f11--conclusion)**
+**Software Dev Path**: **[F1 Opening](#f1--opening)** → **[F2 The Hub ↔ Spoke Contract](#f2--the-hub-spoke-contract)** → **[F3 Storage](#f3--storage-and-the-hubs-databases)** → **[F4 Spec-First Governance](#f4--governance-fxts)** → **[F5 The Plant-Floor Module](#f5--the-forge-ot)** → **[F6 Modules, Module Builder, forge-display](#f6--modules-the-sdk-and-forge-display)** → **[F7 Context, Curation, Decisions](#f7--context-curation-and-decisions)** → **[F8 Security, Identity, Federation](#f8--security-identity-and-federation)** → **[F9 One Clock](#f9--one-clock)** → **[F10 Contributing](#f10--contributing)** → **[F11 Conclusion](#f11--conclusion)**
 
 **End User Path**: **[U1 Start Here](#end-user-path)** → **[U2 How Data Flows](#u2--how-data-flows)** → **[U3 The Hub You Run](#u3--the-hub-you-run)** → **[U4 Your Systems as Spokes](#u4--your-systems-as-spokes)** → **[U5 The Plant Floor](#u5--the-plant-floor)** → **[U6 Context, Products, Decisions](#u6--context-products-and-decisions)** → **[U7 Governance for Users](#u7--governance-for-users)** → **[U8 Screens](#u8--screens)** → **[U9 Identity, Roles, Credentials](#u9--identity-roles-and-credentials)** → **[U10 One Clock](#u10--one-clock)** → **[U11 Operations](#u11--operations)** → **[U12 Where to Go Next](#u12--where-to-go-next)**
 
@@ -52,7 +52,7 @@ note:
 | [F2](#f2--the-hub-spoke-contract) | The hub ↔ spoke contract: `AdapterService`, `ContextualRecord`, transport, ingest | ~12 min | what crosses the hub boundary and how |
 | [F3](#f3--storage-and-the-hubs-databases) | Storage: hub-owned databases, routing, migrations, Forge-issued credentials | ~8 min | where data lands and who may touch it |
 | [F4](#f4--governance-fxts) | **Spec-first governance** (headline): the four layers, the FxTS family, hashing and the owner's approval | ~14 min | why nothing changes silently |
-| [F5](#f5--the-ot-module) | The plant-floor module (forge-ot): tags, alarms, the write defense chain, changeover, one clock, the three-layer process control framework | ~15 min | how the plant floor is reached safely, and what will sit above the PLC |
+| [F5](#f5--the-forge-ot) | The plant-floor module (forge-ot): tags, alarms, the write defense chain, changeover, one clock, the three-layer process control framework | ~15 min | how the plant floor is reached safely, and what will sit above the PLC |
 | [F6](#f6--modules-the-sdk-and-forge-display) | Modules, the module builder and forge-display | ~8 min | how new capability is built and shown |
 | [F7](#f7--context-curation-and-decisions) | Context, curation and decisions | ~8 min | how a value becomes decision-quality |
 | [F8](#f8--security-identity-and-federation) | Security, identity and federation | ~6 min | roles, credentials, hub of hubs, repo posture |
@@ -239,11 +239,11 @@ note:
 | `src/forge/gateway` · `api` · `observer` · `cli` | auth and RBAC middleware, the hub FastAPI app, health, the `forge` CLI |
 | `src/forge/modules/ot` | the OT module: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
 | `src/forge/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
-| `src/forge/adapters` | the eight in-repo spoke adapters (forge-wms, forge-mes, forge-cmms, forge-integ-erp-netsuite, forge-nms, forge-ims, forge-historian, scanner-gateway), each with its manifest and config, and four generic adapter stubs |
+| `src/forge/adapters` | the eight in-repo spoke adapters (forge-wms, forge-mes, forge-cmms, forge-integ-erp-netsuite, forge-nms, forge-ims, forge-historian, forge-scanner), each with its manifest and config, and four generic adapter stubs |
 | `go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js) that FB-076 retires |
 | `tests/` | 267 files mirroring `src/`; migration tests read the migration source |
-| `docs/` | the key docs, `FxTS/` framework pages, `decisions/`, `deployment/` (clock discipline), `governance/`, `core/`, `spokes/`, `p7-ot-module/`, `personal/` (agent context) |
+| `docs/` | the key docs, `FxTS/` framework pages, `decisions/`, `deployment/` (clock discipline), `governance/`, `core/`, `spokes/`, `p7-forge-ot/`, `personal/` (agent context) |
 | `deploy/docker` | the development compose stack and the hub image |
 
 note:
@@ -566,7 +566,7 @@ note:
 
 # F4 · Spec-First Governance
 
-**Nav**: [← F3](#f3--storage-and-the-hubs-databases) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [F5 →](#f5--the-ot-module)
+**Nav**: [← F3](#f3--storage-and-the-hubs-databases) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [F5 →](#f5--the-forge-ot)
 
 The spec is the contract. This section is the headline for contributors: spec-first governance, the four layers every framework shares, the family of frameworks and their state, hashing and the owner's approval, the anatomy of a FACTS spec, and how to run the gates.
 
@@ -673,7 +673,7 @@ note:
 | `sample_records` | records the runner validates against the data contract |
 | `integrity` | the FHTS block |
 
-- Nine specs today: forge-wms (the reference), forge-mes, forge-ims, forge-cmms, forge-integ-erp-netsuite, forge-nms, forge-historian, scanner-gateway, ot-module.
+- Nine specs today: forge-wms (the reference), forge-mes, forge-ims, forge-cmms, forge-integ-erp-netsuite, forge-nms, forge-historian, forge-scanner, forge-ot.
 - The runner validates every spec against the JSON schema first (`facts:schema-valid`) and reads its enums from the schema (FB-080).
 - The developer guide, `docs/governance/facts-developer-guide.md`, walks the schema, how to write a spec, running the runner, common failures and cross-spoke consistency.
 
@@ -719,7 +719,7 @@ note:
 ---
 
 <!-- SECTION F5, OT MODULE -->
-<!-- .slide: id="f5--the-ot-module" -->
+<!-- .slide: id="f5--the-forge-ot" -->
 
 # F5 · The Plant-Floor Module (forge-ot)
 
@@ -849,7 +849,7 @@ note:
 | `forge.perspective` · `forge.file` · `forge.util` · `forge.security` | `system.perspective.*`, `system.file.*`, `system.util.*`, `system.security.*` | UI interaction, sandboxed files, JSON and messaging, user and role queries |
 
 - Python 3.12+ engine replacing Jython 2.7: discovery, loading, hot reload; a PEP 302 import allow-list sandbox; `@timer`, `@on_tag_change`, `@api.route` triggers; area and tag-pattern RBAC; an append-only audit ring buffer.
-- The migration map covers all 52 `system.*` calls; 42 Tier 1 scripts are identified for conversion (`docs/p7-ot-module/`).
+- The migration map covers all 52 `system.*` calls; 42 Tier 1 scripts are identified for conversion (`docs/p7-forge-ot/`).
 
 note:
 - The SDK lives in `src/forge/sdk/scripting`; the OT module's user scripts in `src/forge/modules/ot/scripts`.
@@ -955,7 +955,7 @@ note:
 | Gap | Backlog / decision |
 |---|---|
 | Source time is corrected to master on OPC UA only; the Logix, S7 and Modbus readers follow their drivers; the FACTS declaration is in place | FB-094 and FB-090 done 2026-11-13; FB-093 enforces on OPC UA since 2026-11-15 |
-| One adapter identity (code `forge-ot-module`, manifest and spec `ot-module`) | FB-079 (includes FB-018) |
+| One adapter identity (code `forge-ot`, manifest and spec `forge-ot`) | FB-079 (includes FB-018) |
 | Batch context resolver wired to MES | FB-020 |
 | OT FACTS vocabulary | D-8 |
 | OT reference FVTS spec with real tags, owner-approved | FB-078 |
@@ -970,7 +970,7 @@ note:
 
 # F6 · Modules, the Module Builder and forge-display
 
-**Nav**: [← F5](#f5--the-ot-module) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [F7 →](#f7--context-curation-and-decisions)
+**Nav**: [← F5](#f5--the-forge-ot) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [F7 →](#f7--context-curation-and-decisions)
 
 How new capability enters Forge: the language policy, the module builder's pattern, what exists in Go, the interim MES bridge and its Go rewrite, and the one UI runtime.
 
@@ -2004,8 +2004,8 @@ Which systems connect, and what the contract behind each one means to the people
 | forge-nms | network management | the plant network's topology and health |
 | forge-ims | aerospace inventory | parts and stock over gRPC |
 | forge-historian | time-series historian | archived process history, bulk backfill |
-| scanner-gateway | Android barcode scanners | scans as events |
-| ot-module | the plant floor: OPC-UA, MQTT, alarms, control writes, scripting | tags, alarms, writes; 21 sources |
+| forge-scanner | Android barcode scanners | scans as events |
+| forge-ot | the plant floor: OPC-UA, MQTT, alarms, control writes, scripting | tags, alarms, writes; 21 sources |
 
 Vendor SCADA (Ignition) runs in parallel behind a bridge while the OT module proves parity; Jython middleware scripts are being migrated to the Forge scripting SDK.
 
@@ -2024,8 +2024,8 @@ Each spoke has a **FACTS specification**: what the system is, what it is allowed
 
 | Contract | State today |
 |---|---|
-| all nine: forge-wms, forge-mes, forge-ims, forge-cmms, forge-integ-erp-netsuite, forge-nms, forge-historian, scanner-gateway, ot-module | approved by the owner on 2026-11-13, after every contract gained its time-governance declaration |
-| ot-module | approved, but its contract still fails schema validation until the OT vocabulary is extended (FB-079; decided 2026-11-03) |
+| all nine: forge-wms, forge-mes, forge-ims, forge-cmms, forge-integ-erp-netsuite, forge-nms, forge-historian, forge-scanner, forge-ot | approved by the owner on 2026-11-13, after every contract gained its time-governance declaration |
+| forge-ot | approved, but its contract still fails schema validation until the OT vocabulary is extended (FB-079; decided 2026-11-03) |
 
 note:
 - "Approved" means the owner approved this exact content. A contract goes back to pending whenever its content changes (a person or an AI agent re-stamps it) and the owner re-approves; "pending" does not mean broken.

@@ -1,9 +1,9 @@
 {
-  "adapter_id": "ot-module",
+  "adapter_id": "forge-ot",
   "name": "Forge OT/SCADA Module — OPC-UA Adapter",
-  "version": "0.1.0",
-  "type": "ACQUISITION",
-  "protocol": "opcua",
+  "version": "0.5.0",
+  "type": "BIDIRECTIONAL",
+  "protocol": "opcua+mqtt+amqp",
   "tier": "OT_SCADA",
   "capabilities": {
     "read": true,
@@ -13,7 +13,7 @@
     "discover": true
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/ot-module/v0.1.0",
+    "schema_ref": "forge://schemas/forge-ot/v0.1.0",
     "output_format": "tag_value",
     "context_fields": [
       "tag_path",
@@ -74,9 +74,9 @@
     ],
     "note": "9-type tag engine — 6 standard types matching Ignition + 3 Forge-exclusive (Computed, Event, Virtual)"
   },
-  "facts_spec_ref": "forge://governance/facts/specs/ot-module.facts.json",
+  "facts_spec_ref": "forge://governance/facts/specs/forge-ot.facts.json",
   "metadata": {
-    "spoke": "ot-module",
+    "spoke": "forge-ot",
     "hub_module": "forge.modules.ot",
     "source_repo": "https://github.com/reh3376/forge",
     "source_lines": 2000,

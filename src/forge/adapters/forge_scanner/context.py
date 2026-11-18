@@ -1,4 +1,4 @@
-"""Context builder for the Scanner Gateway adapter.
+"""Context builder for the Forge Scanner adapter.
 
 Transforms scanner.v1 ScanEvent messages (as dicts) into Forge
 RecordContext objects. Scanner events are simpler than transaction

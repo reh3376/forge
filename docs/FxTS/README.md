@@ -114,12 +114,12 @@ forge governance stamp src/forge/governance/facts/specs/forge-wms.facts.json \
 forge governance approve src/forge/governance/facts/specs/forge-wms.facts.json --by reh3376
 
 # Validate a spec file against its framework schema (framework taken from the file name)
-forge governance validate-spec src/forge/governance/fvts/specs/ot-module.fvts.json
+forge governance validate-spec src/forge/governance/fvts/specs/forge-ot.fvts.json
 
 # Run one framework's checks on one spec: a spec file, or its id looked up in the
 # framework's spec directory (endpoint path, adapter_id, view_id, transport_id, module_id)
 forge governance run facts forge-wms
-forge governance run fvts ot-module-views --format json --output reports/fvts-ot-module.json
+forge governance run fvts forge-ot-views --format json --output reports/fvts-forge-ot.json
 forge governance run ftts grpc-hardened-transport
 forge governance run fmts path/to/module.fmts.json # the module requirements; skipped checks are listed
 forge governance run fats /v1/health --live        # live checks: FATS, FACTS, FTTS

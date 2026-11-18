@@ -1,9 +1,9 @@
-"""Tests for the Scanner Gateway server handler."""
+"""Tests for the Forge Scanner server handler."""
 
 import pytest
 
-from forge.adapters.scanner_gateway.device_registry import DeviceRegistry
-from forge.adapters.scanner_gateway.server import (
+from forge.adapters.forge_scanner.device_registry import DeviceRegistry
+from forge.adapters.forge_scanner.server import (
     MockScannerServiceHandler,
 )
 

@@ -11,7 +11,7 @@ This document contains every change in the FVTS (Forge View Test Specification) 
 2. [[#1. New file — docs/FxTS/FVTS.md]]
 3. [[#2. Edit — docs/FxTS/README.md]]
 4. [[#3. New file — src/forge/governance/fvts/schema/fvts.schema.json]]
-5. [[#4. New file — src/forge/governance/fvts/specs/ot-module.fvts.json]]
+5. [[#4. New file — src/forge/governance/fvts/specs/forge-ot.fvts.json]]
 6. [[#5. New empty package files]]
 7. [[#Verification performed]]
 
@@ -22,7 +22,7 @@ This document contains every change in the FVTS (Forge View Test Specification) 
 | 1 | `docs/FxTS/FVTS.md` | New — framework documentation |
 | 2 | `docs/FxTS/README.md` | Edit — two table rows added |
 | 3 | `src/forge/governance/fvts/schema/fvts.schema.json` | New — JSON Schema (draft 2020-12) |
-| 4 | `src/forge/governance/fvts/specs/ot-module.fvts.json` | New — reference spec for the OT module |
+| 4 | `src/forge/governance/fvts/specs/forge-ot.fvts.json` | New — reference spec for the OT module |
 | 5 | `src/forge/governance/fvts/__init__.py`, `schema/__init__.py`, `specs/__init__.py`, `runners/__init__.py` | New — empty package markers |
 
 No existing code is modified. No runner is included yet.
@@ -37,7 +37,7 @@ No existing code is modified. No runner is included yet.
 **Framework ID:** FVTS
 **Full Name:** Forge View Test Specification
 **CI Gate:** Hard-fail (merge-blocking) once the runner lands
-**Status:** v0.1.0 DRAFT — Schema + reference spec (`ot-module.fvts.json`); runner not yet implemented
+**Status:** v0.1.0 DRAFT — Schema + reference spec (`forge-ot.fvts.json`); runner not yet implemented
 **Phase:** TBD (forge-display)
 **MDEMG Analog:** None — new for forge-display
 
@@ -177,7 +177,7 @@ Per FxTS principle 2 (schema-runner parity), the CI gate stays off until every s
 
 | Spec | Status | Notes |
 |------|--------|-------|
-| `ot-module.fvts.json` | Draft — `hash_state: pending_review` | Reference contract: fermenter HMI screen, trend, alarm summary, settings; setpoint write via two-step review |
+| `forge-ot.fvts.json` | Draft — `hash_state: pending_review` | Reference contract: fermenter HMI screen, trend, alarm summary, settings; setpoint write via two-step review |
 
 ## Relationship to other FxTS frameworks
 
@@ -808,7 +808,7 @@ Two rows added; nothing else changed.
 
 ---
 
-## 4. New file — `src/forge/governance/fvts/specs/ot-module.fvts.json`
+## 4. New file — `src/forge/governance/fvts/specs/forge-ot.fvts.json`
 
 The `integrity` block was computed with the repo's own `add_spec_hash()` (`sha256-c14n-v1`) and then set to `hash_state: pending_review` with no approver, because the spec is agent-authored. **Any edit to this file invalidates the hash** — re-stamp with your FHTS tooling after review.
 
@@ -816,11 +816,11 @@ The `integrity` block was computed with the repo's own `add_spec_hash()` (`sha25
 {
   "spec_version": "0.1.0",
   "view_identity": {
-    "view_id": "ot-module-views",
+    "view_id": "forge-ot-views",
     "name": "Forge OT/SCADA Module — Operator Views",
     "version": "0.1.0",
-    "owner_module": "ot-module",
-    "facts_spec_ref": "src/forge/governance/facts/specs/ot-module.facts.json",
+    "owner_module": "forge-ot",
+    "facts_spec_ref": "src/forge/governance/facts/specs/forge-ot.facts.json",
     "description": "Reference FVTS contract: operator HMI, trending and alarm summary for the OT module. Exercises every FVTS section, including the write path through the OT module's four-layer write engine."
   },
   "scope": {
@@ -843,7 +843,7 @@ The `integrity` block was computed with the repo's own `add_spec_hash()` (`sha25
         "point_id": "ferm.temperature",
         "label": "Fermenter temperature",
         "source": {
-          "adapter_id": "ot-module",
+          "adapter_id": "forge-ot",
           "tag_path": "{area}/{equipment_id}/Temperature"
         },
         "data_type": "FLOAT",
@@ -864,7 +864,7 @@ The `integrity` block was computed with the repo's own `add_spec_hash()` (`sha25
         "point_id": "ferm.temperature_sp",
         "label": "Temperature setpoint",
         "source": {
-          "adapter_id": "ot-module",
+          "adapter_id": "forge-ot",
           "tag_path": "{area}/{equipment_id}/TemperatureSP"
         },
         "data_type": "FLOAT",
@@ -885,7 +885,7 @@ The `integrity` block was computed with the repo's own `add_spec_hash()` (`sha25
         "point_id": "ferm.agitator_running",
         "label": "Agitator running",
         "source": {
-          "adapter_id": "ot-module",
+          "adapter_id": "forge-ot",
           "tag_path": "{area}/{equipment_id}/Agitator/Running"
         },
         "data_type": "BOOLEAN",
@@ -900,7 +900,7 @@ The `integrity` block was computed with the repo's own `add_spec_hash()` (`sha25
         "point_id": "ferm.mode",
         "label": "Operating mode",
         "source": {
-          "adapter_id": "ot-module",
+          "adapter_id": "forge-ot",
           "tag_path": "{area}/{equipment_id}/Mode"
         },
         "data_type": "ENUM",
@@ -1024,7 +1024,7 @@ The `integrity` block was computed with the repo's own `add_spec_hash()` (`sha25
   ],
   "settings": {
     "exposed": true,
-    "schema_ref": "forge://schemas/ot-module/settings/v1",
+    "schema_ref": "forge://schemas/forge-ot/settings/v1",
     "required_role": "ENGINEER",
     "apply_mode": "staged_with_review",
     "allowed_profiles": [
@@ -1120,7 +1120,7 @@ The `integrity` block was computed with the repo's own `add_spec_hash()` (`sha25
   },
   "conformance_tests": {
     "suite_path": "tests/governance/fvts/test_ot_module_views.py",
-    "golden_messages_path": "tests/governance/fvts/golden/ot-module/",
+    "golden_messages_path": "tests/governance/fvts/golden/forge-ot/",
     "renderers_under_test": [
       "desktop_hmi",
       "web"
@@ -1170,7 +1170,7 @@ src/forge/governance/fvts/runners/__init__.py
 ## Verification performed
 
 - `fvts.schema.json` passes `jsonschema` Draft 2020-12 `check_schema`.
-- `ot-module.fvts.json` validates against the schema.
+- `forge-ot.fvts.json` validates against the schema.
 - Every point and action referenced by a surface exists; every action's profiles are within the supported profiles.
 - 14 deliberately unsafe variants of the spec were rejected by the schema, including: a tag write with no confirmation, a tag write by `VIEWER`, missing interlock feedback, handling only `CONFIRMED`, shelving without a reason code, `audit: false`, client-side decimation, freezing on disconnect, a missing alarm state, a hand-coded `hmi_screen`, a numeric point without units, an `ENUM` without labels, a non-alarm colour token for an alarm priority, and an unknown top-level key.
 - `verify_spec_hash()` confirms the spec's integrity hash.

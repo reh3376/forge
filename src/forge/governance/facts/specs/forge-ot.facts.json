@@ -1,7 +1,7 @@
 {
   "spec_version": "0.1.0",
   "adapter_identity": {
-    "adapter_id": "ot-module",
+    "adapter_id": "forge-ot",
     "name": "Forge OT/SCADA Module — OPC-UA Adapter",
     "version": "0.5.0",
     "type": "BIDIRECTIONAL",
@@ -210,7 +210,7 @@
     ]
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/ot-module/v0.3.0",
+    "schema_ref": "forge://schemas/forge-ot/v0.3.0",
     "output_format": "tag_value",
     "context_fields": [
       "tag_path",
@@ -470,8 +470,8 @@
       }
     ],
     "sample_alarm_record": {
-      "record_id": "ot-module:alarm:evt-20260409-001",
-      "source_adapter": "ot-module",
+      "record_id": "forge-ot:alarm:evt-20260409-001",
+      "source_adapter": "forge-ot",
       "collected_at": "2026-04-09T14:30:00Z",
       "context": {
         "alarm_id": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
@@ -496,8 +496,8 @@
       }
     },
     "sample_control_write_record": {
-      "record_id": "ot-module:write:evt-20260409-002",
-      "source_adapter": "ot-module",
+      "record_id": "forge-ot:write:evt-20260409-002",
+      "source_adapter": "forge-ot",
       "collected_at": "2026-04-09T15:00:00Z",
       "context": {
         "write_request_id": "f1e2d3c4-5678-90ab-cdef-1234567890ef",
@@ -525,8 +525,8 @@
       }
     },
     "sample_record": {
-      "record_id": "ot-module:tag:evt-20260408-001",
-      "source_adapter": "ot-module",
+      "record_id": "forge-ot:tag:evt-20260408-001",
+      "source_adapter": "forge-ot",
       "collected_at": "2026-04-08T10:30:00Z",
       "context": {
         "tag_path": "WH/WHK01/Distillery01/Utility01/LIT_6050B/Out_PV",
@@ -714,7 +714,7 @@
     },
     "dead_letter": {
       "enabled": true,
-      "topic": "forge.dead-letter.ot-module",
+      "topic": "forge.dead-letter.forge-ot",
       "max_age_hours": 168
     },
     "health_degradation": {
@@ -770,7 +770,7 @@
     "fail_closed": true
   },
   "metadata": {
-    "spoke": "ot-module",
+    "spoke": "forge-ot",
     "hub_module": "forge-modules",
     "source_repo": "https://github.com/reh3376/forge",
     "source_loc": "8000+",
@@ -787,10 +787,19 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "11ade06eeebfa480739b80c746e53e4254e7773bf364e23722ea873f29a0574d",
+    "spec_hash": "e6548e1573f875475cfcf9b174a6044828b95060de68f802383e9744a87f81ab",
     "hash_state": "approved",
-    "previous_hash": "8276e7fa27c55c2672ffdd84580f5dfdf9e90dd2e7efe6cc2e2326204d4a2cf7",
+    "previous_hash": "11ade06eeebfa480739b80c746e53e4254e7773bf364e23722ea873f29a0574d",
     "change_history": [
+      {
+        "previous_hash": "11ade06eeebfa480739b80c746e53e4254e7773bf364e23722ea873f29a0574d",
+        "new_hash": "e6548e1573f875475cfcf9b174a6044828b95060de68f802383e9744a87f81ab",
+        "changed_at": "2026-11-18T17:01:10Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "Owner review 2026-11-18: the OT module's one id is forge-ot (FB-144)"
+      },
       {
         "previous_hash": "8276e7fa27c55c2672ffdd84580f5dfdf9e90dd2e7efe6cc2e2326204d4a2cf7",
         "new_hash": "11ade06eeebfa480739b80c746e53e4254e7773bf364e23722ea873f29a0574d",
@@ -808,18 +817,9 @@
         "changed_by": "claude-code",
         "change_type": "structural",
         "reason": "FB-074: REJECTED_REVIEW added to the write_status vocabulary (server-side two-step review and reason codes). Awaiting owner approval."
-      },
-      {
-        "previous_hash": "d66d9bd361c4a0d09a529bac9b48a13c4d73fcc94d77837642b2c44634d2d951",
-        "new_hash": "a99f6a8792f568a364f8b45c740f5c9a19543901e8f1be32fc8da7bfefba1529",
-        "changed_at": "2026-10-17T01:24:20Z",
-        "source": "agent",
-        "changed_by": "claude-code",
-        "change_type": "content",
-        "reason": "FB-073: P7 phases 3-6 (alarm engine, control-write interface, Ignition bridge adapter, script migration) were recorded on 2026-04-09 by claude-opus with placeholder hashes (pending-rehash-after-{alarm,control-write,bridge-adapter,script-migration}-additions) and hash_state 'draft', which FHTS cannot verify. Re-hashed from the last well-formed hash in one step; the four placeholder entries live in git history (commit d6db522c) and docs/p7-ot-module/P7_SPRINT_PLAN.md. Content unchanged. Awaiting owner approval."
       }
     ],
     "approved_by": "reh3376",
-    "approved_at": "2026-11-13T19:35:04Z"
+    "approved_at": "2026-11-18T17:03:01Z"
   }
 }

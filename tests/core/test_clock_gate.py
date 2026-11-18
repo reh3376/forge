@@ -127,15 +127,15 @@ def test_a_refused_clock_changes_cause_without_counting_a_second_entry() -> None
 def test_the_tracker_holds_a_series_to_the_tolerance_of_its_class() -> None:
     tracker = ClockOffsetTracker(tolerance_seconds=1.0)
     stats = tracker.observe(
-        "forge-ot-module", SERVER_LINK, 0.05, T, clock_id="server:WHK01", tolerance_seconds=0.010
+        "forge-ot", SERVER_LINK, 0.05, T, clock_id="server:WHK01", tolerance_seconds=0.010
     )
     assert stats.tolerance_seconds == 0.010 and stats.within_tolerance is False
     # a series measured without a declared class keeps the tracker's own tolerance
-    other = tracker.observe("forge-ot-module", SERVER_LINK, 0.05, T)
+    other = tracker.observe("forge-ot", SERVER_LINK, 0.05, T)
     assert other.tolerance_seconds == 1.0 and other.within_tolerance is True
     # a class change (a device moving to PTP declares T1) takes effect on the next sample
     stats = tracker.observe(
-        "forge-ot-module", SERVER_LINK, 0.005, T, clock_id="server:WHK01", tolerance_seconds=0.001
+        "forge-ot", SERVER_LINK, 0.005, T, clock_id="server:WHK01", tolerance_seconds=0.001
     )
     assert stats.tolerance_seconds == 0.001 and stats.within_tolerance is False
 

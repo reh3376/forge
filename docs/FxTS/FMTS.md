@@ -119,11 +119,13 @@ Every run gives 19 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:h
 |---|---|---|---|
 | forge-wms, forge-cmms, forge-nms, forge-historian, forge-ims | management | M-10 (FB-141) | **approved by the owner 2026-11-18**; every other requirement passes, M-4 to M-7 run by the kit |
 | forge-integ-erp-netsuite | integration | M-10 (FB-141) | **approved by the owner 2026-11-18**; the same |
-| scanner-gateway | integration | M-10 (FB-141) | `pending_review`; M-6 not checked (no sample events) |
-| ot-module | ot | M-10 (FB-141), M-11 (FB-146) | `pending_review`; fails `m2` (FB-144); M-4 to M-7 not checked (FB-155) |
-| forge-mes (the interim bridge) | management | M-3 (FB-145), M-8 (FB-057), M-9 (FB-143), M-10 (FB-141), M-11 (FB-076) | `pending_review`; `waivers` fails until approved (the M-3 waiver needs admin privileges); M-4 to M-7 not checked (FB-155) |
+| forge-scanner | management | M-3 (FB-117), M-10 (FB-141) | **approved by the owner 2026-11-18**, which is what makes its time-keeping waiver count; M-6 not checked (no sample events) |
+| forge-ot | ot | M-10 (FB-141), M-11 (FB-146) | `pending_review` by the owner's decision: M-4 to M-7 are not checked, because the kit cannot drive it yet (FB-155). Everything else passes |
+| forge-mes (the interim bridge) | management | M-3 (FB-145), M-8 (FB-057), M-9 (FB-143), M-10 (FB-141), M-11 (FB-076) | `pending_review` by the owner's decision, for the same reason; `waivers` fails until approved (the M-3 waiver needs admin privileges) |
 
-The five management modules are Forge's own (owner, 2026-11-18). An existing application was the example each is built from; today each is a Python adapter that holds the data contract taken from that example, and its own logic, storage and screens are not built. The target is a Go module with Python scripting for customization. Each declares its hub database as the rule it is built to: `mod_wms`, `mod_cmms`, `mod_nms`, `mod_ims`, and for forge-historian the hub's time-series store (what forge-historian is to become: FB-157).
+The owner reviewed all nine on 2026-11-18, the first line by line, and approves a module spec only when the conformance kit has run M-4 to M-7 against the module.
+
+The six management modules that are approved are Forge's own (owner, 2026-11-18). An existing application was the example each is built from; today each is a Python adapter that holds the data contract taken from that example, and its own logic, storage and screens are not built. The target is a Go module with Python scripting for customization. Each declares its hub database as the rule it is built to: `mod_wms`, `mod_cmms`, `mod_nms`, `mod_ims`, and for forge-historian the hub's time-series store (what forge-historian is to become: FB-157). forge-scanner has no database; its counterparts are the handheld scanners, plant-floor devices whose clocks nothing can read yet (FB-117).
 
 forge-integ-erp-netsuite is an integration module for one named product. It keeps the hub schema `mod_erpi` through an explicit mapping in `forge.storage.access`, because its id no longer derives that name. Nothing reads the product's clock yet (FB-139).
 
@@ -142,12 +144,11 @@ forge governance approve path/to/x.fmts.json --by reh3376    # the owner only
 
 | Gap | Backlog |
 |---|---|
-| The nine module specs await the owner's approval | FB-136 |
-| The OT module's manifests disagree with its FACTS spec, so its spec fails `fmts:m2` | FB-144 |
+| Two module specs (forge-ot, forge-mes) wait for a kit driver before the owner approves them | FB-155 |
 | The interim MES bridge cannot state a governed time source; M-3 is waived | FB-145 |
 | The OT module is not built from a template (M-11 waived), and its local SQLite buffer is not declared | FB-146, FB-147 |
 | No clock-read method exists for a gRPC server | FB-139 |
-| M-4 to M-7 are not checked for a module in another process or language (ot-module, forge-mes) | FB-155 |
+| M-4 to M-7 are not checked for a module in another process or language (forge-ot, forge-mes) | FB-155 |
 | M-6 is checked only where a module has sample events (forge-wms); a source event without a stamp is not covered | FB-137 |
 | The hub does not probe its own databases' clocks | FB-138 |
 | No integration module reads its third-party system's clock | FB-139 |

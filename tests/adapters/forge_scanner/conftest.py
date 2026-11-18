@@ -1,4 +1,4 @@
-"""Test configuration for Scanner Gateway adapter tests."""
+"""Test configuration for Forge Scanner adapter tests."""
 
 import sys
 from pathlib import Path

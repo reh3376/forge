@@ -377,7 +377,7 @@ async def test_full_changeover_over_the_embedded_broker() -> None:
             rows = r.json()
             assert {row["tag_path"] for row in rows} == {CIP_START, SP, RR}
             assert all(row["status"] == "CONFIRMED" for row in rows)
-            assert all(row["requestor"] == "forge-ot-module" for row in rows)
+            assert all(row["requestor"] == "forge-ot" for row in rows)
             r = await client.get("/api/v1/ot/control/writes", params={"tag_path": SP, "limit": 5})
             assert [row["requested_value"] for row in r.json()] == [180]
             r = await client.get("/api/v1/ot/control/tags")

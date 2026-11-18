@@ -16,10 +16,10 @@
 | **Estimated Sprints** | 22–26 (across 7 phases) |
 | **Estimated Duration** | 10–14 months |
 | **Dependencies** | opcua-asyncio (reference only), Forge core models, Forge Historian historian, forge-mes MQTT, forge-cmms asset registry |
-| **FACTS Spec** | `ot-module.facts.json` (to be created in Phase 1) |
+| **FACTS Spec** | `forge-ot.facts.json` (to be created in Phase 1) |
 | **FTTS Spec** | `grpc-hardened-transport.ftts.json` (existing, shared) |
-| **Research Doc** | `docs/p7-ot-module/P7_RESEARCH_SUMMARY.md` |
-| **Competitive Analysis** | `docs/p7-ot-module/COMPETITIVE_ANALYSIS.md` |
+| **Research Doc** | `docs/p7-forge-ot/P7_RESEARCH_SUMMARY.md` |
+| **Competitive Analysis** | `docs/p7-forge-ot/COMPETITIVE_ANALYSIS.md` |
 
 ---
 
@@ -161,7 +161,7 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 |---|------|---------|
 | 1.3.1 | L82E-specific testing | Test against real PLC (or simulator) — browse address space, subscribe to tags, validate quality codes |
 | 1.3.2 | Tag path normalization | `[WHK01]Distillery01/Utility01/LIT_6050B/Out_PV` → `WH/WHK01/Distillery01/Utility01/LIT_6050B/Out_PV` |
-| 1.3.3 | Write FACTS spec | `ot-module.facts.json` — 10 sections, all vocabulary-compliant, hash verified |
+| 1.3.3 | Write FACTS spec | `forge-ot.facts.json` — 10 sections, all vocabulary-compliant, hash verified |
 | 1.3.4 | Write adapter manifest | `manifest.json` — OT tier, opcua protocol, read+write+subscribe+backfill+discover capabilities |
 | 1.3.5 | Performance benchmarking | Measure: connection time, subscription latency, browse time for 1000+ nodes, reconnect time |
 | 1.3.6 | Documentation | OPC-UA library API reference, security configuration guide, L82E compatibility notes |
@@ -327,7 +327,7 @@ The scripting engine is a new sub-package within the existing `forge.sdk` — NO
 | 3.3.6 | Alarm ContextualRecord | Alarm events produce ContextualRecords with alarm-specific context fields |
 | 3.3.7 | Alarm MQTT acknowledge | Subscribe to `whk/whk01/{area}/ot/alarms/{alarm_id}/ack` — allows remote alarm acknowledgment from dashboard/mobile (with auth token in payload) |
 | 3.3.8 | Alarm pipeline scripting | @forge.on_alarm scripts fire on alarm state changes. Custom notification logic (Slack, Teams, webhook) via forge.net.* |
-| 3.3.9 | FACTS spec update | Add alarm-related context fields, MQTT data sources, and alarm topics to ot-module.facts.json |
+| 3.3.9 | FACTS spec update | Add alarm-related context fields, MQTT data sources, and alarm topics to forge-ot.facts.json |
 
 **Gate 3:** Alarm lifecycle tests pass (all ISA-18.2 state transitions). At least 1 threshold alarm triggers from mock PLC data, produces ContextualRecord, publishes to MQTT alarm topic, CMMS receives work order event, and @forge.on_alarm script fires correctly.
 
@@ -565,7 +565,7 @@ Each area follows the same pattern as Epic 7.1: subscribe → migrate alarms →
 |----------|----------------|
 | `docs/VISION.md`, `docs/WHERE-WE-ARE.md` | OT module section and state rows (the retired `ARCHITECTURE.md` / `SPOKE_ONBOARDING.md` / `PLAN.md` updates, FB-081) |
 | `CLAUDE.md` (forge) | Add OT Module CLI commands, health checks |
-| `docs/p7-ot-module/` | Complete API reference, configuration guide, operator guide |
+| `docs/p7-forge-ot/` | Complete API reference, configuration guide, operator guide |
 | Memory files | Update `project_ignition_scada.md`, `decision_ignition_replacement.md` |
 
 ---
@@ -595,8 +595,8 @@ Each area follows the same pattern as Epic 7.1: subscribe → migrate alarms →
 
 | Document | Path | Purpose |
 |----------|------|---------|
-| P7 Research Summary | `docs/p7-ot-module/P7_RESEARCH_SUMMARY.md` | Full research findings (v2) |
-| Competitive Analysis | `docs/p7-ot-module/COMPETITIVE_ANALYSIS.md` | Ignition module inventory, tag engine design, competitive landscape |
+| P7 Research Summary | `docs/p7-forge-ot/P7_RESEARCH_SUMMARY.md` | Full research findings (v2) |
+| Competitive Analysis | `docs/p7-forge-ot/COMPETITIVE_ANALYSIS.md` | Ignition module inventory, tag engine design, competitive landscape |
 | Principles | `docs/PRINCIPLES.md` | Adapter tiers, Ignition replacement strategy (§7), spoke priority scoring (§8) |
 | Where we are | `docs/WHERE-WE-ARE.md` | Spoke status table, test counts |
 | AdapterBase model | `src/forge/core/models/adapter.py` | Interface contract |
@@ -623,7 +623,7 @@ OT Module is not connected to production PLCs yet. Rollback is simply stopping t
 ### Phase 5–6 (Bridge Active + Script Migration): Disable bridge adapter
 ```bash
 # Stop OT Module, Ignition continues as primary
-forge module stop ot-module
+forge module stop forge-ot
 # Verify Ignition still producing data
 curl -s http://localhost:9999/v1/health | jq '.ot_module'
 ```

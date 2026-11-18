@@ -1,11 +1,11 @@
 {
   "spec_version": "0.1.0",
   "view_identity": {
-    "view_id": "ot-module-views",
+    "view_id": "forge-ot-views",
     "name": "Forge OT/SCADA Module — Operator Views",
     "version": "0.1.0",
-    "owner_module": "ot-module",
-    "facts_spec_ref": "src/forge/governance/facts/specs/ot-module.facts.json",
+    "owner_module": "forge-ot",
+    "facts_spec_ref": "src/forge/governance/facts/specs/forge-ot.facts.json",
     "description": "Reference FVTS contract: operator HMI, trending and alarm summary for the OT module. Exercises every FVTS section, including the write path through the OT module's write engine (validation, two-step review, interlocks, authorization, write with read-back)."
   },
   "scope": {
@@ -28,7 +28,7 @@
         "point_id": "ferm.temperature",
         "label": "Fermenter temperature",
         "source": {
-          "adapter_id": "ot-module",
+          "adapter_id": "forge-ot",
           "tag_path": "{area}/{equipment_id}/Temperature"
         },
         "data_type": "FLOAT",
@@ -49,7 +49,7 @@
         "point_id": "ferm.temperature_sp",
         "label": "Temperature setpoint",
         "source": {
-          "adapter_id": "ot-module",
+          "adapter_id": "forge-ot",
           "tag_path": "{area}/{equipment_id}/TemperatureSP"
         },
         "data_type": "FLOAT",
@@ -70,7 +70,7 @@
         "point_id": "ferm.agitator_running",
         "label": "Agitator running",
         "source": {
-          "adapter_id": "ot-module",
+          "adapter_id": "forge-ot",
           "tag_path": "{area}/{equipment_id}/Agitator/Running"
         },
         "data_type": "BOOLEAN",
@@ -85,7 +85,7 @@
         "point_id": "ferm.mode",
         "label": "Operating mode",
         "source": {
-          "adapter_id": "ot-module",
+          "adapter_id": "forge-ot",
           "tag_path": "{area}/{equipment_id}/Mode"
         },
         "data_type": "ENUM",
@@ -210,7 +210,7 @@
   ],
   "settings": {
     "exposed": true,
-    "schema_ref": "forge://schemas/ot-module/settings/v1",
+    "schema_ref": "forge://schemas/forge-ot/settings/v1",
     "required_role": "ENGINEER",
     "apply_mode": "staged_with_review",
     "allowed_profiles": [
@@ -306,7 +306,7 @@
   },
   "conformance_tests": {
     "suite_path": "tests/governance/fvts/test_ot_module_views.py",
-    "golden_messages_path": "tests/governance/fvts/golden/ot-module/",
+    "golden_messages_path": "tests/governance/fvts/golden/forge-ot/",
     "renderers_under_test": [
       "desktop_hmi",
       "web"
@@ -318,8 +318,17 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": "d2344754a70a9b501267ca7cdc42be89b10bd576503f8640a32d9e83f926d179",
+    "previous_hash": "c7d1c3d44175dc1b4927bfdbf463b018eee6f413809555b54c4d3aef9d95c725",
     "change_history": [
+      {
+        "previous_hash": "c7d1c3d44175dc1b4927bfdbf463b018eee6f413809555b54c4d3aef9d95c725",
+        "new_hash": "948d0fed76e0f89ad3d5b492e3c9bda1f99afc6533dec3e652d88d497a097db4",
+        "changed_at": "2026-11-18T17:01:10Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "Owner review 2026-11-18: the OT module's one id is forge-ot (FB-144)"
+      },
       {
         "previous_hash": "d2344754a70a9b501267ca7cdc42be89b10bd576503f8640a32d9e83f926d179",
         "new_hash": "c7d1c3d44175dc1b4927bfdbf463b018eee6f413809555b54c4d3aef9d95c725",
@@ -340,8 +349,6 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "c7d1c3d44175dc1b4927bfdbf463b018eee6f413809555b54c4d3aef9d95c725",
-    "approved_by": null,
-    "approved_at": null
+    "spec_hash": "948d0fed76e0f89ad3d5b492e3c9bda1f99afc6533dec3e652d88d497a097db4"
   }
 }

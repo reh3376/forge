@@ -1,7 +1,7 @@
 """Every FACTS spec validates against ``facts.schema.json`` and the runner's
 vocabulary is the schema's (BACKLOG FB-080).
 
-``ot-module`` is the one exception until FB-079 settles the OT vocabulary
+``forge-ot`` is the one exception until FB-079 settles the OT vocabulary
 (ROADMAP D-8). It is marked ``xfail(strict=True)``: the day it validates, this
 file must change, and ``KNOWN_VOCABULARY_FAILURES`` in
 ``test_ot_module_spec.py`` shrinks with it.
@@ -33,7 +33,7 @@ SPEC_PATHS = sorted(SPECS_DIR.glob("*.facts.json"))
 
 #: adapter_id → why the spec does not validate yet (and which item fixes it).
 VOCABULARY_GAPS = {
-    "ot-module": "FB-079 / D-8: the OT spec uses an OPC-UA vocabulary FACTS v0.1.0 lacks",
+    "forge-ot": "FB-079 / D-8: the OT spec uses an OPC-UA vocabulary FACTS v0.1.0 lacks",
 }
 
 
@@ -75,7 +75,7 @@ def _load(path: Path) -> dict:
 
 class TestEverySpec:
     def test_specs_are_present(self) -> None:
-        assert {_spec_id(p) for p in SPEC_PATHS} >= {"forge-mes", "forge-wms", "ot-module"}
+        assert {_spec_id(p) for p in SPEC_PATHS} >= {"forge-mes", "forge-wms", "forge-ot"}
 
     @pytest.mark.parametrize("path", CONFORMING)
     def test_validates_against_schema(self, validator: Draft202012Validator, path: Path) -> None:

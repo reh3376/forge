@@ -172,7 +172,7 @@ class TestContextualRecordAuditSink:
         batch = sink_store.write_batch.call_args[0][0]
         assert len(batch) == 1 and sink.records_written == 1
         cr = batch[0]
-        assert cr.source.adapter_id == "forge-ot-module" and cr.source.system == "forge-ot"
+        assert cr.source.adapter_id == "forge-ot" and cr.source.system == "forge-ot"
         assert cr.source.tag_path == "ot.control.write.WH/WHK01/Distillery01/TIT_2010/SP"
         assert cr.context.area == "Distillery01" and cr.context.site == "whk01"
         assert cr.context.operator_id == record["requestor"]
@@ -180,7 +180,7 @@ class TestContextualRecordAuditSink:
         assert cr.context.extra["target_tag_path"] == "WH/WHK01/Distillery01/TIT_2010/SP"
         assert cr.context.extra["write_status"] == record["status"]
         assert cr.value.raw["requested_value"] == record["requested_value"]
-        assert cr.lineage.schema_ref == "forge://schemas/ot-module/v0.1.0"
+        assert cr.lineage.schema_ref == "forge://schemas/forge-ot/v0.1.0"
         assert cr.lineage.transformation_chain == ["ot:control-write-engine"]
         assert cr.timestamp.source_time.isoformat() == record["timestamp"]
 
