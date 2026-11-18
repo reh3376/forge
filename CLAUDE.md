@@ -33,6 +33,7 @@ These documents are the authority (A-12). Where Jiminy or MDEMG guidance injecte
 ## Architecture rules that bound every change
 
 - **Hub and spoke (A-1).** forge-core (`src/forge`, Python) is the hub. Every module is a spoke that speaks `forge.v1.AdapterService` to the hub over gRPC. Nothing reaches the hub any other way.
+- **The transport contract is signed (D-15).** `docs/decisions/transport-contract.md`. Records go up at least once, with store and forward; commands go down at most once, are never stored, and expire. Within a major version the proto only gains additions. Nothing in it is built yet (FB-164); do not change the proto or the transport in a way that contradicts it.
 - **Third-party software is never integrated with the hub directly (A-4, A-11).** An integration module handles that system's API and is the middleware back to the hub.
 - **Modules are Go (A-2)**, built from the module SDK. The NestJS/Next.js code under `modules/Forge MES` is the interim MES bridge; forge-mes is Go and is not built yet. Say "the interim MES bridge", never "the TypeScript forge-mes".
 - **All user interfaces come from forge-display (A-3)**, for every module, and the hub's own UI. No module ships its own UI. forge-display is the first module to be built (A-14). The bridge's Next.js frontend stays only until forge-display exists.

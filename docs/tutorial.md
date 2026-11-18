@@ -334,7 +334,7 @@ note:
 | Per-spoke callback token, scoped hub endpoints | ✅ | FB-063 |
 | Hub → spoke write-back over a session-bound callback | ✅ | FB-054 |
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
-| FTTS transport spec and runner | 🟡 | `src/forge/governance/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18; no `docs/FxTS/FTTS.md` page yet |
+| FTTS transport spec and runner | 🟡 | `src/forge/governance/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18; no `docs/FxTS/FTTS.md` page yet. The transport contract it should become is decided and signed (D-15, `docs/decisions/transport-contract.md`): versioning, delivery, store and forward, command expiry, time-outs, security. None of that is built (FB-164) |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
 | Hub time in the contract: the four-timestamp exchange on Register, Health and Ingest; a reporting spoke measured two-way | ✅ | FB-092 (2026-11-15) |
 | A spoke outside its tolerance, or one that reports no measurement, refused at Register and Ingest | ✅ | FB-093's hub half (2026-11-17; the plant-floor links fail closed since 2026-11-15) |
