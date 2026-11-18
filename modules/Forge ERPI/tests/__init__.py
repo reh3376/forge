@@ -1,1 +1,1 @@
-"""Tests for the WHK ERPI adapter."""
+"""Tests for the Forge ERP adapter."""

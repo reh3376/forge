@@ -1,6 +1,6 @@
 {
-  "adapter_id": "whk-erpi",
-  "name": "Whiskey House ERP Integration Adapter",
+  "adapter_id": "forge-erpi",
+  "name": "Forge ERP Interface Adapter",
   "version": "0.1.0",
   "type": "INGESTION",
   "protocol": "amqp+rest+graphql",
@@ -13,7 +13,7 @@
     "discover": true
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/whk-erpi/v0.1.0",
+    "schema_ref": "forge://schemas/forge-erpi/v0.1.0",
     "output_format": "contextual_record",
     "context_fields": [
       "cross_system_id",
@@ -72,8 +72,8 @@
   ],
   "metadata": {
     "spoke": "erpi",
-    "hub_module": "forge.adapters.whk_erpi",
-    "source_repo": "https://github.com/WhiskeyHouse/whk-erpi",
+    "hub_module": "forge.adapters.forge_erpi",
+    "source_repo": "https://github.com/WhiskeyHouse/forge-erpi",
     "external_contract": "asyncapi://whk-asyncapi-types/v1.0.0"
   }
 }

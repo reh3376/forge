@@ -167,18 +167,18 @@ class TestAdapterRegistry:
 
     @pytest.mark.asyncio
     async def test_adapter_health_after_register(self, client):
-        manifest = _make_manifest("whk-erpi")
+        manifest = _make_manifest("forge-erpi")
         await client.post("/v1/adapters/register", json=manifest)
 
-        resp = await client.get("/v1/adapters/whk-erpi/health")
+        resp = await client.get("/v1/adapters/forge-erpi/health")
         assert resp.status_code == 200
         data = resp.json()
-        assert data["adapter_id"] == "whk-erpi"
+        assert data["adapter_id"] == "forge-erpi"
         assert data["state"] == "REGISTERED"
 
     @pytest.mark.asyncio
     async def test_register_multiple_adapters(self, client):
-        for aid in ["forge-wms", "forge-mes", "whk-cmms"]:
+        for aid in ["forge-wms", "forge-mes", "forge-cmms"]:
             await client.post("/v1/adapters/register", json=_make_manifest(aid))
 
         resp = await client.get("/v1/adapters")

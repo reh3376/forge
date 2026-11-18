@@ -18,7 +18,7 @@ from forge.core.models.manufacturing.enums import EntityType
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-erpi"
+_SOURCE_SYSTEM = "forge-erpi"
 
 
 def map_vendor(raw: dict[str, Any]) -> BusinessEntity | None:

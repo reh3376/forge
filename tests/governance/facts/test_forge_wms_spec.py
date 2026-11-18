@@ -338,8 +338,10 @@ class TestIntegrity:
     def test_change_history_has_initial_entry(self, spec):
         ch = spec["integrity"]["change_history"]
         assert len(ch) >= 1
-        # the stamp puts the newest entry first; the initial creation is the oldest
-        assert ch[-1]["source"] == "manual"
+        # the stamp puts the newest entry first and the history keeps the last three, so
+        # the oldest kept entry is a manual creation or a later recorded stamp
+        assert ch[-1]["source"] in {"manual", "agent"}
+        assert all(entry.get("changed_by") and entry.get("reason") for entry in ch)
         assert ch[-1]["change_type"] == "structural"
 
     def test_hash_method_is_normative(self, spec):

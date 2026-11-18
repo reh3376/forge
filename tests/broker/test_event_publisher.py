@@ -39,18 +39,18 @@ class TestAdapterLifecycle:
 
     @pytest.mark.asyncio
     async def test_adapter_started(self, publisher, producer):
-        await publisher.adapter_started("whk-erpi")
+        await publisher.adapter_started("forge-erpi")
         msgs = producer.get_messages("forge.adapter.lifecycle")
         assert len(msgs) == 1
         import json
 
         event = json.loads(msgs[0]["body"])
         assert event["event_type"] == "adapter.started"
-        assert event["payload"]["adapter_id"] == "whk-erpi"
+        assert event["payload"]["adapter_id"] == "forge-erpi"
 
     @pytest.mark.asyncio
     async def test_adapter_stopped(self, publisher, producer):
-        await publisher.adapter_stopped("whk-cmms", reason="maintenance")
+        await publisher.adapter_stopped("forge-cmms", reason="maintenance")
         msgs = producer.get_messages("forge.adapter.lifecycle")
         assert len(msgs) == 1
         import json
@@ -61,7 +61,7 @@ class TestAdapterLifecycle:
 
     @pytest.mark.asyncio
     async def test_adapter_errored(self, publisher, producer):
-        await publisher.adapter_errored("whk-nms", error="connection timeout")
+        await publisher.adapter_errored("forge-nms", error="connection timeout")
         msgs = producer.get_messages("forge.adapter.lifecycle")
         import json
 
@@ -75,7 +75,7 @@ class TestIngestion:
 
     @pytest.mark.asyncio
     async def test_record_ingested(self, publisher, producer):
-        await publisher.record_ingested("whk-erpi", count=42, batch_id="batch-001")
+        await publisher.record_ingested("forge-erpi", count=42, batch_id="batch-001")
         msgs = producer.get_messages("forge.ingestion.raw")
         assert len(msgs) == 1
         import json

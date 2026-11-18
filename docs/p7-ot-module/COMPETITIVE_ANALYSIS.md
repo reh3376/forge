@@ -265,7 +265,7 @@ The OT Module must **expose the full PLC tag structure** to users via an API mod
 |---------------------|---------------|--------|
 | Tag Historian | NextTrend (Rust/QuestDB) | Complete (P5) |
 | MES/Batch | whk-mes (NestJS) | Complete |
-| CMMS | whk-cmms (NestJS) | Complete (P2) |
+| CMMS | forge-cmms (NestJS) | Complete (P2) |
 | HMI/Visualization | OT UI Builder | P9 (future) |
 | Reporting | Forge Reporting Module | Future |
 | SFC/Batch Control | MES + OT Module write sequences | Future |

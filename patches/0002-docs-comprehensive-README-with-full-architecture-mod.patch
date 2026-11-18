@@ -45,7 +45,7 @@ index e69de29..583aae5 100644
 +          ┌─────────────┼──────────────┐
 +          ▼             ▼              ▼
 +   ┌────────────┐ ┌──────────┐ ┌────────────┐
-+   │ OT Module  │ │ WHK-CMMS │ │ forge-wms    │   ... (10 spokes)
++   │ OT Module  │ │ forge-cmms │ │ forge-wms    │   ... (10 spokes)
 +   │ (OPC-UA,   │ │ Adapter  │ │ Adapter    │
 +   │  MQTT,     │ │          │ │            │
 +   │  Alarms,   │ │          │ │            │
@@ -117,10 +117,10 @@ index e69de29..583aae5 100644
 +│   │   │   ├── ot-module.facts.json      (v0.5.0 — 21 data sources)
 +│   │   │   ├── forge-wms.facts.json
 +│   │   │   ├── whk-mes.facts.json
-+│   │   │   ├── whk-cmms.facts.json
++│   │   │   ├── forge-cmms.facts.json
 +│   │   │   ├── bosc-ims.facts.json
-+│   │   │   ├── whk-nms.facts.json
-+│   │   │   ├── whk-erpi.facts.json
++│   │   │   ├── forge-nms.facts.json
++│   │   │   ├── forge-erpi.facts.json
 +│   │   │   ├── next-trend.facts.json
 +│   │   │   └── scanner-gateway.facts.json
 +│   │   └── runners/facts_runner.py
@@ -167,7 +167,7 @@ index e69de29..583aae5 100644
 +│           └── security.py        # forge.security — user/role queries
 +│
 +├── adapters/                      # Spoke adapters (in-repo)
-+│   └── whk_cmms/                  # CMMS adapter (first spoke, reference impl)
++│   └── forge_cmms/                  # CMMS adapter (first spoke, reference impl)
 +│       ├── adapter.py
 +│       ├── config.py
 +│       ├── context.py
@@ -259,10 +259,10 @@ index e69de29..583aae5 100644
 +| `ot-module` | OPC-UA / MQTT / Alarms / Control Write | v0.5.0 — 21 data sources |
 +| `forge-wms` | Warehouse Management (NestJS) | Draft |
 +| `whk-mes` | Manufacturing Execution (NestJS) | Draft |
-+| `whk-cmms` | Computerized Maintenance (n8n) | Draft |
++| `forge-cmms` | Computerized Maintenance (n8n) | Draft |
 +| `bosc-ims` | Aerospace Inventory (Go gRPC) | Draft |
-+| `whk-nms` | Network Management (FastAPI) | Draft |
-+| `whk-erpi` | ERP Integration (NetSuite) | Draft |
++| `forge-nms` | Network Management (FastAPI) | Draft |
++| `forge-erpi` | ERP Integration (NetSuite) | Draft |
 +| `next-trend` | Time-Series Historian (Rust) | Draft |
 +| `scanner-gateway` | Android Barcode Scanner | Draft |
 +
@@ -305,10 +305,10 @@ index e69de29..583aae5 100644
 +|-------|------|------|------|
 +| forge-wms | `WhiskeyHouse/forge-wms` | NestJS + Next.js | Warehouse Management |
 +| WHK-MES | `WhiskeyHouse/whk-mes` | NestJS + Next.js | Manufacturing Execution |
-+| WHK-CMMS | `reh3376/whk-cmms` | n8n + API | Maintenance Management |
++| forge-cmms | `reh3376/forge-cmms` | n8n + API | Maintenance Management |
 +| BOSC-IMS | `reh3376/bosc_ims` | Go + gRPC | Aerospace Inventory |
-+| WHK-NMS | `WhiskeyHouse/net-topology` | FastAPI + Next.js | Network Management |
-+| WHK-ERPI | `reh3376/whk-erpi` | Python | ERP Integration (NetSuite) |
++| forge-nms | `WhiskeyHouse/net-topology` | FastAPI + Next.js | Network Management |
++| forge-erpi | `reh3376/forge-erpi` | Python | ERP Integration (NetSuite) |
 +| NextTrend | `TheThoughtagen/nexttrend` | Rust + Next.js | Time-Series Historian |
 +| Scanner Gateway | `WhiskeyHouse/forge-wms-android` | Kotlin | Android Barcode Scanner |
 +| Ignition SCADA | `WhiskeyHouse/whk-ignition-scada` | Ignition 8.x | SCADA/HMI (being replaced) |

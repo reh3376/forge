@@ -21,7 +21,7 @@ runner = CliRunner()
 
 SPECS = governance.SPEC_ROOT
 FACTS_OT = SPECS / "facts" / "specs" / "ot-module.facts.json"  # non-ASCII, hand-wrapped
-FACTS_NMS = SPECS / "facts" / "specs" / "whk-nms.facts.json"  # ASCII-escaped
+FACTS_NMS = SPECS / "facts" / "specs" / "forge-nms.facts.json"  # ASCII-escaped
 FACTS_WMS = SPECS / "facts" / "specs" / "forge-wms.facts.json"  # approved in the fixture
 FVTS_OT = SPECS / "fvts" / "specs" / "ot-module.fvts.json"
 STAMP_RE = re.compile(r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
@@ -84,13 +84,13 @@ def test_specs_lists_state_approver_and_verification(root: Path) -> None:
 
 
 def test_specs_flags_a_hash_mismatch(root: Path) -> None:
-    path = root / "facts" / "specs" / "whk-nms.facts.json"
+    path = root / "facts" / "specs" / "forge-nms.facts.json"
     spec = json.loads(path.read_text())
     spec["adapter_identity"]["name"] += " (edited)"
     path.write_text(json.dumps(spec, indent=2) + "\n")
     code, out = run("specs", "--root", str(root))
     assert code == 0 and "1 with a hash mismatch" in out
-    assert re.search(r"whk-nms\.facts\.json\s+pending_review\s+\S+\s+NO", out)
+    assert re.search(r"forge-nms\.facts\.json\s+pending_review\s+\S+\s+NO", out)
 
 
 # -- approve ----------------------------------------------------------------
@@ -115,7 +115,7 @@ def test_approve_records_the_owner_and_touches_only_the_integrity_block(root: Pa
 
 
 def test_approve_keeps_an_ascii_file_ascii(root: Path) -> None:
-    path = root / "facts" / "specs" / "whk-nms.facts.json"
+    path = root / "facts" / "specs" / "forge-nms.facts.json"
     assert path.read_text(encoding="utf-8").isascii()
     code, _ = run("approve", str(path), "--by", "reh3376")
     assert code == 0
@@ -263,10 +263,10 @@ def test_run_facts_by_adapter_id_and_by_file(root: Path) -> None:
 
 def test_run_facts_reports_a_pending_stamp_as_the_one_failed_check(root: Path) -> None:
     """A stamp the owner has not approved fails the hash-state check alone, exit 1 (FB-021)."""
-    path = root / "facts" / "specs" / "whk-nms.facts.json"
+    path = root / "facts" / "specs" / "forge-nms.facts.json"
     code, out = run("run", "facts", str(path))
     assert code == 1
-    assert "[FAIL] FACTS — whk-nms" in out and "Failed checks:" in out
+    assert "[FAIL] FACTS — forge-nms" in out and "Failed checks:" in out
     assert out.count("[FAIL] facts:") == 1 and "facts:integrity-hash-state" in out
     assert "pending_review" in out and "requires approval" in out
 

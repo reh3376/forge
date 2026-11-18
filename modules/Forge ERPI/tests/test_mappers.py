@@ -6,8 +6,8 @@ Tests verify field mapping, missing field handling, and external ID construction
 
 from __future__ import annotations
 
-from forge.adapters.whk_erpi.mappers.business_entity import map_customer, map_vendor
-from forge.adapters.whk_erpi.mappers.inventory import (
+from forge.adapters.forge_erpi.mappers.business_entity import map_customer, map_vendor
+from forge.adapters.forge_erpi.mappers.inventory import (
     map_barrel,
     map_barrel_event,
     map_barrel_receipt,
@@ -16,14 +16,14 @@ from forge.adapters.whk_erpi.mappers.inventory import (
     map_item_receipt,
     map_lot,
 )
-from forge.adapters.whk_erpi.mappers.material_item import map_bom_item, map_item, map_item_group
-from forge.adapters.whk_erpi.mappers.process_definition import (
+from forge.adapters.forge_erpi.mappers.material_item import map_bom_item, map_item, map_item_group
+from forge.adapters.forge_erpi.mappers.process_definition import (
     map_bom,
     map_recipe,
     map_recipe_group,
     map_recipe_parameter,
 )
-from forge.adapters.whk_erpi.mappers.production import (
+from forge.adapters.forge_erpi.mappers.production import (
     map_equipment_phase,
     map_operation,
     map_production_order,
@@ -167,7 +167,7 @@ class TestMapRecipe:
         )
         assert result is not None
         assert result.name == "Wheated Bourbon #3"
-        assert result.source_system == "whk-erpi"
+        assert result.source_system == "forge-erpi"
 
 
 class TestMapRecipeParameter:

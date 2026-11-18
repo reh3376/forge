@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from forge.adapters.whk_nms.mappers import (
+from forge.adapters.forge_nms.mappers import (
     map_alert,
     map_baseline_anomaly,
     map_device,
@@ -29,7 +29,7 @@ class TestMapDevice:
 
         assert unit is not None
         assert unit.source_id == "dev-001"
-        assert unit.source_system == "whk-nms"
+        assert unit.source_system == "forge-nms"
         assert unit.unit_type == "network_device"
         assert unit.status == UnitStatus.ACTIVE
 
@@ -123,7 +123,7 @@ class TestMapTrapEvent:
 
         assert event is not None
         assert event.source_id == "trap-001"
-        assert event.source_system == "whk-nms"
+        assert event.source_system == "forge-nms"
         assert event.event_type == "snmp_trap"
         assert event.entity_type == "network_device"
         assert event.entity_id == "plc-001"

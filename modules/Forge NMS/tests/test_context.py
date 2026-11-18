@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from forge.adapters.whk_nms.context import build_record_context
+from forge.adapters.forge_nms.context import build_record_context
 
 
 class TestDeviceContext:
@@ -27,7 +27,7 @@ class TestDeviceContext:
         )
 
         assert context.extra["cross_system_id"] == "dev-001"
-        assert context.extra["source_system"] == "whk-nms"
+        assert context.extra["source_system"] == "forge-nms"
         assert context.extra["entity_type"] == "network_device"
         assert context.extra["event_type"] == "device_discovery"
         assert context.extra["device_ip"] == "10.0.0.1"

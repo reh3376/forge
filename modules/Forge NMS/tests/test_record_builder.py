@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from forge.adapters.whk_nms.context import build_record_context
-from forge.adapters.whk_nms.record_builder import build_contextual_record
+from forge.adapters.forge_nms.context import build_record_context
+from forge.adapters.forge_nms.record_builder import build_contextual_record
 from forge.core.models.contextual_record import QualityCode
 
 
@@ -25,15 +25,15 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw_device,
             context=context,
-            adapter_id="whk-nms",
+            adapter_id="forge-nms",
             adapter_version="0.1.0",
             entity_type="network_device",
             event_type="device_discovery",
         )
 
         assert record is not None
-        assert record.source.adapter_id == "whk-nms"
-        assert record.source.system == "whk-nms"
+        assert record.source.adapter_id == "forge-nms"
+        assert record.source.system == "forge-nms"
         assert "network_device" in record.source.tag_path
         assert record.value.quality == QualityCode.GOOD
         assert record.value.data_type == "json"
@@ -51,7 +51,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
-            adapter_id="whk-nms",
+            adapter_id="forge-nms",
             adapter_version="0.1.0",
             entity_type="network_device",
             event_type="snmp_trap",
@@ -75,7 +75,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
-            adapter_id="whk-nms",
+            adapter_id="forge-nms",
             adapter_version="0.1.0",
             entity_type="network_device",
             event_type="infrastructure_alert",
@@ -97,7 +97,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
-            adapter_id="whk-nms",
+            adapter_id="forge-nms",
             adapter_version="0.1.0",
             entity_type="security_event",
             event_type="security_event",
@@ -117,13 +117,13 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
-            adapter_id="whk-nms",
+            adapter_id="forge-nms",
             adapter_version="0.1.0",
             entity_type="network_device",
             event_type="spof_detection",
         )
 
-        assert record.lineage.adapter_id == "whk-nms"
+        assert record.lineage.adapter_id == "forge-nms"
         assert record.lineage.adapter_version == "0.1.0"
         assert len(record.lineage.transformation_chain) > 0
         assert "build_record_context" in record.lineage.transformation_chain[1]
@@ -138,13 +138,13 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
-            adapter_id="whk-nms",
+            adapter_id="forge-nms",
             adapter_version="0.1.0",
             entity_type="network_device",
             event_type="unknown",
         )
 
-        assert "whk-nms" in record.lineage.schema_ref
+        assert "forge-nms" in record.lineage.schema_ref
         assert "v0.1.0" in record.lineage.schema_ref
 
     def test_record_context_preserved(self):
@@ -160,7 +160,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
-            adapter_id="whk-nms",
+            adapter_id="forge-nms",
             adapter_version="0.1.0",
             entity_type="network_device",
             event_type="device_discovery",
@@ -183,7 +183,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
-            adapter_id="whk-nms",
+            adapter_id="forge-nms",
             adapter_version="0.1.0",
             entity_type="network_device",
             event_type="unknown",
@@ -206,7 +206,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
-            adapter_id="whk-nms",
+            adapter_id="forge-nms",
             adapter_version="0.1.0",
             entity_type="network_device",
             event_type="unknown",
@@ -224,7 +224,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw_event,
             context=context,
-            adapter_id="whk-nms",
+            adapter_id="forge-nms",
             adapter_version="0.1.0",
             entity_type="network_device",
             event_type="unknown",

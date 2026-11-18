@@ -1,4 +1,4 @@
-"""Test configuration for WHK ERPI adapter tests."""
+"""Test configuration for Forge ERP adapter tests."""
 
 import sys
 from pathlib import Path

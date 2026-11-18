@@ -28,8 +28,8 @@ from forge.core.models.contextual_record import (
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-cmms"
-_SCHEMA_REF = "forge://schemas/whk-cmms/v0.1.0"
+_SOURCE_SYSTEM = "forge-cmms"
+_SCHEMA_REF = "forge://schemas/forge-cmms/v0.1.0"
 
 
 def build_contextual_record(
@@ -44,7 +44,7 @@ def build_contextual_record(
     Args:
         raw_event: Full CMMS RabbitMQ message envelope or GraphQL response.
         context: Pre-built RecordContext from context.build_record_context().
-        adapter_id: Adapter manifest ID (whk-cmms).
+        adapter_id: Adapter manifest ID (forge-cmms).
         adapter_version: Adapter manifest version.
 
     Returns:
@@ -103,8 +103,8 @@ def build_contextual_record(
             adapter_version=adapter_version,
             transformation_chain=[
                 f"cmms.v1.{entity_type}",
-                "forge.adapters.whk_cmms.context.build_record_context",
-                "forge.adapters.whk_cmms.record_builder.build_contextual_record",
+                "forge.adapters.forge_cmms.context.build_record_context",
+                "forge.adapters.forge_cmms.record_builder.build_contextual_record",
             ],
         ),
     )

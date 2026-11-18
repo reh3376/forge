@@ -141,10 +141,10 @@ Forge is industry-general; the Whiskey House (WHK) deployment is its reference i
 |---|---|---|
 | forge-ot (OT module) | New build (Python, asyncua) | Ignition SCADA and the Ignition Global Jython middleware; direct PLC connectivity, tag acquisition, alarming, control writes. Target: Ignition decommissioned by 2027, with the Ignition bridge adapter carrying existing screens meanwhile |
 | forge-mes | `whk-mes`, migrated into this repo as `modules/Forge MES` on 2026-10-15 | Production orders, recipes, scheduling, quality, ERP sync |
-| forge-whs | `forge-wms` (barrel tracking, ownership, transfers, lots) | — |
-| forge-cmms | `whk-cmms` | PM scheduling, work orders, assets, inventory |
+| forge-wms | `forge-wms` (barrel tracking, ownership, transfers, lots) | — |
+| forge-cmms | `forge-cmms` | PM scheduling, work orders, assets, inventory |
 | forge-qms | New build (Intellect QMS integration service and the ISO planning repo as scope references) | Intellect QMS: document control, CAPA, audits, GRC |
-| ERP connector | `whk-erpi` (bidirectional NetSuite sync, 38 RabbitMQ topics, outbox pattern) | — |
+| ERP connector | `forge-erpi` (bidirectional NetSuite sync, 38 RabbitMQ topics, outbox pattern) | — |
 | NMS | `net-topology` (SNMP/LLDP discovery, topology, FortiAnalyzer) | — |
 | NextTrend (historian) | `nexttrend` (Rust, QuestDB; MQTT/Sparkplug/OPC-UA ingestion) | Canary / PI |
 | IMS | `bosc_ims` (Go + gRPC, Python sidecar) | Aerospace supply-chain inventory; the compliance-enforcing spoke |
@@ -162,8 +162,8 @@ Spokes were ranked in April 2026 on five weighted factors: business value (×3),
 | Rank | Spoke | Weighted score | State (see WHERE-WE-ARE §3.4) |
 |---|---|---|---|
 | done | forge-wms, forge-mes | — | Adapters and approved FACTS specs |
-| 1 | ERP connector (whk-erpi) | 41 | Adapter done; spec re-stamped, awaiting approval |
-| 2 | CMMS (whk-cmms) | 36 | Adapter done; spec re-stamped, awaiting approval |
+| 1 | ERP connector (forge-erpi) | 41 | Adapter done; spec re-stamped, awaiting approval |
+| 2 | CMMS (forge-cmms) | 36 | Adapter done; spec re-stamped, awaiting approval |
 | 3 | NMS (net-topology) | 35 | Adapter done; spec re-stamped, awaiting approval |
 | 4 | Scanner gateway | 26 | Adapter done; spec re-stamped, awaiting approval |
 | 5 | NextTrend | 27 | Adapter done; spec re-stamped, awaiting approval |

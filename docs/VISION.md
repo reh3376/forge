@@ -8,7 +8,7 @@ This document defines the finished product. It is written in the present tense a
 
 ## 1. Definition
 
-**Forge is the industrial data operations platform for a manufacturing enterprise.** It connects every operational system a plant runs on (SCADA/PLC, MES, WMS, CMMS, ERP, QMS, historians, network management, lab and scanner devices), turns their output into one governed record type with manufacturing context attached, curates that into decision-quality data products, and renders every operator and management interface from declarative specifications. Its own management modules (forge-mes, forge-whs, forge-cmms, forge-ot, …) are optional: a site can run Forge purely as the integration and governance layer over the software it already has, or replace that software module by module.
+**Forge is the industrial data operations platform for a manufacturing enterprise.** It connects every operational system a plant runs on (SCADA/PLC, MES, WMS, CMMS, ERP, QMS, historians, network management, lab and scanner devices), turns their output into one governed record type with manufacturing context attached, curates that into decision-quality data products, and renders every operator and management interface from declarative specifications. Its own management modules (forge-mes, forge-wms, forge-cmms, forge-ot, …) are optional: a site can run Forge purely as the integration and governance layer over the software it already has, or replace that software module by module.
 
 The design thesis: **bad manufacturing decisions come from missing quality, context and correlation, not from missing data.** Forge is built so that every datum is validated (quality), carries where/when/what/who it belongs to (context), can be joined with every other datum by that context (correlation), and so that the decision taken on it is itself recorded and measured.
 
@@ -185,11 +185,11 @@ Docker Compose on a laptop is not a plant. Backups, health, upgrades and multi-n
 
 ### 3.2 Spokes
 
-An adapter per external system, each with a manifest and an approved FACTS spec: forge-wms, whk-cmms, whk-erpi, whk-nms, bosc-ims, next-trend (historian), scanner-gateway, and generic adapters (REST, CSV/file, MQTT Sparkplug, OPC-UA) for systems without a dedicated one. Spokes are Python inside the hub or external processes in any language that speaks the proto.
+An adapter per external system, each with a manifest and an approved FACTS spec: forge-wms, forge-cmms, forge-erpi, forge-nms, bosc-ims, next-trend (historian), scanner-gateway, and generic adapters (REST, CSV/file, MQTT Sparkplug, OPC-UA) for systems without a dedicated one. Spokes are Python inside the hub or external processes in any language that speaks the proto.
 
 ### 3.3 Modules
 
-- **Management modules** (`forge-<management service>`): forge-mes, forge-whs, forge-cmms, and later forge-qms, forge-erpi, … — all Go, generated from the module SDK template (A-2, A-5), each with a manifest, FACTS spec, FVTS spec, its `mod_<name>` schema in the hub's PostgreSQL, and no UI of its own.
+- **Management modules** (`forge-<management service>`): forge-mes, forge-wms, forge-cmms, and later forge-qms, forge-erpi, … — all Go, generated from the module SDK template (A-2, A-5), each with a manifest, FACTS spec, FVTS spec, its `mod_<name>` schema in the hub's PostgreSQL, and no UI of its own.
 - **forge-ot**: the OT module (§P-4), hosted by the hub, with PLC connections, supervision and liveness.
 - **Integration modules**: forge-ignition (and successors) for sites that keep vendor software.
 - **forge-hmi-scada**: optional, activated per site.

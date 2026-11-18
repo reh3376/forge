@@ -5,8 +5,8 @@ from __future__ import annotations
 import json
 from datetime import datetime
 
-from forge.adapters.whk_cmms.context import build_record_context
-from forge.adapters.whk_cmms.record_builder import build_contextual_record
+from forge.adapters.forge_cmms.context import build_record_context
+from forge.adapters.forge_cmms.record_builder import build_contextual_record
 from forge.core.models.contextual_record import QualityCode
 
 
@@ -22,10 +22,10 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
-        assert record.source.adapter_id == "whk-cmms"
+        assert record.source.adapter_id == "forge-cmms"
 
     def test_source_system(self):
         raw = {
@@ -36,10 +36,10 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
-        assert record.source.system == "whk-cmms"
+        assert record.source.system == "forge-cmms"
 
     def test_tag_path_format(self):
         raw = {
@@ -51,7 +51,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         # Format: cmms.<entity_type>.<event_type>.<id>
@@ -66,7 +66,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         # Format without ID: cmms.<entity_type>.<event_type>
@@ -81,7 +81,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         assert record.source.connection_id == "whk.cmms.workorder"
@@ -95,7 +95,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         assert record.timestamp.source_time is not None
@@ -109,7 +109,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         assert record.timestamp.server_time is not None
@@ -123,7 +123,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         assert record.timestamp.ingestion_time is not None
@@ -139,7 +139,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         assert record.value.data_type == "json"
@@ -155,7 +155,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         assert record.value.quality == QualityCode.GOOD
@@ -168,10 +168,10 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
-        assert record.lineage.adapter_id == "whk-cmms"
+        assert record.lineage.adapter_id == "forge-cmms"
 
     def test_lineage_adapter_version(self):
         raw = {
@@ -181,7 +181,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         assert record.lineage.adapter_version == "0.1.0"
@@ -194,10 +194,10 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
-        assert record.lineage.schema_ref == "forge://schemas/whk-cmms/v0.1.0"
+        assert record.lineage.schema_ref == "forge://schemas/forge-cmms/v0.1.0"
 
     def test_lineage_transformation_chain(self):
         raw = {
@@ -207,7 +207,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         chain = record.lineage.transformation_chain
@@ -224,7 +224,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         assert record.context.equipment_id == context.equipment_id
@@ -243,7 +243,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         assert record.source.tag_path.startswith("cmms.workorder")
@@ -259,7 +259,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         assert record.source.tag_path.startswith("cmms.workorder")
@@ -276,7 +276,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         payload = json.loads(record.value.raw)
@@ -292,7 +292,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         # timestamp.source_time should be set (default to now)
@@ -308,7 +308,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         assert "workorder" in record.source.tag_path
@@ -330,7 +330,7 @@ class TestRecordBuilder:
         record = build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-cmms",
+            adapter_id="forge-cmms",
             adapter_version="0.1.0",
         )
         payload = json.loads(record.value.raw)

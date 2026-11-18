@@ -1,6 +1,6 @@
 {
-  "adapter_id": "whk-nms",
-  "name": "Whiskey House Network Management System Adapter",
+  "adapter_id": "forge-nms",
+  "name": "Forge Network Management System Adapter",
   "version": "0.1.0",
   "type": "INGESTION",
   "protocol": "rest+websocket",
@@ -13,7 +13,7 @@
     "discover": true
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/whk-nms/v0.1.0",
+    "schema_ref": "forge://schemas/forge-nms/v0.1.0",
     "output_format": "contextual_record",
     "context_fields": [
       "cross_system_id",
@@ -74,7 +74,7 @@
   ],
   "metadata": {
     "spoke": "nms",
-    "hub_module": "forge.adapters.whk_nms",
+    "hub_module": "forge.adapters.forge_nms",
     "source_repo": "https://github.com/WhiskeyHouse/net-topology",
     "external_contract": "openapi://nms-api/v1.0.0"
   }

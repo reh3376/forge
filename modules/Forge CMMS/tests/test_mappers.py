@@ -4,19 +4,19 @@ from __future__ import annotations
 
 import pytest
 
-from forge.adapters.whk_cmms.mappers.equipment import (
+from forge.adapters.forge_cmms.mappers.equipment import (
     map_asset,
     map_work_order_type,
     map_work_request_type,
 )
-from forge.adapters.whk_cmms.mappers.inventory import (
+from forge.adapters.forge_cmms.mappers.inventory import (
     map_inventory_investigation,
     map_inventory_location,
     map_item,
     map_kit,
     map_vendor,
 )
-from forge.adapters.whk_cmms.mappers.maintenance import (
+from forge.adapters.forge_cmms.mappers.maintenance import (
     map_work_order,
     map_work_request,
 )
@@ -37,7 +37,7 @@ class TestMapAsset:
         }
         unit = map_asset(raw)
         assert unit is not None
-        assert unit.source_system == "whk-cmms"
+        assert unit.source_system == "forge-cmms"
         assert unit.source_id == "ASSET-WH-001"
         assert unit.unit_type == "Tank"
         assert unit.metadata["asset_make"] == "Tanks-R-Us"
@@ -93,7 +93,7 @@ class TestMapWorkOrder:
         }
         wo = map_work_order(raw)
         assert wo is not None
-        assert wo.source_system == "whk-cmms"
+        assert wo.source_system == "forge-cmms"
         assert wo.source_id == "WO-2026-001"
         assert wo.title == "PM - Tank Inspection"
         assert wo.order_type == "maintenance"
@@ -169,7 +169,7 @@ class TestMapWorkRequest:
         }
         wr = map_work_request(raw)
         assert wr is not None
-        assert wr.source_system == "whk-cmms"
+        assert wr.source_system == "forge-cmms"
         assert wr.source_id == "WR-2026-001"
         assert wr.order_type == "maintenance_request"
 
@@ -292,7 +292,7 @@ class TestMapVendor:
         }
         vendor = map_vendor(raw)
         assert vendor is not None
-        assert vendor.source_system == "whk-cmms"
+        assert vendor.source_system == "forge-cmms"
         assert vendor.source_id == "VEND-TANKS-001"
         assert vendor.name == "Tanks-R-Us"
 
@@ -377,7 +377,7 @@ class TestMapInventoryInvestigation:
         }
         event = map_inventory_investigation(raw)
         assert event is not None
-        assert event.source_system == "whk-cmms"
+        assert event.source_system == "forge-cmms"
         assert event.source_id == "INVEST-2026-001"
         assert event.event_type == "inventory_audit"
 

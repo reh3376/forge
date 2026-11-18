@@ -147,7 +147,7 @@ enterprise hub (required)       trust root; identity providers; enterprise direc
 
 ## 10. Data visibility (R-11)
 
-**[OWNER]** Assignments constrain **reads as well as actions**. Example: an organisation that runs forge-erp must be able to keep ERP data on the hub invisible to distillery operators.
+**[OWNER]** Assignments constrain **reads as well as actions**. Example: an organisation that runs forge-erpi must be able to keep ERP data on the hub invisible to distillery operators.
 
 **[PROPOSED] Consequences:**
 

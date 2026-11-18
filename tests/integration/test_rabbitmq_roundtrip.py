@@ -65,7 +65,7 @@ class TestInMemoryRoundTrip:
         record = ContextualRecord(
             record_id=uuid4(),
             source=RecordSource(
-                adapter_id="whk-erpi",
+                adapter_id="forge-erpi",
                 system="erpi-prod",
                 tag_path="erpi.material.receive",
             ),
@@ -82,8 +82,8 @@ class TestInMemoryRoundTrip:
                 area="Receiving",
             ),
             lineage=RecordLineage(
-                schema_ref="forge://schemas/whk-erpi/Material/v1",
-                adapter_id="whk-erpi",
+                schema_ref="forge://schemas/forge-erpi/Material/v1",
+                adapter_id="forge-erpi",
                 adapter_version="0.1.0",
             ),
         )
@@ -103,7 +103,7 @@ class TestInMemoryRoundTrip:
 
         # Deserialize
         deserialized = deserialize_record(msgs[0]["body"])
-        assert deserialized["source"]["adapter_id"] == "whk-erpi"
+        assert deserialized["source"]["adapter_id"] == "forge-erpi"
         assert deserialized["value"]["raw"]["material_id"] == "MAT-001"
 
     @pytest.mark.asyncio

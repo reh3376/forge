@@ -1,1 +1,1 @@
-"""Test package for WHK CMMS adapter."""
+"""Test package for Forge CMMS adapter."""

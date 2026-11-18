@@ -9,11 +9,11 @@ integration backbone. Mappers are organized by the canonical Forge
 domain they map INTO, not by the ERPI module they come from.
 """
 
-from forge.adapters.whk_erpi.mappers.business_entity import (
+from forge.adapters.forge_erpi.mappers.business_entity import (
     map_customer,
     map_vendor,
 )
-from forge.adapters.whk_erpi.mappers.inventory import (
+from forge.adapters.forge_erpi.mappers.inventory import (
     map_barrel,
     map_barrel_event,
     map_barrel_receipt,
@@ -22,18 +22,18 @@ from forge.adapters.whk_erpi.mappers.inventory import (
     map_item_receipt,
     map_lot,
 )
-from forge.adapters.whk_erpi.mappers.material_item import (
+from forge.adapters.forge_erpi.mappers.material_item import (
     map_bom_item,
     map_item,
     map_item_group,
 )
-from forge.adapters.whk_erpi.mappers.process_definition import (
+from forge.adapters.forge_erpi.mappers.process_definition import (
     map_bom,
     map_recipe,
     map_recipe_group,
     map_recipe_parameter,
 )
-from forge.adapters.whk_erpi.mappers.production import (
+from forge.adapters.forge_erpi.mappers.production import (
     map_equipment_phase,
     map_operation,
     map_production_order,

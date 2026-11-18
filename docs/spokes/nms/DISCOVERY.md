@@ -1,4 +1,4 @@
-# WHK NMS (Network Topology Suite) — Forge Spoke Discovery
+# Forge NMS (Network Topology Suite) — Forge Spoke Discovery
 
 ## System Identity
 
@@ -147,7 +147,7 @@ NMS entities don't map cleanly to ISA-95 manufacturing models. A network switch 
 
 ### Required
 - `cross_system_id` — Device IP or UUID
-- `source_system` — "whk-nms"
+- `source_system` — "forge-nms"
 - `entity_type` — "Device", "TrapEvent", "Alert", "SecurityEvent", "BaselineAnomaly"
 - `event_type` — "device_status", "snmp_trap", "infrastructure_alert", "security_event", "baseline_anomaly", "spof_detection"
 - `operation_context` — "network_monitoring"

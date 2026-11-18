@@ -21,7 +21,7 @@ from forge.core.models.manufacturing.process_definition import (
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-erpi"
+_SOURCE_SYSTEM = "forge-erpi"
 
 
 def map_recipe(raw: dict[str, Any]) -> ProcessDefinition | None:

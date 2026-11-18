@@ -397,7 +397,7 @@
         "source": "agent",
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
-        "reason": "FB-150: whk-wms renamed forge-wms (owner 2026-11-18: no existing company named in the public repository)"
+        "reason": "FB-150: module id renamed (owner 2026-11-18: no existing company named in the public repository)"
       },
       {
         "previous_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",

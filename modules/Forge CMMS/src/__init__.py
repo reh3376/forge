@@ -1,6 +1,6 @@
-"""WHK CMMS Adapter — hybrid GraphQL + RabbitMQ ingestion for maintenance management.
+"""Forge CMMS Adapter — hybrid GraphQL + RabbitMQ ingestion for maintenance management.
 
-This adapter implements the contract defined in whk-cmms.facts.json:
+This adapter implements the contract defined in forge-cmms.facts.json:
 read + subscribe + backfill + discover (no write).
 
 Primary data source: GraphQL polling of CMMS maintenance entities
@@ -13,6 +13,6 @@ The CMMS is the system of record for all maintenance work and equipment
 state in the WHK manufacturing operation.
 """
 
-from forge.adapters.whk_cmms.adapter import WhkCmmsAdapter
+from forge.adapters.forge_cmms.adapter import ForgeCmmsAdapter
 
-__all__ = ["WhkCmmsAdapter"]
+__all__ = ["ForgeCmmsAdapter"]

@@ -28,7 +28,7 @@ This record designs the convergence of Forge's two schema registries into one: w
 
 [FACT] What the decision buys: `build_pipeline_from_storage` gives the TimescaleDB and PostgreSQL engines the same sink, `forge_ts.contextual_records`; Neo4j gets the graph writer; Kafka, Redis and MinIO fall through to the in-memory sink. `target_namespace` is read only by the shadow writer's metrics. `retention_policy` is read by nothing. `RedisSchemaCache` caches "schema entries" nobody writes. `SchemaStatus` is used only by the storage registry; the F20 `status` is a free string.
 
-[FACT] The entity name of a record is `context.extra["entity_type"]` or, failing that, the second segment of the tag path (`wms.barrel.create.cuid` → `barrel`). The names a registry would hold are the FACTS `data_sources[].entities` names (`Barrel`, `BarrelFill`, …). The whk-cmms adapter stamps `entity_type` with mapper-chosen values (`item`, `kit`, `work_order_type`, `inventory_location`); the forge-mes adapter passes the raw `entity_type` through; the end-to-end test accepts `barrel` or `unknown`. No record today carries the name a registry entry would be found by.
+[FACT] The entity name of a record is `context.extra["entity_type"]` or, failing that, the second segment of the tag path (`wms.barrel.create.cuid` → `barrel`). The names a registry would hold are the FACTS `data_sources[].entities` names (`Barrel`, `BarrelFill`, …). The forge-cmms adapter stamps `entity_type` with mapper-chosen values (`item`, `kit`, `work_order_type`, `inventory_location`); the forge-mes adapter passes the raw `entity_type` through; the end-to-end test accepts `barrel` or `unknown`. No record today carries the name a registry entry would be found by.
 
 [FACT] FB-008 gave both registries one id grammar, `forge://schemas/<spoke>[/<Entity>][/v<version>]`, with three roles: the contract ref (`…/<spoke>/v<version>`, what an adapter emits as a whole; the FACTS `data_contract.schema_ref`, the manifest's `DataContract.schema_ref`, `RecordLineage.schema_ref` on every record), the schema id (`…/<spoke>/<Entity>`, one F20 schema) and the version ref (`…/<spoke>/<Entity>/v<version>`: an integer names a registry version, a semantic version names a routing entry). The grammar encodes the split.
 
@@ -74,7 +74,7 @@ What P-1 to P-4 change for FB-008: the version ref `forge://schemas/<spoke>/<Ent
 2. `PlacementTable`, `DataRouter` over it, `DEFAULT_PLACEMENT`, pipeline wiring from the factory's schema store, invalidation on write.
 3. Retire `forge.storage.registry` and `RedisSchemaCache`; the shadow writer, the end-to-end tests and `schema_ref` follow.
 4. Manifest `schemas`, the proto, `Register` under the compatibility gate (Q-1, Q-2).
-5. Entity naming across adapters (Q-3): whk-cmms mapper values, forge-mes passthrough, the tag-path fallback.
+5. Entity naming across adapters (Q-3): forge-cmms mapper values, forge-mes passthrough, the tag-path fallback.
 6. Data-product schema registration on publish (P-8).
 7. Unplaced-record reporting, then the refusal setting (Q-8).
 8. The retention job (Q-5), when retention is first needed.
@@ -105,7 +105,7 @@ Asked and answered one at a time; the owner declared the answers the signature. 
 - `src/forge/core/schema_ref.py` — the grammar and its three roles (FB-008).
 - `src/forge/governance/facts/schema/facts.schema.json` (`data_contract`), `src/forge/governance/facts/specs/forge-wms.facts.json` — what a spoke declares.
 - `src/forge/core/models/adapter.py` (`DataContract`, `AdapterManifest`), `src/forge/proto/adapter.proto` — the manifest.
-- `src/forge/adapters/whk_cmms/`, `src/forge/adapters/forge_mes/record_builder.py` — who stamps `entity_type` and with what.
+- `src/forge/adapters/forge_cmms/`, `src/forge/adapters/forge_mes/record_builder.py` — who stamps `entity_type` and with what.
 - `src/forge/core/models/data_product.py` (`schema_ref`), `src/forge/curation/engine.py` — data products and curation (FB-009, FB-086).
 - `tests/storage/test_registry.py`, `test_router.py`, `tests/integration/test_end_to_end.py` — what the current behaviour pins.
 - `docs/VISION.md` §Schema Registry and FDTS; `BACKLOG.md` FB-057, FB-076, FB-097.

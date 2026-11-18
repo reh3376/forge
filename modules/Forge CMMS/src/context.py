@@ -137,7 +137,7 @@ def build_record_context(
     # ── Build Extra Context Dict ───────────────────────────────────
     extra: dict[str, Any] = {
         "cross_system_id": global_id,
-        "source_system": "whk-cmms",
+        "source_system": "forge-cmms",
         "entity_type": entity_type,
         "event_type": event_type,
         "operation_context": "maintenance",

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from forge.adapters.whk_cmms.context import build_record_context
+from forge.adapters.forge_cmms.context import build_record_context
 
 
 class TestMaintenanceContext:
@@ -275,7 +275,7 @@ class TestContextFields:
             "entity_type": "WorkOrder",
         }
         ctx = build_record_context(raw)
-        assert ctx.extra["source_system"] == "whk-cmms"
+        assert ctx.extra["source_system"] == "forge-cmms"
 
 
 class TestInventoryContext:

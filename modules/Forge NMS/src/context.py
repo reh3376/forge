@@ -124,7 +124,7 @@ def build_record_context(
     # ── Build Extra Context Dict ───────────────────────────────
     extra: dict[str, Any] = {
         "cross_system_id": device_id or device_ip or "",
-        "source_system": "whk-nms",
+        "source_system": "forge-nms",
         "entity_type": entity_type,
         "event_type": event_type,
         "operation_context": "network_monitoring",

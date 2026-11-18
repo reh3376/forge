@@ -699,7 +699,7 @@ index 0000000..85ea705
 +| Category | Script Count | Migration Path |
 +|----------|-------------|----------------|
 +| Auto-generated OpenAPI clients | 1,109 | **SKIP** — dead code, replaced by dedicated module adapters |
-+| CMMS middleware (`exchange/cmms/`) | 57 | **SKIP** — replaced by `whk-cmms` adapter module |
++| CMMS middleware (`exchange/cmms/`) | 57 | **SKIP** — replaced by `forge-cmms` adapter module |
 +| MES integration (`core/mes/`, `core/OrderManagement/`) | 56 | **SKIP** — replaced by `whk-mes` adapter module |
 +| WMS barrel printing / sync | ~30 | **SKIP** — replaced by `forge-wms` adapter module |
 +| OT/SCADA control scripts | ~15 | **CONVERT** — Tier 1 priority (OT Module native) |

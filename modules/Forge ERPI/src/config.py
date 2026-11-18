@@ -1,4 +1,4 @@
-"""Typed configuration for the WHK ERPI adapter.
+"""Typed configuration for the Forge ERP adapter.
 
 Connection parameters are declared in the FACTS spec and validated
 by the hub before being passed to configure(). This module provides
@@ -10,10 +10,10 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class WhkErpiConfig(BaseModel):
-    """Connection parameters for the WHK ERPI adapter.
+class ForgeErpiConfig(BaseModel):
+    """Connection parameters for the Forge ERP adapter.
 
-    Maps directly to the connection_params in whk-erpi.facts.json.
+    Maps directly to the connection_params in forge-erpi.facts.json.
     Required params have no default; optional params have sensible defaults.
     """
 

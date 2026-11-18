@@ -1,4 +1,4 @@
-"""WHK CMMS Adapter — hybrid GraphQL + RabbitMQ integration for maintenance management.
+"""Forge CMMS Adapter — hybrid GraphQL + RabbitMQ integration for maintenance management.
 
 This adapter collects maintenance and equipment data from CMMS through two channels:
 1. GraphQL polling (primary) — Work orders, assets, maintenance requests from CMMS native DB
@@ -28,10 +28,10 @@ from forge.adapters.base.interface import (
     DiscoveryProvider,
     SubscriptionProvider,
 )
-from forge.adapters.whk_cmms.config import WhkCmmsConfig
-from forge.adapters.whk_cmms.context import build_record_context
-from forge.adapters.whk_cmms.record_builder import build_contextual_record
-from forge.adapters.whk_cmms.topics import (
+from forge.adapters.forge_cmms.config import ForgeCmmsConfig
+from forge.adapters.forge_cmms.context import build_record_context
+from forge.adapters.forge_cmms.record_builder import build_contextual_record
+from forge.adapters.forge_cmms.topics import (
     CMMS_GRAPHQL_ENTITIES,
     CMMS_RABBITMQ_TOPICS,
 )
@@ -73,13 +73,13 @@ def _load_manifest() -> AdapterManifest:
     )
 
 
-class WhkCmmsAdapter(
+class ForgeCmmsAdapter(
     AdapterBase,
     SubscriptionProvider,
     BackfillProvider,
     DiscoveryProvider,
 ):
-    """Hybrid GraphQL + RabbitMQ adapter for WHK CMMS maintenance management.
+    """Hybrid GraphQL + RabbitMQ adapter for Forge CMMS maintenance management.
 
     Polls CMMS GraphQL endpoint for:
         - Assets (equipment hierarchy)
@@ -104,7 +104,7 @@ class WhkCmmsAdapter(
 
     def __init__(self) -> None:
         super().__init__()
-        self._config: WhkCmmsConfig | None = None
+        self._config: ForgeCmmsConfig | None = None
         self._pending_records: list[dict[str, Any]] = []
         self._subscriptions: dict[str, dict[str, Any]] = {}
         self._last_healthy: datetime | None = None
@@ -117,7 +117,7 @@ class WhkCmmsAdapter(
 
         Does NOT open any connections — that happens in start().
         """
-        self._config = WhkCmmsConfig(**params)
+        self._config = ForgeCmmsConfig(**params)
         self._state = AdapterState.REGISTERED
 
     async def start(self) -> None:
@@ -136,7 +136,7 @@ class WhkCmmsAdapter(
         self._last_healthy = datetime.now(tz=UTC)
         self._startup_time = self._last_healthy
         logger.info(
-            "whk-cmms adapter started "
+            "forge-cmms adapter started "
             "(phase 1: inject-only, %d graphql entities, %d rmq topics defined)",
             len(CMMS_GRAPHQL_ENTITIES),
             len(CMMS_RABBITMQ_TOPICS),
@@ -147,7 +147,7 @@ class WhkCmmsAdapter(
         self._pending_records.clear()
         self._subscriptions.clear()
         self._state = AdapterState.STOPPED
-        logger.info("whk-cmms adapter stopped")
+        logger.info("forge-cmms adapter stopped")
 
     async def health(self) -> AdapterHealth:
         """Return current health status and record counters."""
@@ -246,7 +246,7 @@ class WhkCmmsAdapter(
         """
         # TODO(Phase 2): Implement GraphQL polling for historical data
         logger.warning(
-            "whk-cmms backfill() stub called: tags=%s (Phase 2 required)",
+            "forge-cmms backfill() stub called: tags=%s (Phase 2 required)",
             tags,
         )
         return

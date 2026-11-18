@@ -53,7 +53,7 @@ def map_trap_event(raw_trap: dict) -> OperationalEvent | None:
 
     return OperationalEvent(
         source_id=str(trap_id),
-        source_system="whk-nms",
+        source_system="forge-nms",
         event_type="snmp_trap",
         event_subtype=trap_type,
         category=EventCategory.PRODUCTION,  # Network events affect production
@@ -103,7 +103,7 @@ def map_alert(raw_alert: dict) -> OperationalEvent | None:
 
     return OperationalEvent(
         source_id=str(alert_id),
-        source_system="whk-nms",
+        source_system="forge-nms",
         event_type="infrastructure_alert",
         event_subtype=alert_name,
         category=EventCategory.PRODUCTION,  # Infrastructure alerts affect production
@@ -150,7 +150,7 @@ def map_security_event(raw_event: dict) -> OperationalEvent | None:
 
     return OperationalEvent(
         source_id=str(event_id),
-        source_system="whk-nms",
+        source_system="forge-nms",
         event_type="security_event",
         event_subtype=threat_type or event_type_name,
         category=EventCategory.COMPLIANCE,  # Security and compliance
@@ -208,7 +208,7 @@ def map_baseline_anomaly(raw_device: dict) -> OperationalEvent | None:
 
     return OperationalEvent(
         source_id=f"{device_id}-baseline",
-        source_system="whk-nms",
+        source_system="forge-nms",
         event_type="baseline_anomaly",
         event_subtype=baseline_status,
         category=EventCategory.COMPLIANCE,  # Security and compliance
@@ -275,7 +275,7 @@ def map_spof_detection(raw_spof: dict) -> OperationalEvent | None:
 
     return OperationalEvent(
         source_id=f"{device_id}-spof",
-        source_system="whk-nms",
+        source_system="forge-nms",
         event_type="spof_detection",
         event_subtype=spof_type,
         category=EventCategory.PRODUCTION,  # SPOF affects production

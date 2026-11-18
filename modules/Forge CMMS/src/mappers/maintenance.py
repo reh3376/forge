@@ -43,7 +43,7 @@ from forge.core.models.manufacturing.work_order import WorkOrder
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-cmms"
+_SOURCE_SYSTEM = "forge-cmms"
 
 
 def map_work_order(raw: dict[str, Any]) -> WorkOrder | None:
