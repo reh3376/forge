@@ -137,7 +137,7 @@ class TestRecordReceiving:
 
         records = await servicer.drain_records(sid)
         assert len(records) == 1
-        assert records[0].source.adapter_id == "whk-wms"
+        assert records[0].source.adapter_id == "forge-wms"
 
     async def test_receive_increments_counter(
         self,

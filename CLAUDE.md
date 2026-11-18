@@ -61,6 +61,7 @@ Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `build:`)
 - **FxTS specs are the standard for repeatable work (A-13).** Every highly repeatable process has an FxTS spec, and the work is built to it. A repeatable process without one is a finding.
 - **Confirm with the owner before installing packages** or changing a manifest or lock file.
 - **Local models only** for the project's own tooling (`mdemg-llm-v1`). No cloud model.
+- **No existing company is named in this repository.** It is public. Use `forge-<service>` names; the old `whk` names are being removed wherever that breaks nothing (FB-150). Never add a new one.
 - **The repository is public.** Nothing is imported without a secrets scan of its history, and no secret enters a commit. Ask the owner before committing design material for work that is not yet public.
 - **Weigh each decision against the finished product.** Flag anything that would pin the platform in before it reaches a record.
 

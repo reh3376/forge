@@ -94,6 +94,13 @@ def test_every_waiver_names_an_open_backlog_item(module_id: str) -> None:
         assert backlog.get(waiver["backlog_item"]) is True, waiver
 
 
+def test_every_module_has_an_alias_of_its_own() -> None:
+    aliases = {m: _load(m)["module_identity"]["alias"] for m in MODULE_IDS}
+    assert len(set(aliases.values())) == len(MODULE_IDS), aliases
+    assert not set(aliases.values()) & set(MODULE_IDS)  # an alias is never another module's id
+    assert aliases["forge-wms"] == "wms" and aliases["forge-mes"] == "mes"
+
+
 def test_only_the_interim_bridge_is_not_python_from_the_template() -> None:
     templates = {m: _load(m)["scaffold"]["template"] for m in MODULE_IDS}
     assert {m for m, t in templates.items() if t == "none"} == {"forge-mes", "ot-module"}

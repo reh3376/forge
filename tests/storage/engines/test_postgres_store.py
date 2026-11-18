@@ -43,7 +43,7 @@ def sample_product() -> DataProduct:
             schema_ref="forge://schemas/test/v1",
             version="1.0.0",
         ),
-        source_adapters=["whk-wms"],
+        source_adapters=["forge-wms"],
         tags=["test"],
     )
 
@@ -55,7 +55,7 @@ def sample_lineage() -> LineageEntry:
         source_record_ids=["src-1", "src-2"],
         output_record_id="out-1",
         product_id="dp-test-001",
-        adapter_ids=["whk-wms"],
+        adapter_ids=["forge-wms"],
         steps=[
             TransformationStep(
                 step_name="normalize",
@@ -127,7 +127,7 @@ class TestPostgresProductStore:
             "status": "DRAFT",
             "schema_ref": "forge://schemas/test/v1",
             "schema_version": "1.0.0",
-            "source_adapters": json.dumps(["whk-wms"]),
+            "source_adapters": json.dumps(["forge-wms"]),
             "quality_slos": json.dumps([]),
             "tags": json.dumps(["test"]),
             "created_at": datetime.now(UTC),
@@ -267,7 +267,7 @@ class TestPostgresLineageStore:
             "source_record_ids": json.dumps(["src-1"]),
             "output_record_id": "out-1",
             "product_id": "dp-001",
-            "adapter_ids": json.dumps(["whk-wms"]),
+            "adapter_ids": json.dumps(["forge-wms"]),
             "steps": json.dumps(
                 [
                     {

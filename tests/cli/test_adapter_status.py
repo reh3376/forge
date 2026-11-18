@@ -12,9 +12,9 @@ HEALTH = {
     "records_collected": 41,
     "records_failed": 2,
     "uptime_seconds": 90.0,
-    "error_message": "whk-wms: a value on tag wms.barrel.fill arrived without a source timestamp",
+    "error_message": "forge-wms: a value on tag wms.barrel.fill arrived without a source timestamp",
     "refusals": {"source_stamp_missing": 2},
-    "last_refusal": "whk-wms: a value on tag wms.barrel.fill arrived without a source timestamp",
+    "last_refusal": "forge-wms: a value on tag wms.barrel.fill arrived without a source timestamp",
 }
 
 
@@ -29,13 +29,13 @@ def test_status_prints_the_refusals_and_their_cause(monkeypatch) -> None:
     import httpx
 
     monkeypatch.setattr(httpx, "get", lambda *a, **k: _Response())
-    result = CliRunner().invoke(app, ["adapter", "status", "whk-wms"])
+    result = CliRunner().invoke(app, ["adapter", "status", "forge-wms"])
     assert result.exit_code == 0, result.output
     assert "State:            DEGRADED" in result.output
     assert "Records Failed:   2" in result.output
     assert "Refused:          source_stamp_missing=2" in result.output
-    assert "Last Refusal:     whk-wms: a value on tag wms.barrel.fill" in result.output
-    assert "Error:            whk-wms" in result.output
+    assert "Last Refusal:     forge-wms: a value on tag wms.barrel.fill" in result.output
+    assert "Error:            forge-wms" in result.output
 
 
 def test_status_stays_quiet_when_nothing_was_refused(monkeypatch) -> None:
@@ -51,6 +51,6 @@ def test_status_stays_quiet_when_nothing_was_refused(monkeypatch) -> None:
             }
 
     monkeypatch.setattr(httpx, "get", lambda *a, **k: _Healthy())
-    result = CliRunner().invoke(app, ["adapter", "status", "whk-wms"])
+    result = CliRunner().invoke(app, ["adapter", "status", "forge-wms"])
     assert result.exit_code == 0, result.output
     assert "Refused:" not in result.output and "Error:" not in result.output

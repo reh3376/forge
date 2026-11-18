@@ -23,7 +23,7 @@ import pytest
 _base = Path(__file__).resolve().parents[3]
 SCHEMA_PATH = _base / "src" / "forge" / "governance" / "facts" / "schema" / "facts.schema.json"
 MES_SPEC_PATH = _base / "src" / "forge" / "governance" / "facts" / "specs" / "forge-mes.facts.json"
-WMS_SPEC_PATH = _base / "src" / "forge" / "governance" / "facts" / "specs" / "whk-wms.facts.json"
+WMS_SPEC_PATH = _base / "src" / "forge" / "governance" / "facts" / "specs" / "forge-wms.facts.json"
 
 
 @pytest.fixture(scope="module")

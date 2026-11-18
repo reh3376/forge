@@ -4,7 +4,7 @@ Proves the full data path works:
   adapter.collect() → build_record_context() → build_contextual_record()
   → validate_record() → DataRouter.route() → curation pipeline
 
-All in-process — no Docker, no external services. Uses the real WHK WMS
+All in-process — no Docker, no external services. Uses the real Forge WMS
 adapter with injected test data to exercise every contract boundary.
 """
 
@@ -15,7 +15,7 @@ from typing import Any
 
 import pytest
 
-from forge.adapters.whk_wms.adapter import WhkWmsAdapter
+from forge.adapters.forge_wms.adapter import ForgeWmsAdapter
 from forge.core.models.adapter import AdapterState
 from forge.core.models.contextual_record import (
     ContextualRecord,
@@ -42,14 +42,14 @@ class TestAdapterLifecycle:
     """Verify the adapter lifecycle state machine works end-to-end."""
 
     @pytest.fixture()
-    def adapter(self) -> WhkWmsAdapter:
-        return WhkWmsAdapter()
+    def adapter(self) -> ForgeWmsAdapter:
+        return ForgeWmsAdapter()
 
-    def test_initial_state_is_registered(self, adapter: WhkWmsAdapter):
+    def test_initial_state_is_registered(self, adapter: ForgeWmsAdapter):
         assert adapter.state == AdapterState.REGISTERED
 
     @pytest.mark.asyncio()
-    async def test_configure_stays_registered(self, adapter: WhkWmsAdapter):
+    async def test_configure_stays_registered(self, adapter: ForgeWmsAdapter):
         """configure() validates params but doesn't connect — stays REGISTERED."""
         await adapter.configure(
             {
@@ -63,7 +63,7 @@ class TestAdapterLifecycle:
         assert adapter.state == AdapterState.REGISTERED
 
     @pytest.mark.asyncio()
-    async def test_full_lifecycle(self, adapter: WhkWmsAdapter):
+    async def test_full_lifecycle(self, adapter: ForgeWmsAdapter):
         """configure → start → health → stop exercises all transitions."""
         await adapter.configure(
             {
@@ -78,7 +78,7 @@ class TestAdapterLifecycle:
         assert adapter.state in (AdapterState.HEALTHY, AdapterState.CONNECTING)
 
         health = await adapter.health()
-        assert health.adapter_id == "whk-wms"
+        assert health.adapter_id == "forge-wms"
 
         await adapter.stop()
         assert adapter.state == AdapterState.STOPPED
@@ -96,8 +96,8 @@ class TestCollectionPipeline:
     async def configured_adapter(
         self,
         barrel_events: list[dict[str, Any]],
-    ) -> WhkWmsAdapter:
-        adapter = WhkWmsAdapter()
+    ) -> ForgeWmsAdapter:
+        adapter = ForgeWmsAdapter()
         await adapter.configure(
             {
                 "graphql_url": "http://localhost:3020/graphql",
@@ -113,7 +113,7 @@ class TestCollectionPipeline:
     @pytest.mark.asyncio()
     async def test_collect_yields_contextual_records(
         self,
-        configured_adapter: WhkWmsAdapter,
+        configured_adapter: ForgeWmsAdapter,
     ):
         records: list[ContextualRecord] = []
         async for record in configured_adapter.collect():
@@ -125,17 +125,17 @@ class TestCollectionPipeline:
     @pytest.mark.asyncio()
     async def test_records_have_source_metadata(
         self,
-        configured_adapter: WhkWmsAdapter,
+        configured_adapter: ForgeWmsAdapter,
     ):
         async for record in configured_adapter.collect():
-            assert record.source.adapter_id == "whk-wms"
-            assert record.source.system == "whk-wms"
+            assert record.source.adapter_id == "forge-wms"
+            assert record.source.system == "forge-wms"
             break
 
     @pytest.mark.asyncio()
     async def test_records_have_timestamps(
         self,
-        configured_adapter: WhkWmsAdapter,
+        configured_adapter: ForgeWmsAdapter,
     ):
         async for record in configured_adapter.collect():
             assert record.timestamp.source_time is not None
@@ -145,7 +145,7 @@ class TestCollectionPipeline:
     @pytest.mark.asyncio()
     async def test_records_have_context(
         self,
-        configured_adapter: WhkWmsAdapter,
+        configured_adapter: ForgeWmsAdapter,
     ):
         """Context fields from the WMS event should be mapped."""
         async for record in configured_adapter.collect():
@@ -157,17 +157,17 @@ class TestCollectionPipeline:
     @pytest.mark.asyncio()
     async def test_records_have_lineage(
         self,
-        configured_adapter: WhkWmsAdapter,
+        configured_adapter: ForgeWmsAdapter,
     ):
         async for record in configured_adapter.collect():
-            assert record.lineage.adapter_id == "whk-wms"
-            assert record.lineage.schema_ref.startswith("forge://schemas/whk-wms/")
+            assert record.lineage.adapter_id == "forge-wms"
+            assert record.lineage.schema_ref.startswith("forge://schemas/forge-wms/")
             break
 
     @pytest.mark.asyncio()
     async def test_records_have_quality(
         self,
-        configured_adapter: WhkWmsAdapter,
+        configured_adapter: ForgeWmsAdapter,
     ):
         async for record in configured_adapter.collect():
             assert record.value.quality in (
@@ -179,7 +179,7 @@ class TestCollectionPipeline:
     @pytest.mark.asyncio()
     async def test_validate_record_passes(
         self,
-        configured_adapter: WhkWmsAdapter,
+        configured_adapter: ForgeWmsAdapter,
     ):
         """Records produced by collect() should pass the adapter's own validation."""
         async for record in configured_adapter.collect():
@@ -203,14 +203,14 @@ class TestStorageRouting:
 
         reg.register(
             SchemaEntry(
-                schema_id="forge://schemas/whk-wms/graphql/v0.1.0",
-                spoke_id="whk-wms",
+                schema_id="forge://schemas/forge-wms/graphql/v0.1.0",
+                spoke_id="forge-wms",
                 entity_name="graphql",
                 version="0.1.0",
                 schema_json={"type": "object"},
-                authoritative_spoke="whk-wms",
+                authoritative_spoke="forge-wms",
                 storage_engine=StorageEngine.TIMESCALEDB,
-                storage_namespace="whk_wms",
+                storage_namespace="forge_wms",
                 status=SchemaStatus.ACTIVE,
                 registered_at=datetime.now(UTC),
                 updated_at=datetime.now(UTC),
@@ -227,7 +227,7 @@ class TestStorageRouting:
         self,
         barrel_events: list[dict[str, Any]],
     ) -> list[ContextualRecord]:
-        adapter = WhkWmsAdapter()
+        adapter = ForgeWmsAdapter()
         await adapter.configure(
             {
                 "graphql_url": "http://localhost:3020/graphql",
@@ -266,7 +266,7 @@ class TestStorageRouting:
         assert total == len(sample_records)
 
     @pytest.mark.asyncio()
-    async def test_whk_wms_routes_to_timescaledb(
+    async def test_forge_wms_routes_to_timescaledb(
         self,
         router: DataRouter,
         sample_records: list[ContextualRecord],
@@ -345,20 +345,20 @@ class TestCurationPipeline:
         product = product_registry.create(
             name="WMS Barrel Events",
             description="All barrel movement events from WMS",
-            owner="whk-wms",
-            schema_ref="forge://schemas/whk-wms/v0.1.0",
-            source_adapters=["whk-wms"],
+            owner="forge-wms",
+            schema_ref="forge://schemas/forge-wms/v0.1.0",
+            source_adapters=["forge-wms"],
         )
         retrieved = product_registry.get(product.product_id)
         assert retrieved is not None
         assert retrieved.name == "WMS Barrel Events"
-        assert "whk-wms" in retrieved.source_adapters
+        assert "forge-wms" in retrieved.source_adapters
 
     def test_lineage_tracker_records_lineage(self, lineage_tracker):
         """LineageTracker should record and retrieve provenance."""
         entry = lineage_tracker.start_entry(
             source_record_ids=["r1", "r2"],
-            adapter_ids=["whk-wms"],
+            adapter_ids=["forge-wms"],
         )
         lineage_tracker.add_step(
             entry,
@@ -369,11 +369,11 @@ class TestCurationPipeline:
         lineage_tracker.complete_entry(
             entry,
             output_record_id="out1",
-            product_id="whk-wms-barrels",
+            product_id="forge-wms-barrels",
         )
         results = lineage_tracker.get_lineage("out1")
         assert len(results) >= 1
-        assert "whk-wms" in results[0].adapter_ids
+        assert "forge-wms" in results[0].adapter_ids
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -390,7 +390,7 @@ class TestFullPipelineIntegration:
         from datetime import datetime
 
         # 1. Create and configure adapter
-        adapter = WhkWmsAdapter()
+        adapter = ForgeWmsAdapter()
         await adapter.configure(
             {
                 "graphql_url": "http://localhost:3020/graphql",
@@ -418,14 +418,14 @@ class TestFullPipelineIntegration:
         registry = SchemaRegistry()
         registry.register(
             SchemaEntry(
-                schema_id="forge://schemas/whk-wms/graphql/v0.1.0",
-                spoke_id="whk-wms",
+                schema_id="forge://schemas/forge-wms/graphql/v0.1.0",
+                spoke_id="forge-wms",
                 entity_name="graphql",
                 version="0.1.0",
                 schema_json={"type": "object"},
-                authoritative_spoke="whk-wms",
+                authoritative_spoke="forge-wms",
                 storage_engine=StorageEngine.TIMESCALEDB,
-                storage_namespace="whk_wms",
+                storage_namespace="forge_wms",
                 status=SchemaStatus.ACTIVE,
                 registered_at=datetime.now(UTC),
                 updated_at=datetime.now(UTC),

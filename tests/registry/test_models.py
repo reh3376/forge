@@ -142,14 +142,18 @@ class TestSchemaIdGrammar:
     def test_rejects_a_versioned_or_entity_less_id(self):
         from forge.core.schema_ref import SchemaRefError
 
-        bad_ids = ("forge://schemas/whk-wms/Barrel/v1", "forge://schemas/whk-wms/v0.1.0", "Barrel")
+        bad_ids = (
+            "forge://schemas/forge-wms/Barrel/v1",
+            "forge://schemas/forge-wms/v0.1.0",
+            "Barrel",
+        )
         for bad in bad_ids:
             with pytest.raises(SchemaRefError):
                 SchemaMetadata(schema_id=bad, name="Barrel", schema_type=SchemaType.ADAPTER_OUTPUT)
 
     def test_accepts_a_schema_id(self):
         meta = SchemaMetadata(
-            schema_id="forge://schemas/whk-wms/Barrel",
+            schema_id="forge://schemas/forge-wms/Barrel",
             name="Barrel",
             schema_type=SchemaType.ADAPTER_OUTPUT,
         )

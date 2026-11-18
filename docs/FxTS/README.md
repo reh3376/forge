@@ -107,18 +107,18 @@ Every change records `source` (agent/manual/ci), `changed_by` (agent ID), and `r
 forge governance specs                 # --pending: only the ones awaiting approval
 
 # Re-hash a spec after editing it: history entry, pending_review, approver fields dropped
-forge governance stamp src/forge/governance/facts/specs/whk-wms.facts.json \
+forge governance stamp src/forge/governance/facts/specs/forge-wms.facts.json \
     --by claude-code --reason "FB-nnn: what changed" --source agent --change-type content
 
 # The owner approves the stored hash (refused when the content no longer matches it)
-forge governance approve src/forge/governance/facts/specs/whk-wms.facts.json --by reh3376
+forge governance approve src/forge/governance/facts/specs/forge-wms.facts.json --by reh3376
 
 # Validate a spec file against its framework schema (framework taken from the file name)
 forge governance validate-spec src/forge/governance/fvts/specs/ot-module.fvts.json
 
 # Run one framework's checks on one spec: a spec file, or its id looked up in the
 # framework's spec directory (endpoint path, adapter_id, view_id, transport_id, module_id)
-forge governance run facts whk-wms
+forge governance run facts forge-wms
 forge governance run fvts ot-module-views --format json --output reports/fvts-ot-module.json
 forge governance run ftts grpc-hardened-transport
 forge governance run fmts path/to/module.fmts.json # the module requirements; skipped checks are listed
@@ -198,7 +198,7 @@ src/forge/governance/
 │   └── runners/fats_runner.py
 ├── facts/
 │   ├── schema/facts.schema.json
-│   ├── specs/                 # Adapter conformance specs (whk-wms, forge-mes, etc.)
+│   ├── specs/                 # Adapter conformance specs (forge-wms, forge-mes, etc.)
 │   └── runners/facts_runner.py
 ├── fhts/
 │   ├── schema/                    # (FHTS uses registry, not traditional schema)

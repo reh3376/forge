@@ -180,7 +180,7 @@ export const rolePermissions: Record<ManufacturingRole, ManufacturingPermission[
 // Module-level environment variable access for Next.js webpack static analysis
 // CRITICAL: Must use DOT notation (process.env.VAR), NOT bracket notation (process.env['VAR'])
 // CRITICAL: Must be at MODULE LEVEL, not inside functions
-// This pattern matches the working implementation in whk-wms-frontend/authConfig.js
+// This pattern matches the working implementation in forge-wms-frontend/authConfig.js
 
 // DEBUG: Log build-time environment variable values
 console.log('🔧 auth-config.ts - Module load-time check:')

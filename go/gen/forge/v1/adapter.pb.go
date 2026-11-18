@@ -184,7 +184,7 @@ func (x *ConnectionParam) GetDefaultValue() string {
 
 type DataContract struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SchemaRef     string                 `protobuf:"bytes,1,opt,name=schema_ref,json=schemaRef,proto3" json:"schema_ref,omitempty"`             // e.g. "forge://schemas/whk-wms/v0.1.0"
+	SchemaRef     string                 `protobuf:"bytes,1,opt,name=schema_ref,json=schemaRef,proto3" json:"schema_ref,omitempty"`             // e.g. "forge://schemas/forge-wms/v0.1.0"
 	OutputFormat  string                 `protobuf:"bytes,2,opt,name=output_format,json=outputFormat,proto3" json:"output_format,omitempty"`    // e.g. "contextual_record"
 	ContextFields []string               `protobuf:"bytes,3,rep,name=context_fields,json=contextFields,proto3" json:"context_fields,omitempty"` // required context fields
 	unknownFields protoimpl.UnknownFields
@@ -244,7 +244,7 @@ func (x *DataContract) GetContextFields() []string {
 
 type AdapterManifest struct {
 	state                 protoimpl.MessageState `protogen:"open.v1"`
-	AdapterId             string                 `protobuf:"bytes,1,opt,name=adapter_id,json=adapterId,proto3" json:"adapter_id,omitempty"` // unique identifier, e.g. "whk-wms"
+	AdapterId             string                 `protobuf:"bytes,1,opt,name=adapter_id,json=adapterId,proto3" json:"adapter_id,omitempty"` // unique identifier, e.g. "forge-wms"
 	Name                  string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                            // human-readable name
 	Version               string                 `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`                      // semver string
 	Type                  string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`                            // e.g. "INGESTION"

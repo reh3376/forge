@@ -126,7 +126,7 @@ class FHTSRegistry:
         registry = FHTSRegistry(base_path=Path("src/forge/governance"))
         registry.load()  # Load from fhts/specs/fhts-registry.json
 
-        registry.register("facts/specs/whk-wms.facts.json", "facts", hash, "whk-wms spec")
+        registry.register("facts/specs/forge-wms.facts.json", "facts", hash, "forge-wms spec")
         results = registry.verify_all()
         registry.save()
     """

@@ -44,8 +44,8 @@ def sample_record() -> ContextualRecord:
     return ContextualRecord(
         record_id=UUID("01234567-89ab-cdef-0123-456789abcdef"),
         source=RecordSource(
-            adapter_id="whk-wms",
-            system="whk-wms-prod",
+            adapter_id="forge-wms",
+            system="forge-wms-prod",
             tag_path="Area1/Fermenter3/Temperature",
             connection_id="conn-001",
         ),
@@ -73,8 +73,8 @@ def sample_record() -> ContextualRecord:
             extra={"line": "Line-1", "nested": {"key": "val"}},
         ),
         lineage=RecordLineage(
-            schema_ref="forge://schemas/whk-wms/v0.1.0",
-            adapter_id="whk-wms",
+            schema_ref="forge://schemas/forge-wms/v0.1.0",
+            adapter_id="forge-wms",
             adapter_version="0.1.0",
             transformation_chain=["collect", "enrich_context"],
         ),
@@ -85,7 +85,7 @@ def sample_record() -> ContextualRecord:
 def sample_manifest() -> AdapterManifest:
     """A fully populated AdapterManifest for round-trip testing."""
     return AdapterManifest(
-        adapter_id="whk-wms",
+        adapter_id="forge-wms",
         name="Whiskey House WMS Adapter",
         version="0.1.0",
         type="INGESTION",
@@ -99,7 +99,7 @@ def sample_manifest() -> AdapterManifest:
             discover=True,
         ),
         data_contract=DataContract(
-            schema_ref="forge://schemas/whk-wms/v0.1.0",
+            schema_ref="forge://schemas/forge-wms/v0.1.0",
             output_format="contextual_record",
             context_fields=["equipment_id", "lot_id", "batch_id"],
         ),
@@ -119,7 +119,7 @@ def sample_manifest() -> AdapterManifest:
             ),
         ],
         auth_methods=["azure_entra_id", "bearer_token"],
-        metadata={"spoke": "whk-wms", "source_lines": 507000},
+        metadata={"spoke": "forge-wms", "source_lines": 507000},
     )
 
 
@@ -127,7 +127,7 @@ def sample_manifest() -> AdapterManifest:
 def sample_health() -> AdapterHealth:
     """A fully populated AdapterHealth for round-trip testing."""
     return AdapterHealth(
-        adapter_id="whk-wms",
+        adapter_id="forge-wms",
         state=AdapterState.HEALTHY,
         last_check=datetime(2026, 4, 5, 14, 35, 0, tzinfo=UTC),
         last_healthy=datetime(2026, 4, 5, 14, 35, 0, tzinfo=UTC),

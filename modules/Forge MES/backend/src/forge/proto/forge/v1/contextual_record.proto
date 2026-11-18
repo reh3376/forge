@@ -20,8 +20,8 @@ option go_package = "github.com/reh3376/forge/proto/v1";
 // ---------------------------------------------------------------------------
 
 message RecordSource {
-  string adapter_id = 1;       // e.g. "whk-wms", "forge-mes"
-  string system = 2;           // e.g. "whk-wms-prod", "ignition-prod"
+  string adapter_id = 1;       // e.g. "forge-wms", "forge-mes"
+  string system = 2;           // e.g. "forge-wms-prod", "ignition-prod"
   string tag_path = 3;         // optional: e.g. "Area1/Fermenter3/Temperature"
   string connection_id = 4;    // optional: for connection multiplexing
 }
@@ -150,7 +150,7 @@ message RecordContext {
 // ---------------------------------------------------------------------------
 
 message RecordLineage {
-  string schema_ref = 1;               // e.g. "forge://schemas/whk-wms/v0.1.0"
+  string schema_ref = 1;               // e.g. "forge://schemas/forge-wms/v0.1.0"
   string adapter_id = 2;               // producing adapter
   string adapter_version = 3;          // adapter version at capture time
   repeated string transformation_chain = 4;  // ordered list of transforms applied

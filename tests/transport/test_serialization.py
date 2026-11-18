@@ -129,8 +129,8 @@ class TestContextualRecordRoundTrip:
         proto_dict = pydantic_to_proto(sample_record)
         restored = proto_to_pydantic(proto_dict, "ContextualRecord")
 
-        assert restored.lineage.schema_ref == "forge://schemas/whk-wms/v0.1.0"
-        assert restored.lineage.adapter_id == "whk-wms"
+        assert restored.lineage.schema_ref == "forge://schemas/forge-wms/v0.1.0"
+        assert restored.lineage.adapter_id == "forge-wms"
         assert restored.lineage.adapter_version == "0.1.0"
         assert restored.lineage.transformation_chain == ["collect", "enrich_context"]
 
@@ -332,7 +332,7 @@ class TestManifestRoundTrip:
         proto_dict = pydantic_to_proto(sample_manifest)
         restored = proto_to_pydantic(proto_dict, "AdapterManifest")
 
-        assert restored.adapter_id == "whk-wms"
+        assert restored.adapter_id == "forge-wms"
         assert restored.name == "Whiskey House WMS Adapter"
         assert restored.version == "0.1.0"
         assert restored.protocol == "graphql+amqp"
@@ -359,7 +359,7 @@ class TestManifestRoundTrip:
         proto_dict = pydantic_to_proto(sample_manifest)
         restored = proto_to_pydantic(proto_dict, "AdapterManifest")
 
-        assert restored.data_contract.schema_ref == "forge://schemas/whk-wms/v0.1.0"
+        assert restored.data_contract.schema_ref == "forge://schemas/forge-wms/v0.1.0"
         assert restored.data_contract.context_fields == [
             "equipment_id",
             "lot_id",
@@ -400,7 +400,7 @@ class TestHealthRoundTrip:
         proto_dict = pydantic_to_proto(sample_health)
         restored = proto_to_pydantic(proto_dict, "AdapterHealth")
 
-        assert restored.adapter_id == "whk-wms"
+        assert restored.adapter_id == "forge-wms"
         assert restored.state == AdapterState.HEALTHY
         assert restored.records_collected == 1234
         assert restored.records_failed == 5

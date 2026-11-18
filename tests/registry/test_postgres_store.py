@@ -34,7 +34,7 @@ def mock_pool():
 @pytest.fixture
 def sample_metadata() -> SchemaMetadata:
     m = SchemaMetadata(
-        schema_id="forge://schemas/whk-wms/Barrel",
+        schema_id="forge://schemas/forge-wms/Barrel",
         name="Barrel Schema",
         schema_type=SchemaType.ADAPTER_OUTPUT,
         compatibility=CompatibilityMode.BACKWARD,

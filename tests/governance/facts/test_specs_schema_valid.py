@@ -75,7 +75,7 @@ def _load(path: Path) -> dict:
 
 class TestEverySpec:
     def test_specs_are_present(self) -> None:
-        assert {_spec_id(p) for p in SPEC_PATHS} >= {"forge-mes", "whk-wms", "ot-module"}
+        assert {_spec_id(p) for p in SPEC_PATHS} >= {"forge-mes", "forge-wms", "ot-module"}
 
     @pytest.mark.parametrize("path", CONFORMING)
     def test_validates_against_schema(self, validator: Draft202012Validator, path: Path) -> None:
@@ -144,10 +144,10 @@ class TestVocabularyParity:
 class TestSchemaValidCheck:
     @pytest.mark.asyncio()
     async def test_one_violation_per_offending_path(self, runner: FACTSRunner) -> None:
-        spec = _load(SPECS_DIR / "whk-wms.facts.json")
+        spec = _load(SPECS_DIR / "forge-wms.facts.json")
         spec["data_contract"]["data_sources"][0]["source_type"] = "telepathy"
         spec["lifecycle"]["magic_timeout_ms"] = 1
-        report = await runner.run(target="whk-wms", spec=spec)
+        report = await runner.run(target="forge-wms", spec=spec)
         verdict = next(v for v in report.verdicts if v.check_id == "facts:schema-valid")
         assert verdict.status is VerdictStatus.FAIL
         by_field = {v.field: v for v in verdict.violations}
@@ -158,15 +158,15 @@ class TestSchemaValidCheck:
 
     @pytest.mark.asyncio()
     async def test_is_the_first_verdict(self, runner: FACTSRunner) -> None:
-        spec = _load(SPECS_DIR / "whk-wms.facts.json")
-        report = await runner.run(target="whk-wms", spec=spec)
+        spec = _load(SPECS_DIR / "forge-wms.facts.json")
+        report = await runner.run(target="forge-wms", spec=spec)
         assert report.verdicts[0].check_id == "facts:schema-valid"
 
     @pytest.mark.asyncio()
     async def test_large_offending_values_are_summarised(self, runner: FACTSRunner) -> None:
-        spec = _load(SPECS_DIR / "whk-wms.facts.json")
+        spec = _load(SPECS_DIR / "forge-wms.facts.json")
         spec["surprise"] = {"deep": list(range(50))}
-        report = await runner.run(target="whk-wms", spec=spec)
+        report = await runner.run(target="forge-wms", spec=spec)
         verdict = next(v for v in report.verdicts if v.check_id == "facts:schema-valid")
         (violation,) = verdict.violations
         assert violation.field == "/"

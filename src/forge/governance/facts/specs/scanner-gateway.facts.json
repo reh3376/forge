@@ -101,7 +101,7 @@
         "required": true,
         "secret": false,
         "description": "Adapter ID of the WMS spoke for barrel scan routing. Must match a registered Forge adapter.",
-        "default": "whk-wms"
+        "default": "forge-wms"
       },
       {
         "name": "ims_adapter_id",
@@ -386,10 +386,19 @@
   },
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "615a953528ce0d474995fbbb6f765be781b2cb620075e18a008e7175827d7cf4",
+    "spec_hash": "f692cd5caa38a5239a26709e3ec5372f9ece53f83e2213762e2dbc2332eff85e",
     "hash_state": "approved",
-    "previous_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",
+    "previous_hash": "615a953528ce0d474995fbbb6f765be781b2cb620075e18a008e7175827d7cf4",
     "change_history": [
+      {
+        "previous_hash": "615a953528ce0d474995fbbb6f765be781b2cb620075e18a008e7175827d7cf4",
+        "new_hash": "f692cd5caa38a5239a26709e3ec5372f9ece53f83e2213762e2dbc2332eff85e",
+        "changed_at": "2026-11-18T15:30:57Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-150: whk-wms renamed forge-wms (owner 2026-11-18: no existing company named in the public repository)"
+      },
       {
         "previous_hash": "84e4c8a01c3e53fc9a3c3180fcb929393264582e3a0cd6aa59f36806cc210012",
         "new_hash": "615a953528ce0d474995fbbb6f765be781b2cb620075e18a008e7175827d7cf4",
@@ -410,6 +419,6 @@
       }
     ],
     "approved_by": "reh3376",
-    "approved_at": "2026-11-13T19:35:04Z"
+    "approved_at": "2026-11-18T15:34:28Z"
   }
 }

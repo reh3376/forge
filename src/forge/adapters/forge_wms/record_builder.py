@@ -29,7 +29,7 @@ from forge.core.models.contextual_record import (
 logger = logging.getLogger(__name__)
 
 # Schema ref matches the FACTS spec data_contract.schema_ref
-_SCHEMA_REF = "forge://schemas/whk-wms/v0.1.0"
+_SCHEMA_REF = "forge://schemas/forge-wms/v0.1.0"
 
 
 def build_contextual_record(
@@ -45,7 +45,7 @@ def build_contextual_record(
     Args:
         raw_event: Original raw dict from WMS (preserved as the record value).
         context: RecordContext produced by build_record_context().
-        adapter_id: Adapter identity string (e.g. "whk-wms").
+        adapter_id: Adapter identity string (e.g. "forge-wms").
         adapter_version: Adapter version (e.g. "0.1.0").
         source_timestamp_origin: the origin the connection declared for the clock that
             stamps its values (device, server, edge or forge); None when undeclared (FB-088)
@@ -81,7 +81,7 @@ def build_contextual_record(
     # ── Source ─────────────────────────────────────────────────
     source = RecordSource(
         adapter_id=adapter_id,
-        system="whk-wms",
+        system="forge-wms",
         tag_path=tag_path,
     )
 

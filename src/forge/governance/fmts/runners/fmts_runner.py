@@ -24,7 +24,7 @@ missing fails. A waiver of M-3 or M-4 (time-keeping) needs admin privileges:
 it fails until the spec's hash is approved.
 
     runner = FMTSRunner(schema_path=SCHEMA_PATH)
-    report = await runner.run(target="whk-wms", spec=spec)
+    report = await runner.run(target="forge-wms", spec=spec)
 
 Keyword arguments to ``run`` (all optional):
     repo_root   Path the spec's repository-relative paths resolve against; default: this checkout

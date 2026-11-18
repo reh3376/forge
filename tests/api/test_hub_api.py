@@ -52,7 +52,7 @@ async def client(app):
         yield ac
 
 
-def _make_manifest(adapter_id: str = "whk-wms") -> dict:
+def _make_manifest(adapter_id: str = "forge-wms") -> dict:
     """Build a minimal adapter manifest for testing."""
     return AdapterManifest(
         adapter_id=adapter_id,
@@ -141,12 +141,12 @@ class TestAdapterRegistry:
 
     @pytest.mark.asyncio
     async def test_register_adapter(self, client):
-        manifest = _make_manifest("whk-wms")
+        manifest = _make_manifest("forge-wms")
         resp = await client.post("/v1/adapters/register", json=manifest)
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] == "registered"
-        assert data["adapter_id"] == "whk-wms"
+        assert data["adapter_id"] == "forge-wms"
 
     @pytest.mark.asyncio
     async def test_list_after_register(self, client):
@@ -178,7 +178,7 @@ class TestAdapterRegistry:
 
     @pytest.mark.asyncio
     async def test_register_multiple_adapters(self, client):
-        for aid in ["whk-wms", "forge-mes", "whk-cmms"]:
+        for aid in ["forge-wms", "forge-mes", "whk-cmms"]:
             await client.post("/v1/adapters/register", json=_make_manifest(aid))
 
         resp = await client.get("/v1/adapters")
@@ -205,12 +205,12 @@ class TestRecordIngestion:
     @pytest.mark.asyncio
     async def test_ingest_records(self, client):
         # Register adapter first
-        await client.post("/v1/adapters/register", json=_make_manifest("whk-wms"))
+        await client.post("/v1/adapters/register", json=_make_manifest("forge-wms"))
 
         resp = await client.post(
             "/v1/records",
             json={
-                "adapter_id": "whk-wms",
+                "adapter_id": "forge-wms",
                 "records": [
                     {"tag": "temp", "value": 72.5},
                     {"tag": "pressure", "value": 14.7},
@@ -224,12 +224,12 @@ class TestRecordIngestion:
 
     @pytest.mark.asyncio
     async def test_ingest_empty_batch(self, client):
-        await client.post("/v1/adapters/register", json=_make_manifest("whk-wms"))
+        await client.post("/v1/adapters/register", json=_make_manifest("forge-wms"))
 
         resp = await client.post(
             "/v1/records",
             json={
-                "adapter_id": "whk-wms",
+                "adapter_id": "forge-wms",
                 "records": [],
             },
         )
@@ -256,7 +256,7 @@ class TestPlatformInfo:
     @pytest.mark.asyncio
     async def test_info_reflects_adapter_count(self, client):
         # Register 2 adapters
-        for aid in ["whk-wms", "forge-mes"]:
+        for aid in ["forge-wms", "forge-mes"]:
             await client.post("/v1/adapters/register", json=_make_manifest(aid))
 
         resp = await client.get("/v1/info")
@@ -286,7 +286,7 @@ class TestCurationMount:
 class TestCurationOnIngest:
     @pytest.mark.asyncio
     async def test_ingested_records_curate_the_published_products_they_feed(self, client):
-        await client.post("/v1/adapters/register", json=_make_manifest("whk-wms"))
+        await client.post("/v1/adapters/register", json=_make_manifest("forge-wms"))
         created = await client.post(
             "/curation/products",
             json={
@@ -294,7 +294,7 @@ class TestCurationOnIngest:
                 "description": "5-minute averages",
                 "owner": "reh3376",
                 "schema_ref": "forge://schemas/curation/Temperatures/v1",
-                "source_adapters": ["whk-wms"],
+                "source_adapters": ["forge-wms"],
             },
         )
         product_id = created.json()["product_id"]
@@ -303,7 +303,7 @@ class TestCurationOnIngest:
         ingested = await client.post(
             "/v1/records",
             json={
-                "adapter_id": "whk-wms",
+                "adapter_id": "forge-wms",
                 "records": [
                     {"tag": "temp", "value": 70.0, "equipment_id": "FERM-01"},
                     {"tag": "temp", "value": 74.0, "equipment_id": "FERM-01"},

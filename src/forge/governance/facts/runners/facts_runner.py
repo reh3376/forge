@@ -170,7 +170,7 @@ class FACTSRunner(FxTSRunner):
         runner = FACTSRunner(
             schema_path="governance/facts/schema/facts.schema.json",
         )
-        report = await runner.run(target="whk-wms", spec=spec_dict)
+        report = await runner.run(target="forge-wms", spec=spec_dict)
     """
 
     framework = "FACTS"
@@ -217,7 +217,7 @@ class FACTSRunner(FxTSRunner):
         """Run all FACTS checks against an adapter spec.
 
         Args:
-            target: adapter_id (e.g., "whk-wms")
+            target: adapter_id (e.g., "forge-wms")
             **kwargs:
                 spec: dict — the parsed FACTS spec.
                 live: bool — if True, instantiate and exercise the adapter.

@@ -186,7 +186,7 @@ class TestBuildContextualRecord:
             scan_event={
                 "scan_type": "SCAN_TYPE_ENTRY",
                 "barcode_value": "BBL-001",
-                "_routed_to": ["whk-wms"],
+                "_routed_to": ["forge-wms"],
                 "scanned_at": "2026-04-06T14:30:00+00:00",
             },
             context=self._make_context(),

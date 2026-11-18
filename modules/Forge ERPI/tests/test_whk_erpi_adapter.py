@@ -1,6 +1,6 @@
 """Tests for the WHK ERPI adapter lifecycle, collection, and capabilities.
 
-Follows the same testing pattern as test_whk_wms_adapter.py and
+Follows the same testing pattern as test_forge_wms_adapter.py and
 test_forge_mes_adapter.py: inject raw message dicts, verify ContextualRecords.
 """
 

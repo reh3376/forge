@@ -32,7 +32,7 @@ class SpokeRouter:
     asset compliance).
     """
 
-    wms_adapter_id: str = "whk-wms"
+    wms_adapter_id: str = "forge-wms"
     ims_adapter_id: str | None = "bosc-ims"
     qms_adapter_id: str | None = None
     _routing_table: dict[str, list[RouteTarget]] = field(

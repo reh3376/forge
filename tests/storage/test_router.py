@@ -16,7 +16,7 @@ from forge.storage.router import DataRouter
 
 
 def _make_record(
-    system: str = "whk-wms",
+    system: str = "forge-wms",
     tag_path: str = "wms.barrel.create.123",
     data_type: str = "json",
     entity_type: str | None = None,
@@ -60,12 +60,12 @@ class TestDataRouter:
         registry = SchemaRegistry()
         registry.register(
             SchemaEntry(
-                schema_id="forge://schemas/whk-wms/Barrel/v1.0.0",
-                spoke_id="whk-wms",
+                schema_id="forge://schemas/forge-wms/Barrel/v1.0.0",
+                spoke_id="forge-wms",
                 entity_name="Barrel",
                 version="1.0.0",
                 schema_json={"type": "object"},
-                authoritative_spoke="whk-wms",
+                authoritative_spoke="forge-wms",
                 storage_engine=StorageEngine.POSTGRESQL,
                 storage_namespace="spoke_wms",
             )
@@ -119,12 +119,12 @@ class TestDataRouter:
         registry = SchemaRegistry()
         registry.register(
             SchemaEntry(
-                schema_id="forge://schemas/whk-wms/Barrel/v1.0.0",
-                spoke_id="whk-wms",
+                schema_id="forge://schemas/forge-wms/Barrel/v1.0.0",
+                spoke_id="forge-wms",
                 entity_name="Barrel",
                 version="1.0.0",
                 schema_json={"type": "object"},
-                authoritative_spoke="whk-wms",
+                authoritative_spoke="forge-wms",
                 storage_engine=StorageEngine.POSTGRESQL,
                 storage_namespace="spoke_wms",
             )

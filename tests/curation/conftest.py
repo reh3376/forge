@@ -37,8 +37,8 @@ def sample_record() -> ContextualRecord:
     return ContextualRecord(
         record_id=UUID("01234567-89ab-cdef-0123-456789abcdef"),
         source=RecordSource(
-            adapter_id="whk-wms",
-            system="whk-wms-prod",
+            adapter_id="forge-wms",
+            system="forge-wms-prod",
             tag_path="Area1/Fermenter3/Temperature",
         ),
         timestamp=RecordTimestamp(
@@ -63,8 +63,8 @@ def sample_record() -> ContextualRecord:
             shift_id="B",
         ),
         lineage=RecordLineage(
-            schema_ref="forge://schemas/whk-wms/v0.1.0",
-            adapter_id="whk-wms",
+            schema_ref="forge://schemas/forge-wms/v0.1.0",
+            adapter_id="forge-wms",
             adapter_version="0.1.0",
             transformation_chain=["collect", "enrich_context"],
         ),
@@ -137,7 +137,7 @@ def make_record_batch(
     equipment_id: str = "FERM-003",
     base_value: float = 78.4,
     unit: str = "°F",
-    adapter: str = "whk-wms",
+    adapter: str = "forge-wms",
     base_time: datetime | None = None,
     interval: timedelta | None = None,
 ) -> list[ContextualRecord]:

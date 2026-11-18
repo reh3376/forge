@@ -25,7 +25,7 @@ REASON = "The interim bridge keeps this until its replacement exists."
 
 
 async def _run(runner: FMTSRunner, spec: dict, repo: Path, **kwargs: Any) -> FxTSReport:
-    return await runner.run(target="whk-wms", spec=spec, repo_root=repo, **kwargs)
+    return await runner.run(target="forge-wms", spec=spec, repo_root=repo, **kwargs)
 
 
 def _by_id(report: FxTSReport) -> dict[str, FxTSVerdict]:
@@ -277,7 +277,7 @@ class TestM2Facts:
         assert (await _one(runner, unsigned, repo, "m2")).status == FAIL
 
     async def test_an_edited_facts_spec_fails(self, runner, unsigned, repo) -> None:
-        path = repo / "specs" / "whk-wms.facts.json"
+        path = repo / "specs" / "forge-wms.facts.json"
         facts = json.loads(path.read_text(encoding="utf-8"))
         facts["adapter_identity"]["name"] = "Changed after approval"
         path.write_text(json.dumps(facts), encoding="utf-8")
@@ -285,7 +285,7 @@ class TestM2Facts:
         assert verdict.status == FAIL and "hash does not verify" in _messages(verdict)
 
     async def test_an_unapproved_facts_spec_fails(self, runner, unsigned, repo) -> None:
-        path = repo / "specs" / "whk-wms.facts.json"
+        path = repo / "specs" / "forge-wms.facts.json"
         facts = json.loads(path.read_text(encoding="utf-8"))
         facts["integrity"]["hash_state"] = "pending_review"
         path.write_text(json.dumps(facts), encoding="utf-8")
@@ -483,7 +483,7 @@ class TestM9UserInterface:
         assert verdict.status == FAIL and "belongs to 'other'" in _messages(verdict)
 
         view.write_text(
-            json.dumps({"view_identity": {"owner_module": "whk-wms"}}), encoding="utf-8"
+            json.dumps({"view_identity": {"owner_module": "forge-wms"}}), encoding="utf-8"
         )
         assert (await _one(runner, unsigned, repo, "m9")).status == PASS
 

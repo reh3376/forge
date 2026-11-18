@@ -245,7 +245,7 @@ The manifest (`manifest.json`) is the adapter's identity card. Everything else i
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `adapter_id` | string | Unique identifier. Convention: `<org>-<system>` (e.g. `whk-wms`, `acme-erp`). Used in file paths, FACTS specs, and hub registration. |
+| `adapter_id` | string | Unique identifier. Convention: `<org>-<system>` (e.g. `forge-wms`, `acme-erp`). Used in file paths, FACTS specs, and hub registration. |
 | `name` | string | Human-readable name displayed in dashboards. |
 | `version` | string | Semantic version. Bumping this creates a new schema_ref. |
 | `type` | string | Always `"INGESTION"` for data collection adapters. |
@@ -782,7 +782,7 @@ from forge.sdk.module_builder.generators import (
 
 ## 14. Common Patterns
 
-### Pattern: GraphQL + RabbitMQ Adapter (like WHK-WMS)
+### Pattern: GraphQL + RabbitMQ Adapter (like forge-wms)
 
 ```bash
 forge module init my-app \

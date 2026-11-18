@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 
-from forge.adapters.whk_wms.context import (
+from forge.adapters.forge_wms.context import (
     build_record_context,
     compose_location,
     derive_shift,

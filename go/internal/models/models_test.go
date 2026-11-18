@@ -16,17 +16,17 @@ import (
 // ---------------------------------------------------------------------------
 
 func TestNewContextualRecord(t *testing.T) {
-	src := models.RecordSource{AdapterID: "whk-wms", System: "whk-wms-prod"}
+	src := models.RecordSource{AdapterID: "forge-wms", System: "forge-wms-prod"}
 	ts := models.RecordTimestamp{SourceTime: time.Now().UTC()}
 	val := models.RecordValue{Raw: 78.4, Quality: models.QualityGood, DataType: "float64"}
-	lin := models.RecordLineage{SchemaRef: "forge://schemas/test/v1", AdapterID: "whk-wms", AdapterVersion: "0.1.0"}
+	lin := models.RecordLineage{SchemaRef: "forge://schemas/test/v1", AdapterID: "forge-wms", AdapterVersion: "0.1.0"}
 
 	rec := models.NewContextualRecord(src, ts, val, lin)
 
 	if rec.RecordID == uuid.Nil {
 		t.Error("expected non-nil UUID")
 	}
-	if rec.Source.AdapterID != "whk-wms" {
+	if rec.Source.AdapterID != "forge-wms" {
 		t.Errorf("adapter_id: got %q", rec.Source.AdapterID)
 	}
 	if rec.Timestamp.IngestionTime.IsZero() {
@@ -102,8 +102,8 @@ func TestContextualRecordProtoRoundTrip(t *testing.T) {
 	rec := &models.ContextualRecord{
 		RecordID: uuid.New(),
 		Source: models.RecordSource{
-			AdapterID:    "whk-wms",
-			System:       "whk-wms-prod",
+			AdapterID:    "forge-wms",
+			System:       "forge-wms-prod",
 			TagPath:      "Area1/Fermenter3/Temperature",
 			ConnectionID: "conn-001",
 		},
@@ -134,8 +134,8 @@ func TestContextualRecordProtoRoundTrip(t *testing.T) {
 			Extra:          map[string]any{"custom": "val"},
 		},
 		Lineage: models.RecordLineage{
-			SchemaRef:           "forge://schemas/whk-wms/v1",
-			AdapterID:           "whk-wms",
+			SchemaRef:           "forge://schemas/forge-wms/v1",
+			AdapterID:           "forge-wms",
 			AdapterVersion:      "0.1.0",
 			TransformationChain: []string{"normalize", "enrich"},
 		},
@@ -276,19 +276,19 @@ func TestQualityCodeProtoRoundTrip(t *testing.T) {
 
 func TestAdapterManifestConstruction(t *testing.T) {
 	m := models.AdapterManifest{
-		AdapterID:             "whk-wms",
-		Name:                  "WHK WMS Adapter",
+		AdapterID:             "forge-wms",
+		Name:                  "Forge WMS Adapter",
 		Version:               "0.1.0",
 		Type:                  "INGESTION",
 		Protocol:              "graphql+amqp",
 		Tier:                  models.AdapterTierERPBusiness,
 		Capabilities:          models.DefaultAdapterCapabilities(),
-		DataContract:          models.DataContract{SchemaRef: "forge://schemas/whk-wms/v1", OutputFormat: "contextual_record"},
+		DataContract:          models.DataContract{SchemaRef: "forge://schemas/forge-wms/v1", OutputFormat: "contextual_record"},
 		HealthCheckIntervalMs: 5000,
 		AuthMethods:           []string{"azure_entra_id"},
 	}
 
-	if m.AdapterID != "whk-wms" {
+	if m.AdapterID != "forge-wms" {
 		t.Errorf("adapter_id: %q", m.AdapterID)
 	}
 	if !m.Capabilities.Read {
@@ -332,8 +332,8 @@ func TestAdapterManifestJSONRoundTrip(t *testing.T) {
 
 func TestAdapterManifestProtoRoundTrip(t *testing.T) {
 	m := &models.AdapterManifest{
-		AdapterID:             "whk-wms",
-		Name:                  "WHK WMS",
+		AdapterID:             "forge-wms",
+		Name:                  "Forge WMS",
 		Version:               "0.1.0",
 		Type:                  "INGESTION",
 		Protocol:              "graphql+amqp",
@@ -378,7 +378,7 @@ func TestAdapterManifestProtoRoundTrip(t *testing.T) {
 func TestAdapterHealthProtoRoundTrip(t *testing.T) {
 	now := time.Now().UTC().Truncate(time.Microsecond)
 	h := &models.AdapterHealth{
-		AdapterID:        "whk-wms",
+		AdapterID:        "forge-wms",
 		State:            models.AdapterStateHealthy,
 		LastCheck:        &now,
 		LastHealthy:      &now,

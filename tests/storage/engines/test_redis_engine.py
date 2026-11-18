@@ -137,23 +137,23 @@ class TestRedisStateCache:
     @pytest.mark.asyncio
     async def test_set_adapter_health(self, mock_client):
         cache = RedisStateCache(mock_client, ttl=120)
-        result = await cache.set_adapter_health("whk-wms", {"status": "healthy"})
+        result = await cache.set_adapter_health("forge-wms", {"status": "healthy"})
         assert result is True
         mock_client.set.assert_called_once()
         key = mock_client.set.call_args[0][0]
-        assert key == "forge:state:adapter:whk-wms"
+        assert key == "forge:state:adapter:forge-wms"
 
     @pytest.mark.asyncio
     async def test_set_adapter_health_no_client(self):
         cache = RedisStateCache(None)
-        result = await cache.set_adapter_health("whk-wms", {})
+        result = await cache.set_adapter_health("forge-wms", {})
         assert result is False
 
     @pytest.mark.asyncio
     async def test_get_adapter_health(self, mock_client):
         mock_client.get.return_value = json.dumps({"status": "healthy"})
         cache = RedisStateCache(mock_client)
-        result = await cache.get_adapter_health("whk-wms")
+        result = await cache.get_adapter_health("forge-wms")
         assert result == {"status": "healthy"}
 
     @pytest.mark.asyncio

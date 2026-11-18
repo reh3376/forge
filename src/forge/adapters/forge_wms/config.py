@@ -1,4 +1,4 @@
-"""Typed configuration for the WHK WMS adapter.
+"""Typed configuration for the Forge WMS adapter.
 
 Connection parameters are declared in the FACTS spec and validated
 by the hub before being passed to configure(). This module provides
@@ -12,10 +12,10 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class WhkWmsConfig(BaseModel):
-    """Connection parameters for the WHK WMS adapter.
+class ForgeWmsConfig(BaseModel):
+    """Connection parameters for the Forge WMS adapter.
 
-    Maps directly to the 9 connection_params in whk-wms.facts.json.
+    Maps directly to the 9 connection_params in forge-wms.facts.json.
     Required params have no default; optional params have sensible defaults.
     """
 

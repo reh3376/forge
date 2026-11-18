@@ -25,7 +25,7 @@ from forge.core.models.manufacturing.physical_asset import PhysicalAsset
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-wms"
+_SOURCE_SYSTEM = "forge-wms"
 
 
 def map_storage_location(raw: dict[str, Any]) -> PhysicalAsset | None:

@@ -44,8 +44,8 @@ def _make_record_dict() -> dict:
     """Create a serializable ContextualRecord dict."""
     return ContextualRecord(
         source=RecordSource(
-            adapter_id="whk-wms",
-            system="whk-wms-prod",
+            adapter_id="forge-wms",
+            system="forge-wms-prod",
             tag_path="Area1/Fermenter3/Temperature",
         ),
         timestamp=RecordTimestamp(
@@ -64,8 +64,8 @@ def _make_record_dict() -> dict:
             lot_id="L2026-0405",
         ),
         lineage=RecordLineage(
-            schema_ref="forge://schemas/whk-wms/v0.1.0",
-            adapter_id="whk-wms",
+            schema_ref="forge://schemas/forge-wms/v0.1.0",
+            adapter_id="forge-wms",
             adapter_version="0.1.0",
             transformation_chain=["collect"],
         ),
@@ -259,7 +259,7 @@ class TestCurationSpec:
                 "description": "...",
                 "owner": "o",
                 "schema_ref": "forge://schemas/curation/Peaks/v1",
-                "source_adapters": ["whk-wms"],
+                "source_adapters": ["forge-wms"],
                 "curation": {"functions": ["max"], "time_window": "1hr", "normalize": False},
             },
         )

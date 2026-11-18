@@ -120,7 +120,7 @@
       ],
       "minimal": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "C-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {},
@@ -132,7 +132,7 @@
       },
       "full": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "C-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {
@@ -188,7 +188,7 @@
       ],
       "minimal": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "L-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {},
@@ -197,7 +197,7 @@
       },
       "full": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "L-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {
@@ -253,7 +253,7 @@
       ],
       "minimal": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "B-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {},
@@ -262,7 +262,7 @@
       },
       "full": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "B-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {
@@ -311,7 +311,7 @@
       ],
       "minimal": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "I-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {},
@@ -322,7 +322,7 @@
       },
       "full": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "I-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {
@@ -377,7 +377,7 @@
       ],
       "minimal": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "EVT-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {},
@@ -389,7 +389,7 @@
       },
       "full": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "EVT-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {
@@ -438,7 +438,7 @@
       ],
       "minimal": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "WH-A",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {},
@@ -447,7 +447,7 @@
       },
       "full": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "WH-A",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {
@@ -714,7 +714,7 @@
       ],
       "minimal": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "SR-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {},
@@ -723,7 +723,7 @@
       },
       "full": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "SR-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {
@@ -768,7 +768,7 @@
       ],
       "minimal": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "QS-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {},
@@ -780,7 +780,7 @@
       },
       "full": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "QS-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {
@@ -795,7 +795,7 @@
         "results": [
           {
             "forge_id": "00000000-0000-4000-8000-000000000001",
-            "source_system": "whk-wms",
+            "source_system": "forge-wms",
             "source_id": "SR-001",
             "captured_at": "2026-10-23T12:00:00Z",
             "metadata": {},
@@ -831,7 +831,7 @@
       "optional": [],
       "minimal": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "DEP-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {},
@@ -841,7 +841,7 @@
       },
       "full": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "DEP-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {
@@ -892,7 +892,7 @@
       ],
       "minimal": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "WO-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {},
@@ -903,7 +903,7 @@
       },
       "full": {
         "forge_id": "00000000-0000-4000-8000-000000000001",
-        "source_system": "whk-wms",
+        "source_system": "forge-wms",
         "source_id": "WO-001",
         "captured_at": "2026-10-23T12:00:00Z",
         "metadata": {

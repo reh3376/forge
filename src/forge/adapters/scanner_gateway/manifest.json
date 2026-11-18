@@ -45,7 +45,7 @@
       "description": "Adapter ID of the WMS spoke for barrel scan routing",
       "required": true,
       "secret": false,
-      "default": "whk-wms"
+      "default": "forge-wms"
     },
     {
       "name": "ims_adapter_id",
@@ -81,13 +81,13 @@
   "metadata": {
     "spoke": "scanner-gateway",
     "hub_module": "forge.adapters.scanner_gateway",
-    "source_repo": "https://github.com/reh3376/whk-wms-android",
+    "source_repo": "https://github.com/reh3376/forge-wms-android",
     "source_framework": "Kotlin Android + Keyence SDK",
     "proto_package": "scanner.v1",
     "edge_device_type": "Keyence BT-A500GA handheld scanner",
     "scan_types": 12,
     "routing_targets": [
-      "whk-wms",
+      "forge-wms",
       "bosc-ims",
       "qms (future)"
     ],

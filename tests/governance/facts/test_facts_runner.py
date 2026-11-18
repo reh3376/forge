@@ -2,7 +2,7 @@
 
 Test categories:
 1. Unit tests for each _check_* method (pass and fail cases)
-2. Integration tests: run against whk-wms.facts.json and forge-mes.facts.json
+2. Integration tests: run against forge-wms.facts.json and forge-mes.facts.json
 3. Schema-runner parity: implemented_fields() matches facts.schema.json
 4. FHTS governance: integrity hash verification
 5. Cross-field consistency: capability/data-source alignment
@@ -24,7 +24,7 @@ import pytest
 
 SRC_ROOT = Path(__file__).resolve().parents[3] / "src"
 SCHEMA_PATH = SRC_ROOT / "forge" / "governance" / "facts" / "schema" / "facts.schema.json"
-WMS_SPEC_PATH = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "whk-wms.facts.json"
+WMS_SPEC_PATH = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "forge-wms.facts.json"
 MES_SPEC_PATH = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "forge-mes.facts.json"
 
 
@@ -965,7 +965,7 @@ class TestLiveChecks:
 
 
 # =========================================================================
-# 15. Integration Test — Full run against whk-wms.facts.json
+# 15. Integration Test — Full run against forge-wms.facts.json
 # =========================================================================
 
 
@@ -973,7 +973,7 @@ class TestIntegrationWMS:
     """Run FACTSRunner against the real WMS spec — zero failures expected."""
 
     def test_wms_full_run(self, runner, wms_spec, verdict_status):
-        report = _run(runner.run(target="whk-wms", spec=wms_spec))
+        report = _run(runner.run(target="forge-wms", spec=wms_spec))
         fails = [v for v in report.verdicts if v.status == verdict_status.FAIL]
         errors = [v for v in report.verdicts if v.status == verdict_status.ERROR]
         not_impl = [v for v in report.verdicts if v.status == verdict_status.NOT_IMPLEMENTED]
@@ -988,12 +988,12 @@ class TestIntegrationWMS:
         assert report.passed is (not expected)
 
     def test_wms_hash_verified(self, runner, wms_spec):
-        report = _run(runner.run(target="whk-wms", spec=wms_spec))
+        report = _run(runner.run(target="forge-wms", spec=wms_spec))
         assert report.hash_verified is True, f"Hash mismatch: {report.hash_message}"
 
     def test_wms_verdict_count(self, runner, wms_spec, verdict_status):
         """WMS should produce a reasonable number of verdicts (not empty, not truncated)."""
-        report = _run(runner.run(target="whk-wms", spec=wms_spec))
+        report = _run(runner.run(target="forge-wms", spec=wms_spec))
         # At minimum: spec_version(1) + identity(8) + capabilities(2+) + lifecycle(4+)
         # + connection(3+) + data_contract(5+) + context_mapping(3+) + error_handling(2+)
         # + metadata(1) + integrity(3+) + cross-field(1+) = ~33+
@@ -1049,18 +1049,18 @@ class TestCrossSpecConsistency:
     """Verify cross-spec governance properties hold."""
 
     def test_both_specs_pass(self, runner, wms_spec, mes_spec):
-        wms_report = _run(runner.run(target="whk-wms", spec=wms_spec))
+        wms_report = _run(runner.run(target="forge-wms", spec=wms_spec))
         mes_report = _run(runner.run(target="forge-mes", spec=mes_spec))
         assert wms_report.passed is (not _expected_fails(wms_spec))
         assert mes_report.passed is (not _expected_fails(mes_spec))
 
     def test_both_hashes_verified(self, runner, wms_spec, mes_spec):
-        wms_report = _run(runner.run(target="whk-wms", spec=wms_spec))
+        wms_report = _run(runner.run(target="forge-wms", spec=wms_spec))
         mes_report = _run(runner.run(target="forge-mes", spec=mes_spec))
         assert wms_report.hash_verified is True
         assert mes_report.hash_verified is True
 
     def test_runner_version_consistent(self, runner, wms_spec, mes_spec):
-        wms_report = _run(runner.run(target="whk-wms", spec=wms_spec))
+        wms_report = _run(runner.run(target="forge-wms", spec=wms_spec))
         mes_report = _run(runner.run(target="forge-mes", spec=mes_spec))
         assert wms_report.runner_version == mes_report.runner_version == "0.1.0"

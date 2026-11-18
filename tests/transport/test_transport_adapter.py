@@ -20,7 +20,7 @@ if str(_src) not in sys.path:
     sys.path.insert(0, str(_src))
 
 try:
-    from forge.adapters.whk_wms.adapter import WhkWmsAdapter
+    from forge.adapters.forge_wms.adapter import ForgeWmsAdapter
 
     HAS_WMS = True
 except ImportError:
@@ -47,20 +47,20 @@ def servicer() -> InMemoryServicer:
 @pytest.mark.skipif(not HAS_WMS, reason="WMS adapter not available")
 class TestWmsTransportAdapter:
     async def test_register_wms(self, servicer: InMemoryServicer) -> None:
-        adapter = WhkWmsAdapter()
+        adapter = ForgeWmsAdapter()
         channel = InMemoryChannel(servicer)
         transport = GrpcTransportAdapter(adapter=adapter, channel=channel)
 
         session_id = await transport.register()
-        assert session_id.startswith("session-whk-wms-")
-        assert transport.adapter_id == "whk-wms"
+        assert session_id.startswith("session-forge-wms-")
+        assert transport.adapter_id == "forge-wms"
 
     async def test_full_lifecycle_wms(
         self,
         servicer: InMemoryServicer,
         sample_record: ContextualRecord,
     ) -> None:
-        adapter = WhkWmsAdapter()
+        adapter = ForgeWmsAdapter()
         channel = InMemoryChannel(servicer)
         transport = GrpcTransportAdapter(adapter=adapter, channel=channel)
 
@@ -92,7 +92,7 @@ class TestWmsTransportAdapter:
         assert isinstance(flushed, int)
 
     async def test_health_check_wms(self, servicer: InMemoryServicer) -> None:
-        adapter = WhkWmsAdapter()
+        adapter = ForgeWmsAdapter()
         channel = InMemoryChannel(servicer)
         transport = GrpcTransportAdapter(adapter=adapter, channel=channel)
 

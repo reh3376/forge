@@ -1,5 +1,5 @@
 {
-  description = "whk-wms dev env";
+  description = "forge-wms dev env";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 

@@ -44,7 +44,7 @@ class ModulePermission:
     """A database access grant for a Forge module.
 
     Attributes:
-        module_id: Module requesting access (e.g., "whk-wms")
+        module_id: Module requesting access (e.g., "forge-wms")
         schema_name: Target schema (e.g., "mod_wms", "forge_canonical")
         access_level: READ, WRITE, or ADMIN
         granted_at: When the permission was granted
@@ -126,7 +126,7 @@ _IDENT = re.compile(r"[a-z_][a-z0-9_]*")
 
 
 def module_schema(module_id: str) -> str:
-    """``forge-mes`` → ``mod_mes``, ``whk-wms`` → ``mod_wms`` (the schemas of migration 002)."""
+    """``forge-mes`` → ``mod_mes``, ``forge-wms`` → ``mod_wms`` (the schemas of migration 002)."""
     name = module_id.strip().lower()
     for prefix in _MODULE_PREFIXES:
         if name.startswith(prefix):
@@ -202,14 +202,14 @@ class AccessController:
     Usage::
 
         ac = AccessController()
-        ac.grant("whk-wms", "mod_wms", AccessLevel.WRITE)
-        ac.grant("whk-wms", "forge_canonical", AccessLevel.READ)
+        ac.grant("forge-wms", "mod_wms", AccessLevel.WRITE)
+        ac.grant("forge-wms", "forge_canonical", AccessLevel.READ)
 
-        if ac.check("whk-wms", "mod_wms", AccessLevel.WRITE):
+        if ac.check("forge-wms", "mod_wms", AccessLevel.WRITE):
             # proceed with write
             ...
 
-        conn = ac.issue_connection("whk-wms", pg_host="forge-pg", pg_port=5432)
+        conn = ac.issue_connection("forge-wms", pg_host="forge-pg", pg_port=5432)
     """
 
     _permissions: list[ModulePermission] = field(default_factory=list, init=False)
@@ -460,7 +460,7 @@ class AccessController:
 
         Each module gets WRITE on its own schema and READ on forge_canonical.
         """
-        modules = ("whk-wms", "forge-mes", "whk-erpi", "whk-cmms", "whk-nms", "whk-ims")
+        modules = ("forge-wms", "forge-mes", "whk-erpi", "whk-cmms", "whk-nms", "whk-ims")
         defaults = [(module_id, module_schema(module_id)) for module_id in modules]
 
         grants = []

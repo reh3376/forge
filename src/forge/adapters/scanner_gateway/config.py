@@ -32,7 +32,7 @@ class ScannerGatewayConfig(BaseModel):
 
     # ── Spoke routing ────────────────────────────────────────────
     wms_adapter_id: str = Field(
-        default="whk-wms",
+        default="forge-wms",
         description="Adapter ID of the WMS spoke for barrel scan routing.",
     )
     ims_adapter_id: str | None = Field(

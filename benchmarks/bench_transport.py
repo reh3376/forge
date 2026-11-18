@@ -38,8 +38,8 @@ def make_record() -> ContextualRecord:
     return ContextualRecord(
         record_id=uuid4(),
         source=RecordSource(
-            adapter_id="whk-wms",
-            system="whk-wms-prod",
+            adapter_id="forge-wms",
+            system="forge-wms-prod",
             tag_path="Area1/Fermenter3/Temperature",
         ),
         timestamp=RecordTimestamp(
@@ -63,8 +63,8 @@ def make_record() -> ContextualRecord:
             extra={"line": "Line-1"},
         ),
         lineage=RecordLineage(
-            schema_ref="forge://schemas/whk-wms/v0.1.0",
-            adapter_id="whk-wms",
+            schema_ref="forge://schemas/forge-wms/v0.1.0",
+            adapter_id="forge-wms",
             adapter_version="0.1.0",
             transformation_chain=["collect", "enrich_context"],
         ),

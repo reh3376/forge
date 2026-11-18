@@ -11,11 +11,11 @@ import (
 )
 
 func TestNewBase(t *testing.T) {
-	base := mfg.NewBase("whk-wms", "BARREL-001")
+	base := mfg.NewBase("forge-wms", "BARREL-001")
 	if base.ForgeID == uuid.Nil {
 		t.Error("expected non-nil UUID")
 	}
-	if base.SourceSystem != "whk-wms" {
+	if base.SourceSystem != "forge-wms" {
 		t.Errorf("source_system: %q", base.SourceSystem)
 	}
 	if base.SourceID != "BARREL-001" {
@@ -31,7 +31,7 @@ func TestManufacturingUnitConstruction(t *testing.T) {
 	state := mfg.LifecycleAging
 	qty := 53.0
 	u := mfg.ManufacturingUnit{
-		ManufacturingModelBase: mfg.NewBase("whk-wms", "B-001"),
+		ManufacturingModelBase: mfg.NewBase("forge-wms", "B-001"),
 		UnitType:               "barrel",
 		SerialNumber:           "SN-12345",
 		LotID:                  "LOT-001",
@@ -51,7 +51,7 @@ func TestManufacturingUnitConstruction(t *testing.T) {
 
 func TestManufacturingUnitJSONRoundTrip(t *testing.T) {
 	u := mfg.ManufacturingUnit{
-		ManufacturingModelBase: mfg.NewBase("whk-wms", "B-001"),
+		ManufacturingModelBase: mfg.NewBase("forge-wms", "B-001"),
 		UnitType:               "barrel",
 		Status:                 mfg.UnitStatusActive,
 	}
@@ -76,7 +76,7 @@ func TestManufacturingUnitJSONRoundTrip(t *testing.T) {
 
 func TestLotConstruction(t *testing.T) {
 	lot := mfg.Lot{
-		ManufacturingModelBase: mfg.NewBase("whk-wms", "L-001"),
+		ManufacturingModelBase: mfg.NewBase("forge-wms", "L-001"),
 		LotNumber:              "2026-001",
 		Status:                 "CREATED",
 		ProductType:            "bourbon",
@@ -104,7 +104,7 @@ func TestLotConstruction(t *testing.T) {
 
 func TestPhysicalAssetConstruction(t *testing.T) {
 	asset := mfg.PhysicalAsset{
-		ManufacturingModelBase: mfg.NewBase("whk-wms", "WH-A"),
+		ManufacturingModelBase: mfg.NewBase("forge-wms", "WH-A"),
 		AssetType:              mfg.AssetTypeSite,
 		Name:                   "Warehouse A",
 		LocationPath:           "Enterprise/Site-1",
@@ -116,7 +116,7 @@ func TestPhysicalAssetConstruction(t *testing.T) {
 
 func TestOperationalEventConstruction(t *testing.T) {
 	evt := mfg.OperationalEvent{
-		ManufacturingModelBase: mfg.NewBase("whk-wms", "EVT-001"),
+		ManufacturingModelBase: mfg.NewBase("forge-wms", "EVT-001"),
 		EventType:              "Entry",
 		Severity:               mfg.EventSeverityInfo,
 		EntityType:             "manufacturing_unit",
@@ -130,7 +130,7 @@ func TestOperationalEventConstruction(t *testing.T) {
 
 func TestBusinessEntityConstruction(t *testing.T) {
 	e := mfg.BusinessEntity{
-		ManufacturingModelBase: mfg.NewBase("whk-wms", "C-001"),
+		ManufacturingModelBase: mfg.NewBase("forge-wms", "C-001"),
 		EntityType:             mfg.EntityTypeCustomer,
 		Name:                   "Acme Corp",
 		ExternalIDs:            map[string]string{"erp": "C-12345"},
@@ -173,7 +173,7 @@ func TestProcessDefinitionConstruction(t *testing.T) {
 
 func TestWorkOrderConstruction(t *testing.T) {
 	wo := mfg.WorkOrder{
-		ManufacturingModelBase: mfg.NewBase("whk-wms", "WO-001"),
+		ManufacturingModelBase: mfg.NewBase("forge-wms", "WO-001"),
 		Title:                  "Transfer barrels to Warehouse B",
 		OrderType:              "TRANSFER",
 		Status:                 mfg.WorkOrderStatusPending,
@@ -186,7 +186,7 @@ func TestWorkOrderConstruction(t *testing.T) {
 
 func TestMaterialItemConstruction(t *testing.T) {
 	item := mfg.MaterialItem{
-		ManufacturingModelBase: mfg.NewBase("whk-wms", "I-001"),
+		ManufacturingModelBase: mfg.NewBase("forge-wms", "I-001"),
 		ItemNumber:             "BBL-53-WHT-OAK",
 		Name:                   "53-gallon White Oak Barrel",
 		Category:               "barrel",
@@ -202,14 +202,14 @@ func TestQualitySampleConstruction(t *testing.T) {
 	lower := 80.0
 	upper := 100.0
 	qs := mfg.QualitySample{
-		ManufacturingModelBase: mfg.NewBase("whk-wms", "QS-001"),
+		ManufacturingModelBase: mfg.NewBase("forge-wms", "QS-001"),
 		SampleType:             "proof_check",
 		EntityType:             "manufacturing_unit",
 		EntityID:               "B-001",
 		OverallOutcome:         mfg.SampleOutcomePass,
 		Results: []mfg.SampleResult{
 			{
-				ManufacturingModelBase: mfg.NewBase("whk-wms", "SR-001"),
+				ManufacturingModelBase: mfg.NewBase("forge-wms", "SR-001"),
 				ParameterName:          "proof",
 				MeasuredValue:          &val,
 				LowerLimit:             &lower,
@@ -246,7 +246,7 @@ func TestProductionOrderConstruction(t *testing.T) {
 
 func TestWorkOrderDependencyConstruction(t *testing.T) {
 	dep := mfg.WorkOrderDependency{
-		ManufacturingModelBase: mfg.NewBase("whk-wms", "DEP-001"),
+		ManufacturingModelBase: mfg.NewBase("forge-wms", "DEP-001"),
 		DependentOrderID:       "WO-002",
 		PrerequisiteOrderID:    "WO-001",
 		DependencyType:         "BLOCKS",

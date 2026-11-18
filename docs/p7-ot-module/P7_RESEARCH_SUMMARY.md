@@ -128,8 +128,8 @@ Key capabilities that MUST be accounted for (but NOT all go into OT Module):
 | MES API client | `mes_api_client/` (1,007 model files) | **whk-mes** (already exists) |
 | Recipe/BOM management | `RecipeManagement/`, `RecipeBOM/` | **whk-mes recipe module** |
 | Mashing protocols | `MashingProtocol/` | **whk-mes** |
-| Barrel printing | `barrel_printing/` | **whk-wms printer-automation** |
-| CSV import | `CSVImportScript01/` | **whk-wms sync** |
+| Barrel printing | `barrel_printing/` | **forge-wms printer-automation** |
+| CSV import | `CSVImportScript01/` | **forge-wms sync** |
 | GraphQL client | `core/networking/graphql/` | **OT Module context enrichment** |
 
 **Critical finding:** Most Ignition Global capabilities are already being replaced by dedicated Forge spoke modules. The OT Module only needs to replace the **tag acquisition, alarming, and control write** functions.
