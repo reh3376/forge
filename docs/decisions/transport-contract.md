@@ -72,6 +72,16 @@ From the owner's answers in §4 (2026-11-18). All of it is **[OWNER]**.
 | T-15 | **Errors.** One catalogue: cause name, status code, meaning, required reaction; the same names on health and status (Q-13). |
 | T-16 | **Module ids are unique**, checked by the FMTS gate (Q-15). |
 
+### Data classes are a dynamic list with rules (T-9, the owner on 2026-11-18, after the signature)
+
+**[OWNER]** "Data classes will probably need to be further discussed, as long as the data class list / enum is dynamic and rules can be created for each we do not need to think of every possible data class before build starts. Although, it is a good idea to give it significant thought beforehand to minimize versioning changes later."
+
+So the list of data classes is not closed, and a class is defined by its rules, not by its name:
+
+- A data class is an entry in a governed list: a name and its rules (keepalive, deadlines, batch and buffer numbers with their ranges, the delivery rule, the order rule, whether commands of that class expire and how fast).
+- Adding a class, or a rule to a class, is an addition, never a breaking change (T-2). **[PROPOSED]** The list is carried as data, not as a fixed enumeration compiled into every module: the hub tells a module the classes and rules in force at Register (T-3), so a module built before a class existed can still be told its numbers. A module that declares a class its hub does not know is refused at Register with that cause.
+- The four classes sketched in Q-9 are a starting point, not the list. The first list is worked out with the owner before the contract spec is written (FB-164, step 7), with as much thought as can be given beforehand, to keep later version steps few.
+
 ## 6. What this changes in work already planned
 
 - **The module requirements (D-12).** T-5, T-6, T-8 and T-11 are behaviour every module must show, so the baseline gains requirements and the conformance kit gains checks for them: a stable record id, store and forward with its capacity, the goodbye and the last will, refusing a late command. That is a change to a signed record and needs the owner's word.

@@ -187,7 +187,7 @@ From `docs/WHERE-WE-ARE.md` §1, the snapshot at PR 95:
 | Measure | Value (2026-11-13) |
 |---|---|
 | Python hub (`src/forge`) | 354 files, ~74,100 lines |
-| Python tests | 276 files, 4,790 collected, full suite green on the locked dependency set |
+| Python tests | 277 files, 4,794 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend, kept until the Go forge-mes and forge-display land |
 | Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
@@ -1545,7 +1545,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q                         # 4,790 tests, ~1 minute
+uv run pytest tests -q -rsx                    # 4,794 tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -1649,7 +1649,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 276 files, 4,790 collected; the full suite runs in about a minute on the locked dependency set.
+- `tests/` mirrors `src/`: 277 files, 4,794 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
