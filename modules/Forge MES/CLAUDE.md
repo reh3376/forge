@@ -1,20 +1,24 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this directory, the Forge MES module of the forge repository. The repository's rules are in the root `CLAUDE.md`; read it first.
 
 ## Repository Overview
 
-This is a **Turborepo monorepo** for WhiskeyHouse Manufacturing Execution System (MES) - a comprehensive manufacturing execution system for whiskey production. The system manages end-to-end production from raw material receipt through finished goods, with complete traceability and ERP integration.
+This directory is the Forge MES module: a **Turborepo workspace** migrated from `WhiskeyHouse/whk-mes` on 2026-10-15. It is a manufacturing execution system for whiskey production, from raw material receipt through finished goods, with traceability and ERP integration.
 
-**MES Phase 1 Status**: 66% Complete (16/24 projects)
+## Where this module stands in Forge
 
-## Monorepo Structure
+- **This code is the interim MES bridge.** forge-mes is to be rewritten in Go (`docs/decisions/forge-mes-go.md` in the repository root, signed 2026-11-03) and is not built yet. Until then the NestJS backend here speaks the Forge spoke contract: `backend/src/forge/` registers with the hub and streams `ContextualRecord`s over gRPC (`forge.v1.AdapterService`). The hub-side half is `src/forge/adapters/forge_mes/`, and the module's FACTS spec is `specs/forge-mes.facts.json`.
+- **The frontend is interim too.** Every Forge user interface will be rendered by forge-display from the modules' FVTS specs; no module ships its own UI. This Next.js frontend is the MES user interface only until forge-display exists. Do not build new product surface on it without the owner's word.
+- **The backend's link to the hub is held to the one-clock rules.** It exchanges time with the hub on every Register, Health and Ingest, and the hub refuses it when its clock is outside the declared tolerance class. `docs/integration/forge-core-integration.md` describes the link.
+- Open problems in this module are in the root `BACKLOG.md`, section "Forge MES module".
+
+## Workspace Structure
 
 ```
-apps/
-├── whk-recipe-configuration/  # Backend (NestJS + Prisma + GraphQL)
-├── mes-ui/                     # Frontend (Next.js 15 + React 19)
-└── shared/                     # Shared TypeScript types and utilities
+backend/    # NestJS + Prisma + GraphQL (@forge-mes/backend)
+frontend/   # Next.js 14 + React 18 (@forge-mes/frontend)
+shared/     # Shared TypeScript types and utilities (@forge-mes/shared)
 ```
 
 ## Common Commands
@@ -107,10 +111,11 @@ make turbo-cache           # Clear Turborepo cache
 - **Inventory**: `inventory`, `lot`, `itemReceipt`, `inventoryTransfer` - Lot traceability
 - **Integration**: `rabbitmq`, `sync` - NetSuite ERP sync, RabbitMQ messaging
 - **Real-time**: `mqtt` - Equipment interface via MQTT
-- **Auth**: `auth`, `acl` - JWT + Role-based access control
+- **Auth**: `auth` - JWT + Role-based access control
+- **Forge hub link**: `forge` - the spoke side of the hub contract (registration, health, ingest, write-back)
 - **Audit**: `audit` - Comprehensive audit logging with `AuditContextInterceptor`
 
-**Database Schema**: 50+ Prisma models in `backend/prisma/schema.prisma`
+**Database Schema**: 84 Prisma models in `backend/prisma/schema.prisma`
 
 **Important Patterns**:
 - Prisma generates base resolvers/services - extend them in module files
@@ -123,7 +128,7 @@ make turbo-cache           # Clear Turborepo cache
 
 **Location**: `frontend/`
 
-**Tech Stack**: Next.js 15 (App Router), React 19, TypeScript, TailwindCSS, shadcn/ui, Apollo Client, Zustand
+**Tech Stack**: Next.js 14 (App Router), React 18, TypeScript, TailwindCSS, shadcn/ui, Apollo Client, Zustand
 
 **Key Libraries**:
 - **GraphQL**: `@apollo/client` for API queries/mutations
@@ -182,7 +187,7 @@ npm test -- path/to/test.spec.ts
 # Frontend
 cd frontend
 npm test -- path/to/test.spec.tsx
-npm run test:e2e -- tests/specific-test.spec.ts
+npm run test:e2e -- e2e/specific-test.spec.ts
 ```
 
 ## Integration Points
@@ -243,7 +248,7 @@ Setup: `npx dotenv-vault pull`
 - **Backend**: Jest unit tests, supertest for E2E
 - **Frontend**: Jest + React Testing Library for components, Playwright for E2E
 - **Test Data**: Seeding scripts in `backend/scripts/seed/`
-- **E2E**: Playwright tests in `frontend/tests/`
+- **E2E**: Playwright tests in `frontend/e2e/`
 
 ## Turborepo Specifics
 
@@ -277,9 +282,20 @@ Setup: `npx dotenv-vault pull`
 - Zod schemas for runtime validation
 - No runtime dependencies (keep lightweight)
 
-## Submodules
+## What CI checks here
 
-**Note**: The repository contains a submodule at `backend/submodules/whk-script-library` (currently shown as modified in git status). Coordinate with team on submodule updates.
+The `mes-module` job in the repository's `.github/workflows/ci.yml` installs from `package-lock.json` (`npm ci`), builds `shared`, generates the Prisma client and then runs:
+
+- the backend type check and the frontend type check, both blocking. The frontend compiles under `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess` and `noPropertyAccessFromIndexSignature`; fix an error in the code, do not relax a flag;
+- backend jest, advisory (root `BACKLOG.md` FB-036).
+
+Things that have cost time here:
+
+- A local type check means nothing unless the packages were installed from the lock file first. Ask the owner before installing.
+- Starting Next.js, which the frontend's jest does, rewrites `package-lock.json` (FB-132). Restore the lock file afterwards.
+- `shared/node_modules` is committed (FB-130). Do not stage changes under it.
+- The frontend's own unit tests fail in ten tests and CI does not run them (FB-131).
+- Read an environment variable by name in the frontend only after declaring it in `frontend/types/env.d.ts`; the dotted form is what Next.js inlines at build time.
 
 ## Documentation
 

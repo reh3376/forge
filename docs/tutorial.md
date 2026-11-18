@@ -1663,6 +1663,7 @@ note:
 - The repository runs its own MDEMG instance (a local, graph-backed project memory) with Jiminy as the governance layer; it recalls constraints, corrections and outcomes from a graph built by ingesting the codebase, documentation included.
 - **The repository's documents are the authority (A-12, owner 2026-11-17).** Where Jiminy guidance disagrees with them, follow the documents; the disagreement is a defect in MDEMG and is reported to the mdemg agent, not worked around here (FB-126).
 - The J17 handshake: identify by session, request the constraints for the task at hand, acknowledge them, act under enforcement, report the outcome.
+- The repository's own `CLAUDE.md` is what every coding agent reads first: what Forge is, why it is built, its goal, the documents to read, the architecture rules and the workflow. The interim MES bridge has one of its own under `modules/Forge MES/`.
 - The **PreToolUse hook** enforces constraints deterministically at each tool call, whether or not the agent has read anything; a blocked action is the protocol working.
 - Models: the local llama-server model `mdemg-llm-v1`; no cloud model, ever (A-10).
 - This is problem P-7 applied to the engineering platform itself: the more AI assistance, the more the contracts and the workflow must be machine-enforced.
@@ -1752,7 +1753,7 @@ note:
 ## What Is Next
 
 1. ~~A decision session on D-1, D-3, D-4, D-8, D-9 and D-10~~ (done 2026-11-03, one question at a time) and ~~the FB-076 design document~~ (signed the same day); D-11 signed 2026-11-13.
-2. The one-clock steps in the record's order: FB-088, FB-094 and FB-090 done 2026-11-13; FB-093's OT half and FB-092 (hub time in the contract) done 2026-11-15; FB-093's hub half (a spoke refused at Register and Ingest) done 2026-11-17; **FB-091** (the time-quality dimension) is the next of them, after the items the owner's answers of 2026-11-17 opened (FB-125, FB-124, FB-123, FB-126); the one-registry steps (FB-097, D-10) before the Go module's first ingest.
+2. The one-clock steps in the record's order: FB-088, FB-094 and FB-090 done 2026-11-13; FB-093's OT half and FB-092 (hub time in the contract) done 2026-11-15; FB-093's hub half (a spoke refused at Register and Ingest) done 2026-11-17; **FB-091** (the time-quality dimension) is the next of them, after the items the owner's answers of 2026-11-17 opened (FB-125, the root `CLAUDE.md`, done the same day; FB-124, FB-123, FB-126); the one-registry steps (FB-097, D-10) before the Go module's first ingest.
 3. The module SDK Go scaffold (FB-017); its first consumer is the Go forge-mes.
 4. FB-076 phase 1: the Go module registers, ingests and takes write-backs against the hub.
 5. FB-057 `mod_mes`, with FB-004 and FB-059 as the Go module needs them.
