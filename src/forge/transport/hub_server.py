@@ -98,10 +98,17 @@ class AdapterServiceServicer(ABC):
     async def register(
         self,
         manifest_dict: dict[str, Any],
+        *,
+        spoke_time: SpokeTime | None = None,
     ) -> dict[str, Any]:
         """Register a new adapter with the hub.
 
-        Returns: {accepted: bool, message: str, session_id: str}
+        ``spoke_time`` is the spoke's half of the time exchange (FB-092): T1 of this
+        call and, from a spoke that has completed an exchange, the offset it measured.
+        This base class does not judge it; :class:`HubIngestServicer` does (FB-093).
+
+        Returns: {accepted: bool, message: str, session_id: str}, with
+        ``refusal_cause`` when the hub refused the registration under a named cause.
         """
         manifest = proto_to_pydantic(manifest_dict, "AdapterManifest")
         session_id = f"session-{manifest.adapter_id}-{len(self._sessions)}"

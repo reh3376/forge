@@ -29,6 +29,7 @@ if TYPE_CHECKING:
 import grpc
 import grpc.aio
 
+from forge.core.clock import REFUSAL_CAUSE_HEADER, ClockRefusedError
 from forge.proto_gen.forge.v1 import adapter_service_pb2 as service_msg
 from forge.proto_gen.forge.v1 import adapter_service_pb2_grpc as service_grpc
 from forge.proto_gen.forge.v1 import contextual_record_pb2 as record_msg
@@ -42,7 +43,7 @@ from forge.transport.proto_bridge import (
     set_typed_value,
     spoke_time_to_proto,
 )
-from forge.transport.spoke_client import ChannelTls, TransportChannel
+from forge.transport.spoke_client import ChannelTls, TransportChannel, clock_refusal_cause
 
 logger = logging.getLogger(__name__)
 
@@ -205,17 +206,26 @@ class GrpcChannel(TransportChannel):
 
         proto_request = service_msg.RegisterRequest(manifest=proto_manifest)
         self._set_spoke_time(proto_request, request)
-        response: service_msg.RegisterResponse = await stub.Register(
-            proto_request, metadata=self.metadata
-        )
-        return self._with_hub_time(
-            {
-                "accepted": response.accepted,
-                "message": response.message,
-                "session_id": response.session_id,
-            },
-            response,
-        )
+        call = stub.Register(proto_request, metadata=self.metadata)
+        response: service_msg.RegisterResponse = await call
+        result: dict[str, Any] = {
+            "accepted": response.accepted,
+            "message": response.message,
+            "session_id": response.session_id,
+        }
+        # a refused registration names its cause in the trailer (FB-093)
+        cause = self._refusal_cause(await call.trailing_metadata())
+        if cause:
+            result["refusal_cause"] = cause
+        return self._with_hub_time(result, response)
+
+    @staticmethod
+    def _refusal_cause(trailing: Any) -> str | None:
+        """The ``x-forge-refusal-cause`` trailer of a refused call, when the hub sent one."""
+        for key, value in trailing or ():
+            if key == REFUSAL_CAUSE_HEADER:
+                return value.decode() if isinstance(value, bytes) else str(value)
+        return None
 
     @staticmethod
     def _set_spoke_time(proto_request: Any, request: dict[str, Any]) -> None:
@@ -454,10 +464,21 @@ class GrpcChannel(TransportChannel):
                 pydantic_record = proto_to_pydantic(record_dict, "ContextualRecord")
                 yield contextual_record_to_proto(pydantic_record)
 
-        response: service_msg.IngestResponse = await stub.Ingest(
-            _proto_stream(),
-            metadata=[*self.metadata, *((str(k), str(v)) for k, v in (metadata or ()))],
-        )
+        try:
+            response: service_msg.IngestResponse = await stub.Ingest(
+                _proto_stream(),
+                metadata=[*self.metadata, *((str(k), str(v)) for k, v in (metadata or ()))],
+            )
+        except grpc.aio.AioRpcError as exc:
+            # The hub refuses a spoke whose clock it does not trust with
+            # FAILED_PRECONDITION and the cause in the trailer (FB-093): that is a
+            # refusal the caller acts on, not a transport fault.
+            if exc.code() == grpc.StatusCode.FAILED_PRECONDITION:
+                details = exc.details() or ""
+                cause = clock_refusal_cause(self._refusal_cause(exc.trailing_metadata()), details)
+                if cause is not None:
+                    raise ClockRefusedError(f"Ingest refused: {details}", cause=cause) from exc
+            raise
         logger.info(
             "Ingest RPC completed: %d records acknowledged",
             response.records_received,

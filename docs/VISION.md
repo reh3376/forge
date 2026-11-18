@@ -1,6 +1,6 @@
 # Forge, complete — what it will be and the problems it solves
 
-**Status date:** 2026-10-16 · **Owner:** reh3376 · **Companions:** [Where we are going](WHERE-WE-ARE-GOING.md) · [Where we are](WHERE-WE-ARE.md) · [Roadmap](ROADMAP.md) · [Principles](PRINCIPLES.md) · [Backlog](../BACKLOG.md)
+**Status date:** 2026-11-17 · **Owner:** reh3376 · **Companions:** [Where we are going](WHERE-WE-ARE-GOING.md) · [Where we are](WHERE-WE-ARE.md) · [Roadmap](ROADMAP.md) · [Principles](PRINCIPLES.md) · [Backlog](../BACKLOG.md)
 
 This document defines the finished product. It is written in the present tense about a system that does not fully exist yet; the gap between this page and [Where we are](WHERE-WE-ARE.md) is the work. Nothing here is a status claim. When a decision in [`ROADMAP.md`](ROADMAP.md) §1 changes, this page changes with it.
 
@@ -11,6 +11,8 @@ This document defines the finished product. It is written in the present tense a
 **Forge is the industrial data operations platform for a manufacturing enterprise.** It connects every operational system a plant runs on (SCADA/PLC, MES, WMS, CMMS, ERP, QMS, historians, network management, lab and scanner devices), turns their output into one governed record type with manufacturing context attached, curates that into decision-quality data products, and renders every operator and management interface from declarative specifications. Its own management modules (forge-mes, forge-whs, forge-cmms, forge-ot, …) are optional: a site can run Forge purely as the integration and governance layer over the software it already has, or replace that software module by module.
 
 The design thesis: **bad manufacturing decisions come from missing quality, context and correlation, not from missing data.** Forge is built so that every datum is validated (quality), carries where/when/what/who it belongs to (context), can be joined with every other datum by that context (correlation), and so that the decision taken on it is itself recorded and measured.
+
+The goal in the owner's words (2026-11-17): "Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business."
 
 Forge is also a **governed engineering platform**: contracts between components are machine-checked specifications with hash integrity and owner approval, so that neither people nor AI coding agents can change an interface silently.
 

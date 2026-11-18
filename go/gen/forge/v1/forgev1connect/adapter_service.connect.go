@@ -97,6 +97,16 @@ type AdapterServiceClient interface {
 	//
 	// T1 of the time exchange (FB-092) travels the same way, since the request is a
 	// stream of records: x-forge-spoke-transmit-time, an RFC 3339 UTC timestamp.
+	// So does the spoke's last measurement of its clock against the hub's (FB-093):
+	//
+	//	x-forge-spoke-offset-seconds, x-forge-spoke-round-trip-seconds,
+	//	x-forge-spoke-measured-at (RFC 3339 UTC)
+	//
+	// Every Register, Health and Ingest request is a probe of the spoke's clock. The hub
+	// refuses the Register and the Ingest of a spoke whose clock it cannot read or finds
+	// outside the declared tolerance class: RegisterResponse.accepted = false, and Ingest
+	// fails with FAILED_PRECONDITION. Both name the cause in the x-forge-refusal-cause
+	// trailer (clock_unreadable, clock_out_of_tolerance) and in the message.
 	Ingest(context.Context) *connect.ClientStreamForClient[v1.ContextualRecord, v1.IngestResponse]
 	// Hub requests records from spoke (pull model). Server-streaming.
 	Collect(context.Context, *connect.Request[v1.CollectRequest]) (*connect.ServerStreamForClient[v1.ContextualRecord], error)
@@ -295,6 +305,16 @@ type AdapterServiceHandler interface {
 	//
 	// T1 of the time exchange (FB-092) travels the same way, since the request is a
 	// stream of records: x-forge-spoke-transmit-time, an RFC 3339 UTC timestamp.
+	// So does the spoke's last measurement of its clock against the hub's (FB-093):
+	//
+	//	x-forge-spoke-offset-seconds, x-forge-spoke-round-trip-seconds,
+	//	x-forge-spoke-measured-at (RFC 3339 UTC)
+	//
+	// Every Register, Health and Ingest request is a probe of the spoke's clock. The hub
+	// refuses the Register and the Ingest of a spoke whose clock it cannot read or finds
+	// outside the declared tolerance class: RegisterResponse.accepted = false, and Ingest
+	// fails with FAILED_PRECONDITION. Both name the cause in the x-forge-refusal-cause
+	// trailer (clock_unreadable, clock_out_of_tolerance) and in the message.
 	Ingest(context.Context, *connect.ClientStream[v1.ContextualRecord]) (*connect.Response[v1.IngestResponse], error)
 	// Hub requests records from spoke (pull model). Server-streaming.
 	Collect(context.Context, *connect.Request[v1.CollectRequest], *connect.ServerStream[v1.ContextualRecord]) error

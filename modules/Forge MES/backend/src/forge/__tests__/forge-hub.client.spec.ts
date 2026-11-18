@@ -5,8 +5,14 @@
 import * as grpc from "@grpc/grpc-js";
 import { mapDomainEventToRecord } from "../contextual-record.mapper";
 import {
+  clockRefusalCause,
   computeExchange,
   ForgeHubClient,
+  HubClockRefusedError,
+  REFUSAL_CAUSE_HEADER,
+  SPOKE_MEASURED_AT_HEADER,
+  SPOKE_OFFSET_HEADER,
+  SPOKE_ROUND_TRIP_HEADER,
   SPOKE_TRANSMIT_TIME_HEADER,
 } from "../forge-hub.client";
 import { toProtoManifest } from "../forge-manifest";
@@ -215,6 +221,7 @@ describe("the time exchange with the hub", () => {
       register?: any;
       health: any[];
       ingestHeader?: string;
+      ingestMeasurement?: { offset: string; roundTrip: string; measuredAt: string };
       ingested: any[];
     } = { health: [], ingested: [] };
     // every read of either clock moves true time on by 1 ms
@@ -243,6 +250,11 @@ describe("the time exchange with the hub", () => {
         },
         Ingest: (call: grpc.ServerReadableStream<any, any>, cb: grpc.sendUnaryData<any>) => {
           seen.ingestHeader = String(call.metadata.get(SPOKE_TRANSMIT_TIME_HEADER)[0]);
+          seen.ingestMeasurement = {
+            offset: String(call.metadata.get(SPOKE_OFFSET_HEADER)[0]),
+            roundTrip: String(call.metadata.get(SPOKE_ROUND_TRIP_HEADER)[0]),
+            measuredAt: String(call.metadata.get(SPOKE_MEASURED_AT_HEADER)[0]),
+          };
           call.on("data", (record) => seen.ingested.push(record));
           call.on("end", () =>
             cb(null, { records_received: "1", success: true, message: "OK", hub_time: hubTime() })
@@ -295,9 +307,78 @@ describe("the time exchange with the hub", () => {
       await client.ingest("forge-mes", "s1", [record]);
       expect(seen.ingestHeader).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
       expect(seen.ingested[0].timestamp.spoke_time.seconds).toBe("1750000000");
+      // the measurement of the Health before it rode in the headers: the hub's probe
+      expect(Number(seen.ingestMeasurement!.offset)).toBeCloseTo(2.0, 6);
+      expect(Number(seen.ingestMeasurement!.roundTrip)).toBeCloseTo(0.002, 6);
+      expect(seen.ingestMeasurement!.measuredAt).toMatch(/^2025-06-15T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
       expect(client.exchanges).toBe(3);
       expect(client.lastExchange!.offsetSeconds).toBeCloseTo(2.0, 6);
     });
+  });
+
+  describe("against a hub that refuses this spoke for its clock (FB-093)", () => {
+    const CAUSE =
+      "CLOCK_OUT_OF_TOLERANCE: clock spoke:forge-mes is +2.000000 s from Forge's clock " +
+      "after 3 consecutive probes; tolerance class it-lan allows 0.01 s";
+    let server: grpc.Server;
+    let client: ForgeHubClient;
+
+    beforeAll(async () => {
+      const Service = getAdapterService();
+      server = new grpc.Server();
+      server.addService(Service.service, {
+        Register: (_call: grpc.ServerUnaryCall<any, any>, cb: grpc.sendUnaryData<any>) => {
+          const now = msToTimestamp(Date.now());
+          cb(null, {
+            accepted: false,
+            message: CAUSE,
+            session_id: "",
+            hub_time: { receive_time: now, transmit_time: now },
+          });
+        },
+        Ingest: (call: grpc.ServerReadableStream<any, any>, cb: grpc.sendUnaryData<any>) => {
+          const trailer = new grpc.Metadata();
+          trailer.set(REFUSAL_CAUSE_HEADER, "clock_out_of_tolerance");
+          call.resume();
+          cb({ code: grpc.status.FAILED_PRECONDITION, details: CAUSE, metadata: trailer });
+        },
+      });
+      const port = await new Promise<number>((resolve, reject) => {
+        server.bindAsync("127.0.0.1:0", grpc.ServerCredentials.createInsecure(), (err, p) =>
+          err ? reject(err) : resolve(p)
+        );
+      });
+      client = new ForgeHubClient({ url: `127.0.0.1:${port}`, rpcTimeoutMs: 5000 });
+    });
+
+    afterAll(async () => {
+      client.close();
+      await new Promise<void>((r) => server.tryShutdown(() => r()));
+    });
+
+    it("names the cause of a refused registration and still measures the hub's clock", async () => {
+      const reg = await client.register(toProtoManifest());
+      expect(reg.accepted).toBe(false);
+      expect(reg.refusal_cause).toBe("clock_out_of_tolerance");
+      expect(reg.message).toBe(CAUSE);
+      expect(client.exchanges).toBe(1); // the refused answer carried T2 and T3
+    });
+
+    it("turns a refused Ingest into a HubClockRefusedError", async () => {
+      const refused = await client.ingest("forge-mes", "s1", []).catch((e) => e);
+      expect(refused).toBeInstanceOf(HubClockRefusedError);
+      expect(refused.refusalCause).toBe("clock_out_of_tolerance");
+      expect(refused.message).toContain(CAUSE);
+    });
+  });
+
+  it("recognises a clock refusal by the hub's trailer or by its message", () => {
+    expect(clockRefusalCause("clock_unreadable")).toBe("clock_unreadable");
+    expect(clockRefusalCause(undefined, "CLOCK_UNREADABLE: no measurement")).toBe(
+      "clock_unreadable"
+    );
+    expect(clockRefusalCause("time_governance_missing", "no section")).toBeUndefined();
+    expect(clockRefusalCause(undefined, "FACTS conformance failed")).toBeUndefined();
   });
 
   it("stays unmeasured against a hub that sends no time", async () => {

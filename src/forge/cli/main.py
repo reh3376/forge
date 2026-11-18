@@ -194,6 +194,15 @@ def adapter_status(
         typer.echo(f"  Uptime:           {health.get('uptime_seconds', 0):.0f}s")
         if health.get("error_message"):
             typer.echo(f"  Error:            {health['error_message']}")
+        clock_state = health.get("clock_state") or "OK"
+        if clock_state != "OK":
+            # The hub refuses this spoke for its clock (FB-093): the state, then the cause.
+            gate = health.get("clock_gate") or {}
+            typer.echo(f"  Clock:            {clock_state} since {gate.get('since')}")
+            typer.echo(
+                f"  Clock Class:      {gate.get('tolerance_class')} "
+                f"({gate.get('tolerance_seconds')} s)"
+            )
         refusals = health.get("refusals") or {}
         if refusals:
             # Never silent (owner, 2026-11-03): a refused value shows here with its cause.

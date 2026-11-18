@@ -179,8 +179,9 @@ class AdapterManifest(BaseModel):
         default=None,
         description=(
             "The FACTS time_governance section, carried to the hub at Register (one clock, "
-            "FB-090). None only for a manifest built before FB-090; FB-093 refuses a "
-            "registration without it. Proto field 13."
+            "FB-090). None only for a manifest built before FB-090; the hub refuses a "
+            "registration without it (FB-093): there is no class to hold the spoke's "
+            "clock to. Proto field 13."
         ),
     )
 
@@ -209,9 +210,10 @@ class AdapterHealth(BaseModel):
         description=(
             "Values this adapter refused rather than invent something about them, by cause: "
             "source_stamp_missing (a value without a source timestamp on a connection that "
-            "does not declare origin forge, FB-088); the clock refusals of FB-093 join it. "
-            "Hub-side only until the health contract carries it (FB-092); on the wire, "
-            "error_message names the last refusal."
+            "does not declare origin forge, FB-088), and clock_unreadable and "
+            "clock_out_of_tolerance (FB-093): on a spoke's own health the connections it "
+            "refused, on the hub's view of a spoke the Register and Ingest requests the hub "
+            "refused. Hub-side only: on the wire, error_message names the last refusal."
         ),
     )
     hub_time: HubTime | None = Field(
@@ -227,5 +229,23 @@ class AdapterHealth(BaseModel):
             "The last refusal, with its cause, as the adapter reported it. A refusal is never "
             "silent (owner, 2026-11-03): it is here, on error_message, on the adapter's state "
             "(DEGRADED) and on the forge.ingest.refused metric."
+        ),
+    )
+    clock_state: str = Field(
+        default="OK",
+        description=(
+            "The hub's gate on this spoke's own clock (FB-093, hub half): OK, "
+            "CLOCK_UNREADABLE (its requests carry no time-exchange measurement) or "
+            "CLOCK_OUT_OF_TOLERANCE (its measured offset is outside the class it declared). "
+            "In either refused state the hub refuses its Register and its Ingest. Hub-side: "
+            "on the wire the state is DEGRADED and error_message names the cause."
+        ),
+    )
+    clock_gate: dict[str, Any] | None = Field(
+        default=None,
+        description=(
+            "The gate behind clock_state: the cause, since when, the tolerance class and "
+            "its seconds, the consecutive-probe counters, the last offset and round trip, "
+            "and the requests refused by cause. None for a spoke the hub does not gate."
         ),
     )

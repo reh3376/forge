@@ -461,6 +461,16 @@ def create_app(
         manifest = registry.get_manifest(request.adapter_id)
         if manifest is None:
             raise HTTPException(404, f"Adapter '{request.adapter_id}' not registered")
+        refusal = pipeline.gates.refusal(request.adapter_id)
+        if refusal is not None:
+            # The hub refuses this spoke for its clock (FB-093). This endpoint carries no
+            # time exchange and is to be retired (FB-123: every module speaks to the hub
+            # over gRPC); until then it honours the state the gRPC exchange established,
+            # so there is no path around the refusal.
+            pipeline.gates.note_refused(request.adapter_id, refusal.cause)
+            telemetry.record_refusal(request.adapter_id, refusal.cause)
+            logger.warning("REST ingest from adapter '%s' refused: %s", request.adapter_id, refusal)
+            raise HTTPException(409, f"Ingest refused: {refusal}")
 
         records = []
         parse_errors: list[str] = []

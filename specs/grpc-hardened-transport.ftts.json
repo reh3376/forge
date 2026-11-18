@@ -227,7 +227,7 @@
         "request_type": "RegisterRequest",
         "response_type": "RegisterResponse",
         "plane": "control",
-        "description": "Register an adapter with the hub, providing its manifest. Carries the time exchange: RegisterRequest.spoke_time (T1), RegisterResponse.hub_time (T2, T3)"
+        "description": "Register an adapter with the hub, providing its manifest. Carries the time exchange: RegisterRequest.spoke_time (T1), RegisterResponse.hub_time (T2, T3). A manifest without time_governance is refused (time_governance_missing). A Register that reports a measurement is a probe of the spoke's clock; a spoke the hub refuses for its clock gets accepted=false with the cause in the message and in the x-forge-refusal-cause trailer, and hub_time all the same (FB-093)"
       },
       {
         "method": "Configure",
@@ -259,7 +259,7 @@
         "request_type": "HealthRequest",
         "response_type": "AdapterHealth",
         "plane": "control",
-        "description": "Query adapter health status. Carries the time exchange: HealthRequest.spoke_time (T1 and the offset and round trip of the spoke's last exchange), AdapterHealth.hub_time (T2, T3)"
+        "description": "Query adapter health status. Carries the time exchange: HealthRequest.spoke_time (T1 and the offset and round trip of the spoke's last exchange), AdapterHealth.hub_time (T2, T3). Every Health is a probe of the spoke's clock and is answered while the spoke is refused: state DEGRADED, error_message the cause (FB-093)"
       },
       {
         "method": "Collect",
@@ -315,7 +315,7 @@
         "request_type": "ContextualRecord",
         "response_type": "IngestResponse",
         "plane": "data",
-        "description": "Client-streaming: spoke pushes ContextualRecords to hub. Carries the time exchange: T1 in the x-forge-spoke-transmit-time header, IngestResponse.hub_time (T2, T3)"
+        "description": "Client-streaming: spoke pushes ContextualRecords to hub. Carries the time exchange: T1 in the x-forge-spoke-transmit-time header, IngestResponse.hub_time (T2, T3). The spoke's last measurement rides in three more headers and is the probe of its clock for the call; the Ingest of a refused spoke fails with FAILED_PRECONDITION before a record is read, the cause in the x-forge-refusal-cause trailer (FB-093)"
       }
     ],
     "metadata_protocol": {
@@ -333,6 +333,26 @@
         {
           "key": "x-forge-spoke-transmit-time",
           "purpose": "T1 of the hub-spoke time exchange on Ingest, an RFC 3339 UTC timestamp: the request is a stream of records and has no field for it",
+          "required": false
+        },
+        {
+          "key": "x-forge-spoke-offset-seconds",
+          "purpose": "The offset the spoke measured in its last completed exchange, hub clock minus spoke clock in seconds, on Ingest. With the two headers below it is the probe of the spoke's clock for the call (FB-093); a spoke that sends none is counted as a clock the hub cannot read",
+          "required": false
+        },
+        {
+          "key": "x-forge-spoke-round-trip-seconds",
+          "purpose": "The round trip of that exchange in seconds, on Ingest",
+          "required": false
+        },
+        {
+          "key": "x-forge-spoke-measured-at",
+          "purpose": "The spoke's T4 of that exchange, an RFC 3339 UTC timestamp, on Ingest: a measurement the hub has already judged is not counted again",
+          "required": false
+        },
+        {
+          "key": "x-forge-refusal-cause",
+          "purpose": "Trailing metadata from the hub on a refused Register or Ingest: the cause by name (clock_unreadable, clock_out_of_tolerance, time_governance_missing)",
           "required": false
         }
       ]

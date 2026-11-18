@@ -20,7 +20,7 @@ import {
   OnModuleDestroy,
 } from "@nestjs/common";
 import { FORGE_CONFIG, ForgeConfig } from "./forge.config";
-import { ForgeHubClient, HubHealth } from "./forge-hub.client";
+import { clockRefusalCause, ForgeHubClient, HubHealth } from "./forge-hub.client";
 import { ForgeIngestService } from "./forge-ingest.service";
 import { FORGE_MES_MANIFEST, toProtoManifest } from "./forge-manifest";
 import { ForgeSpokeServer } from "./forge-spoke.server";
@@ -55,6 +55,9 @@ export interface HubStatus {
     measuredAt: string;
     exchanges: number;
   };
+  /** The hub refuses this spoke because it does not trust its clock (FB-093): the
+   *  cause as the hub states it. Unset while the hub accepts this spoke. */
+  clockRefusal?: string;
   healthFailures: number;
   reconnects: number;
   lastError?: string;
@@ -71,6 +74,7 @@ export class ForgeHubService implements OnApplicationBootstrap, OnModuleDestroy 
   private healthFailures = 0;
   private reconnects = 0;
   private lastError?: string;
+  private clockRefusal?: string;
   private heartbeat?: NodeJS.Timeout;
   private destroyed = false;
   private connecting?: Promise<void>;
@@ -140,10 +144,22 @@ export class ForgeHubService implements OnApplicationBootstrap, OnModuleDestroy 
       lastHealthAt: this.lastHealthAt?.toISOString(),
       lastHealth: this.lastHealth,
       clock: this.clockStatus(),
+      clockRefusal: this.clockRefusal,
       healthFailures: this.healthFailures,
       reconnects: this.reconnects,
       lastError: this.lastError,
     };
+  }
+
+  /** Never silent: the refusal is logged when it starts and when it ends, and it is
+   *  on the status for as long as it lasts. */
+  private noteClockRefusal(cause: string | undefined): void {
+    if (cause && cause !== this.clockRefusal) {
+      this.logger.error(`Forge hub refuses this spoke for its clock: ${cause}`);
+    } else if (!cause && this.clockRefusal) {
+      this.logger.log("Forge hub trusts this spoke's clock again");
+    }
+    this.clockRefusal = cause;
   }
 
   private clockStatus(): HubStatus["clock"] {
@@ -186,8 +202,12 @@ export class ForgeHubService implements OnApplicationBootstrap, OnModuleDestroy 
     });
     const reg = await this.client.register(manifest);
     if (!reg.accepted || !reg.session_id) {
+      // A clock refusal (FB-093) is retried like any other: the refused answer carried
+      // the hub's time, so the next attempt reports a fresh measurement of this clock.
+      this.noteClockRefusal(reg.refusal_cause ? reg.message : undefined);
       throw new Error(`hub rejected registration: ${reg.message || "no reason"}`);
     }
+    this.noteClockRefusal(undefined);
     const callbackUrl = await this.spoke.whenListening();
     const params: Record<string, string> = {
       ...this.config.connectionParams,
@@ -247,6 +267,13 @@ export class ForgeHubService implements OnApplicationBootstrap, OnModuleDestroy 
       );
       this.lastHealthAt = new Date();
       this.healthFailures = 0;
+      const refused = clockRefusalCause(undefined, this.lastHealth.error_message ?? "");
+      this.noteClockRefusal(refused ? this.lastHealth.error_message : undefined);
+      if (refused) {
+        // the hub answers Health but takes no records: not a healthy session
+        this.state = "degraded";
+        return;
+      }
       if (this.state !== "healthy") this.logger.log("Hub session healthy again");
       this.state = "healthy";
     } catch (err) {

@@ -24,11 +24,18 @@ Usage:
 from __future__ import annotations
 
 import json
+import logging
 import math
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
+from forge.core.clock import (
+    SPOKE_MEASURED_AT_HEADER,
+    SPOKE_OFFSET_HEADER,
+    SPOKE_ROUND_TRIP_HEADER,
+    SPOKE_TRANSMIT_TIME_HEADER,
+)
 from forge.core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -51,6 +58,11 @@ from forge.core.models.contextual_record import (
     RecordValue,
     TimeQuality,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Enum ↔ int mappings (mirror proto enum numbering from enums.proto)
@@ -332,6 +344,78 @@ def proto_to_spoke_time(d: dict[str, Any] | None) -> SpokeTime | None:
         round_trip_seconds=d.get("round_trip_seconds"),
         measured_at=_proto_to_datetime(d.get("measured_at")),
     )
+
+
+def spoke_time_to_headers(spoke_time: SpokeTime) -> list[tuple[str, str]]:
+    """The spoke's half of the exchange as ``Ingest`` metadata (FB-092, FB-093).
+
+    ``Ingest`` is a stream of records with no request field of its own, so T1 and the
+    spoke's last measurement ride in headers: the hub answers T1 with its T2 and T3 and
+    judges the measurement as a probe of the spoke's clock.
+    """
+    headers = [(SPOKE_TRANSMIT_TIME_HEADER, spoke_time.transmit_time.isoformat())]
+    if spoke_time.offset_seconds is not None and spoke_time.round_trip_seconds is not None:
+        headers.append((SPOKE_OFFSET_HEADER, repr(spoke_time.offset_seconds)))
+        headers.append((SPOKE_ROUND_TRIP_HEADER, repr(spoke_time.round_trip_seconds)))
+        if spoke_time.measured_at is not None:
+            headers.append((SPOKE_MEASURED_AT_HEADER, spoke_time.measured_at.isoformat()))
+    return headers
+
+
+def headers_to_spoke_time(metadata: Mapping[str, Any]) -> SpokeTime | None:
+    """The spoke's half of the exchange from ``Ingest`` metadata; None without a T1.
+
+    A header that does not parse is logged and read as absent. The request then
+    carries no measurement, which the hub's gate counts as a clock it could not read
+    (FB-093): a malformed report is never taken for a good one.
+    """
+
+    def _text(name: str) -> str | None:
+        value = metadata.get(name)
+        if isinstance(value, bytes):
+            value = value.decode("utf-8", "replace")
+        return value.strip() if isinstance(value, str) and value.strip() else None
+
+    def _time(name: str) -> datetime | None:
+        raw = _text(name)
+        if raw is None:
+            return None
+        try:
+            # RFC 3339 writes UTC as "Z" (the bridge's toISOString() does)
+            return datetime.fromisoformat(raw[:-1] + "+00:00" if raw.endswith("Z") else raw)
+        except ValueError:
+            logger.warning("Ingest header %s=%r is not an RFC 3339 time; ignored", name, raw)
+            return None
+
+    def _seconds(name: str) -> float | None:
+        raw = _text(name)
+        if raw is None:
+            return None
+        try:
+            value = float(raw)
+        except ValueError:
+            value = math.nan
+        if not math.isfinite(value):
+            logger.warning("Ingest header %s=%r is not a number of seconds; ignored", name, raw)
+            return None
+        return value
+
+    transmit_time = _time(SPOKE_TRANSMIT_TIME_HEADER)
+    if transmit_time is None:
+        return None
+    offset = _seconds(SPOKE_OFFSET_HEADER)
+    round_trip = _seconds(SPOKE_ROUND_TRIP_HEADER)
+    measured = offset is not None and round_trip is not None
+    try:
+        return SpokeTime(
+            transmit_time=transmit_time,
+            offset_seconds=offset if measured else None,
+            round_trip_seconds=round_trip if measured else None,
+            measured_at=_time(SPOKE_MEASURED_AT_HEADER) if measured else None,
+        )
+    except ValueError as exc:  # a naive stamp: the one-clock gate of the model
+        logger.warning("Ingest time headers refused: %s", exc)
+        return None
 
 
 def hub_time_to_proto(hub_time: HubTime) -> dict[str, Any]:

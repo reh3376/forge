@@ -693,6 +693,203 @@ class ClockGate:
 
 
 # ---------------------------------------------------------------------------
+# The hub's gate on each spoke's clock (one clock, FB-093 hub half; D-9 P-5, P-9)
+# ---------------------------------------------------------------------------
+
+#: gRPC metadata headers that carry the spoke's last completed exchange on ``Ingest``,
+#: beside its T1 (``SPOKE_TRANSMIT_TIME_HEADER``): the offset (hub clock minus spoke
+#: clock, seconds), the round trip (seconds) and the spoke's T4 of that exchange
+#: (RFC 3339 UTC). ``Register`` and ``Health`` carry the same three in ``SpokeTime``.
+SPOKE_OFFSET_HEADER = "x-forge-spoke-offset-seconds"
+SPOKE_ROUND_TRIP_HEADER = "x-forge-spoke-round-trip-seconds"
+SPOKE_MEASURED_AT_HEADER = "x-forge-spoke-measured-at"
+#: Trailing metadata of a refused ``Register`` or ``Ingest``: the refusal's cause, the
+#: key it is counted under on ``AdapterHealth.refusals`` (``clock_out_of_tolerance``).
+REFUSAL_CAUSE_HEADER = "x-forge-refusal-cause"
+#: The record refuses a probe cadence under 1 s (FB-090's ``facts:time-governed``), so
+#: the hub counts at most one probe a second for a spoke: a burst of requests is one
+#: probe, and a sub-second network transient cannot refuse a spoke or readmit one.
+SPOKE_PROBE_MIN_INTERVAL_SECONDS = 1.0
+#: The cause a registration is refused under when its manifest declares no
+#: ``time_governance``: there is no class to hold the spoke's clock to.
+TIME_GOVERNANCE_MISSING = "time_governance_missing"
+
+
+def spoke_clock_id(adapter_id: str) -> str:
+    """The name of a spoke's own clock as the hub gates it (``spoke:forge-mes``)."""
+    return f"spoke:{adapter_id}"
+
+
+@dataclass(frozen=True)
+class SpokeProbe:
+    """What one request told the hub about the spoke's clock.
+
+    ``fresh``: it carried a measurement the hub had not seen (it belongs on the series);
+    ``counted``: the gate judged it as a probe; ``transition``: the gate changed state.
+    """
+
+    fresh: bool = False
+    counted: bool = False
+    transition: ClockGateTransition | None = None
+
+
+class _SpokeGate:
+    def __init__(self, gate: ClockGate) -> None:
+        self.gate = gate
+        self.last_probe_at: datetime | None = None
+        self.last_measured_at: datetime | None = None
+        self.last_round_trip_seconds: float | None = None
+        self.refused_requests: dict[str, int] = {}
+
+
+class SpokeClockGates:
+    """Fail closed on every spoke's clock, as its own requests report it (FB-093, hub half).
+
+    One-clock record P-5 applied to the hub-to-spoke link of P-9. The hub cannot probe a
+    spoke: the spoke opens every call. So each Register, Health and Ingest request is the
+    probe. It either carries the spoke's last two-way measurement of its clock against
+    the hub's (``SpokeTime``, or the three headers on ``Ingest``) or it does not:
+
+    * a measurement outside the tolerance of the class the spoke declared (P-8) is an
+      *out of tolerance* probe; three in a row enter ``CLOCK_OUT_OF_TOLERANCE``;
+    * a request with no measurement is an *unreadable* probe; three in a row enter
+      ``CLOCK_UNREADABLE``. A spoke that does not implement the exchange is refused at
+      runtime (owner, 2026-11-17: "this should never occur"; the module requirements
+      make the exchange a core requirement). A first Register cannot carry one and is
+      not counted;
+    * three good probes in a row clear either state.
+
+    A measurement already judged is not a new probe, and at most one probe is counted
+    per ``min_probe_interval_seconds``. While a spoke is refused the hub refuses its
+    Register and its Ingest and keeps answering its Health; Register and Health still
+    return the hub's time, so the spoke goes on measuring and is readmitted by its own
+    reports. The gates only decide: the servicer refuses, records and announces.
+    """
+
+    def __init__(
+        self,
+        *,
+        min_probe_interval_seconds: float = SPOKE_PROBE_MIN_INTERVAL_SECONDS,
+        threshold: int = FAIL_CLOSED_PROBES,
+    ) -> None:
+        self.min_probe_interval_seconds = min_probe_interval_seconds
+        self.threshold = threshold
+        self._gates: dict[str, _SpokeGate] = {}
+
+    def declare(self, adapter_id: str, tolerance_class: str) -> ClockGate:
+        """The gate of ``adapter_id`` on the class its manifest declares.
+
+        Created at the spoke's first Register and kept across its sessions, so a refused
+        spoke does not shed the refusal by registering again; a manifest that declares
+        another class is held to the new one from the next probe.
+        """
+        entry = self._gates.get(adapter_id)
+        if entry is None:
+            gate = ClockGate(
+                spoke_clock_id(adapter_id),
+                tolerance_class=tolerance_class,
+                threshold=self.threshold,
+            )
+            entry = self._gates[adapter_id] = _SpokeGate(gate)
+        elif entry.gate.tolerance_class != tolerance_class:
+            entry.gate.tolerance_class = tolerance_class
+            entry.gate.tolerance_seconds = tolerance_for_class(tolerance_class)
+        return entry.gate
+
+    def probe(
+        self,
+        adapter_id: str,
+        at: datetime,
+        *,
+        offset_seconds: float | None = None,
+        round_trip_seconds: float | None = None,
+        measured_at: datetime | None = None,
+        first_contact: bool = False,
+    ) -> SpokeProbe:
+        """Judge one request of ``adapter_id`` as a probe of its clock.
+
+        ``offset_seconds`` is what the spoke reports, hub clock minus spoke clock by
+        RFC 5905, with ``round_trip_seconds`` and ``measured_at`` (its T4); all None when
+        the request carried no measurement. ``first_contact`` marks a Register, which is
+        not counted as unreadable when it carries none.
+        """
+        entry = self._gates.get(adapter_id)
+        if entry is None:
+            return SpokeProbe()
+        measured = offset_seconds is not None and round_trip_seconds is not None
+        if measured and measured_at is not None and measured_at == entry.last_measured_at:
+            return SpokeProbe()  # the measurement the hub already has: not a new probe
+        if measured:
+            entry.last_measured_at = measured_at
+            entry.last_round_trip_seconds = round_trip_seconds
+        elif first_contact:
+            return SpokeProbe()
+        if (
+            entry.last_probe_at is not None
+            and (at - entry.last_probe_at).total_seconds() < self.min_probe_interval_seconds
+        ):
+            return SpokeProbe(fresh=measured)
+        entry.last_probe_at = at
+        if not measured or offset_seconds is None:
+            transition = entry.gate.observe(
+                None, at, detail="its requests carried no time-exchange measurement"
+            )
+        else:
+            # the gate judges "measured clock minus governing clock"; the spoke reports
+            # the hub's clock minus its own
+            transition = entry.gate.observe(-offset_seconds, at)
+        return SpokeProbe(fresh=measured, counted=True, transition=transition)
+
+    def state(self, adapter_id: str) -> str:
+        entry = self._gates.get(adapter_id)
+        return entry.gate.state if entry is not None else CLOCK_OK
+
+    def refusal(self, adapter_id: str) -> ClockRefusedError | None:
+        """The refusal ``adapter_id`` is under, or None while its clock is trusted."""
+        entry = self._gates.get(adapter_id)
+        if entry is None or not entry.gate.refused:
+            return None
+        gate = entry.gate
+        return ClockRefusedError(f"{gate.state}: {gate.cause}", cause=gate.state.lower())
+
+    def note_refused(self, adapter_id: str, cause: str) -> None:
+        """Count one request of ``adapter_id`` refused under ``cause``."""
+        entry = self._gates.get(adapter_id)
+        if entry is not None:
+            entry.refused_requests[cause] = entry.refused_requests.get(cause, 0) + 1
+
+    def refused_requests(self, adapter_id: str) -> dict[str, int]:
+        entry = self._gates.get(adapter_id)
+        return dict(entry.refused_requests) if entry is not None else {}
+
+    def describe_gate(self, adapter_id: str) -> dict[str, Any] | None:
+        entry = self._gates.get(adapter_id)
+        if entry is None:
+            return None
+        return {
+            "clock_id": entry.gate.clock_id,
+            **entry.gate.describe(),
+            "last_round_trip_seconds": entry.last_round_trip_seconds,
+            "last_probe_at": (
+                entry.last_probe_at.isoformat() if entry.last_probe_at is not None else None
+            ),
+            "refused_requests": dict(entry.refused_requests),
+        }
+
+    def refused(self) -> dict[str, str]:
+        """Every refused spoke with the state it is in."""
+        return {aid: e.gate.state for aid, e in self._gates.items() if e.gate.refused}
+
+    def describe(self) -> dict[str, Any]:
+        return {
+            "min_probe_interval_seconds": self.min_probe_interval_seconds,
+            "threshold_probes": self.threshold,
+            "refused": self.refused(),
+            "spokes": {aid: self.describe_gate(aid) for aid in sorted(self._gates)},
+        }
+
+
+# ---------------------------------------------------------------------------
 # Source stamps are never invented (one clock, FB-088; D-9 step 1)
 # ---------------------------------------------------------------------------
 
