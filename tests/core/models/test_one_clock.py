@@ -80,7 +80,7 @@ class TestRecordTimestamp:
 
     @pytest.mark.parametrize(
         "field",
-        ["source_time", "server_time", "ingestion_time", "sent_time", "source_time_as_sent"],
+        ["source_time", "server_time", "ingestion_time", "spoke_time", "source_time_as_sent"],
     )
     def test_naive_field_rejected(self, field: str) -> None:
         kwargs = {"source_time": utc_now(), field: NAIVE}
@@ -91,7 +91,7 @@ class TestRecordTimestamp:
         """A view trends against a wire timestamp; the kept spoke stamp is not a basis."""
         assert set(RecordTimestamp.TIME_BASES) == {"source_time", "server_time", "ingestion_time"}
         assert set(RecordTimestamp.TIME_BASES) < set(RecordTimestamp.model_fields)
-        assert "sent_time" not in RecordTimestamp.TIME_BASES
+        assert "spoke_time" not in RecordTimestamp.TIME_BASES
 
     def test_server_time_none_allowed(self) -> None:
         assert RecordTimestamp(source_time=utc_now()).server_time is None

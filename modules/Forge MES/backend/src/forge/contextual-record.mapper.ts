@@ -39,6 +39,9 @@ export interface ContextualRecordMessage {
     source_time: ProtoTimestamp;
     server_time?: ProtoTimestamp;
     ingestion_time: ProtoTimestamp;
+    /** This spoke's own clock when the record was sent (proto field 10, FB-092). The hub
+     *  client stamps it as the record leaves; the hub stamps receipt with its own clock. */
+    spoke_time?: ProtoTimestamp;
     /** Which clock stamped source_time (one-clock record P-3/P-4); "forge" when the
      *  bridge's own clock stood in for an event that carried no time (FB-088). */
     source_clock?: string;

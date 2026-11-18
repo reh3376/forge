@@ -121,7 +121,10 @@ type RecordTimestamp struct {
 	// sampling bound once the stamping clock is measured (FB-094).
 	SourceUncertaintySeconds *float64 `protobuf:"fixed64,8,opt,name=source_uncertainty_seconds,json=sourceUncertaintySeconds,proto3,oneof" json:"source_uncertainty_seconds,omitempty"`
 	// IEC 61850 TimeQuality in Forge's words, set when the stamping clock is measured.
-	TimeQuality   *TimeQuality `protobuf:"bytes,9,opt,name=time_quality,json=timeQuality,proto3" json:"time_quality,omitempty"`
+	TimeQuality *TimeQuality `protobuf:"bytes,9,opt,name=time_quality,json=timeQuality,proto3" json:"time_quality,omitempty"`
+	// The spoke's own clock when it sent the record (FB-092). The hub stamps
+	// ingestion_time with its own clock on receipt and never takes this for arrival.
+	SpokeTime     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=spoke_time,json=spokeTime,proto3" json:"spoke_time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -208,6 +211,13 @@ func (x *RecordTimestamp) GetSourceUncertaintySeconds() float64 {
 func (x *RecordTimestamp) GetTimeQuality() *TimeQuality {
 	if x != nil {
 		return x.TimeQuality
+	}
+	return nil
+}
+
+func (x *RecordTimestamp) GetSpokeTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.SpokeTime
 	}
 	return nil
 }
@@ -761,7 +771,7 @@ const file_forge_v1_contextual_record_proto_rawDesc = "" +
 	"adapter_id\x18\x01 \x01(\tR\tadapterId\x12\x16\n" +
 	"\x06system\x18\x02 \x01(\tR\x06system\x12\x19\n" +
 	"\btag_path\x18\x03 \x01(\tR\atagPath\x12#\n" +
-	"\rconnection_id\x18\x04 \x01(\tR\fconnectionId\"\xab\x04\n" +
+	"\rconnection_id\x18\x04 \x01(\tR\fconnectionId\"\xe6\x04\n" +
 	"\x0fRecordTimestamp\x12;\n" +
 	"\vsource_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"sourceTime\x12;\n" +
@@ -772,7 +782,10 @@ const file_forge_v1_contextual_record_proto_rawDesc = "" +
 	"\fsource_clock\x18\x06 \x01(\tR\vsourceClock\x127\n" +
 	"\x15source_offset_seconds\x18\a \x01(\x01H\x00R\x13sourceOffsetSeconds\x88\x01\x01\x12A\n" +
 	"\x1asource_uncertainty_seconds\x18\b \x01(\x01H\x01R\x18sourceUncertaintySeconds\x88\x01\x01\x128\n" +
-	"\ftime_quality\x18\t \x01(\v2\x15.forge.v1.TimeQualityR\vtimeQualityB\x18\n" +
+	"\ftime_quality\x18\t \x01(\v2\x15.forge.v1.TimeQualityR\vtimeQuality\x129\n" +
+	"\n" +
+	"spoke_time\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\tspokeTimeB\x18\n" +
 	"\x16_source_offset_secondsB\x1d\n" +
 	"\x1b_source_uncertainty_seconds\"\xf4\x01\n" +
 	"\vTimeQuality\x12'\n" +
@@ -865,19 +878,20 @@ var file_forge_v1_contextual_record_proto_depIdxs = []int32{
 	8,  // 2: forge.v1.RecordTimestamp.ingestion_time:type_name -> google.protobuf.Timestamp
 	8,  // 3: forge.v1.RecordTimestamp.source_time_as_sent:type_name -> google.protobuf.Timestamp
 	2,  // 4: forge.v1.RecordTimestamp.time_quality:type_name -> forge.v1.TimeQuality
-	9,  // 5: forge.v1.RecordValue.quality:type_name -> forge.v1.QualityCode
-	8,  // 6: forge.v1.RecordContext.event_timestamp:type_name -> google.protobuf.Timestamp
-	7,  // 7: forge.v1.RecordContext.extra:type_name -> forge.v1.RecordContext.ExtraEntry
-	0,  // 8: forge.v1.ContextualRecord.source:type_name -> forge.v1.RecordSource
-	1,  // 9: forge.v1.ContextualRecord.timestamp:type_name -> forge.v1.RecordTimestamp
-	3,  // 10: forge.v1.ContextualRecord.value:type_name -> forge.v1.RecordValue
-	4,  // 11: forge.v1.ContextualRecord.context:type_name -> forge.v1.RecordContext
-	5,  // 12: forge.v1.ContextualRecord.lineage:type_name -> forge.v1.RecordLineage
-	13, // [13:13] is the sub-list for method output_type
-	13, // [13:13] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	8,  // 5: forge.v1.RecordTimestamp.spoke_time:type_name -> google.protobuf.Timestamp
+	9,  // 6: forge.v1.RecordValue.quality:type_name -> forge.v1.QualityCode
+	8,  // 7: forge.v1.RecordContext.event_timestamp:type_name -> google.protobuf.Timestamp
+	7,  // 8: forge.v1.RecordContext.extra:type_name -> forge.v1.RecordContext.ExtraEntry
+	0,  // 9: forge.v1.ContextualRecord.source:type_name -> forge.v1.RecordSource
+	1,  // 10: forge.v1.ContextualRecord.timestamp:type_name -> forge.v1.RecordTimestamp
+	3,  // 11: forge.v1.ContextualRecord.value:type_name -> forge.v1.RecordValue
+	4,  // 12: forge.v1.ContextualRecord.context:type_name -> forge.v1.RecordContext
+	5,  // 13: forge.v1.ContextualRecord.lineage:type_name -> forge.v1.RecordLineage
+	14, // [14:14] is the sub-list for method output_type
+	14, // [14:14] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_forge_v1_contextual_record_proto_init() }

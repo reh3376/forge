@@ -41,6 +41,7 @@ const (
 type RegisterRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Manifest      *AdapterManifest       `protobuf:"bytes,1,opt,name=manifest,proto3" json:"manifest,omitempty"`
+	SpokeTime     *SpokeTime             `protobuf:"bytes,2,opt,name=spoke_time,json=spokeTime,proto3" json:"spoke_time,omitempty"` // T1 of the time exchange (one clock, FB-092)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -82,11 +83,19 @@ func (x *RegisterRequest) GetManifest() *AdapterManifest {
 	return nil
 }
 
+func (x *RegisterRequest) GetSpokeTime() *SpokeTime {
+	if x != nil {
+		return x.SpokeTime
+	}
+	return nil
+}
+
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Accepted      bool                   `protobuf:"varint,1,opt,name=accepted,proto3" json:"accepted,omitempty"`
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`                      // human-readable status or rejection reason
 	SessionId     string                 `protobuf:"bytes,3,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"` // hub-assigned session ID for this adapter
+	HubTime       *HubTime               `protobuf:"bytes,4,opt,name=hub_time,json=hubTime,proto3" json:"hub_time,omitempty"`       // T2 and T3 of the time exchange (FB-092)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -140,6 +149,13 @@ func (x *RegisterResponse) GetSessionId() string {
 		return x.SessionId
 	}
 	return ""
+}
+
+func (x *RegisterResponse) GetHubTime() *HubTime {
+	if x != nil {
+		return x.HubTime
+	}
+	return nil
 }
 
 type ConfigureRequest struct {
@@ -480,9 +496,12 @@ func (x *StopResponse) GetRecordsFlushed() int64 {
 }
 
 type HealthRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AdapterId     string                 `protobuf:"bytes,1,opt,name=adapter_id,json=adapterId,proto3" json:"adapter_id,omitempty"`
-	SessionId     string                 `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	AdapterId string                 `protobuf:"bytes,1,opt,name=adapter_id,json=adapterId,proto3" json:"adapter_id,omitempty"`
+	SessionId string                 `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	// T1 of this exchange, and the offset and round trip the spoke measured in its last
+	// one: the hub keeps the two-way series of the spoke's clock from it (FB-092).
+	SpokeTime     *SpokeTime `protobuf:"bytes,3,opt,name=spoke_time,json=spokeTime,proto3" json:"spoke_time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -529,6 +548,13 @@ func (x *HealthRequest) GetSessionId() string {
 		return x.SessionId
 	}
 	return ""
+}
+
+func (x *HealthRequest) GetSpokeTime() *SpokeTime {
+	if x != nil {
+		return x.SpokeTime
+	}
+	return nil
 }
 
 type CollectRequest struct {
@@ -768,6 +794,7 @@ type IngestResponse struct {
 	RecordsReceived int64                  `protobuf:"varint,1,opt,name=records_received,json=recordsReceived,proto3" json:"records_received,omitempty"`
 	Success         bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
 	Message         string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	HubTime         *HubTime               `protobuf:"bytes,4,opt,name=hub_time,json=hubTime,proto3" json:"hub_time,omitempty"` // T2 and T3 of the time exchange (FB-092)
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -821,6 +848,13 @@ func (x *IngestResponse) GetMessage() string {
 		return x.Message
 	}
 	return ""
+}
+
+func (x *IngestResponse) GetHubTime() *HubTime {
+	if x != nil {
+		return x.HubTime
+	}
+	return nil
 }
 
 type WriteRequest struct {
@@ -1325,14 +1359,17 @@ var File_forge_v1_adapter_service_proto protoreflect.FileDescriptor
 
 const file_forge_v1_adapter_service_proto_rawDesc = "" +
 	"\n" +
-	"\x1eforge/v1/adapter_service.proto\x12\bforge.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a forge/v1/contextual_record.proto\x1a\x16forge/v1/adapter.proto\"H\n" +
+	"\x1eforge/v1/adapter_service.proto\x12\bforge.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a forge/v1/contextual_record.proto\x1a\x16forge/v1/adapter.proto\"|\n" +
 	"\x0fRegisterRequest\x125\n" +
-	"\bmanifest\x18\x01 \x01(\v2\x19.forge.v1.AdapterManifestR\bmanifest\"g\n" +
+	"\bmanifest\x18\x01 \x01(\v2\x19.forge.v1.AdapterManifestR\bmanifest\x122\n" +
+	"\n" +
+	"spoke_time\x18\x02 \x01(\v2\x13.forge.v1.SpokeTimeR\tspokeTime\"\x95\x01\n" +
 	"\x10RegisterResponse\x12\x1a\n" +
 	"\baccepted\x18\x01 \x01(\bR\baccepted\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x03 \x01(\tR\tsessionId\"\xcb\x01\n" +
+	"session_id\x18\x03 \x01(\tR\tsessionId\x12,\n" +
+	"\bhub_time\x18\x04 \x01(\v2\x11.forge.v1.HubTimeR\ahubTime\"\xcb\x01\n" +
 	"\x10ConfigureRequest\x12\x1d\n" +
 	"\n" +
 	"adapter_id\x18\x01 \x01(\tR\tadapterId\x12\x1d\n" +
@@ -1362,12 +1399,14 @@ const file_forge_v1_adapter_service_proto_rawDesc = "" +
 	"\fStopResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12'\n" +
-	"\x0frecords_flushed\x18\x03 \x01(\x03R\x0erecordsFlushed\"M\n" +
+	"\x0frecords_flushed\x18\x03 \x01(\x03R\x0erecordsFlushed\"\x81\x01\n" +
 	"\rHealthRequest\x12\x1d\n" +
 	"\n" +
 	"adapter_id\x18\x01 \x01(\tR\tadapterId\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x02 \x01(\tR\tsessionId\"t\n" +
+	"session_id\x18\x02 \x01(\tR\tsessionId\x122\n" +
+	"\n" +
+	"spoke_time\x18\x03 \x01(\v2\x13.forge.v1.SpokeTimeR\tspokeTime\"t\n" +
 	"\x0eCollectRequest\x12\x1d\n" +
 	"\n" +
 	"adapter_id\x18\x01 \x01(\tR\tadapterId\x12\x1d\n" +
@@ -1388,11 +1427,12 @@ const file_forge_v1_adapter_service_proto_rawDesc = "" +
 	"\x0fsubscription_id\x18\x03 \x01(\tR\x0esubscriptionId\"I\n" +
 	"\x13UnsubscribeResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"o\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x9d\x01\n" +
 	"\x0eIngestResponse\x12)\n" +
 	"\x10records_received\x18\x01 \x01(\x03R\x0frecordsReceived\x12\x18\n" +
 	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessage\"\xe6\x02\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x12,\n" +
+	"\bhub_time\x18\x04 \x01(\v2\x11.forge.v1.HubTimeR\ahubTime\"\xe6\x02\n" +
 	"\fWriteRequest\x12\x1d\n" +
 	"\n" +
 	"adapter_id\x18\x01 \x01(\tR\tadapterId\x12\x1d\n" +
@@ -1489,48 +1529,54 @@ var file_forge_v1_adapter_service_proto_goTypes = []any{
 	(*TagDescriptor)(nil),         // 19: forge.v1.TagDescriptor
 	nil,                           // 20: forge.v1.ConfigureRequest.ParamsEntry
 	(*AdapterManifest)(nil),       // 21: forge.v1.AdapterManifest
-	(*ContextualRecord)(nil),      // 22: forge.v1.ContextualRecord
-	(*timestamppb.Timestamp)(nil), // 23: google.protobuf.Timestamp
-	(*structpb.Struct)(nil),       // 24: google.protobuf.Struct
-	(*AdapterHealth)(nil),         // 25: forge.v1.AdapterHealth
+	(*SpokeTime)(nil),             // 22: forge.v1.SpokeTime
+	(*HubTime)(nil),               // 23: forge.v1.HubTime
+	(*ContextualRecord)(nil),      // 24: forge.v1.ContextualRecord
+	(*timestamppb.Timestamp)(nil), // 25: google.protobuf.Timestamp
+	(*structpb.Struct)(nil),       // 26: google.protobuf.Struct
+	(*AdapterHealth)(nil),         // 27: forge.v1.AdapterHealth
 }
 var file_forge_v1_adapter_service_proto_depIdxs = []int32{
 	21, // 0: forge.v1.RegisterRequest.manifest:type_name -> forge.v1.AdapterManifest
-	20, // 1: forge.v1.ConfigureRequest.params:type_name -> forge.v1.ConfigureRequest.ParamsEntry
-	22, // 2: forge.v1.WriteResponse.readback:type_name -> forge.v1.ContextualRecord
-	23, // 3: forge.v1.BackfillRequest.start_time:type_name -> google.protobuf.Timestamp
-	23, // 4: forge.v1.BackfillRequest.end_time:type_name -> google.protobuf.Timestamp
-	19, // 5: forge.v1.DiscoverResponse.tags:type_name -> forge.v1.TagDescriptor
-	24, // 6: forge.v1.TagDescriptor.metadata:type_name -> google.protobuf.Struct
-	0,  // 7: forge.v1.AdapterService.Register:input_type -> forge.v1.RegisterRequest
-	2,  // 8: forge.v1.AdapterService.Configure:input_type -> forge.v1.ConfigureRequest
-	4,  // 9: forge.v1.AdapterService.Start:input_type -> forge.v1.StartRequest
-	6,  // 10: forge.v1.AdapterService.Stop:input_type -> forge.v1.StopRequest
-	8,  // 11: forge.v1.AdapterService.Health:input_type -> forge.v1.HealthRequest
-	22, // 12: forge.v1.AdapterService.Ingest:input_type -> forge.v1.ContextualRecord
-	9,  // 13: forge.v1.AdapterService.Collect:input_type -> forge.v1.CollectRequest
-	10, // 14: forge.v1.AdapterService.Subscribe:input_type -> forge.v1.SubscribeRequest
-	11, // 15: forge.v1.AdapterService.Unsubscribe:input_type -> forge.v1.UnsubscribeRequest
-	14, // 16: forge.v1.AdapterService.Write:input_type -> forge.v1.WriteRequest
-	16, // 17: forge.v1.AdapterService.Backfill:input_type -> forge.v1.BackfillRequest
-	17, // 18: forge.v1.AdapterService.Discover:input_type -> forge.v1.DiscoverRequest
-	1,  // 19: forge.v1.AdapterService.Register:output_type -> forge.v1.RegisterResponse
-	3,  // 20: forge.v1.AdapterService.Configure:output_type -> forge.v1.ConfigureResponse
-	5,  // 21: forge.v1.AdapterService.Start:output_type -> forge.v1.StartResponse
-	7,  // 22: forge.v1.AdapterService.Stop:output_type -> forge.v1.StopResponse
-	25, // 23: forge.v1.AdapterService.Health:output_type -> forge.v1.AdapterHealth
-	13, // 24: forge.v1.AdapterService.Ingest:output_type -> forge.v1.IngestResponse
-	22, // 25: forge.v1.AdapterService.Collect:output_type -> forge.v1.ContextualRecord
-	22, // 26: forge.v1.AdapterService.Subscribe:output_type -> forge.v1.ContextualRecord
-	12, // 27: forge.v1.AdapterService.Unsubscribe:output_type -> forge.v1.UnsubscribeResponse
-	15, // 28: forge.v1.AdapterService.Write:output_type -> forge.v1.WriteResponse
-	22, // 29: forge.v1.AdapterService.Backfill:output_type -> forge.v1.ContextualRecord
-	18, // 30: forge.v1.AdapterService.Discover:output_type -> forge.v1.DiscoverResponse
-	19, // [19:31] is the sub-list for method output_type
-	7,  // [7:19] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	22, // 1: forge.v1.RegisterRequest.spoke_time:type_name -> forge.v1.SpokeTime
+	23, // 2: forge.v1.RegisterResponse.hub_time:type_name -> forge.v1.HubTime
+	20, // 3: forge.v1.ConfigureRequest.params:type_name -> forge.v1.ConfigureRequest.ParamsEntry
+	22, // 4: forge.v1.HealthRequest.spoke_time:type_name -> forge.v1.SpokeTime
+	23, // 5: forge.v1.IngestResponse.hub_time:type_name -> forge.v1.HubTime
+	24, // 6: forge.v1.WriteResponse.readback:type_name -> forge.v1.ContextualRecord
+	25, // 7: forge.v1.BackfillRequest.start_time:type_name -> google.protobuf.Timestamp
+	25, // 8: forge.v1.BackfillRequest.end_time:type_name -> google.protobuf.Timestamp
+	19, // 9: forge.v1.DiscoverResponse.tags:type_name -> forge.v1.TagDescriptor
+	26, // 10: forge.v1.TagDescriptor.metadata:type_name -> google.protobuf.Struct
+	0,  // 11: forge.v1.AdapterService.Register:input_type -> forge.v1.RegisterRequest
+	2,  // 12: forge.v1.AdapterService.Configure:input_type -> forge.v1.ConfigureRequest
+	4,  // 13: forge.v1.AdapterService.Start:input_type -> forge.v1.StartRequest
+	6,  // 14: forge.v1.AdapterService.Stop:input_type -> forge.v1.StopRequest
+	8,  // 15: forge.v1.AdapterService.Health:input_type -> forge.v1.HealthRequest
+	24, // 16: forge.v1.AdapterService.Ingest:input_type -> forge.v1.ContextualRecord
+	9,  // 17: forge.v1.AdapterService.Collect:input_type -> forge.v1.CollectRequest
+	10, // 18: forge.v1.AdapterService.Subscribe:input_type -> forge.v1.SubscribeRequest
+	11, // 19: forge.v1.AdapterService.Unsubscribe:input_type -> forge.v1.UnsubscribeRequest
+	14, // 20: forge.v1.AdapterService.Write:input_type -> forge.v1.WriteRequest
+	16, // 21: forge.v1.AdapterService.Backfill:input_type -> forge.v1.BackfillRequest
+	17, // 22: forge.v1.AdapterService.Discover:input_type -> forge.v1.DiscoverRequest
+	1,  // 23: forge.v1.AdapterService.Register:output_type -> forge.v1.RegisterResponse
+	3,  // 24: forge.v1.AdapterService.Configure:output_type -> forge.v1.ConfigureResponse
+	5,  // 25: forge.v1.AdapterService.Start:output_type -> forge.v1.StartResponse
+	7,  // 26: forge.v1.AdapterService.Stop:output_type -> forge.v1.StopResponse
+	27, // 27: forge.v1.AdapterService.Health:output_type -> forge.v1.AdapterHealth
+	13, // 28: forge.v1.AdapterService.Ingest:output_type -> forge.v1.IngestResponse
+	24, // 29: forge.v1.AdapterService.Collect:output_type -> forge.v1.ContextualRecord
+	24, // 30: forge.v1.AdapterService.Subscribe:output_type -> forge.v1.ContextualRecord
+	12, // 31: forge.v1.AdapterService.Unsubscribe:output_type -> forge.v1.UnsubscribeResponse
+	15, // 32: forge.v1.AdapterService.Write:output_type -> forge.v1.WriteResponse
+	24, // 33: forge.v1.AdapterService.Backfill:output_type -> forge.v1.ContextualRecord
+	18, // 34: forge.v1.AdapterService.Discover:output_type -> forge.v1.DiscoverResponse
+	23, // [23:35] is the sub-list for method output_type
+	11, // [11:23] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_forge_v1_adapter_service_proto_init() }

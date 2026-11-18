@@ -21,15 +21,25 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+from forge.core.clock import utc_now
 from forge.core.models.adapter import (
     AdapterHealth,
     AdapterManifest,
     AdapterState,
+    HubTime,
+    SpokeTime,
 )
 from forge.core.models.contextual_record import ContextualRecord
-from forge.transport.serialization import proto_to_pydantic, pydantic_to_proto
+from forge.transport.serialization import (
+    hub_time_to_proto,
+    proto_to_pydantic,
+    pydantic_to_proto,
+)
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +69,19 @@ class AdapterServiceServicer(ABC):
     def __init__(self) -> None:
         self._sessions: dict[str, AdapterSession] = {}
         self._record_queues: dict[str, asyncio.Queue[ContextualRecord]] = {}
+        #: The hub's clock: T2 and T3 of the time exchange are read from it (FB-092).
+        self.clock: Callable[[], datetime] = utc_now
+
+    # ── The time exchange (one clock, FB-092) ─────────────────────────────
+
+    def hub_time(self, received_at: datetime) -> dict[str, Any]:
+        """The hub's half of an exchange as a proto dict: T2 ``received_at``, T3 now.
+
+        The transport calls ``clock()`` when a Register, Health or Ingest request
+        arrives and this when it answers, so the time the hub spent on the request
+        drops out of the spoke's measurement.
+        """
+        return hub_time_to_proto(HubTime(receive_time=received_at, transmit_time=self.clock()))
 
     # ── Session management ────────────────────────────────────────────────
 
@@ -148,8 +171,15 @@ class AdapterServiceServicer(ABC):
         self,
         adapter_id: str,
         session_id: str,
+        *,
+        spoke_time: SpokeTime | None = None,
     ) -> dict[str, Any]:
-        """Return current health status."""
+        """Return current health status.
+
+        ``spoke_time`` is the spoke's half of the time exchange (FB-092): T1 of this
+        call and the offset and round trip it measured in its last one. This base
+        class keeps no clock series; :class:`HubIngestServicer` does.
+        """
         session = self._get_session(adapter_id, session_id)
         health = AdapterHealth(
             adapter_id=adapter_id,

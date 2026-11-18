@@ -41,6 +41,25 @@ export function toTimestamp(date: Date): ProtoTimestamp {
   return { seconds: String(seconds), nanos: (ms - seconds * 1000) * 1_000_000 };
 }
 
+/** Epoch milliseconds (fractions kept) to a Timestamp: for the time exchange (FB-092). */
+export function msToTimestamp(ms: number): ProtoTimestamp {
+  const seconds = Math.floor(ms / 1000);
+  return {
+    seconds: String(seconds),
+    nanos: Math.round((ms - seconds * 1000) * 1_000_000),
+  };
+}
+
+/** A Timestamp to epoch milliseconds, keeping what the nanos carry below a millisecond. */
+export function timestampToMs(
+  ts?: { seconds?: string | number; nanos?: number } | null
+): number | undefined {
+  if (!ts || ts.seconds === undefined) return undefined;
+  const seconds = Number(ts.seconds);
+  if (!Number.isFinite(seconds)) return undefined;
+  return seconds * 1000 + (ts.nanos ?? 0) / 1_000_000;
+}
+
 export function fromTimestamp(
   ts?: { seconds?: string | number; nanos?: number } | null
 ): Date | undefined {

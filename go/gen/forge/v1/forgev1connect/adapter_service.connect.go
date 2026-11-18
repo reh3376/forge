@@ -94,6 +94,9 @@ type AdapterServiceClient interface {
 	// adapter_id and session_id are passed via gRPC metadata headers:
 	//
 	//	x-forge-adapter-id, x-forge-session-id
+	//
+	// T1 of the time exchange (FB-092) travels the same way, since the request is a
+	// stream of records: x-forge-spoke-transmit-time, an RFC 3339 UTC timestamp.
 	Ingest(context.Context) *connect.ClientStreamForClient[v1.ContextualRecord, v1.IngestResponse]
 	// Hub requests records from spoke (pull model). Server-streaming.
 	Collect(context.Context, *connect.Request[v1.CollectRequest]) (*connect.ServerStreamForClient[v1.ContextualRecord], error)
@@ -289,6 +292,9 @@ type AdapterServiceHandler interface {
 	// adapter_id and session_id are passed via gRPC metadata headers:
 	//
 	//	x-forge-adapter-id, x-forge-session-id
+	//
+	// T1 of the time exchange (FB-092) travels the same way, since the request is a
+	// stream of records: x-forge-spoke-transmit-time, an RFC 3339 UTC timestamp.
 	Ingest(context.Context, *connect.ClientStream[v1.ContextualRecord]) (*connect.Response[v1.IngestResponse], error)
 	// Hub requests records from spoke (pull model). Server-streaming.
 	Collect(context.Context, *connect.Request[v1.CollectRequest], *connect.ServerStream[v1.ContextualRecord]) error

@@ -37,6 +37,8 @@ from forge.core.models.adapter import (
     ConnectionParam,
     ConnectionTimeGovernance,
     DataContract,
+    HubTime,
+    SpokeTime,
     TimeGovernance,
 )
 from forge.core.models.contextual_record import (
@@ -225,6 +227,9 @@ def record_timestamp_to_proto(ts: RecordTimestamp) -> record_msg.RecordTimestamp
             flag = getattr(quality, name)
             if flag is not None:
                 setattr(proto_ts.time_quality, name, flag)
+    spoke_ts = _dt_to_timestamp(ts.spoke_time)
+    if spoke_ts is not None:
+        proto_ts.spoke_time.CopyFrom(spoke_ts)
     return proto_ts
 
 
@@ -409,7 +414,64 @@ def health_to_proto(health: AdapterHealth) -> adapter_msg.AdapterHealth:
     last_healthy = _dt_to_timestamp(health.last_healthy)
     if last_healthy is not None:
         proto_health.last_healthy.CopyFrom(last_healthy)
+    if health.hub_time is not None:
+        proto_health.hub_time.CopyFrom(hub_time_to_proto(health.hub_time))
     return proto_health
+
+
+# ---------------------------------------------------------------------------
+# The hub <-> spoke time exchange (one clock, FB-092)
+# ---------------------------------------------------------------------------
+
+
+def spoke_time_to_proto(spoke_time: SpokeTime) -> adapter_msg.SpokeTime:
+    """The spoke's half of the exchange: T1 and its last measured offset and round trip."""
+    msg = adapter_msg.SpokeTime()
+    transmit = _dt_to_timestamp(spoke_time.transmit_time)
+    if transmit is not None:
+        msg.transmit_time.CopyFrom(transmit)
+    if spoke_time.offset_seconds is not None:
+        msg.offset_seconds = spoke_time.offset_seconds
+    if spoke_time.round_trip_seconds is not None:
+        msg.round_trip_seconds = spoke_time.round_trip_seconds
+    measured = _dt_to_timestamp(spoke_time.measured_at)
+    if measured is not None:
+        msg.measured_at.CopyFrom(measured)
+    return msg
+
+
+def proto_to_spoke_time(msg: adapter_msg.SpokeTime) -> SpokeTime | None:
+    """A request's ``spoke_time``, or None when the spoke sent no T1 (before FB-092)."""
+    if not msg.HasField("transmit_time"):
+        return None
+    return SpokeTime(
+        transmit_time=_timestamp_to_dt(msg.transmit_time),
+        offset_seconds=msg.offset_seconds if msg.HasField("offset_seconds") else None,
+        round_trip_seconds=(msg.round_trip_seconds if msg.HasField("round_trip_seconds") else None),
+        measured_at=_timestamp_to_dt(msg.measured_at) if msg.HasField("measured_at") else None,
+    )
+
+
+def hub_time_to_proto(hub_time: HubTime) -> adapter_msg.HubTime:
+    """The hub's half of the exchange: T2 (receive) and T3 (transmit)."""
+    msg = adapter_msg.HubTime()
+    receive = _dt_to_timestamp(hub_time.receive_time)
+    transmit = _dt_to_timestamp(hub_time.transmit_time)
+    if receive is not None:
+        msg.receive_time.CopyFrom(receive)
+    if transmit is not None:
+        msg.transmit_time.CopyFrom(transmit)
+    return msg
+
+
+def proto_to_hub_time(msg: adapter_msg.HubTime) -> HubTime | None:
+    """A response's ``hub_time``, or None when the hub sent none (a hub before FB-092)."""
+    if not msg.HasField("receive_time") or not msg.HasField("transmit_time"):
+        return None
+    return HubTime(
+        receive_time=_timestamp_to_dt(msg.receive_time),
+        transmit_time=_timestamp_to_dt(msg.transmit_time),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -431,8 +493,9 @@ def proto_to_record_timestamp(msg: record_msg.RecordTimestamp) -> RecordTimestam
     """Convert proto RecordTimestamp to Pydantic RecordTimestamp.
 
     ``ingestion_time`` is left unset when the spoke sent none: the hub stamps it
-    on receipt (FB-087) and only a stamp the spoke actually sent becomes
-    ``sent_time``. ``sent_time`` itself is hub-local and never on the wire.
+    on receipt (FB-087). The spoke's own send time is ``spoke_time`` (field 10,
+    FB-092); a stamp an older spoke put in ``ingestion_time`` is moved there on
+    receipt.
     """
     kwargs: dict[str, Any] = {
         "source_time": _timestamp_to_dt(msg.source_time),
@@ -461,6 +524,8 @@ def proto_to_record_timestamp(msg: record_msg.RecordTimestamp) -> RecordTimestam
             ),
             accuracy_class=quality.accuracy_class or "unspecified",
         )
+    if msg.HasField("spoke_time"):
+        kwargs["spoke_time"] = _timestamp_to_dt(msg.spoke_time)
     return RecordTimestamp(**kwargs)
 
 
@@ -593,4 +658,5 @@ def proto_to_health(msg: adapter_msg.AdapterHealth) -> AdapterHealth:
         records_collected=msg.records_collected,
         records_failed=msg.records_failed,
         uptime_seconds=msg.uptime_seconds,
+        hub_time=proto_to_hub_time(msg.hub_time) if msg.HasField("hub_time") else None,
     )

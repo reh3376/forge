@@ -22,16 +22,23 @@ def test_unset_ingestion_time_is_left_to_the_hub() -> None:
     ts = proto_to_record_timestamp(msg)
     assert ts.source_time == SOURCE
     assert "ingestion_time" not in ts.model_fields_set
-    assert ts.sent_time is None
+    assert ts.spoke_time is None
 
 
-def test_a_sent_stamp_arrives_as_ingestion_time_and_sent_time_stays_off_the_wire() -> None:
-    ts = RecordTimestamp(source_time=SOURCE, ingestion_time=SPOKE, sent_time=KEPT)
+def test_the_spoke_s_send_time_crosses_the_wire_as_spoke_time() -> None:
+    """spoke_time is proto field 10 since FB-092; before, it was hub-local as sent_time."""
+    ts = RecordTimestamp(source_time=SOURCE, ingestion_time=SPOKE, spoke_time=KEPT)
     msg = record_timestamp_to_proto(ts)
+    assert msg.HasField("spoke_time")
     back = proto_to_record_timestamp(msg)
     assert back.ingestion_time == SPOKE
     assert "ingestion_time" in back.model_fields_set
-    assert back.sent_time is None  # hub-local: the pipeline sets it on receipt
+    assert back.spoke_time == KEPT
+
+    # a spoke that sends none leaves the field absent, not zero
+    plain = record_timestamp_to_proto(RecordTimestamp(source_time=SOURCE))
+    assert not plain.HasField("spoke_time")
+    assert proto_to_record_timestamp(plain).spoke_time is None
 
 
 def test_the_one_clock_fields_cross_the_wire_and_absence_stays_absent() -> None:

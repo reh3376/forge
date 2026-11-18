@@ -13,7 +13,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
-from forge.core.clock import ClockOffsetStats
+from forge.core.clock import ClockOffsetStats, OneClockModel
 from forge.core.schema_ref import require_versioned_ref
 
 
@@ -133,6 +133,28 @@ class TimeGovernance(BaseModel):
         return self.tolerance_class
 
 
+class SpokeTime(OneClockModel):
+    """What a spoke sends with a request in the time exchange (one-clock record P-9, FB-092).
+
+    ``transmit_time`` is T1, the spoke's clock when it sent the request. The other
+    fields report the spoke's last completed exchange, so the hub keeps the two-way
+    series of the spoke's clock: ``offset_seconds`` is hub clock minus spoke clock,
+    ``round_trip_seconds`` the round trip, ``measured_at`` its T4. Proto ``SpokeTime``.
+    """
+
+    transmit_time: datetime
+    offset_seconds: float | None = None
+    round_trip_seconds: float | None = None
+    measured_at: datetime | None = None
+
+
+class HubTime(OneClockModel):
+    """What the hub answers with: T2, when the request arrived, and T3, when it replied."""
+
+    receive_time: datetime
+    transmit_time: datetime
+
+
 class AdapterManifest(BaseModel):
     """Declares an adapter's identity, capabilities, and data contract.
 
@@ -178,8 +200,8 @@ class AdapterHealth(BaseModel):
         default_factory=dict,
         description=(
             "Measured clock offsets of this adapter per link (spoke, server, source) as the "
-            "hub sees them (FB-089). Hub-side only: not on the wire until FB-092 puts time "
-            "in the contract."
+            "hub sees them (FB-089). The spoke link is two-way once the spoke reports the "
+            "time exchange (FB-092). Hub-side: the statistics themselves are not on the wire."
         ),
     )
     refusals: dict[str, int] = Field(
@@ -190,6 +212,13 @@ class AdapterHealth(BaseModel):
             "does not declare origin forge, FB-088); the clock refusals of FB-093 join it. "
             "Hub-side only until the health contract carries it (FB-092); on the wire, "
             "error_message names the last refusal."
+        ),
+    )
+    hub_time: HubTime | None = Field(
+        default=None,
+        description=(
+            "The hub's half of the time exchange (T2, T3), set on the response to Health "
+            "(FB-092). Proto field 9."
         ),
     )
     last_refusal: str | None = Field(
