@@ -42,7 +42,6 @@ from forge.governance.shared.runner import (
     FxTSVerdict,
     SpecViolation,
     VerdictStatus,
-    verify_spec_hash,
 )
 
 if TYPE_CHECKING:
@@ -334,46 +333,8 @@ class FVTSRunner(FxTSRunner):
     # ------------------------------------------------------------------
 
     def _check_integrity(self, spec: dict[str, Any]) -> list[FxTSVerdict]:
-        integrity = spec.get("integrity")
-        if integrity is None:
-            missing = SpecViolation(
-                field="integrity",
-                message="no integrity block; every FVTS spec carries an FHTS hash",
-            )
-            return [
-                self._verdict("hash-verified", "integrity/spec_hash", [missing], ""),
-                self._verdict("hash-approved", "integrity/hash_state", [missing], ""),
-            ]
-        verified, hash_message = verify_spec_hash(spec)
-        hash_violations = []
-        if verified is not True:
-            hash_violations.append(SpecViolation(field="integrity.spec_hash", message=hash_message))
-        state = integrity.get("hash_state", "unknown")
-        approved_by = integrity.get("approved_by") or ""
-        state_violations = []
-        if state != "approved" or not approved_by:
-            state_violations.append(
-                SpecViolation(
-                    field="integrity.hash_state",
-                    expected="approved (with approved_by)",
-                    actual=f"{state} / approved_by={approved_by!r}",
-                    message=(
-                        f"hash_state is '{state}' (approved_by={approved_by!r}); the contract is "
-                        "not binding until the owner approves it"
-                    ),
-                    severity="warning",
-                )
-            )
-        return [
-            self._verdict("hash-verified", "integrity/spec_hash", hash_violations, hash_message),
-            self._verdict(
-                "hash-approved",
-                "integrity/hash_state",
-                state_violations,
-                f"hash_state is 'approved' by {approved_by}.",
-                evidence={"hash_state": state, "approved_by": approved_by},
-            ),
-        ]
+        """The two hash verdicts, from the shared runner (D-14, F-4), at this place."""
+        return self.integrity_verdicts(spec)
 
     # ------------------------------------------------------------------
     # fvts:enum-parity — schema $defs mirror the Python models

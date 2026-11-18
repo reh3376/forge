@@ -4,7 +4,11 @@
   "method": "GET",
   "authentication": {
     "required": false,
-    "schemes": ["bearer", "api_key", "none"]
+    "schemes": [
+      "bearer",
+      "api_key",
+      "none"
+    ]
   },
   "request": {},
   "response": {
@@ -17,5 +21,12 @@
   "rate_limit": {
     "requests_per_minute": 60,
     "burst": 10
+  },
+  "integrity": {
+    "hash_state": "pending_review",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "29244a79a1abe50c721a31fce01f9edf9eed6ab38577caa6c4b9c7fe84adb4f5"
   }
 }

@@ -87,7 +87,8 @@ class TestIdentityAndIntegrity:
         assert (await check(spec, "fvts:hash-verified")).status is PASS
         approved = await check(spec, "fvts:hash-approved")
         assert approved.status is FAIL and "pending_review" in approved.message
-        assert approved.violations[0].severity == "warning"
+        # an unapproved hash is a failure in every framework since D-14 (F-4), not a warning
+        assert approved.violations[0].severity == "error"
 
     async def test_tampered_content_fails_hash_verified(self, check, spec) -> None:
         spec["scope"]["multi_site"] = True

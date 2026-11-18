@@ -262,12 +262,17 @@ def test_run_facts_by_adapter_id_and_by_file(root: Path) -> None:
 
 
 def test_run_facts_reports_a_pending_stamp_as_the_one_failed_check(root: Path) -> None:
-    """A stamp the owner has not approved fails the hash-state check alone, exit 1 (FB-021)."""
+    """A stamp the owner has not approved fails the approval checks alone, exit 1 (FB-021).
+
+    Two verdicts say so: FACTS's own ``integrity-hash-state`` and the one every framework
+    gives since D-14, ``hash-approved`` (FB-159).
+    """
     path = root / "facts" / "specs" / "forge-nms.facts.json"
     code, out = run("run", "facts", str(path))
     assert code == 1
     assert "[FAIL] FACTS — forge-nms" in out and "Failed checks:" in out
-    assert out.count("[FAIL] facts:") == 1 and "facts:integrity-hash-state" in out
+    assert out.count("[FAIL] facts:") == 2
+    assert "facts:integrity-hash-state" in out and "facts:hash-approved" in out
     assert "pending_review" in out and "requires approval" in out
 
 
@@ -294,15 +299,21 @@ def test_run_fvts_reference_only_waits_on_the_owner(tmp_path: Path) -> None:
 
 
 def test_run_ftts_and_fats_load_their_specs() -> None:
+    # The FTTS spec is hashed since FB-160 and awaits the owner's approval (FB-161), so
+    # the one check that fails is the approval; everything else passes.
     code, out = run("run", "ftts", "grpc-hardened-transport")
-    assert code == 0, out
-    assert "[PASS] FTTS — grpc-hardened-transport" in out
+    assert code == 1, out
+    assert "FTTS — grpc-hardened-transport: 39/40 checks passed" in out
+    assert out.count("[FAIL] ftts:") == 1 and "[FAIL] ftts:hash-approved" in out
 
     code, out = run("run", "fats", "/v1/health", "--format", "json")
     report = json.loads(out)
     assert report["framework"] == "FATS" and report["target"] == "/v1/health"
     assert report["metadata"]["spec_file"].endswith("v1_health.json")
     assert not [v for v in report["verdicts"] if v["check_id"] == "fats:spec-load"]
+    by_id = {v["check_id"]: v["status"] for v in report["verdicts"]}
+    assert by_id["fats:hash-verified"] == "PASS"  # every FATS spec carries a hash (FB-160)
+    assert by_id["fats:hash-approved"] == "FAIL"  # until the owner approves FATS (FB-161)
 
 
 def test_run_rejects_unknown_frameworks_targets_and_formats(tmp_path: Path) -> None:

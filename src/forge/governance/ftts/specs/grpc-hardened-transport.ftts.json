@@ -404,11 +404,9 @@
 
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": null,
+    "spec_hash": "9e4b1e20257c5c52145e9ae11f1aca303a227e6884710531de55c75fc6bd6cfd",
     "hash_state": "pending_review",
     "previous_hash": null,
-    "approved_by": null,
-    "approved_at": null,
     "change_history": []
   },
 

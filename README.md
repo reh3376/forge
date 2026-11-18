@@ -51,7 +51,7 @@ Each spoke wraps one production system and produces ContextualRecords that confo
 
 | Component | Technology |
 |-----------|-----------|
-| Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,756 tests) |
+| Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,790 tests) |
 | Management and integration modules (`go/`) | Go 1.26 · `go build`, `go vet`, `go test` in CI; module SDK scaffold (the Go forge-mes is FB-076) |
 | Interim MES bridge (`modules/Forge MES`) | The migrated whk-mes application, NestJS 10 + Next.js 14, kept running only until the Go forge-mes module (FB-076) replaces it |
 | User interfaces | forge-display renders every surface from FVTS specs (not built yet; the FVTS runner and reference renderer exist) |
@@ -239,7 +239,7 @@ First-party modules that ship with both a backend and a frontend live under the 
 
 ## Governance: FxTS (Forge Test Specifications)
 
-FxTS is **spec-first governance** — the specs define what must exist and the code conforms to the specs, not the other way around. This is not a testing framework; it's a compliance framework. Every spec is hashed and approved only by the owner.
+FxTS is **spec-first governance** — the specs define what must exist and the code conforms to the specs, not the other way around. This is not a testing framework; it's a compliance framework. Every spec carries a hash, and a run fails when the hash does not verify or the owner has not approved it. What every framework must provide is `docs/decisions/fxts-framework-baseline.md`.
 
 | Framework | Governs | State |
 |-----------|---------|-------|
@@ -249,8 +249,7 @@ FxTS is **spec-first governance** — the specs define what must exist and the c
 | **FVTS** | Module ↔ display contract: points, alarms, actions, surfaces, profiles | schema, runner, reference renderer, 1 spec |
 | **FMTS** | Module requirements: the eleven-item baseline, the time contract, waivers (`docs/decisions/forge-module-requirements.md`) | schema, runner, conformance kit, 9 specs (8 approved) |
 | **FHTS** | Hash integrity and owner approval of every spec above | hashing in the shared runner; `forge governance specs / stamp / approve` |
-| FQTS · FSTS | Data quality · security controls | stubs |
-| FDTS · FLTS · FNTS · FOTS · FPTS | Schema evolution · lineage · normalization · observability · performance | planned |
+| FQTS · FSTS · FDTS · FLTS · FNTS · FOTS · FPTS | Data quality · security controls · schema evolution · lineage · normalization · observability · performance | planned |
 
 ### FACTS Specs (9 spokes)
 
@@ -366,14 +365,14 @@ uv sync --locked --extra dev --extra ot && uv run pytest   # then commit uv.lock
 ### Test Coverage
 
 ```
-Total:  4,756 tests collected (full suite green on 2026-11-18)
-        275 test files
-        362 source files
+Total:  4,790 tests collected (full suite green on 2026-11-18)
+        276 test files
+        354 source files
 
 By area:
   OT module:                       1,162  (alarming, bridge, control, mqtt, tag_engine, opcua)
   Spokes (adapters):               1,011
-  Governance (FxTS):                 751  (FATS, FACTS, FTTS, FVTS, FMTS runners and schemas)
+  Governance (FxTS):                 785  (FATS, FACTS, FTTS, FVTS, FMTS runners and schemas)
   Scripting SDK, module builder:     356
   Core models, registry, context:    547
   Storage:                           317
@@ -431,4 +430,4 @@ The published tutorial is at https://reh3376.github.io/forge/. The `Deploy Tutor
 
 ---
 
-*362 Python source files | 275 test files | 4,756 tests | 9 FACTS · 28 FATS · 9 FMTS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
+*354 Python source files | 276 test files | 4,790 tests | 9 FACTS · 28 FATS · 9 FMTS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*

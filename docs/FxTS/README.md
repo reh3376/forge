@@ -166,10 +166,10 @@ Every FxTS framework follows the same structure:
 | [FATS](FATS.md) | Forge API Test Specification | API contract verification | Hard-fail | Schema + Runner implemented |
 | [FACTS](FACTS.md) | Forge Adapter Conformance Test Specification | Adapter lifecycle and data contracts | Hard-fail | Schema + runner (`facts:schema-valid` + 35 rule checks, enums read from the schema) + 9 specs; 8 validate, the OT spec waits on FB-079 |
 | [FDTS](FDTS.md) | Forge Data Test Specification | Schema evolution and compatibility | Hard-fail | Planned |
-| [FQTS](FQTS.md) | Forge Quality Test Specification | Data quality rules | Hard-fail | Stub |
+| [FQTS](FQTS.md) | Forge Quality Test Specification | Data quality rules | Hard-fail | Planned |
 | [FLTS](FLTS.md) | Forge Lineage Test Specification | Lineage chain integrity | Soft-fail | Planned |
 | [FNTS](FNTS.md) | Forge Normalization Test Specification | Unit and definition consistency | Soft-fail | Planned |
-| [FSTS](FSTS.md) | Forge Security Test Specification | Security controls and PII handling | Hard-fail | Stub |
+| [FSTS](FSTS.md) | Forge Security Test Specification | Security controls and PII handling | Hard-fail | Planned |
 | [FOTS](FOTS.md) | Forge Observability Test Specification | Pipeline health and SLOs | Soft-fail | Planned |
 | [FPTS](FPTS.md) | Forge Performance Test Specification | Throughput and latency benchmarks | Soft-fail | Planned |
 | [FHTS](FHTS.md) | Forge Hash Test Specification | Cross-cutting hash integrity and AI agent governance | Hard-fail | Implemented |
@@ -204,8 +204,18 @@ src/forge/governance/
 │   ├── schema/                    # (FHTS uses registry, not traditional schema)
 │   ├── specs/fhts-registry.json   # Cross-cutting hash registry
 │   └── runners/fhts_runner.py
-├── fqts/ ... fsts/ ... (same structure per framework)
+└── (FMTS, FVTS and FTTS have the same structure; a planned framework has no directory)
 ```
+
+## What every framework provides
+
+Signed by the owner on 2026-11-18: [`docs/decisions/fxts-framework-baseline.md`](../decisions/fxts-framework-baseline.md) (D-14), ten requirements, F-1 to F-10. A framework is either **planned** (a documentation page that says so; no code, no specs) or it meets the whole baseline. In force today:
+
+- **Every spec carries a hash** (F-4). The 28 FATS specs and the FTTS spec were stamped on 2026-11-18; they await the owner's approval (FB-161).
+- **Every run gives two verdicts for it**, in every framework, from the shared runner: `<framework>:hash-verified` fails when the spec's content does not match its recorded hash, `<framework>:hash-approved` when the owner has not approved it. A spec with no hash fails both.
+- **Every spec lives in its framework's `specs/` directory** and is listed by `forge governance specs` (F-5). There is no other place for a spec.
+
+Not built yet: the test that walks the frameworks against the ten (FB-149 with FB-152), and schema versions with hashes (FB-151).
 
 ## Writing a New Spec
 

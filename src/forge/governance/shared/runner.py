@@ -645,6 +645,75 @@ class FxTSRunner(abc.ABC):
         schema but is not in this set, the run will HARD FAIL.
         """
 
+    def integrity_verdicts(self, spec: dict[str, Any]) -> list[FxTSVerdict]:
+        """The two verdicts every framework gives for a spec's hash (D-14, F-4).
+
+        ``<fw>:hash-verified`` fails when the spec's content does not match its recorded
+        hash; ``<fw>:hash-approved`` fails when the hash is not approved by the owner.
+        A spec with no integrity block fails both: a spec that can change without
+        anyone's approval is not a governed spec. One implementation for all
+        frameworks; a runner that wants them at a fixed place in its report calls
+        this itself, and ``run`` adds them for any runner that did not.
+        """
+        prefix = self.framework.lower()
+        ref = self.framework
+
+        def verdict(
+            check: str,
+            spec_ref: str,
+            failure: SpecViolation | None,
+            ok: str,
+            evidence: dict[str, Any] | None = None,
+        ) -> FxTSVerdict:
+            return FxTSVerdict(
+                check_id=f"{prefix}:{check}",
+                spec_ref=f"{ref}/{spec_ref}",
+                status=VerdictStatus.FAIL if failure else VerdictStatus.PASS,
+                message=f"1 violation(s): {failure.message}" if failure else ok,
+                violations=[failure] if failure else [],
+                evidence=evidence or {},
+            )
+
+        integrity = spec.get("integrity")
+        if not isinstance(integrity, dict):
+            missing = SpecViolation(
+                field="integrity",
+                message=f"no integrity block; every {ref} spec carries an FHTS hash",
+            )
+            return [
+                verdict("hash-verified", "integrity/spec_hash", missing, ""),
+                verdict("hash-approved", "integrity/hash_state", missing, ""),
+            ]
+        verified, hash_message = verify_spec_hash(spec)
+        mismatch = (
+            None
+            if verified is True
+            else SpecViolation(field="integrity.spec_hash", message=hash_message)
+        )
+        state = integrity.get("hash_state", "unknown")
+        approved_by = integrity.get("approved_by") or ""
+        unapproved = None
+        if state != "approved" or not approved_by:
+            unapproved = SpecViolation(
+                field="integrity.hash_state",
+                expected="approved (with approved_by)",
+                actual=f"{state} / approved_by={approved_by!r}",
+                message=(
+                    f"hash_state is '{state}' (approved_by={approved_by!r}); the spec is "
+                    "not binding until the owner approves it"
+                ),
+            )
+        return [
+            verdict("hash-verified", "integrity/spec_hash", mismatch, hash_message),
+            verdict(
+                "hash-approved",
+                "integrity/hash_state",
+                unapproved,
+                f"hash_state is 'approved' by {approved_by}.",
+                {"hash_state": state, "approved_by": approved_by},
+            ),
+        ]
+
     async def run(self, target: str, **kwargs: Any) -> FxTSReport:
         """Execute the full runner pipeline.
 
@@ -716,6 +785,12 @@ class FxTSRunner(abc.ABC):
         # Framework-specific checks (always execute, regardless of hash result)
         verdicts = await self._run_checks(target, **kwargs)
         report.verdicts.extend(verdicts)
+
+        # Every framework fails a spec whose hash does not verify or is not approved
+        # (D-14, F-4). A runner that placed the two verdicts itself is left as it is.
+        placed = {v.check_id for v in report.verdicts}
+        if spec is not None and f"{self.framework.lower()}:hash-verified" not in placed:
+            report.verdicts.extend(self.integrity_verdicts(spec))
 
         report.finished_at = datetime.now(UTC)
         return report
