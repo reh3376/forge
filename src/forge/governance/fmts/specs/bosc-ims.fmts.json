@@ -1,0 +1,82 @@
+{
+  "spec_version": "0.1.0",
+  "module_identity": {
+    "module_id": "bosc-ims",
+    "name": "BOSC Inventory Management System Adapter",
+    "version": "0.1.0",
+    "kind": "integration",
+    "language": "python",
+    "source_paths": [
+      "src/forge/adapters/bosc_ims"
+    ]
+  },
+  "hub_link": {
+    "protocol": "grpc",
+    "service": "forge.v1.AdapterService"
+  },
+  "references": {
+    "facts": {
+      "path": "src/forge/governance/facts/specs/bosc-ims.facts.json",
+      "adapter_id": "bosc-ims"
+    },
+    "manifest": "src/forge/adapters/bosc_ims/manifest.json"
+  },
+  "baseline": {
+    "M-1": "met",
+    "M-2": "met",
+    "M-3": "met",
+    "M-4": "met",
+    "M-5": "met",
+    "M-6": "met",
+    "M-7": "met",
+    "M-8": "met",
+    "M-9": "met",
+    "M-10": "waived",
+    "M-11": "met"
+  },
+  "waivers": [
+    {
+      "requirement": "M-10",
+      "reason": "No module ships a roles file yet: the roles file has no FxTS spec to be written against, and the hub still uses its own flat roles.",
+      "backlog_item": "FB-141"
+    }
+  ],
+  "time_contract": {
+    "hub": {
+      "exchange": "four-timestamp",
+      "fail_closed": true
+    },
+    "plant_floor_devices": "none",
+    "databases": [],
+    "third_party_systems": [
+      {
+        "name": "bosc-ims",
+        "interface": "grpc",
+        "clock_read_method": "message-timestamp",
+        "tolerance_class": "edge-mqtt",
+        "clock_probe_interval_seconds": 30,
+        "offset_reported": true,
+        "fail_closed": true
+      }
+    ]
+  },
+  "user_interface": {
+    "ships_ui_code": false,
+    "screens": false
+  },
+  "scaffold": {
+    "template": "python-adapter"
+  },
+  "metadata": {
+    "hosting": "hub-hosted Python adapter",
+    "time_contract_state": "Nothing reads this system's clock yet: the entry is the contract the module is to be built to (FB-139). M-4 to M-7 are unverified until the conformance kit exists (FB-137).",
+    "note": "FMTS has no clock-read method for a gRPC server; `message-timestamp` in the one-way class is a proposal (FB-139)."
+  },
+  "integrity": {
+    "hash_state": "pending_review",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "1bfa45842ace9364242e3ca2f33acd6235c2df8ca026ac8cd48bed18df126fa9"
+  }
+}

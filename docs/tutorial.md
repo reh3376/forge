@@ -180,14 +180,14 @@ From `docs/WHERE-WE-ARE.md` §1, the snapshot at PR 95:
 1. The **hub ↔ spoke contract works end to end**: a spoke registers, is checked against its FACTS spec, pushes records that are persisted, is pulled (Collect, Backfill, Subscribe) and receives write-backs, over TLS/mTLS both ways with per-spoke tokens.
 2. The **OT module runs inside the hub** with OPC-UA connections, a tag engine, the full control-write defense chain (the ISA-18.2 alarm package exists but the host does not compose it yet, FB-115), and drives the MES changeover sequence including the PLC CIP runner. Since the one-clock steps of 2026-11-13 no record builder invents a source time, the OPC-UA server's clock is read and every stamp corrected by its measured offset, and every spoke declares how it is time-governed in its FACTS contract (FB-088, FB-094, FB-090).
 3. **forge-mes is Go and not yet built**: the imported NestJS backend and Next.js frontend stand in as the interim bridge and speak the spoke contract; the Go rewrite (FB-076) is decided and designed (`docs/decisions/forge-mes-go.md`, signed 2026-11-03); the Go SDK scaffold is its first step.
-4. **Governance is real for five frameworks** (FATS, FACTS, FTTS, FVTS, and FMTS since 2026-11-17, though no module has an FMTS spec yet) plus FHTS hashing; the other seven are stubs or planned. forge-display does not exist yet, and it is the first module to be built (owner, 2026-11-17: it builds the frontend of the whole platform, the hub's UI included); its contract (FVTS) does, with a runner and golden messages.
+4. **Governance is real for five frameworks** (FATS, FACTS, FTTS, FVTS, and FMTS since 2026-11-17, with a spec for each of the nine modules since 2026-11-18, awaiting the owner's approval) plus FHTS hashing; the other seven are stubs or planned. forge-display does not exist yet, and it is the first module to be built (owner, 2026-11-17: it builds the frontend of the whole platform, the hub's UI included); its contract (FVTS) does, with a runner and golden messages.
 5. **Not yet**: scoped roles in the gateway, `mod_mes` in the hub, the Go module SDK, the hub-of-hubs federation, Kubernetes, and any management module in Go.
 6. **The three-layer process control framework** (PC-L1 PID in the PLC, PC-L2 MPC, PC-L3 SME agents) is decided and signed by the owner (D-11, 2026-11-13); nothing of it is built, and nothing is built before its FSDs (F5).
 
 | Measure | Value (2026-11-13) |
 |---|---|
 | Python hub (`src/forge`) | 360 files, ~73,400 lines |
-| Python tests | 273 files, 4,712 collected, full suite green on the locked dependency set |
+| Python tests | 274 files, 4,733 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend, kept until the Go forge-mes and forge-display land |
 | Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
@@ -401,7 +401,7 @@ note:
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.1 |
 | Go transport parity tests | FB-055 |
 | The hub's REST ingest (`POST /v1/records`) carries no time exchange and is to be retired: every module speaks to the hub over gRPC | FB-123 |
-| The baseline every module must meet is decided and signed (D-12, 2026-11-17) and its framework, FMTS, exists (FB-135); no module has an FMTS spec yet, and four of the eleven requirements are not checked until the conformance kit exists | FB-136 to FB-140 |
+| Every module has an FMTS spec since 2026-11-18, awaiting the owner's approval; four of the eleven requirements are not checked until the conformance kit exists; no module ships a roles file; the OT module's manifests disagree with its FACTS spec; the interim MES bridge's time-source requirement is waived | FB-136, FB-137, FB-141, FB-144, FB-145 |
 | The time fields stored at rest (only `source_time` is; the rest travel on the record) | FB-108 |
 | Generic adapters (csv_file, mqtt_sparkplug, opcua, rest_generic) | package stubs only |
 
@@ -694,7 +694,7 @@ forge governance approve <spec.json> --by reh3376   # the owner, on their own wo
 ```
 
 - `run` covers FATS, FACTS, FVTS, FTTS and FMTS (FB-021, FB-083, FB-135), and lists every check it skipped: a waived or unverified requirement is never shown as passed.
-- FMTS is the module requirements framework (`docs/FxTS/FMTS.md`, D-12): one spec per module with the eleven-item baseline, the time contract and any waivers the owner approved.
+- FMTS is the module requirements framework (`docs/FxTS/FMTS.md`, D-12): one spec per module with the eleven-item baseline, the time contract and any waivers the owner approved. Nine module specs exist; a gate test runs them all and names every failure it allows. The two time-keeping requirements can be waived only with admin privileges: the waiver counts once the owner has approved the spec.
 - The hub test suite holds FATS in both directions: every served route has a spec, every spec names a served route.
 - The FVTS runner has a render-profile baseline and golden messages; a module can only tighten the baseline, never loosen it.
 
@@ -1544,7 +1544,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q                         # 4,712 tests, ~1 minute
+uv run pytest tests -q                         # 4,733 tests, ~1 minute
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -1648,7 +1648,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 273 files, 4,712 collected; the full suite runs in about a minute on the locked dependency set.
+- `tests/` mirrors `src/`: 274 files, 4,733 collected; the full suite runs in about a minute on the locked dependency set.
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -2397,7 +2397,7 @@ note:
 
 | Not yet | When |
 |---|---|
-| The list of what every module must do, time-keeping first: decided and signed on 2026-11-17 and the checker exists; no connected system has been checked against it yet | planned (FB-136 to FB-140) |
+| The list of what every module must do, time-keeping first: decided and signed on 2026-11-17; since 2026-11-18 each of the nine connected systems is checked against it on every change, with the gaps named (four items need the system running and are not checked yet) | in progress (FB-136 to FB-140) |
 | Forge checking its own server's clock before it judges the others | recorded (FB-119) |
 | Clock agreement counted in a data product's quality score | planned (FB-091) |
 | Business systems having the clock of their own server checked | recorded (FB-120) |

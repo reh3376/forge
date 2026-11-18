@@ -1,0 +1,80 @@
+{
+  "spec_version": "0.1.0",
+  "module_identity": {
+    "module_id": "ot-module",
+    "name": "Forge OT/SCADA Module — OPC-UA Adapter",
+    "version": "0.5.0",
+    "kind": "ot",
+    "language": "python",
+    "source_paths": [
+      "src/forge/modules/ot"
+    ]
+  },
+  "hub_link": {
+    "protocol": "grpc",
+    "service": "forge.v1.AdapterService"
+  },
+  "references": {
+    "facts": {
+      "path": "src/forge/governance/facts/specs/ot-module.facts.json",
+      "adapter_id": "ot-module"
+    },
+    "manifest": "src/forge/modules/ot/manifest.json",
+    "fvts": [
+      "src/forge/governance/fvts/specs/ot-module.fvts.json"
+    ]
+  },
+  "baseline": {
+    "M-1": "met",
+    "M-2": "met",
+    "M-3": "met",
+    "M-4": "met",
+    "M-5": "met",
+    "M-6": "met",
+    "M-7": "met",
+    "M-8": "met",
+    "M-9": "met",
+    "M-10": "waived",
+    "M-11": "waived"
+  },
+  "waivers": [
+    {
+      "requirement": "M-10",
+      "reason": "No module ships a roles file yet: the roles file has no FxTS spec to be written against, and the hub still uses its own flat roles.",
+      "backlog_item": "FB-141"
+    },
+    {
+      "requirement": "M-11",
+      "reason": "The OT module is hub-hosted Python with its own layout; no module SDK template exists for a hub-hosted module.",
+      "backlog_item": "FB-146"
+    }
+  ],
+  "time_contract": {
+    "hub": {
+      "exchange": "four-timestamp",
+      "fail_closed": true
+    },
+    "plant_floor_devices": "declared-in-facts",
+    "databases": [],
+    "third_party_systems": []
+  },
+  "user_interface": {
+    "ships_ui_code": false,
+    "screens": true
+  },
+  "scaffold": {
+    "template": "none"
+  },
+  "metadata": {
+    "hosting": "hub-hosted Python module",
+    "known_failure": "fmts:m2 fails: the manifest file and the manifest in the code disagree with the approved FACTS spec (FB-144).",
+    "note": "The local SQLite store-and-forward buffer is not declared as a database; whether M-8 covers it is the owner's to decide (FB-147)."
+  },
+  "integrity": {
+    "hash_state": "pending_review",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "8d17a328e5ea4834704cc545c00a4d9f236df7dd6c880b22ed9bcc8c8ea64a70"
+  }
+}
