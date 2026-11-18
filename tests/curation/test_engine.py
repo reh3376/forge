@@ -23,7 +23,7 @@ T0 = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
 
 
 def _record(
-    adapter_id: str = "whk-wms", equipment_id: str = "FERM-01", raw: float = 70.0, minute: int = 0
+    adapter_id: str = "forge-wms", equipment_id: str = "FERM-01", raw: float = 70.0, minute: int = 0
 ) -> ContextualRecord:
     return ContextualRecord(
         source=RecordSource(adapter_id=adapter_id, system=adapter_id, tag_path="Temp"),
@@ -50,7 +50,7 @@ def _engine(**kwargs) -> CurationEngine:
     return CurationEngine(DataProductRegistry(), **kwargs)
 
 
-def _product(engine: CurationEngine, *, adapters=("whk-wms",), publish=True, **spec):
+def _product(engine: CurationEngine, *, adapters=("forge-wms",), publish=True, **spec):
     product = engine.registry.create(
         name="Fermentation",
         description="...",
@@ -160,20 +160,20 @@ class TestOnIngest:
         _product(engine, publish=False)  # a draft is not in service
         _product(engine, adapters=("forge-mes",))  # another spoke
         _product(engine, on_ingest=False)  # manual only
-        assert [p.product_id for p in engine.products_for("whk-wms")] == [fed.product_id]
+        assert [p.product_id for p in engine.products_for("forge-wms")] == [fed.product_id]
 
-        curated, errors = await engine.on_ingested("whk-wms", _batch())
+        curated, errors = await engine.on_ingested("forge-wms", _batch())
         assert curated == {fed.product_id: 2} and errors == []
         assert engine.curated(fed.product_id)
-        assert await engine.on_ingested("whk-wms", []) == ({}, [])
+        assert await engine.on_ingested("forge-wms", []) == ({}, [])
 
     @pytest.mark.asyncio
     async def test_a_failing_product_does_not_stop_the_others(self, caplog):
         engine = _engine()
         broken = _product(engine, time_window="7min")
         fine = _product(engine)
-        curated, errors = await engine.on_ingested("whk-wms", _batch())
+        curated, errors = await engine.on_ingested("forge-wms", _batch())
         assert curated == {fine.product_id: 2}
         assert len(errors) == 1 and errors[0].startswith(broken.product_id)
         assert "unknown time_window" in errors[0]
-        assert f"Curation of {broken.product_id} for whk-wms failed" in caplog.text
+        assert f"Curation of {broken.product_id} for forge-wms failed" in caplog.text

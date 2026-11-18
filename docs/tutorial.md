@@ -187,7 +187,7 @@ From `docs/WHERE-WE-ARE.md` §1, the snapshot at PR 95:
 | Measure | Value (2026-11-13) |
 |---|---|
 | Python hub (`src/forge`) | 360 files, ~73,400 lines |
-| Python tests | 274 files, 4,733 collected, full suite green on the locked dependency set |
+| Python tests | 274 files, 4,736 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend, kept until the Go forge-mes and forge-display land |
 | Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
@@ -239,7 +239,7 @@ note:
 | `src/forge/gateway` · `api` · `observer` · `cli` | auth and RBAC middleware, the hub FastAPI app, health, the `forge` CLI |
 | `src/forge/modules/ot` | the OT module: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
 | `src/forge/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
-| `src/forge/adapters` | the eight in-repo spoke adapters (whk-wms, forge-mes, whk-cmms, whk-erpi, whk-nms, bosc-ims, next-trend, scanner-gateway), each with its manifest and config, and four generic adapter stubs |
+| `src/forge/adapters` | the eight in-repo spoke adapters (forge-wms, forge-mes, whk-cmms, whk-erpi, whk-nms, bosc-ims, next-trend, scanner-gateway), each with its manifest and config, and four generic adapter stubs |
 | `go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js) that FB-076 retires |
 | `tests/` | 267 files mirroring `src/`; migration tests read the migration source |
@@ -673,7 +673,7 @@ note:
 | `sample_records` | records the runner validates against the data contract |
 | `integrity` | the FHTS block |
 
-- Nine specs today: whk-wms (the reference), forge-mes, bosc-ims, whk-cmms, whk-erpi, whk-nms, next-trend, scanner-gateway, ot-module.
+- Nine specs today: forge-wms (the reference), forge-mes, bosc-ims, whk-cmms, whk-erpi, whk-nms, next-trend, scanner-gateway, ot-module.
 - The runner validates every spec against the JSON schema first (`facts:schema-valid`) and reads its enums from the schema (FB-080).
 - The developer guide, `docs/governance/facts-developer-guide.md`, walks the schema, how to write a spec, running the runner, common failures and cross-spoke consistency.
 
@@ -688,13 +688,13 @@ note:
 forge governance specs                       # every spec's hash state, approver, hash still verifies?
 forge governance specs --pending             # what awaits the owner
 forge governance validate-spec <spec.json>   # against its framework schema
-forge governance run facts whk-wms           # one framework, one spec; exit 1 on any failure
+forge governance run facts forge-wms           # one framework, one spec; exit 1 on any failure
 forge governance stamp <spec.json>           # after an edit: history entry, pending_review, no approver
 forge governance approve <spec.json> --by reh3376   # the owner, on their own word, never on their behalf
 ```
 
 - `run` covers FATS, FACTS, FVTS, FTTS and FMTS (FB-021, FB-083, FB-135), and lists every check it skipped: a waived or unverified requirement is never shown as passed.
-- FMTS is the module requirements framework (`docs/FxTS/FMTS.md`, D-12): one spec per module with the eleven-item baseline, the time contract and any waivers the owner approved. Nine module specs exist; a gate test runs them all and names every failure it allows. The two time-keeping requirements can be waived only with admin privileges: the waiver counts once the owner has approved the spec.
+- FMTS is the module requirements framework (`docs/FxTS/FMTS.md`, D-12): one spec per module with its name and alias (its shortcut name), the eleven-item baseline, the time contract and any waivers the owner approved. Nine module specs exist; a gate test runs them all and names every failure it allows. The two time-keeping requirements can be waived only with admin privileges: the waiver counts once the owner has approved the spec.
 - The hub test suite holds FATS in both directions: every served route has a spec, every spec names a served route.
 - The FVTS runner has a render-profile baseline and golden messages; a module can only tighten the baseline, never loosen it.
 
@@ -1544,7 +1544,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q                         # 4,733 tests, ~1 minute
+uv run pytest tests -q                         # 4,736 tests, ~1 minute
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -1626,7 +1626,7 @@ note:
 | bump a dependency | `uv lock --upgrade-package <name>`, commit `uv.lock` with the change |
 
 note:
-- The repository's own FACTS reference spec is `whk-wms`; the OT module is the most complete in-repo module to read for patterns.
+- The repository's own FACTS reference spec is `forge-wms`; the OT module is the most complete in-repo module to read for patterns.
 
 ---
 
@@ -1648,7 +1648,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 274 files, 4,733 collected; the full suite runs in about a minute on the locked dependency set.
+- `tests/` mirrors `src/`: 274 files, 4,736 collected; the full suite runs in about a minute on the locked dependency set.
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -1996,7 +1996,7 @@ Which systems connect, and what the contract behind each one means to the people
 
 | Spoke | System | What it brings |
 |---|---|---|
-| whk-wms | warehouse management | inventory, movements, receipts; 14 data sources |
+| forge-wms | warehouse management | inventory, movements, receipts; 14 data sources |
 | forge-mes | manufacturing execution (the interim bridge today, the Go module to come) | orders, batches, recipes, changeover, audit; 18 sources |
 | whk-cmms | maintenance management | equipment, work orders, maintenance events |
 | whk-erpi | ERP integration (NetSuite) | master data, orders, finance |
@@ -2023,7 +2023,7 @@ Each spoke has a **FACTS specification**: what the system is, what it is allowed
 
 | Contract | State today |
 |---|---|
-| all nine: whk-wms, forge-mes, bosc-ims, whk-cmms, whk-erpi, whk-nms, next-trend, scanner-gateway, ot-module | approved by the owner on 2026-11-13, after every contract gained its time-governance declaration |
+| all nine: forge-wms, forge-mes, bosc-ims, whk-cmms, whk-erpi, whk-nms, next-trend, scanner-gateway, ot-module | approved by the owner on 2026-11-13, after every contract gained its time-governance declaration |
 | ot-module | approved, but its contract still fails schema validation until the OT vocabulary is extended (FB-079; decided 2026-11-03) |
 
 note:

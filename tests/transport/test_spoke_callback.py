@@ -160,7 +160,7 @@ class TestWriteDispatcher:
         await dispatcher.close()
 
     async def test_unknown_adapter_missing_callback_and_capability_gate(self) -> None:
-        caps = {"forge-mes": True, "whk-wms": False}
+        caps = {"forge-mes": True, "forge-wms": False}
         dispatcher = in_memory_dispatcher(FakeSpoke(), can_write=caps.get)
 
         with pytest.raises(WriteDispatchError) as info:
@@ -171,12 +171,12 @@ class TestWriteDispatcher:
             await dispatcher.write("forge-mes", "t", 1)
         assert info.value.code == "no_callback"
 
-        dispatcher.register_callback("whk-wms", "s", {CALLBACK_PARAM: "mes-backend:50052"})
+        dispatcher.register_callback("forge-wms", "s", {CALLBACK_PARAM: "mes-backend:50052"})
         with pytest.raises(WriteDispatchError) as info:
-            await dispatcher.write("whk-wms", "t", 1)
+            await dispatcher.write("forge-wms", "t", 1)
         assert info.value.code == "not_writable"
         # Discover is a read; the capability gate does not apply
-        assert await dispatcher.discover("whk-wms") == [
+        assert await dispatcher.discover("forge-wms") == [
             {"tag_path": "mes.changeover.cooker.cip-complete", "data_type": "object"}
         ]
 

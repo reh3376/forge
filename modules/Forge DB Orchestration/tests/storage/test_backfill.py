@@ -58,7 +58,7 @@ class TestBackfillTablePlan:
 
     def _make_plan(self, **overrides) -> BackfillTablePlan:
         defaults = {
-            "spoke_id": "whk-wms",
+            "spoke_id": "forge-wms",
             "source_table": "public.Barrel",
             "target_schema": "mod_wms",
             "target_table": "barrels",
@@ -69,7 +69,7 @@ class TestBackfillTablePlan:
 
     def test_basic_creation(self):
         plan = self._make_plan()
-        assert plan.spoke_id == "whk-wms"
+        assert plan.spoke_id == "forge-wms"
         assert plan.source_table == "public.Barrel"
         assert plan.target_schema == "mod_wms"
         assert plan.target_table == "barrels"
@@ -103,19 +103,19 @@ class TestBackfillProgress:
     """Verify BackfillProgress tracking and computed properties."""
 
     def test_initial_state(self):
-        prog = BackfillProgress(spoke_id="whk-wms", table_name="public.Barrel")
+        prog = BackfillProgress(spoke_id="forge-wms", table_name="public.Barrel")
         assert prog.status == BackfillStatus.NOT_STARTED
         assert prog.rows_total == 0
         assert prog.rows_transferred == 0
         assert prog.started_at is None
 
     def test_progress_pct_zero_total(self):
-        prog = BackfillProgress(spoke_id="whk-wms", table_name="public.Barrel")
+        prog = BackfillProgress(spoke_id="forge-wms", table_name="public.Barrel")
         assert prog.progress_pct == 0.0
 
     def test_progress_pct_partial(self):
         prog = BackfillProgress(
-            spoke_id="whk-wms",
+            spoke_id="forge-wms",
             table_name="public.Barrel",
             rows_total=1000,
             rows_transferred=500,
@@ -124,7 +124,7 @@ class TestBackfillProgress:
 
     def test_progress_pct_complete(self):
         prog = BackfillProgress(
-            spoke_id="whk-wms",
+            spoke_id="forge-wms",
             table_name="public.Barrel",
             rows_total=1000,
             rows_transferred=1000,
@@ -133,7 +133,7 @@ class TestBackfillProgress:
 
     def test_is_terminal_complete(self):
         prog = BackfillProgress(
-            spoke_id="whk-wms",
+            spoke_id="forge-wms",
             table_name="public.Barrel",
             status=BackfillStatus.COMPLETE,
         )
@@ -141,7 +141,7 @@ class TestBackfillProgress:
 
     def test_is_terminal_failed(self):
         prog = BackfillProgress(
-            spoke_id="whk-wms",
+            spoke_id="forge-wms",
             table_name="public.Barrel",
             status=BackfillStatus.FAILED,
         )
@@ -149,7 +149,7 @@ class TestBackfillProgress:
 
     def test_is_not_terminal_in_progress(self):
         prog = BackfillProgress(
-            spoke_id="whk-wms",
+            spoke_id="forge-wms",
             table_name="public.Barrel",
             status=BackfillStatus.IN_PROGRESS,
         )
@@ -163,12 +163,12 @@ class TestBackfillSpokeSummary:
     """Verify BackfillSpokeSummary computed properties."""
 
     def test_progress_pct_zero_tables(self):
-        summary = BackfillSpokeSummary(spoke_id="whk-wms")
+        summary = BackfillSpokeSummary(spoke_id="forge-wms")
         assert summary.progress_pct == 0.0
 
     def test_progress_pct_partial(self):
         summary = BackfillSpokeSummary(
-            spoke_id="whk-wms",
+            spoke_id="forge-wms",
             tables_total=10,
             tables_complete=5,
         )
@@ -176,7 +176,7 @@ class TestBackfillSpokeSummary:
 
     def test_progress_pct_complete(self):
         summary = BackfillSpokeSummary(
-            spoke_id="whk-wms",
+            spoke_id="forge-wms",
             tables_total=10,
             tables_complete=10,
         )
@@ -191,7 +191,7 @@ class TestBackfillEngine:
 
     def _make_plan(self, **overrides) -> BackfillTablePlan:
         defaults = {
-            "spoke_id": "whk-wms",
+            "spoke_id": "forge-wms",
             "source_table": "public.Barrel",
             "target_schema": "mod_wms",
             "target_table": "barrels",
@@ -215,7 +215,7 @@ class TestBackfillEngine:
 
     def test_add_plans_across_spokes(self):
         engine = BackfillEngine()
-        engine.add_table_plan(self._make_plan(spoke_id="whk-wms"))
+        engine.add_table_plan(self._make_plan(spoke_id="forge-wms"))
         engine.add_table_plan(
             self._make_plan(
                 spoke_id="forge-mes",
@@ -225,7 +225,7 @@ class TestBackfillEngine:
             )
         )
         assert engine.total_tables_planned == 2
-        assert set(engine.list_spokes()) == {"whk-wms", "forge-mes"}
+        assert set(engine.list_spokes()) == {"forge-wms", "forge-mes"}
 
     def test_plan_spoke_summary(self):
         engine = BackfillEngine()
@@ -237,7 +237,7 @@ class TestBackfillEngine:
                 estimated_rows=5_000,
             )
         )
-        summary = engine.plan_spoke("whk-wms")
+        summary = engine.plan_spoke("forge-wms")
         assert summary.tables_total == 2
         assert summary.rows_total == 15_000
         assert summary.overall_status == BackfillStatus.PLANNED
@@ -250,7 +250,7 @@ class TestBackfillEngine:
 
     def test_list_spokes(self):
         engine = BackfillEngine()
-        engine.add_table_plan(self._make_plan(spoke_id="whk-wms"))
+        engine.add_table_plan(self._make_plan(spoke_id="forge-wms"))
         engine.add_table_plan(
             self._make_plan(
                 spoke_id="forge-mes",
@@ -260,26 +260,26 @@ class TestBackfillEngine:
             )
         )
         spokes = engine.list_spokes()
-        assert "whk-wms" in spokes
+        assert "forge-wms" in spokes
         assert "forge-mes" in spokes
 
     def test_get_progress_table(self):
         engine = BackfillEngine()
         engine.add_table_plan(self._make_plan())
-        progress = engine.get_progress("whk-wms", "public.Barrel")
+        progress = engine.get_progress("forge-wms", "public.Barrel")
         assert isinstance(progress, BackfillProgress)
         assert progress.status == BackfillStatus.NOT_STARTED
 
     def test_get_progress_spoke(self):
         engine = BackfillEngine()
         engine.add_table_plan(self._make_plan())
-        summary = engine.get_progress("whk-wms")
+        summary = engine.get_progress("forge-wms")
         assert isinstance(summary, BackfillSpokeSummary)
 
     def test_get_progress_nonexistent_raises(self):
         engine = BackfillEngine()
         with pytest.raises(ValueError, match="No backfill progress"):
-            engine.get_progress("whk-wms", "nonexistent")
+            engine.get_progress("forge-wms", "nonexistent")
 
     def test_total_tables_complete_initially_zero(self):
         engine = BackfillEngine()
@@ -297,7 +297,7 @@ class TestBackfillEngineAsync:
         engine = BackfillEngine()
         engine.add_table_plan(
             BackfillTablePlan(
-                spoke_id="whk-wms",
+                spoke_id="forge-wms",
                 source_table="public.Barrel",
                 target_schema="mod_wms",
                 target_table="barrels",
@@ -306,7 +306,7 @@ class TestBackfillEngineAsync:
             )
         )
         progress = asyncio.get_event_loop().run_until_complete(
-            engine.run_table("whk-wms", "public.Barrel")
+            engine.run_table("forge-wms", "public.Barrel")
         )
         assert progress.status == BackfillStatus.COMPLETE
         assert progress.rows_transferred == 10_000
@@ -315,13 +315,15 @@ class TestBackfillEngineAsync:
     def test_run_table_nonexistent_raises(self):
         engine = BackfillEngine()
         with pytest.raises(ValueError, match="No backfill plan"):
-            asyncio.get_event_loop().run_until_complete(engine.run_table("whk-wms", "nonexistent"))
+            asyncio.get_event_loop().run_until_complete(
+                engine.run_table("forge-wms", "nonexistent")
+            )
 
     def test_run_spoke(self):
         engine = BackfillEngine()
         engine.add_table_plan(
             BackfillTablePlan(
-                spoke_id="whk-wms",
+                spoke_id="forge-wms",
                 source_table="public.Barrel",
                 target_schema="mod_wms",
                 target_table="barrels",
@@ -331,7 +333,7 @@ class TestBackfillEngineAsync:
         )
         engine.add_table_plan(
             BackfillTablePlan(
-                spoke_id="whk-wms",
+                spoke_id="forge-wms",
                 source_table="public.Customer",
                 target_schema="mod_wms",
                 target_table="customers",
@@ -339,7 +341,7 @@ class TestBackfillEngineAsync:
                 estimated_rows=5_000,
             )
         )
-        summary = asyncio.get_event_loop().run_until_complete(engine.run_spoke("whk-wms"))
+        summary = asyncio.get_event_loop().run_until_complete(engine.run_spoke("forge-wms"))
         assert summary.overall_status == BackfillStatus.COMPLETE
         assert summary.tables_complete == 2
         assert summary.rows_transferred == 15_000
@@ -354,7 +356,7 @@ class TestBackfillEngineAsync:
         # Higher priority (lower number) should run first
         engine.add_table_plan(
             BackfillTablePlan(
-                spoke_id="whk-wms",
+                spoke_id="forge-wms",
                 source_table="public.Customer",
                 target_schema="mod_wms",
                 target_table="customers",
@@ -365,7 +367,7 @@ class TestBackfillEngineAsync:
         )
         engine.add_table_plan(
             BackfillTablePlan(
-                spoke_id="whk-wms",
+                spoke_id="forge-wms",
                 source_table="public.Barrel",
                 target_schema="mod_wms",
                 target_table="barrels",
@@ -375,7 +377,7 @@ class TestBackfillEngineAsync:
                 depends_on=["public.Customer"],
             )
         )
-        summary = asyncio.get_event_loop().run_until_complete(engine.run_spoke("whk-wms"))
+        summary = asyncio.get_event_loop().run_until_complete(engine.run_spoke("forge-wms"))
         assert summary.tables_complete == 2
 
 
@@ -389,7 +391,7 @@ class TestBackfillEngineValidation:
         engine = BackfillEngine()
         engine.add_table_plan(
             BackfillTablePlan(
-                spoke_id="whk-wms",
+                spoke_id="forge-wms",
                 source_table="public.Barrel",
                 target_schema="mod_wms",
                 target_table="barrels",
@@ -397,8 +399,8 @@ class TestBackfillEngineValidation:
                 estimated_rows=10_000,
             )
         )
-        asyncio.get_event_loop().run_until_complete(engine.run_table("whk-wms", "public.Barrel"))
-        progress = engine.validate_table("whk-wms", "public.Barrel")
+        asyncio.get_event_loop().run_until_complete(engine.run_table("forge-wms", "public.Barrel"))
+        progress = engine.validate_table("forge-wms", "public.Barrel")
         assert progress.status == BackfillStatus.COMPLETE
         assert progress.rows_validated == 10_000
 
@@ -406,7 +408,7 @@ class TestBackfillEngineValidation:
         engine = BackfillEngine()
         engine.add_table_plan(
             BackfillTablePlan(
-                spoke_id="whk-wms",
+                spoke_id="forge-wms",
                 source_table="public.Barrel",
                 target_schema="mod_wms",
                 target_table="barrels",
@@ -415,11 +417,11 @@ class TestBackfillEngineValidation:
             )
         )
         # Don't run the table — validate should fail
-        progress = engine.validate_table("whk-wms", "public.Barrel")
+        progress = engine.validate_table("forge-wms", "public.Barrel")
         assert progress.status == BackfillStatus.FAILED
         assert "Cannot validate" in (progress.error or "")
 
     def test_validate_nonexistent_raises(self):
         engine = BackfillEngine()
         with pytest.raises(ValueError, match="No backfill progress"):
-            engine.validate_table("whk-wms", "nonexistent")
+            engine.validate_table("forge-wms", "nonexistent")

@@ -73,7 +73,7 @@ def sample_lineage() -> LineageEntry:
         source_record_ids=["src-1", "src-2"],
         output_record_id="out-1",
         product_id="dp-test-001",
-        adapter_ids=["whk-wms"],
+        adapter_ids=["forge-wms"],
         steps=[
             TransformationStep(
                 step_name="normalize",

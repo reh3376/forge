@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://governance/fmts/v0.1.0",
+  "$id": "forge://governance/fmts/v0.2.0",
   "title": "FMTS — Forge Module Test Specification",
   "description": "What every Forge module declares before a hub admits it: its kind, the baseline it claims (M-1 to M-11), its time contract, references to its other specs, and waivers. Decided in docs/decisions/forge-module-requirements.md (D-12, signed 2026-11-17). One spec per module, `<module>.fmts.json`.",
   "type": "object",
@@ -19,7 +19,7 @@
   "properties": {
     "spec_version": {
       "type": "string",
-      "const": "0.1.0",
+      "const": "0.2.0",
       "description": "FMTS schema version this spec is written against."
     },
     "module_identity": {
@@ -28,6 +28,7 @@
       "required": [
         "module_id",
         "name",
+        "alias",
         "version",
         "kind",
         "language",
@@ -46,6 +47,11 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 128
+        },
+        "alias": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]{1,15}$",
+          "description": "The module's shortcut name (owner, 2026-11-18): short, lower case, unique among the modules. Where a person or a command names a module briefly, this is the name (`wms` for `forge-wms`)."
         },
         "version": {
           "type": "string",

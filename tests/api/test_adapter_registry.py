@@ -84,7 +84,7 @@ async def test_registered_persists_and_load_restores() -> None:
     assert second.get_health("forge-mes").records_collected == 42
     assert second.describe()["restored"] == 1
     # Loading again does not clobber what the running hub already knows.
-    second.register(manifest("whk-wms"))
+    second.register(manifest("forge-wms"))
     assert await second.load() == 0 and second.describe()["pending"] == 1
     assert await second.flush() == 1 and len(store) == 2
 

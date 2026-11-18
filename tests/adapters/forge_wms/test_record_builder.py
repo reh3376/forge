@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from forge.adapters.whk_wms.record_builder import (
+from forge.adapters.forge_wms.record_builder import (
     _assess_quality,
     _derive_tag_path,
     _extract_server_time,
@@ -135,7 +135,7 @@ class TestBuildContextualRecord:
         return build_contextual_record(
             raw_event=raw,
             context=context,
-            adapter_id="whk-wms",
+            adapter_id="forge-wms",
             adapter_version="0.1.0",
             **kwargs,
         )
@@ -146,13 +146,13 @@ class TestBuildContextualRecord:
 
     def test_source_adapter_id(self):
         record = self._build()
-        assert record.source.adapter_id == "whk-wms"
-        assert record.source.system == "whk-wms"
+        assert record.source.adapter_id == "forge-wms"
+        assert record.source.system == "forge-wms"
 
     def test_lineage_schema_ref(self):
         record = self._build()
-        assert record.lineage.schema_ref == "forge://schemas/whk-wms/v0.1.0"
-        assert record.lineage.adapter_id == "whk-wms"
+        assert record.lineage.schema_ref == "forge://schemas/forge-wms/v0.1.0"
+        assert record.lineage.adapter_id == "forge-wms"
         assert record.lineage.adapter_version == "0.1.0"
 
     def test_value_preserves_raw(self):
@@ -179,7 +179,7 @@ class TestBuildContextualRecord:
     def test_no_timestamp_is_refused_unless_the_adapter_declared_forge(self):
         """One clock (FB-088): a WMS event without a timestamp gets no invented one."""
         raw = {"barrel_id": "BRL-001"}
-        with pytest.raises(SourceStampMissingError, match=r"whk-wms.*without a source timestamp"):
+        with pytest.raises(SourceStampMissingError, match=r"forge-wms.*without a source timestamp"):
             self._build(raw=raw)
         record = self._build(raw=raw, source_timestamp_origin="forge")
         assert record.timestamp.source_clock == "forge"

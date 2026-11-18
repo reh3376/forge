@@ -22,7 +22,7 @@ from forge.core.models.manufacturing.production_order import ProductionOrder
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-wms"
+_SOURCE_SYSTEM = "forge-wms"
 
 # WMS production order status → Forge OrderStatus
 _STATUS_MAP: dict[str, OrderStatus] = {

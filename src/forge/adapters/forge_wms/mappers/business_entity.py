@@ -22,7 +22,7 @@ from forge.core.models.manufacturing.enums import EntityType
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-wms"
+_SOURCE_SYSTEM = "forge-wms"
 
 
 def map_customer(raw: dict[str, Any]) -> BusinessEntity | None:

@@ -10,7 +10,7 @@ facts/
 ├── schema/
 │   └── facts.schema.json          # JSON Schema draft 2020-12 (10 top-level properties)
 ├── specs/
-│   ├── whk-wms.facts.json         # WMS adapter spec (14 data sources)
+│   ├── forge-wms.facts.json         # WMS adapter spec (14 data sources)
 │   └── forge-mes.facts.json         # MES adapter spec (17 data sources)
 └── runners/
     └── facts_runner.py            # FACTSRunner — static + live checks
@@ -23,8 +23,8 @@ import asyncio, json
 from forge.governance.facts.runners.facts_runner import FACTSRunner
 
 runner = FACTSRunner(schema_path="schema/facts.schema.json")
-spec = json.load(open("specs/whk-wms.facts.json"))
-report = asyncio.run(runner.run(target="whk-wms", spec=spec))
+spec = json.load(open("specs/forge-wms.facts.json"))
+report = asyncio.run(runner.run(target="forge-wms", spec=spec))
 print(f"{'PASS' if report.passed else 'FAIL'}: {report.pass_count}/{report.total}")
 ```
 

@@ -3,13 +3,13 @@
 **Version:** 1.0
 **Created:** 2026-04-06
 **Path:** Roadmap Path 2 — Core Data Models
-**Source Systems:** WHK-WMS (121 Prisma models), WHK-MES (84 Prisma models)
+**Source Systems:** forge-wms (121 Prisma models), WHK-MES (84 Prisma models)
 
 ---
 
 ## Purpose
 
-This document catalogs the shared manufacturing concepts extracted from the WHK WMS and MES Prisma schemas. It serves as the design rationale for the `forge.core.models.manufacturing` package — every model in that package traces back to entries in this catalog.
+This document catalogs the shared manufacturing concepts extracted from the Forge WMS and MES Prisma schemas. It serves as the design rationale for the `forge.core.models.manufacturing` package — every model in that package traces back to entries in this catalog.
 
 ## Entity Family Cross-Reference
 

@@ -47,7 +47,7 @@ message ConnectionParam {
 // ---------------------------------------------------------------------------
 
 message DataContract {
-  string schema_ref = 1;                   // e.g. "forge://schemas/whk-wms/v0.1.0"
+  string schema_ref = 1;                   // e.g. "forge://schemas/forge-wms/v0.1.0"
   string output_format = 2;               // e.g. "contextual_record"
   repeated string context_fields = 3;     // required context fields
 }
@@ -62,7 +62,7 @@ message DataContract {
 // ---------------------------------------------------------------------------
 
 message AdapterManifest {
-  string adapter_id = 1;                  // unique identifier, e.g. "whk-wms"
+  string adapter_id = 1;                  // unique identifier, e.g. "forge-wms"
   string name = 2;                        // human-readable name
   string version = 3;                     // semver string
   string type = 4;                        // e.g. "INGESTION"

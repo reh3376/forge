@@ -1,8 +1,9 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "module_identity": {
     "module_id": "whk-erpi",
     "name": "Whiskey House ERP Integration Adapter",
+    "alias": "erpi",
     "version": "0.1.0",
     "kind": "integration",
     "language": "python",
@@ -73,9 +74,19 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": null,
-    "change_history": [],
+    "previous_hash": "fa67c6edc323bf19b878464e70158177d82ff251063a204493a45320d6b91038",
+    "change_history": [
+      {
+        "previous_hash": "fa67c6edc323bf19b878464e70158177d82ff251063a204493a45320d6b91038",
+        "new_hash": "fcbeaf8248952d1197eece1965cf96dff67d733a47c2bb2a48c41c8175118b38",
+        "changed_at": "2026-11-18T15:32:42Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
+      }
+    ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "fa67c6edc323bf19b878464e70158177d82ff251063a204493a45320d6b91038"
+    "spec_hash": "fcbeaf8248952d1197eece1965cf96dff67d733a47c2bb2a48c41c8175118b38"
   }
 }

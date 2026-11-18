@@ -70,7 +70,7 @@ The FHTS registry (`fhts/specs/fhts-registry.json`) maintains a central record a
   "description": "FHTS Hash Verification Registry",
   "files": [
     {
-      "path": "facts/specs/whk-wms.facts.json",
+      "path": "facts/specs/forge-wms.facts.json",
       "framework": "facts",
       "current_hash": "3a161edf...",
       "status": "verified",
@@ -78,7 +78,7 @@ The FHTS registry (`fhts/specs/fhts-registry.json`) maintains a central record a
       "history": [
         { "hash": "b7f42a01...", "updated_at": "...", "source": "agent", "changed_by": "claude-opus-4-6" }
       ],
-      "source_ref": "whk-wms.facts.json",
+      "source_ref": "forge-wms.facts.json",
       "approved_by": "reh3376",
       "approved_at": "2026-04-06T12:00:00Z"
     }

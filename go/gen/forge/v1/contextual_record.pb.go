@@ -31,8 +31,8 @@ const (
 
 type RecordSource struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	AdapterId     string                 `protobuf:"bytes,1,opt,name=adapter_id,json=adapterId,proto3" json:"adapter_id,omitempty"`          // e.g. "whk-wms", "forge-mes"
-	System        string                 `protobuf:"bytes,2,opt,name=system,proto3" json:"system,omitempty"`                                 // e.g. "whk-wms-prod", "ignition-prod"
+	AdapterId     string                 `protobuf:"bytes,1,opt,name=adapter_id,json=adapterId,proto3" json:"adapter_id,omitempty"`          // e.g. "forge-wms", "forge-mes"
+	System        string                 `protobuf:"bytes,2,opt,name=system,proto3" json:"system,omitempty"`                                 // e.g. "forge-wms-prod", "ignition-prod"
 	TagPath       string                 `protobuf:"bytes,3,opt,name=tag_path,json=tagPath,proto3" json:"tag_path,omitempty"`                // optional: e.g. "Area1/Fermenter3/Temperature"
 	ConnectionId  string                 `protobuf:"bytes,4,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"` // optional: for connection multiplexing
 	unknownFields protoimpl.UnknownFields
@@ -611,7 +611,7 @@ func (x *RecordContext) GetExtra() map[string]string {
 
 type RecordLineage struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
-	SchemaRef           string                 `protobuf:"bytes,1,opt,name=schema_ref,json=schemaRef,proto3" json:"schema_ref,omitempty"`                               // e.g. "forge://schemas/whk-wms/v0.1.0"
+	SchemaRef           string                 `protobuf:"bytes,1,opt,name=schema_ref,json=schemaRef,proto3" json:"schema_ref,omitempty"`                               // e.g. "forge://schemas/forge-wms/v0.1.0"
 	AdapterId           string                 `protobuf:"bytes,2,opt,name=adapter_id,json=adapterId,proto3" json:"adapter_id,omitempty"`                               // producing adapter
 	AdapterVersion      string                 `protobuf:"bytes,3,opt,name=adapter_version,json=adapterVersion,proto3" json:"adapter_version,omitempty"`                // adapter version at capture time
 	TransformationChain []string               `protobuf:"bytes,4,rep,name=transformation_chain,json=transformationChain,proto3" json:"transformation_chain,omitempty"` // ordered list of transforms applied

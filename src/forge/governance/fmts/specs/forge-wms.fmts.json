@@ -1,13 +1,14 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "module_identity": {
-    "module_id": "whk-wms",
-    "name": "Whiskey House Warehouse Management System Adapter",
+    "module_id": "forge-wms",
+    "name": "Forge Warehouse Management System Adapter",
+    "alias": "wms",
     "version": "0.1.0",
     "kind": "integration",
     "language": "python",
     "source_paths": [
-      "src/forge/adapters/whk_wms"
+      "src/forge/adapters/forge_wms"
     ]
   },
   "hub_link": {
@@ -16,10 +17,10 @@
   },
   "references": {
     "facts": {
-      "path": "src/forge/governance/facts/specs/whk-wms.facts.json",
-      "adapter_id": "whk-wms"
+      "path": "src/forge/governance/facts/specs/forge-wms.facts.json",
+      "adapter_id": "forge-wms"
     },
-    "manifest": "src/forge/adapters/whk_wms/manifest.json"
+    "manifest": "src/forge/adapters/forge_wms/manifest.json"
   },
   "baseline": {
     "M-1": "met",
@@ -50,7 +51,7 @@
     "databases": [],
     "third_party_systems": [
       {
-        "name": "whk-wms",
+        "name": "forge-wms",
         "interface": "graphql+amqp",
         "clock_read_method": "http-date-header",
         "tolerance_class": "it-lan",
@@ -74,9 +75,28 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": null,
-    "change_history": [],
+    "previous_hash": "f4b14d145e7b59d107d0a799e5cab1da6be7084559fd91e1671bccdc71cef5c2",
+    "change_history": [
+      {
+        "previous_hash": "f4b14d145e7b59d107d0a799e5cab1da6be7084559fd91e1671bccdc71cef5c2",
+        "new_hash": "6ec66b593f8f13732607452dd42408b85a24837d13455e98d9779ca022c98048",
+        "changed_at": "2026-11-18T15:32:42Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
+      },
+      {
+        "previous_hash": "769703de2ce51fae1f78547b283b0b9cf55da20fca2648d301cbe7d613575ced",
+        "new_hash": "f4b14d145e7b59d107d0a799e5cab1da6be7084559fd91e1671bccdc71cef5c2",
+        "changed_at": "2026-11-18T15:30:57Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-150: whk-wms renamed forge-wms (owner 2026-11-18: no existing company named in the public repository)"
+      }
+    ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "769703de2ce51fae1f78547b283b0b9cf55da20fca2648d301cbe7d613575ced"
+    "spec_hash": "6ec66b593f8f13732607452dd42408b85a24837d13455e98d9779ca022c98048"
   }
 }

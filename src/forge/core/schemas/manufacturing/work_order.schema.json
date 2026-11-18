@@ -35,7 +35,7 @@
       "type": "string"
     },
     "source_system": {
-      "description": "Adapter or system that produced this record (e.g. 'whk-wms').",
+      "description": "Adapter or system that produced this record (e.g. 'forge-wms').",
       "title": "Source System",
       "type": "string"
     },

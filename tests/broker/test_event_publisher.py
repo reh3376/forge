@@ -23,7 +23,7 @@ class TestAdapterLifecycle:
 
     @pytest.mark.asyncio
     async def test_adapter_registered(self, publisher, producer):
-        await publisher.adapter_registered("whk-wms", "WMS Adapter", version="1.0")
+        await publisher.adapter_registered("forge-wms", "WMS Adapter", version="1.0")
         msgs = producer.get_messages("forge.adapter.lifecycle")
         assert len(msgs) == 1
         body = msgs[0]["body"]
@@ -32,7 +32,7 @@ class TestAdapterLifecycle:
 
         event = json.loads(body)
         assert event["event_type"] == "adapter.registered"
-        assert event["payload"]["adapter_id"] == "whk-wms"
+        assert event["payload"]["adapter_id"] == "forge-wms"
         assert event["payload"]["name"] == "WMS Adapter"
         assert event["payload"]["version"] == "1.0"
         assert "timestamp" in event
@@ -95,7 +95,7 @@ class TestGovernance:
             "schema-drift",
             severity="error",
             detail="Hash mismatch on barrel schema",
-            entity_id="forge://schemas/whk-wms/Barrel/v1",
+            entity_id="forge://schemas/forge-wms/Barrel/v1",
         )
         msgs = producer.get_messages("forge.governance.events")
         assert len(msgs) == 1

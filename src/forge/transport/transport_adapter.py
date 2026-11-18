@@ -3,14 +3,14 @@
 
 This is the bridge between the existing adapter interface (collect(),
 subscribe(), write(), etc.) and the gRPC transport layer. Existing
-adapter classes (WhkWmsAdapter, ForgeMesAdapter) require ZERO code changes
+adapter classes (ForgeWmsAdapter, ForgeMesAdapter) require ZERO code changes
 to work with gRPC — they just get wrapped in this adapter.
 
 Usage:
-    from forge.adapters.whk_wms.adapter import WhkWmsAdapter
+    from forge.adapters.forge_wms.adapter import ForgeWmsAdapter
     from forge.transport.transport_adapter import GrpcTransportAdapter
 
-    wms = WhkWmsAdapter()
+    wms = ForgeWmsAdapter()
     transport = GrpcTransportAdapter(adapter=wms, channel=grpc_channel)
     await transport.register()
     await transport.configure(params)

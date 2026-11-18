@@ -83,10 +83,10 @@ class TestLineageTracker:
     def test_start_entry(self, lineage_tracker: LineageTracker) -> None:
         entry = lineage_tracker.start_entry(
             source_record_ids=[uuid4(), uuid4()],
-            adapter_ids=["whk-wms"],
+            adapter_ids=["forge-wms"],
         )
         assert len(entry.source_record_ids) == 2
-        assert entry.adapter_ids == ["whk-wms"]
+        assert entry.adapter_ids == ["forge-wms"]
 
     def test_add_step(self, lineage_tracker: LineageTracker) -> None:
         entry = lineage_tracker.start_entry(["r1"])
@@ -136,7 +136,7 @@ class TestLineageTracker:
         # Simulate a full curation lifecycle
         entry = lineage_tracker.start_entry(
             source_record_ids=["rec-001", "rec-002", "rec-003"],
-            adapter_ids=["whk-wms", "forge-mes"],
+            adapter_ids=["forge-wms", "forge-mes"],
         )
         lineage_tracker.add_step(
             entry,
@@ -172,4 +172,4 @@ class TestLineageTracker:
         assert lineage.steps[0].step_name == "normalize"
         assert lineage.steps[1].step_name == "time_bucket_5min"
         assert lineage.steps[2].step_name == "aggregate_avg"
-        assert lineage.adapter_ids == ["whk-wms", "forge-mes"]
+        assert lineage.adapter_ids == ["forge-wms", "forge-mes"]

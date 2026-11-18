@@ -41,7 +41,7 @@ Ignition is not a single product — it's an **11-module industrial application 
 |--------|--------|----------|-----------------|
 | **Batch Procedure** | Sepasoft | ISA-88 batch control, recipe management, electronic batch records | MES recipe module (whk-mes) |
 | **OEE Downtime** | Sepasoft | Overall Equipment Effectiveness tracking | Future Forge analytics |
-| **Track & Trace** | Sepasoft | Material genealogy, lot tracking | WMS lot tracking (whk-wms) |
+| **Track & Trace** | Sepasoft | Material genealogy, lot tracking | WMS lot tracking (forge-wms) |
 | **MQTT Engine** | Cirrus Link | MQTT/SparkplugB subscriber | OT Module MQTT subscriber (P7) |
 | **MQTT Transmission** | Cirrus Link | MQTT/SparkplugB publisher | OT Module MQTT publisher (P7) |
 | **MQTT Distributor** | Cirrus Link | Built-in MQTT broker | External broker (RabbitMQ) |

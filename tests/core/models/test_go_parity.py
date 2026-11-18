@@ -94,7 +94,7 @@ _STEP = ProcessStep(
     description="Mill the grain bill.",
 )
 _RESULT = SampleResult(
-    **_base("whk-wms", "SR-001"),
+    **_base("forge-wms", "SR-001"),
     parameter_name="proof",
     measured_value=90.0,
     measured_text="90 proof",
@@ -108,7 +108,7 @@ _RESULT = SampleResult(
 #: instance), and every other field (the full instance adds them).
 _MODELS: dict[type[ManufacturingModelBase], tuple[str, str, dict[str, Any], dict[str, Any]]] = {
     BusinessEntity: (
-        "whk-wms",
+        "forge-wms",
         "C-001",
         {"entity_type": EntityType.CUSTOMER, "name": "Acme Corp"},
         {
@@ -121,7 +121,7 @@ _MODELS: dict[type[ManufacturingModelBase], tuple[str, str, dict[str, Any], dict
         },
     ),
     Lot: (
-        "whk-wms",
+        "forge-wms",
         "L-001",
         {"lot_number": "2026-001"},
         {
@@ -139,7 +139,7 @@ _MODELS: dict[type[ManufacturingModelBase], tuple[str, str, dict[str, Any], dict
         },
     ),
     ManufacturingUnit: (
-        "whk-wms",
+        "forge-wms",
         "B-001",
         {"unit_type": "barrel"},
         {
@@ -157,7 +157,7 @@ _MODELS: dict[type[ManufacturingModelBase], tuple[str, str, dict[str, Any], dict
         },
     ),
     MaterialItem: (
-        "whk-wms",
+        "forge-wms",
         "I-001",
         {"item_number": "BBL-53-WHT-OAK", "name": "53-gallon White Oak Barrel"},
         {
@@ -171,7 +171,7 @@ _MODELS: dict[type[ManufacturingModelBase], tuple[str, str, dict[str, Any], dict
         },
     ),
     OperationalEvent: (
-        "whk-wms",
+        "forge-wms",
         "EVT-001",
         {
             "event_type": "Entry",
@@ -191,7 +191,7 @@ _MODELS: dict[type[ManufacturingModelBase], tuple[str, str, dict[str, Any], dict
         },
     ),
     PhysicalAsset: (
-        "whk-wms",
+        "forge-wms",
         "WH-A",
         {"asset_type": AssetType.SITE, "name": "Warehouse A"},
         {
@@ -252,7 +252,7 @@ _MODELS: dict[type[ManufacturingModelBase], tuple[str, str, dict[str, Any], dict
         },
     ),
     SampleResult: (
-        "whk-wms",
+        "forge-wms",
         "SR-001",
         {"parameter_name": "proof"},
         {
@@ -263,7 +263,7 @@ _MODELS: dict[type[ManufacturingModelBase], tuple[str, str, dict[str, Any], dict
         | {"metadata": {"sample_type_id": 2}},
     ),
     QualitySample: (
-        "whk-wms",
+        "forge-wms",
         "QS-001",
         {"sample_type": "proof_check", "entity_type": "manufacturing_unit", "entity_id": "B-001"},
         {
@@ -276,13 +276,13 @@ _MODELS: dict[type[ManufacturingModelBase], tuple[str, str, dict[str, Any], dict
         },
     ),
     WorkOrderDependency: (
-        "whk-wms",
+        "forge-wms",
         "DEP-001",
         {"dependent_order_id": "WO-002", "prerequisite_order_id": "WO-001"},
         {"dependency_type": "RELATED", "metadata": {"template_id": "T-1"}},
     ),
     WorkOrder: (
-        "whk-wms",
+        "forge-wms",
         "WO-001",
         {"title": "Transfer barrels to Warehouse B", "order_type": "TRANSFER"},
         {

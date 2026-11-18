@@ -24,7 +24,7 @@ This record designs the convergence of Forge's two schema registries into one: w
 | Read by | the API | `DataRouter`, which `IngestPipeline` builds over a new, empty `SchemaRegistry()` on every hub start |
 | Tests | the registry and API suites (FB-001, FB-095) | 21 in `tests/storage/test_registry.py`, 9 in `test_router.py`, 2 end-to-end |
 
-[FACT] How the hub routes a record today (`forge.storage.router.DataRouter.route`): first the routing registry, by `(spoke, entity)`, which never matches because the registry is empty; then `_DEFAULT_ROUTES`, a table of ten `value.data_type` strings (`snmp_metric`, `opc_ua_tag`, `historian_point`, `sensor_reading` → TimescaleDB; `device_topology`, `equipment_hierarchy`, `material_genealogy` → Neo4j; `cdc_event`, `adapter_event` → Kafka); then PostgreSQL. The decision's namespace is `spoke_<spoke_id>` (for example `spoke_whk-wms`), which names no schema any migration creates (002 creates `mod_wms`, `mod_mes`, …).
+[FACT] How the hub routes a record today (`forge.storage.router.DataRouter.route`): first the routing registry, by `(spoke, entity)`, which never matches because the registry is empty; then `_DEFAULT_ROUTES`, a table of ten `value.data_type` strings (`snmp_metric`, `opc_ua_tag`, `historian_point`, `sensor_reading` → TimescaleDB; `device_topology`, `equipment_hierarchy`, `material_genealogy` → Neo4j; `cdc_event`, `adapter_event` → Kafka); then PostgreSQL. The decision's namespace is `spoke_<spoke_id>` (for example `spoke_forge-wms`), which names no schema any migration creates (002 creates `mod_wms`, `mod_mes`, …).
 
 [FACT] What the decision buys: `build_pipeline_from_storage` gives the TimescaleDB and PostgreSQL engines the same sink, `forge_ts.contextual_records`; Neo4j gets the graph writer; Kafka, Redis and MinIO fall through to the in-memory sink. `target_namespace` is read only by the shadow writer's metrics. `retention_policy` is read by nothing. `RedisSchemaCache` caches "schema entries" nobody writes. `SchemaStatus` is used only by the storage registry; the F20 `status` is a free string.
 
@@ -103,7 +103,7 @@ Asked and answered one at a time; the owner declared the answers the signature. 
 - `src/forge/ingest/pipeline.py` (`IngestPipeline.__init__`, `build_pipeline_from_storage`) — the empty registry on every start; the sinks per engine.
 - `src/forge/storage/migrations/versions/001_forge_core_schema.py` (`schema_entries`), `009_registry_and_equipment_tables.py` (`registry_schemas`, `registry_versions`).
 - `src/forge/core/schema_ref.py` — the grammar and its three roles (FB-008).
-- `src/forge/governance/facts/schema/facts.schema.json` (`data_contract`), `src/forge/governance/facts/specs/whk-wms.facts.json` — what a spoke declares.
+- `src/forge/governance/facts/schema/facts.schema.json` (`data_contract`), `src/forge/governance/facts/specs/forge-wms.facts.json` — what a spoke declares.
 - `src/forge/core/models/adapter.py` (`DataContract`, `AdapterManifest`), `src/forge/proto/adapter.proto` — the manifest.
 - `src/forge/adapters/whk_cmms/`, `src/forge/adapters/forge_mes/record_builder.py` — who stamps `entity_type` and with what.
 - `src/forge/core/models/data_product.py` (`schema_ref`), `src/forge/curation/engine.py` — data products and curation (FB-009, FB-086).

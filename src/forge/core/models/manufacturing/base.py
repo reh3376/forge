@@ -40,7 +40,7 @@ class ManufacturingModelBase(OneClockModel):
     )
     source_system: str = Field(
         ...,
-        description="Adapter or system that produced this record (e.g. 'whk-wms').",
+        description="Adapter or system that produced this record (e.g. 'forge-wms').",
     )
     source_id: str = Field(
         ...,

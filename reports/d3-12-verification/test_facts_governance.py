@@ -3,7 +3,7 @@
 Proves the governance framework works end-to-end:
   spec load → FACTSRunner validation → hash verification → report generation
 
-Uses the real WHK WMS FACTS spec and the real FACTSRunner to exercise
+Uses the real Forge WMS FACTS spec and the real FACTSRunner to exercise
 every check — adapter identity, capabilities, lifecycle, connection,
 data contract, context mapping, error handling, metadata, integrity.
 """
@@ -34,11 +34,11 @@ from forge.governance.shared.runner import (
 class TestSpecLoading:
     """Verify FACTS specs load and have correct structure."""
 
-    def test_whk_wms_spec_loads(self, whk_wms_spec: dict):
-        assert whk_wms_spec is not None
-        assert whk_wms_spec["spec_version"] == "0.1.0"
+    def test_forge_wms_spec_loads(self, forge_wms_spec: dict):
+        assert forge_wms_spec is not None
+        assert forge_wms_spec["spec_version"] == "0.1.0"
 
-    def test_spec_has_all_required_sections(self, whk_wms_spec: dict):
+    def test_spec_has_all_required_sections(self, forge_wms_spec: dict):
         required = {
             "spec_version",
             "adapter_identity",
@@ -51,18 +51,18 @@ class TestSpecLoading:
             "metadata",
             "integrity",
         }
-        assert required.issubset(whk_wms_spec.keys()), (
-            f"Missing sections: {required - whk_wms_spec.keys()}"
+        assert required.issubset(forge_wms_spec.keys()), (
+            f"Missing sections: {required - forge_wms_spec.keys()}"
         )
 
-    def test_adapter_identity_matches(self, whk_wms_spec: dict):
-        identity = whk_wms_spec["adapter_identity"]
-        assert identity["adapter_id"] == "whk-wms"
+    def test_adapter_identity_matches(self, forge_wms_spec: dict):
+        identity = forge_wms_spec["adapter_identity"]
+        assert identity["adapter_id"] == "forge-wms"
         assert identity["tier"] == "MES_MOM"
         assert identity["type"] == "INGESTION"
 
-    def test_capabilities_match_manifest(self, whk_wms_spec: dict):
-        caps = whk_wms_spec["capabilities"]
+    def test_capabilities_match_manifest(self, forge_wms_spec: dict):
+        caps = forge_wms_spec["capabilities"]
         assert caps["read"] is True
         assert caps["subscribe"] is True
         assert caps["backfill"] is True
@@ -93,11 +93,11 @@ class TestFACTSRunnerValidation:
         return FACTSRunner(schema_path=facts_schema_path)
 
     @pytest.mark.asyncio()
-    async def test_whk_wms_passes_validation(
-        self, runner: FACTSRunner, whk_wms_spec: dict,
+    async def test_forge_wms_passes_validation(
+        self, runner: FACTSRunner, forge_wms_spec: dict,
     ):
-        """The WHK WMS spec should pass all static checks."""
-        report = await runner.run(target="whk-wms", spec=whk_wms_spec)
+        """The Forge WMS spec should pass all static checks."""
+        report = await runner.run(target="forge-wms", spec=forge_wms_spec)
         verdicts = report.verdicts if hasattr(report, "verdicts") else report
 
         # Extract just the list of FxTSVerdict objects
@@ -118,10 +118,10 @@ class TestFACTSRunnerValidation:
 
     @pytest.mark.asyncio()
     async def test_all_enforced_fields_checked(
-        self, runner: FACTSRunner, whk_wms_spec: dict,
+        self, runner: FACTSRunner, forge_wms_spec: dict,
     ):
         """Runner should produce verdicts covering all enforced fields."""
-        report = await runner.run(target="whk-wms", spec=whk_wms_spec)
+        report = await runner.run(target="forge-wms", spec=forge_wms_spec)
         verdicts = report.verdicts if hasattr(report, "verdicts") else report
         if not isinstance(verdicts, list):
             verdicts = list(verdicts)
@@ -183,57 +183,57 @@ class TestFACTSRunnerValidation:
 class TestHashVerification:
     """Verify spec integrity hashing and verification works correctly."""
 
-    def test_compute_spec_hash_deterministic(self, whk_wms_spec: dict):
+    def test_compute_spec_hash_deterministic(self, forge_wms_spec: dict):
         """Same spec content should always produce the same hash."""
-        h1 = compute_spec_hash(whk_wms_spec)
-        h2 = compute_spec_hash(whk_wms_spec)
+        h1 = compute_spec_hash(forge_wms_spec)
+        h2 = compute_spec_hash(forge_wms_spec)
         assert h1 == h2
         assert len(h1) == 64  # SHA-256 hex digest
 
-    def test_spec_hash_changes_with_content(self, whk_wms_spec: dict):
+    def test_spec_hash_changes_with_content(self, forge_wms_spec: dict):
         """Modifying spec content should change the hash."""
         import copy
 
-        original_hash = compute_spec_hash(whk_wms_spec)
-        modified = copy.deepcopy(whk_wms_spec)
+        original_hash = compute_spec_hash(forge_wms_spec)
+        modified = copy.deepcopy(forge_wms_spec)
         modified["adapter_identity"]["version"] = "99.99.99"
         modified_hash = compute_spec_hash(modified)
         assert original_hash != modified_hash
 
-    def test_hash_excludes_integrity_block(self, whk_wms_spec: dict):
+    def test_hash_excludes_integrity_block(self, forge_wms_spec: dict):
         """Changing the integrity block should NOT change the hash."""
         import copy
 
-        h1 = compute_spec_hash(whk_wms_spec)
-        modified = copy.deepcopy(whk_wms_spec)
+        h1 = compute_spec_hash(forge_wms_spec)
+        modified = copy.deepcopy(forge_wms_spec)
         modified["integrity"]["spec_hash"] = "deadbeef"
         h2 = compute_spec_hash(modified)
         assert h1 == h2
 
-    def test_verify_spec_hash_with_correct_hash(self, whk_wms_spec: dict):
+    def test_verify_spec_hash_with_correct_hash(self, forge_wms_spec: dict):
         """Spec with matching hash should verify True."""
         import copy
 
-        spec = copy.deepcopy(whk_wms_spec)
+        spec = copy.deepcopy(forge_wms_spec)
         computed = compute_spec_hash(spec)
         spec["integrity"]["spec_hash"] = computed
         verified, msg = verify_spec_hash(spec)
         assert verified is True
         assert "verified" in msg.lower()
 
-    def test_verify_spec_hash_with_wrong_hash(self, whk_wms_spec: dict):
+    def test_verify_spec_hash_with_wrong_hash(self, forge_wms_spec: dict):
         """Spec with mismatched hash should verify False."""
         import copy
 
-        spec = copy.deepcopy(whk_wms_spec)
+        spec = copy.deepcopy(forge_wms_spec)
         spec["integrity"]["spec_hash"] = "0" * 64
         verified, msg = verify_spec_hash(spec)
         assert verified is False
         assert "mismatch" in msg.lower()
 
-    def test_verify_spec_integrity_full(self, whk_wms_spec: dict):
+    def test_verify_spec_integrity_full(self, forge_wms_spec: dict):
         """Full integrity verification should return structured result."""
-        result = verify_spec_integrity(whk_wms_spec)
+        result = verify_spec_integrity(forge_wms_spec)
         assert "hash_verified" in result
         assert "hash_state" in result
         assert "warnings" in result

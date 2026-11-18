@@ -123,8 +123,8 @@ async def test_error_mapping(client, app, spoke: FakeSpoke) -> None:
     assert CALLBACK_PARAM in resp.json()["detail"]
 
     # read-only adapter with a callback
-    await _register_with_callback(client, app, "whk-wms", write=False)
-    resp = await client.post("/v1/adapters/whk-wms/write", json={"tag_path": "t", "value": 1})
+    await _register_with_callback(client, app, "forge-wms", write=False)
+    resp = await client.post("/v1/adapters/forge-wms/write", json={"tag_path": "t", "value": 1})
     assert resp.status_code == 403
 
     # spoke unreachable

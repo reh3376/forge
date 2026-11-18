@@ -1,4 +1,4 @@
-"""WHK WMS Adapter — the first working Forge adapter.
+"""Forge WMS Adapter — the first working Forge adapter.
 
 Implements AdapterBase + SubscriptionProvider + BackfillProvider +
 DiscoveryProvider (everything except WritableAdapter, per FACTS spec
@@ -23,9 +23,9 @@ from forge.adapters.base.interface import (
     DiscoveryProvider,
     SubscriptionProvider,
 )
-from forge.adapters.whk_wms.config import WhkWmsConfig
-from forge.adapters.whk_wms.context import build_record_context
-from forge.adapters.whk_wms.record_builder import build_contextual_record
+from forge.adapters.forge_wms.config import ForgeWmsConfig
+from forge.adapters.forge_wms.context import build_record_context
+from forge.adapters.forge_wms.record_builder import build_contextual_record
 from forge.core.clock import SourceStampMissingError
 from forge.core.models.adapter import (
     AdapterCapabilities,
@@ -67,7 +67,7 @@ def _load_manifest() -> AdapterManifest:
     )
 
 
-class WhkWmsAdapter(
+class ForgeWmsAdapter(
     AdapterBase,
     SubscriptionProvider,
     BackfillProvider,
@@ -85,7 +85,7 @@ class WhkWmsAdapter(
 
     def __init__(self) -> None:
         super().__init__()
-        self._config: WhkWmsConfig | None = None
+        self._config: ForgeWmsConfig | None = None
         self._subscriptions: dict[str, Any] = {}
         self._consecutive_failures: int = 0
         self._last_healthy: datetime | None = None
@@ -94,11 +94,11 @@ class WhkWmsAdapter(
 
     async def configure(self, params: dict[str, Any]) -> None:
         """Validate and store connection parameters."""
-        self._config = WhkWmsConfig(**params)
+        self._config = ForgeWmsConfig(**params)
         self.check_time_governance()
         self._state = AdapterState.REGISTERED
         logger.info(
-            "WHK-WMS adapter configured: graphql=%s",
+            "forge-wms adapter configured: graphql=%s",
             self._config.graphql_url,
         )
 
@@ -116,7 +116,7 @@ class WhkWmsAdapter(
         # TODO(P3-live): Connect to RabbitMQ and bind exchanges
         self._state = AdapterState.HEALTHY
         self._last_healthy = datetime.now(UTC)
-        logger.info("WHK-WMS adapter started (state=%s)", self._state)
+        logger.info("forge-wms adapter started (state=%s)", self._state)
 
     async def stop(self) -> None:
         """Graceful shutdown."""
@@ -124,7 +124,7 @@ class WhkWmsAdapter(
         # TODO(P3-live): Disconnect from RabbitMQ
         self._subscriptions.clear()
         self._state = AdapterState.STOPPED
-        logger.info("WHK-WMS adapter stopped")
+        logger.info("forge-wms adapter stopped")
 
     async def health(self) -> AdapterHealth:
         """Return current health status."""
@@ -198,7 +198,7 @@ class WhkWmsAdapter(
             "callback": callback,
         }
         logger.info(
-            "WHK-WMS subscription %s: tags=%s",
+            "forge-wms subscription %s: tags=%s",
             sub_id,
             tags,
         )

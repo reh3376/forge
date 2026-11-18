@@ -72,9 +72,9 @@ def barrel_events(barrel_event: dict) -> list[dict[str, Any]]:
 
 
 @pytest.fixture()
-def whk_wms_spec() -> dict[str, Any]:
-    """Load the WHK WMS FACTS spec from the governance directory."""
-    spec_path = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "whk-wms.facts.json"
+def forge_wms_spec() -> dict[str, Any]:
+    """Load the Forge WMS FACTS spec from the governance directory."""
+    spec_path = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "forge-wms.facts.json"
     return json.loads(spec_path.read_text())
 
 

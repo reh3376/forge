@@ -14,8 +14,8 @@ func TestContextualRecordRoundTrip(t *testing.T) {
 	rec := &forgev1.ContextualRecord{
 		RecordId: "test-001",
 		Source: &forgev1.RecordSource{
-			AdapterId: "whk-wms",
-			System:    "whk-wms-prod",
+			AdapterId: "forge-wms",
+			System:    "forge-wms-prod",
 			TagPath:   "Area1/Fermenter3/Temperature",
 		},
 		Timestamp: &forgev1.RecordTimestamp{
@@ -48,8 +48,8 @@ func TestContextualRecordRoundTrip(t *testing.T) {
 	if rec2.RecordId != "test-001" {
 		t.Errorf("record_id: got %q, want %q", rec2.RecordId, "test-001")
 	}
-	if rec2.Source.AdapterId != "whk-wms" {
-		t.Errorf("adapter_id: got %q, want %q", rec2.Source.AdapterId, "whk-wms")
+	if rec2.Source.AdapterId != "forge-wms" {
+		t.Errorf("adapter_id: got %q, want %q", rec2.Source.AdapterId, "forge-wms")
 	}
 	if rec2.Value.GetNumberValue() != 72.5 {
 		t.Errorf("number_value: got %f, want 72.5", rec2.Value.GetNumberValue())
@@ -61,8 +61,8 @@ func TestContextualRecordRoundTrip(t *testing.T) {
 
 func TestAdapterManifestFields(t *testing.T) {
 	m := &forgev1.AdapterManifest{
-		AdapterId: "whk-wms",
-		Name:      "WHK WMS Adapter",
+		AdapterId: "forge-wms",
+		Name:      "Forge WMS Adapter",
 		Version:   "0.1.0",
 		Type:      "INGESTION",
 		Protocol:  "graphql+amqp",
@@ -74,7 +74,7 @@ func TestAdapterManifestFields(t *testing.T) {
 		},
 	}
 
-	if m.AdapterId != "whk-wms" {
+	if m.AdapterId != "forge-wms" {
 		t.Errorf("adapter_id: got %q", m.AdapterId)
 	}
 	if m.Tier != forgev1.AdapterTier_ADAPTER_TIER_ERP_BUSINESS {

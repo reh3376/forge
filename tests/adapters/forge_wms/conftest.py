@@ -1,4 +1,4 @@
-"""Test configuration for WHK WMS adapter tests."""
+"""Test configuration for Forge WMS adapter tests."""
 
 import sys
 from pathlib import Path

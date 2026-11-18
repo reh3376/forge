@@ -46,7 +46,7 @@ These documents are the authority (A-12). Where Jiminy or MDEMG guidance injecte
 2. Before every push:
    - the documents match the code: `docs/WHERE-WE-ARE.md` (status date, last merged PR, pick-up point, numbers), `BACKLOG.md`, the roadmap, the README counts;
    - both tracks of the tutorial are reviewed against the change and updated, then `make sync-tutorial-embed`, `make verify-tutorial-embed` and `make check-tutorial-build`. The tutorial must describe the code as it is;
-   - the full test suite passes (`uv run pytest tests -q`, `uv run ruff check src tests`, and the Go and bridge checks when those areas changed);
+   - the full test suite passes (`uv run pytest tests -q`, `uv run ruff check .` and `uv run ruff format --check .`, over the whole repository as CI runs them, and the Go and bridge checks when those areas changed);
    - `gitleaks` is clean on the commits.
 3. Push to `reh3376_dev01`. The `auto-pr.yml` workflow opens the pull request. Never open a pull request as the owner.
 4. The owner approves and merges, then says "pr N merged". Sync with `main`, confirm no pull request is open, and start the next item.
@@ -61,6 +61,7 @@ Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `build:`)
 - **FxTS specs are the standard for repeatable work (A-13).** Every highly repeatable process has an FxTS spec, and the work is built to it. A repeatable process without one is a finding.
 - **Confirm with the owner before installing packages** or changing a manifest or lock file.
 - **Local models only** for the project's own tooling (`mdemg-llm-v1`). No cloud model.
+- **No existing company is named in this repository.** It is public. Use `forge-<service>` names; the old `whk` names are being removed wherever that breaks nothing (FB-150). Never add a new one.
 - **The repository is public.** Nothing is imported without a secrets scan of its history, and no secret enters a commit. Ask the owner before committing design material for work that is not yet public.
 - **Weigh each decision against the finished product.** Flag anything that would pin the platform in before it reaches a record.
 
@@ -69,7 +70,7 @@ Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `build:`)
 ```bash
 uv sync --locked --extra dev --extra ot      # install from the lock file
 uv run pytest tests -q                       # the Python suite, about a minute
-uv run ruff check src tests && uv run ruff format --check src tests
+uv run ruff check . && uv run ruff format --check .   # the whole repository, as CI does
 uv run forge governance specs                # spec states and hash checks
 cd go && gofmt -l . && go vet ./... && go test ./...
 make sync-tutorial-embed verify-tutorial-embed check-tutorial-build

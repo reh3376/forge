@@ -31,7 +31,7 @@ Forge solves Industry / Manufacturing dataOPS.  Organizations run on dozens of d
           ┌─────────────┼──────────────┐
           ▼             ▼              ▼
    ┌────────────┐ ┌──────────┐ ┌────────────┐
-   │ OT Module  │ │ WHK-CMMS │ │ WHK-WMS    │   ... (10 spokes)
+   │ OT Module  │ │ WHK-CMMS │ │ forge-wms    │   ... (10 spokes)
    │ (OPC-UA,   │ │ Adapter  │ │ Adapter    │
    │  MQTT,     │ │          │ │            │
    │  Alarms,   │ │          │ │            │
@@ -51,7 +51,7 @@ Each spoke wraps one production system and produces ContextualRecords that confo
 
 | Component | Technology |
 |-----------|-----------|
-| Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,733 tests) |
+| Hub (forge-core, `src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (4,736 tests) |
 | Management and integration modules (`go/`) | Go 1.26 · `go build`, `go vet`, `go test` in CI; module SDK scaffold (the Go forge-mes is FB-076) |
 | Interim MES bridge (`modules/Forge MES`) | The migrated whk-mes application, NestJS 10 + Next.js 14, kept running only until the Go forge-mes module (FB-076) replaces it |
 | User interfaces | forge-display renders every surface from FVTS specs (not built yet; the FVTS runner and reference renderer exist) |
@@ -103,7 +103,7 @@ src/forge/
 │   │   ├── schema/facts.schema.json
 │   │   ├── specs/                 # Per-spoke compliance specs (9 spokes)
 │   │   │   ├── ot-module.facts.json      (v0.5.0 — 21 data sources)
-│   │   │   ├── whk-wms.facts.json
+│   │   │   ├── forge-wms.facts.json
 │   │   │   ├── forge-mes.facts.json
 │   │   │   ├── whk-cmms.facts.json
 │   │   │   ├── bosc-ims.facts.json
@@ -258,7 +258,7 @@ Each spoke has a FACTS spec that declares its identity, capabilities, connection
 
 | Spoke | System (data sources) | Spec |
 |-------|-----------------------|------|
-| `whk-wms` | Warehouse management (GraphQL, RabbitMQ, REST; 14 sources) | v0.1.0 — approved (reh3376) |
+| `forge-wms` | Warehouse management (GraphQL, RabbitMQ, REST; 14 sources) | v0.1.0 — approved (reh3376) |
 | `forge-mes` | Manufacturing execution, `modules/Forge MES` (GraphQL, RabbitMQ, MQTT, REST, WebSocket, database; 18 sources) | v0.1.0 — approved 2026-10-15 (reh3376) |
 | `bosc-ims` | Aerospace inventory (gRPC unary and stream; 8 sources) | v0.1.0 — approved (no approver recorded) |
 | `whk-cmms` | Maintenance management (GraphQL, REST, RabbitMQ; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
@@ -307,14 +307,14 @@ The scripting SDK provides 11 modules that replace Ignition's `system.*` namespa
 
 | Spoke | Repo | Tech | Role |
 |-------|------|------|------|
-| WHK-WMS | `WhiskeyHouse/whk-wms` | NestJS + Next.js | Warehouse Management |
+| forge-wms | `WhiskeyHouse/forge-wms` | NestJS + Next.js | Warehouse Management |
 | Forge MES | `modules/Forge MES` (in-repo; migrated from `WhiskeyHouse/whk-mes` on 2026-10-15) | NestJS 10 + Next.js 14 | Manufacturing Execution — forge-mes replaces whk-mes |
 | WHK-CMMS | `reh3376/whk-cmms` | GraphQL + REST + RabbitMQ | Maintenance Management |
 | BOSC-IMS | `reh3376/bosc_ims` | Go + gRPC | Aerospace Inventory |
 | WHK-NMS | `WhiskeyHouse/net-topology` | FastAPI + Next.js | Network Management |
 | WHK-ERPI | `reh3376/whk-erpi` | RabbitMQ + REST + GraphQL | ERP Integration (NetSuite) |
 | NextTrend | `TheThoughtagen/nexttrend` | Rust + Next.js | Time-Series Historian |
-| Scanner Gateway | `WhiskeyHouse/whk-wms-android` | Kotlin | Android Barcode Scanner |
+| Scanner Gateway | `WhiskeyHouse/forge-wms-android` | Kotlin | Android Barcode Scanner |
 | Ignition SCADA | `WhiskeyHouse/whk-ignition-scada` | Ignition 8.x | SCADA/HMI (being replaced) |
 | Ignition Global | `WhiskeyHouse/whk-distillery01-ignition-global` | Jython 2.7 | Middleware scripts (being migrated) |
 
@@ -366,14 +366,14 @@ uv sync --locked --extra dev --extra ot && uv run pytest   # then commit uv.lock
 ### Test Coverage
 
 ```
-Total:  4,733 tests collected (full suite green on 2026-11-18)
+Total:  4,736 tests collected (full suite green on 2026-11-18)
         274 test files
         360 source files
 
 By area:
   OT module:                       1,162  (alarming, bridge, control, mqtt, tag_engine, opcua)
   Spokes (adapters):               1,011
-  Governance (FxTS):                 728  (FATS, FACTS, FTTS, FVTS, FMTS runners and schemas)
+  Governance (FxTS):                 731  (FATS, FACTS, FTTS, FVTS, FMTS runners and schemas)
   Scripting SDK, module builder:     356
   Core models, registry, context:    547
   Storage:                           317
@@ -431,4 +431,4 @@ The published tutorial is at https://reh3376.github.io/forge/. The `Deploy Tutor
 
 ---
 
-*360 Python source files | 274 test files | 4,733 tests | 9 FACTS · 28 FATS · 9 FMTS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
+*360 Python source files | 274 test files | 4,736 tests | 9 FACTS · 28 FATS · 9 FMTS · 1 FVTS · 1 FTTS specs | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*

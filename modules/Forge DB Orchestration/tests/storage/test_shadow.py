@@ -21,7 +21,7 @@ from forge.storage.shadow import ShadowWriter
 
 
 def _make_record(
-    system: str = "whk-wms",
+    system: str = "forge-wms",
     tag_path: str = "wms.barrel.create.123",
     record_id: uuid.UUID | None = None,
 ) -> ContextualRecord:
@@ -83,10 +83,10 @@ class TestShadowWriter:
     @pytest.mark.asyncio
     async def test_write_tracks_by_spoke(self):
         writer = _make_writer()
-        await writer.write(_make_record(system="whk-wms"))
+        await writer.write(_make_record(system="forge-wms"))
         await writer.write(_make_record(system="forge-mes"))
-        await writer.write(_make_record(system="whk-wms"))
-        assert writer.metrics.by_spoke["whk-wms"] == 2
+        await writer.write(_make_record(system="forge-wms"))
+        assert writer.metrics.by_spoke["forge-wms"] == 2
         assert writer.metrics.by_spoke["forge-mes"] == 1
 
     @pytest.mark.asyncio

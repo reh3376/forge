@@ -25,7 +25,7 @@ from forge.core.models.manufacturing.operational_event import OperationalEvent
 
 logger = logging.getLogger(__name__)
 
-_SOURCE_SYSTEM = "whk-wms"
+_SOURCE_SYSTEM = "forge-wms"
 
 # WMS EventType → Forge EventCategory
 _EVENT_TYPE_TO_CATEGORY: dict[str, EventCategory] = {

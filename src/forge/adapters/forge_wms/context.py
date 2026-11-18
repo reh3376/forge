@@ -1,7 +1,7 @@
 """WMS context mapper — transforms raw WMS events into RecordContext.
 
 Implements the 11 context field mappings and 3 enrichment rules
-defined in the whk-wms FACTS spec (context_mapping section):
+defined in the forge-wms FACTS spec (context_mapping section):
 
 Mandatory context fields:
     manufacturing_unit_id, lot_id, physical_asset_id,

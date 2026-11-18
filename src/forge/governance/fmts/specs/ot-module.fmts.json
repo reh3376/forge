@@ -1,8 +1,9 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "module_identity": {
     "module_id": "ot-module",
     "name": "Forge OT/SCADA Module — OPC-UA Adapter",
+    "alias": "ot",
     "version": "0.5.0",
     "kind": "ot",
     "language": "python",
@@ -72,9 +73,19 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": null,
-    "change_history": [],
+    "previous_hash": "8d17a328e5ea4834704cc545c00a4d9f236df7dd6c880b22ed9bcc8c8ea64a70",
+    "change_history": [
+      {
+        "previous_hash": "8d17a328e5ea4834704cc545c00a4d9f236df7dd6c880b22ed9bcc8c8ea64a70",
+        "new_hash": "67ef9bfcd2b9929ac5db14306371373ddb8ac407ffc30a84dbfeef0e7fd82227",
+        "changed_at": "2026-11-18T15:32:42Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
+      }
+    ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "8d17a328e5ea4834704cc545c00a4d9f236df7dd6c880b22ed9bcc8c8ea64a70"
+    "spec_hash": "67ef9bfcd2b9929ac5db14306371373ddb8ac407ffc30a84dbfeef0e7fd82227"
   }
 }

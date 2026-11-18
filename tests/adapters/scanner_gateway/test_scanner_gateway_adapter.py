@@ -77,7 +77,7 @@ class TestManifest:
 _VALID_CONFIG = {
     "gateway_listen_host": "0.0.0.0",
     "gateway_listen_port": 50060,
-    "wms_adapter_id": "whk-wms",
+    "wms_adapter_id": "forge-wms",
     "ims_adapter_id": "bosc-ims",
     "device_token_secret": "test-secret-key-for-device-auth",
 }
@@ -110,7 +110,7 @@ class TestLifecycle:
         await adapter.configure(_VALID_CONFIG)
         assert adapter._router is not None
         ids = adapter._router.target_adapter_ids()
-        assert "whk-wms" in ids
+        assert "forge-wms" in ids
         assert "bosc-ims" in ids
 
     @pytest.mark.asyncio()
@@ -255,7 +255,7 @@ class TestCollect:
         )
         records = [r async for r in adapter.collect()]
         routed_to = records[0].context.extra["_routed_to"]
-        assert "whk-wms" in routed_to
+        assert "forge-wms" in routed_to
         assert "bosc-ims" in routed_to
 
     @pytest.mark.asyncio()
@@ -435,7 +435,7 @@ class TestQueueCollection:
         )
         records = [r async for r in adapter.collect()]
         routed = records[0].context.extra["_routed_to"]
-        assert "whk-wms" in routed
+        assert "forge-wms" in routed
         assert "bosc-ims" in routed
 
     @pytest.mark.asyncio()
@@ -551,7 +551,7 @@ class TestEndToEnd:
         # Verify first record (barrel entry → WMS)
         entry_record = records[0]
         assert entry_record.source.tag_path == "scanner.scan.entry"
-        assert "whk-wms" in entry_record.context.extra["_routed_to"]
+        assert "forge-wms" in entry_record.context.extra["_routed_to"]
 
         # Verify second record (asset receive → IMS)
         asset_record = records[1]

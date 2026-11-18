@@ -1,8 +1,9 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "module_identity": {
     "module_id": "forge-mes",
     "name": "Forge MES (the interim MES bridge)",
+    "alias": "mes",
     "version": "0.1.0",
     "kind": "management",
     "language": "typescript",
@@ -95,8 +96,17 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": "143c13540a8f2b404171283c78ccdd586dcf18840f7cfa44769bf35862f6bad9",
+    "previous_hash": "15c1953615c0dea524b872aa426ae38b11d64f6e4d29f2a370c564e1684cae47",
     "change_history": [
+      {
+        "previous_hash": "15c1953615c0dea524b872aa426ae38b11d64f6e4d29f2a370c564e1684cae47",
+        "new_hash": "f6d8a7e8e90b40ae5645be762fb8e61081c6d17ff033ca778ffe490cf2c197cd",
+        "changed_at": "2026-11-18T15:32:41Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
+      },
       {
         "previous_hash": "143c13540a8f2b404171283c78ccdd586dcf18840f7cfa44769bf35862f6bad9",
         "new_hash": "15c1953615c0dea524b872aa426ae38b11d64f6e4d29f2a370c564e1684cae47",
@@ -108,6 +118,6 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "15c1953615c0dea524b872aa426ae38b11d64f6e4d29f2a370c564e1684cae47"
+    "spec_hash": "f6d8a7e8e90b40ae5645be762fb8e61081c6d17ff033ca778ffe490cf2c197cd"
   }
 }

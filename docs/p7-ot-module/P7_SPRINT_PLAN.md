@@ -70,7 +70,7 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 | CMMS (work orders, equipment registry) | whk-cmms | Existing (P2 adapter done) |
 | MES (recipes, production orders, changeover) | forge-mes | Existing (adapter done) |
 | Time-series historian | NextTrend | Existing (P5 adapter done) |
-| Barrel printing / WMS | whk-wms | Existing (adapter done) |
+| Barrel printing / WMS | forge-wms | Existing (adapter done) |
 | Network monitoring | net-topology (NMS) | Existing (P3 adapter done) |
 
 ### Hard Constraints
@@ -409,7 +409,7 @@ The scripting engine is a new sub-package within the existing `forge.sdk` — NO
 | # | Task | Details |
 |---|------|---------|
 | 6.1.1 | Inventory Ignition scripts | Catalog all 1,539 Jython files by category: tag change, timer, WebDev, project library, alarm pipeline |
-| 6.1.2 | Identify migration scope | Many scripts are already replaced by dedicated modules (CMMS→whk-cmms, MES→forge-mes, barrel printing→whk-wms). Identify only scripts that need OT Module equivalents |
+| 6.1.2 | Identify migration scope | Many scripts are already replaced by dedicated modules (CMMS→whk-cmms, MES→forge-mes, barrel printing→forge-wms). Identify only scripts that need OT Module equivalents |
 | 6.1.3 | Convert system.* to forge.* | `system.tag.readBlocking()` → `await forge.tag.read()`, `system.db.runPrepQuery()` → `await forge.db.query()`, etc. |
 | 6.1.4 | Convert WebDev endpoints | `doGet(request, session)` → `@forge.api.route("/path", methods=["GET"])` handlers |
 | 6.1.5 | Add type hints and async | Convert synchronous Jython to async Python 3.12+ with proper type annotations |

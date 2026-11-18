@@ -72,7 +72,7 @@ class SchemaMetadata:
 
     Attributes:
         schema_id: The schema id, ``forge://schemas/<spoke>/<Entity>`` (e.g.
-            ``forge://schemas/whk-wms/Barrel``); the registry assigns the
+            ``forge://schemas/forge-wms/Barrel``); the registry assigns the
             versions, so the id carries none (``forge.core.schema_ref``, FB-008)
         name: Human-readable name
         schema_type: Category of schema

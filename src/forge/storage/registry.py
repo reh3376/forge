@@ -63,7 +63,7 @@ class SchemaEntry:
         schema_id: The version ref ``forge://schemas/<spoke>/<entity>/v<version>``,
             which must agree with ``spoke_id``, ``entity_name`` and ``version``
             (``forge.core.schema_ref``, FB-008)
-        spoke_id: Source spoke identifier (e.g., "whk-wms", "forge-mes")
+        spoke_id: Source spoke identifier (e.g., "forge-wms", "forge-mes")
         entity_name: Entity type name (e.g., "Barrel", "Recipe", "Device")
         version: Semantic version string
         schema_json: JSON Schema defining the entity structure
@@ -125,9 +125,9 @@ class SchemaRegistry:
 
         registry = SchemaRegistry()
         registry.register(entry)
-        entry = registry.get("forge://schemas/whk-wms/Barrel/v1.0.0")
-        entries = registry.list_by_spoke("whk-wms")
-        drift = registry.check_drift("whk-wms")
+        entry = registry.get("forge://schemas/forge-wms/Barrel/v1.0.0")
+        entries = registry.list_by_spoke("forge-wms")
+        drift = registry.check_drift("forge-wms")
     """
 
     _entries: dict[str, SchemaEntry] = field(default_factory=dict, init=False)

@@ -436,8 +436,8 @@ func TestValidateFoldsNestedEntitiesIn(t *testing.T) {
 	if err == nil || err.Error() != "ProcessDefinition: steps[1]: missing source_id; steps[1]: missing name" {
 		t.Errorf("definition: %v", err)
 	}
-	sample := mfg.NewQualitySample("whk-wms", "QS-001", "proof_check", "manufacturing_unit", "B-001")
-	result := mfg.NewSampleResult("whk-wms", "SR-001", "proof")
+	sample := mfg.NewQualitySample("forge-wms", "QS-001", "proof_check", "manufacturing_unit", "B-001")
+	result := mfg.NewSampleResult("forge-wms", "SR-001", "proof")
 	result.Outcome = "MAYBE"
 	sample.Results = []mfg.SampleResult{result}
 	err = sample.Validate()

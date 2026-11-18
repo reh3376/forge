@@ -45,14 +45,14 @@ def test_the_spoke_link_is_two_way_once_an_exchange_is_reported() -> None:
     tracker = ClockOffsetTracker(tolerance_seconds=1.0)
     # before any exchange: one-way, from the record's own stamps, and it carries the delay
     stamps = RecordTimestamp(source_time=HUB, ingestion_time=HUB, spoke_time=HUB - ms(300))
-    one_way = tracker.observe_record("whk-wms", stamps)[SPOKE_LINK]
+    one_way = tracker.observe_record("forge-wms", stamps)[SPOKE_LINK]
     assert one_way.last_seconds == pytest.approx(-0.3) and one_way.round_trip_seconds is None
-    assert not tracker.measured_two_way("whk-wms")
+    assert not tracker.measured_two_way("forge-wms")
 
     stats = tracker.observe_exchange(
-        "whk-wms", offset_seconds=-0.020, round_trip_seconds=0.004, at=HUB
+        "forge-wms", offset_seconds=-0.020, round_trip_seconds=0.004, at=HUB
     )
-    assert tracker.measured_two_way("whk-wms")
+    assert tracker.measured_two_way("forge-wms")
     assert stats.last_seconds == pytest.approx(0.020)  # the series is spoke minus hub
     assert stats.round_trip_seconds == 0.004 and stats.estimate_uncertainty_seconds == 0.002
     assert stats.samples == 1  # the one-way samples were another measurement: dropped
@@ -60,7 +60,11 @@ def test_the_spoke_link_is_two_way_once_an_exchange_is_reported() -> None:
 
     # with the spoke's declared class the two-way series is held to it (it-lan, 10 ms)
     held = tracker.observe_exchange(
-        "whk-wms", offset_seconds=-0.020, round_trip_seconds=0.004, at=HUB, tolerance_seconds=0.010
+        "forge-wms",
+        offset_seconds=-0.020,
+        round_trip_seconds=0.004,
+        at=HUB,
+        tolerance_seconds=0.010,
     )
     assert held.tolerance_seconds == 0.010 and held.within_tolerance is False
     assert held.samples == 2
@@ -69,9 +73,9 @@ def test_the_spoke_link_is_two_way_once_an_exchange_is_reported() -> None:
     more = RecordTimestamp(
         source_time=HUB, server_time=HUB, ingestion_time=HUB, spoke_time=HUB - ms(300)
     )
-    observed = tracker.observe_record("whk-wms", more)
+    observed = tracker.observe_record("forge-wms", more)
     assert SPOKE_LINK not in observed and SERVER_LINK in observed
-    assert tracker.stats("whk-wms")[SPOKE_LINK].samples == 2
+    assert tracker.stats("forge-wms")[SPOKE_LINK].samples == 2
     # a spoke that has not reported an exchange is still measured one-way
     assert SPOKE_LINK in tracker.observe_record("whk-mes", stamps)
     assert not tracker.measured_two_way("whk-mes")
@@ -108,7 +112,7 @@ def test_the_exchange_messages_cross_both_serializers() -> None:
 
 def test_health_carries_the_hub_s_half_of_the_exchange() -> None:
     health = AdapterHealth(
-        adapter_id="whk-wms",
+        adapter_id="forge-wms",
         state=AdapterState.HEALTHY,
         hub_time=HubTime(receive_time=HUB, transmit_time=HUB + ms(2)),
     )
@@ -117,7 +121,7 @@ def test_health_carries_the_hub_s_half_of_the_exchange() -> None:
     )
     wire = serialization.pydantic_to_proto(health)
     assert serialization.proto_to_pydantic(wire, "AdapterHealth").hub_time == health.hub_time
-    plain = AdapterHealth(adapter_id="whk-wms", state=AdapterState.HEALTHY)
+    plain = AdapterHealth(adapter_id="forge-wms", state=AdapterState.HEALTHY)
     assert proto_bridge.proto_to_health(proto_bridge.health_to_proto(plain)).hub_time is None
     assert "hub_time" not in serialization.pydantic_to_proto(plain)
 

@@ -49,7 +49,7 @@ class TestInMemoryRoundTrip:
         await consumer.consume(exchange, "test-queue", on_message)
 
         # Publish
-        await producer.publish(exchange, {"adapter_id": "whk-wms", "event": "registered"})
+        await producer.publish(exchange, {"adapter_id": "forge-wms", "event": "registered"})
 
         # Deliver published messages to consumer
         for msg in producer.get_messages(exchange.name):
@@ -57,7 +57,7 @@ class TestInMemoryRoundTrip:
             await consumer.deliver("test-queue", body)
 
         assert len(received) == 1
-        assert received[0]["adapter_id"] == "whk-wms"
+        assert received[0]["adapter_id"] == "forge-wms"
 
     @pytest.mark.asyncio
     async def test_contextual_record_serialization_roundtrip(self):
@@ -113,8 +113,8 @@ class TestInMemoryRoundTrip:
         publisher = ForgeEventPublisher(producer)
 
         # Publish lifecycle events
-        await publisher.adapter_registered("whk-wms", "WMS Adapter")
-        await publisher.record_ingested("whk-wms", count=10)
+        await publisher.adapter_registered("forge-wms", "WMS Adapter")
+        await publisher.record_ingested("forge-wms", count=10)
         await publisher.governance_violation("schema-drift", detail="hash mismatch")
 
         # Verify adapter lifecycle

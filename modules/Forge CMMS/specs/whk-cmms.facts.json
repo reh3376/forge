@@ -399,7 +399,7 @@
       "data_flow": "CMMS scheduled maintenance windows → MES production scheduling constraints"
     },
     {
-      "adapter_id": "whk-wms",
+      "adapter_id": "forge-wms",
       "relationship": "WMS coordinates with CMMS on inventory investigations and physical counts",
       "data_flow": "CMMS inventory investigations ↔ WMS barrel inventory reconciliation"
     }

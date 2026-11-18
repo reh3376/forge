@@ -45,7 +45,7 @@ index e69de29..583aae5 100644
 +          ┌─────────────┼──────────────┐
 +          ▼             ▼              ▼
 +   ┌────────────┐ ┌──────────┐ ┌────────────┐
-+   │ OT Module  │ │ WHK-CMMS │ │ WHK-WMS    │   ... (10 spokes)
++   │ OT Module  │ │ WHK-CMMS │ │ forge-wms    │   ... (10 spokes)
 +   │ (OPC-UA,   │ │ Adapter  │ │ Adapter    │
 +   │  MQTT,     │ │          │ │            │
 +   │  Alarms,   │ │          │ │            │
@@ -115,7 +115,7 @@ index e69de29..583aae5 100644
 +│   │   ├── schema/facts.schema.json
 +│   │   ├── specs/                 # Per-spoke compliance specs (9 spokes)
 +│   │   │   ├── ot-module.facts.json      (v0.5.0 — 21 data sources)
-+│   │   │   ├── whk-wms.facts.json
++│   │   │   ├── forge-wms.facts.json
 +│   │   │   ├── whk-mes.facts.json
 +│   │   │   ├── whk-cmms.facts.json
 +│   │   │   ├── bosc-ims.facts.json
@@ -257,7 +257,7 @@ index e69de29..583aae5 100644
 +| Spoke | System | Status |
 +|-------|--------|--------|
 +| `ot-module` | OPC-UA / MQTT / Alarms / Control Write | v0.5.0 — 21 data sources |
-+| `whk-wms` | Warehouse Management (NestJS) | Draft |
++| `forge-wms` | Warehouse Management (NestJS) | Draft |
 +| `whk-mes` | Manufacturing Execution (NestJS) | Draft |
 +| `whk-cmms` | Computerized Maintenance (n8n) | Draft |
 +| `bosc-ims` | Aerospace Inventory (Go gRPC) | Draft |
@@ -303,14 +303,14 @@ index e69de29..583aae5 100644
 +
 +| Spoke | Repo | Tech | Role |
 +|-------|------|------|------|
-+| WHK-WMS | `WhiskeyHouse/whk-wms` | NestJS + Next.js | Warehouse Management |
++| forge-wms | `WhiskeyHouse/forge-wms` | NestJS + Next.js | Warehouse Management |
 +| WHK-MES | `WhiskeyHouse/whk-mes` | NestJS + Next.js | Manufacturing Execution |
 +| WHK-CMMS | `reh3376/whk-cmms` | n8n + API | Maintenance Management |
 +| BOSC-IMS | `reh3376/bosc_ims` | Go + gRPC | Aerospace Inventory |
 +| WHK-NMS | `WhiskeyHouse/net-topology` | FastAPI + Next.js | Network Management |
 +| WHK-ERPI | `reh3376/whk-erpi` | Python | ERP Integration (NetSuite) |
 +| NextTrend | `TheThoughtagen/nexttrend` | Rust + Next.js | Time-Series Historian |
-+| Scanner Gateway | `WhiskeyHouse/whk-wms-android` | Kotlin | Android Barcode Scanner |
++| Scanner Gateway | `WhiskeyHouse/forge-wms-android` | Kotlin | Android Barcode Scanner |
 +| Ignition SCADA | `WhiskeyHouse/whk-ignition-scada` | Ignition 8.x | SCADA/HMI (being replaced) |
 +| Ignition Global | `WhiskeyHouse/whk-distillery01-ignition-global` | Jython 2.7 | Middleware scripts (being migrated) |
 +

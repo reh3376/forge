@@ -1,8 +1,9 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "module_identity": {
     "module_id": "whk-nms",
     "name": "Whiskey House Network Management System Adapter",
+    "alias": "nms",
     "version": "0.1.0",
     "kind": "integration",
     "language": "python",
@@ -73,9 +74,19 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": null,
-    "change_history": [],
+    "previous_hash": "211645dc113b7bcfc50f181628381797a9aca41c9b1b17e5c9134817421a12fa",
+    "change_history": [
+      {
+        "previous_hash": "211645dc113b7bcfc50f181628381797a9aca41c9b1b17e5c9134817421a12fa",
+        "new_hash": "1859fdbbaa4473e7de3110bed4df64e71d8b66cb55a3e4ce374a5d38c3e6fa38",
+        "changed_at": "2026-11-18T15:32:42Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
+      }
+    ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "211645dc113b7bcfc50f181628381797a9aca41c9b1b17e5c9134817421a12fa"
+    "spec_hash": "1859fdbbaa4473e7de3110bed4df64e71d8b66cb55a3e4ce374a5d38c3e6fa38"
   }
 }

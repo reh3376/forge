@@ -10,7 +10,7 @@ hub-level concerns:
 Usage::
 
     publisher = ForgeEventPublisher(producer)
-    await publisher.adapter_registered("whk-wms", "WMS Adapter")
+    await publisher.adapter_registered("forge-wms", "WMS Adapter")
     await publisher.record_ingested("whk-erpi", count=42)
 """
 

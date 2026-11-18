@@ -126,8 +126,8 @@ class TestManifestBuilderValidation:
             assert manifest["capabilities"][cap] is True
 
     def test_hyphenated_id_valid(self):
-        manifest = ManifestBuilder("whk-wms-v2").build()
-        assert manifest["adapter_id"] == "whk-wms-v2"
+        manifest = ManifestBuilder("forge-wms-v2").build()
+        assert manifest["adapter_id"] == "forge-wms-v2"
 
     def test_underscored_id_valid(self):
         manifest = ManifestBuilder("acme_plc").build()

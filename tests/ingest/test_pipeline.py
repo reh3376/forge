@@ -387,9 +387,9 @@ class TestCurationOnIngest:
     async def test_other_adapters_and_rejected_batches_curate_nothing(self):
         engine, _product = self._engine()
         pipeline = IngestPipeline(curation=engine)
-        outcome = await pipeline.ingest([self._numeric("whk-wms")], adapter_id="whk-wms")
+        outcome = await pipeline.ingest([self._numeric("forge-wms")], adapter_id="forge-wms")
         assert outcome.accepted == 1 and outcome.curated == {}
-        rejected = await pipeline.ingest([self._numeric("whk-wms")], adapter_id="forge-mes")
+        rejected = await pipeline.ingest([self._numeric("forge-wms")], adapter_id="forge-mes")
         assert rejected.accepted == 0 and rejected.curated == {}
 
     @pytest.mark.asyncio

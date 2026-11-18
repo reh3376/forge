@@ -1,15 +1,15 @@
 """Tests for all WMS entity mappers."""
 
-from forge.adapters.whk_wms.mappers.business_entity import map_customer, map_vendor
-from forge.adapters.whk_wms.mappers.lot import map_lot
-from forge.adapters.whk_wms.mappers.manufacturing_unit import map_barrel
-from forge.adapters.whk_wms.mappers.operational_event import map_barrel_event
-from forge.adapters.whk_wms.mappers.physical_asset import (
+from forge.adapters.forge_wms.mappers.business_entity import map_customer, map_vendor
+from forge.adapters.forge_wms.mappers.lot import map_lot
+from forge.adapters.forge_wms.mappers.manufacturing_unit import map_barrel
+from forge.adapters.forge_wms.mappers.operational_event import map_barrel_event
+from forge.adapters.forge_wms.mappers.physical_asset import (
     map_storage_location,
     map_warehouse,
 )
-from forge.adapters.whk_wms.mappers.production_order import map_production_order
-from forge.adapters.whk_wms.mappers.work_order import map_warehouse_job
+from forge.adapters.forge_wms.mappers.production_order import map_production_order
+from forge.adapters.forge_wms.mappers.work_order import map_warehouse_job
 from forge.core.models.manufacturing.enums import (
     AssetType,
     EntityType,
@@ -44,7 +44,7 @@ class TestMapBarrel:
     def test_maps_basic_fields(self):
         barrel = map_barrel(self._raw())
         assert barrel is not None
-        assert barrel.source_system == "whk-wms"
+        assert barrel.source_system == "forge-wms"
         assert barrel.source_id == "BRL-001"
         assert barrel.unit_type == "barrel"
         assert barrel.serial_number == "SN-001"

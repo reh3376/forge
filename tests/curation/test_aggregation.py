@@ -145,11 +145,11 @@ class TestAggregationLineage:
         assert "dp-test" in lineage.schema_ref
 
     def test_output_preserves_source_adapter(self) -> None:
-        records = make_record_batch(count=5, adapter="whk-wms")
+        records = make_record_batch(count=5, adapter="forge-wms")
         spec = AggregationSpec(
             group_by=["equipment_id"],
             time_window="1hr",
             functions=[AggregationFunction.AVG],
         )
         results = aggregate_records(records, spec)
-        assert results[0].source.adapter_id == "whk-wms"
+        assert results[0].source.adapter_id == "forge-wms"

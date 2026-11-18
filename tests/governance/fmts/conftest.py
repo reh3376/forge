@@ -18,8 +18,8 @@ from forge.governance.shared.runner import add_spec_hash, approve_spec_hash
 if TYPE_CHECKING:
     from pathlib import Path
 
-FACTS_SPEC = FACTS_SCHEMA_PATH.parent.parent / "specs" / "whk-wms.facts.json"
-ADAPTER_DIR = REPO_ROOT / "src" / "forge" / "adapters" / "whk_wms"
+FACTS_SPEC = FACTS_SCHEMA_PATH.parent.parent / "specs" / "forge-wms.facts.json"
+ADAPTER_DIR = REPO_ROOT / "src" / "forge" / "adapters" / "forge_wms"
 
 BACKLOG = """# Backlog
 
@@ -31,7 +31,7 @@ BACKLOG = """# Backlog
 """
 
 ROLES = {
-    "module_id": "whk-wms",
+    "module_id": "forge-wms",
     "roles": [
         {"role_id": "wms-viewer", "scopes": ["wms:barrel:read", "wms:lot:read"]},
         {"role_id": "wms-operator", "scopes": ["wms:barrel:move"], "inherits": ["wms-viewer"]},
@@ -64,7 +64,7 @@ def repo(tmp_path: Path) -> Path:
     module = tmp_path / "src" / "wms"
     shutil.copytree(ADAPTER_DIR, module, ignore=shutil.ignore_patterns("__pycache__"))
     (tmp_path / "specs").mkdir()
-    shutil.copy(FACTS_SPEC, tmp_path / "specs" / "whk-wms.facts.json")
+    shutil.copy(FACTS_SPEC, tmp_path / "specs" / "forge-wms.facts.json")
     (tmp_path / "specs" / "roles.json").write_text(json.dumps(ROLES), encoding="utf-8")
     (tmp_path / "BACKLOG.md").write_text(BACKLOG, encoding="utf-8")
     return tmp_path
@@ -72,10 +72,11 @@ def repo(tmp_path: Path) -> Path:
 
 def _base_spec() -> dict[str, Any]:
     return {
-        "spec_version": "0.1.0",
+        "spec_version": "0.2.0",
         "module_identity": {
-            "module_id": "whk-wms",
+            "module_id": "forge-wms",
             "name": "Warehouse management integration",
+            "alias": "wms",
             "version": "0.1.0",
             "kind": "integration",
             "language": "python",
@@ -83,7 +84,7 @@ def _base_spec() -> dict[str, Any]:
         },
         "hub_link": {"protocol": "grpc", "service": "forge.v1.AdapterService"},
         "references": {
-            "facts": {"path": "specs/whk-wms.facts.json", "adapter_id": "whk-wms"},
+            "facts": {"path": "specs/forge-wms.facts.json", "adapter_id": "forge-wms"},
             "manifest": "src/wms/manifest.json",
             "roles": "specs/roles.json",
         },
@@ -105,7 +106,7 @@ def _base_spec() -> dict[str, Any]:
             ],
             "third_party_systems": [
                 {
-                    "name": "whk-wms",
+                    "name": "forge-wms",
                     "interface": "graphql",
                     "clock_read_method": "http-date-header",
                     "tolerance_class": "it-lan",

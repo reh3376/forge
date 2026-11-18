@@ -1,7 +1,7 @@
 """FMTS — Forge Module Test Specification.
 
 What every Forge module declares before a hub admits it: its kind, the
-baseline it claims (M-1 to M-11), its time contract with every
+name and alias, the baseline it claims (M-1 to M-11), its time contract with every
 counterpart, references to its other specs (FACTS, FVTS, roles) and the
 waivers the owner has approved. Decided in
 ``docs/decisions/forge-module-requirements.md`` (D-12, signed 2026-11-17).

@@ -21,7 +21,7 @@ from forge.ingest.pipeline import IngestPipeline, InMemoryRecordSink
 from forge.storage.config import StorageConfig
 
 
-def _manifest(adapter_id: str = "whk-wms", *, declared: bool = True) -> dict:
+def _manifest(adapter_id: str = "forge-wms", *, declared: bool = True) -> dict:
     # declared: the adapter says Forge's read time may stand in for a reading that carries
     # no timestamp (source_timestamp_origin: forge, one clock, FB-088); the declaration is
     # the FACTS time_governance section on the manifest (FB-090).
@@ -72,7 +72,7 @@ async def test_raw_readings_are_wrapped_and_persisted(client, sink: InMemoryReco
     await client.post("/v1/adapters/register", json=_manifest())
     resp = await client.post(
         "/v1/records",
-        json={"adapter_id": "whk-wms", "records": [{"tag": "temp", "value": 72.5}, {"value": 1}]},
+        json={"adapter_id": "forge-wms", "records": [{"tag": "temp", "value": 72.5}, {"value": 1}]},
     )
     assert resp.status_code == 200
     body = resp.json()
@@ -81,13 +81,13 @@ async def test_raw_readings_are_wrapped_and_persisted(client, sink: InMemoryReco
         "rejected": 0,
         "persisted": 2,
         "errors": [],
-        # curation on ingest (FB-009): no product feeds on whk-wms here
+        # curation on ingest (FB-009): no product feeds on forge-wms here
         "curated": {},
         "curation_errors": [],
     }
     assert len(sink) == 2
-    assert sink.records[0].source.adapter_id == "whk-wms"
-    assert sink.records[0].lineage.schema_ref == "forge://schemas/whk-wms/v1"
+    assert sink.records[0].source.adapter_id == "forge-wms"
+    assert sink.records[0].lineage.schema_ref == "forge://schemas/forge-wms/v1"
     # neither reading carried a timestamp: the hub's read time stands in, and says so
     assert {r.timestamp.source_clock for r in sink.records} == {"forge"}
 
@@ -102,7 +102,7 @@ async def test_reading_without_timestamp_is_refused_unless_the_adapter_declared_
         resp = await client.post(
             "/v1/records",
             json={
-                "adapter_id": "whk-wms",
+                "adapter_id": "forge-wms",
                 "records": [
                     {"tag": "temp", "value": 72.5},
                     {"tag": "temp", "value": 73.0, "timestamp": "2026-06-01T12:00:00Z"},
@@ -118,7 +118,7 @@ async def test_reading_without_timestamp_is_refused_unless_the_adapter_declared_
     assert "refused before ingest" in caplog.text
     assert len(sink) == 1 and sink.records[0].timestamp.source_clock is None
     # the refusal is on the ingest log too
-    log = (await client.get("/v1/adapters/whk-wms/ingest-log")).json()
+    log = (await client.get("/v1/adapters/forge-wms/ingest-log")).json()
     assert log and log[0]["rejected"] == 1
 
 
@@ -128,19 +128,19 @@ async def test_full_records_are_validated_against_the_manifest(
 ) -> None:
     await client.post("/v1/adapters/register", json=_manifest())
     good = {
-        "source": {"adapter_id": "whk-wms", "system": "whk-wms-prod", "tag_path": "a.b"},
+        "source": {"adapter_id": "forge-wms", "system": "forge-wms-prod", "tag_path": "a.b"},
         "timestamp": {"source_time": "2026-06-01T12:00:00Z"},
         "value": {"raw": 1, "data_type": "int64"},
         "context": {"equipment_id": "E1", "extra": {"event_type": "x"}},
         "lineage": {
-            "schema_ref": "forge://schemas/whk-wms/v1",
-            "adapter_id": "whk-wms",
+            "schema_ref": "forge://schemas/forge-wms/v1",
+            "adapter_id": "forge-wms",
             "adapter_version": "1.0.0",
         },
     }
     wrong_schema = {**good, "lineage": {**good["lineage"], "schema_ref": "forge://schemas/old/v0"}}
     resp = await client.post(
-        "/v1/records", json={"adapter_id": "whk-wms", "records": [good, wrong_schema]}
+        "/v1/records", json={"adapter_id": "forge-wms", "records": [good, wrong_schema]}
     )
     assert resp.status_code == 200
     body = resp.json()
@@ -154,7 +154,7 @@ async def test_hub_stamps_receipt_on_rest_records(client, sink: InMemoryRecordSi
     """ingestion_time is the hub's clock on receipt; what the client sent is kept as spoke_time."""
     await client.post("/v1/adapters/register", json=_manifest())
     full = {
-        "source": {"adapter_id": "whk-wms", "system": "whk-wms-prod", "tag_path": "a.b"},
+        "source": {"adapter_id": "forge-wms", "system": "forge-wms-prod", "tag_path": "a.b"},
         "timestamp": {
             "source_time": "2026-06-01T12:00:00Z",
             "ingestion_time": "2026-06-01T12:00:02Z",
@@ -162,14 +162,14 @@ async def test_hub_stamps_receipt_on_rest_records(client, sink: InMemoryRecordSi
         "value": {"raw": 1, "data_type": "int64"},
         "context": {"equipment_id": "E1", "extra": {"event_type": "x"}},
         "lineage": {
-            "schema_ref": "forge://schemas/whk-wms/v1",
-            "adapter_id": "whk-wms",
+            "schema_ref": "forge://schemas/forge-wms/v1",
+            "adapter_id": "forge-wms",
             "adapter_version": "1.0.0",
         },
     }
     before = datetime.now(UTC)
     resp = await client.post(
-        "/v1/records", json={"adapter_id": "whk-wms", "records": [full, {"tag": "t", "value": 1}]}
+        "/v1/records", json={"adapter_id": "forge-wms", "records": [full, {"tag": "t", "value": 1}]}
     )
     assert resp.status_code == 200 and resp.json()["persisted"] == 2
     stamped, bare = sink.records[0].timestamp, sink.records[1].timestamp
@@ -186,7 +186,7 @@ async def test_ingest_stats_expose_the_measured_clock_offsets(
     """/v1/ingest/stats carries the clock offsets the hub measured per adapter and link (FB-089)."""
     await client.post("/v1/adapters/register", json=_manifest())
     record = {
-        "source": {"adapter_id": "whk-wms", "system": "whk-wms-prod", "tag_path": "a.b"},
+        "source": {"adapter_id": "forge-wms", "system": "forge-wms-prod", "tag_path": "a.b"},
         "timestamp": {
             "source_time": "2026-06-01T12:00:00Z",
             "server_time": "2026-06-01T12:00:01Z",
@@ -195,14 +195,14 @@ async def test_ingest_stats_expose_the_measured_clock_offsets(
         "value": {"raw": 1, "data_type": "int64"},
         "context": {"equipment_id": "E1", "extra": {"event_type": "x"}},
         "lineage": {
-            "schema_ref": "forge://schemas/whk-wms/v1",
-            "adapter_id": "whk-wms",
+            "schema_ref": "forge://schemas/forge-wms/v1",
+            "adapter_id": "forge-wms",
             "adapter_version": "1.0.0",
         },
     }
-    await client.post("/v1/records", json={"adapter_id": "whk-wms", "records": [record]})
+    await client.post("/v1/records", json={"adapter_id": "forge-wms", "records": [record]})
     offsets = (await client.get("/v1/ingest/stats")).json()["pipeline"]["clock_offsets"]
-    links = offsets["adapters"]["whk-wms"]
+    links = offsets["adapters"]["forge-wms"]
     assert set(links) == {"spoke", "server", "source"}
     assert links["source"]["last_seconds"] == -1.0 and links["source"]["within_tolerance"] is True
     # a stamp from June against today's hub clock: far outside any tolerance
@@ -219,7 +219,7 @@ async def test_unknown_adapter_still_404(client) -> None:
 @pytest.mark.asyncio
 async def test_ingest_stats_endpoint(client, sink: InMemoryRecordSink) -> None:
     await client.post("/v1/adapters/register", json=_manifest())
-    await client.post("/v1/records", json={"adapter_id": "whk-wms", "records": [{"value": 1}]})
+    await client.post("/v1/records", json={"adapter_id": "forge-wms", "records": [{"value": 1}]})
     resp = await client.get("/v1/ingest/stats")
     assert resp.status_code == 200
     body = resp.json()
@@ -235,21 +235,23 @@ async def test_a_spoke_refused_for_its_clock_is_refused_on_rest_too(
 ) -> None:
     """One clock (FB-093): REST honours the refusal the time exchange established."""
     await client.post("/v1/adapters/register", json=_manifest())
-    body = {"adapter_id": "whk-wms", "records": [{"tag": "temp", "value": 72.5}]}
+    body = {"adapter_id": "forge-wms", "records": [{"tag": "temp", "value": 72.5}]}
     assert (await client.post("/v1/records", json=body)).status_code == 200
 
     gates = app.state.ingest_pipeline.gates
-    gates.declare("whk-wms", "it-lan")
+    gates.declare("forge-wms", "it-lan")
     start = datetime(2026, 6, 1, 12, tzinfo=UTC)
     for i in range(3):  # three measurements 2 s off, as the gRPC exchange reports them
         at = start + timedelta(seconds=30 * i)
-        gates.probe("whk-wms", at, offset_seconds=-2.0, round_trip_seconds=0.002, measured_at=at)
+        gates.probe("forge-wms", at, offset_seconds=-2.0, round_trip_seconds=0.002, measured_at=at)
 
     with caplog.at_level(logging.WARNING, logger="forge.api.main"):
         resp = await client.post("/v1/records", json=body)
     assert resp.status_code == 409
     detail = resp.json()["detail"]
-    assert detail.startswith("Ingest refused: CLOCK_OUT_OF_TOLERANCE: clock spoke:whk-wms is +2.0")
-    assert "REST ingest from adapter 'whk-wms' refused" in caplog.text
+    assert detail.startswith(
+        "Ingest refused: CLOCK_OUT_OF_TOLERANCE: clock spoke:forge-wms is +2.0"
+    )
+    assert "REST ingest from adapter 'forge-wms' refused" in caplog.text
     assert len(sink) == 1  # nothing of the refused request was taken
-    assert gates.refused_requests("whk-wms") == {"clock_out_of_tolerance": 1}
+    assert gates.refused_requests("forge-wms") == {"clock_out_of_tolerance": 1}

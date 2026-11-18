@@ -1,8 +1,9 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "module_identity": {
     "module_id": "whk-cmms",
     "name": "Whiskey House CMMS Adapter",
+    "alias": "cmms",
     "version": "0.1.0",
     "kind": "integration",
     "language": "python",
@@ -73,9 +74,19 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": null,
-    "change_history": [],
+    "previous_hash": "9237a5dce180e52e81bc3908f32218ffeddb08a1f6a9e8a8fc13bace20f92d0b",
+    "change_history": [
+      {
+        "previous_hash": "9237a5dce180e52e81bc3908f32218ffeddb08a1f6a9e8a8fc13bace20f92d0b",
+        "new_hash": "50d0da3e073dc9fea0c995dbd9d1b8eb0a42b7e4d28215adffea69049c6c22e8",
+        "changed_at": "2026-11-18T15:32:42Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
+      }
+    ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "9237a5dce180e52e81bc3908f32218ffeddb08a1f6a9e8a8fc13bace20f92d0b"
+    "spec_hash": "50d0da3e073dc9fea0c995dbd9d1b8eb0a42b7e4d28215adffea69049c6c22e8"
   }
 }

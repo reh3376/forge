@@ -210,7 +210,7 @@ The Access Controller is the permission layer that governs which module can read
 ```python
 class ModulePermission:
     """A database access grant for a Forge module."""
-    module_id: str              # e.g., "whk-wms", "forge-mes"
+    module_id: str              # e.g., "forge-wms", "forge-mes"
     schema_name: str            # e.g., "mod_wms", "forge_canonical"
     engine: StorageEngine       # Which database pod
     access_level: AccessLevel   # READ, WRITE, ADMIN
@@ -265,7 +265,7 @@ The Schema Registry is the single source of truth for what data Forge manages. E
 ```python
 class SchemaEntry:
     schema_id: str              # version ref forge://schemas/<module>/<entity>/v<version>; one grammar for every forge://schemas id, see forge.core.schema_ref (FB-008)
-    module_id: str              # e.g., "whk-wms", "forge-mes", "forge-core"
+    module_id: str              # e.g., "forge-wms", "forge-mes", "forge-core"
     entity_name: str            # e.g., "Barrel", "Recipe", "Device"
     version: str                # Semantic version: "1.0.0"
     schema_json: dict           # JSON Schema for the entity
@@ -433,7 +433,7 @@ forge db status                        # Show migration + backfill state for all
 forge db migrate                       # Apply pending migrations (all engines)
 forge db migrate --module wms          # Apply only WMS module migrations
 forge db rollback --steps 1            # Rollback last migration
-forge db generate --from-facts whk-wms.facts.json  # Auto-generate migration from FACTS spec
+forge db generate --from-facts forge-wms.facts.json  # Auto-generate migration from FACTS spec
 forge db drift-check                   # Compare module schemas against registry
 forge db audit                         # Generate compliance report of all schema changes
 forge db access grant wms mod_wms WRITE  # Grant WMS module write access to mod_wms schema
@@ -557,7 +557,7 @@ A new governance spec family for database orchestration:
 {
   "spec_version": "0.2.0",
   "spec_type": "FDBS",
-  "module_id": "whk-wms",
+  "module_id": "forge-wms",
   "schemas": [
     {
       "namespace": "mod_wms",
@@ -574,14 +574,14 @@ A new governance spec family for database orchestration:
     }
   ],
   "access_grants": [
-    { "module_id": "whk-wms", "schema": "mod_wms", "level": "WRITE" },
-    { "module_id": "whk-wms", "schema": "forge_canonical", "level": "READ" }
+    { "module_id": "forge-wms", "schema": "mod_wms", "level": "WRITE" },
+    { "module_id": "forge-wms", "schema": "forge_canonical", "level": "READ" }
   ],
   "consistency_checks": [
     {
       "type": "row_count",
       "source": "mod_wms.barrels",
-      "target": "whk-wms-spoke.Barrel",
+      "target": "forge-wms-spoke.Barrel",
       "tolerance_pct": 0.1,
       "phase": "B"
     }

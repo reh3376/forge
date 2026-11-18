@@ -1,8 +1,8 @@
-"""Tests for the WHK WMS adapter lifecycle and manifest."""
+"""Tests for the Forge WMS adapter lifecycle and manifest."""
 
 import pytest
 
-from forge.adapters.whk_wms.adapter import WhkWmsAdapter
+from forge.adapters.forge_wms.adapter import ForgeWmsAdapter
 from forge.core.models.adapter import AdapterState, AdapterTier
 
 # ── Manifest Tests ─────────────────────────────────────────────────
@@ -12,22 +12,22 @@ class TestManifest:
     """Verify manifest loads correctly from manifest.json."""
 
     def test_adapter_id(self):
-        assert WhkWmsAdapter.manifest.adapter_id == "whk-wms"
+        assert ForgeWmsAdapter.manifest.adapter_id == "forge-wms"
 
     def test_version(self):
-        assert WhkWmsAdapter.manifest.version == "0.1.0"
+        assert ForgeWmsAdapter.manifest.version == "0.1.0"
 
     def test_type_is_ingestion(self):
-        assert WhkWmsAdapter.manifest.type == "INGESTION"
+        assert ForgeWmsAdapter.manifest.type == "INGESTION"
 
     def test_protocol(self):
-        assert WhkWmsAdapter.manifest.protocol == "graphql+amqp"
+        assert ForgeWmsAdapter.manifest.protocol == "graphql+amqp"
 
     def test_tier(self):
-        assert WhkWmsAdapter.manifest.tier == AdapterTier.MES_MOM
+        assert ForgeWmsAdapter.manifest.tier == AdapterTier.MES_MOM
 
     def test_capabilities_read_only(self):
-        caps = WhkWmsAdapter.manifest.capabilities
+        caps = ForgeWmsAdapter.manifest.capabilities
         assert caps.read is True
         assert caps.write is False
         assert caps.subscribe is True
@@ -35,10 +35,10 @@ class TestManifest:
         assert caps.discover is True
 
     def test_connection_params_count(self):
-        assert len(WhkWmsAdapter.manifest.connection_params) == 9
+        assert len(ForgeWmsAdapter.manifest.connection_params) == 9
 
     def test_required_params(self):
-        required = [p.name for p in WhkWmsAdapter.manifest.connection_params if p.required]
+        required = [p.name for p in ForgeWmsAdapter.manifest.connection_params if p.required]
         assert sorted(required) == [
             "azure_client_id",
             "azure_client_secret",
@@ -48,13 +48,15 @@ class TestManifest:
         ]
 
     def test_auth_methods(self):
-        assert "azure_entra_id" in WhkWmsAdapter.manifest.auth_methods
+        assert "azure_entra_id" in ForgeWmsAdapter.manifest.auth_methods
 
     def test_data_contract_schema_ref(self):
-        assert WhkWmsAdapter.manifest.data_contract.schema_ref == "forge://schemas/whk-wms/v0.1.0"
+        assert (
+            ForgeWmsAdapter.manifest.data_contract.schema_ref == "forge://schemas/forge-wms/v0.1.0"
+        )
 
     def test_data_contract_context_fields(self):
-        fields = WhkWmsAdapter.manifest.data_contract.context_fields
+        fields = ForgeWmsAdapter.manifest.data_contract.context_fields
         assert "equipment_id" in fields
         assert "lot_id" in fields
 
@@ -76,7 +78,7 @@ class TestLifecycle:
 
     @pytest.fixture()
     def adapter(self):
-        return WhkWmsAdapter()
+        return ForgeWmsAdapter()
 
     @pytest.mark.asyncio()
     async def test_configure_sets_state(self, adapter):
@@ -106,7 +108,7 @@ class TestLifecycle:
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         health = await adapter.health()
-        assert health.adapter_id == "whk-wms"
+        assert health.adapter_id == "forge-wms"
         assert health.state == AdapterState.HEALTHY
 
     @pytest.mark.asyncio()
@@ -125,7 +127,7 @@ class TestCollect:
     """Verify the collect() async generator yields ContextualRecords."""
 
     async def _make_adapter(self):
-        adapter = WhkWmsAdapter()
+        adapter = ForgeWmsAdapter()
         await adapter.configure(_VALID_CONFIG)
         await adapter.start()
         return adapter
@@ -153,8 +155,8 @@ class TestCollect:
         )
         records = [r async for r in adapter.collect()]
         assert len(records) == 1
-        assert records[0].source.adapter_id == "whk-wms"
-        assert records[0].source.system == "whk-wms"
+        assert records[0].source.adapter_id == "forge-wms"
+        assert records[0].source.system == "forge-wms"
 
     @pytest.mark.asyncio()
     async def test_collect_increments_counter(self):
@@ -178,7 +180,7 @@ class TestSubscription:
 
     @pytest.mark.asyncio()
     async def test_subscribe_returns_id(self):
-        adapter = WhkWmsAdapter()
+        adapter = ForgeWmsAdapter()
         sub_id = await adapter.subscribe(
             tags=["wh.whk01.distillery01.barrel"],
             callback=lambda msg: None,
@@ -188,7 +190,7 @@ class TestSubscription:
 
     @pytest.mark.asyncio()
     async def test_unsubscribe_removes(self):
-        adapter = WhkWmsAdapter()
+        adapter = ForgeWmsAdapter()
         sub_id = await adapter.subscribe(tags=["test"], callback=lambda m: None)
         assert sub_id in adapter._subscriptions
         await adapter.unsubscribe(sub_id)
@@ -203,13 +205,13 @@ class TestDiscovery:
 
     @pytest.mark.asyncio()
     async def test_discover_returns_sources(self):
-        adapter = WhkWmsAdapter()
+        adapter = ForgeWmsAdapter()
         sources = await adapter.discover()
         assert len(sources) == 6
 
     @pytest.mark.asyncio()
     async def test_discover_sources_have_tag_path(self):
-        adapter = WhkWmsAdapter()
+        adapter = ForgeWmsAdapter()
         sources = await adapter.discover()
         for source in sources:
             assert "tag_path" in source
@@ -217,7 +219,7 @@ class TestDiscovery:
 
     @pytest.mark.asyncio()
     async def test_discover_includes_barrel(self):
-        adapter = WhkWmsAdapter()
+        adapter = ForgeWmsAdapter()
         sources = await adapter.discover()
         tags = [s["tag_path"] for s in sources]
         assert "wms.graphql.barrel" in tags

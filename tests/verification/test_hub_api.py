@@ -44,11 +44,11 @@ def client(hub_app) -> TestClient:
 
 
 @pytest.fixture()
-def whk_wms_manifest() -> dict[str, Any]:
-    """WHK WMS adapter manifest as a dict (matching API payload)."""
+def forge_wms_manifest() -> dict[str, Any]:
+    """Forge WMS adapter manifest as a dict (matching API payload)."""
     return AdapterManifest(
-        adapter_id="whk-wms",
-        name="WHK WMS Adapter",
+        adapter_id="forge-wms",
+        name="Forge WMS Adapter",
         version="0.1.0",
         protocol="graphql+amqp",
         tier=AdapterTier.MES_MOM,
@@ -59,7 +59,7 @@ def whk_wms_manifest() -> dict[str, Any]:
             discover=True,
         ),
         data_contract=DataContract(
-            schema_ref="forge://schemas/whk-wms/v0.1.0",
+            schema_ref="forge://schemas/forge-wms/v0.1.0",
             context_fields=["equipment_id", "batch_id", "lot_id"],
         ),
     ).model_dump(mode="json")
@@ -95,37 +95,37 @@ class TestAdapterRegistration:
     def test_register_adapter(
         self,
         client: TestClient,
-        whk_wms_manifest: dict,
+        forge_wms_manifest: dict,
     ):
-        resp = client.post("/v1/adapters/register", json=whk_wms_manifest)
+        resp = client.post("/v1/adapters/register", json=forge_wms_manifest)
         assert resp.status_code == 200
         data = resp.json()
         assert data["status"] == "registered"
-        assert data["adapter_id"] == "whk-wms"
+        assert data["adapter_id"] == "forge-wms"
 
     def test_list_after_register(
         self,
         client: TestClient,
-        whk_wms_manifest: dict,
+        forge_wms_manifest: dict,
     ):
-        client.post("/v1/adapters/register", json=whk_wms_manifest)
+        client.post("/v1/adapters/register", json=forge_wms_manifest)
         resp = client.get("/v1/adapters")
         assert resp.status_code == 200
         adapters = resp.json()
         assert len(adapters) >= 1
         ids = [a["adapter_id"] for a in adapters]
-        assert "whk-wms" in ids
+        assert "forge-wms" in ids
 
     def test_adapter_health_after_register(
         self,
         client: TestClient,
-        whk_wms_manifest: dict,
+        forge_wms_manifest: dict,
     ):
-        client.post("/v1/adapters/register", json=whk_wms_manifest)
-        resp = client.get("/v1/adapters/whk-wms/health")
+        client.post("/v1/adapters/register", json=forge_wms_manifest)
+        resp = client.get("/v1/adapters/forge-wms/health")
         assert resp.status_code == 200
         health = resp.json()
-        assert health["adapter_id"] == "whk-wms"
+        assert health["adapter_id"] == "forge-wms"
         assert health["state"] == "REGISTERED"
 
     def test_unknown_adapter_returns_404(self, client: TestClient):
@@ -142,14 +142,14 @@ class TestRecordIngestion:
     def test_ingest_succeeds_for_registered_adapter(
         self,
         client: TestClient,
-        whk_wms_manifest: dict,
+        forge_wms_manifest: dict,
         barrel_event: dict[str, Any],
     ):
-        client.post("/v1/adapters/register", json=whk_wms_manifest)
+        client.post("/v1/adapters/register", json=forge_wms_manifest)
         resp = client.post(
             "/v1/records",
             json={
-                "adapter_id": "whk-wms",
+                "adapter_id": "forge-wms",
                 "records": [barrel_event],
             },
         )
@@ -175,14 +175,14 @@ class TestRecordIngestion:
     def test_ingest_batch(
         self,
         client: TestClient,
-        whk_wms_manifest: dict,
+        forge_wms_manifest: dict,
         barrel_events: list[dict[str, Any]],
     ):
-        client.post("/v1/adapters/register", json=whk_wms_manifest)
+        client.post("/v1/adapters/register", json=forge_wms_manifest)
         resp = client.post(
             "/v1/records",
             json={
-                "adapter_id": "whk-wms",
+                "adapter_id": "forge-wms",
                 "records": barrel_events,
             },
         )
@@ -199,13 +199,13 @@ class TestMultiAdapterFlow:
     def test_register_multiple_adapters(self, client: TestClient):
         """Register WMS and MES adapters, verify both appear."""
         wms = AdapterManifest(
-            adapter_id="whk-wms",
-            name="WHK WMS",
+            adapter_id="forge-wms",
+            name="Forge WMS",
             version="0.1.0",
             protocol="graphql+amqp",
             tier=AdapterTier.MES_MOM,
             data_contract=DataContract(
-                schema_ref="forge://schemas/whk-wms/v0.1.0",
+                schema_ref="forge://schemas/forge-wms/v0.1.0",
             ),
         ).model_dump(mode="json")
 
@@ -225,7 +225,7 @@ class TestMultiAdapterFlow:
 
         resp = client.get("/v1/adapters")
         ids = {a["adapter_id"] for a in resp.json()}
-        assert "whk-wms" in ids
+        assert "forge-wms" in ids
         assert "forge-mes" in ids
 
     def test_ingestion_isolated_by_adapter(self, client: TestClient):

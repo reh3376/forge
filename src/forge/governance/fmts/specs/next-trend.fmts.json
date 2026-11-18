@@ -1,8 +1,9 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "module_identity": {
     "module_id": "next-trend",
     "name": "NextTrend Historian Adapter",
+    "alias": "trend",
     "version": "0.1.0",
     "kind": "integration",
     "language": "python",
@@ -73,9 +74,19 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": null,
-    "change_history": [],
+    "previous_hash": "be5170c0f62297aaf593d4209d174e7a3ad3cd6f776fec1c37add71fa9db7305",
+    "change_history": [
+      {
+        "previous_hash": "be5170c0f62297aaf593d4209d174e7a3ad3cd6f776fec1c37add71fa9db7305",
+        "new_hash": "26ce5510fe62c3d1e2475c7c89db4af6f3e7ec54b7657f9c68e37e6a1b52f463",
+        "changed_at": "2026-11-18T15:32:42Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
+      }
+    ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "be5170c0f62297aaf593d4209d174e7a3ad3cd6f776fec1c37add71fa9db7305"
+    "spec_hash": "26ce5510fe62c3d1e2475c7c89db4af6f3e7ec54b7657f9c68e37e6a1b52f463"
   }
 }

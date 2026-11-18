@@ -16,8 +16,8 @@ class TestSchemaEntry:
 
     def _make_entry(self, **overrides) -> SchemaEntry:
         defaults = {
-            "schema_id": "forge://schemas/whk-wms/Barrel/v1.0.0",
-            "spoke_id": "whk-wms",
+            "schema_id": "forge://schemas/forge-wms/Barrel/v1.0.0",
+            "spoke_id": "forge-wms",
             "entity_name": "Barrel",
             "version": "1.0.0",
             "schema_json": {
@@ -27,7 +27,7 @@ class TestSchemaEntry:
                     "serialNumber": {"type": "string"},
                 },
             },
-            "authoritative_spoke": "whk-wms",
+            "authoritative_spoke": "forge-wms",
             "storage_engine": StorageEngine.POSTGRESQL,
             "storage_namespace": "spoke_wms",
         }
@@ -81,7 +81,7 @@ class TestSchemaEntry:
 class TestSchemaRegistry:
     """Verify schema registration, lookup, and drift detection."""
 
-    def _make_entry(self, spoke_id="whk-wms", entity="Barrel", **kw) -> SchemaEntry:
+    def _make_entry(self, spoke_id="forge-wms", entity="Barrel", **kw) -> SchemaEntry:
         return SchemaEntry(
             schema_id=f"forge://schemas/{spoke_id}/{entity}/v1.0.0",
             spoke_id=spoke_id,
@@ -115,15 +115,15 @@ class TestSchemaRegistry:
 
     def test_list_by_spoke(self):
         registry = SchemaRegistry()
-        registry.register(self._make_entry("whk-wms", "Barrel"))
-        registry.register(self._make_entry("whk-wms", "Lot"))
+        registry.register(self._make_entry("forge-wms", "Barrel"))
+        registry.register(self._make_entry("forge-wms", "Lot"))
         registry.register(self._make_entry("forge-mes", "Recipe"))
-        wms_entries = registry.list_by_spoke("whk-wms")
+        wms_entries = registry.list_by_spoke("forge-wms")
         assert len(wms_entries) == 2
 
     def test_list_by_engine(self):
         registry = SchemaRegistry()
-        registry.register(self._make_entry("whk-wms", "Barrel"))
+        registry.register(self._make_entry("forge-wms", "Barrel"))
         registry.register(
             SchemaEntry(
                 schema_id="forge://schemas/whk-nms/Device/v1.0.0",
@@ -143,10 +143,10 @@ class TestSchemaRegistry:
 
     def test_list_active(self):
         registry = SchemaRegistry()
-        e1 = self._make_entry("whk-wms", "Barrel")
+        e1 = self._make_entry("forge-wms", "Barrel")
         e1.status = SchemaStatus.ACTIVE
         registry.register(e1)
-        e2 = self._make_entry("whk-wms", "Lot")
+        e2 = self._make_entry("forge-wms", "Lot")
         e2.status = SchemaStatus.DRAFT
         registry.register(e2)
         active = registry.list_active()
@@ -156,7 +156,7 @@ class TestSchemaRegistry:
     def test_check_drift_clean(self):
         registry = SchemaRegistry()
         registry.register(self._make_entry())
-        drifted = registry.check_drift("whk-wms")
+        drifted = registry.check_drift("forge-wms")
         assert len(drifted) == 0
 
     def test_check_drift_detects_change(self):
@@ -165,16 +165,16 @@ class TestSchemaRegistry:
         registry.register(entry)
         # Tamper after registration
         entry.schema_json["properties"]["new_field"] = {"type": "string"}
-        drifted = registry.check_drift("whk-wms")
+        drifted = registry.check_drift("forge-wms")
         assert len(drifted) == 1
         assert drifted[0][0] == entry.schema_id
 
     def test_get_authoritative_spoke(self):
         registry = SchemaRegistry()
-        e = self._make_entry("whk-wms", "Barrel")
+        e = self._make_entry("forge-wms", "Barrel")
         e.status = SchemaStatus.ACTIVE
         registry.register(e)
-        assert registry.get_authoritative_spoke("Barrel") == "whk-wms"
+        assert registry.get_authoritative_spoke("Barrel") == "forge-wms"
 
     def test_get_authoritative_spoke_none(self):
         registry = SchemaRegistry()
@@ -182,13 +182,13 @@ class TestSchemaRegistry:
 
     def test_spoke_count(self):
         registry = SchemaRegistry()
-        registry.register(self._make_entry("whk-wms", "Barrel"))
+        registry.register(self._make_entry("forge-wms", "Barrel"))
         registry.register(self._make_entry("forge-mes", "Recipe"))
         registry.register(self._make_entry("whk-cmms", "Asset"))
         assert registry.spoke_count == 3
 
     def test_entry_count(self):
         registry = SchemaRegistry()
-        registry.register(self._make_entry("whk-wms", "Barrel"))
-        registry.register(self._make_entry("whk-wms", "Lot"))
+        registry.register(self._make_entry("forge-wms", "Barrel"))
+        registry.register(self._make_entry("forge-wms", "Lot"))
         assert registry.entry_count == 2

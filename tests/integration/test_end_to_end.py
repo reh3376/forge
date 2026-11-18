@@ -40,7 +40,7 @@ class TestEndToEnd:
                 ContextualRecord(
                     record_id=uuid4(),
                     source=RecordSource(
-                        adapter_id="whk-wms",
+                        adapter_id="forge-wms",
                         system="wms-prod",
                         tag_path=f"warehouse.barrel.create.{i}",
                     ),
@@ -58,8 +58,8 @@ class TestEndToEnd:
                         batch_id=f"BATCH-{i}",
                     ),
                     lineage=RecordLineage(
-                        schema_ref="forge://schemas/whk-wms/Barrel/v1",
-                        adapter_id="whk-wms",
+                        schema_ref="forge://schemas/forge-wms/Barrel/v1",
+                        adapter_id="forge-wms",
                         adapter_version="0.1.0",
                     ),
                 )

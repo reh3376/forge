@@ -22,7 +22,7 @@ runner = CliRunner()
 SPECS = governance.SPEC_ROOT
 FACTS_OT = SPECS / "facts" / "specs" / "ot-module.facts.json"  # non-ASCII, hand-wrapped
 FACTS_NMS = SPECS / "facts" / "specs" / "whk-nms.facts.json"  # ASCII-escaped
-FACTS_WMS = SPECS / "facts" / "specs" / "whk-wms.facts.json"  # approved in the fixture
+FACTS_WMS = SPECS / "facts" / "specs" / "forge-wms.facts.json"  # approved in the fixture
 FVTS_OT = SPECS / "fvts" / "specs" / "ot-module.fvts.json"
 STAMP_RE = re.compile(r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
 
@@ -40,7 +40,7 @@ def root(tmp_path: Path) -> Path:
     """A governance root with copies of real specs in a known state.
 
     The real specs' hash state is the owner's call (an agent never approves, FB-021), so
-    the copies are put where the tests expect them: whk-wms approved by a test owner, the
+    the copies are put where the tests expect them: forge-wms approved by a test owner, the
     other three awaiting approval.
     """
     for src in (FACTS_OT, FACTS_NMS, FACTS_WMS, FVTS_OT):
@@ -72,12 +72,12 @@ def run(*args: str) -> tuple[int, str]:
 def test_specs_lists_state_approver_and_verification(root: Path) -> None:
     code, out = run("specs", "--root", str(root))
     assert code == 0, out
-    assert "whk-wms.facts.json" in out and "approved" in out and "test-owner" in out
+    assert "forge-wms.facts.json" in out and "approved" in out and "test-owner" in out
     assert "ot-module.fvts.json" in out and "pending_review" in out
     assert "4 spec(s): 3 awaiting approval, 0 with a hash mismatch." in out
 
     code, out = run("specs", "--root", str(root), "--pending")
-    assert code == 0 and "whk-wms.facts.json" not in out and "3 spec(s)" in out
+    assert code == 0 and "forge-wms.facts.json" not in out and "3 spec(s)" in out
 
     code, out = run("specs", "--root", str(root / "nowhere"))
     assert code == 0 and "No specs" in out
@@ -124,7 +124,7 @@ def test_approve_keeps_an_ascii_file_ascii(root: Path) -> None:
 
 
 def test_approve_is_idempotent_for_the_same_approver(root: Path) -> None:
-    path = root / "facts" / "specs" / "whk-wms.facts.json"
+    path = root / "facts" / "specs" / "forge-wms.facts.json"
     before = path.read_text()
     code, out = run("approve", str(path), "--by", "test-owner")
     assert code == 0 and "already approved by test-owner" in out
@@ -158,7 +158,7 @@ def test_approve_needs_a_hash_and_a_file(root: Path, tmp_path: Path) -> None:
 
 
 def test_stamp_rehashes_and_leaves_the_spec_pending(root: Path) -> None:
-    path = root / "facts" / "specs" / "whk-wms.facts.json"
+    path = root / "facts" / "specs" / "forge-wms.facts.json"
     original = json.loads(path.read_text(encoding="utf-8"))
     old_hash = original["integrity"]["spec_hash"]
 
@@ -205,7 +205,7 @@ def test_stamp_rehashes_and_leaves_the_spec_pending(root: Path) -> None:
 
 
 def test_stamp_validates_its_vocabulary(root: Path) -> None:
-    path = root / "facts" / "specs" / "whk-wms.facts.json"
+    path = root / "facts" / "specs" / "forge-wms.facts.json"
     code, _ = run("stamp", str(path), "--by", "x", "--reason", "r", "--source", "wishful")
     assert code == 2
     code, _ = run("stamp", str(path), "--by", "x", "--reason", "r", "--change-type", "vibes")
@@ -249,15 +249,15 @@ def test_validate_spec_knows_fvts_and_ftts() -> None:
 
 def test_run_facts_by_adapter_id_and_by_file(root: Path) -> None:
     specs = root / "facts" / "specs"
-    code, out = run("run", "facts", "whk-wms", "--specs", str(specs))
+    code, out = run("run", "facts", "forge-wms", "--specs", str(specs))
     assert code == 0, out
-    assert "[PASS] FACTS — whk-wms" in out and "All checks passed." in out
+    assert "[PASS] FACTS — forge-wms" in out and "All checks passed." in out
 
-    code, out = run("run", "facts", str(specs / "whk-wms.facts.json"), "--format", "json")
+    code, out = run("run", "facts", str(specs / "forge-wms.facts.json"), "--format", "json")
     assert code == 0, out
     report = json.loads(out)
-    assert report["framework"] == "FACTS" and report["target"] == "whk-wms"
-    assert report["metadata"]["spec_file"] == str(specs / "whk-wms.facts.json")
+    assert report["framework"] == "FACTS" and report["target"] == "forge-wms"
+    assert report["metadata"]["spec_file"] == str(specs / "forge-wms.facts.json")
     assert {v["status"] for v in report["verdicts"]} <= {"PASS", "SKIP"}
 
 
@@ -310,9 +310,9 @@ def test_run_rejects_unknown_frameworks_targets_and_formats(tmp_path: Path) -> N
     assert code == 1 and "no runner on the CLI" in out
     code, out = run("run", "facts", "no-such-adapter")
     assert code == 1 and "no FACTS spec for 'no-such-adapter'" in out
-    code, out = run("run", "facts", "whk-wms", "--specs", str(tmp_path))
+    code, out = run("run", "facts", "forge-wms", "--specs", str(tmp_path))
     assert code == 1 and str(tmp_path) in out
-    code, _ = run("run", "facts", "whk-wms", "--format", "yaml")
+    code, _ = run("run", "facts", "forge-wms", "--format", "yaml")
     assert code == 2
 
 
@@ -324,22 +324,23 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
     from forge.governance.shared.runner import add_spec_hash, approve_spec_hash
 
     spec = {
-        "spec_version": "0.1.0",
+        "spec_version": "0.2.0",
         "module_identity": {
-            "module_id": "whk-wms",
+            "module_id": "forge-wms",
             "name": "Warehouse management integration",
+            "alias": "wms",
             "version": "0.1.0",
             "kind": "integration",
             "language": "python",
-            "source_paths": ["src/forge/adapters/whk_wms"],
+            "source_paths": ["src/forge/adapters/forge_wms"],
         },
         "hub_link": {"protocol": "grpc", "service": "forge.v1.AdapterService"},
         "references": {
             "facts": {
-                "path": "src/forge/governance/facts/specs/whk-wms.facts.json",
-                "adapter_id": "whk-wms",
+                "path": "src/forge/governance/facts/specs/forge-wms.facts.json",
+                "adapter_id": "forge-wms",
             },
-            "manifest": "src/forge/adapters/whk_wms/manifest.json",
+            "manifest": "src/forge/adapters/forge_wms/manifest.json",
         },
         "baseline": {f"M-{n}": "met" for n in range(1, 12)},
         "waivers": [],
@@ -349,7 +350,7 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
             "databases": [],
             "third_party_systems": [
                 {
-                    "name": "whk-wms",
+                    "name": "forge-wms",
                     "interface": "graphql",
                     "clock_read_method": "unreadable",
                     "polling_interval_seconds": 30,
@@ -362,7 +363,7 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
     }
     add_spec_hash(spec, changed_by="test")
     approve_spec_hash(spec, approved_by="test-owner")
-    path = tmp_path / "whk-wms.fmts.json"
+    path = tmp_path / "forge-wms.fmts.json"
     path.write_text(json.dumps(spec, indent=2) + "\n")
 
     code, out = run("run", "fmts", str(path))

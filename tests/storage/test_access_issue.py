@@ -30,7 +30,7 @@ T0 = datetime(2026, 6, 1, 12, tzinfo=UTC)
 
 def test_naming_matches_migration_002() -> None:
     assert module_schema("forge-mes") == "mod_mes"
-    assert module_schema("whk-wms") == "mod_wms"
+    assert module_schema("forge-wms") == "mod_wms"
     assert module_schema("Forge-CMMS") == "mod_cmms"
     assert module_schema("bosc-ims") == "mod_bosc_ims"
     assert schema_role("mod_mes") == "forge_mod_mes"

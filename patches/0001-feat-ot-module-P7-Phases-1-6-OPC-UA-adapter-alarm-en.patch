@@ -701,7 +701,7 @@ index 0000000..85ea705
 +| Auto-generated OpenAPI clients | 1,109 | **SKIP** — dead code, replaced by dedicated module adapters |
 +| CMMS middleware (`exchange/cmms/`) | 57 | **SKIP** — replaced by `whk-cmms` adapter module |
 +| MES integration (`core/mes/`, `core/OrderManagement/`) | 56 | **SKIP** — replaced by `whk-mes` adapter module |
-+| WMS barrel printing / sync | ~30 | **SKIP** — replaced by `whk-wms` adapter module |
++| WMS barrel printing / sync | ~30 | **SKIP** — replaced by `forge-wms` adapter module |
 +| OT/SCADA control scripts | ~15 | **CONVERT** — Tier 1 priority (OT Module native) |
 +| Utility / shared libraries (`Framework/`, `core/util/`) | ~25 | **CONVERT** — Tier 1 (used by OT scripts) |
 +| HMI/Perspective UI scripts | ~27 | **CONVERT** — Tier 2 (via forge.perspective bridge) |

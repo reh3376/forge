@@ -3,7 +3,7 @@
 **Framework ID:** FMTS
 **Full Name:** Forge Module Test Specification
 **CI Gate:** Hard-fail (merge-blocking): `tests/governance/fmts/` runs in the `hub-python` job
-**Status:** v0.1.0. Schema, runner (`fmts_runner.py`, 19 verdicts per spec) and nine module specs, all `pending_review` until the owner approves them (FB-136). Four of the eleven requirements are reported as not checked until the conformance kit exists (FB-137)
+**Status:** v0.2.0 (0.1.0 plus the module alias, 2026-11-18; no spec had been approved under 0.1.0). Schema, runner (`fmts_runner.py`, 19 verdicts per spec) and nine module specs, all `pending_review` until the owner approves them (FB-136). Four of the eleven requirements are reported as not checked until the conformance kit exists (FB-137)
 **Decided in:** [`docs/decisions/forge-module-requirements.md`](../decisions/forge-module-requirements.md) (D-12, signed by the owner on 2026-11-17)
 **MDEMG Analog:** None
 
@@ -79,8 +79,8 @@ A module that cannot yet meet a requirement says so in its spec:
 
 | Section | Content |
 |---|---|
-| `spec_version` | `0.1.0` |
-| `module_identity` | `module_id`, `name`, `version`, `kind` (`management`, `integration`, `ot`, `display`), `language` (`go`, `python`, `typescript`), `source_paths` |
+| `spec_version` | `0.2.0` |
+| `module_identity` | `module_id`, `name`, `alias` (the module's shortcut name: short, lower case, unique among the modules; `wms` for `forge-wms`), `version`, `kind` (`management`, `integration`, `ot`, `display`), `language` (`go`, `python`, `typescript`), `source_paths` |
 | `hub_link` | `protocol: grpc`, `service: forge.v1.AdapterService` (both fixed) |
 | `references` | `facts` (path and `adapter_id`), `manifest`, `fvts` (paths), `roles` (path) |
 | `baseline` | `M-1` to `M-11`, each `met` or `waived` |
@@ -105,7 +105,7 @@ Every run gives 19 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:h
 
 | Module | Kind | Waived | Fails today |
 |---|---|---|---|
-| whk-wms, whk-cmms, whk-erpi, whk-nms, next-trend | integration | M-10 (FB-141) | `hash-approved` |
+| forge-wms, whk-cmms, whk-erpi, whk-nms, next-trend | integration | M-10 (FB-141) | `hash-approved` |
 | bosc-ims, scanner-gateway | integration | M-10 (FB-141) | `hash-approved` |
 | ot-module | ot | M-10 (FB-141), M-11 (FB-146) | `hash-approved`, `m2` (FB-144) |
 | forge-mes (the interim bridge) | management | M-3 (FB-145), M-8 (FB-057), M-9 (FB-143), M-10 (FB-141), M-11 (FB-076) | `hash-approved`, `waivers` (the M-3 waiver needs the owner's approval) |

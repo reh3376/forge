@@ -38,7 +38,7 @@
           "pattern": "^[a-z][a-z0-9-]*$",
           "minLength": 3,
           "maxLength": 64,
-          "description": "Unique kebab-case identifier (e.g., 'whk-wms', 'opcua-generic')."
+          "description": "Unique kebab-case identifier (e.g., 'forge-wms', 'opcua-generic')."
         },
         "name": {
           "type": "string",
@@ -316,7 +316,7 @@
         "schema_ref": {
           "type": "string",
           "pattern": "^forge://schemas/[A-Za-z0-9][A-Za-z0-9_.-]*(/(?!v[0-9])[A-Za-z][A-Za-z0-9_-]*)?/v[0-9]+(\\.[0-9]+){0,2}([-+][0-9A-Za-z.-]+)?$",
-          "description": "Contract ref of the adapter's output: forge://schemas/<spoke>/v<version> (e.g. 'forge://schemas/whk-wms/v0.1.0'); forge.core.schema_ref, FB-008."
+          "description": "Contract ref of the adapter's output: forge://schemas/<spoke>/v<version> (e.g. 'forge://schemas/forge-wms/v0.1.0'); forge.core.schema_ref, FB-008."
         },
         "output_format": {
           "type": "string",
@@ -594,7 +594,7 @@
             },
             "topic": {
               "type": "string",
-              "description": "Dead letter topic name (e.g., 'forge.dead-letter.whk-wms')."
+              "description": "Dead letter topic name (e.g., 'forge.dead-letter.forge-wms')."
             },
             "max_age_hours": {
               "type": "integer",

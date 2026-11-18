@@ -39,17 +39,17 @@ def batch(adapter_id: str = "forge-mes", **kw) -> IngestBatchRow:
 async def test_in_memory_store_round_trip() -> None:
     store = InMemoryAdapterRegistryStore(max_batches=3)
     await store.save_adapter(row(state="HEALTHY"))
-    await store.save_adapter(row("whk-wms", name="WMS"))
+    await store.save_adapter(row("forge-wms", name="WMS"))
     later = row(state="DEGRADED", registered_at=datetime(2026, 7, 1, tzinfo=UTC))
     await store.save_adapter(later)  # re-registration keeps the first registered_at
     adapters = await store.list_adapters()
-    assert [a.adapter_id for a in adapters] == ["forge-mes", "whk-wms"]
+    assert [a.adapter_id for a in adapters] == ["forge-mes", "forge-wms"]
     assert adapters[0].state == "DEGRADED" and adapters[0].registered_at == T0
     assert len(store) == 2
     assert adapters[0].to_dict()["registered_at"] == T0.isoformat()
 
     for i in range(5):
-        await store.log_batch(batch(adapter_id="forge-mes" if i % 2 else "whk-wms", persisted=i))
+        await store.log_batch(batch(adapter_id="forge-mes" if i % 2 else "forge-wms", persisted=i))
     rows = await store.list_batches()
     assert [r.id for r in rows] == [5, 4, 3]  # bounded, newest first
     assert [r.id for r in await store.list_batches("forge-mes")] == [4]

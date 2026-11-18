@@ -73,17 +73,17 @@ class TestResolveSourceStamp:
                 None,
                 origin=origin,
                 read_at=READ_AT,
-                adapter_id="whk-wms",
+                adapter_id="forge-wms",
                 connection="wms-prod",
                 tag_path="wms.barrel.fill",
                 detail="unparseable timestamp 'yesterday'",
             )
         exc = info.value
         assert exc.cause == "source_stamp_missing"
-        assert exc.adapter_id == "whk-wms" and exc.connection == "wms-prod"
+        assert exc.adapter_id == "forge-wms" and exc.connection == "wms-prod"
         assert exc.tag_path == "wms.barrel.fill"
         message = str(exc)
-        assert message.startswith("whk-wms: a value on connection wms-prod, tag wms.barrel.fill")
+        assert message.startswith("forge-wms: a value on connection wms-prod, tag wms.barrel.fill")
         assert "(unparseable timestamp 'yesterday')" in message
         assert "does not declare source_timestamp_origin: forge" in message
         assert "FB-088" in message
@@ -271,7 +271,7 @@ class TestSamplingBound:
         assert stamp.source_uncertainty_seconds == 1.0 and stamp.source_offset_seconds is None
 
     def test_an_event_the_source_stamped_at_the_instant_has_none(self) -> None:
-        stamp = resolve_source_stamp(STAMP, origin=None, read_at=READ_AT, adapter_id="whk-wms")
+        stamp = resolve_source_stamp(STAMP, origin=None, read_at=READ_AT, adapter_id="forge-wms")
         assert stamp.source_uncertainty_seconds is None
 
     def test_a_corrected_stamp_adds_the_clock_s_bound(self) -> None:

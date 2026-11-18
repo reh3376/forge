@@ -1,6 +1,6 @@
 {
-  "adapter_id": "whk-wms",
-  "name": "Whiskey House Warehouse Management System Adapter",
+  "adapter_id": "forge-wms",
+  "name": "Forge Warehouse Management System Adapter",
   "version": "0.1.0",
   "type": "INGESTION",
   "protocol": "graphql+amqp",
@@ -13,7 +13,7 @@
     "discover": true
   },
   "data_contract": {
-    "schema_ref": "forge://schemas/whk-wms/v0.1.0",
+    "schema_ref": "forge://schemas/forge-wms/v0.1.0",
     "output_format": "contextual_record",
     "context_fields": [
       "equipment_id",
@@ -89,9 +89,9 @@
     "api_key"
   ],
   "metadata": {
-    "spoke": "whk-wms",
-    "hub_module": "forge.adapters.whk_wms",
-    "source_repo": "https://github.com/WhiskeyHouse/whk-wms",
+    "spoke": "forge-wms",
+    "hub_module": "forge.adapters.forge_wms",
+    "source_repo": "https://github.com/WhiskeyHouse/forge-wms",
     "source_lines": 507000
   },
   "time_governance": {

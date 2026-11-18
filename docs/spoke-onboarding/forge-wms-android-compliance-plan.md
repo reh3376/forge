@@ -1,4 +1,4 @@
-# Forge Spoke Compliance Plan: WHK-WMS Android (Scanner Edge Device)
+# Forge Spoke Compliance Plan: forge-wms Android (Scanner Edge Device)
 
 **Spoke ID:** `whk_scanner`
 **Status:** Production — changes require careful planning
@@ -9,7 +9,7 @@
 
 ## 1. Spoke Summary
 
-WHK-WMS Android is a production Kotlin Android application deployed on Keyence handheld scanners that captures barrel QR code scans (entry, dump, withdrawal, relocation, inspection, inventory, label verification) and syncs them to the WMS backend. It serves as the physical-world data ingestion edge for the warehouse.
+forge-wms Android is a production Kotlin Android application deployed on Keyence handheld scanners that captures barrel QR code scans (entry, dump, withdrawal, relocation, inspection, inventory, label verification) and syncs them to the WMS backend. It serves as the physical-world data ingestion edge for the warehouse.
 
 **Tech Stack:** Kotlin, Android SDK 34, Retrofit 2.9.0 + Moshi (REST/JSON), Room/SQLite (local), WorkManager (background sync), Azure OAuth2
 **Current Transport:** REST/JSON over HTTPS → `POST /api/android-sync` (batch upload of `BarrelEvent` objects)

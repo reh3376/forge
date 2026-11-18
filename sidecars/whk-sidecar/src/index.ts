@@ -21,7 +21,7 @@ import type { AdapterManifest, AdapterTier } from './types';
 // ---------------------------------------------------------------------------
 
 const HUB_ADDRESS = process.env.FORGE_HUB_ADDRESS ?? 'localhost:50051';
-const ADAPTER_ID = process.env.FORGE_ADAPTER_ID ?? 'whk-wms';
+const ADAPTER_ID = process.env.FORGE_ADAPTER_ID ?? 'forge-wms';
 const ADAPTER_VERSION = '0.1.0';
 
 // ---------------------------------------------------------------------------

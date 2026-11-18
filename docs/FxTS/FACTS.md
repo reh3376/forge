@@ -46,9 +46,9 @@ State on 2026-10-17 (`FACTSRunner` over `src/forge/governance/facts/specs/`; "Ru
 | `whk-cmms.facts.json` | MES_MOM | 5 (3 GraphQL, 1 REST, 1 RabbitMQ) | 19 + 2 enrichment | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; previous hash approved by reh3376) | pass |
 | `whk-erpi.facts.json` | ERP_BUSINESS | 5 (3 RabbitMQ, 1 REST, 1 GraphQL) | 12 + 2 enrichment | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; previous hash approved by forge-governance-audit) | pass |
 | `whk-nms.facts.json` | MES_MOM | 11 (10 REST, 1 WS) | 19 + 2 enrichment | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; previous hash approved by reh3376) | pass |
-| `whk-wms.facts.json` | MES_MOM | 14 (9 GraphQL, 1 subscription, 3 RabbitMQ, 1 REST) | 11 + 3 enrichment | read, subscribe, backfill, discover | approved (reh3376) | pass |
+| `forge-wms.facts.json` | MES_MOM | 14 (9 GraphQL, 1 subscription, 3 RabbitMQ, 1 REST) | 11 + 3 enrichment | read, subscribe, backfill, discover | approved (reh3376) | pass |
 
-The runner's first verdict is `facts:schema-valid` (JSON Schema 2020-12, one violation per offending path); the 35 rule checks that follow read their closed value sets from the schema's enums, so the two cannot drift (FB-080). `tests/governance/facts/test_specs_schema_valid.py` validates every file in `specs/` in CI; the OT spec is a strict xfail there until FB-079. Adapter-specific material the contract has no slot for — routing rules, cross-module flows, scan rejection, pre-FHTS history notes — lives under `metadata`, which the schema leaves free-form and the runner never inspects. Only the owner approves a hash (`approve_spec_hash(approved_by="reh3376")`); agents re-stamp as `pending_review`. Five specs await that approval after FB-080 moved their out-of-contract fields to `metadata` (content changes; adapter behaviour unchanged). Per-spec test modules exist for whk-wms, forge-mes and ot-module.
+The runner's first verdict is `facts:schema-valid` (JSON Schema 2020-12, one violation per offending path); the 35 rule checks that follow read their closed value sets from the schema's enums, so the two cannot drift (FB-080). `tests/governance/facts/test_specs_schema_valid.py` validates every file in `specs/` in CI; the OT spec is a strict xfail there until FB-079. Adapter-specific material the contract has no slot for — routing rules, cross-module flows, scan rejection, pre-FHTS history notes — lives under `metadata`, which the schema leaves free-form and the runner never inspects. Only the owner approves a hash (`approve_spec_hash(approved_by="reh3376")`); agents re-stamp as `pending_review`. Five specs await that approval after FB-080 moved their out-of-contract fields to `metadata` (content changes; adapter behaviour unchanged). Per-spec test modules exist for forge-wms, forge-mes and ot-module.
 
 **Cross-spoke consistency:** 6 shared context fields (`lot_id`, `shift_id`, `operator_id`, `event_timestamp`, `event_type`, `work_order_id`). Identical shift definitions (America/Kentucky/Louisville, day/night). Shared RabbitMQ exchange topology (`wh.whk01.distillery01.*`). Both MES_MOM tier.
 
@@ -193,14 +193,14 @@ The same section rides on the adapter manifest (`AdapterManifest.time_governance
 
 ```bash
 # Static validation: by adapter_id (looked up in src/forge/governance/facts/specs) or by file
-forge governance run facts whk-wms
-forge governance run facts path/to/whk-wms.facts.json
+forge governance run facts forge-wms
+forge governance run facts path/to/forge-wms.facts.json
 
 # Live validation (instantiates and exercises the adapter)
-forge governance run facts whk-wms --live
+forge governance run facts forge-wms --live
 
 # JSON report (also printed with --format json)
-forge governance run facts whk-wms --output reports/facts-whk-wms.json
+forge governance run facts forge-wms --output reports/facts-forge-wms.json
 ```
 
 The command exits 1 when any check fails and prints the failed checks with their violations; the first verdict is always `facts:schema-valid`.
@@ -209,9 +209,9 @@ Spec integrity is on the CLI already (FB-021): `forge governance specs --pending
 
 ## First Adapter Specs
 
-### whk-wms (Whiskey House Warehouse Management System)
+### forge-wms (Forge Warehouse Management System)
 
-**Spec File:** `src/forge/governance/facts/specs/whk-wms.facts.json`
+**Spec File:** `src/forge/governance/facts/specs/forge-wms.facts.json`
 **Tier:** MES_MOM
 **Protocol:** graphql+amqp
 **Capabilities:** read, subscribe, backfill, discover (no write)
