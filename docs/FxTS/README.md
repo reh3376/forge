@@ -173,6 +173,7 @@ Every FxTS framework follows the same structure:
 | [FPTS](FPTS.md) | Forge Performance Test Specification | Throughput and latency benchmarks | Soft-fail | Planned |
 | [FHTS](FHTS.md) | Forge Hash Test Specification | Cross-cutting hash integrity and AI agent governance | Hard-fail | Implemented |
 | [FVTS](FVTS.md) | Forge View Test Specification | Module ↔ forge-display contract: bindings, alarms, actions, surfaces, render profiles | Hard-fail | Schema + Runner + reference renderer implemented; reference spec awaits owner approval (FB-078) |
+| FMTS | Forge Module Test Specification | The requirements every module meets: the baseline, the time contract, references to its other specs, waivers (`docs/decisions/forge-module-requirements.md`, D-12) | Hard-fail | Decided 2026-11-17, not built (FB-135) |
 
 ## Shared Infrastructure
 
