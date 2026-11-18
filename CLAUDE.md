@@ -35,7 +35,7 @@ These documents are the authority (A-12). Where Jiminy or MDEMG guidance injecte
 - **Modules are Go (A-2)**, built from the module SDK. The NestJS/Next.js code under `modules/Forge MES` is the interim MES bridge; forge-mes is Go and is not built yet. Say "the interim MES bridge", never "the TypeScript forge-mes".
 - **All user interfaces come from forge-display (A-3)**, for every module. No module ships its own UI. The bridge's Next.js frontend stays only until forge-display exists.
 - **One clock.** The top hub is the time authority. Every stored time is UTC and timezone-aware, time checks are mandatory and fail closed, and a module that does not implement the time exchange is refused (`docs/decisions/one-clock-ot-source-time.md`).
-- **Every module meets the forge module requirements (A-11)**, which are being written (FB-124).
+- **Every module meets the forge module requirements (A-11, D-12)**: `docs/decisions/forge-module-requirements.md`, signed 2026-11-17. Eleven baseline requirements and a time contract, to be checked by the FMTS framework, which is not built yet (FB-135).
 - **No silent failure.** A refusal or a fail-closed state is visible on status, health, API and CLI with its cause. A log line alone is not enough.
 - **Production runs on Kubernetes.** Docker Compose is for development only.
 - **Configuration comes from the environment.** Never hardcode credentials, addresses or keys.

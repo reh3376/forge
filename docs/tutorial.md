@@ -401,7 +401,7 @@ note:
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.1 |
 | Go transport parity tests | FB-055 |
 | The hub's REST ingest (`POST /v1/records`) carries no time exchange and is to be retired: every module speaks to the hub over gRPC | FB-123 |
-| The baseline every module must meet (the forge module requirements and their FxTS spec) is not written down | FB-124 |
+| The baseline every module must meet is decided and signed (D-12, 2026-11-17: eleven requirements and a time contract, checked by a new framework, FMTS) and not built | FB-135 to FB-140 |
 | The time fields stored at rest (only `source_time` is; the rest travel on the record) | FB-108 |
 | Generic adapters (csv_file, mqtt_sparkplug, opcua, rest_generic) | package stubs only |
 
@@ -706,7 +706,7 @@ note:
 
 | Gap | Backlog / decision |
 |---|---|
-| The `time_contract` of a module with every database and plant-floor device is not defined; only the spoke's own declaration and its PLC connections are | FB-124 (with FB-117 and FB-120) |
+| The `time_contract` of a module with its hub, every database, every plant-floor device and every third-party system is decided (D-12, 2026-11-17) and not built; today only the spoke's own declaration and its PLC connections are declared | FB-135, FB-138, FB-139 (with FB-117 and FB-120) |
 | The OT FACTS spec fails `facts:schema-valid` and eight vocabulary checks | FB-079, D-8 |
 | FQTS and FSTS are stubs; FDTS, FLTS, FNTS, FOTS, FPTS are planned | M5 |
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.9 |
@@ -1509,7 +1509,7 @@ note:
 | Missing | Backlog |
 |---|---|
 | The hub's REST ingest retired: it carries no time exchange, and every module speaks to the hub over gRPC | FB-123 |
-| The forge module requirements and their FxTS spec, with a `time_contract` between each module and every database and device | FB-124 |
+| The module requirements' framework (FMTS) and the `time_contract` between each module and its hub, every database, device and third-party system: signed as D-12 on 2026-11-17, not built | FB-135 to FB-140 |
 | Forge checking its own host's clock before it judges others | FB-119 |
 | Clock agreement as a quality dimension; the offset assumed for an offset-less source stamp | FB-091 |
 | The time fields stored at rest | FB-108 |
@@ -1597,7 +1597,7 @@ note:
 | **Documentation is current before every push**: `docs/WHERE-WE-ARE.md` rows, numbers and status date, `README.md` counts, the roadmap and backlog | 2026-10-16 |
 | **The developer and user tutorial is current before every push**: `docs/tutorial.md` reviewed against the change, updated, rebuilt (`make sync-tutorial-embed`) and checked | 2026-11-17 (owner) |
 | **The repository's documents are the authority**: where Jiminy guidance disagrees, the documents win and the disagreement is reported to the mdemg agent as a defect | A-12, 2026-11-17 |
-| **Every module speaks to the hub over gRPC**; third-party software is reached by an integration module, never by the hub; every module meets the forge module requirements (being written, FB-124) | A-11, 2026-11-17 |
+| **Every module speaks to the hub over gRPC**; third-party software is reached by an integration module, never by the hub; every module meets the forge module requirements (`docs/decisions/forge-module-requirements.md`, signed 2026-11-17; their framework, FMTS, is not built yet) | A-11, D-12 |
 | **Only the owner approves** a spec hash (`forge governance approve --by reh3376`) and signs a design record, on their explicit word | A-9, FHTS |
 | **Forge-issued passwords are printed once and never stored** | FB-057 |
 | **Local models only** for the project's tooling (MDEMG/Jiminy on `mdemg-llm-v1`); never a cloud model | A-10 |
@@ -2396,7 +2396,7 @@ note:
 
 | Not yet | When |
 |---|---|
-| A written list of what every module must do, time-keeping first, checked before a module is admitted | recorded (FB-124) |
+| The list of what every module must do, time-keeping first, checked before a module is admitted: decided and signed on 2026-11-17, not yet built | planned (FB-135 to FB-140) |
 | Forge checking its own server's clock before it judges the others | recorded (FB-119) |
 | Clock agreement counted in a data product's quality score | planned (FB-091) |
 | Business systems having the clock of their own server checked | recorded (FB-120) |
