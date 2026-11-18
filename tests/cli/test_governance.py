@@ -359,7 +359,8 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
             ],
         },
         "user_interface": {"ships_ui_code": False, "screens": False},
-        "scaffold": {"template": "python-adapter"},
+        # off the template, so the conformance kit cannot drive it: M-4 to M-7 are skipped
+        "scaffold": {"template": "none"},
     }
     add_spec_hash(spec, changed_by="test")
     approve_spec_hash(spec, approved_by="test-owner")
@@ -373,4 +374,4 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
     for requirement in ("m4", "m5", "m6", "m7"):
         assert f"[SKIP] fmts:{requirement}: NOT CHECKED" in out
     assert "[FAIL] fmts:m1:" not in out and "[FAIL] fmts:m2:" not in out
-    assert "[FAIL] fmts:m3:" not in out and "[FAIL] fmts:m11:" not in out
+    assert "[FAIL] fmts:m3:" not in out and "[FAIL] fmts:m11:" in out
