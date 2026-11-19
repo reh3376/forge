@@ -1,13 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://fxts/fmts/v0.2.0",
+  "$id": "forge://fxts/fmts/v1.0.0",
   "title": "FMTS — Forge Module Test Specification",
-  "description": "What every Forge module declares before a hub admits it: its kind, the baseline it claims (M-1 to M-11), its time contract, references to its other specs, and waivers. Decided in docs/decisions/forge-module-requirements.md (D-12, signed 2026-11-17). One spec per module, `<module>.fmts.json`.",
+  "description": "What every Forge module declares before a hub admits it: its kind, the baseline it claims (M-1 to M-16), its time contract, references to its other specs, and waivers. Decided in docs/decisions/forge-module-requirements.md (D-12, signed 2026-11-17, amended 2026-11-19). One spec per module, `<module>.fmts.json`.",
   "type": "object",
   "required": [
     "spec_version",
     "module_identity",
     "hub_link",
+    "transport",
     "references",
     "baseline",
     "waivers",
@@ -19,7 +20,7 @@
   "properties": {
     "spec_version": {
       "type": "string",
-      "const": "0.2.0",
+      "const": "1.0.0",
       "description": "FMTS schema version this spec is written against."
     },
     "module_identity": {
@@ -108,6 +109,25 @@
         }
       }
     },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "process_control_writes",
+        "business_write_backs"
+      ],
+      "description": "What the module does with messages that come down from the hub (D-12 amendment of 2026-11-19; D-15, T-11).",
+      "properties": {
+        "process_control_writes": {
+          "type": "boolean",
+          "description": "The module can issue or carry a command: a write to a tag in a process controller (PLC or HMI) that directly affects a process. True makes M-15 required."
+        },
+        "business_write_backs": {
+          "type": "boolean",
+          "description": "The module accepts write-backs to a business system, delivered once and only once. True makes M-16 required."
+        }
+      }
+    },
     "references": {
       "type": "object",
       "additionalProperties": false,
@@ -173,9 +193,14 @@
         "M-8",
         "M-9",
         "M-10",
-        "M-11"
+        "M-11",
+        "M-12",
+        "M-13",
+        "M-14",
+        "M-15",
+        "M-16"
       ],
-      "description": "The claim for each of the eleven requirements: met, or waived by an entry in `waivers`. A requirement with no waiver is enforced in full.",
+      "description": "The claim for each of the sixteen requirements: met, or waived by an entry in `waivers`. M-15 and M-16 bind only a module that declares the matching kind of downward message in `transport`; for any other module they are `not_applicable`. A requirement with no waiver is enforced in full.",
       "properties": {
         "M-1": {
           "$ref": "#/$defs/claim"
@@ -209,6 +234,21 @@
         },
         "M-11": {
           "$ref": "#/$defs/claim"
+        },
+        "M-12": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-13": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-14": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-15": {
+          "$ref": "#/$defs/conditionalClaim"
+        },
+        "M-16": {
+          "$ref": "#/$defs/conditionalClaim"
         }
       }
     },
@@ -476,7 +516,12 @@
             "M-8",
             "M-9",
             "M-10",
-            "M-11"
+            "M-11",
+            "M-12",
+            "M-13",
+            "M-14",
+            "M-15",
+            "M-16"
           ]
         },
         "reason": {
@@ -627,6 +672,15 @@
           "const": true
         }
       }
+    },
+    "conditionalClaim": {
+      "type": "string",
+      "enum": [
+        "met",
+        "waived",
+        "not_applicable"
+      ],
+      "description": "A claim for a requirement that binds only some modules (M-15, M-16)."
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.2.0",
+  "spec_version": "1.0.0",
   "module_identity": {
     "module_id": "forge-ot",
     "name": "Forge OT/SCADA Module — OPC-UA Adapter",
@@ -14,6 +14,10 @@
   "hub_link": {
     "protocol": "grpc",
     "service": "forge.v1.AdapterService"
+  },
+  "transport": {
+    "process_control_writes": true,
+    "business_write_backs": false
   },
   "references": {
     "facts": {
@@ -36,7 +40,12 @@
     "M-8": "met",
     "M-9": "met",
     "M-10": "waived",
-    "M-11": "waived"
+    "M-11": "waived",
+    "M-12": "waived",
+    "M-13": "waived",
+    "M-14": "waived",
+    "M-15": "waived",
+    "M-16": "not_applicable"
   },
   "waivers": [
     {
@@ -48,6 +57,26 @@
       "requirement": "M-11",
       "reason": "The OT module is hub-hosted Python with its own layout; no module SDK template exists for a hub-hosted module.",
       "backlog_item": "FB-146"
+    },
+    {
+      "requirement": "M-12",
+      "reason": "The record id rule of the transport contract (T-5) is not built: records carry an id the adapter makes, and the hub does not yet keep each id once.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-13",
+      "reason": "The module has a store-and-forward buffer of its own for acquisition, but not the transport contract's (T-6): no declared capacity on the hub link, no replay at a separate rate, and buffering is not on its health.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-14",
+      "reason": "The goodbye and the last will of the transport contract (T-8) are not built: the hub learns of a shutdown only when calls stop.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-15",
+      "reason": "Command expiry (T-11) is not built: a process-control write carries no expiry for the module to refuse it by.",
+      "backlog_item": "FB-164"
     }
   ],
   "time_contract": {
@@ -74,8 +103,26 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "dbc46f93854ce3eda3b053d5ebee261ce2ec27e2e7b2f7994f63d91df01c3653",
+    "previous_hash": "8dd87c2729105c1af0b702ab990e8d55a37fc887091c4fa1b4b702e0d4913d51",
     "change_history": [
+      {
+        "previous_hash": "8dd87c2729105c1af0b702ab990e8d55a37fc887091c4fa1b4b702e0d4913d51",
+        "new_hash": "6f2ccc1a528fe4d646c0bbcd0c499ca55b79b28e8d003410f6f584681e096aa2",
+        "changed_at": "2026-11-19T18:38:28Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-165: the M-13 waiver states what forge-ot's own buffer lacks"
+      },
+      {
+        "previous_hash": "4bfc7cf6bc7dd39fc959c1be698fdb590e415b4f3d29dadc6211044e411ab3f5",
+        "new_hash": "8dd87c2729105c1af0b702ab990e8d55a37fc887091c4fa1b4b702e0d4913d51",
+        "changed_at": "2026-11-19T18:38:18Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-165: FMTS 1.0.0, the transport contract's requirements M-12 to M-16 (D-12 amendment, owner 2026-11-19); each one that binds the module waived until FB-164"
+      },
       {
         "previous_hash": "dbc46f93854ce3eda3b053d5ebee261ce2ec27e2e7b2f7994f63d91df01c3653",
         "new_hash": "4bfc7cf6bc7dd39fc959c1be698fdb590e415b4f3d29dadc6211044e411ab3f5",
@@ -84,31 +131,13 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
         "reason": "FB-155: M-4 to M-7 run by the conformance kit through the module's hook"
-      },
-      {
-        "previous_hash": "ed806fe9578f30688cc0fd58e8a3b7e66ea7d26885322c113ebd5bff283c9e8a",
-        "new_hash": "dbc46f93854ce3eda3b053d5ebee261ce2ec27e2e7b2f7994f63d91df01c3653",
-        "changed_at": "2026-11-18T17:02:48Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "content",
-        "reason": "Owner review 2026-11-18: one identity (FB-144); the notes brought to date"
-      },
-      {
-        "previous_hash": "67ef9bfcd2b9929ac5db14306371373ddb8ac407ffc30a84dbfeef0e7fd82227",
-        "new_hash": "ed806fe9578f30688cc0fd58e8a3b7e66ea7d26885322c113ebd5bff283c9e8a",
-        "changed_at": "2026-11-18T17:01:10Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "content",
-        "reason": "Owner review 2026-11-18: the OT module's one id is forge-ot (FB-144)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "4bfc7cf6bc7dd39fc959c1be698fdb590e415b4f3d29dadc6211044e411ab3f5",
+    "spec_hash": "6f2ccc1a528fe4d646c0bbcd0c499ca55b79b28e8d003410f6f584681e096aa2",
+    "schema_version": "1.0.0",
+    "schema_hash": "49e1e80a99ad1b201c88a9b1289eb854454f22f417824e29d78670c5b9aeccf8",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-18T17:20:53Z",
-    "schema_version": "0.2.0",
-    "schema_hash": "849a1bbcf3a9c8c421e08fc7f884616f79c3dd027a258a743cc87dc4e76a6375"
+    "approved_at": "2026-11-19T21:10:46Z"
   }
 }

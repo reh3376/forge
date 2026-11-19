@@ -21,6 +21,17 @@
       "released_at": "2026-11-19T00:00:00Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-19T18:03:47Z"
+    },
+    {
+      "version": "1.0.0",
+      "file": "versions/fmts.v1.0.0.schema.json",
+      "schema_hash": "49e1e80a99ad1b201c88a9b1289eb854454f22f417824e29d78670c5b9aeccf8",
+      "hash_state": "approved",
+      "step": "major",
+      "summary": "FB-165: the transport contract's requirements M-12 to M-16, the transport section, and not_applicable for M-15 and M-16 (D-12 amendment, owner 2026-11-19)",
+      "released_at": "2026-11-19T18:37:42Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-19T21:08:56Z"
     }
   ]
 }

@@ -68,7 +68,7 @@ class TestAModuleThatMeetsTheBaseline:
         report = await _run(runner, spec, repo)
         verdicts = _by_id(report)
         assert report.passed and report.hash_verified is True and report.framework == "FMTS"
-        assert report.total == 20
+        assert report.total == 26
         for requirement in ("m1", "m2", "m3", "m8", "m9", "m10", "m11"):
             assert verdicts[f"fmts:{requirement}"].status == PASS, verdicts[f"fmts:{requirement}"]
         for check in (
@@ -106,10 +106,62 @@ class TestAModuleThatMeetsTheBaseline:
 
     async def test_one_verdict_per_requirement(self, runner, spec, repo) -> None:
         verdicts = _by_id(await _run(runner, spec, repo))
-        assert [f"fmts:m{n}" for n in range(1, 12)] == [
+        assert [f"fmts:m{n}" for n in range(1, 17)] == [
             f"fmts:{r.lower().replace('-', '')}" for r in REQUIREMENTS
         ]
-        assert all(f"fmts:m{n}" in verdicts for n in range(1, 12))
+        assert all(f"fmts:m{n}" in verdicts for n in range(1, 17))
+
+
+class TestTheTransportRequirements:
+    """M-12 to M-16: the D-12 amendment of 2026-11-19 (FB-165)."""
+
+    async def test_a_claim_of_met_is_reported_as_not_checked(self, runner, spec, repo) -> None:
+        verdicts = _by_id(await _run(runner, spec, repo))
+        for check in ("m12", "m13", "m14"):
+            verdict = verdicts[f"fmts:{check}"]
+            assert verdict.status == SKIP and verdict.message.startswith("NOT CHECKED")
+            assert verdict.evidence["blocked_on"] == "FB-164"
+
+    async def test_a_module_with_no_downward_writes_is_not_bound(self, runner, spec, repo) -> None:
+        verdicts = _by_id(await _run(runner, spec, repo))
+        assert verdicts["fmts:transport"].status == PASS
+        for check in ("m15", "m16"):
+            assert verdicts[f"fmts:{check}"].status == PASS
+            assert verdicts[f"fmts:{check}"].evidence == {"not_applicable": True}
+
+    async def test_not_applicable_must_be_true(self, runner, unsigned, repo) -> None:
+        unsigned["transport"]["process_control_writes"] = True
+        verdict = await _one(runner, unsigned, repo, "m15")
+        assert verdict.status == FAIL and "is required" in _messages(verdict)
+
+    async def test_a_module_not_bound_claims_not_applicable(self, runner, unsigned, repo) -> None:
+        unsigned["baseline"]["M-16"] = "met"
+        verdict = await _one(runner, unsigned, repo, "transport")
+        assert verdict.status == FAIL and "claim not_applicable" in _messages(verdict)
+
+    async def test_the_declarations_are_held_to_the_facts_spec(
+        self, runner, unsigned, repo
+    ) -> None:
+        # The fixture's FACTS spec declares no write capability.
+        unsigned["transport"]["business_write_backs"] = True
+        unsigned["baseline"]["M-16"] = "met"
+        verdict = await _one(runner, unsigned, repo, "transport")
+        assert verdict.status == FAIL and "declares no write capability" in _messages(verdict)
+
+    async def test_facts_write_needs_a_declaration(self, runner, unsigned, repo) -> None:
+        path = repo / "specs" / "forge-wms.facts.json"
+        facts = json.loads(path.read_text(encoding="utf-8"))
+        facts["capabilities"]["write"] = True
+        path.write_text(json.dumps(facts), encoding="utf-8")
+        verdict = await _one(runner, unsigned, repo, "transport")
+        assert verdict.status == FAIL and "declares neither" in _messages(verdict)
+
+    async def test_only_the_conditional_requirements_can_be_not_applicable(
+        self, runner, unsigned, repo, schema
+    ) -> None:
+        unsigned["baseline"]["M-12"] = "not_applicable"
+        report = await _run(runner, sign(unsigned), repo)
+        assert _by_id(report)["fmts:schema-valid"].status == FAIL
 
 
 class TestPlumbing:
@@ -207,9 +259,11 @@ class TestWaivers:
     ) -> None:
         from forge.governance.shared.runner import add_spec_hash
 
-        assert frozenset({"M-3", "M-4"}) == ADMIN_WAIVABLE
+        assert frozenset({"M-3", "M-4", "M-15"}) == ADMIN_WAIVABLE
         for requirement in sorted(ADMIN_WAIVABLE):
             spec = json.loads(json.dumps(unsigned))
+            if requirement == "M-15":  # binds only a module that declares the writes
+                spec["transport"]["process_control_writes"] = True
             _waive(spec, requirement)
             # Stamped but not approved: the waiver does not count yet.
             add_spec_hash(spec, changed_by="test")

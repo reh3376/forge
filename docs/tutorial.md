@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-19` against the repository `reh3376/forge` at the merge of PR 122 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-19` against the repository `reh3376/forge` at the merge of PR 123 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -210,7 +210,7 @@ How to read it:
 - **Three hubs, each with two modules.** Every hub is the same software (forge-core). An area hub serves the modules that run that area's processes; the site hub serves site-wide functions and collects from the area hubs.
 - **Two kinds of module on each hub.** A management module is Forge's own; an integration module connects one third-party application. The integration module is the only thing that talks to that application, over the application's own interface (a RESTful API or GraphQL here; MQTT, OPC UA, SQL and others where the application offers them). Its hub side is gRPC, like every module.
 - **The time contract is on every link.** The site hub is the time authority. Each exchange carries four timestamps, so both sides know the offset between their clocks. A clock outside its tolerance class is refused, never silently corrected. It reaches down to PLC connections and across to databases and third-party systems.
-- **Store and forward is on every link.** A module or a child hub that cannot reach its parent keeps what it could not deliver and replays it in order. Commands going down are the opposite: never stored, and they expire.
+- **Store and forward is on every link.** A module or a child hub that cannot reach its parent keeps what it could not deliver and replays it in order. A command going down (a write to a process controller) is the opposite: never stored, and it expires.
 - **Every hub owns its own databases, not only the top one.** The chart draws the full set of stores on the site hub to keep it readable, but each area hub has its own PostgreSQL, TimescaleDB and the rest, and stores the data of the modules attached to it. A hub at any level keeps working, and keeps storing, when the hub above it cannot be reached. A module gets a Forge-issued credential to its own schema on its own hub and holds no connection of its own.
 
 note:
@@ -245,7 +245,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 122:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 123:
 
 **Working**
 
@@ -269,7 +269,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 122:
 
 | What | Record |
 |---|---|
-| The module requirements, eleven of them, and the time contract | D-12 (the checker is built; the hub does not yet demand an approved spec at Register) |
+| The module requirements, sixteen of them, and the time contract | D-12 (the checker is built; the hub does not yet demand an approved spec at Register) |
 | The integration module builder and the designer | D-13 |
 | What every FxTS framework provides | D-14 (all five steps built) |
 | The transport contract: versioning, delivery, store and forward, command expiry, security | D-15 |
@@ -280,7 +280,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 122:
 | Measure | Value (2026-11-19) |
 |---|---|
 | Python hub (`src/forge`) | 354 files, ~74,100 lines |
-| Python tests | 280 files, 4,874 collected, full suite green on the locked dependency set |
+| Python tests | 280 files, 4,881 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -520,6 +520,8 @@ The transport above works, but it was silent on what happens when things go wron
 | **store and forward**: buffered while the hub is unreachable, with a capacity the installation controls | **never stored**: a command carries a short expiry; a late command is refused by the module and reported as not delivered |
 | replayed with original source times; everything is ordered by source time, not by arrival | whoever issued it decides again |
 
+**What a command is** (owner, 2026-11-19): only a write to a tag in a process controller (PLC or HMI) that directly affects a process. A message down to a business system is not one. A **business write-back** (a transaction posted to an ERP, an order updated in the MES) follows the IT rule in the other direction: it carries an id, the hub keeps it while the link is down, and it is delivered and confirmed **once and only once**; a minor delay is acceptable and it does not expire as a command does. Lifecycle calls (Configure, Start, Stop, a request to collect) are neither: they are answered or failed within a deadline.
+
 | Rule | What it means for your code |
 |---|---|
 | Change | Within `forge.v1` only **add** (optional fields, RPCs, enum values). Never remove, rename or reuse a field number. A breaking change is `forge.v2`, served beside v1; a hub serves two majors. |
@@ -534,7 +536,7 @@ The transport above works, but it was silent on what happens when things go wron
 
 note:
 - The owner on why commands differ: "Messaging related to OT functionality specifically command type messages require a very different set of constraints from a normal IT-type data transfer."
-- None of this is in the code yet beyond what the earlier slides list as working (FB-164). It also adds to what every module must do (a stable record id, store and forward, the goodbye and last will, refusing a late command), which is an amendment of the module requirements still to be put to the owner (FB-165).
+- None of this is in the code yet beyond what the earlier slides list as working (FB-164). It also adds to what every module must do (a stable record id, store and forward, the goodbye and last will, refusing a late command), which the owner added to the module requirements on 2026-11-19 as M-12 to M-16 (F4); every module waives the ones that bind it until this is built.
 
 ---
 
@@ -542,10 +544,10 @@ note:
 
 | Gap | Backlog |
 |---|---|
-| The signed transport contract (D-15) is not built: no versions or limits at Register, no de-duplication, no store and forward outside forge-ot, no deadlines or keepalive, no command expiry, TLS optional | FB-164, FB-165 |
+| The signed transport contract (D-15) is not built: no versions or limits at Register, no de-duplication, no store and forward outside forge-ot, no deadlines or keepalive, no command expiry, no once-and-only-once write-back, TLS optional | FB-164 |
 | Go transport parity tests | FB-055 |
 | The hub's REST ingest (`POST /v1/records`) carries no time exchange and is to be retired: every module speaks to the hub over gRPC | FB-123 |
-| Every module has an FMTS spec; the owner has approved eight of the nine. A conformance kit runs four of the eleven requirements against a running module; the interim MES bridge cannot be driven by it yet, so its spec is not approved; no module ships a roles file; the bridge's time-source requirement is waived | FB-155, FB-141, FB-145 |
+| Every module has an FMTS spec; the owner has approved eight of the nine. A conformance kit runs four of the sixteen requirements against a running module; the interim MES bridge cannot be driven by it yet, so its spec is not approved; no module ships a roles file; the bridge's time-source requirement is waived | FB-155, FB-141, FB-145 |
 | The time fields stored at rest (only `source_time` is; the rest travel on the record) | FB-108 |
 | Four generic adapter packages (csv_file, mqtt_sparkplug, opcua, rest_generic) are empty | FB-148 |
 | The FATS specs of the hub's REST routes declare no request or response shapes | FB-162 |
@@ -774,7 +776,7 @@ note:
 | **FATS** · Forge API Test Specification | the hub's REST routes: route, method, authentication, status, errors, rate limit | schema + runner + 28 specs, one per served route, all approved; thin (FB-162) |
 | **FTTS** · Forge Transport Test Specification | the hub-to-module transport | schema + runner + 1 spec, approved; the signed transport contract is not built (FB-164) |
 | **FVTS** · Forge View Test Specification | module ↔ forge-display: points, alarms, actions, surfaces, profiles | schema + runner + reference renderer + golden messages + 1 spec, awaiting approval (FB-078) |
-| **FMTS** · Forge Module Test Specification | what every module must do: eleven requirements, the time contract, waivers | schema + runner + conformance kit + 9 specs, 8 approved |
+| **FMTS** · Forge Module Test Specification | what every module must do: sixteen requirements, the time contract, waivers | schema + runner + conformance kit + 9 specs, 8 approved |
 | **FHTS** · Forge Hash Test Specification | the hash and owner approval of every spec above | hashing, verification, approval, revert, registry |
 | FQTS · FSTS · FDTS · FLTS · FNTS · FOTS · FPTS | data quality · security · schema evolution · lineage · normalization · observability · performance | planned: a documentation page each, nothing in the code |
 
@@ -866,7 +868,7 @@ note:
 
 ## FMTS · What Every Module Must Do (D-12)
 
-FACTS says what a module's data looks like. FMTS says what a module must do before a hub admits it. `docs/decisions/forge-module-requirements.md`, signed 2026-11-17; one spec per module, `<module>.fmts.json`.
+FACTS says what a module's data looks like. FMTS says what a module must do before a hub admits it. `docs/decisions/forge-module-requirements.md`, signed 2026-11-17 and amended 2026-11-19; one spec per module, `<module>.fmts.json`.
 
 | # | Requirement | Checked |
 |---|---|---|
@@ -881,22 +883,27 @@ FACTS says what a module's data looks like. FMTS says what a module must do befo
 | M-9 | Ships no user interface code; describes its screens in FVTS specs | from the repository |
 | M-10 | Declares its roles and scopes | from the repository |
 | M-11 | Is built from the module SDK template for its language | from the repository |
+| M-12 | Gives every record a stable record id | not yet: needs the transport contract (FB-164) |
+| M-13 | Stores and forwards what it cannot deliver, with a declared capacity | not yet (FB-164) |
+| M-14 | Says goodbye on a proper shutdown and declares a last will | not yet (FB-164) |
+| M-15 | Refuses a command that arrives after its expiry; only for a module that declares process-control writes | not yet (FB-164); the declaration is checked now |
+| M-16 | Applies each business write-back once by its id and confirms it; only for a module that declares it takes them | not yet (FB-164); the declaration is checked now |
 
 - **The conformance kit** (`src/forge/governance/fmts/conformance.py`) runs the real hub on clocks it controls, puts the module's clock 5 s out, and checks that the hub refuses the module, that nothing is delivered, that the module's own health says why, and that it is readmitted when the clock is put right.
-- **A waiver** is a requirement a module cannot meet yet, written in its spec with the reason and the backlog item that removes it. The owner approves it through the spec's hash; every run names it; it expires when its backlog item is closed. The two time-keeping requirements (M-3, M-4) are waived only with admin privileges.
+- **A waiver** is a requirement a module cannot meet yet, written in its spec with the reason and the backlog item that removes it. The owner approves it through the spec's hash; every run names it; it expires when its backlog item is closed. Three requirements are waived only with admin privileges: the two for time keeping (M-3, M-4) and refusing a late command (M-15).
 - **A check that could not run is reported as `NOT CHECKED`**, never as passed.
 
 | Module | Kind | Approved | Waived |
 |---|---|---|---|
-| forge-wms, forge-cmms, forge-nms, forge-ims, forge-historian | management | yes | M-10 (no roles file exists yet) |
-| forge-scanner | management | yes | M-3 (no clock reader for handheld devices), M-10 |
-| forge-integ-erp-netsuite | integration | yes | M-10 |
-| forge-ot | ot | yes | M-10, M-11 |
-| forge-mes (the interim bridge) | management | no: the kit cannot drive a TypeScript process yet | M-3, M-8, M-9, M-10, M-11 |
+| forge-wms, forge-cmms, forge-nms, forge-ims, forge-historian | management | yes | M-10 (no roles file exists yet); M-12 to M-14 |
+| forge-scanner | management | yes | M-3 (no clock reader for handheld devices), M-10; M-12 to M-14 |
+| forge-integ-erp-netsuite | integration | yes | M-10; M-12 to M-14 |
+| forge-ot | ot | yes | M-10, M-11; M-12 to M-15 (it writes to process controllers) |
+| forge-mes (the interim bridge) | management | no: the kit cannot drive a TypeScript process yet | M-3, M-8, M-9, M-10, M-11; M-12 to M-14 and M-16 (it takes business write-backs) |
 
 note:
 - Driving forge-ot with the kit found four defects that its own tests, which use stand-ins for the tag registry, had hidden: a collect that could not run on the real registry, subscriptions that never fired, and a schema reference that would have made the hub refuse its registration and every record. That is what the kit is for.
-- The hub does not yet demand an approved FMTS spec at Register (FB-140). The transport contract adds requirements that are not in this list yet (FB-165).
+- The hub does not yet demand an approved FMTS spec at Register (FB-140). M-12 to M-16 were added on 2026-11-19 from the transport contract; nothing can check them against a running module until that contract is built (FB-164).
 
 ---
 
@@ -1037,7 +1044,7 @@ flowchart TD
 ```
 
 - Safety stays in the core: roles, interlocks, confirmation, read-back and audit are enforced in forge-core/OT, never only in a UI.
-- A write is a **command**, and commands follow the OT half of the transport contract (F2): delivered at most once, never stored or queued, with an expiry. A write that could not be delivered at once is reported, and the person or logic that issued it decides again. Expiry is decided (D-15) and not built.
+- A write to a controller tag is a **command**, the only thing the transport contract calls one, and commands follow its OT half (F2): delivered at most once, never stored or queued, with an expiry. forge-ot declares process-control writes in its module spec, so requirement M-15 (refuse a command past its expiry) binds it. A write that could not be delivered at once is reported, and the person or logic that issued it decides again. Expiry is decided (D-15) and not built.
 - Server-side two-step review with reason codes and `REJECTED_REVIEW` since FB-074; multi-party approval follows the role model (D-1, signed 2026-11-03; FB-075).
 - The audit record goes to the hub store and to an external publisher (FB-066, FB-067).
 - The FVTS contract binds every UI action to a required role, a confirmation mode and the statuses it must handle; the render profile decides whether a surface may write at all.
@@ -1234,7 +1241,7 @@ note:
 flowchart TD
   M["A module"] --> MAN["manifest<br/>what it registers with"]
   M --> FA["FACTS spec<br/>its data contract and time governance"]
-  M --> FM["FMTS spec<br/>the eleven requirements, the time contract, waivers"]
+  M --> FM["FMTS spec<br/>the sixteen requirements, the time contract, waivers"]
   M --> FV["FVTS specs<br/>its screens, for forge-display to render"]
   M --> RO["roles file<br/>its roles and scopes"]
   M --> CODE["code from the module SDK template<br/>Go, with Python scripting for customization"]
@@ -1917,7 +1924,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q -rsx                    # 4,874 tests, ~1 minute; lists each skip with its reason
+uv run pytest tests -q -rsx                    # 4,881 tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -1985,7 +1992,7 @@ note:
 | **Every FxTS framework meets the baseline**: planned or complete, every spec hashed and approved | A-15, D-14 |
 | **No existing company is named** in the repository; a third-party product that an integration module integrates may be | A-16 |
 | **Module names**: `forge-<service>` for a build, `forge-integ-<function>-<product>` for an integration; every module has an alias | A-17 |
-| **Within `forge.v1` the proto only gains**; records go up at least once, commands go down at most once and expire | D-15 |
+| **Within `forge.v1` the proto only gains**; records go up at least once; a command (a write to a process controller) goes down at most once and expires; a business write-back is delivered once and only once | D-15 |
 | **Every skipped test states its reason**; a check that was not run is reported as not run | A-20 |
 | **No silent failure**: a refusal or a fail-closed state is visible on status, health, API and CLI with its cause | owner, 2026-11-03 |
 | **Confirm with the owner before installing packages** or changing a manifest or lock file | owner, 2026-11-17 |
@@ -2021,7 +2028,7 @@ note:
 1. **Name it**: `forge-<service>` if Forge builds the function, `forge-integ-<function>-<product>` if it connects a third-party product; give it an alias.
 2. **Scaffold**: the module builder generates manifest, config, adapter, context mapper, record builder and a FACTS spec skeleton (`docs/MODULE_BUILDER.md` §3–§4).
 3. **Declare its data** in the FACTS spec: identity and tier, capabilities, connection, data sources with schema references, context mapping and enrichment, error handling, `time_governance`, sample records.
-4. **Declare what it must do** in the FMTS spec: its kind, the eleven claims, its time contract with every counterpart, and a waiver, with a reason and an open backlog item, for anything it cannot meet yet.
+4. **Declare what it must do** in the FMTS spec: its kind, whether it takes process-control writes or business write-backs, the sixteen claims, its time contract with every counterpart, and a waiver, with a reason and an open backlog item, for anything it cannot meet yet.
 5. **Validate**: `forge governance run facts <module>` and `run fmts <module>`; fix every violation; `stamp` both specs.
 6. **Implement**: `collect`, lifecycle and health in `adapter.py`; mappers turn source rows into `ContextualRecord`s with the context the spec declares. Never invent a source time; refuse with `adapter.refuse(exc)`.
 7. **Prove it runs right**: give the conformance kit sample events (`tests/governance/fmts/conformance/<module>.json`); it drives the module against a reference hub and checks the time exchange, failing closed, UTC stamps and health with refusal causes.
@@ -2055,7 +2062,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 280 files, 4,874 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/` mirrors `src/`: 280 files, 4,881 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -2158,7 +2165,7 @@ note:
 | D-14 | What every FxTS framework provides (`fxts-framework-baseline.md`) | signed 2026-11-18; built (all five steps) |
 | D-15 | The hub-to-module transport contract (`transport-contract.md`) | signed 2026-11-18; nothing built |
 
-**Waiting for the owner**: the forge-display design record and the redone sequence (FB-143); the transport contract's additions to the module requirements (FB-165); the list of module functions (FB-153); the first list of transport data classes; forge-creds (FB-142); a new site id and the last old names (FB-150).
+**Waiting for the owner**: the forge-display design record and the redone sequence (FB-143); the list of module functions (FB-153); the first list of transport data classes; forge-creds (FB-142); a new site id and the last old names (FB-150).
 
 On 2026-11-03 the owner answered the open questions **one at a time** (34 answers) and declared the answers the signature; every gated item can start. Two standing rules came with the answers: no silent failure, and no decision that pins the platform in.
 
@@ -2169,7 +2176,7 @@ note:
 
 ## What Is Next
 
-1. **Finish the specifications.** The transport contract's additions to the module requirements, with the owner (FB-165). The module function field (FB-153).
+1. **Finish the specifications.** The module function field, the integration fields, the data classes and what a module declares for its buffer and last will (FB-153).
 2. **Design forge-display** with the owner, design mode included, and redo the sequence around it (FB-143).
 3. **Build the transport contract** in its ten steps (FB-164), with the conformance kit gaining a check at each; a kit driver for modules in another process (FB-155).
 4. **The Go module SDK** (FB-017), written to the contract spec; its first consumer is forge-display.
@@ -2310,7 +2317,8 @@ Plant networks drop. Forge is designed so that a dropped link loses nothing and,
 | What travels | Rule | Why |
 |---|---|---|
 | **Records** going up (readings, events, transactions) | never lost: the module keeps what it could not send and delivers it in order when the link returns; the hub ignores anything it already has | history must be complete |
-| **Commands** going down (a setpoint, a start, a recipe write) | never kept: a command that cannot be delivered now is dropped and you are told; it also carries a time limit | a setpoint from two minutes ago must not arrive on a process that has moved on |
+| **Commands** going down: writes to a PLC or HMI tag that act on a running process (a setpoint, a start, a recipe write) | never kept: a command that cannot be delivered now is dropped and you are told; it also carries a time limit | a setpoint from two minutes ago must not arrive on a process that has moved on |
+| **Business write-backs** going down (a transaction posted to your ERP, an order updated) | delivered and confirmed once and only once: kept while the link is down, never applied twice, no short time limit | a posting must not be lost or doubled, and a minor delay does no harm |
 
 - After an outage, live data flows first and the backlog follows. Every record is placed by the time it happened, so late arrival does not scramble the picture. That is one reason Forge is strict about clocks (U10).
 - A module that shuts down properly says goodbye; one that vanishes is noticed by the hub and reported. A module that restarts is recorded as a restart.

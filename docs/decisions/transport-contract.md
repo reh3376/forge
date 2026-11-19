@@ -82,6 +82,26 @@ So the list of data classes is not closed, and a class is defined by its rules, 
 - Adding a class, or a rule to a class, is an addition, never a breaking change (T-2). **[PROPOSED]** The list is carried as data, not as a fixed enumeration compiled into every module: the hub tells a module the classes and rules in force at Register (T-3), so a module built before a class existed can still be told its numbers. A module that declares a class its hub does not know is refused at Register with that cause.
 - The four classes sketched in Q-9 are a starting point, not the list. The first list is worked out with the owner before the contract spec is written (FB-164, step 7), with as much thought as can be given beforehand, to keep later version steps few.
 
+### What a command is, and the rule for a business write-back (T-11, the owner on 2026-11-19, after the signature)
+
+Asked while the contract's requirements were carried into the module requirements (FB-165).
+
+**[OWNER]** "The correct answer to this is highly dependent on how we define a 'command'. When we discussed this yesterday we were talking about a very specific type of command. We were referring to a command that writes to a tag in a process control controller that would directly effect a processes operation. If that is the only type of cmd we are referring to here then only modules which could potentially have write access to PLC or HMI tags would be relevant."
+
+**[OWNER]** On a downward message to a business system: "IT Rule: Ensure delivery once and only once, these should not time out in the sense that OT tag write commands should. A downward message to a business system needs to be confirmed delivered once and only once, but a minor delay is not system critical."
+
+So two kinds of message go down, with opposite rules:
+
+| | A command | A business write-back |
+|---|---|---|
+| What it is | a write to a tag in a process controller (PLC or HMI) that directly affects a process | a message to a business system, for example a transaction posted to an ERP or an order updated in the MES |
+| Delivery | at most once | once and only once, confirmed |
+| While the link is down | never stored; dropped and reported | kept, and delivered when the link returns |
+| Time | expires quickly, by its data class; a late one is refused by the module | does not expire as a command does; a minor delay is acceptable |
+| The module's part | M-15: refuses a command past its expiry | M-16: applies each id once and confirms it |
+
+T-11 is read with this definition. Lifecycle calls from the hub (Configure, Start, Stop, a request to collect or backfill) are neither: they are requests, answered or failed within their deadline (T-8).
+
 ## 6. What this changes in work already planned
 
 - **The module requirements (D-12).** T-5, T-6, T-8 and T-11 are behaviour every module must show, so the baseline gains requirements and the conformance kit gains checks for them: a stable record id, store and forward with its capacity, the goodbye and the last will, refusing a late command. That is a change to a signed record and needs the owner's word.
