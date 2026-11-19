@@ -111,7 +111,7 @@ async def test_module_meets_its_spec(runner: FMTSRunner, module_id: str) -> None
     for verdict in report.verdicts:
         by_status.setdefault(verdict.status, set()).add(verdict.check_id)
 
-    assert report.total == 26 and report.hash_verified is True
+    assert report.total == 29 and report.hash_verified is True
     assert by_status.get(VerdictStatus.NOT_IMPLEMENTED, set()) == set()  # schema-runner parity
     assert by_status.get(VerdictStatus.ERROR, set()) == set()
     assert by_status.get(VerdictStatus.FAIL, set()) == ALLOWED_FAILURES.get(

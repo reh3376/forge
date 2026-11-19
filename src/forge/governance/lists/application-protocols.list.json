@@ -1,0 +1,44 @@
+{
+  "list": "application-protocols",
+  "title": "Application-side protocols",
+  "description": "How an integration module reaches the third-party application it connects. Its hub side is gRPC only (M-1); its application side uses one or more of these (owner, 2026-11-18 and 2026-11-19). Adding a protocol is one approved change to this list.",
+  "entries": [
+    {
+      "id": "rest",
+      "description": "A RESTful HTTP API."
+    },
+    {
+      "id": "graphql",
+      "description": "A GraphQL API."
+    },
+    {
+      "id": "mqtt",
+      "description": "MQTT publish and subscribe."
+    },
+    {
+      "id": "opc-ua",
+      "description": "OPC UA."
+    },
+    {
+      "id": "sql",
+      "description": "Direct SQL access to the application's database."
+    },
+    {
+      "id": "amqp",
+      "description": "AMQP message queues."
+    },
+    {
+      "id": "file",
+      "description": "File exchange: CSV or similar, placed and collected."
+    }
+  ],
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "3ae21a0711b2883096552f0e0d44585857c3b233af625fa9ee2d3f9317197e41",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-19T22:06:45Z"
+  }
+}

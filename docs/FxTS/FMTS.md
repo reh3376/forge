@@ -3,7 +3,7 @@
 **Framework ID:** FMTS
 **Full Name:** Forge Module Test Specification
 **CI Gate:** Hard-fail (merge-blocking): `tests/governance/fmts/` runs in the `hub-python` job
-**Status:** v1.0.0 (2026-11-19: the transport contract's five requirements, M-12 to M-16, and the `transport` section; a major step from 0.2.0, released and approved under the schema version rules). Earlier: 0.2.0 added the module alias; 0.1.0 is kept for history. Schema, runner (`fmts_runner.py`, 26 verdicts per spec) and nine module specs, eight approved by the owner. The conformance kit runs four of the sixteen requirements against every module on the Python adapter template (FB-137); for the modules it cannot drive they are reported as not checked (FB-155). The five transport requirements have no kit check yet, because the transport contract is not built (FB-164): every module waives the ones that bind it.
+**Status:** v2.0.0 (2026-11-19, FB-153: the module's function, the integration section, and in `transport` the data classes, the buffer, the last will and a keepalive limit; values come from four governed lists). Earlier the same day 1.0.0 added the transport contract's five requirements, M-12 to M-16 (FB-165); 0.2.0 added the module alias; 0.1.0 is kept for history. Schema, runner (`fmts_runner.py`, 29 verdicts per spec) and nine module specs, eight approved by the owner. The conformance kit runs four of the sixteen requirements against every module on the Python adapter template (FB-137); for the modules it cannot drive they are reported as not checked (FB-155). The five transport requirements have no kit check yet, because the transport contract is not built (FB-164): every module waives the ones that bind it.
 **Decided in:** [`docs/decisions/forge-module-requirements.md`](../decisions/forge-module-requirements.md) (D-12, signed by the owner on 2026-11-17)
 **MDEMG Analog:** None
 
@@ -101,10 +101,11 @@ A module that cannot yet meet a requirement says so in its spec:
 
 | Section | Content |
 |---|---|
-| `spec_version` | `1.0.0` |
-| `module_identity` | `module_id`, `name`, `alias` (the module's shortcut name: short, lower case, unique among the modules; `wms` for `forge-wms`), `version`, `kind` (`management`, `integration`, `ot`, `display`), `language` (`go`, `python`, `typescript`), `source_paths` |
+| `spec_version` | `2.0.0` |
+| `module_identity` | `module_id`, `name`, `alias` (the module's shortcut name: short, lower case, unique among the modules; `wms` for `forge-wms`), `version`, `kind` (`management`, `integration`, `ot`, `display`), `function` (the service the module performs, from the governed list of module functions), `language` (`go`, `python`, `typescript`), `source_paths` |
 | `hub_link` | `protocol: grpc`, `service: forge.v1.AdapterService` (both fixed) |
-| `transport` | `process_control_writes` and `business_write_backs`, each true or false: what the module does with messages that come down from the hub |
+| `transport` | `process_control_writes` and `business_write_backs`, each true or false; `data_classes`, the classes the module carries; optional `store_and_forward` (a size range, an age range, the pruning strategies it supports), `last_will` (a message and an alarm priority) and `keepalive_max_seconds` |
+| `integration` | only for kind `integration`, and required there: `product`, optional `vendor`, `supported_versions`, `interfaces` (from the governed list of application-side protocols), `direction`, `site_owner`, `credential` (a name, never the secret) |
 | `references` | `facts` (path and `adapter_id`), `manifest`, `fvts` (paths), `roles` (path) |
 | `baseline` | `M-1` to `M-16`, each `met` or `waived`; `M-15` and `M-16` may also be `not_applicable` |
 | `waivers` | `requirement`, `reason`, `backlog_item` |
@@ -118,11 +119,28 @@ All paths are relative to the repository root and must stay inside it.
 
 ## Checks
 
-Every run gives 26 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:hash-verified`, `fmts:hash-approved`, `fmts:schema-current`, `fmts:enum-parity`, `fmts:source-paths`, `fmts:waivers`, `fmts:transport`, one per requirement (`fmts:m1` to `fmts:m16`) and `fmts:metadata`. When the spec fails its schema, the run stops after the first five: the schema failure is the finding.
+Every run gives 29 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:hash-verified`, `fmts:hash-approved`, `fmts:schema-current`, `fmts:enum-parity`, `fmts:source-paths`, `fmts:waivers`, `fmts:lists`, `fmts:function`, `fmts:integration`, `fmts:transport`, one per requirement (`fmts:m1` to `fmts:m16`) and `fmts:metadata`. When the spec fails its schema, the run stops after the first five: the schema failure is the finding.
 
 `fmts:enum-parity` fails if the tolerance classes drift from FACTS `time_governance.tolerance_class`, or the schema's baseline from the runner's sixteen requirements.
 
 `fmts:transport` fails when a module that declares no downward writes claims anything but `not_applicable` for M-15 or M-16, when a module declares a kind of downward write while its FACTS spec declares no write capability, when the FACTS spec declares the write capability and the module declares neither kind, or when a module of kind `ot` with the write capability does not declare process-control writes.
+
+## Governed lists
+
+Four fields take their values from lists that can grow without a schema version (owner, 2026-11-19). Each list is a file under `src/forge/governance/lists/`, hashed and approved by the owner like a spec, shown by `forge governance specs`, and changed with `forge governance stamp` and `approve`. A module spec fails `fmts:lists` while any of them does not verify or is not approved.
+
+| List | File | Used by | Entries today |
+|---|---|---|---|
+| Module functions | `module-functions.list.json` | `module_identity.function` | mes, wms, cmms, erp, nms, ims, historian, scanner, ot, display, creds, mpc, qms, lims |
+| Application-side protocols | `application-protocols.list.json` | `integration.interfaces` | rest, graphql, mqtt, opc-ua, sql, amqp, file |
+| Data classes | `data-classes.list.json` | `transport.data_classes` | thirteen parents: raw, curated, historical, alarm, audit, status, live, control, write-back, config, security, request, artifact |
+| Pruning strategies | `pruning-strategies.list.json` | `transport.store_and_forward.pruning` | drop-oldest (the default), by-class-priority |
+
+A data class is named `parent` or `parent.child`. Each parent has one rule (direction, the links it may travel, its delivery guarantee, whether it is stored, whether it expires); a sub-class inherits it and may only tighten its numbers, and the loader refuses a sub-class that restates a rule. The rules of each parent are in `docs/decisions/transport-contract.md`, "Data classes: parents and sub-classes"; the numbers come with FB-164.
+
+`fmts:transport` also holds the declared classes to the rest of the spec: a module that declares process-control writes carries `control` and no other module does; the same for business write-backs and `write-back`; a module whose FACTS spec declares backfill carries `historical`; a module that claims M-13 met declares its buffer, and one that claims M-14 met its last will.
+
+To add an entry: edit the list, `forge governance stamp <list> --by <you> --reason <why>`, and the owner approves it.
 
 ## The module specs
 

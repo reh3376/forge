@@ -44,6 +44,7 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 from forge.governance.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
 from forge.governance.fmts import REPO_ROOT
+from forge.governance.shared import lists
 from forge.governance.shared.runner import (
     FxTSRunner,
     FxTSVerdict,
@@ -134,6 +135,7 @@ _TOP_LEVEL = frozenset(
         "module_identity",
         "hub_link",
         "transport",
+        "integration",
         "references",
         "baseline",
         "waivers",
@@ -262,6 +264,7 @@ class FMTSRunner(FxTSRunner):
             # would report noise. The schema failure is the finding.
             return head
         facts_spec, facts_error = _load_json(repo_root / spec["references"]["facts"]["path"])
+        governed = {name: lists.load(name, kwargs.get("lists_dir")) for name in lists.NAMES}
         requirement_checks = {
             "M-1": lambda: self._check_m1(spec, repo_root),
             "M-2": lambda: self._check_m2(spec, repo_root, facts_spec, facts_error),
@@ -276,7 +279,10 @@ class FMTSRunner(FxTSRunner):
             *head,
             self._check_source_paths(spec, repo_root),
             self._check_waivers(spec, backlog),
-            self._check_transport(spec, facts_spec),
+            self._check_lists(governed),
+            self._check_function(spec, governed),
+            self._check_integration(spec, governed),
+            self._check_transport(spec, facts_spec, governed),
         ]
         wanted = [
             r for r in CONFORMANCE_KIT if not (spec["baseline"][r] == "waived" and r in waived)
@@ -402,8 +408,199 @@ class FMTSRunner(FxTSRunner):
             evidence={"not_applicable": True},
         )
 
-    def _check_transport(self, spec: dict[str, Any], facts_spec: Any) -> FxTSVerdict:
-        """``fmts:transport``: the two declarations agree with the claims and with FACTS."""
+    def _check_lists(self, governed: dict[str, lists.GovernedList]) -> FxTSVerdict:
+        """``fmts:lists``: every governed list a spec chooses from is hashed and approved."""
+        violations = [
+            SpecViolation(field=f"lists/{name}", message=problem)
+            for name, governed_list in governed.items()
+            for problem in governed_list.problems
+        ]
+        return self._verdict(
+            "lists",
+            "lists",
+            violations,
+            f"The {len(governed)} governed lists verify and are approved by the owner.",
+            evidence={name: len(g.entries) for name, g in governed.items()},
+        )
+
+    def _check_function(
+        self, spec: dict[str, Any], governed: dict[str, lists.GovernedList]
+    ) -> FxTSVerdict:
+        function = spec["module_identity"]["function"]
+        known = governed[lists.MODULE_FUNCTIONS].ids
+        violations = []
+        if function not in known:
+            violations.append(
+                SpecViolation(
+                    field="module_identity.function",
+                    expected=sorted(known),
+                    actual=function,
+                    message=(
+                        f"'{function}' is not in the governed list of module functions; a new "
+                        "function is one approved change to that list"
+                    ),
+                )
+            )
+        return self._verdict(
+            "function",
+            "module_identity/function",
+            violations,
+            f"Function '{function}' is in the governed list.",
+            evidence={"function": function},
+        )
+
+    def _check_integration(
+        self, spec: dict[str, Any], governed: dict[str, lists.GovernedList]
+    ) -> FxTSVerdict:
+        """``fmts:integration``: the third-party application of an integration module."""
+        section = spec.get("integration")
+        if section is None:  # the schema requires it for kind integration and forbids it otherwise
+            return self._verdict(
+                "integration",
+                "integration",
+                [],
+                "Not an integration module: no third-party application to declare.",
+            )
+        violations = []
+        known = governed[lists.APPLICATION_PROTOCOLS].ids
+        for protocol in section["interfaces"]:
+            if protocol not in known:
+                violations.append(
+                    SpecViolation(
+                        field="integration.interfaces",
+                        expected=sorted(known),
+                        actual=protocol,
+                        message=(
+                            f"'{protocol}' is not in the governed list of application-side "
+                            "protocols"
+                        ),
+                    )
+                )
+        writes = any(spec["transport"][flag] for flag in CONDITIONAL.values())
+        if section["direction"] == "read" and writes:
+            violations.append(
+                SpecViolation(
+                    field="integration.direction",
+                    message="direction is 'read' but the module declares downward writes",
+                )
+            )
+        if section["direction"] in ("write", "both") and not writes:
+            violations.append(
+                SpecViolation(
+                    field="integration.direction",
+                    message=(
+                        f"direction is '{section['direction']}' but the module declares no "
+                        "downward writes in transport"
+                    ),
+                )
+            )
+        if not spec["time_contract"]["third_party_systems"]:
+            violations.append(
+                SpecViolation(
+                    field="integration",
+                    message=(
+                        "an integration module declares its application in "
+                        "time_contract.third_party_systems too: that is where its clock is read"
+                    ),
+                )
+            )
+        return self._verdict(
+            "integration",
+            "integration",
+            violations,
+            f"Integrates '{section['product']}' over {', '.join(section['interfaces'])}.",
+            evidence={"product": section["product"], "interfaces": section["interfaces"]},
+        )
+
+    def _class_violations(
+        self, spec: dict[str, Any], facts_spec: Any, governed: dict[str, lists.GovernedList]
+    ) -> list[SpecViolation]:
+        """The data classes, the buffer and the last will a module declares (FB-153)."""
+        transport, baseline = spec["transport"], spec["baseline"]
+        classes = governed[lists.DATA_CLASSES]
+        declared = transport["data_classes"]
+        violations = [
+            SpecViolation(
+                field="transport.data_classes",
+                actual=class_id,
+                message=f"'{class_id}' is not in the governed list of data classes",
+            )
+            for class_id in declared
+            if class_id not in classes.ids
+        ]
+        parents = {lists.data_class_parent(class_id) for class_id in declared}
+        for flag, parent in (
+            ("process_control_writes", "control"),
+            ("business_write_backs", "write-back"),
+        ):
+            if transport[flag] and parent not in parents:
+                violations.append(
+                    SpecViolation(
+                        field="transport.data_classes",
+                        message=f"transport.{flag} is true, so the module carries '{parent}'",
+                    )
+                )
+            if not transport[flag] and parent in parents:
+                violations.append(
+                    SpecViolation(
+                        field="transport.data_classes",
+                        message=f"the module declares '{parent}' but transport.{flag} is false",
+                    )
+                )
+        backfill = isinstance(facts_spec, dict) and (facts_spec.get("capabilities") or {}).get(
+            "backfill"
+        )
+        if backfill and "historical" not in parents:
+            violations.append(
+                SpecViolation(
+                    field="transport.data_classes",
+                    message=(
+                        "the FACTS spec declares the backfill capability, so the module "
+                        "carries 'historical'"
+                    ),
+                )
+            )
+        buffer = transport.get("store_and_forward")
+        if buffer is None and baseline["M-13"] == "met":
+            violations.append(
+                SpecViolation(
+                    field="transport.store_and_forward",
+                    message="M-13 is claimed met, so the buffer's capacity is declared",
+                )
+            )
+        if buffer is not None:
+            for key in ("size_bytes", "age_seconds"):
+                if buffer[key]["min"] > buffer[key]["max"]:
+                    violations.append(
+                        SpecViolation(
+                            field=f"transport.store_and_forward.{key}",
+                            message=f"{key}: min is larger than max",
+                        )
+                    )
+            known = governed[lists.PRUNING_STRATEGIES].ids
+            violations.extend(
+                SpecViolation(
+                    field="transport.store_and_forward.pruning",
+                    actual=strategy,
+                    message=f"'{strategy}' is not in the governed list of pruning strategies",
+                )
+                for strategy in buffer["pruning"]
+                if strategy not in known
+            )
+        if transport.get("last_will") is None and baseline["M-14"] == "met":
+            violations.append(
+                SpecViolation(
+                    field="transport.last_will",
+                    message="M-14 is claimed met, so the last will is declared",
+                )
+            )
+        return violations
+
+    def _check_transport(
+        self, spec: dict[str, Any], facts_spec: Any, governed: dict[str, lists.GovernedList]
+    ) -> FxTSVerdict:
+        """``fmts:transport``: what the module declares for its link agrees with its claims,
+        with the governed lists and with its FACTS spec."""
         transport, baseline = spec["transport"], spec["baseline"]
         violations = [
             SpecViolation(
@@ -454,13 +651,19 @@ class FMTSRunner(FxTSRunner):
                     ),
                 )
             )
+        violations.extend(self._class_violations(spec, facts_spec, governed))
         return self._verdict(
             "transport",
             "transport",
             violations,
             (f"Declares {', '.join(declared)}; " if declared else "Takes no downward writes; ")
-            + "the claims for M-15 and M-16 and the FACTS write capability agree.",
-            evidence={"declared": declared, "facts_write": writes},
+            + f"carries {', '.join(transport['data_classes'])}; the claims, the governed "
+            "lists and the FACTS capabilities agree.",
+            evidence={
+                "declared": declared,
+                "facts_write": writes,
+                "data_classes": transport["data_classes"],
+            },
         )
 
     async def _run_kit(

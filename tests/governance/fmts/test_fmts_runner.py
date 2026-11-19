@@ -68,7 +68,7 @@ class TestAModuleThatMeetsTheBaseline:
         report = await _run(runner, spec, repo)
         verdicts = _by_id(report)
         assert report.passed and report.hash_verified is True and report.framework == "FMTS"
-        assert report.total == 26
+        assert report.total == 29
         for requirement in ("m1", "m2", "m3", "m8", "m9", "m10", "m11"):
             assert verdicts[f"fmts:{requirement}"].status == PASS, verdicts[f"fmts:{requirement}"]
         for check in (
@@ -162,6 +162,109 @@ class TestTheTransportRequirements:
         unsigned["baseline"]["M-12"] = "not_applicable"
         report = await _run(runner, sign(unsigned), repo)
         assert _by_id(report)["fmts:schema-valid"].status == FAIL
+
+
+class TestFunctionIntegrationAndDataClasses:
+    """FMTS 2.0.0 (FB-153): values chosen from governed lists the owner approves."""
+
+    async def test_the_reference_module_passes_all_four_checks(self, runner, spec, repo) -> None:
+        verdicts = _by_id(await _run(runner, spec, repo))
+        for check in ("lists", "function", "integration", "transport"):
+            assert verdicts[f"fmts:{check}"].status == PASS, verdicts[f"fmts:{check}"]
+
+    async def test_a_function_outside_the_list_fails(self, runner, unsigned, repo) -> None:
+        unsigned["module_identity"]["function"] = "warehouse"
+        verdict = await _one(runner, unsigned, repo, "function")
+        assert verdict.status == FAIL and "not in the governed list" in _messages(verdict)
+
+    async def test_only_an_integration_module_has_an_integration_section(
+        self, runner, unsigned, repo
+    ) -> None:
+        unsigned["module_identity"]["kind"] = "management"
+        report = await _run(runner, sign(unsigned), repo)
+        assert _by_id(report)["fmts:schema-valid"].status == FAIL
+        del unsigned["integration"]
+        unsigned["time_contract"]["third_party_systems"] = []
+        verdict = await _one(runner, unsigned, repo, "integration")
+        assert verdict.status == PASS and "Not an integration module" in verdict.message
+
+    async def test_an_integration_module_must_declare_its_application(
+        self, runner, unsigned, repo
+    ) -> None:
+        del unsigned["integration"]
+        report = await _run(runner, sign(unsigned), repo)
+        assert _by_id(report)["fmts:schema-valid"].status == FAIL
+
+    async def test_an_interface_outside_the_list_fails(self, runner, unsigned, repo) -> None:
+        unsigned["integration"]["interfaces"] = ["graphql", "soap"]
+        verdict = await _one(runner, unsigned, repo, "integration")
+        assert verdict.status == FAIL and "'soap' is not in the governed list" in _messages(verdict)
+
+    async def test_the_direction_agrees_with_the_declared_writes(
+        self, runner, unsigned, repo
+    ) -> None:
+        unsigned["integration"]["direction"] = "both"
+        verdict = await _one(runner, unsigned, repo, "integration")
+        assert verdict.status == FAIL and "declares no downward writes" in _messages(verdict)
+
+    async def test_a_data_class_outside_the_list_fails(self, runner, unsigned, repo) -> None:
+        unsigned["transport"]["data_classes"].append("telemetry")
+        verdict = await _one(runner, unsigned, repo, "transport")
+        assert verdict.status == FAIL and "'telemetry' is not in the governed list" in _messages(
+            verdict
+        )
+
+    async def test_the_classes_agree_with_the_declared_writes(self, runner, unsigned, repo) -> None:
+        unsigned["transport"]["data_classes"].append("control")
+        verdict = await _one(runner, unsigned, repo, "transport")
+        assert verdict.status == FAIL
+        assert "declares 'control' but transport.process_control_writes is false" in _messages(
+            verdict
+        )
+
+    async def test_backfill_in_facts_means_historical(self, runner, unsigned, repo) -> None:
+        unsigned["transport"]["data_classes"].remove("historical")
+        verdict = await _one(runner, unsigned, repo, "transport")
+        assert verdict.status == FAIL and "carries 'historical'" in _messages(verdict)
+
+    async def test_a_met_buffer_and_last_will_are_declared(self, runner, unsigned, repo) -> None:
+        del unsigned["transport"]["store_and_forward"]
+        del unsigned["transport"]["last_will"]
+        messages = _messages(await _one(runner, unsigned, repo, "transport"))
+        assert "M-13 is claimed met" in messages and "M-14 is claimed met" in messages
+
+    async def test_a_waived_buffer_need_not_be_declared(self, runner, unsigned, repo) -> None:
+        del unsigned["transport"]["store_and_forward"]
+        _waive(unsigned, "M-13")
+        assert (await _one(runner, unsigned, repo, "transport")).status == PASS
+
+    async def test_the_buffer_ranges_and_strategies_are_checked(
+        self, runner, unsigned, repo
+    ) -> None:
+        buffer = unsigned["transport"]["store_and_forward"]
+        buffer["size_bytes"] = {"min": 10, "max": 5}
+        buffer["pruning"] = ["drop-oldest", "drop-random"]
+        messages = _messages(await _one(runner, unsigned, repo, "transport"))
+        assert "min is larger than max" in messages and "'drop-random' is not in" in messages
+
+    async def test_an_unapproved_list_fails_every_module(
+        self, runner, unsigned, repo, tmp_path
+    ) -> None:
+        import shutil
+
+        from forge.governance.shared import lists
+
+        copy = tmp_path / "lists"
+        shutil.copytree(lists.LISTS_DIR, copy)
+        path = lists.list_path(lists.MODULE_FUNCTIONS, copy)
+        document = json.loads(path.read_text(encoding="utf-8"))
+        document["entries"].append({"id": "warehouse", "description": "Added without approval."})
+        path.write_text(json.dumps(document), encoding="utf-8")
+        report = await runner.run(
+            target="forge-wms", spec=sign(unsigned), repo_root=repo, lists_dir=copy
+        )
+        verdict = _by_id(report)["fmts:lists"]
+        assert verdict.status == FAIL and "module-functions" in _messages(verdict)
 
 
 class TestPlumbing:
@@ -386,6 +489,7 @@ class TestM3TimeContract:
 
     async def test_a_management_module_needs_no_third_party_system(self, runner, unsigned, repo):
         unsigned["module_identity"]["kind"] = "management"
+        del unsigned["integration"]  # only an integration module declares one
         unsigned["time_contract"]["third_party_systems"] = []
         assert (await _one(runner, unsigned, repo, "m3")).status == PASS
 
@@ -470,6 +574,7 @@ class TestM3TimeContract:
 
     async def test_an_ot_module_declares_its_devices(self, runner, unsigned, repo) -> None:
         unsigned["module_identity"]["kind"] = "ot"
+        del unsigned["integration"]  # only an integration module declares one
         verdict = await _one(runner, unsigned, repo, "m3")
         assert verdict.status == FAIL and "plant-floor devices" in _messages(verdict)
 
@@ -563,6 +668,7 @@ class TestM9UserInterface:
     async def test_the_display_module_is_not_bound(self, runner, unsigned, repo) -> None:
         (repo / "src" / "wms" / "Page.tsx").write_text("export {}\n", encoding="utf-8")
         unsigned["module_identity"]["kind"] = "display"
+        del unsigned["integration"]  # only an integration module declares one
         unsigned["user_interface"]["ships_ui_code"] = True
         verdict = await _one(runner, unsigned, repo, "m9")
         assert verdict.status == PASS and "does not bind it" in verdict.message

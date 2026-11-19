@@ -76,18 +76,37 @@ def repo(tmp_path: Path) -> Path:
 
 def _base_spec() -> dict[str, Any]:
     return {
-        "spec_version": "1.0.0",
+        "spec_version": "2.0.0",
         "module_identity": {
             "module_id": "forge-wms",
             "name": "Warehouse management integration",
             "alias": "wms",
             "version": "0.1.0",
             "kind": "integration",
+            "function": "wms",
             "language": "python",
             "source_paths": ["src/wms"],
         },
         "hub_link": {"protocol": "grpc", "service": "forge.v1.AdapterService"},
-        "transport": {"process_control_writes": False, "business_write_backs": False},
+        "transport": {
+            "process_control_writes": False,
+            "business_write_backs": False,
+            "data_classes": ["raw", "historical", "status", "config"],
+            "store_and_forward": {
+                "size_bytes": {"min": 1_000_000, "max": 1_000_000_000},
+                "age_seconds": {"min": 3600, "max": 604800},
+                "pruning": ["drop-oldest"],
+            },
+            "last_will": {"message": "The warehouse module was lost.", "alarm_priority": "medium"},
+        },
+        "integration": {
+            "product": "Example WMS",
+            "supported_versions": ["4.x"],
+            "interfaces": ["graphql"],
+            "direction": "read",
+            "site_owner": "warehouse operations",
+            "credential": "example-wms-api",
+        },
         "references": {
             "facts": {"path": "specs/forge-wms.facts.json", "adapter_id": "forge-wms"},
             "manifest": "src/wms/manifest.json",

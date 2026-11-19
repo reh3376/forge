@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://fxts/fmts/v1.0.0",
+  "$id": "forge://fxts/fmts/v2.0.0",
   "title": "FMTS — Forge Module Test Specification",
   "description": "What every Forge module declares before a hub admits it: its kind, the baseline it claims (M-1 to M-16), its time contract, references to its other specs, and waivers. Decided in docs/decisions/forge-module-requirements.md (D-12, signed 2026-11-17, amended 2026-11-19). One spec per module, `<module>.fmts.json`.",
   "type": "object",
@@ -20,7 +20,7 @@
   "properties": {
     "spec_version": {
       "type": "string",
-      "const": "1.0.0",
+      "const": "2.0.0",
       "description": "FMTS schema version this spec is written against."
     },
     "module_identity": {
@@ -32,6 +32,7 @@
         "alias",
         "version",
         "kind",
+        "function",
         "language",
         "source_paths"
       ],
@@ -68,6 +69,11 @@
             "display"
           ],
           "description": "management: a forge-<service> module that runs a business function (forge-mes, forge-wms, forge-cmms). integration: a module whose counterpart is third-party software; the only place that system's API is called (A-4, O-5). ot: the module that talks to plant-floor devices. display: forge-display, the one module that renders user interfaces (A-3)."
+        },
+        "function": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "The service the module performs: an entry of the governed list `module-functions` (owner, 2026-11-19). The runner checks the entry; the list can grow without a schema version."
         },
         "language": {
           "type": "string",
@@ -114,9 +120,10 @@
       "additionalProperties": false,
       "required": [
         "process_control_writes",
-        "business_write_backs"
+        "business_write_backs",
+        "data_classes"
       ],
-      "description": "What the module does with messages that come down from the hub (D-12 amendment of 2026-11-19; D-15, T-11).",
+      "description": "What the module carries on its link to the hub, and what it does with messages that come down (D-12 amendments of 2026-11-19; D-15).",
       "properties": {
         "process_control_writes": {
           "type": "boolean",
@@ -125,6 +132,172 @@
         "business_write_backs": {
           "type": "boolean",
           "description": "The module accepts write-backs to a business system, delivered once and only once. True makes M-16 required."
+        },
+        "data_classes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)?$"
+          },
+          "description": "The data classes the module carries: entries of the governed list `data-classes`, each a parent or a parent.child. A parent covers every sub-class of it."
+        },
+        "store_and_forward": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "size_bytes",
+            "age_seconds",
+            "pruning"
+          ],
+          "description": "M-13: the capacity of the module's store-and-forward buffer, as ranges the hub admin sets a value within, and the pruning strategies the module supports for a full buffer. Required when M-13 is claimed met.",
+          "properties": {
+            "size_bytes": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "min",
+                "max"
+              ],
+              "description": "The smallest and largest storage the buffer may use.",
+              "properties": {
+                "min": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "max": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "age_seconds": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "min",
+                "max"
+              ],
+              "description": "The smallest and largest age of the oldest record kept.",
+              "properties": {
+                "min": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "max": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "pruning": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*$"
+              },
+              "description": "Entries of the governed list `pruning-strategies`. Whatever the strategy, a loss is counted and the audit class is never pruned."
+            }
+          }
+        },
+        "last_will": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "message",
+            "alarm_priority"
+          ],
+          "description": "M-14: what the hub does when the module's keepalive lapses without a goodbye. The recorded state is fixed by the contract (lost, with the time last heard). Required when M-14 is claimed met.",
+          "properties": {
+            "message": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 200,
+              "description": "What an operator is told."
+            },
+            "alarm_priority": {
+              "type": "string",
+              "enum": [
+                "none",
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ],
+              "description": "The priority of the alarm raised."
+            }
+          }
+        },
+        "keepalive_max_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Optional. The longest keepalive interval the module accepts. The hub's interval comes from the module's strictest data class; this can only tighten it."
+        }
+      }
+    },
+    "integration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "product",
+        "supported_versions",
+        "interfaces",
+        "direction",
+        "site_owner",
+        "credential"
+      ],
+      "description": "The third-party application an integration module connects (D-13, B-10). Required for kind `integration`, absent for every other kind. How its clock is read is in `time_contract.third_party_systems`, not here.",
+      "properties": {
+        "product": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The product's name."
+        },
+        "vendor": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional. Who makes it. Set at an installation; the public repository names no company (A-16)."
+        },
+        "supported_versions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "The product versions the module supports."
+        },
+        "interfaces": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "description": "Entries of the governed list `application-protocols`: how the module reaches the application. Its hub side is gRPC only."
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write",
+            "both"
+          ],
+          "description": "Whether Forge reads from the application, writes to it, or both."
+        },
+        "site_owner": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Who owns the application at the site: a role or a department, not a person."
+        },
+        "credential": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "The name of the credential the module needs, as forge-creds will know it. Never the secret."
         }
       }
     },
@@ -682,5 +855,38 @@
       ],
       "description": "A claim for a requirement that binds only some modules (M-15, M-16)."
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "module_identity": {
+            "properties": {
+              "kind": {
+                "const": "integration"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          }
+        },
+        "required": [
+          "module_identity"
+        ]
+      },
+      "then": {
+        "required": [
+          "integration"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "integration"
+          ]
+        }
+      }
+    }
+  ]
 }

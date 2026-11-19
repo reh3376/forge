@@ -32,6 +32,17 @@
       "released_at": "2026-11-19T18:37:42Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-19T21:08:56Z"
+    },
+    {
+      "version": "2.0.0",
+      "file": "versions/fmts.v2.0.0.schema.json",
+      "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e",
+      "hash_state": "approved",
+      "step": "major",
+      "summary": "FB-153: module_identity.function, the integration section, and in transport the data classes, the store-and-forward capacity with its pruning strategies, the last will and an optional tighter keepalive (owner, 2026-11-19); values come from governed lists",
+      "released_at": "2026-11-19T21:45:42Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-19T22:07:00Z"
     }
   ]
 }

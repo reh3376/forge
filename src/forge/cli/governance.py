@@ -97,7 +97,8 @@ def write_integrity(path: Path, text: str, integrity: dict[str, Any]) -> None:
 
 
 def spec_files(root: Path) -> list[Path]:
-    return sorted(root.glob("*/specs/*.json"))
+    """Every governed file: each framework's specs, and the governed lists (FB-153)."""
+    return sorted(root.glob("*/specs/*.json")) + sorted(root.glob("lists/*.list.json"))
 
 
 def schema_dir_of(spec_file: Path) -> Path | None:
@@ -138,7 +139,7 @@ def describe(path: Path) -> dict[str, Any] | None:
         return None
     verified, _ = verify_spec_hash(spec)
     return {
-        "framework": path.parent.parent.name,
+        "framework": "lists" if path.parent.name == "lists" else path.parent.parent.name,
         "spec": path.name,
         "hash_state": integrity.get("hash_state") or "unknown",
         "approved_by": integrity.get("approved_by") or "",
