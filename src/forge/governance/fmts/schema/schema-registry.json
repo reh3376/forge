@@ -1,0 +1,26 @@
+{
+  "framework": "fmts",
+  "hash_method": "sha256-c14n-v1",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "file": "versions/fmts.v0.1.0.schema.json",
+      "schema_hash": "8052f7932a90d297bf08f36ef57ec77e6d4d50ea8924b2e39ded9c279e2dd496",
+      "hash_state": "historical",
+      "step": "baseline",
+      "summary": "The first FMTS schema (FB-135), restored unchanged from the repository's history. No spec is written against it; it was replaced in place by 0.2.0 before any spec was approved.",
+      "released_at": "2026-11-17T00:00:00Z"
+    },
+    {
+      "version": "0.2.0",
+      "file": "versions/fmts.v0.2.0.schema.json",
+      "schema_hash": "849a1bbcf3a9c8c421e08fc7f884616f79c3dd027a258a743cc87dc4e76a6375",
+      "hash_state": "approved",
+      "step": "baseline",
+      "summary": "Baseline at the start of the schema registry (FB-151). 0.2.0 added module_identity.alias; before the registry it was also edited in place for the module kinds (FB-150). At the baseline every schema took the one id form forge://fxts/<framework>/v<version> and gained integrity.schema_version and integrity.schema_hash.",
+      "released_at": "2026-11-19T00:00:00Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-19T18:03:47Z"
+    }
+  ]
+}

@@ -820,6 +820,8 @@
       }
     ],
     "approved_by": "reh3376",
-    "approved_at": "2026-11-18T17:03:01Z"
+    "approved_at": "2026-11-18T17:03:01Z",
+    "schema_version": "0.1.0",
+    "schema_hash": "fd84db40f1a74f6f3e4774f50f449b69a449237b8e2cf2b51f5a13475ba7a352"
   }
 }

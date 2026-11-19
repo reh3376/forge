@@ -38,6 +38,7 @@ from typing import TYPE_CHECKING, Annotated, Any
 
 import typer
 
+from forge.governance.shared import schemas
 from forge.governance.shared.runner import (
     add_spec_hash,
     approve_spec_hash,
@@ -97,6 +98,33 @@ def write_integrity(path: Path, text: str, integrity: dict[str, Any]) -> None:
 
 def spec_files(root: Path) -> list[Path]:
     return sorted(root.glob("*/specs/*.json"))
+
+
+def schema_dir_of(spec_file: Path) -> Path | None:
+    """The schema directory of the framework a spec file belongs to, when it has a registry."""
+    candidate = spec_file.resolve().parent.parent / "schema"
+    return candidate if (candidate / schemas.REGISTRY_NAME).is_file() else None
+
+
+def schema_record(spec_file: Path, spec: dict[str, Any]) -> dict[str, str]:
+    """``schema_version`` and ``schema_hash`` for a spec's integrity block (D-14, F-10).
+
+    Empty for a spec outside a framework with registered schema versions. A spec that
+    names a version that is not registered is refused: there is nothing to record.
+    """
+    schema_dir = schema_dir_of(spec_file)
+    if schema_dir is None:
+        return {}
+    declared = spec.get("spec_version")
+    row = schemas.find(schema_dir, declared) if isinstance(declared, str) else None
+    if row is None:
+        known = ", ".join(v.version for v in schemas.versions(schema_dir))
+        typer.echo(
+            f"{spec_file.name}: spec_version {declared!r} is not a registered "
+            f"{schema_dir.parent.name} schema version (registered: {known})."
+        )
+        raise typer.Exit(code=1)
+    return {"schema_version": row.version, "schema_hash": row.schema_hash}
 
 
 def describe(path: Path) -> dict[str, Any] | None:
@@ -183,7 +211,18 @@ def stamp(
     integrity = spec.get("integrity") or {}
     old_hash = integrity.get("spec_hash") or ""
     new_hash = compute_spec_hash(spec)
+    record = schema_record(spec_file, spec)
     if old_hash == new_hash:
+        if record and any(integrity.get(key) != value for key, value in record.items()):
+            # The record of the schema is not part of the hashed content: adding it to a
+            # spec whose content is unchanged leaves its state and its approval as they are.
+            integrity.update(record)
+            write_integrity(spec_file, text, integrity)
+            typer.echo(
+                f"{spec_file.name}: content unchanged; now records schema "
+                f"{record['schema_version']} ({_short(record['schema_hash'])})."
+            )
+            return
         typer.echo(
             f"{spec_file.name}: unchanged, hash {_short(old_hash)} already covers the content "
             f"(state {integrity.get('hash_state') or 'unknown'})."
@@ -191,6 +230,7 @@ def stamp(
         return
     add_spec_hash(spec, source=source, changed_by=by, change_type=change_type, reason=reason)
     integrity = spec["integrity"]
+    integrity.update(record)
     integrity["hash_state"] = "pending_review"
     integrity.pop("approved_by", None)
     integrity.pop("approved_at", None)
@@ -225,6 +265,12 @@ def approve(
             f"Re-stamp first: forge governance stamp {spec_file} --by <who> --reason <why>"
         )
         raise typer.Exit(code=1)
+    schema_dir = schema_dir_of(spec_file)
+    if schema_dir is not None:
+        problem = schemas.spec_schema_problem(schema_dir, spec)
+        if problem:
+            typer.echo(f"{spec_file.name}: refused. {problem}")
+            raise typer.Exit(code=1)
     if integrity.get("hash_state") == "approved" and integrity.get("approved_by") == by:
         typer.echo(
             f"{spec_file.name}: already approved by {by} at {integrity.get('approved_at') or '?'}."
@@ -372,7 +418,8 @@ async def run_framework(
     """Run one framework's checks on one spec; the report names the file it ran."""
     framework = FRAMEWORKS[name]
     file, spec, ident = resolve_spec(framework, target, specs_dir)
-    runner = framework.make_runner(framework.schema)
+    # The spec is validated against the schema version it declares (D-14, Q-5).
+    runner = framework.make_runner(schemas.schema_for_spec(framework.schema.parent, spec))
     kwargs: dict[str, Any] = {"spec": spec}
     if framework.live:
         kwargs["live"] = live
@@ -407,3 +454,282 @@ def emit_report(report: FxTSReport, fmt: str, output: Path | None) -> None:
             typer.echo(f"  [SKIP] {v.check_id}: {v.message}")
     if output is not None:
         typer.echo(f"JSON report written to {output}")
+
+
+# -- schema versions (D-14 Q-5, FB-151) ---------------------------------------
+
+
+def _framework_schema_dir(name: str) -> Path:
+    key = name.lower()
+    if key not in FRAMEWORKS:
+        raise typer.BadParameter(f"unknown framework '{name}' (known: {', '.join(FRAMEWORKS)})")
+    return FRAMEWORKS[key].schema.parent
+
+
+def schema_rows(names: list[str] | None = None) -> list[dict[str, Any]]:
+    """One row per registered schema version, with how many specs are written against it."""
+    rows: list[dict[str, Any]] = []
+    for name in names or sorted(FRAMEWORKS):
+        framework = FRAMEWORKS[name]
+        schema_dir = framework.schema.parent
+        head = schemas.latest(schema_dir)
+        counts: dict[str, int] = {}
+        for file in framework.specs_dir.glob(framework.pattern):
+            declared = json.loads(file.read_text(encoding="utf-8")).get("spec_version", "")
+            counts[declared] = counts.get(declared, 0) + 1
+        rows.extend(
+            {
+                "framework": name,
+                "version": row.version,
+                "current": head is not None and row.version == head.version,
+                "step": row.step,
+                "hash_state": row.hash_state,
+                "approved_by": row.approved_by,
+                "approved_at": row.approved_at,
+                "schema_hash": row.schema_hash,
+                "specs": counts.get(row.version, 0),
+                "summary": row.summary,
+            }
+            for row in schemas.versions(schema_dir)
+        )
+    return rows
+
+
+def schema_problems(names: list[str] | None = None) -> list[str]:
+    return [
+        problem
+        for name in names or sorted(FRAMEWORKS)
+        for problem in schemas.registry_problems(FRAMEWORKS[name].schema.parent)
+    ]
+
+
+def schemas_command(
+    framework: Annotated[
+        str | None, typer.Argument(help="One framework (default: every framework)")
+    ] = None,
+    as_json: Annotated[bool, typer.Option("--json", help="Machine-readable output")] = False,
+) -> None:
+    """List every schema version: step, approval state, hash, and the specs written against it."""
+    names = None
+    if framework:
+        _framework_schema_dir(framework)
+        names = [framework.lower()]
+    rows = schema_rows(names)
+    problems = schema_problems(names)
+    if as_json:
+        typer.echo(json.dumps({"versions": rows, "problems": problems}, indent=2))
+    else:
+        typer.echo(
+            f"{'FRAMEWORK':<9} {'VERSION':<9} {'STEP':<9} {'STATE':<15} {'HASH':<13} "
+            f"{'SPECS':<5} APPROVED"
+        )
+        for r in rows:
+            mark = "*" if r["current"] else " "
+            approver = f"{r['approved_by']} {r['approved_at']}".strip() or "-"
+            typer.echo(
+                f"{r['framework']:<9} {r['version'] + mark:<9} {r['step']:<9} "
+                f"{r['hash_state']:<15} {_short(r['schema_hash']):<13} {r['specs']:<5} {approver}"
+            )
+        waiting = sum(1 for r in rows if r["hash_state"] == "pending_review")
+        typer.echo(
+            f"{len(rows)} version(s), * is current: {waiting} awaiting approval, "
+            f"{len(problems)} problem(s)."
+        )
+        for problem in problems:
+            typer.echo(f"  PROBLEM {problem}")
+    if problems:
+        raise typer.Exit(code=1)
+
+
+def _version_row(schema_dir: Path, version: str) -> schemas.SchemaVersion:
+    row = schemas.find(schema_dir, version)
+    if row is None:
+        known = ", ".join(v.version for v in schemas.versions(schema_dir)) or "none"
+        typer.echo(
+            f"{schema_dir.parent.name} has no schema version {version} (registered: {known})"
+        )
+        raise typer.Exit(code=1)
+    return row
+
+
+def schema_diff(
+    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts")],
+    old: Annotated[str, typer.Argument(help="The earlier version, e.g. 0.1.0")],
+    new: Annotated[
+        str | None,
+        typer.Argument(help="The later version (default: the schema file as it is now)"),
+    ] = None,
+) -> None:
+    """Show what changed between two schema versions and the version step each change needs."""
+    schema_dir = _framework_schema_dir(framework)
+    before = _version_row(schema_dir, old).load()
+    if new is None:
+        after = json.loads(schemas.current_file(schema_dir).read_text(encoding="utf-8"))
+        label = "the working file"
+    else:
+        after = _version_row(schema_dir, new).load()
+        label = new
+    changes = schemas.diff(before, after)
+    if not changes:
+        typer.echo(f"{framework} {old} -> {label}: no difference beyond the version.")
+        return
+    for change in changes:
+        typer.echo(f"  [{change.step:<5}] {change.path}: {change.what}")
+    typer.echo(
+        f"{framework} {old} -> {label}: {len(changes)} change(s); "
+        f"they need a {schemas.needed_step(changes)} step."
+    )
+
+
+def schema_release(
+    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts")],
+    summary: Annotated[str, typer.Option("--summary", help="What changed and why (FB-nnn: ...)")],
+) -> None:
+    """Register the edited schema file as a new version, awaiting the owner's approval.
+
+    Raise the version in the file's ``$id`` and in ``spec_version`` first. The step the
+    number declares must be at least the step the changes need.
+    """
+    schema_dir = _framework_schema_dir(framework)
+    try:
+        row = schemas.release(schema_dir, summary=summary, released_at=utc_stamp())
+    except ValueError as exc:
+        typer.echo(f"{framework}: refused. {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(
+        f"{framework} {row.version}: released as a {row.step} step, hash "
+        f"{_short(row.schema_hash)}, pending_review. Owner approves with: "
+        f"forge governance schema-approve {framework} {row.version} --by <owner>"
+    )
+
+
+def schema_approve(
+    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts")],
+    version: Annotated[str, typer.Argument(help="The version to approve, e.g. 0.2.0")],
+    by: Annotated[str, typer.Option("--by", help="The approving owner (recorded as approved_by)")],
+) -> None:
+    """Approve one schema version's hash. The owner's command, on their word."""
+    if not by.strip():
+        raise typer.BadParameter("--by must name the approver")
+    schema_dir = _framework_schema_dir(framework)
+    try:
+        row = schemas.approve(schema_dir, version, by=by, at=utc_stamp())
+    except ValueError as exc:
+        typer.echo(f"{framework} {version}: refused. {exc}")
+        raise typer.Exit(code=1) from exc
+    typer.echo(
+        f"{framework} {row.version}: hash {_short(row.schema_hash)} approved by {by} "
+        f"at {row.approved_at}."
+    )
+
+
+def framework_of(spec_file: Path) -> str | None:
+    """The framework a spec file belongs to: by its directory, then by its name."""
+    resolved = spec_file.resolve()
+    for name, framework in FRAMEWORKS.items():
+        if resolved.parent == framework.specs_dir.resolve():
+            return name
+    stem = spec_file.name.lower()
+    return next((name for name in FRAMEWORKS if f".{name}." in stem or name in stem), None)
+
+
+def validation_errors(spec: dict[str, Any], schema: dict[str, Any]) -> list[str]:
+    import jsonschema
+
+    validator = jsonschema.Draft202012Validator(schema)
+    return [
+        f"{'/'.join(str(part) for part in error.absolute_path) or '<root>'}: {error.message}"
+        for error in sorted(validator.iter_errors(spec), key=lambda e: list(e.absolute_path))
+    ]
+
+
+def validate_spec(
+    spec_file: Annotated[Path, typer.Argument(help="Path to the spec file to validate")],
+    schema_version: Annotated[
+        str | None,
+        typer.Option(
+            "--schema-version",
+            help="Validate against this registered version instead of the one the spec declares",
+        ),
+    ] = None,
+) -> None:
+    """Validate a spec against the schema version it declares, or a named one."""
+    if not spec_file.exists():
+        typer.echo(f"Spec file not found: {spec_file}")
+        raise typer.Exit(code=1)
+    name = framework_of(spec_file)
+    if name is None:
+        typer.echo("Cannot determine framework from the file's directory or name.")
+        raise typer.Exit(code=1)
+    _, spec = load_spec(spec_file)
+    schema_dir = FRAMEWORKS[name].schema.parent
+    if schema_version is not None:
+        schema_file = _version_row(schema_dir, schema_version).file
+        against = schema_version
+    else:
+        schema_file = schemas.schema_for_spec(schema_dir, spec)
+        against = json.loads(schema_file.read_text(encoding="utf-8")).get("$id", "?")
+    errors = validation_errors(spec, json.loads(schema_file.read_text(encoding="utf-8")))
+    if schema_version is not None:
+        # The spec says which version it is written for; that one line is expected to differ.
+        errors = [e for e in errors if not e.startswith("spec_version:")]
+    if errors:
+        typer.echo(f"[FAIL] {spec_file.name} against {name.upper()} schema {against}:")
+        for error in errors:
+            typer.echo(f"  -> {error}")
+        raise typer.Exit(code=1)
+    typer.echo(f"[PASS] {spec_file.name} conforms to {name.upper()} schema {against}.")
+
+
+def migrate_spec(
+    spec_file: Annotated[Path, typer.Argument(help="Spec file to move to a later schema version")],
+    to: Annotated[str, typer.Option("--to", help="The registered schema version to move to")],
+    by: Annotated[str, typer.Option("--by", help="Who made the change (agent id or user)")],
+    reason: Annotated[
+        str | None, typer.Option("--reason", help="Why (default: names the two versions)")
+    ] = None,
+    source: Annotated[
+        str, typer.Option("--source", help="manual | ci | agent | spec_update")
+    ] = "manual",
+) -> None:
+    """Move a spec to a later schema version: set ``spec_version``, validate, re-stamp.
+
+    A spec that does not conform to the target version is left untouched and every
+    violation is listed: those are the edits a major step asks of its author.
+    """
+    if not spec_file.exists():
+        typer.echo(f"Spec file not found: {spec_file}")
+        raise typer.Exit(code=1)
+    name = framework_of(spec_file)
+    if name is None:
+        typer.echo("Cannot determine framework from the file's directory or name.")
+        raise typer.Exit(code=1)
+    schema_dir = FRAMEWORKS[name].schema.parent
+    target = _version_row(schema_dir, to)
+    text, spec = load_spec(spec_file)
+    declared = str(spec.get("spec_version", ""))
+    if declared == to:
+        typer.echo(f"{spec_file.name}: already written against {name} {to}.")
+        return
+    if schemas.find(schema_dir, declared) and schemas.step_between(declared, to) is None:
+        typer.echo(f"{spec_file.name}: refused. {to} is not later than {declared}.")
+        raise typer.Exit(code=1)
+    candidate = {**spec, "spec_version": to}
+    errors = validation_errors(candidate, target.load())
+    if errors:
+        typer.echo(f"{spec_file.name}: does not conform to {name} {to}; nothing was changed:")
+        for error in errors:
+            typer.echo(f"  -> {error}")
+        raise typer.Exit(code=1)
+    needle = f'"spec_version": "{declared}"'
+    if text.count(needle) != 1:
+        typer.echo(f"{spec_file.name}: refused. Could not find its one spec_version line.")
+        raise typer.Exit(code=1)
+    spec_file.write_text(text.replace(needle, f'"spec_version": "{to}"'), encoding="utf-8")
+    stamp(
+        spec_file,
+        by=by,
+        reason=reason or f"schema {name} {declared} -> {to}",
+        source=source,
+        change_type="structural",
+    )

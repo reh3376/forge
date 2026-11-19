@@ -349,6 +349,8 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "948d0fed76e0f89ad3d5b492e3c9bda1f99afc6533dec3e652d88d497a097db4"
+    "spec_hash": "948d0fed76e0f89ad3d5b492e3c9bda1f99afc6533dec3e652d88d497a097db4",
+    "schema_version": "0.1.0",
+    "schema_hash": "9e4bf0b831f13978b92d38e6ecaba49e6245bc0716bee301337bdd290ad4a350"
   }
 }

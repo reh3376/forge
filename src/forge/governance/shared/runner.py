@@ -714,6 +714,42 @@ class FxTSRunner(abc.ABC):
             ),
         ]
 
+    def schema_verdict(self, spec: dict[str, Any]) -> FxTSVerdict | None:
+        """``<fw>:schema-current``: the spec's record of its schema stands (D-14, F-10).
+
+        Fails when the spec does not record the schema version and hash it was approved
+        against, when that version's hash has changed or is not approved by the owner,
+        or when the schema has moved a major step past it. ``None`` for a runner whose
+        schema is not a registered framework schema (a test double).
+        """
+        from forge.governance.shared import schemas
+
+        if self._schema_path is None:
+            return None
+        schema_dir = self._schema_path.parent
+        if schema_dir.name == "versions":
+            schema_dir = schema_dir.parent
+        if not (schema_dir / schemas.REGISTRY_NAME).is_file():
+            return None
+        problem = schemas.spec_schema_problem(schema_dir, spec)
+        integrity = spec.get("integrity") if isinstance(spec.get("integrity"), dict) else {}
+        recorded = integrity.get("schema_version", "")
+        violation = (
+            SpecViolation(field="integrity.schema_version", message=problem) if problem else None
+        )
+        return FxTSVerdict(
+            check_id=f"{self.framework.lower()}:schema-current",
+            spec_ref=f"{self.framework}/integrity/schema_version",
+            status=VerdictStatus.FAIL if violation else VerdictStatus.PASS,
+            message=(
+                f"1 violation(s): {problem}"
+                if problem
+                else f"approved against schema {recorded}, whose hash the owner approved."
+            ),
+            violations=[violation] if violation else [],
+            evidence={"schema_version": recorded},
+        )
+
     async def run(self, target: str, **kwargs: Any) -> FxTSReport:
         """Execute the full runner pipeline.
 
@@ -791,6 +827,10 @@ class FxTSRunner(abc.ABC):
         placed = {v.check_id for v in report.verdicts}
         if spec is not None and f"{self.framework.lower()}:hash-verified" not in placed:
             report.verdicts.extend(self.integrity_verdicts(spec))
+        if spec is not None and f"{self.framework.lower()}:schema-current" not in placed:
+            schema_verdict = self.schema_verdict(spec)
+            if schema_verdict is not None:
+                report.verdicts.append(schema_verdict)
 
         report.finished_at = datetime.now(UTC)
         return report

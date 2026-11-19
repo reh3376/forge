@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-19` against the repository `reh3376/forge` at the merge of PR 121 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-19` against the repository `reh3376/forge` at the merge of PR 122 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -179,16 +179,20 @@ flowchart TD
   end
   SM1["forge-cmms<br/>management module"]
   SM2["forge-integ-erp-netsuite<br/>integration module"]
-  ERP[/"third-party ERP<br/>REST · SQL · …"/]
+  ERP[/"third-party ERP application"/]
   SM1 -- "gRPC AdapterService<br/>time contract: on every Register, Health and Ingest<br/>the module sends T1, the hub answers T2 and T3,<br/>the module measures its offset and reports it;<br/>a clock outside its class is refused" --> SH
   SM2 -- "gRPC AdapterService" --> SH
-  SM2 -. "the product's own protocol;<br/>its clock is measured too" .- ERP
+  SM2 <-- "RESTful API / GraphQL<br/>(the application's own interface;<br/>its clock is measured too)" --> ERP
 
   subgraph A1["Area hub 1 · forge-core"]
-    AH1["a hub like the site hub<br/>with its own databases and roles"]
+    AH1["a hub like the site hub<br/>with its own roles"]
+    DB1[("its own databases")]
+    AH1 --- DB1
   end
   subgraph A2["Area hub 2 · forge-core"]
-    AH2["a hub like the site hub<br/>with its own databases and roles"]
+    AH2["a hub like the site hub<br/>with its own roles"]
+    DB2[("its own databases")]
+    AH2 --- DB2
   end
   AH1 == "same contract: a hub is a module to its parent<br/>reporting and history up · time down<br/>STORE AND FORWARD: while the link is down the area hub<br/>buffers, then replays in order with original timestamps" ==> SH
   AH2 == "same contract" ==> SH
@@ -204,10 +208,10 @@ flowchart TD
 How to read it:
 
 - **Three hubs, each with two modules.** Every hub is the same software (forge-core). An area hub serves the modules that run that area's processes; the site hub serves site-wide functions and collects from the area hubs.
-- **Two kinds of module on each hub.** A management module is Forge's own; an integration module connects one third-party product.
+- **Two kinds of module on each hub.** A management module is Forge's own; an integration module connects one third-party application. The integration module is the only thing that talks to that application, over the application's own interface (a RESTful API or GraphQL here; MQTT, OPC UA, SQL and others where the application offers them). Its hub side is gRPC, like every module.
 - **The time contract is on every link.** The site hub is the time authority. Each exchange carries four timestamps, so both sides know the offset between their clocks. A clock outside its tolerance class is refused, never silently corrected. It reaches down to PLC connections and across to databases and third-party systems.
 - **Store and forward is on every link.** A module or a child hub that cannot reach its parent keeps what it could not deliver and replays it in order. Commands going down are the opposite: never stored, and they expire.
-- **The hub owns the databases.** A module gets a Forge-issued credential to its own schema and holds no connection of its own.
+- **Every hub owns its own databases, not only the top one.** The chart draws the full set of stores on the site hub to keep it readable, but each area hub has its own PostgreSQL, TimescaleDB and the rest, and stores the data of the modules attached to it. A hub at any level keeps working, and keeps storing, when the hub above it cannot be reached. A module gets a Forge-issued credential to its own schema on its own hub and holds no connection of its own.
 
 note:
 - `docs/VISION.md` §3. This is the finished system; the next slide says which boxes exist today.
@@ -241,7 +245,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 121:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 122:
 
 **Working**
 
@@ -267,7 +271,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 121:
 |---|---|
 | The module requirements, eleven of them, and the time contract | D-12 (the checker is built; the hub does not yet demand an approved spec at Register) |
 | The integration module builder and the designer | D-13 |
-| What every FxTS framework provides | D-14 (four of five steps built; schema versions and hashes are not) |
+| What every FxTS framework provides | D-14 (all five steps built) |
 | The transport contract: versioning, delivery, store and forward, command expiry, security | D-15 |
 | The three-layer process control framework | D-11 |
 
@@ -276,7 +280,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 121:
 | Measure | Value (2026-11-19) |
 |---|---|
 | Python hub (`src/forge`) | 354 files, ~74,100 lines |
-| Python tests | 279 files, 4,834 collected, full suite green on the locked dependency set |
+| Python tests | 280 files, 4,874 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -349,7 +353,7 @@ note:
 | `src/forge/adapters` | the Python adapters of eight modules (`forge_wms`, `forge_mes`, `forge_cmms`, `forge_nms`, `forge_ims`, `forge_historian`, `forge_scanner`, `forge_integ_erp_netsuite`), each with its manifest and config, and four empty generic packages (FB-148) |
 | `go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
-| `tests/` | 279 files mirroring `src/`; `tests/governance/` holds the gates of every framework |
+| `tests/` | 280 files mirroring `src/`; `tests/governance/` holds the gates of every framework |
 | `docs/` | the key documents, `FxTS/` (the framework pages), `decisions/` (the signed records), `deployment/`, `governance/`, `tutorial.md` (this deck's source) |
 | `deploy/docker` | the development compose stack and the hub image |
 
@@ -791,7 +795,7 @@ A framework is either **planned** (a page that says so; no code, no specs) or it
 | # | Requirement | Today |
 |---|---|---|
 | F-1 | A stated purpose: which repeatable work it standardizes | ✅ |
-| F-2 | A versioned schema, every released version kept, each with a hash | ⬜ the id carries a version; versions and hashes are FB-151 |
+| F-2 | A versioned schema, every released version kept, each with a hash the owner approves | ✅ |
 | F-3 | A runner that enforces every schema field | ✅ |
 | F-4 | Every spec carries a hash; a run fails when it does not verify or is not approved | ✅ |
 | F-5 | Every spec lives in the framework's `specs/` directory and is listed | ✅ |
@@ -799,13 +803,16 @@ A framework is either **planned** (a page that says so; no code, no specs) or it
 | F-7 | A check that was not run is reported as not run, never as passed | ✅ |
 | F-8 | A documentation page and a summary row stating the real state | ✅ |
 | F-9 | `forge governance run`, `stamp`, `approve`, `validate-spec` work for it | ✅ |
-| F-10 | Each spec records the schema version and hash it was approved against | ⬜ FB-151 |
+| F-10 | Each spec records the schema version and hash it was approved against | ✅ |
 
-`tests/governance/test_framework_baseline.py` walks every framework against these on every run. A gap that is not listed there fails; so does a listed gap that has been closed.
+`tests/governance/test_framework_baseline.py` walks every framework against these on every run. Its list of allowed gaps is empty since 2026-11-19.
+
+**Changing a schema** is a release, never an edit in place: edit `<framework>.schema.json`, raise the version in its `$id`, run `forge governance schema-release <framework> --summary "..."`, and the owner approves the new version's hash. `forge governance schemas` lists every version; `schema-diff` shows what changed and the step each change needs; `migrate-spec` moves a spec forward. A schema edited without a release fails the suite.
 
 note:
 - Why it exists, in the owner's words: "we need to ensure we are not generating excessive technical debt when building FxTS specs by ensuring these core purposes are met with each new instantiation of a FxTS spec."
-- Schema rules decided with it: within a major version a schema only gains; patch is wording, minor adds something optional, major adds a required field or removes or narrows anything and marks every spec for review. The owner approves each schema hash.
+- Schema rules decided with it: within a major version a schema only gains; patch is wording, minor adds something optional, major adds a required field or removes or narrows anything and marks every spec for review. The owner approves each schema hash. The code is `src/forge/governance/shared/schemas.py`; the page is `docs/FxTS/FHTS.md`, "Schema Versions".
+- Every run now gives three verdicts for a spec's standing: `hash-verified`, `hash-approved` and `schema-current`.
 
 ---
 
@@ -824,6 +831,7 @@ stateDiagram-v2
 
 - Every governed spec carries an `integrity` block: `spec_hash`, `hash_state`, `previous_hash`, `approved_by`, `approved_at`, `change_history` naming who or what changed it.
 - The content hash **excludes the whole `integrity` block** (a history entry refers to the hash itself); canonical JSON uses sorted keys, compact separators and ASCII escaping, so the digest is portable.
+- **A spec is also tied to its schema.** Its integrity block records the schema version and hash it was approved against, and `<framework>:schema-current` fails when that schema version is not approved, has changed, or is a major step behind.
 - **A bad hash fails the run, in every framework.** The shared runner gives two verdicts for every spec: `<framework>:hash-verified` fails when the content no longer matches the recorded hash, and `<framework>:hash-approved` when the owner has not approved it. A spec with no hash fails both.
 - **Only the owner approves** a spec hash. Agents re-stamp to `pending_review` and never approve on the owner's behalf. `approve` is refused when the hash no longer covers the content.
 - The hub's Register check verifies a spoke's FACTS hash before accepting the spoke.
@@ -897,7 +905,8 @@ note:
 ```bash
 forge governance specs                       # every spec's hash state, approver, hash still verifies?
 forge governance specs --pending             # what awaits the owner
-forge governance validate-spec <spec.json>   # against its framework schema
+forge governance validate-spec <spec.json>   # against the schema version it declares
+forge governance schemas                     # every schema version, its step, hash and approval
 forge governance run facts forge-wms           # one framework, one spec; exit 1 on any failure
 forge governance stamp <spec.json>           # after an edit: history entry, pending_review, no approver
 forge governance approve <spec.json> --by reh3376   # the owner, on their own word, never on their behalf
@@ -920,7 +929,7 @@ note:
 |---|---|
 | The time contract is declared by every module and checked for form; nothing reads the clocks of databases or third-party systems yet | FB-138, FB-139 (with FB-117 and FB-120) |
 | The OT FACTS spec fails `facts:schema-valid` and eight vocabulary checks | FB-079, D-8 |
-| No schema is hashed or versioned beyond its id, and no spec records the schema it was approved against (F-2, F-10) | FB-151 |
+| The JSON documents outside FxTS (adapter manifests, the OT control configuration, the golden-message sets) carry no schema version | FB-171 |
 | The FATS specs declare no request or response shapes | FB-162 |
 | The hub does not demand an approved FMTS spec at Register; the scaffold does not generate one | FB-140 |
 | No module ships a roles file, and the roles file has no FxTS spec of its own | FB-141 |
@@ -1908,7 +1917,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q -rsx                    # 4,834 tests, ~1 minute; lists each skip with its reason
+uv run pytest tests -q -rsx                    # 4,874 tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2046,7 +2055,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 279 files, 4,834 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/` mirrors `src/`: 280 files, 4,874 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -2105,7 +2114,7 @@ note:
 4. **No scoped roles in force**: the gateway's auth is off by default; the role model is signed and not enforced; roles per hub and the super admin are stated and not designed in.
 5. **No credential module**: forge-creds is the owner's direction and has no record; production mutual TLS depends on it.
 6. **No hub hierarchy**: a single hub only.
-7. **Schemas are not versioned or hashed**: every spec is, the schemas they are written against are not.
+7. **The JSON documents outside FxTS carry no schema version**: manifests, the OT control configuration, the golden-message sets (FB-171).
 8. **Seven governance frameworks are planned**, none half-built.
 9. **No production deployment**: compose only.
 10. **One clock is enforced on the links that exist, not everywhere**: not on Forge's own hosts, not on databases or third-party systems, not between hubs.
@@ -2146,7 +2155,7 @@ note:
 | D-11 | Three-layer process control framework, PC-L1/PC-L2/PC-L3 (`docs/decisions/process-control-framework.md`) | signed 2026-11-13 by the owner; Forge review done; the FSDs follow the owner's round-4 answers (FB-110) |
 | D-12 | The forge module requirements (`forge-module-requirements.md`) | signed 2026-11-17; the checker and the conformance kit are built; the check at Register is not |
 | D-13 | The integration module builder (`integration-module-builder.md`) | signed 2026-11-18; nothing built |
-| D-14 | What every FxTS framework provides (`fxts-framework-baseline.md`) | signed 2026-11-18; four of five steps built |
+| D-14 | What every FxTS framework provides (`fxts-framework-baseline.md`) | signed 2026-11-18; built (all five steps) |
 | D-15 | The hub-to-module transport contract (`transport-contract.md`) | signed 2026-11-18; nothing built |
 
 **Waiting for the owner**: the forge-display design record and the redone sequence (FB-143); the transport contract's additions to the module requirements (FB-165); the list of module functions (FB-153); the first list of transport data classes; forge-creds (FB-142); a new site id and the last old names (FB-150).
@@ -2160,7 +2169,7 @@ note:
 
 ## What Is Next
 
-1. **Finish the specifications.** Schema versions and hashes (FB-151), the last step of the framework baseline. The transport contract's additions to the module requirements, with the owner (FB-165). The module function field (FB-153).
+1. **Finish the specifications.** The transport contract's additions to the module requirements, with the owner (FB-165). The module function field (FB-153).
 2. **Design forge-display** with the owner, design mode included, and redo the sequence around it (FB-143).
 3. **Build the transport contract** in its ten steps (FB-164), with the conformance kit gaining a check at each; a kit driver for modules in another process (FB-155).
 4. **The Go module SDK** (FB-017), written to the contract spec; its first consumer is forge-display.
@@ -2651,6 +2660,7 @@ What "approved" means, why nothing changes silently, and the owner's role.
 - The same goes for **anything done more than once**: if it is repeatable, it has a specification and is built to it.
 - The specification is checked by a **runner** and enforced as a **gate**: a change that breaks a contract is stopped before it is merged, not discovered on the floor.
 - Specifications are **hashed**. Each carries its hash, its state and a history of who or what changed it.
+- The **form** a specification must take (its schema) is versioned and hashed too. A released version is never changed; a change is a new version that the owner approves, and every specification records the version it was approved against.
 
 | State | Meaning |
 |---|---|

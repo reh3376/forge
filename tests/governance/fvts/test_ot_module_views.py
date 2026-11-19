@@ -36,7 +36,7 @@ async def test_reference_contract_passes_every_check(
         (v.check_id, v.message) for v in report.verdicts if v.status is VerdictStatus.FAIL
     ]
     assert report.hash_verified is True, report.hash_message
-    assert report.total == 19
+    assert report.total == 20
 
 
 def test_approval_state_is_honest(reference_spec: dict[str, Any]) -> None:

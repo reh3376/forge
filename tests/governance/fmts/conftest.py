@@ -13,6 +13,7 @@ import pytest
 from forge.governance.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
 from forge.governance.fmts import REPO_ROOT, SCHEMA_PATH
 from forge.governance.fmts.runners.fmts_runner import FMTSRunner
+from forge.governance.shared import schemas
 from forge.governance.shared.runner import add_spec_hash, approve_spec_hash
 
 if TYPE_CHECKING:
@@ -44,6 +45,9 @@ def sign(spec: dict[str, Any]) -> dict[str, Any]:
     spec.pop("integrity", None)
     add_spec_hash(spec, changed_by="test")
     approve_spec_hash(spec, approved_by="reh3376")
+    row = schemas.find(SCHEMA_PATH.parent, str(spec.get("spec_version")))
+    if row is not None:  # what ``forge governance stamp`` records (D-14, F-10)
+        spec["integrity"].update(schema_version=row.version, schema_hash=row.schema_hash)
     return spec
 
 

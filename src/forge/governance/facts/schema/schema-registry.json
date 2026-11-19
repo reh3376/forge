@@ -1,0 +1,17 @@
+{
+  "framework": "facts",
+  "hash_method": "sha256-c14n-v1",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "file": "versions/facts.v0.1.0.schema.json",
+      "schema_hash": "fd84db40f1a74f6f3e4774f50f449b69a449237b8e2cf2b51f5a13475ba7a352",
+      "hash_state": "approved",
+      "step": "baseline",
+      "summary": "Baseline at the start of the schema registry (FB-151). Before it, 0.1.0 was edited in place several times, most recently to require time_governance (FB-090); those states are in the repository's history and are not versions. At the baseline every schema took the one id form forge://fxts/<framework>/v<version> and gained integrity.schema_version and integrity.schema_hash.",
+      "released_at": "2026-11-19T00:00:00Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-19T18:03:46Z"
+    }
+  ]
+}

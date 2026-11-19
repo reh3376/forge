@@ -51,7 +51,7 @@ class TestParity:
         statuses = {v.status for v in report.verdicts}
         assert VerdictStatus.NOT_IMPLEMENTED not in statuses
         assert VerdictStatus.ERROR not in statuses
-        assert report.total == 19
+        assert report.total == 20
         assert report.framework == "FVTS" and report.hash_verified is True
 
     async def test_no_spec_is_an_error(self, runner: FVTSRunner) -> None:

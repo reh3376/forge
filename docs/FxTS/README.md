@@ -113,8 +113,18 @@ forge governance stamp src/forge/governance/facts/specs/forge-wms.facts.json \
 # The owner approves the stored hash (refused when the content no longer matches it)
 forge governance approve src/forge/governance/facts/specs/forge-wms.facts.json --by reh3376
 
-# Validate a spec file against its framework schema (framework taken from the file name)
+# Validate a spec against the schema version it declares, or a named one
 forge governance validate-spec src/forge/governance/fvts/specs/forge-ot.fvts.json
+forge governance validate-spec src/forge/governance/fvts/specs/forge-ot.fvts.json --schema-version 0.1.0
+
+# Schema versions: list them, compare two, release an edited schema, move a spec forward
+forge governance schemas
+forge governance schema-diff fmts 0.1.0 0.2.0
+forge governance schema-release fmts --summary "FB-nnn: what changed"
+forge governance migrate-spec <spec> --to 0.3.0 --by <who>
+
+# The owner approves a schema version's hash
+forge governance schema-approve fmts 0.3.0 --by reh3376
 
 # Run one framework's checks on one spec: a spec file, or its id looked up in the
 # framework's spec directory (endpoint path, adapter_id, view_id, transport_id, module_id)
@@ -216,7 +226,9 @@ Signed by the owner on 2026-11-18: [`docs/decisions/fxts-framework-baseline.md`]
 - **Every run gives two verdicts for it**, in every framework, from the shared runner: `<framework>:hash-verified` fails when the spec's content does not match its recorded hash, `<framework>:hash-approved` when the owner has not approved it. A spec with no hash fails both.
 - **Every spec lives in its framework's `specs/` directory** and is listed by `forge governance specs` (F-5). There is no other place for a spec.
 
-`tests/governance/test_framework_baseline.py` walks every framework against the ten on every run and names each gap it allows, with the backlog item that closes it. Not built yet: schema versions with hashes, and the record in each spec of the schema it was approved against (FB-151).
+- **Every schema is versioned and hashed** (F-2), and **every spec records the schema version and hash it was approved against** (F-10), since 2026-11-19 (FB-151). A released version is never edited; a change is a new version whose hash the owner approves; every run gives a third verdict, `<framework>:schema-current`. The rules, the layout and the commands are in [FHTS, "Schema Versions"](FHTS.md#schema-versions).
+
+`tests/governance/test_framework_baseline.py` walks every framework against the ten on every run. It allows no gap: the list of known gaps is empty since FB-151.
 
 ## Writing a New Spec
 

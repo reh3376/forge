@@ -1,5 +1,5 @@
 {
-  "$schema": "forge://governance/ftts/v0.1.0",
+  "$schema": "forge://fxts/ftts/v0.1.0",
   "spec_version": "0.1.0",
 
   "transport_identity": {
@@ -404,12 +404,24 @@
 
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "9e4b1e20257c5c52145e9ae11f1aca303a227e6884710531de55c75fc6bd6cfd",
+    "spec_hash": "bf89cb3699f5748413c10cc766bf5a628b68261c15f9a358501ea33715fd6c8a",
     "hash_state": "approved",
-    "previous_hash": null,
-    "change_history": [],
+    "previous_hash": "9e4b1e20257c5c52145e9ae11f1aca303a227e6884710531de55c75fc6bd6cfd",
+    "change_history": [
+      {
+        "previous_hash": "9e4b1e20257c5c52145e9ae11f1aca303a227e6884710531de55c75fc6bd6cfd",
+        "new_hash": "bf89cb3699f5748413c10cc766bf5a628b68261c15f9a358501ea33715fd6c8a",
+        "changed_at": "2026-11-19T17:54:49Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "config",
+        "reason": "FB-151: the schema id takes the one form forge://fxts/<framework>/v<version>"
+      }
+    ],
+    "schema_version": "0.1.0",
+    "schema_hash": "121616f19462d1dbc5bf8d671dd2c26289ac3787adbb90ddfd24e47c461a906a",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-18T18:40:47Z"
+    "approved_at": "2026-11-19T18:04:11Z"
   },
 
   "metadata": {

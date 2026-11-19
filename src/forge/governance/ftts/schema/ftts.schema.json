@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://governance/ftts/v0.1.0",
+  "$id": "forge://fxts/ftts/v0.1.0",
   "title": "Forge Transport Test Specification (FTTS)",
   "description": "Governs the gRPC + Protobuf transport layer between Forge hub and spoke modules. Ensures compiled binary protobuf on the wire, schema-enforced message types, round-trip fidelity, and proper gRPC patterns.",
   "type": "object",
@@ -345,6 +345,16 @@
         "hash_state": { "type": "string", "enum": ["approved", "modified", "pending_review", "reverted", "unknown"] },
         "previous_hash": { "type": ["string", "null"] },
         "approved_by": { "type": "string" },
+        "schema_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "The schema version this spec was stamped and approved against (D-14, F-10)."
+        },
+        "schema_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "The hash of that schema version, from the framework's schema registry."
+        },
         "approved_at": { "type": "string" },
         "change_history": {
           "type": "array",
