@@ -1,0 +1,72 @@
+{
+  "list": "module-functions",
+  "title": "Module functions",
+  "description": "The service a module performs, whether Forge builds it or an integration module connects a product that does it. A module spec's module_identity.function is one of these (owner, 2026-11-19, FB-153). Adding a function is one approved change to this list.",
+  "entries": [
+    {
+      "id": "mes",
+      "description": "Manufacturing execution: orders, batches, recipes, changeover."
+    },
+    {
+      "id": "wms",
+      "description": "Warehouse management: inventory, movements, receipts."
+    },
+    {
+      "id": "cmms",
+      "description": "Maintenance management: equipment, work orders, maintenance events."
+    },
+    {
+      "id": "erp",
+      "description": "Enterprise resource planning: master data, orders, finance."
+    },
+    {
+      "id": "nms",
+      "description": "Network management: the plant network's topology and health."
+    },
+    {
+      "id": "ims",
+      "description": "Inventory management."
+    },
+    {
+      "id": "historian",
+      "description": "Process history: one time-series store, trends, export."
+    },
+    {
+      "id": "scanner",
+      "description": "Barcode and handheld scanning."
+    },
+    {
+      "id": "ot",
+      "description": "The plant floor: process controllers, tags, alarms, control writes."
+    },
+    {
+      "id": "display",
+      "description": "User interfaces: every screen, and the designer."
+    },
+    {
+      "id": "creds",
+      "description": "Credentials: the central credential module."
+    },
+    {
+      "id": "mpc",
+      "description": "The MPC Supervisor of the process control framework (PC-L2)."
+    },
+    {
+      "id": "qms",
+      "description": "Quality management."
+    },
+    {
+      "id": "lims",
+      "description": "Laboratory information management."
+    }
+  ],
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "a702b34be57f2370b3f49eeac357afe0097cd5aadc281e7bb542f91b7666a035",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-19T22:06:45Z"
+  }
+}

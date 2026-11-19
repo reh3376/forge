@@ -1,11 +1,12 @@
 {
-  "spec_version": "1.0.0",
+  "spec_version": "2.0.0",
   "module_identity": {
     "module_id": "forge-nms",
     "name": "Forge Network Management System Adapter",
     "alias": "nms",
     "version": "0.1.0",
     "kind": "management",
+    "function": "nms",
     "language": "python",
     "source_paths": [
       "src/forge/adapters/forge_nms"
@@ -17,7 +18,13 @@
   },
   "transport": {
     "process_control_writes": false,
-    "business_write_backs": false
+    "business_write_backs": false,
+    "data_classes": [
+      "raw",
+      "historical",
+      "status",
+      "config"
+    ]
   },
   "references": {
     "facts": {
@@ -100,8 +107,17 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "00efc96a79dfa29270c4bcd7fa4bb09c2d1e8b6376f2a8653a4e073c3bc116ce",
+    "previous_hash": "25c0a932fe2b6bd02d33c020c074225feb608a20b72916d5a9303f938ab7430e",
     "change_history": [
+      {
+        "previous_hash": "25c0a932fe2b6bd02d33c020c074225feb608a20b72916d5a9303f938ab7430e",
+        "new_hash": "9e4d00a24e9941f9529c9656f066815b4fc4f30c2b583086d549bd2cd0c7d605",
+        "changed_at": "2026-11-19T21:46:24Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-153: FMTS 2.0.0, the module's function and the data classes it carries (owner, 2026-11-19)"
+      },
       {
         "previous_hash": "00efc96a79dfa29270c4bcd7fa4bb09c2d1e8b6376f2a8653a4e073c3bc116ce",
         "new_hash": "25c0a932fe2b6bd02d33c020c074225feb608a20b72916d5a9303f938ab7430e",
@@ -119,22 +135,13 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
         "reason": "The shape the owner approved for forge-wms on 2026-11-18: the module's hub database declared; the Go target stated"
-      },
-      {
-        "previous_hash": "1859fdbbaa4473e7de3110bed4df64e71d8b66cb55a3e4ce374a5d38c3e6fa38",
-        "new_hash": "f9675a9b679101c368889dc0fb45a01ed7b58a1023ae0302213a5cde9ff2e01d",
-        "changed_at": "2026-11-18T15:50:07Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "content",
-        "reason": "FB-150: module ids renamed and the company's name removed; a management module, not an integration (owner 2026-11-18)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "25c0a932fe2b6bd02d33c020c074225feb608a20b72916d5a9303f938ab7430e",
-    "schema_version": "1.0.0",
-    "schema_hash": "49e1e80a99ad1b201c88a9b1289eb854454f22f417824e29d78670c5b9aeccf8",
+    "spec_hash": "9e4d00a24e9941f9529c9656f066815b4fc4f30c2b583086d549bd2cd0c7d605",
+    "schema_version": "2.0.0",
+    "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-19T21:10:45Z"
+    "approved_at": "2026-11-19T22:07:23Z"
   }
 }

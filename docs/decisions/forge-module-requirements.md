@@ -146,3 +146,25 @@ The transport contract (`transport-contract.md`, D-15, signed 2026-11-18) requir
 | A-Q5 | Whether the receiving module's part in that is a requirement. | **Yes: M-16**, for modules that declare they accept business write-backs, with an ordinary waiver. |
 
 Debt check: nothing of the transport contract is built (FB-164), so every existing module carries a waiver naming FB-164 for each new requirement that applies to it, and the waivers expire together when that item is closed. The module spec gains one section, `transport`, with the two declarations; its capacity, last will, data classes and keepalive follow with FB-153. Adding required fields is a major step of the FMTS schema under D-14's rules.
+
+## 10. Amendment of 2026-11-19: the module's function, its application and what it declares for its link (FB-153)
+
+**Status:** approved by reh3376 on 2026-11-19. The owner answered the questions below one at a time and declared the eight points of the summary the signature of this amendment. Everything above stands as signed.
+
+All of the following is **[OWNER]**.
+
+| # | Question | Answer |
+|---|---|---|
+| B-Q1 | How the list of module functions is kept. | **A governed list file**, hashed and approved by the owner like a spec. The schema says only that the field takes an entry of the list; the runner checks it. Adding an entry is one approved change to the list: no schema version, no spec touched. The same mechanism carries the application-side protocols, the data classes and the pruning strategies. |
+| B-Q2 | The first list of module functions. | **These fourteen:** mes, wms, cmms, erp, nms, ims, historian, scanner, ot, display, creds, mpc, qms, lims. |
+| B-Q3 | The first list of application-side protocols for an integration module. | **rest, graphql, mqtt, opc-ua, sql, amqp, file.** The owner named the first five on 2026-11-18; the module's hub side is gRPC only. |
+| B-Q4 | The data classes. | See the transport contract, "Data classes: parents and sub-classes". |
+| B-Q5 | What a module declares for its store-and-forward buffer. | **Size and age, a range for each**, plus a pruning strategy. The owner's words: "I agree with option 1, but will likely need user defined pruning strategy as well when / if max store is reached how is it handled." The first strategies: **drop-oldest** (the default) and **by-class-priority**. A module declares the strategies it supports; the hub admin chooses one; every loss is counted and shown; the audit class is never pruned. |
+| B-Q6 | What a module declares as its last will. | **A message and an alarm priority** (none, low, medium, high, critical). The state the hub records is fixed by the contract: lost, with the time last heard. |
+| B-Q7 | What a module declares about keepalive. | **An optional tighter limit.** The interval comes from the module's strictest data class; a module may declare a longest interval it accepts, which can only tighten it. |
+
+The integration fields were settled in the integration builder record (D-13, B-10): product and vendor, supported versions, interfaces, direction, site owner, credential name; how the application's clock is read stays in the time contract.
+
+In the module spec: `module_identity.function`; an `integration` section, required for kind `integration` and absent otherwise; in `transport`, the data classes, and the buffer, the last will and the keepalive limit. A module that waives M-13 or M-14 need not declare the buffer or the last will yet.
+
+Debt check: four lists can now grow without a schema version, which is what kept the first two schema steps of this week from being four. A list is trusted only while its hash verifies and the owner has approved it; a module spec fails otherwise.

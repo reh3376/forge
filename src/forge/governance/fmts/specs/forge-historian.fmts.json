@@ -1,11 +1,12 @@
 {
-  "spec_version": "1.0.0",
+  "spec_version": "2.0.0",
   "module_identity": {
     "module_id": "forge-historian",
     "name": "Forge Historian Adapter",
     "alias": "historian",
     "version": "0.1.0",
     "kind": "management",
+    "function": "historian",
     "language": "python",
     "source_paths": [
       "src/forge/adapters/forge_historian"
@@ -17,7 +18,13 @@
   },
   "transport": {
     "process_control_writes": false,
-    "business_write_backs": false
+    "business_write_backs": false,
+    "data_classes": [
+      "raw",
+      "historical",
+      "status",
+      "config"
+    ]
   },
   "references": {
     "facts": {
@@ -100,8 +107,17 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "6ab550453cd4e2355722bd478fb5474569653895c70a5eae9018e40009a78c87",
+    "previous_hash": "4caf37f23c483b2432fefcbcafa1ffb6364cba9db8ce9dc5b08c9d7d825162f9",
     "change_history": [
+      {
+        "previous_hash": "4caf37f23c483b2432fefcbcafa1ffb6364cba9db8ce9dc5b08c9d7d825162f9",
+        "new_hash": "ed66809de1cb71d0220fd2727485a2fbeb5a649b44be0203ebecf9f5fbae4a8b",
+        "changed_at": "2026-11-19T21:46:23Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-153: FMTS 2.0.0, the module's function and the data classes it carries (owner, 2026-11-19)"
+      },
       {
         "previous_hash": "6ab550453cd4e2355722bd478fb5474569653895c70a5eae9018e40009a78c87",
         "new_hash": "4caf37f23c483b2432fefcbcafa1ffb6364cba9db8ce9dc5b08c9d7d825162f9",
@@ -119,22 +135,13 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
         "reason": "Owner review 2026-11-18: the historian is Forge's own module, forge-historian"
-      },
-      {
-        "previous_hash": "be5170c0f62297aaf593d4209d174e7a3ad3cd6f776fec1c37add71fa9db7305",
-        "new_hash": "26ce5510fe62c3d1e2475c7c89db4af6f3e7ec54b7657f9c68e37e6a1b52f463",
-        "changed_at": "2026-11-18T15:32:42Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "structural",
-        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "4caf37f23c483b2432fefcbcafa1ffb6364cba9db8ce9dc5b08c9d7d825162f9",
-    "schema_version": "1.0.0",
-    "schema_hash": "49e1e80a99ad1b201c88a9b1289eb854454f22f417824e29d78670c5b9aeccf8",
+    "spec_hash": "ed66809de1cb71d0220fd2727485a2fbeb5a649b44be0203ebecf9f5fbae4a8b",
+    "schema_version": "2.0.0",
+    "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-19T21:10:45Z"
+    "approved_at": "2026-11-19T22:07:23Z"
   }
 }

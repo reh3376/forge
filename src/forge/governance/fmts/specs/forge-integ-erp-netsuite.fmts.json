@@ -1,11 +1,12 @@
 {
-  "spec_version": "1.0.0",
+  "spec_version": "2.0.0",
   "module_identity": {
     "module_id": "forge-integ-erp-netsuite",
     "name": "Forge NetSuite ERP Integration Adapter",
     "alias": "netsuite",
     "version": "0.1.0",
     "kind": "integration",
+    "function": "erp",
     "language": "python",
     "source_paths": [
       "src/forge/adapters/forge_integ_erp_netsuite"
@@ -17,7 +18,27 @@
   },
   "transport": {
     "process_control_writes": false,
-    "business_write_backs": false
+    "business_write_backs": false,
+    "data_classes": [
+      "raw",
+      "historical",
+      "status",
+      "config"
+    ]
+  },
+  "integration": {
+    "product": "NetSuite",
+    "supported_versions": [
+      "set at the installation"
+    ],
+    "interfaces": [
+      "amqp",
+      "graphql",
+      "rest"
+    ],
+    "direction": "read",
+    "site_owner": "set at the installation",
+    "credential": "netsuite-api"
   },
   "references": {
     "facts": {
@@ -109,8 +130,17 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "79a9b8df349d9ff3fe40f478a070b498e329435a0c7f7011ee279957c6f35847",
+    "previous_hash": "3b2e57b269a003b1533e9bbcaf0c7257eb36cd9c916e7f665fc0945a43de35a4",
     "change_history": [
+      {
+        "previous_hash": "3b2e57b269a003b1533e9bbcaf0c7257eb36cd9c916e7f665fc0945a43de35a4",
+        "new_hash": "6db8a6af11d55b695b37492e79875c75bf7fa2933f689692ea6a14cacbed9294",
+        "changed_at": "2026-11-19T21:46:24Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-153: FMTS 2.0.0, the module's function and the data classes it carries (owner, 2026-11-19)"
+      },
       {
         "previous_hash": "79a9b8df349d9ff3fe40f478a070b498e329435a0c7f7011ee279957c6f35847",
         "new_hash": "3b2e57b269a003b1533e9bbcaf0c7257eb36cd9c916e7f665fc0945a43de35a4",
@@ -128,22 +158,13 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
         "reason": "Owner review 2026-11-18: the ERP module is forge-integ-erp-netsuite, an integration module for a named product"
-      },
-      {
-        "previous_hash": "f2cfc6425b407fca54733dcca8a4befd772ed4ba66694d720391bbfc1f3a119e",
-        "new_hash": "4ac9c1b91014a05031734de741af6bafb4397c3851336adc98403e632f07d12a",
-        "changed_at": "2026-11-18T16:20:22Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "content",
-        "reason": "The shape the owner approved for forge-wms on 2026-11-18: the module's hub database declared; the Go target stated"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "3b2e57b269a003b1533e9bbcaf0c7257eb36cd9c916e7f665fc0945a43de35a4",
-    "schema_version": "1.0.0",
-    "schema_hash": "49e1e80a99ad1b201c88a9b1289eb854454f22f417824e29d78670c5b9aeccf8",
+    "spec_hash": "6db8a6af11d55b695b37492e79875c75bf7fa2933f689692ea6a14cacbed9294",
+    "schema_version": "2.0.0",
+    "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-19T21:10:46Z"
+    "approved_at": "2026-11-19T22:07:23Z"
   }
 }

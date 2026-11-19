@@ -1,11 +1,12 @@
 {
-  "spec_version": "1.0.0",
+  "spec_version": "2.0.0",
   "module_identity": {
     "module_id": "forge-mes",
     "name": "Forge MES (the interim MES bridge)",
     "alias": "mes",
     "version": "0.1.0",
     "kind": "management",
+    "function": "mes",
     "language": "typescript",
     "source_paths": [
       "modules/Forge MES/backend/src",
@@ -20,7 +21,14 @@
   },
   "transport": {
     "process_control_writes": false,
-    "business_write_backs": true
+    "business_write_backs": true,
+    "data_classes": [
+      "raw",
+      "historical",
+      "write-back",
+      "status",
+      "config"
+    ]
   },
   "references": {
     "facts": {
@@ -125,8 +133,17 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": "f6d8a7e8e90b40ae5645be762fb8e61081c6d17ff033ca778ffe490cf2c197cd",
+    "previous_hash": "81fa2662182d4fa6d630156312ef2a19bb84f1a104d30ecd6cf1b83543acc300",
     "change_history": [
+      {
+        "previous_hash": "81fa2662182d4fa6d630156312ef2a19bb84f1a104d30ecd6cf1b83543acc300",
+        "new_hash": "1bc87dacd7876e04d886de8ce855db5a5030c15a14f9ef2c5a92a71bb12b6999",
+        "changed_at": "2026-11-19T21:46:24Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-153: FMTS 2.0.0, the module's function and the data classes it carries (owner, 2026-11-19)"
+      },
       {
         "previous_hash": "f6d8a7e8e90b40ae5645be762fb8e61081c6d17ff033ca778ffe490cf2c197cd",
         "new_hash": "81fa2662182d4fa6d630156312ef2a19bb84f1a104d30ecd6cf1b83543acc300",
@@ -144,20 +161,11 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "structural",
         "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
-      },
-      {
-        "previous_hash": "143c13540a8f2b404171283c78ccdd586dcf18840f7cfa44769bf35862f6bad9",
-        "new_hash": "15c1953615c0dea524b872aa426ae38b11d64f6e4d29f2a370c564e1684cae47",
-        "changed_at": "2026-11-18T15:12:26Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "content",
-        "reason": "FB-136: M-3 waived against FB-145 (owner, Q-10: time-keeping waivers with admin privileges)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "81fa2662182d4fa6d630156312ef2a19bb84f1a104d30ecd6cf1b83543acc300",
-    "schema_version": "1.0.0",
-    "schema_hash": "49e1e80a99ad1b201c88a9b1289eb854454f22f417824e29d78670c5b9aeccf8"
+    "spec_hash": "1bc87dacd7876e04d886de8ce855db5a5030c15a14f9ef2c5a92a71bb12b6999",
+    "schema_version": "2.0.0",
+    "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e"
   }
 }

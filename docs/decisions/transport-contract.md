@@ -102,6 +102,50 @@ So two kinds of message go down, with opposite rules:
 
 T-11 is read with this definition. Lifecycle calls from the hub (Configure, Start, Stop, a request to collect or backfill) are neither: they are requests, answered or failed within their deadline (T-8).
 
+### Data classes: parents and sub-classes (T-9, the owner on 2026-11-19, after the signature)
+
+Asked while the module spec gained its data classes (FB-153). The four classes sketched in Q-9 are replaced by this.
+
+**[OWNER]** "It is very likely that we will have far more than 8 data classes. We should probably think this thru for a minute before we commit to these 8 simple classes. Here are some that I am considering, they may not all be needed and we could use a parent child relationship for data classes as well which would allow us to create the initial parent classes now and build out sub-classes as they come up later. Here are a few: raw, historical, curated, control, ... ."
+
+**[OWNER]** On more parents: "The 8 named thus far for sure, can you think of other parent classes we may need with current backlog and direction? mod-hub, hub-hub, & hub-mod may be useful, but I have not thought them all the way thru yet." The owner then approved config, live, request and artifact, then security, and confirmed that mod-hub, hub-mod and hub-hub are an attribute of each class, not classes.
+
+- **A class is named `parent` or `parent.child`.** A sub-class inherits every rule of its parent and may only tighten its numbers. It never changes the delivery rule and never loosens anything, so a hub that knows only the parents handles a new sub-class safely.
+- **Each parent has exactly one rule**: its direction, the links it may travel (module to hub, hub to module, hub to hub), its delivery guarantee, whether it is stored, whether it expires.
+- **A module declares the classes it carries**, as parents (anything in them) or as specific sub-classes.
+- **The numbers of each class** (keepalive, deadlines, batch, buffer, expiry) are settled with the owner when the contract is built (FB-164).
+
+| Parent | Direction | Rule |
+|---|---|---|
+| raw | up | values and events as collected from a source; at least once; stored and forwarded |
+| curated | up | curated records and data products; at least once; relaxed |
+| historical | up | bulk history and backfill; at least once; slow, may be scheduled |
+| alarm | up | alarms, interlock and safety-related states; at least once; tighter than raw |
+| audit | up | audit records; at least once; never pruned when a buffer fills |
+| status | up | health, the goodbye, the last will; not buffered |
+| live | up | live values for screens; the latest wins; never stored; a late one is dropped |
+| control | down, hub to module only | commands; at most once; never stored; expires |
+| write-back | down | messages to a business system; once and only once; kept while a link is down |
+| config | down | configuration, promoted flows and specs, role assignments, limits; the newest wins; kept until delivered |
+| security | down | credentials, token renewal, revocation; highest priority; never stored in clear; never replayed |
+| request | both | a question answered within a deadline; never stored |
+| artifact | both | large objects; sent in pieces, resumable, verified by hash |
+
+The list is `src/forge/governance/lists/data-classes.list.json`, approved by the owner on 2026-11-19. Adding a class or a sub-class is one approved change to it and never a breaking change (T-2).
+
+### A full buffer: the pruning strategy (T-6, the owner on 2026-11-19, after the signature)
+
+T-6 said a full buffer drops the oldest and counts the loss. **[OWNER]** "I agree with option 1, but will likely need user defined pruning strategy as well when / if max store is reached how is it handled." So T-6 is amended:
+
+- A module declares its buffer as a size range and an age range; the hub admin sets a value within each; whichever limit is reached first triggers pruning.
+- How it prunes is a strategy from a governed list. The first two: **drop-oldest**, the default, and **by-class-priority** (the lowest-priority class first, oldest first within it). A module declares the strategies it supports; the hub admin chooses one.
+- Whatever the strategy, every loss is counted and shown, and the audit class is never pruned.
+
+### The last will and the keepalive (T-8, the owner on 2026-11-19, after the signature)
+
+- **The last will** a module declares is a message for the operator and the priority of the alarm raised (none, low, medium, high, critical). The state the hub records is fixed: lost, with the time last heard.
+- **The keepalive** comes from the strictest data class a module carries. A module may declare a longest interval it accepts; that can only tighten it.
+
 ## 6. What this changes in work already planned
 
 - **The module requirements (D-12).** T-5, T-6, T-8 and T-11 are behaviour every module must show, so the baseline gains requirements and the conformance kit gains checks for them: a stable record id, store and forward with its capacity, the goodbye and the last will, refusing a late command. That is a change to a signed record and needs the owner's word.

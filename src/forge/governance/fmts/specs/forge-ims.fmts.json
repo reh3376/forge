@@ -1,11 +1,12 @@
 {
-  "spec_version": "1.0.0",
+  "spec_version": "2.0.0",
   "module_identity": {
     "module_id": "forge-ims",
     "name": "Forge Inventory Management System Adapter",
     "alias": "ims",
     "version": "0.1.0",
     "kind": "management",
+    "function": "ims",
     "language": "python",
     "source_paths": [
       "src/forge/adapters/forge_ims"
@@ -17,7 +18,13 @@
   },
   "transport": {
     "process_control_writes": false,
-    "business_write_backs": false
+    "business_write_backs": false,
+    "data_classes": [
+      "raw",
+      "historical",
+      "status",
+      "config"
+    ]
   },
   "references": {
     "facts": {
@@ -100,8 +107,17 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "2ed2381f32f8a95423d687b9d4dc9a3dacc77e9fb165e9b478c8708bffd67871",
+    "previous_hash": "74af78298b3c70fdaceaf55130f1fb8dad13bc3024e346b549b9fbf82a44ce1e",
     "change_history": [
+      {
+        "previous_hash": "74af78298b3c70fdaceaf55130f1fb8dad13bc3024e346b549b9fbf82a44ce1e",
+        "new_hash": "247c0f8af16f4f129a4eff802236d019c45a01770666753c271e7d08817de62f",
+        "changed_at": "2026-11-19T21:46:24Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-153: FMTS 2.0.0, the module's function and the data classes it carries (owner, 2026-11-19)"
+      },
       {
         "previous_hash": "2ed2381f32f8a95423d687b9d4dc9a3dacc77e9fb165e9b478c8708bffd67871",
         "new_hash": "74af78298b3c70fdaceaf55130f1fb8dad13bc3024e346b549b9fbf82a44ce1e",
@@ -119,22 +135,13 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
         "reason": "Owner review 2026-11-18: the inventory module is Forge's own, forge-ims"
-      },
-      {
-        "previous_hash": "1bfa45842ace9364242e3ca2f33acd6235c2df8ca026ac8cd48bed18df126fa9",
-        "new_hash": "282b871db9cdcbd7a6ed3631a0fdb1b3c4665bf8ecf66b4625e0775809c01a3d",
-        "changed_at": "2026-11-18T15:32:41Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "structural",
-        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "74af78298b3c70fdaceaf55130f1fb8dad13bc3024e346b549b9fbf82a44ce1e",
-    "schema_version": "1.0.0",
-    "schema_hash": "49e1e80a99ad1b201c88a9b1289eb854454f22f417824e29d78670c5b9aeccf8",
+    "spec_hash": "247c0f8af16f4f129a4eff802236d019c45a01770666753c271e7d08817de62f",
+    "schema_version": "2.0.0",
+    "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-19T21:10:45Z"
+    "approved_at": "2026-11-19T22:07:23Z"
   }
 }

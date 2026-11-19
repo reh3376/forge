@@ -1,0 +1,892 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://fxts/fmts/v2.0.0",
+  "title": "FMTS — Forge Module Test Specification",
+  "description": "What every Forge module declares before a hub admits it: its kind, the baseline it claims (M-1 to M-16), its time contract, references to its other specs, and waivers. Decided in docs/decisions/forge-module-requirements.md (D-12, signed 2026-11-17, amended 2026-11-19). One spec per module, `<module>.fmts.json`.",
+  "type": "object",
+  "required": [
+    "spec_version",
+    "module_identity",
+    "hub_link",
+    "transport",
+    "references",
+    "baseline",
+    "waivers",
+    "time_contract",
+    "user_interface",
+    "scaffold"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "spec_version": {
+      "type": "string",
+      "const": "2.0.0",
+      "description": "FMTS schema version this spec is written against."
+    },
+    "module_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "module_id",
+        "name",
+        "alias",
+        "version",
+        "kind",
+        "function",
+        "language",
+        "source_paths"
+      ],
+      "description": "What the module is and where its source lives.",
+      "properties": {
+        "module_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "minLength": 3,
+          "maxLength": 64,
+          "description": "Unique kebab-case id of the module."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "alias": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]{1,15}$",
+          "description": "The module's shortcut name (owner, 2026-11-18): short, lower case, unique among the modules. Where a person or a command names a module briefly, this is the name (`wms` for `forge-wms`)."
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+",
+          "description": "Semantic version of the module."
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "management",
+            "integration",
+            "ot",
+            "display"
+          ],
+          "description": "management: a forge-<service> module that runs a business function (forge-mes, forge-wms, forge-cmms). integration: a module whose counterpart is third-party software; the only place that system's API is called (A-4, O-5). ot: the module that talks to plant-floor devices. display: forge-display, the one module that renders user interfaces (A-3)."
+        },
+        "function": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "The service the module performs: an entry of the governed list `module-functions` (owner, 2026-11-19). The runner checks the entry; the list can grow without a schema version."
+        },
+        "language": {
+          "type": "string",
+          "enum": [
+            "go",
+            "python",
+            "typescript"
+          ],
+          "description": "The language the module is written in. Modules are Go (A-2); python is the hub-hosted adapters and the OT module; typescript is the interim MES bridge only."
+        },
+        "source_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Repository-relative directories that hold the module's source. The static checks read these."
+        }
+      }
+    },
+    "hub_link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol",
+        "service"
+      ],
+      "description": "M-1: the module speaks forge.v1.AdapterService to its hub over gRPC and nothing else.",
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "const": "grpc"
+        },
+        "service": {
+          "type": "string",
+          "const": "forge.v1.AdapterService"
+        }
+      }
+    },
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "process_control_writes",
+        "business_write_backs",
+        "data_classes"
+      ],
+      "description": "What the module carries on its link to the hub, and what it does with messages that come down (D-12 amendments of 2026-11-19; D-15).",
+      "properties": {
+        "process_control_writes": {
+          "type": "boolean",
+          "description": "The module can issue or carry a command: a write to a tag in a process controller (PLC or HMI) that directly affects a process. True makes M-15 required."
+        },
+        "business_write_backs": {
+          "type": "boolean",
+          "description": "The module accepts write-backs to a business system, delivered once and only once. True makes M-16 required."
+        },
+        "data_classes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)?$"
+          },
+          "description": "The data classes the module carries: entries of the governed list `data-classes`, each a parent or a parent.child. A parent covers every sub-class of it."
+        },
+        "store_and_forward": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "size_bytes",
+            "age_seconds",
+            "pruning"
+          ],
+          "description": "M-13: the capacity of the module's store-and-forward buffer, as ranges the hub admin sets a value within, and the pruning strategies the module supports for a full buffer. Required when M-13 is claimed met.",
+          "properties": {
+            "size_bytes": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "min",
+                "max"
+              ],
+              "description": "The smallest and largest storage the buffer may use.",
+              "properties": {
+                "min": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "max": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "age_seconds": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "min",
+                "max"
+              ],
+              "description": "The smallest and largest age of the oldest record kept.",
+              "properties": {
+                "min": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "max": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            },
+            "pruning": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]*$"
+              },
+              "description": "Entries of the governed list `pruning-strategies`. Whatever the strategy, a loss is counted and the audit class is never pruned."
+            }
+          }
+        },
+        "last_will": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "message",
+            "alarm_priority"
+          ],
+          "description": "M-14: what the hub does when the module's keepalive lapses without a goodbye. The recorded state is fixed by the contract (lost, with the time last heard). Required when M-14 is claimed met.",
+          "properties": {
+            "message": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 200,
+              "description": "What an operator is told."
+            },
+            "alarm_priority": {
+              "type": "string",
+              "enum": [
+                "none",
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ],
+              "description": "The priority of the alarm raised."
+            }
+          }
+        },
+        "keepalive_max_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Optional. The longest keepalive interval the module accepts. The hub's interval comes from the module's strictest data class; this can only tighten it."
+        }
+      }
+    },
+    "integration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "product",
+        "supported_versions",
+        "interfaces",
+        "direction",
+        "site_owner",
+        "credential"
+      ],
+      "description": "The third-party application an integration module connects (D-13, B-10). Required for kind `integration`, absent for every other kind. How its clock is read is in `time_contract.third_party_systems`, not here.",
+      "properties": {
+        "product": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The product's name."
+        },
+        "vendor": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional. Who makes it. Set at an installation; the public repository names no company (A-16)."
+        },
+        "supported_versions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "The product versions the module supports."
+        },
+        "interfaces": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "description": "Entries of the governed list `application-protocols`: how the module reaches the application. Its hub side is gRPC only."
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write",
+            "both"
+          ],
+          "description": "Whether Forge reads from the application, writes to it, or both."
+        },
+        "site_owner": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Who owns the application at the site: a role or a department, not a person."
+        },
+        "credential": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "The name of the credential the module needs, as forge-creds will know it. Never the secret."
+        }
+      }
+    },
+    "references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "facts",
+        "manifest"
+      ],
+      "description": "The module's other declarations. FMTS names them and requires them; it does not repeat them.",
+      "properties": {
+        "facts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "adapter_id"
+          ],
+          "description": "M-2: the module's FACTS spec.",
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Repository-relative path of the FACTS spec."
+            },
+            "adapter_id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$",
+              "description": "The adapter_id the FACTS spec and the manifest carry."
+            }
+          }
+        },
+        "manifest": {
+          "type": "string",
+          "minLength": 1,
+          "description": "M-2: repository-relative path of the manifest the module registers with."
+        },
+        "fvts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "M-9: repository-relative paths of the module's FVTS specs, one per view contract."
+        },
+        "roles": {
+          "type": "string",
+          "minLength": 1,
+          "description": "M-10: repository-relative path of the module's shipped roles (roles record R-12): a JSON file with a `roles` list, each a `role_id`, its `scopes` and the roles it `inherits`."
+        }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "M-1",
+        "M-2",
+        "M-3",
+        "M-4",
+        "M-5",
+        "M-6",
+        "M-7",
+        "M-8",
+        "M-9",
+        "M-10",
+        "M-11",
+        "M-12",
+        "M-13",
+        "M-14",
+        "M-15",
+        "M-16"
+      ],
+      "description": "The claim for each of the sixteen requirements: met, or waived by an entry in `waivers`. M-15 and M-16 bind only a module that declares the matching kind of downward message in `transport`; for any other module they are `not_applicable`. A requirement with no waiver is enforced in full.",
+      "properties": {
+        "M-1": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-2": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-3": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-4": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-5": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-6": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-7": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-8": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-9": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-10": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-11": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-12": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-13": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-14": {
+          "$ref": "#/$defs/claim"
+        },
+        "M-15": {
+          "$ref": "#/$defs/conditionalClaim"
+        },
+        "M-16": {
+          "$ref": "#/$defs/conditionalClaim"
+        }
+      }
+    },
+    "waivers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/waiver"
+      },
+      "description": "Requirements this module cannot yet meet (Q-8). The owner approves each through the spec's hash; the runner reports every waiver on every run."
+    },
+    "time_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hub",
+        "plant_floor_devices",
+        "databases",
+        "third_party_systems"
+      ],
+      "description": "M-3: one entry for every counterpart the module exchanges data with. Every entry fails closed.",
+      "properties": {
+        "hub": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "exchange",
+            "fail_closed"
+          ],
+          "description": "The link to the hub. Its tolerance class is the one the FACTS spec declares in `time_governance`; it is not repeated here.",
+          "properties": {
+            "exchange": {
+              "type": "string",
+              "const": "four-timestamp",
+              "description": "The exchange carried on every Register, Health and Ingest (one-clock record P-9)."
+            },
+            "fail_closed": {
+              "type": "boolean",
+              "const": true
+            }
+          }
+        },
+        "plant_floor_devices": {
+          "type": "string",
+          "enum": [
+            "none",
+            "declared-in-facts"
+          ],
+          "description": "none: the module talks to no plant-floor device or server. declared-in-facts: it does, and the FACTS spec's `time_governance` (and its `connections`) is the declaration."
+        },
+        "databases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/database"
+          },
+          "description": "Every database the module reads or writes (Q-5)."
+        },
+        "third_party_systems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/thirdPartySystem"
+          },
+          "description": "Every third-party system the module calls. An integration module has at least one (O-6)."
+        }
+      }
+    },
+    "user_interface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ships_ui_code",
+        "screens"
+      ],
+      "description": "M-9: a module ships no user interface code; it describes its screens in FVTS specs and forge-display renders them (A-3). The display module is the one kind this does not bind.",
+      "properties": {
+        "ships_ui_code": {
+          "type": "boolean",
+          "description": "True when the module's source contains user interface code."
+        },
+        "screens": {
+          "type": "boolean",
+          "description": "True when the module has screens; then `references.fvts` names their view contracts."
+        }
+      }
+    },
+    "scaffold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "template"
+      ],
+      "description": "M-11: the module SDK template the module was built from.",
+      "properties": {
+        "template": {
+          "type": "string",
+          "enum": [
+            "python-adapter",
+            "go-module",
+            "none"
+          ],
+          "description": "python-adapter: the six-file layout `forge module init` generates. go-module: the Go layout of docs/decisions/forge-mes-go.md. none: not built from a template; M-11 must then be waived."
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Free-form context for people. Not enforced."
+    },
+    "integrity": {
+      "type": "object",
+      "description": "Self-contained spec integrity block (FHTS Layer 1). Hash governance for AI agent oversight.",
+      "properties": {
+        "hash_method": {
+          "type": "string",
+          "enum": [
+            "sha256-c14n-v1",
+            "sha256-jcs"
+          ],
+          "default": "sha256-c14n-v1",
+          "description": "Hash algorithm. sha256-c14n-v1 is normative."
+        },
+        "spec_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hex digest of canonical JSON (excluding this field)."
+        },
+        "hash_state": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "modified",
+            "pending_review",
+            "reverted",
+            "unknown"
+          ],
+          "default": "unknown",
+          "description": "Governance state — tracks whether changes have been reviewed and approved."
+        },
+        "previous_hash": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Hash before most recent change. Enables single-step drift detection."
+        },
+        "approved_by": {
+          "type": "string",
+          "description": "Identifier of actor who approved current hash state."
+        },
+        "schema_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "The schema version this spec was stamped and approved against (D-14, F-10)."
+        },
+        "schema_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "The hash of that schema version, from the framework's schema registry."
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO8601 timestamp of approval."
+        },
+        "change_history": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": [
+              "previous_hash",
+              "new_hash",
+              "changed_at",
+              "source"
+            ],
+            "properties": {
+              "previous_hash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "new_hash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "changed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "type": "string",
+                "enum": [
+                  "manual",
+                  "ci",
+                  "agent",
+                  "revert",
+                  "spec_update"
+                ]
+              },
+              "changed_by": {
+                "type": "string"
+              },
+              "change_type": {
+                "type": "string",
+                "enum": [
+                  "structural",
+                  "content",
+                  "config",
+                  "revert"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Last 3 hash changes for audit trail and AI agent governance."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "toleranceClass": {
+      "type": "string",
+      "enum": [
+        "T0",
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "it-lan",
+        "it-wan",
+        "edge-mqtt"
+      ],
+      "description": "The tolerance classes of the one-clock record (P-8). Mirrors FACTS `time_governance.tolerance_class`; the runner fails if they drift."
+    },
+    "claim": {
+      "type": "string",
+      "enum": [
+        "met",
+        "waived"
+      ]
+    },
+    "waiver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement",
+        "reason",
+        "backlog_item"
+      ],
+      "properties": {
+        "requirement": {
+          "type": "string",
+          "enum": [
+            "M-1",
+            "M-2",
+            "M-3",
+            "M-4",
+            "M-5",
+            "M-6",
+            "M-7",
+            "M-8",
+            "M-9",
+            "M-10",
+            "M-11",
+            "M-12",
+            "M-13",
+            "M-14",
+            "M-15",
+            "M-16"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 20,
+          "description": "Why the module cannot meet the requirement today."
+        },
+        "backlog_item": {
+          "type": "string",
+          "pattern": "^FB-\\d{3,}$",
+          "description": "The open BACKLOG.md item that removes the waiver. A waiver whose item is closed or missing fails."
+        }
+      }
+    },
+    "database": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "owner",
+        "access",
+        "credential",
+        "fail_closed"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "enum": [
+            "hub",
+            "third-party",
+            "module"
+          ],
+          "description": "hub: a database the hub owns (A-6); the hub checks its clock. third-party: the database of a third-party system; the integration module measures its clock and reports the offset. module: a database the module holds itself, which M-8 forbids."
+        },
+        "engine": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The database product, for people."
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write",
+            "read-write"
+          ]
+        },
+        "credential": {
+          "type": "string",
+          "enum": [
+            "forge-issued",
+            "third-party-issued",
+            "module-held"
+          ],
+          "description": "Who issued the credential the module connects with (M-8)."
+        },
+        "written_time_source": {
+          "type": "string",
+          "enum": [
+            "module-clock",
+            "hub-clock"
+          ],
+          "description": "Which governed clock the times the module writes come from. Required when the module writes. The database's own now() is not a permitted source (Q-5)."
+        },
+        "clock_read_method": {
+          "type": "string",
+          "enum": [
+            "sql-server-time",
+            "unreadable"
+          ],
+          "description": "Third-party databases: how the module reads the server's clock."
+        },
+        "tolerance_class": {
+          "$ref": "#/$defs/toleranceClass"
+        },
+        "clock_probe_interval_seconds": {
+          "type": "number",
+          "minimum": 1
+        },
+        "offset_reported": {
+          "type": "boolean",
+          "const": true,
+          "description": "Third-party databases with a readable clock: the module corrects the database's times to master time and reports the offset on the record (Q-5)."
+        },
+        "polling_interval_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "When the clock is unreadable: the module's read time is the stamp and this interval is recorded as the uncertainty on every record (Q-6)."
+        },
+        "fail_closed": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "thirdPartySystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "interface",
+        "clock_read_method",
+        "fail_closed"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "interface": {
+          "type": "string",
+          "minLength": 1,
+          "description": "How the module reaches the system (rest, graphql, amqp, mqtt, file, …)."
+        },
+        "clock_read_method": {
+          "type": "string",
+          "enum": [
+            "http-date-header",
+            "server-time-endpoint",
+            "message-timestamp",
+            "unreadable"
+          ],
+          "description": "How the module reads the system's clock. unreadable is a declaration, not an escape: it requires `polling_interval_seconds` (Q-6)."
+        },
+        "tolerance_class": {
+          "$ref": "#/$defs/toleranceClass"
+        },
+        "clock_probe_interval_seconds": {
+          "type": "number",
+          "minimum": 1
+        },
+        "offset_reported": {
+          "type": "boolean",
+          "const": true,
+          "description": "Readable clocks: the offset is reported on the record."
+        },
+        "polling_interval_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "When the clock is unreadable: the uncertainty recorded on every record."
+        },
+        "fail_closed": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "conditionalClaim": {
+      "type": "string",
+      "enum": [
+        "met",
+        "waived",
+        "not_applicable"
+      ],
+      "description": "A claim for a requirement that binds only some modules (M-15, M-16)."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "module_identity": {
+            "properties": {
+              "kind": {
+                "const": "integration"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          }
+        },
+        "required": [
+          "module_identity"
+        ]
+      },
+      "then": {
+        "required": [
+          "integration"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "integration"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "list": "data-classes",
+  "title": "Data classes",
+  "description": "What travels on a link, by its rule. A class is named parent or parent.child; a sub-class inherits every rule of its parent and may only tighten its numbers, never change the delivery rule or loosen anything (owner, 2026-11-19, FB-153). Direction and the links a class may travel are attributes of the class, not classes. The numbers of each class (keepalive, deadlines, batch, buffer, expiry) are settled when the transport contract is built (FB-164). Adding a class is one approved change to this list and never a breaking change.",
+  "deliveries": [
+    "at-least-once",
+    "at-most-once",
+    "once-only",
+    "latest-wins",
+    "request-response",
+    "resumable"
+  ],
+  "directions": [
+    "up",
+    "down",
+    "both"
+  ],
+  "links": [
+    "module-to-hub",
+    "hub-to-module",
+    "hub-to-hub"
+  ],
+  "entries": [
+    {
+      "id": "raw",
+      "parent": null,
+      "direction": "up",
+      "links": [
+        "module-to-hub",
+        "hub-to-hub"
+      ],
+      "delivery": "at-least-once",
+      "stored": true,
+      "expires": false,
+      "description": "Values and events as collected from a source, before curation. Stored and forwarded; replayed with original source times."
+    },
+    {
+      "id": "curated",
+      "parent": null,
+      "direction": "up",
+      "links": [
+        "module-to-hub",
+        "hub-to-hub"
+      ],
+      "delivery": "at-least-once",
+      "stored": true,
+      "expires": false,
+      "description": "Curated records and data products. Relaxed."
+    },
+    {
+      "id": "historical",
+      "parent": null,
+      "direction": "up",
+      "links": [
+        "module-to-hub",
+        "hub-to-hub"
+      ],
+      "delivery": "at-least-once",
+      "stored": true,
+      "expires": false,
+      "description": "Bulk history and backfill. Slow; may be sent in scheduled windows."
+    },
+    {
+      "id": "alarm",
+      "parent": null,
+      "direction": "up",
+      "links": [
+        "module-to-hub",
+        "hub-to-hub"
+      ],
+      "delivery": "at-least-once",
+      "stored": true,
+      "expires": false,
+      "description": "Alarms, interlock and safety-related states. Tighter than raw; always sent at once."
+    },
+    {
+      "id": "audit",
+      "parent": null,
+      "direction": "up",
+      "links": [
+        "module-to-hub",
+        "hub-to-hub"
+      ],
+      "delivery": "at-least-once",
+      "stored": true,
+      "expires": false,
+      "description": "Audit records. Always flow upward; never pruned when a buffer fills."
+    },
+    {
+      "id": "status",
+      "parent": null,
+      "direction": "up",
+      "links": [
+        "module-to-hub",
+        "hub-to-hub"
+      ],
+      "delivery": "at-least-once",
+      "stored": false,
+      "expires": false,
+      "description": "A module's or hub's own state: health, the goodbye, the last will."
+    },
+    {
+      "id": "control",
+      "parent": null,
+      "direction": "down",
+      "links": [
+        "hub-to-module"
+      ],
+      "delivery": "at-most-once",
+      "stored": false,
+      "expires": true,
+      "description": "Commands: writes to a tag in a process controller (PLC or HMI) that directly affect a process. Never stored; a late one is refused."
+    },
+    {
+      "id": "write-back",
+      "parent": null,
+      "direction": "down",
+      "links": [
+        "hub-to-module",
+        "hub-to-hub"
+      ],
+      "delivery": "once-only",
+      "stored": true,
+      "expires": false,
+      "description": "Messages to a business system. Delivered and confirmed once and only once; kept while a link is down; does not expire as a command does."
+    },
+    {
+      "id": "config",
+      "parent": null,
+      "direction": "down",
+      "links": [
+        "hub-to-module",
+        "hub-to-hub"
+      ],
+      "delivery": "latest-wins",
+      "stored": true,
+      "expires": false,
+      "description": "What a hub pushes to set up what is below it: configuration, promoted flows and specs, role assignments, limits. Only the newest matters; kept until delivered."
+    },
+    {
+      "id": "security",
+      "parent": null,
+      "direction": "down",
+      "links": [
+        "hub-to-module",
+        "hub-to-hub"
+      ],
+      "delivery": "at-most-once",
+      "stored": false,
+      "expires": false,
+      "description": "Credentials, token renewal and revocation. Highest priority; never stored in clear; never replayed."
+    },
+    {
+      "id": "live",
+      "parent": null,
+      "direction": "up",
+      "links": [
+        "module-to-hub",
+        "hub-to-hub"
+      ],
+      "delivery": "latest-wins",
+      "stored": false,
+      "expires": true,
+      "description": "Live values for screens. The latest value wins; never stored; a late update is dropped."
+    },
+    {
+      "id": "request",
+      "parent": null,
+      "direction": "both",
+      "links": [
+        "module-to-hub",
+        "hub-to-module",
+        "hub-to-hub"
+      ],
+      "delivery": "request-response",
+      "stored": false,
+      "expires": true,
+      "description": "A question that expects an answer within a deadline: collect on demand, a query. Never stored."
+    },
+    {
+      "id": "artifact",
+      "parent": null,
+      "direction": "both",
+      "links": [
+        "module-to-hub",
+        "hub-to-module",
+        "hub-to-hub"
+      ],
+      "delivery": "resumable",
+      "stored": true,
+      "expires": false,
+      "description": "Large objects rather than records: files, model files, flow packages. Sent in pieces, resumable, verified by hash."
+    }
+  ],
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "8d58d34f13f0653cf1e46ec3df61a3696f3abc6237c6a893e9f82161a9de5e04",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-19T22:06:45Z"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "list": "pruning-strategies",
+  "title": "Store-and-forward pruning strategies",
+  "description": "What a module does when its store-and-forward buffer is full. A module spec declares the strategies it supports; the hub admin chooses one. Whatever the strategy, every loss is counted and shown, and the audit class is never pruned (owner, 2026-11-19, FB-153; amends T-6).",
+  "entries": [
+    {
+      "id": "drop-oldest",
+      "default": true,
+      "description": "The oldest records go first, so the newest picture of the process is always kept."
+    },
+    {
+      "id": "by-class-priority",
+      "default": false,
+      "description": "The lowest-priority data class is pruned first, oldest first within it; audit never."
+    }
+  ],
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "59d005c98cb691aa361e80c3ca54b97b717ab5b1e4aa30e2a87bb364ddd17db7",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-19T22:06:45Z"
+  }
+}

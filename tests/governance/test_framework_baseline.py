@@ -32,7 +32,11 @@ SUMMARY = (DOCS / "README.md").read_text(encoding="utf-8")
 
 #: Not frameworks with specs of their own: the engine every runner is built on, and the
 #: hash framework, which governs the integrity block of every other framework's specs.
-INFRASTRUCTURE = {"shared": "the shared runner", "fhts": "the hash framework"}
+INFRASTRUCTURE = {
+    "shared": "the shared runner",
+    "fhts": "the hash framework",
+    "lists": "the governed lists specs choose from (FB-153)",
+}
 #: A documentation page that says "Planned", and nothing in the code.
 PLANNED = ("fdts", "flts", "fnts", "fots", "fpts", "fqts", "fsts")
 BUILT = tuple(sorted(FRAMEWORKS))
