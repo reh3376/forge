@@ -1548,29 +1548,18 @@ class FACTSRunner(FxTSRunner):
     # ------------------------------------------------------------------
 
     def _check_integrity(self, spec: dict[str, Any]) -> list[FxTSVerdict]:
-        """Check FHTS integrity block — hash present, verified, approved."""
+        """The format of the recorded hash.
+
+        Whether a spec carries a hash at all, whether it verifies and whether the owner
+        approved it are the two verdicts every framework gets from the shared runner
+        (``facts:hash-verified``, ``facts:hash-approved``; D-14, F-4). FACTS's own
+        ``integrity-present`` and ``integrity-hash-state`` said the same thing less
+        strictly and are gone (FB-149).
+        """
         verdicts: list[FxTSVerdict] = []
         integrity = spec.get("integrity")
-
-        if integrity is None:
-            verdicts.append(
-                FxTSVerdict(
-                    check_id="facts:integrity-present",
-                    spec_ref="FACTS/integrity",
-                    status=VerdictStatus.SKIP,
-                    message="No integrity block — FHTS checks skipped.",
-                )
-            )
-            return verdicts
-
-        verdicts.append(
-            FxTSVerdict(
-                check_id="facts:integrity-present",
-                spec_ref="FACTS/integrity",
-                status=VerdictStatus.PASS,
-                message="Integrity block present.",
-            )
-        )
+        if not isinstance(integrity, dict):
+            return verdicts  # the shared verdicts fail a spec with no integrity block
 
         # Hash present and valid format
         spec_hash = integrity.get("spec_hash")
@@ -1596,46 +1585,6 @@ class FACTSRunner(FxTSRunner):
                     spec_ref="FACTS/integrity/spec_hash",
                     status=VerdictStatus.PASS,
                     message=f"spec_hash format valid: {spec_hash[:16]}...",
-                )
-            )
-
-        # Hash state
-        state = integrity.get("hash_state", "unknown")
-        if state == "approved":
-            verdicts.append(
-                FxTSVerdict(
-                    check_id="facts:integrity-hash-state",
-                    spec_ref="FACTS/integrity/hash_state",
-                    status=VerdictStatus.PASS,
-                    message="hash_state is 'approved'.",
-                )
-            )
-        elif state in ("modified", "pending_review"):
-            verdicts.append(
-                FxTSVerdict(
-                    check_id="facts:integrity-hash-state",
-                    spec_ref="FACTS/integrity/hash_state",
-                    status=VerdictStatus.FAIL,
-                    message=f"hash_state is '{state}' — requires approval before deployment.",
-                    violations=[
-                        SpecViolation(
-                            field="integrity.hash_state",
-                            expected="approved",
-                            actual=state,
-                            message="Unapproved hash state.",
-                            severity="warning",
-                        )
-                    ],
-                )
-            )
-        else:
-            verdicts.append(
-                FxTSVerdict(
-                    check_id="facts:integrity-hash-state",
-                    spec_ref="FACTS/integrity/hash_state",
-                    status=VerdictStatus.PASS,
-                    message=f"hash_state is '{state}'.",
-                    evidence={"hash_state": state},
                 )
             )
 

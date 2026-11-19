@@ -124,21 +124,21 @@ class TestRunnerVerdicts:
     """The FACTS runner's view of the spec after FB-073."""
 
     def test_integrity_checks(self, spec: dict, verdicts: dict) -> None:
-        assert verdicts["facts:integrity-present"].status is VerdictStatus.PASS
+        assert verdicts["facts:hash-verified"].status is VerdictStatus.PASS
         assert verdicts["facts:integrity-hash-format"].status is VerdictStatus.PASS
         expected = (
             VerdictStatus.PASS
             if spec["integrity"]["hash_state"] == "approved"
             else VerdictStatus.FAIL
         )
-        assert verdicts["facts:integrity-hash-state"].status is expected
+        assert verdicts["facts:hash-approved"].status is expected
 
     def test_only_known_vocabulary_gaps_fail(self, verdicts: dict) -> None:
         statuses = {v.status for v in verdicts.values()}
         assert VerdictStatus.ERROR not in statuses
         assert VerdictStatus.NOT_IMPLEMENTED not in statuses
         failed = {cid for cid, v in verdicts.items() if v.status is VerdictStatus.FAIL}
-        unexpected = failed - KNOWN_VOCABULARY_FAILURES - {"facts:integrity-hash-state"}
+        unexpected = failed - KNOWN_VOCABULARY_FAILURES - {"facts:hash-approved"}
         assert unexpected == set(), unexpected
 
 

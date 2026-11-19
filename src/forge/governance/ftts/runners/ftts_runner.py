@@ -1144,15 +1144,10 @@ class FTTSRunner(FxTSRunner):
         verdicts: list[FxTSVerdict] = []
         integrity = spec.get("integrity")
 
-        if integrity is None:
-            verdicts.append(
-                FxTSVerdict(
-                    check_id="ftts:integrity-present",
-                    spec_ref="FTTS/integrity",
-                    status=VerdictStatus.PASS,
-                    message="No integrity block — hash verification deferred.",
-                )
-            )
+        if not isinstance(integrity, dict):
+            # A spec with no integrity block is failed by the two verdicts every
+            # framework gets from the shared runner (D-14, F-4); it was passed here as
+            # "deferred" before FB-149.
             return verdicts
 
         # hash_state

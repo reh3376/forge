@@ -1,5 +1,10 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { INestApplication, ValidationPipe } from "@nestjs/common";
+import {
+  ConsoleLogger,
+  INestApplication,
+  ValidationPipe,
+} from "@nestjs/common";
+import { randomBytes } from "crypto";
 import { ConfigModule } from "@nestjs/config";
 import request from "supertest";
 import { PrismaService } from "../../prisma/prisma.service";
@@ -50,6 +55,12 @@ describe("EnzymeConfiguration API (e2e)", () => {
   };
 
   beforeAll(async () => {
+    // This suite loads the real AuthModule, which needs a JWT signing secret. No vault
+    // and no secret are configured for a test run, so give it one made for this run
+    // (never a fixed value): without it the secrets service logged an error for a
+    // secret that a test has no reason to have.
+    process.env.JwtSecretKey ??= randomBytes(32).toString("hex");
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({ isGlobal: true }),
@@ -97,6 +108,11 @@ describe("EnzymeConfiguration API (e2e)", () => {
         },
       ],
     })
+      // Nest's default testing logger drops every warning while a test module is built
+      // and prints errors only. The real secrets factory runs during that build, so its
+      // "no vault configured" warning was swallowed. Print warnings too: something that
+      // is not configured is said once as a warning, never hidden (BACKLOG FB-166).
+      .setLogger(new ConsoleLogger())
       .overrideProvider(PrismaService)
       .useValue({
         enzymeConfiguration: {
@@ -822,13 +838,14 @@ describe("EnzymeConfiguration API (e2e)", () => {
 
       it("should create multiple configurations successfully", async () => {
         // Mock item lookup to succeed for bulk items
-        (jest.spyOn(prismaService.item, "findUnique") as jest.SpyInstance)
-          .mockResolvedValue({
-            id: bulkItemId1,
-            itemName: "Bulk Enzyme 1",
-            itemNumber: "ENZ-B01",
-            active: true,
-          } as any);
+        (
+          jest.spyOn(prismaService.item, "findUnique") as jest.SpyInstance
+        ).mockResolvedValue({
+          id: bulkItemId1,
+          itemName: "Bulk Enzyme 1",
+          itemNumber: "ENZ-B01",
+          active: true,
+        } as any);
 
         // Mock findUnique to return null for duplicate checks (both id and itemId)
         (
@@ -846,7 +863,11 @@ describe("EnzymeConfiguration API (e2e)", () => {
           instructions: "Bulk enzyme 1",
           active: true,
           createdBy: "test-user",
-          item: { id: bulkItemId1, itemName: "Bulk Enzyme 1", itemNumber: "ENZ-B01" },
+          item: {
+            id: bulkItemId1,
+            itemName: "Bulk Enzyme 1",
+            itemNumber: "ENZ-B01",
+          },
         };
         const mockConfig2 = {
           id: bulkConfigId2,
@@ -856,7 +877,11 @@ describe("EnzymeConfiguration API (e2e)", () => {
           instructions: "Bulk enzyme 2",
           active: true,
           createdBy: "test-user",
-          item: { id: bulkItemId2, itemName: "Bulk Enzyme 2", itemNumber: "ENZ-B02" },
+          item: {
+            id: bulkItemId2,
+            itemName: "Bulk Enzyme 2",
+            itemNumber: "ENZ-B02",
+          },
         };
 
         jest
@@ -881,13 +906,14 @@ describe("EnzymeConfiguration API (e2e)", () => {
 
       it("should handle partial failures in bulk create", async () => {
         // Mock item lookup to succeed
-        (jest.spyOn(prismaService.item, "findUnique") as jest.SpyInstance)
-          .mockResolvedValue({
-            id: bulkItemId1,
-            itemName: "Bulk Enzyme 1",
-            itemNumber: "ENZ-B01",
-            active: true,
-          } as any);
+        (
+          jest.spyOn(prismaService.item, "findUnique") as jest.SpyInstance
+        ).mockResolvedValue({
+          id: bulkItemId1,
+          itemName: "Bulk Enzyme 1",
+          itemNumber: "ENZ-B01",
+          active: true,
+        } as any);
 
         // First config: no duplicate (null) then succeed create
         // Second config: duplicate found (conflict)
@@ -913,7 +939,11 @@ describe("EnzymeConfiguration API (e2e)", () => {
           instructions: "Bulk enzyme 1",
           active: true,
           createdBy: "test-user",
-          item: { id: bulkItemId1, itemName: "Bulk Enzyme 1", itemNumber: "ENZ-B01" },
+          item: {
+            id: bulkItemId1,
+            itemName: "Bulk Enzyme 1",
+            itemNumber: "ENZ-B01",
+          },
         };
 
         jest
@@ -974,10 +1004,7 @@ describe("EnzymeConfiguration API (e2e)", () => {
           ],
         };
 
-        await makeAuthenticatedRequest(
-          "patch",
-          "/enzyme-configurations/bulk"
-        )
+        await makeAuthenticatedRequest("patch", "/enzyme-configurations/bulk")
           .send(bulkUpdateDto)
           .expect(400);
       });
@@ -998,10 +1025,7 @@ describe("EnzymeConfiguration API (e2e)", () => {
 
         // DELETE /enzyme-configurations/bulk is matched by @Delete(":id") with id="bulk"
         // The controller's remove() method checks @Query("updatedBy") first
-        await makeAuthenticatedRequest(
-          "delete",
-          "/enzyme-configurations/bulk"
-        )
+        await makeAuthenticatedRequest("delete", "/enzyme-configurations/bulk")
           .send(bulkDeleteDto)
           .expect(400);
       });
@@ -1072,13 +1096,14 @@ describe("EnzymeConfiguration API (e2e)", () => {
       const sanitizeItemId = "clzhhlsx30f09mbc9r5mjsanz";
 
       // Mock item lookup for this specific item
-      (jest.spyOn(prismaService.item, "findUnique") as jest.SpyInstance)
-        .mockResolvedValue({
-          id: sanitizeItemId,
-          itemName: "Sanitize Test Enzyme",
-          itemNumber: "ENZ-SAN",
-          active: true,
-        } as any);
+      (
+        jest.spyOn(prismaService.item, "findUnique") as jest.SpyInstance
+      ).mockResolvedValue({
+        id: sanitizeItemId,
+        itemName: "Sanitize Test Enzyme",
+        itemNumber: "ENZ-SAN",
+        active: true,
+      } as any);
 
       // Mock findUnique to return null for both id and itemId checks
       (
@@ -1096,7 +1121,11 @@ describe("EnzymeConfiguration API (e2e)", () => {
         instructions: "Add enzyme carefully",
         active: true,
         createdBy: "user",
-        item: { id: sanitizeItemId, itemName: "Sanitize Test Enzyme", itemNumber: "ENZ-SAN" },
+        item: {
+          id: sanitizeItemId,
+          itemName: "Sanitize Test Enzyme",
+          itemNumber: "ENZ-SAN",
+        },
       };
 
       jest
