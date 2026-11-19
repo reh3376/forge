@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-13` against the repository `reh3376/forge` at the merge of PR 95 (branch `main`): every slide reviewed against the tree and the key documents (FB-114), the three-layer process control framework (D-11) added to both tracks.
+`Last verified: 2026-11-19` against the repository `reh3376/forge` at the merge of PR 120 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-13 (FB-114).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -48,7 +48,7 @@ note:
 
 | § | Section | Target | What you leave with |
 |---|---|---:|---|
-| [F1](#f1--opening) | Opening: definition, thesis, the twelve problems, the finished system, honest state, the key docs | ~12 min | the shape of the platform and how to read its documents |
+| [F1](#f1--opening) | Opening: definition, thesis, the twelve problems, the vocabulary, the finished system, one value end to end, honest state, the key docs | ~15 min | the shape of the platform and how to read its documents |
 | [F2](#f2--the-hub-spoke-contract) | The hub ↔ spoke contract: `AdapterService`, `ContextualRecord`, transport, ingest | ~12 min | what crosses the hub boundary and how |
 | [F3](#f3--storage-and-the-hubs-databases) | Storage: hub-owned databases, routing, migrations, Forge-issued credentials | ~8 min | where data lands and who may touch it |
 | [F4](#f4--governance-fxts) | **Spec-first governance** (headline): the four layers, the FxTS family, hashing and the owner's approval | ~14 min | why nothing changes silently |
@@ -90,15 +90,16 @@ note:
 - It turns their output into **one governed record type with manufacturing context attached**.
 - It curates that into **decision-quality data products** with lineage and quality objectives.
 - It renders every operator and management interface **from declarative specifications**.
-- Its own management modules (forge-mes, forge-wms, forge-cmms, forge-ot, …) are **optional**: a site can run Forge purely as the integration and governance layer over the software it already has, or replace that software module by module.
 
 **Why it is built, in the owner's words (2026-11-17):** "Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business."
 
-Forge is also a **governed engineering platform**: contracts between components are machine-checked specifications with hash integrity and owner approval, so that neither people nor AI coding agents can change an interface silently.
+**Forge is a dynamic framework, not a fixed product (A-19).** Manufacturing differs from plant to plant even within one sector, so Forge is instantiated for a facility, a site or an enterprise by customization. That build-out is done in the **forge designer**, where users build with tools and widgets that are each governed by a specification. A user builds only within what the specifications allow.
+
+Forge is also a **governed engineering platform**: every contract between components is a machine-checked specification with a hash that only the owner approves, so that neither people nor AI coding agents can change an interface silently.
 
 note:
-- `docs/VISION.md` §1 verbatim in substance. The vision is written in the present tense about a system that does not fully exist yet; the gap is the work.
-- Hub and spoke is the topology: the hub is `forge-core` (`src/forge`), a spoke is any external system behind an adapter.
+- `docs/VISION.md` §1; decision A-19 in `docs/ROADMAP.md` §1.
+- The vision is written in the present tense about a system that does not fully exist yet. The gap is the work, and "Where We Are Today" says exactly where it is.
 
 ---
 
@@ -127,16 +128,16 @@ Each is stated as it is experienced in a plant; each has a component that carrie
 | # | Problem | What Forge does about it |
 |---|---|---|
 | P-1 | Every system is an island with its own data shape | hub and spoke: one contract, one record type |
-| P-2 | Values arrive without context | context is declared per spoke and enforced at ingest |
+| P-2 | Values arrive without context | context is declared per module and enforced at ingest |
 | P-3 | Nothing can be trusted enough to decide on | curation with lineage and quality objectives |
 | P-4 | SCADA and HMI lock the plant to one vendor | an open OT module over OPC-UA; vendor software behind an integration module |
-| P-5 | Integrations are one-off projects that rot | a module SDK and machine-checked contracts as CI gates |
-| P-6 | Writing to the plant floor is unsafe | a defense chain in the core for every write |
+| P-5 | Integrations are one-off projects that rot | a module SDK, machine-checked contracts as CI gates, and integration modules an installation builds itself in the designer |
+| P-6 | Writing to the plant floor is unsafe | a defense chain in the core for every write; a command is never delivered late |
 | P-7 | Contracts change silently, now also by AI agents | hash governance: every spec hashed, only the owner approves |
 | P-8 | Every module ships its own UI | modules describe (FVTS), forge-display renders |
 | P-9 | Decisions are not recorded, so their cost is never learned | the decision is a record with its products and lineage |
-| P-10 | Multi-site enterprises break on the WAN | a hub of hubs along ISA-95; sites keep working offline |
-| P-11 | Credentials sprawl and nobody has a role model | the hub owns the databases and issues credentials; scoped roles |
+| P-10 | Multi-site enterprises break on the WAN | a hub of hubs along ISA-95; store and forward; sites keep working offline |
+| P-11 | Credentials sprawl and nobody has a role model | the hub owns the databases; a central credential module; roles scoped per hub |
 | P-12 | There is no production deployment story | Kubernetes per hub; compose is development only |
 
 note:
@@ -144,60 +145,150 @@ note:
 
 ---
 
+## The Vocabulary You Need First
+
+| Term | What it means in Forge |
+|---|---|
+| **Hub** | forge-core (`src/forge`, Python). It owns the transport, the ingest pipeline, the databases, context, curation, governance and the time. Hubs form a hierarchy: area hubs under a site hub under an enterprise hub. |
+| **Module** (also **spoke**) | Anything that registers with a hub. A module speaks `forge.v1.AdapterService` to its hub over gRPC and reaches it no other way (A-1). |
+| **Management module** | A module Forge builds for a business function: `forge-mes`, `forge-wms`, `forge-cmms`, `forge-nms`, `forge-ims`, `forge-historian`, `forge-scanner`. Named `forge-<service>`. |
+| **Integration module** | A module that connects Forge to one third-party product: `forge-integ-erp-netsuite`. Named `forge-integ-<function>-<product>`. Its hub side is gRPC only; its application side uses whatever the product offers (REST, GraphQL, MQTT, OPC UA, SQL, …). Installations build their own in the designer. |
+| **forge-ot** | The plant-floor module: PLC and OPC UA connections, tags, alarms, control writes. |
+| **forge-display** | The one module that produces every user interface, the hub's own included (A-3). It has a run mode (render screens) and a design mode (the designer). It is the first module to be built (A-14). |
+| **ContextualRecord** | The one record type. Every value that enters a hub is one: the value, its quality, its timestamps, and the manufacturing context it belongs to. |
+| **FxTS** | The family of specification frameworks. Each governs one kind of repeatable thing: FACTS a module's data contract, FATS a hub API route, FTTS the transport, FVTS a screen, FMTS what every module must do. Every spec carries a hash the owner approves. |
+| **The owner** | reh3376. Only the owner approves a spec's hash or signs a decision record. |
+
+note:
+- Every module has an alias as well as its id: `wms` for `forge-wms`, `netsuite` for `forge-integ-erp-netsuite`. The alias is in the module's FMTS spec.
+- The management modules were built using existing applications as examples. They are Forge's own modules, not connectors to those applications. The repository names no existing company (A-16); a third-party product that an integration module integrates may be named.
+
+---
+
 ## The Finished System
 
 ```mermaid
 flowchart TD
-  E["Enterprise hub<br/>roles · audit · enterprise spokes"]
-  S["Site hub (forge-core)<br/>transport · ingest · storage · context · registry<br/>curation · gateway · observer · governance · CLI"]
-  E -- "audit up / on demand down" --- S
-  S -- "gRPC" --> SP["Spokes<br/>WMS, CMMS, ERP, NMS, scanners, historian"]
-  S -- "gRPC" --> M["Management modules (Go)<br/>forge-mes, forge-wms, forge-cmms"]
-  S -- "in-process" --> OT["forge-ot<br/>OPC-UA, alarms, writes, scripting"]
-  S -- "FVTS" --> D["forge-display<br/>4 render profiles"]
-  OT -. "optional" .- I["Integration modules<br/>forge-ignition · forge-hmi-scada"]
+  subgraph SITE["Site hub · forge-core"]
+    direction TB
+    SH["transport · ingest · context · curation<br/>governance · module manager"]
+    TA(["TIME AUTHORITY<br/>this hub's clock is the reference<br/>for everything below it"])
+    DB[("Hub-owned databases<br/>PostgreSQL · TimescaleDB · Neo4j · Redis<br/>no module holds its own")]
+    SH --- TA
+    SH --- DB
+  end
+  SM1["forge-cmms<br/>management module"]
+  SM2["forge-integ-erp-netsuite<br/>integration module"]
+  ERP[/"third-party ERP<br/>REST · SQL · …"/]
+  SM1 -- "gRPC AdapterService<br/>time contract: on every Register, Health and Ingest<br/>the module sends T1, the hub answers T2 and T3,<br/>the module measures its offset and reports it;<br/>a clock outside its class is refused" --> SH
+  SM2 -- "gRPC AdapterService" --> SH
+  SM2 -. "the product's own protocol;<br/>its clock is measured too" .- ERP
+
+  subgraph A1["Area hub 1 · forge-core"]
+    AH1["a hub like the site hub<br/>with its own databases and roles"]
+  end
+  subgraph A2["Area hub 2 · forge-core"]
+    AH2["a hub like the site hub<br/>with its own databases and roles"]
+  end
+  AH1 == "same contract: a hub is a module to its parent<br/>reporting and history up · time down<br/>STORE AND FORWARD: while the link is down the area hub<br/>buffers, then replays in order with original timestamps" ==> SH
+  AH2 == "same contract" ==> SH
+
+  M11["forge-mes<br/>management module"] -- "gRPC" --> AH1
+  M12["forge-integ-lims-&lt;product&gt;<br/>integration module"] -- "gRPC" --> AH1
+  M21["forge-wms<br/>management module"] -- "gRPC" --> AH2
+  M22["forge-integ-qms-&lt;product&gt;<br/>integration module"] -- "gRPC" --> AH2
+  OT["forge-ot · plant floor<br/>PLCs · OPC UA · alarms · writes"] -- "gRPC" --> AH1
+  D["forge-display<br/>every screen, from FVTS specs"] -. "renders for every hub" .- SH
 ```
 
-| Layer of the hub | What it is when complete |
-|---|---|
-| Transport | `forge.v1.AdapterService` over gRPC with TLS/mTLS both ways; push, pull, write-back, discovery |
-| Ingest | validates manifest against the spoke's FACTS spec (hash verified), validates each record, routes, logs, feeds curation |
-| Storage | hub-owned PostgreSQL, TimescaleDB, Neo4j, Redis; versioned migrations; modules never connect on their own credentials |
-| Context Engine · Schema Registry | enrichment and the context field registry; versioned schemas and compatibility rules |
-| Curation | normalization, data products, per-product pipelines, lineage, quality monitoring |
-| Gateway · Hub API · Observer · CLI | auth and scoped RBAC; REST for operators and modules; health and SLOs; `forge` |
-| Governance · Federation | the FxTS suite as CI gates with FHTS hashing; hub of hubs |
+How to read it:
+
+- **Three hubs, each with two modules.** Every hub is the same software (forge-core). An area hub serves the modules that run that area's processes; the site hub serves site-wide functions and collects from the area hubs.
+- **Two kinds of module on each hub.** A management module is Forge's own; an integration module connects one third-party product.
+- **The time contract is on every link.** The site hub is the time authority. Each exchange carries four timestamps, so both sides know the offset between their clocks. A clock outside its tolerance class is refused, never silently corrected. It reaches down to PLC connections and across to databases and third-party systems.
+- **Store and forward is on every link.** A module or a child hub that cannot reach its parent keeps what it could not deliver and replays it in order. Commands going down are the opposite: never stored, and they expire.
+- **The hub owns the databases.** A module gets a Forge-issued credential to its own schema and holds no connection of its own.
 
 note:
-- `docs/VISION.md` §3. The diagram is the finished system; F1's next sub-section says which boxes exist today.
+- `docs/VISION.md` §3. This is the finished system; the next slide says which boxes exist today.
+- The link rules are the signed transport contract, `docs/decisions/transport-contract.md` (D-15). The time rules are `docs/decisions/one-clock-ot-source-time.md` (D-9) and the time contract in `docs/decisions/forge-module-requirements.md` (D-12). F2 and F9 go through them.
+- Hub-to-hub links carry reporting and history and tolerate delay; nothing between hubs may be needed for a module to keep controlling its process.
+
+---
+
+## One Value, End to End
+
+How the pieces work together, following one temperature reading from a PLC to a decision.
+
+| Step | What happens | Where |
+|---|---|---|
+| 1 | A PLC produces a value. forge-ot reads it over OPC UA with the server's own timestamp, and has measured that server's clock. | F5, F9 |
+| 2 | forge-ot builds a **ContextualRecord**: value, quality code, source time corrected by the measured offset, and context (site, area, equipment). | F2, F7 |
+| 3 | forge-ot sends it to its hub with **Ingest** over gRPC. The same call is a time exchange and a probe of forge-ot's own clock. | F2, F9 |
+| 4 | The hub checks the module (its FACTS spec matches its manifest, its clock is within its class), stamps receipt with the hub's clock, validates the record and refuses what is wrong, with a cause. | F2, F4 |
+| 5 | The hub routes the record to the right database by its type and writes it. The module never touches a database. | F3 |
+| 6 | The Context Engine enriches it (lot, batch, shift, operating mode). Curation turns many records into a **data product** with lineage and a quality score. | F7 |
+| 7 | forge-display renders it on a screen from the module's FVTS spec. A person decides; the **decision** is a record too, with what was known. | F6, F7 |
+| 8 | If the decision is a write to the plant, it goes back down as a command through the write defense chain, with an expiry. | F5 |
+
+At every step a specification says what is allowed and a hash says the specification has not changed without the owner.
+
+note:
+- This table is the map of the deck: each row names the section that explains it.
+- Steps 1 to 5 run today. Step 6 runs in part. Step 7's renderer does not exist yet. Step 8's defense chain exists; command expiry is decided and not built.
 
 ---
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md` §1, the snapshot at PR 95:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 120:
 
-1. The **hub ↔ spoke contract works end to end**: a spoke registers, is checked against its FACTS spec, pushes records that are persisted, is pulled (Collect, Backfill, Subscribe) and receives write-backs, over TLS/mTLS both ways with per-spoke tokens.
-2. The **OT module runs inside the hub** with OPC-UA connections, a tag engine, the full control-write defense chain (the ISA-18.2 alarm package exists but the host does not compose it yet, FB-115), and drives the MES changeover sequence including the PLC CIP runner. Since the one-clock steps of 2026-11-13 no record builder invents a source time, the OPC-UA server's clock is read and every stamp corrected by its measured offset, and every spoke declares how it is time-governed in its FACTS contract (FB-088, FB-094, FB-090).
-3. **forge-mes is Go and not yet built**: the imported NestJS backend and Next.js frontend stand in as the interim bridge and speak the spoke contract; the Go rewrite (FB-076) is decided and designed (`docs/decisions/forge-mes-go.md`, signed 2026-11-03); the Go SDK scaffold is its first step.
-4. **Governance is real for five frameworks** (FATS, FACTS, FTTS, FVTS, and FMTS since 2026-11-17, with a spec for each of the nine modules, eight of them approved by the owner on 2026-11-18) plus FHTS hashing; the other seven are planned. forge-display does not exist yet, and it is the first module to be built (owner, 2026-11-17: it builds the frontend of the whole platform, the hub's UI included); its contract (FVTS) does, with a runner and golden messages.
-5. **Not yet**: scoped roles in the gateway, `mod_mes` in the hub, the Go module SDK, the hub-of-hubs federation, Kubernetes, and any management module in Go.
-6. **The three-layer process control framework** (PC-L1 PID in the PLC, PC-L2 MPC, PC-L3 SME agents) is decided and signed by the owner (D-11, 2026-11-13); nothing of it is built, and nothing is built before its FSDs (F5).
+**Working**
 
-| Measure | Value (2026-11-13) |
+1. **The hub-to-module contract works end to end.** A module registers, is checked against its FACTS spec, pushes records that are persisted, is pulled (Collect, Backfill, Subscribe) and receives write-backs, over TLS/mTLS both ways with per-module tokens.
+2. **One clock is enforced on the links that exist.** Every Register, Health and Ingest is a time exchange. The hub refuses a module whose clock is outside its class or that reports no measurement; forge-ot does the same to each PLC connection. No record builder invents a source time.
+3. **forge-ot runs inside the hub**: OPC UA connections, the tag engine, the control-write defense chain, and the MES changeover sequence.
+4. **Governance is real for five frameworks** (FACTS, FATS, FTTS, FVTS, FMTS) plus FHTS hashing. All 48 specs carry a hash; 46 are approved by the owner. A run fails in every framework when a hash does not verify or is not approved. A test checks every framework against ten requirements on every run.
+5. **Every module is checked against the module requirements.** Nine modules have an FMTS spec; eight are approved. A conformance kit runs each Python module against a reference hub with its clock set wrong, to prove it stops and says why.
+
+**The modules, as they are**
+
+| Module | What exists today |
+|---|---|
+| forge-ot | a Python module hosted in the hub; the most complete |
+| forge-wms, forge-cmms, forge-nms, forge-ims, forge-historian, forge-scanner | each a Python adapter that holds the module's data contract (sources, context mapping, record shapes). The module's own logic, storage and screens are not built. The target is a Go module with Python scripting. |
+| forge-integ-erp-netsuite | a hand-written integration adapter, the forerunner of what the designer will let an installation build |
+| forge-mes | the **interim MES bridge**: an imported NestJS backend and Next.js frontend that speak the contract until the Go forge-mes exists. Its module spec is not approved. |
+| forge-display | does not exist. Its contract (FVTS), a runner, a reference renderer and example messages do. |
+
+**Decided and signed, not built**
+
+| What | Record |
+|---|---|
+| The module requirements, eleven of them, and the time contract | D-12 (the checker is built; the hub does not yet demand an approved spec at Register) |
+| The integration module builder and the designer | D-13 |
+| What every FxTS framework provides | D-14 (four of five steps built; schema versions and hashes are not) |
+| The transport contract: versioning, delivery, store and forward, command expiry, security | D-15 |
+| The three-layer process control framework | D-11 |
+
+**Not built at all**: forge-display, any module in Go and the Go SDK, scoped roles in the gateway, the credential module (forge-creds), the hub hierarchy, Kubernetes deployment.
+
+| Measure | Value (2026-11-19) |
 |---|---|
 | Python hub (`src/forge`) | 354 files, ~74,100 lines |
-| Python tests | 277 files, 4,794 collected, full suite green on the locked dependency set |
+| Python tests | 279 files, 4,834 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
-| Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend, kept until the Go forge-mes and forge-display land |
+| Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
+| `AdapterService` RPCs | 12 |
 | Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
 | Storage migrations | 12 |
-| FACTS specs · FATS specs · FVTS specs | 9 · 28 · 1 |
-| Backlog | 114 items recorded; every finding fixed or recorded |
+| Specs | 9 FACTS · 28 FATS · 9 FMTS · 1 FTTS · 1 FVTS |
+| Signed decision records | 9 |
+| Backlog | 170 items recorded, 75 done; every finding is fixed or recorded |
 
 note:
-- Wording rule from the owner: the NestJS/Next.js code under `modules/Forge MES` is "the interim MES bridge"; forge-mes is the Go module that FB-076 builds. Never "TypeScript forge-mes".
-- The numbers move with every push; `docs/WHERE-WE-ARE.md` §2 is current before each one.
+- Wording rule from the owner: the NestJS/Next.js code under `modules/Forge MES` is "the interim MES bridge"; forge-mes is the Go module that replaces it. Never "TypeScript forge-mes".
+- The numbers move with every push; `docs/WHERE-WE-ARE.md` §2 is current before each one, and a test fails if this deck's date and that document's disagree.
 
 ---
 
@@ -205,24 +296,40 @@ note:
 
 ```mermaid
 flowchart LR
-  V["VISION.md<br/>what Forge is when complete"] --> G["WHERE-WE-ARE-GOING.md<br/>destination, principles, milestones, next, gates"]
-  G --> W["WHERE-WE-ARE.md<br/>the snapshot, component by component"]
-  R["ROADMAP.md<br/>decisions in force, workstreams, sequence, decision queue"] --> G
-  B["BACKLOG.md<br/>every open and closed item"] --> W
+  C["CLAUDE.md<br/>what Forge is, the goal,<br/>the rules that hold every session"] --> W
+  V["VISION.md<br/>what Forge is when complete"] --> G["WHERE-WE-ARE-GOING.md<br/>destination, milestones, next"]
+  G --> W["WHERE-WE-ARE.md<br/>the snapshot · read this first, every time"]
+  R["ROADMAP.md<br/>decisions in force A-1 … A-20<br/>signed records D-1 … D-15"] --> G
+  DR["docs/decisions/<br/>the nine signed design records"] --> R
+  B["BACKLOG.md<br/>every known problem, FB-nnn"] --> W
   P["PRINCIPLES.md<br/>what does not change with the code"] --> V
+  F["docs/FxTS/README.md<br/>every FxTS framework: what it governs,<br/>its state, its specs · one page per framework"] --> W
+  DR --> F
 ```
 
-- **`VISION.md`** changes only when a decision in `ROADMAP.md` §1 changes.
-- **`WHERE-WE-ARE-GOING.md`** changes when a milestone or the sequence changes.
-- **`WHERE-WE-ARE.md`** changes **before any push** that changes the state it describes (rule since 2026-10-16).
-- **`ROADMAP.md`** holds decisions in force (A-1 … A-10, R-1 … R-19), the workstreams, the proposed sequence and the owner's decision queue (D-1 …).
-- **`BACKLOG.md`** is the unit of work: one item per PR; a finding is fixed or recorded, never skipped.
-- **`PRINCIPLES.md`** holds the design principles, technical invariants, the governance pattern, the decision frame, adapter tiers, technology choices and lessons that still bind.
+- **`CLAUDE.md`** (repository root) is what every coding agent reads first: what Forge is, why, the goal, the architecture rules and the workflow.
+- **`WHERE-WE-ARE.md`** is the current state. Its "Pick-up point" paragraph says what was done last and what comes next. It changes **before every push**.
+- **`ROADMAP.md`** §1 holds the decisions in force (A-1 to A-20). §5 lists the signed records (D-1 to D-15).
+- **`docs/decisions/`** holds the signed design records. Each was decided by the owner one question at a time; a signed record is changed only by the owner.
+- **`docs/FxTS/README.md`** is the summary of the specification frameworks: which exist, what each governs, its real state and its spec count, with a page per framework (`FACTS.md`, `FATS.md`, `FMTS.md`, `FTTS.md`, `FVTS.md`, `FHTS.md`, and the planned ones). A test keeps it true to the code.
+- **`BACKLOG.md`** is the unit of work: one item per pull request; a finding is fixed or recorded, never skipped.
+- **`VISION.md`** and **`PRINCIPLES.md`** change rarely: the finished product, and what does not change with the code.
 
-Design records for decisions the owner must sign live in `docs/decisions/` (`roles.md`, `forge-mes-go.md`, `one-clock-ot-source-time.md`, `one-schema-registry.md`, `process-control-framework.md`, all signed); an agent-facing context document accompanies the last in `docs/personal/`.
+| Signed record | What it decides |
+|---|---|
+| `roles.md` (D-1) | the role model: scoped roles, per-module roles, the hub hierarchy |
+| `forge-mes-go.md` (D-3) | the Go design of forge-mes and the module layout |
+| `one-clock-ot-source-time.md` (D-9) | one clock: measuring, tolerance classes, failing closed |
+| `one-schema-registry.md` (D-10) | one schema registry |
+| `process-control-framework.md` (D-11) | three layers of process control |
+| `forge-module-requirements.md` (D-12) | what every module must do; the time contract; FMTS |
+| `integration-module-builder.md` (D-13) | integration modules built on site in the designer |
+| `fxts-framework-baseline.md` (D-14) | what every FxTS framework provides |
+| `transport-contract.md` (D-15) | the hub-to-module transport contract |
 
 note:
-- `docs/WHERE-WE-ARE-GOING.md` §6 is the reading guide. A newcomer reads VISION once, GOING once, and WHERE-WE-ARE every time.
+- These documents are the authority (A-12). Where guidance injected into a coding session disagrees with them, the documents win.
+- A newcomer reads `CLAUDE.md` and VISION once, then `WHERE-WE-ARE.md` every time.
 
 ---
 
@@ -230,33 +337,34 @@ note:
 
 | Path | What lives there |
 |---|---|
-| `src/forge/core` | `ContextualRecord`, decisions, adapters, manufacturing entities (ISA-95 hierarchy), the embedded MQTT broker, the context field registry, the schema-reference grammar, the clock helpers |
-| `src/forge/transport` · `proto` · `proto_gen` | the gRPC hub and spoke sides, the proto set and the generated Python bindings |
+| `src/forge/core` | `ContextualRecord`, decisions, adapters, manufacturing entities (ISA-95 hierarchy), the embedded MQTT broker, the context field registry, the schema-reference grammar, the clock (`clock.py`: time exchange, offsets, the gates) |
+| `src/forge/transport` · `proto` · `proto_gen` | the gRPC hub and module sides, the proto set and the generated Python bindings |
 | `src/forge/ingest` | the ingest pipeline, the FACTS check at Register, receipt stamping |
 | `src/forge/storage` | router, factory, engines (PostgreSQL, TimescaleDB, Neo4j, Redis), access control, migrations |
 | `src/forge/context` · `registry` · `curation` | Context Engine, Schema Registry, curation (normalization, data products, pipeline, lineage, quality) |
-| `src/forge/governance` | FxTS: schemas, runners, specs, the shared hashing runner |
+| `src/forge/governance` | FxTS: one directory per built framework (`facts`, `fats`, `fmts`, `ftts`, `fvts`), each with `schema/`, `runners/`, `specs/`; `shared/` is the runner every framework is built on; `fhts/` is the hash framework; `fmts/conformance.py` is the conformance kit |
 | `src/forge/gateway` · `api` · `observer` · `cli` | auth and RBAC middleware, the hub FastAPI app, health, the `forge` CLI |
-| `src/forge/modules/ot` | the OT module: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
+| `src/forge/modules/ot` | forge-ot: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
 | `src/forge/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
-| `src/forge/adapters` | the eight in-repo spoke adapters (forge-wms, forge-mes, forge-cmms, forge-integ-erp-netsuite, forge-nms, forge-ims, forge-historian, forge-scanner), each with its manifest and config, and four generic adapter stubs |
+| `src/forge/adapters` | the Python adapters of eight modules (`forge_wms`, `forge_mes`, `forge_cmms`, `forge_nms`, `forge_ims`, `forge_historian`, `forge_scanner`, `forge_integ_erp_netsuite`), each with its manifest and config, and four empty generic packages (FB-148) |
 | `go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
-| `modules/Forge MES` | the interim MES bridge (NestJS + Next.js) that FB-076 retires |
-| `tests/` | 267 files mirroring `src/`; migration tests read the migration source |
-| `docs/` | the key docs, `FxTS/` framework pages, `decisions/`, `deployment/` (clock discipline), `governance/`, `core/`, `spokes/`, `p7-forge-ot/`, `personal/` (agent context) |
+| `modules/Forge MES` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
+| `tests/` | 279 files mirroring `src/`; `tests/governance/` holds the gates of every framework |
+| `docs/` | the key documents, `FxTS/` (the framework pages), `decisions/` (the signed records), `deployment/`, `governance/`, `tutorial.md` (this deck's source) |
 | `deploy/docker` | the development compose stack and the hub image |
 
 note:
-- `README.md` "Project Structure" has the file-level tree. Note that two README tree comments still carry old names for FATS and FHTS; the framework pages under `docs/FxTS/` are the authority.
+- `README.md` "Project Structure" has the file-level tree. The README and the repository's About text are due a rewrite (FB-156).
 
 ---
 
 ## F1 Recap → F2
 
-- Forge: one governed record type, context attached, curated into data products, interfaces rendered from specs, contracts hashed and owner-approved.
-- Twelve problems, each carried by a named component with a definition of solved.
-- Today: the contract works end to end, the OT module runs in the hub, governance is real for five frameworks; forge-display, forge-mes in Go, scoped roles, federation and Kubernetes are not built. forge-display is the first module to be built (owner, 2026-11-17).
-- Read VISION once, GOING once, WHERE-WE-ARE every time.
+- Forge: one governed record type with context, curated into data products, every interface rendered from a spec, every contract hashed and owner-approved. A dynamic framework that each installation builds out in the designer.
+- A hub and its modules; hubs in a hierarchy. Management modules are Forge's own; integration modules connect third-party products.
+- Time and store and forward are on every link; the hub owns the databases.
+- Today: the contract and one clock work, forge-ot runs in the hub, five specification frameworks are real and every spec is hashed. forge-display, modules in Go, scoped roles, the hub hierarchy and Kubernetes are not built. forge-display is first.
+- Read `WHERE-WE-ARE.md` every time.
 
 **Next**: what actually crosses the hub boundary.
 
@@ -334,7 +442,7 @@ note:
 | Per-spoke callback token, scoped hub endpoints | ✅ | FB-063 |
 | Hub → spoke write-back over a session-bound callback | ✅ | FB-054 |
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
-| FTTS transport spec and runner | 🟡 | `src/forge/governance/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18; no `docs/FxTS/FTTS.md` page yet. The transport contract it should become is decided and signed (D-15, `docs/decisions/transport-contract.md`): versioning, delivery, store and forward, command expiry, time-outs, security. None of that is built (FB-164) |
+| FTTS transport spec and runner | ✅ | `src/forge/governance/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18; page `docs/FxTS/FTTS.md`. The transport contract it should become is decided and signed (D-15, `docs/decisions/transport-contract.md`): versioning, delivery, store and forward, command expiry, time-outs, security. None of that is built (FB-164) |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
 | Hub time in the contract: the four-timestamp exchange on Register, Health and Ingest; a reporting spoke measured two-way | ✅ | FB-092 (2026-11-15) |
 | A spoke outside its tolerance, or one that reports no measurement, refused at Register and Ingest | ✅ | FB-093's hub half (2026-11-17; the plant-floor links fail closed since 2026-11-15) |
@@ -710,7 +818,7 @@ note:
 |---|---|
 | The `time_contract` of a module with its hub, every database, every plant-floor device and every third-party system can be declared and is checked for form (FMTS, FB-135); no module declares one yet and nothing reads the clocks of databases or third-party systems | FB-136, FB-138, FB-139 (with FB-117 and FB-120) |
 | The OT FACTS spec fails `facts:schema-valid` and eight vocabulary checks | FB-079, D-8 |
-| What a framework must provide is decided and signed (2026-11-18, D-14: ten requirements). Done: every spec carries a hash the owner approved (all but two), and a run fails in every framework when a hash does not verify or is not approved. Not done: no schema is hashed or versioned beyond its id; FTTS has no page; the FATS specs declare no request or response shapes; the transport spec is still to be thought through for edge cases; the test that checks a framework against the ten | FB-151, FB-149, FB-162, FB-163 |
+| What a framework must provide is decided and signed (2026-11-18, D-14: ten requirements), and a test checks every framework against them on every run. Done: every spec carries a hash the owner approved (all but two), and a run fails in every framework when a hash does not verify or is not approved. Not done: no schema is hashed or versioned beyond its id, and no spec records the schema it was approved against; the FATS specs declare no request or response shapes; the transport contract is signed and not built | FB-151, FB-162, FB-164 |
 | FTTS has no documentation page | noted in `docs/WHERE-WE-ARE.md` §3.9 |
 | The OT reference FVTS spec uses invented points and is `pending_review` | FB-078 |
 
@@ -1545,7 +1653,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q -rsx                    # 4,794 tests, ~1 minute; lists each skip with its reason
+uv run pytest tests -q -rsx                    # 4,834 tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -1649,7 +1757,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 277 files, 4,794 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/` mirrors `src/`: 279 files, 4,834 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.

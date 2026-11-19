@@ -163,7 +163,7 @@ Every FxTS framework follows the same structure:
 
 | Framework | Full Name | Scope | CI Gate | Status |
 |-----------|-----------|-------|---------|--------|
-| [FATS](FATS.md) | Forge API Test Specification | API contract verification | Hard-fail | Schema + Runner implemented |
+| [FATS](FATS.md) | Forge API Test Specification | API contract verification | Hard-fail | Schema + Runner implemented; 28 specs, hashed and approved 2026-11-18; thin, to be built out (FB-162) |
 | [FACTS](FACTS.md) | Forge Adapter Conformance Test Specification | Adapter lifecycle and data contracts | Hard-fail | Schema + runner (`facts:schema-valid` + 35 rule checks, enums read from the schema) + 9 specs; 8 validate, the OT spec waits on FB-079 |
 | [FDTS](FDTS.md) | Forge Data Test Specification | Schema evolution and compatibility | Hard-fail | Planned |
 | [FQTS](FQTS.md) | Forge Quality Test Specification | Data quality rules | Hard-fail | Planned |
@@ -173,8 +173,9 @@ Every FxTS framework follows the same structure:
 | [FOTS](FOTS.md) | Forge Observability Test Specification | Pipeline health and SLOs | Soft-fail | Planned |
 | [FPTS](FPTS.md) | Forge Performance Test Specification | Throughput and latency benchmarks | Soft-fail | Planned |
 | [FHTS](FHTS.md) | Forge Hash Test Specification | Cross-cutting hash integrity and AI agent governance | Hard-fail | Implemented |
-| [FVTS](FVTS.md) | Forge View Test Specification | Module ↔ forge-display contract: bindings, alarms, actions, surfaces, render profiles | Hard-fail | Schema + Runner + reference renderer implemented; reference spec awaits owner approval (FB-078) |
-| [FMTS](FMTS.md) | Forge Module Test Specification | The requirements every module meets: the baseline, the time contract, references to its other specs, waivers (`docs/decisions/forge-module-requirements.md`, D-12) | Hard-fail | Schema + Runner implemented (FB-135); nine module specs awaiting approval (FB-136) |
+| [FVTS](FVTS.md) | Forge View Test Specification | Module ↔ forge-display contract: bindings, alarms, actions, surfaces, render profiles | Hard-fail | Schema + Runner + reference renderer implemented; 1 spec, hashed, awaiting the owner's approval (FB-078) |
+| [FMTS](FMTS.md) | Forge Module Test Specification | The requirements every module meets: the baseline, the time contract, references to its other specs, waivers (`docs/decisions/forge-module-requirements.md`, D-12) | Hard-fail | Schema + Runner + conformance kit implemented; 9 specs, 8 approved (the interim MES bridge is pending, FB-155) |
+| [FTTS](FTTS.md) | Forge Transport Test Specification | The transport between a hub and every module: wire format, RPCs, errors | Hard-fail | Schema + Runner implemented; 1 spec, hashed and approved 2026-11-18; the signed transport contract is not built (D-15, FB-164) |
 
 ## Shared Infrastructure
 
@@ -215,7 +216,7 @@ Signed by the owner on 2026-11-18: [`docs/decisions/fxts-framework-baseline.md`]
 - **Every run gives two verdicts for it**, in every framework, from the shared runner: `<framework>:hash-verified` fails when the spec's content does not match its recorded hash, `<framework>:hash-approved` when the owner has not approved it. A spec with no hash fails both.
 - **Every spec lives in its framework's `specs/` directory** and is listed by `forge governance specs` (F-5). There is no other place for a spec.
 
-Not built yet: the test that walks the frameworks against the ten (FB-149 with FB-152), and schema versions with hashes (FB-151).
+`tests/governance/test_framework_baseline.py` walks every framework against the ten on every run and names each gap it allows, with the backlog item that closes it. Not built yet: schema versions with hashes, and the record in each spec of the schema it was approved against (FB-151).
 
 ## Writing a New Spec
 
