@@ -52,17 +52,37 @@ jobs:
         working-directory: go
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the changed-files comparison needs the branch's history
+      # The job is a required check on main, so it always reports. Its steps run only when
+      # the push touches what the Go suite checks (BACKLOG FB-173, owner 2026-11-19).
+      - name: anything to check?
+        id: changes
+        working-directory: ${{ github.workspace }}
+        run: >
+          .github/scripts/changed-paths.sh hub-go
+          go/ src/forge/proto/ .github/workflows/ci.yml .github/scripts/
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
       - uses: actions/setup-go@v7
+        if: steps.changes.outputs.run == 'true'
         with:
           go-version-file: go/go.mod
           cache-dependency-path: go/go.sum
       - run: go build ./...
+        if: steps.changes.outputs.run == 'true'
       - name: gofmt
+        if: steps.changes.outputs.run == 'true'
         run: |
           unformatted=$(gofmt -l .)
           if [ -n "$unformatted" ]; then echo "gofmt -l:"; echo "$unformatted"; exit 1; fi
       - run: go vet ./...
+        if: steps.changes.outputs.run == 'true'
       - run: go test ./... -count=1
+        if: steps.changes.outputs.run == 'true'
 
   mes-module:
     name: mes-module
@@ -73,27 +93,51 @@ jobs:
         working-directory: modules/Forge MES
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the changed-files comparison needs the branch's history
+      # The job is a required check on main, so it always reports. Its steps run only when
+      # the push touches the interim MES bridge, or the hub's proto files and forge-mes
+      # manifest that the bridge keeps copies of (BACKLOG FB-173, owner 2026-11-19).
+      - name: anything to check?
+        id: changes
+        working-directory: ${{ github.workspace }}
+        run: >
+          .github/scripts/changed-paths.sh mes-module
+          "modules/Forge MES/" src/forge/proto/ src/forge/adapters/forge_mes/manifest.json
+          .github/workflows/ci.yml .github/scripts/
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
       - uses: actions/setup-node@v7
+        if: steps.changes.outputs.run == 'true'
         with:
           node-version: "20"
           cache: npm
           cache-dependency-path: modules/Forge MES/package-lock.json
       - run: npm ci --no-audit --no-fund
+        if: steps.changes.outputs.run == 'true'
       - name: shared build
+        if: steps.changes.outputs.run == 'true'
         run: npm run build:shared
       - name: backend prisma generate
+        if: steps.changes.outputs.run == 'true'
         run: npx prisma generate
         working-directory: modules/Forge MES/backend
       - name: backend type-check
+        if: steps.changes.outputs.run == 'true'
         run: npx tsc --noEmit -p tsconfig.json
         working-directory: modules/Forge MES/backend
       - name: backend unit tests (advisory until BACKLOG FB-036 is verified)
+        if: steps.changes.outputs.run == 'true'
         # --forceExit: Jest finishes in ~5 min but open Prisma/RabbitMQ handles from the DB-less
         # suites (FB-036) kept the process alive ~15 min more (BACKLOG FB-052).
         run: npx jest --ci --passWithNoTests --forceExit
         working-directory: modules/Forge MES/backend
         continue-on-error: true
       - name: frontend type-check
+        if: steps.changes.outputs.run == 'true'
         # Blocking since BACKLOG FB-028 (2026-11-17): the interim frontend type-checks clean
         # under its strict flags, and a new type error fails the job.
         run: npx tsc --noEmit -p tsconfig.json
