@@ -331,7 +331,7 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
     from forge.governance.shared.runner import add_spec_hash, approve_spec_hash
 
     spec = {
-        "spec_version": "0.2.0",
+        "spec_version": "1.0.0",
         "module_identity": {
             "module_id": "forge-wms",
             "name": "Warehouse management integration",
@@ -342,6 +342,7 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
             "source_paths": ["src/forge/adapters/forge_wms"],
         },
         "hub_link": {"protocol": "grpc", "service": "forge.v1.AdapterService"},
+        "transport": {"process_control_writes": False, "business_write_backs": False},
         "references": {
             "facts": {
                 "path": "src/forge/governance/facts/specs/forge-wms.facts.json",
@@ -349,7 +350,11 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
             },
             "manifest": "src/forge/adapters/forge_wms/manifest.json",
         },
-        "baseline": {f"M-{n}": "met" for n in range(1, 12)},
+        "baseline": {
+            **{f"M-{n}": "met" for n in range(1, 15)},
+            "M-15": "not_applicable",
+            "M-16": "not_applicable",
+        },
         "waivers": [],
         "time_contract": {
             "hub": {"exchange": "four-timestamp", "fail_closed": True},

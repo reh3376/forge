@@ -3,7 +3,7 @@
 **Framework ID:** FMTS
 **Full Name:** Forge Module Test Specification
 **CI Gate:** Hard-fail (merge-blocking): `tests/governance/fmts/` runs in the `hub-python` job
-**Status:** v0.2.0 (0.1.0 plus the module alias, 2026-11-18; no spec had been approved under 0.1.0). Schema, runner (`fmts_runner.py`, 20 verdicts per spec) and nine module specs, all `pending_review` until the owner approves them (FB-136). The conformance kit runs four of the eleven requirements against every module on the Python adapter template (FB-137, 2026-11-18); for the two modules it cannot drive they are reported as not checked (FB-155)
+**Status:** v1.0.0 (2026-11-19: the transport contract's five requirements, M-12 to M-16, and the `transport` section; a major step from 0.2.0, released and approved under the schema version rules). Earlier: 0.2.0 added the module alias; 0.1.0 is kept for history. Schema, runner (`fmts_runner.py`, 26 verdicts per spec) and nine module specs, eight approved by the owner. The conformance kit runs four of the sixteen requirements against every module on the Python adapter template (FB-137); for the modules it cannot drive they are reported as not checked (FB-155). The five transport requirements have no kit check yet, because the transport contract is not built (FB-164): every module waives the ones that bind it.
 **Decided in:** [`docs/decisions/forge-module-requirements.md`](../decisions/forge-module-requirements.md) (D-12, signed by the owner on 2026-11-17)
 **MDEMG Analog:** None
 
@@ -21,7 +21,7 @@ One FMTS spec per module is that module's entry in governance. It does not repea
 
 A module without an approved FMTS spec is not a Forge module. The hub does not enforce that at Register yet (FB-140).
 
-## The baseline: eleven requirements
+## The baseline: sixteen requirements
 
 | # | Requirement | Checked by this runner |
 |---|---|---|
@@ -36,6 +36,13 @@ A module without an approved FMTS spec is not a Forge module. The hub does not e
 | M-9 | Ships no user interface code; describes its screens in FVTS specs. | Yes: no `.tsx`, `.jsx`, `.vue` or `.svelte` file in the module's source; a module with screens names FVTS specs that exist and belong to it. The display module is the one kind this does not bind. |
 | M-10 | Declares its roles and scopes. | Yes: the roles file exists and each role has a kebab-case id, scopes of the form `domain:resource:action`, and inherits only roles the file defines. The roles file has no FxTS spec of its own (FB-141). |
 | M-11 | Is built from the module SDK template for its language. | Yes, by layout: the six files of the Python adapter template, or the Go module layout. |
+| M-12 | Gives every record a stable record id. | Not yet: by the conformance kit when the transport contract is built (FB-164). A claim of `met` is reported as not checked. |
+| M-13 | Stores and forwards what it cannot deliver, with a declared capacity. | Not yet (FB-164). |
+| M-14 | Says goodbye on a proper shutdown and declares a last will. | Not yet (FB-164). |
+| M-15 | Refuses a command that arrives after its expiry. Binds only a module that declares `transport.process_control_writes`. | Not yet (FB-164). The declaration is checked now, by `fmts:transport`. |
+| M-16 | Applies each business write-back once by its id and confirms it. Binds only a module that declares `transport.business_write_backs`. | Not yet (FB-164). The declaration is checked now. |
+
+M-12 to M-16 are the amendment of 2026-11-19 (`docs/decisions/forge-module-requirements.md` §9): what the transport contract (D-15) requires of a module. Two words are the owner's definitions. A **command** is a write to a tag in a process controller (PLC or HMI) that directly affects a process: delivered at most once, never stored, and it expires. A **business write-back** is a message down to a business system: delivered and confirmed once and only once, kept while a link is down, and it does not expire as a command does. A module that declares neither is not bound by M-15 or M-16 and claims `not_applicable`; the runner holds that claim to the module's FACTS spec. M-15 is waived only with admin privileges, like M-3 and M-4.
 
 A requirement that was not checked is reported on every run as `SKIP` with the text `NOT CHECKED` and the reason. It is never counted as passed, and `forge governance run fmts` prints it under "Not checked:".
 
@@ -94,11 +101,12 @@ A module that cannot yet meet a requirement says so in its spec:
 
 | Section | Content |
 |---|---|
-| `spec_version` | `0.2.0` |
+| `spec_version` | `1.0.0` |
 | `module_identity` | `module_id`, `name`, `alias` (the module's shortcut name: short, lower case, unique among the modules; `wms` for `forge-wms`), `version`, `kind` (`management`, `integration`, `ot`, `display`), `language` (`go`, `python`, `typescript`), `source_paths` |
 | `hub_link` | `protocol: grpc`, `service: forge.v1.AdapterService` (both fixed) |
+| `transport` | `process_control_writes` and `business_write_backs`, each true or false: what the module does with messages that come down from the hub |
 | `references` | `facts` (path and `adapter_id`), `manifest`, `fvts` (paths), `roles` (path) |
-| `baseline` | `M-1` to `M-11`, each `met` or `waived` |
+| `baseline` | `M-1` to `M-16`, each `met` or `waived`; `M-15` and `M-16` may also be `not_applicable` |
 | `waivers` | `requirement`, `reason`, `backlog_item` |
 | `time_contract` | `hub`, `plant_floor_devices`, `databases`, `third_party_systems` |
 | `user_interface` | `ships_ui_code`, `screens` |
@@ -110,9 +118,11 @@ All paths are relative to the repository root and must stay inside it.
 
 ## Checks
 
-Every run gives 20 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:hash-verified`, `fmts:hash-approved`, `fmts:schema-current`, `fmts:enum-parity`, `fmts:source-paths`, `fmts:waivers`, one per requirement (`fmts:m1` to `fmts:m11`) and `fmts:metadata`. When the spec fails its schema, the run stops after the first five: the schema failure is the finding.
+Every run gives 26 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:hash-verified`, `fmts:hash-approved`, `fmts:schema-current`, `fmts:enum-parity`, `fmts:source-paths`, `fmts:waivers`, `fmts:transport`, one per requirement (`fmts:m1` to `fmts:m16`) and `fmts:metadata`. When the spec fails its schema, the run stops after the first five: the schema failure is the finding.
 
-`fmts:enum-parity` fails if the tolerance classes drift from FACTS `time_governance.tolerance_class`, or the schema's baseline from the runner's eleven requirements.
+`fmts:enum-parity` fails if the tolerance classes drift from FACTS `time_governance.tolerance_class`, or the schema's baseline from the runner's sixteen requirements.
+
+`fmts:transport` fails when a module that declares no downward writes claims anything but `not_applicable` for M-15 or M-16, when a module declares a kind of downward write while its FACTS spec declares no write capability, when the FACTS spec declares the write capability and the module declares neither kind, or when a module of kind `ot` with the write capability does not declare process-control writes.
 
 ## The module specs
 
@@ -120,11 +130,11 @@ Every run gives 20 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:h
 
 | Module | Kind | Waived | State |
 |---|---|---|---|
-| forge-wms, forge-cmms, forge-nms, forge-historian, forge-ims | management | M-10 (FB-141) | **approved by the owner 2026-11-18**; every other requirement passes, M-4 to M-7 run by the kit |
-| forge-integ-erp-netsuite | integration | M-10 (FB-141) | **approved by the owner 2026-11-18**; the same |
-| forge-scanner | management | M-3 (FB-117), M-10 (FB-141) | **approved by the owner 2026-11-18**, which is what makes its time-keeping waiver count; M-6 not checked (no sample events) |
-| forge-ot | ot | M-10 (FB-141), M-11 (FB-146) | **approved by the owner 2026-11-18**; M-4 to M-7 run by the kit through the module's own hook |
-| forge-mes (the interim bridge) | management | M-3 (FB-145), M-8 (FB-057), M-9 (FB-143), M-10 (FB-141), M-11 (FB-076) | `pending_review` by the owner's decision: M-4 to M-7 are not checked, because the kit cannot drive a TypeScript process (FB-155); `waivers` fails until approved (the M-3 waiver needs admin privileges) |
+| forge-wms, forge-cmms, forge-nms, forge-historian, forge-ims | management | M-10 (FB-141); M-12 to M-14 (FB-164) | **approved by the owner 2026-11-19** (1.0.0; first on 2026-11-18); every other requirement passes, M-4 to M-7 run by the kit |
+| forge-integ-erp-netsuite | integration | M-10 (FB-141); M-12 to M-14 (FB-164) | **approved by the owner 2026-11-19**; the same |
+| forge-scanner | management | M-3 (FB-117), M-10 (FB-141); M-12 to M-14 (FB-164) | **approved by the owner 2026-11-19**, which is what makes its time-keeping waiver count; M-6 not checked (no sample events) |
+| forge-ot | ot | M-10 (FB-141), M-11 (FB-146); M-12 to M-15 (FB-164) | **approved by the owner 2026-11-19**; it declares process-control writes, so M-15 binds it and its waiver is admin-level; M-4 to M-7 run by the kit through the module's own hook |
+| forge-mes (the interim bridge) | management | M-3 (FB-145), M-8 (FB-057), M-9 (FB-143), M-10 (FB-141), M-11 (FB-076); M-12 to M-14 and M-16 (FB-164): it declares business write-backs | `pending_review` by the owner's decision: M-4 to M-7 are not checked, because the kit cannot drive a TypeScript process (FB-155); `waivers` fails until approved (the M-3 waiver needs admin privileges) |
 
 The owner reviewed all nine on 2026-11-18, the first line by line, and approves a module spec only when the conformance kit has run M-4 to M-7 against the module.
 

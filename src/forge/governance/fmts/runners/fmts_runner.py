@@ -68,6 +68,12 @@ REQUIREMENTS: dict[str, str] = {
     "M-9": "ships no user interface code; its screens are FVTS specs",
     "M-10": "declares its roles and scopes",
     "M-11": "is built from the module SDK template for its language",
+    # The transport contract's requirements (D-12 amendment, owner 2026-11-19; D-15).
+    "M-12": "gives every record a stable record id",
+    "M-13": "stores and forwards what it cannot deliver, with a declared capacity",
+    "M-14": "says goodbye on a proper shutdown and declares a last will",
+    "M-15": "refuses a command that arrives after its expiry",
+    "M-16": "applies each business write-back once by its id and confirms it",
 }
 
 # Time-keeping is the core requirement (owner, O-1). Its two requirements can be waived
@@ -75,7 +81,21 @@ REQUIREMENTS: dict[str, str] = {
 # hash is approved, and until then it fails by name. Only the owner approves a hash today;
 # the admin scope of the role model takes that place when it exists (FB-075). A waiver
 # covers this check only: the hub still refuses a module that does not exchange time (O-2).
-ADMIN_WAIVABLE = frozenset({"M-3", "M-4"})
+# M-15 joins them (owner, 2026-11-19): refusing a late command protects a running process.
+ADMIN_WAIVABLE = frozenset({"M-3", "M-4", "M-15"})
+
+# Requirements that bind only a module that declares the matching kind of downward
+# message in ``transport`` (owner, 2026-11-19). A command is a write to a tag in a process
+# controller that directly affects a process; a business write-back is delivered once and
+# only once. For any other module the claim is ``not_applicable``.
+CONDITIONAL: dict[str, str] = {
+    "M-15": "process_control_writes",
+    "M-16": "business_write_backs",
+}
+# Checked against a running module once the transport contract is built (FB-164): the
+# conformance kit has no check for them yet, so a claim of "met" is reported as not checked.
+TRANSPORT_KIT = ("M-12", "M-13", "M-14", "M-15", "M-16")
+TRANSPORT_KIT_ITEM = "FB-164"
 
 # Checked against a running module by the conformance kit (FB-137). The kit drives a
 # Python adapter in this process; a driver for any other module is FB-155.
@@ -113,6 +133,7 @@ _TOP_LEVEL = frozenset(
         "spec_version",
         "module_identity",
         "hub_link",
+        "transport",
         "references",
         "baseline",
         "waivers",
@@ -255,6 +276,7 @@ class FMTSRunner(FxTSRunner):
             *head,
             self._check_source_paths(spec, repo_root),
             self._check_waivers(spec, backlog),
+            self._check_transport(spec, facts_spec),
         ]
         wanted = [
             r for r in CONFORMANCE_KIT if not (spec["baseline"][r] == "waived" and r in waived)
@@ -263,6 +285,10 @@ class FMTSRunner(FxTSRunner):
         for requirement in REQUIREMENTS:
             if spec["baseline"][requirement] == "waived" and requirement in waived:
                 verdicts.append(self._waived(requirement, waived[requirement]))
+            elif spec["baseline"][requirement] == "not_applicable":
+                verdicts.append(self._not_applicable(spec, requirement))
+            elif requirement in TRANSPORT_KIT:
+                verdicts.append(self._needs_transport_contract(requirement))
             elif requirement in CONFORMANCE_KIT:
                 verdicts.append(
                     kit.get(requirement) or self._needs_conformance_kit(requirement, kit_blocked)
@@ -331,6 +357,110 @@ class FMTSRunner(FxTSRunner):
                 f"({CONFORMANCE_KIT_ITEM}). The claim 'met' is unverified."
             ),
             evidence={"waived": False, "unverified": True, "blocked_on": CONFORMANCE_KIT_ITEM},
+        )
+
+    def _needs_transport_contract(self, requirement: str) -> FxTSVerdict:
+        return FxTSVerdict(
+            check_id=f"fmts:{self._check_id(requirement)}",
+            spec_ref=f"FMTS/baseline/{requirement}",
+            status=VerdictStatus.SKIP,
+            message=(
+                f"NOT CHECKED: {requirement} ({REQUIREMENTS[requirement]}) is behaviour of the "
+                "transport contract, which is not built, so the conformance kit has no check "
+                f"for it ({TRANSPORT_KIT_ITEM}). The claim 'met' is unverified."
+            ),
+            evidence={"waived": False, "unverified": True, "blocked_on": TRANSPORT_KIT_ITEM},
+        )
+
+    def _not_applicable(self, spec: dict[str, Any], requirement: str) -> FxTSVerdict:
+        """A conditional requirement the module is not bound by; the claim must be true."""
+        flag = CONDITIONAL.get(requirement)
+        violations = []
+        if flag is None:
+            violations.append(
+                SpecViolation(
+                    field=f"baseline.{requirement}",
+                    message=f"{requirement} binds every module; it cannot be not_applicable",
+                )
+            )
+        elif spec["transport"][flag]:
+            violations.append(
+                SpecViolation(
+                    field=f"baseline.{requirement}",
+                    message=(
+                        f"transport.{flag} is true, so {requirement} "
+                        f"({REQUIREMENTS[requirement]}) is required: claim met, or waive it"
+                    ),
+                )
+            )
+        return self._verdict(
+            self._check_id(requirement),
+            f"baseline/{requirement}",
+            violations,
+            f"Not applicable: transport.{flag} is false, so {requirement} does not bind "
+            "this module.",
+            evidence={"not_applicable": True},
+        )
+
+    def _check_transport(self, spec: dict[str, Any], facts_spec: Any) -> FxTSVerdict:
+        """``fmts:transport``: the two declarations agree with the claims and with FACTS."""
+        transport, baseline = spec["transport"], spec["baseline"]
+        violations = [
+            SpecViolation(
+                field=f"baseline.{requirement}",
+                message=(
+                    f"transport.{flag} is false, so {requirement} does not bind this module: "
+                    f"claim not_applicable, not {baseline[requirement]!r}"
+                ),
+            )
+            for requirement, flag in CONDITIONAL.items()
+            if not transport[flag] and baseline[requirement] != "not_applicable"
+        ]
+        declared = sorted(flag for flag in CONDITIONAL.values() if transport[flag])
+        writes = None
+        if isinstance(facts_spec, dict):
+            writes = bool((facts_spec.get("capabilities") or {}).get("write"))
+            if writes and not declared:
+                violations.append(
+                    SpecViolation(
+                        field="transport",
+                        message=(
+                            "the FACTS spec declares the write capability, but the module "
+                            "declares neither process-control writes nor business write-backs"
+                        ),
+                    )
+                )
+            if not writes and declared:
+                violations.append(
+                    SpecViolation(
+                        field="transport",
+                        message=(
+                            f"the module declares {', '.join(declared)}, but its FACTS spec "
+                            "declares no write capability"
+                        ),
+                    )
+                )
+        if (
+            spec["module_identity"]["kind"] == "ot"
+            and writes
+            and not transport[CONDITIONAL["M-15"]]
+        ):
+            violations.append(
+                SpecViolation(
+                    field="transport.process_control_writes",
+                    message=(
+                        "a module of kind 'ot' with the write capability writes to process "
+                        "controllers; process_control_writes must be true"
+                    ),
+                )
+            )
+        return self._verdict(
+            "transport",
+            "transport",
+            violations,
+            (f"Declares {', '.join(declared)}; " if declared else "Takes no downward writes; ")
+            + "the claims for M-15 and M-16 and the FACTS write capability agree.",
+            evidence={"declared": declared, "facts_write": writes},
         )
 
     async def _run_kit(
@@ -469,7 +599,7 @@ class FMTSRunner(FxTSRunner):
             "enum-parity",
             "$defs",
             violations,
-            "Tolerance classes match FACTS; the baseline lists the eleven requirements.",
+            "Tolerance classes match FACTS; the baseline lists the sixteen requirements.",
         )
 
     # ------------------------------------------------------------------
@@ -524,9 +654,9 @@ class FMTSRunner(FxTSRunner):
                     SpecViolation(
                         field=field,
                         message=(
-                            f"{requirement} is a time-keeping requirement and is waived "
-                            "only with admin privileges: the waiver does not count until "
-                            "the spec's hash is approved"
+                            f"{requirement} is waived only with admin privileges (time "
+                            "keeping, and refusing a late command): the waiver does not "
+                            "count until the spec's hash is approved"
                         ),
                     )
                 )
@@ -534,7 +664,10 @@ class FMTSRunner(FxTSRunner):
                 violations.append(
                     SpecViolation(
                         field=field,
-                        message=f"{requirement} has a waiver but the baseline claims 'met'",
+                        message=(
+                            f"{requirement} has a waiver but the baseline claims "
+                            f"{baseline[requirement]!r}"
+                        ),
                     )
                 )
             if item not in backlog:
@@ -570,7 +703,7 @@ class FMTSRunner(FxTSRunner):
             violations,
             f"{len(waivers)} waiver(s), each naming an open backlog item."
             if waivers
-            else "No waivers: all eleven requirements are claimed met.",
+            else "No waivers: every requirement that binds the module is claimed met.",
             evidence={
                 "waived": sorted(seen),
                 "backlog_items": {w["requirement"]: w["backlog_item"] for w in waivers},

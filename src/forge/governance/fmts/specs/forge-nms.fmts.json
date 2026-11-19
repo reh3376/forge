@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.2.0",
+  "spec_version": "1.0.0",
   "module_identity": {
     "module_id": "forge-nms",
     "name": "Forge Network Management System Adapter",
@@ -14,6 +14,10 @@
   "hub_link": {
     "protocol": "grpc",
     "service": "forge.v1.AdapterService"
+  },
+  "transport": {
+    "process_control_writes": false,
+    "business_write_backs": false
   },
   "references": {
     "facts": {
@@ -33,13 +37,33 @@
     "M-8": "met",
     "M-9": "met",
     "M-10": "waived",
-    "M-11": "met"
+    "M-11": "met",
+    "M-12": "waived",
+    "M-13": "waived",
+    "M-14": "waived",
+    "M-15": "not_applicable",
+    "M-16": "not_applicable"
   },
   "waivers": [
     {
       "requirement": "M-10",
       "reason": "No module ships a roles file yet: the roles file has no FxTS spec to be written against, and the hub still uses its own flat roles.",
       "backlog_item": "FB-141"
+    },
+    {
+      "requirement": "M-12",
+      "reason": "The record id rule of the transport contract (T-5) is not built: records carry an id the adapter makes, and the hub does not yet keep each id once.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-13",
+      "reason": "Store and forward is not part of the module SDK yet (T-6): the module does not buffer what it cannot deliver.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-14",
+      "reason": "The goodbye and the last will of the transport contract (T-8) are not built: the hub learns of a shutdown only when calls stop.",
+      "backlog_item": "FB-164"
     }
   ],
   "time_contract": {
@@ -76,8 +100,17 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "f9675a9b679101c368889dc0fb45a01ed7b58a1023ae0302213a5cde9ff2e01d",
+    "previous_hash": "00efc96a79dfa29270c4bcd7fa4bb09c2d1e8b6376f2a8653a4e073c3bc116ce",
     "change_history": [
+      {
+        "previous_hash": "00efc96a79dfa29270c4bcd7fa4bb09c2d1e8b6376f2a8653a4e073c3bc116ce",
+        "new_hash": "25c0a932fe2b6bd02d33c020c074225feb608a20b72916d5a9303f938ab7430e",
+        "changed_at": "2026-11-19T18:38:18Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-165: FMTS 1.0.0, the transport contract's requirements M-12 to M-16 (D-12 amendment, owner 2026-11-19); each one that binds the module waived until FB-164"
+      },
       {
         "previous_hash": "f9675a9b679101c368889dc0fb45a01ed7b58a1023ae0302213a5cde9ff2e01d",
         "new_hash": "00efc96a79dfa29270c4bcd7fa4bb09c2d1e8b6376f2a8653a4e073c3bc116ce",
@@ -95,22 +128,13 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
         "reason": "FB-150: module ids renamed and the company's name removed; a management module, not an integration (owner 2026-11-18)"
-      },
-      {
-        "previous_hash": "211645dc113b7bcfc50f181628381797a9aca41c9b1b17e5c9134817421a12fa",
-        "new_hash": "1859fdbbaa4473e7de3110bed4df64e71d8b66cb55a3e4ce374a5d38c3e6fa38",
-        "changed_at": "2026-11-18T15:32:42Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "structural",
-        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "00efc96a79dfa29270c4bcd7fa4bb09c2d1e8b6376f2a8653a4e073c3bc116ce",
+    "spec_hash": "25c0a932fe2b6bd02d33c020c074225feb608a20b72916d5a9303f938ab7430e",
+    "schema_version": "1.0.0",
+    "schema_hash": "49e1e80a99ad1b201c88a9b1289eb854454f22f417824e29d78670c5b9aeccf8",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-18T16:28:36Z",
-    "schema_version": "0.2.0",
-    "schema_hash": "849a1bbcf3a9c8c421e08fc7f884616f79c3dd027a258a743cc87dc4e76a6375"
+    "approved_at": "2026-11-19T21:10:45Z"
   }
 }

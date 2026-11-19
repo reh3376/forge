@@ -46,6 +46,10 @@ ALLOWED_FAILURES: dict[str, frozenset[str]] = {
     "forge-ot": frozenset(),
     "forge-mes": PENDING_APPROVAL | {"fmts:waivers"},
 }
+#: The transport contract is not built, so every module waives M-12 to M-14 until it is
+#: (FB-165, FB-164). M-15 binds only forge-ot (process-control writes) and M-16 only
+#: forge-mes (business write-backs); for every other module they are not applicable.
+TRANSPORT = {"M-12": "FB-164", "M-13": "FB-164", "M-14": "FB-164"}
 WAIVED: dict[str, dict[str, str]] = {
     "forge-mes": {
         "M-3": "FB-145",
@@ -53,11 +57,15 @@ WAIVED: dict[str, dict[str, str]] = {
         "M-9": "FB-143",
         "M-10": "FB-141",
         "M-11": "FB-076",
+        **TRANSPORT,
+        "M-16": "FB-164",
     },
-    "forge-ot": {"M-10": "FB-141", "M-11": "FB-146"},
-    "forge-scanner": {"M-3": "FB-117", "M-10": "FB-141"},
+    "forge-ot": {"M-10": "FB-141", "M-11": "FB-146", **TRANSPORT, "M-15": "FB-164"},
+    "forge-scanner": {"M-3": "FB-117", "M-10": "FB-141", **TRANSPORT},
 }
-ROLES_ONLY = {"M-10": "FB-141"}
+ROLES_ONLY = {"M-10": "FB-141", **TRANSPORT}
+NOT_APPLICABLE: dict[str, set[str]] = {"forge-ot": {"M-16"}, "forge-mes": {"M-15"}}
+NO_DOWNWARD_WRITES = {"M-15", "M-16"}
 #: Requirements the conformance kit did not check, per module. Everything else of
 #: M-4 to M-7 was run against the module and passed.
 NO_SAMPLE_EVENTS = frozenset({"M-6"})
@@ -103,7 +111,7 @@ async def test_module_meets_its_spec(runner: FMTSRunner, module_id: str) -> None
     for verdict in report.verdicts:
         by_status.setdefault(verdict.status, set()).add(verdict.check_id)
 
-    assert report.total == 20 and report.hash_verified is True
+    assert report.total == 26 and report.hash_verified is True
     assert by_status.get(VerdictStatus.NOT_IMPLEMENTED, set()) == set()  # schema-runner parity
     assert by_status.get(VerdictStatus.ERROR, set()) == set()
     assert by_status.get(VerdictStatus.FAIL, set()) == ALLOWED_FAILURES.get(
@@ -116,6 +124,9 @@ async def test_module_meets_its_spec(runner: FMTSRunner, module_id: str) -> None
     ran = {_check(r) for r in CONFORMANCE_KIT} - not_run - {_check(r) for r in waived}
     assert ran <= by_status.get(VerdictStatus.PASS, set())
     assert {w["requirement"]: w["backlog_item"] for w in spec["waivers"]} == waived
+    not_bound = {r for r, claim in spec["baseline"].items() if claim == "not_applicable"}
+    assert not_bound == NOT_APPLICABLE.get(module_id, NO_DOWNWARD_WRITES)
+    assert {_check(r) for r in not_bound} <= by_status.get(VerdictStatus.PASS, set())
 
 
 @pytest.mark.parametrize("module_id", MODULE_IDS)

@@ -76,7 +76,7 @@ def repo(tmp_path: Path) -> Path:
 
 def _base_spec() -> dict[str, Any]:
     return {
-        "spec_version": "0.2.0",
+        "spec_version": "1.0.0",
         "module_identity": {
             "module_id": "forge-wms",
             "name": "Warehouse management integration",
@@ -87,12 +87,17 @@ def _base_spec() -> dict[str, Any]:
             "source_paths": ["src/wms"],
         },
         "hub_link": {"protocol": "grpc", "service": "forge.v1.AdapterService"},
+        "transport": {"process_control_writes": False, "business_write_backs": False},
         "references": {
             "facts": {"path": "specs/forge-wms.facts.json", "adapter_id": "forge-wms"},
             "manifest": "src/wms/manifest.json",
             "roles": "specs/roles.json",
         },
-        "baseline": {f"M-{n}": "met" for n in range(1, 12)},
+        "baseline": {
+            **{f"M-{n}": "met" for n in range(1, 15)},
+            "M-15": "not_applicable",
+            "M-16": "not_applicable",
+        },
         "waivers": [],
         "time_contract": {
             "hub": {"exchange": "four-timestamp", "fail_closed": True},

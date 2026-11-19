@@ -19,15 +19,15 @@ def _errors(schema: dict, spec: dict) -> list[str]:
 class TestSchema:
     def test_is_a_valid_draft_2020_12_schema(self, schema: dict) -> None:
         Draft202012Validator.check_schema(schema)
-        assert schema["$id"] == "forge://fxts/fmts/v0.2.0"
-        assert schema["properties"]["spec_version"]["const"] == "0.2.0"
+        assert schema["$id"] == "forge://fxts/fmts/v1.0.0"
+        assert schema["properties"]["spec_version"]["const"] == "1.0.0"
 
     def test_the_reference_spec_validates(self, schema: dict, spec: dict) -> None:
         assert _errors(schema, spec) == []
 
-    def test_baseline_lists_the_eleven_requirements(self, schema: dict) -> None:
+    def test_baseline_lists_the_sixteen_requirements(self, schema: dict) -> None:
         baseline = schema["properties"]["baseline"]
-        assert baseline["required"] == list(REQUIREMENTS) == [f"M-{n}" for n in range(1, 12)]
+        assert baseline["required"] == list(REQUIREMENTS) == [f"M-{n}" for n in range(1, 17)]
         assert set(baseline["properties"]) == set(REQUIREMENTS)
 
     def test_tolerance_classes_mirror_facts(self, schema: dict) -> None:
