@@ -19,7 +19,7 @@ def _errors(schema: dict, spec: dict) -> list[str]:
 class TestSchema:
     def test_is_a_valid_draft_2020_12_schema(self, schema: dict) -> None:
         Draft202012Validator.check_schema(schema)
-        assert schema["$id"] == "forge://governance/fmts/v0.2.0"
+        assert schema["$id"] == "forge://fxts/fmts/v0.2.0"
         assert schema["properties"]["spec_version"]["const"] == "0.2.0"
 
     def test_the_reference_spec_validates(self, schema: dict, spec: dict) -> None:

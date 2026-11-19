@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://governance/fvts/v0.1.0",
+  "$id": "forge://fxts/fvts/v0.1.0",
   "title": "Forge View Test Specification (FVTS)",
   "description": "Governs the contract between Forge modules and forge-display. A module never renders UI; it declares what can be shown (data bindings, history, alarms), what can be done (actions, settings) and on which surfaces and render profiles. forge-display renderers (desktop HMI, desktop app, web, mobile) consume this contract. One FVTS spec per module.",
   "type": "object",
@@ -313,6 +313,16 @@
         },
         "previous_hash": { "type": ["string", "null"] },
         "approved_by": { "type": ["string", "null"] },
+        "schema_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "The schema version this spec was stamped and approved against (D-14, F-10)."
+        },
+        "schema_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "The hash of that schema version, from the framework's schema registry."
+        },
         "approved_at": { "type": ["string", "null"] },
         "change_history": {
           "type": "array",

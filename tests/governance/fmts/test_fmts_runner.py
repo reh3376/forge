@@ -68,7 +68,7 @@ class TestAModuleThatMeetsTheBaseline:
         report = await _run(runner, spec, repo)
         verdicts = _by_id(report)
         assert report.passed and report.hash_verified is True and report.framework == "FMTS"
-        assert report.total == 19
+        assert report.total == 20
         for requirement in ("m1", "m2", "m3", "m8", "m9", "m10", "m11"):
             assert verdicts[f"fmts:{requirement}"].status == PASS, verdicts[f"fmts:{requirement}"]
         for check in (
@@ -126,6 +126,7 @@ class TestPlumbing:
             "fmts:hash-verified",
             "fmts:hash-approved",
             "fmts:enum-parity",
+            "fmts:schema-current",
         ]
         assert _by_id(report)["fmts:schema-valid"].status == FAIL and not report.passed
 

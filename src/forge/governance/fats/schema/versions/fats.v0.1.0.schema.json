@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://fxts/fats/v0.1.0",
+  "title": "FATS — Forge API Test Specification",
+  "description": "Spec-first governance schema for Forge HTTP API endpoints. Defines what every API endpoint MUST provide — the runner enforces conformance.",
+  "type": "object",
+  "required": [
+    "spec_version",
+    "endpoint",
+    "method",
+    "authentication",
+    "request",
+    "response",
+    "rate_limit"
+  ],
+  "properties": {
+    "spec_version": {
+      "type": "string",
+      "const": "0.1.0",
+      "description": "FATS schema version this spec conforms to."
+    },
+    "endpoint": {
+      "type": "string",
+      "pattern": "^/",
+      "description": "URL path of the endpoint (must start with /)."
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ],
+      "description": "HTTP method."
+    },
+    "authentication": {
+      "type": "object",
+      "required": [
+        "required",
+        "schemes"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "description": "Whether authentication is required."
+        },
+        "schemes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "bearer",
+              "api_key",
+              "basic",
+              "none"
+            ]
+          },
+          "minItems": 1,
+          "description": "Accepted authentication schemes."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Authentication requirements."
+    },
+    "request": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string",
+          "default": "application/json"
+        },
+        "body_schema_ref": {
+          "type": "string",
+          "description": "JSON Schema $ref for the request body."
+        },
+        "required_headers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "required_query_params": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false,
+      "description": "Request envelope spec."
+    },
+    "response": {
+      "type": "object",
+      "required": [
+        "success_status",
+        "error_format"
+      ],
+      "properties": {
+        "success_status": {
+          "type": "integer",
+          "description": "Expected HTTP status on success."
+        },
+        "body_schema_ref": {
+          "type": "string",
+          "description": "JSON Schema $ref for the response body."
+        },
+        "error_format": {
+          "type": "object",
+          "required": [
+            "type"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "rfc7807",
+                "forge_standard"
+              ],
+              "description": "Error response format."
+            }
+          },
+          "additionalProperties": false
+        },
+        "max_latency_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum acceptable p95 latency in milliseconds."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Response envelope spec."
+    },
+    "rate_limit": {
+      "type": "object",
+      "required": [
+        "requests_per_minute"
+      ],
+      "properties": {
+        "requests_per_minute": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Max requests per minute (0 = unlimited)."
+        },
+        "burst": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 10,
+          "description": "Burst allowance."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Rate limiting requirements."
+    },
+    "integrity": {
+      "type": "object",
+      "description": "Self-contained spec integrity block (FHTS Layer 1). Hash governance for AI agent oversight.",
+      "properties": {
+        "hash_method": {
+          "type": "string",
+          "enum": [
+            "sha256-c14n-v1",
+            "sha256-jcs"
+          ],
+          "default": "sha256-c14n-v1",
+          "description": "Hash algorithm. sha256-c14n-v1 is normative."
+        },
+        "spec_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hex digest of canonical JSON (excluding this field)."
+        },
+        "hash_state": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "modified",
+            "pending_review",
+            "reverted",
+            "unknown"
+          ],
+          "default": "unknown",
+          "description": "Governance state — tracks whether changes have been reviewed and approved."
+        },
+        "previous_hash": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Hash before most recent change. Enables single-step drift detection."
+        },
+        "approved_by": {
+          "type": "string",
+          "description": "Identifier of actor who approved current hash state."
+        },
+        "schema_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "The schema version this spec was stamped and approved against (D-14, F-10)."
+        },
+        "schema_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "The hash of that schema version, from the framework's schema registry."
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO8601 timestamp of approval."
+        },
+        "change_history": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": [
+              "previous_hash",
+              "new_hash",
+              "changed_at",
+              "source"
+            ],
+            "properties": {
+              "previous_hash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "new_hash": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "changed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "type": "string",
+                "enum": [
+                  "manual",
+                  "ci",
+                  "agent",
+                  "revert",
+                  "spec_update"
+                ]
+              },
+              "changed_by": {
+                "type": "string"
+              },
+              "change_type": {
+                "type": "string",
+                "enum": [
+                  "structural",
+                  "content",
+                  "config",
+                  "revert"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Last 3 hash changes for audit trail and AI agent governance."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

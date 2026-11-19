@@ -3,7 +3,7 @@
 **Framework ID:** FMTS
 **Full Name:** Forge Module Test Specification
 **CI Gate:** Hard-fail (merge-blocking): `tests/governance/fmts/` runs in the `hub-python` job
-**Status:** v0.2.0 (0.1.0 plus the module alias, 2026-11-18; no spec had been approved under 0.1.0). Schema, runner (`fmts_runner.py`, 19 verdicts per spec) and nine module specs, all `pending_review` until the owner approves them (FB-136). The conformance kit runs four of the eleven requirements against every module on the Python adapter template (FB-137, 2026-11-18); for the two modules it cannot drive they are reported as not checked (FB-155)
+**Status:** v0.2.0 (0.1.0 plus the module alias, 2026-11-18; no spec had been approved under 0.1.0). Schema, runner (`fmts_runner.py`, 20 verdicts per spec) and nine module specs, all `pending_review` until the owner approves them (FB-136). The conformance kit runs four of the eleven requirements against every module on the Python adapter template (FB-137, 2026-11-18); for the two modules it cannot drive they are reported as not checked (FB-155)
 **Decided in:** [`docs/decisions/forge-module-requirements.md`](../decisions/forge-module-requirements.md) (D-12, signed by the owner on 2026-11-17)
 **MDEMG Analog:** None
 
@@ -110,7 +110,7 @@ All paths are relative to the repository root and must stay inside it.
 
 ## Checks
 
-Every run gives 19 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:hash-verified`, `fmts:hash-approved`, `fmts:enum-parity`, `fmts:source-paths`, `fmts:waivers`, one per requirement (`fmts:m1` to `fmts:m11`) and `fmts:metadata`. When the spec fails its schema, the run stops after the first five: the schema failure is the finding.
+Every run gives 20 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:hash-verified`, `fmts:hash-approved`, `fmts:schema-current`, `fmts:enum-parity`, `fmts:source-paths`, `fmts:waivers`, one per requirement (`fmts:m1` to `fmts:m11`) and `fmts:metadata`. When the spec fails its schema, the run stops after the first five: the schema failure is the finding.
 
 `fmts:enum-parity` fails if the tolerance classes drift from FACTS `time_governance.tolerance_class`, or the schema's baseline from the runner's eleven requirements.
 

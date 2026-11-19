@@ -21,6 +21,7 @@ import pytest
 
 from forge.cli.governance import FRAMEWORKS, REPO_ROOT, SPEC_ROOT, spec_files
 from forge.governance.fmts.runners.fmts_runner import load_backlog
+from forge.governance.shared import schemas
 from forge.governance.shared.runner import check_schema_runner_parity, verify_spec_hash
 
 if TYPE_CHECKING:
@@ -41,13 +42,8 @@ ID_FORM = re.compile(r"^forge://fxts/[a-z]+/v\d+\.\d+\.\d+$")
 ANY_VERSIONED_ID = re.compile(r"^forge://[a-z]+/[a-z]+/v\d+\.\d+\.\d+$")
 
 #: Requirements not met yet, per framework, each with the backlog item that closes it.
-KNOWN_GAPS: dict[str, dict[str, str]] = {
-    "facts": {"F-2 schema hash": "FB-151", "F-10": "FB-151"},
-    "fats": {"F-2 schema hash": "FB-151", "F-10": "FB-151"},
-    "fmts": {"F-2 schema hash": "FB-151", "F-2 id form": "FB-151", "F-10": "FB-151"},
-    "ftts": {"F-2 schema hash": "FB-151", "F-2 id form": "FB-151", "F-10": "FB-151"},
-    "fvts": {"F-2 schema hash": "FB-151", "F-2 id form": "FB-151", "F-10": "FB-151"},
-}
+#: Empty since FB-151 (2026-11-19): every framework meets all ten.
+KNOWN_GAPS: dict[str, dict[str, str]] = {}
 #: Specs whose hash the owner has not approved, each with the item that leads to it.
 PENDING_APPROVAL = {"forge-mes.fmts.json": "FB-155", "forge-ot.fvts.json": "FB-078"}
 
@@ -78,13 +74,22 @@ def _gaps(fw: str) -> dict[str, str]:
         gaps["F-2 version"] = f"schema $id {schema_id!r} carries no version"
     elif not ID_FORM.match(schema_id):
         gaps["F-2 id form"] = f"schema $id is {schema_id!r}, not forge://fxts/{fw}/v<version>"
-    if not (FRAMEWORKS[fw].schema.parent / "schema-registry.json").is_file():
-        gaps["F-2 schema hash"] = "no schema version is hashed"
-    specs = [json.loads(path.read_text(encoding="utf-8")) for path in _specs(fw)]
-    if not all(
-        {"schema_version", "schema_hash"} <= set(spec.get("integrity") or {}) for spec in specs
-    ):
-        gaps["F-10"] = "a spec does not record the schema version and hash it was approved against"
+    schema_dir = FRAMEWORKS[fw].schema.parent
+    problems = schemas.registry_problems(schema_dir)
+    if problems:
+        gaps["F-2 schema hash"] = "; ".join(problems)
+    unapproved = [
+        row.version for row in schemas.versions(schema_dir) if row.hash_state == "pending_review"
+    ]
+    if unapproved:
+        gaps["F-2 schema approval"] = f"schema version(s) {unapproved} await the owner's approval"
+    for path in _specs(fw):
+        problem = schemas.spec_schema_problem(
+            schema_dir, json.loads(path.read_text(encoding="utf-8"))
+        )
+        if problem:
+            gaps["F-10"] = f"{path.name}: {problem}"
+            break
     return gaps
 
 

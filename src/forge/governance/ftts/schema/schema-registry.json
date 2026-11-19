@@ -1,0 +1,17 @@
+{
+  "framework": "ftts",
+  "hash_method": "sha256-c14n-v1",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "file": "versions/ftts.v0.1.0.schema.json",
+      "schema_hash": "121616f19462d1dbc5bf8d671dd2c26289ac3787adbb90ddfd24e47c461a906a",
+      "hash_state": "approved",
+      "step": "baseline",
+      "summary": "Baseline at the start of the schema registry (FB-151). At the baseline every schema took the one id form forge://fxts/<framework>/v<version> and gained integrity.schema_version and integrity.schema_hash.",
+      "released_at": "2026-11-19T00:00:00Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-19T18:03:46Z"
+    }
+  ]
+}

@@ -290,7 +290,7 @@ def test_run_fvts_reference_only_waits_on_the_owner(tmp_path: Path) -> None:
     code, out = run("run", "fvts", "forge-ot-views", "--format", "json", "--output", str(out_file))
     report = json.loads(out)
     assert report == json.loads(out_file.read_text(encoding="utf-8"))
-    assert report["framework"] == "FVTS" and len(report["verdicts"]) == 19
+    assert report["framework"] == "FVTS" and len(report["verdicts"]) == 20
     not_ok = {v["check_id"] for v in report["verdicts"] if v["status"] not in ("PASS", "SKIP")}
     assert not_ok <= {"fvts:hash-approved"}  # pending the owner's approval, nothing else
     assert code == (1 if not_ok else 0)
@@ -300,7 +300,7 @@ def test_run_ftts_and_fats_load_their_specs() -> None:
     # The FTTS spec is hashed since FB-160 and the owner approved it on 2026-11-18.
     code, out = run("run", "ftts", "grpc-hardened-transport")
     assert code == 0, out
-    assert "[PASS] FTTS — grpc-hardened-transport: 40/40 checks passed" in out
+    assert "[PASS] FTTS — grpc-hardened-transport: 41/41 checks passed" in out
 
     code, out = run("run", "fats", "/v1/health", "--format", "json")
     report = json.loads(out)

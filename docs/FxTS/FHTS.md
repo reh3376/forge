@@ -200,6 +200,48 @@ forge governance run fhts --verify-all --format json --output reports/fhts.json
 | `scan_framework_specs()` | Discover and register specs from a directory | `ScanAndSync` |
 | `get_history()` | Return hash change history | `GetHashHistory` |
 
+## Schema Versions
+
+A spec's hash covers the spec. The schema a spec is written against is hashed and approved the same way, so that a schema cannot change under an approved spec (D-14, F-2 and F-10; owner, 2026-11-18: "when a FxTS schema changes so must the hash, this functionality should be built directly into the FxTS framework").
+
+**Layout**, per framework, under `src/forge/governance/<framework>/schema/`:
+
+| File | What it is |
+|---|---|
+| `<framework>.schema.json` | the current version, the file an author edits |
+| `versions/<framework>.v<version>.schema.json` | one frozen copy per released version; never edited |
+| `schema-registry.json` | every version: its file, hash, step, summary, and the owner's approval |
+
+**Rules** (`src/forge/governance/shared/schemas.py`):
+
+| Rule | How it is held |
+|---|---|
+| One id form, `forge://fxts/<framework>/v<major.minor.patch>` | `schema-release` refuses any other; a test checks every current schema |
+| A released version is never edited | each frozen copy is checked against its recorded hash on every run |
+| A schema change is a new version | the current file must be identical to the highest version's frozen copy; an edit without a release fails the baseline test |
+| Patch is wording only; minor adds something optional; major adds a required field or removes or narrows anything | the difference between two versions is computed, each change is given the step it needs, and a release whose number declares a smaller step is refused |
+| The owner approves each version's hash | `forge governance schema-approve <framework> <version> --by <owner>`; until then every spec written against that version fails `<framework>:schema-current` |
+| Each spec records the schema version and hash it was approved against | `stamp` writes `integrity.schema_version` and `integrity.schema_hash`; `approve` refuses a spec whose record does not stand |
+| A major step marks every spec for review | `<framework>:schema-current` fails for a spec whose recorded version is a major step behind the current one |
+| A spec is validated against the version it declares | `forge governance run` and `validate-spec` pick the schema file by the spec's `spec_version` |
+
+The two integrity fields are not part of the hashed content, like the rest of the integrity block: recording them does not change a spec's hash or its approval.
+
+**Commands:**
+
+```bash
+forge governance schemas [framework]            # every version: step, state, hash, specs written against it
+forge governance schema-diff fmts 0.1.0 0.2.0   # what changed, and the step each change needs
+forge governance schema-release fmts --summary "FB-nnn: what changed"   # after raising the version in the file
+forge governance schema-approve fmts 0.3.0 --by <owner>                 # the owner's command
+forge governance validate-spec <spec> --schema-version 0.3.0            # against a named version
+forge governance migrate-spec <spec> --to 0.3.0 --by <who>              # set the version, validate, re-stamp
+```
+
+**Changing a schema:** edit `<framework>.schema.json`; raise the version in its `$id` and in the `const` of `spec_version`; run `schema-release`; the owner approves the new version; move specs forward with `migrate-spec` (after a minor or patch step they may stay where they are).
+
+**State (2026-11-19):** five current versions (FACTS 0.1.0, FATS 0.1.0, FMTS 0.2.0, FTTS 0.1.0, FVTS 0.1.0), each registered as the baseline of the registry. Before the registry existed these files were edited in place under an unchanged version; those earlier states are in the repository's history and are not versions. The one earlier file that had a version number of its own, FMTS 0.1.0, is restored unchanged and marked `historical`: no spec is written against it.
+
 ## Relationship to Other Frameworks
 
 | Framework | Relationship to FHTS |
@@ -236,7 +278,8 @@ forge governance run fhts --verify-all --format json --output reports/fhts.json
 | Hash history + state tracking | ✅ Implemented in `shared/runner.py` |
 | FHTS Registry (Layer 2) | ✅ Implemented in `fhts/registry.py` |
 | FHTS Runner | ✅ Implemented in `fhts/runners/fhts_runner.py` |
-| CLI integration | ⬜ Planned (Sprint 1, task S1.6) |
+| CLI integration | ✅ `forge governance specs`, `stamp`, `approve` (FB-021) |
+| Schema versions: registry, hashes, step rules, the spec's record, the commands | ✅ `shared/schemas.py` (FB-151, 2026-11-19) |
 | CI gate workflow | ⬜ Planned (Sprint 4) |
 | Registry JSON persistence | ✅ Implemented |
 | Framework scanner | ✅ Implemented (`scan_framework_specs()`) |

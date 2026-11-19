@@ -383,50 +383,12 @@ def migrate_down(
 # ---------------------------------------------------------------------------
 
 
-@governance_app.command("validate-spec")
-def governance_validate_spec(
-    spec_file: Annotated[Path, typer.Argument(help="Path to the spec file to validate")],
-) -> None:
-    """Validate a spec file against its framework schema."""
-    import json
-
-    import jsonschema
-
-    if not spec_file.exists():
-        typer.echo(f"Spec file not found: {spec_file}")
-        raise typer.Exit(code=1)
-
-    with spec_file.open() as f:
-        spec = json.load(f)
-
-    # Determine framework from spec or filename
-    framework = None
-    fname = spec_file.stem.lower()
-    for fw in ("fats", "facts", "fvts", "ftts", "fmts"):
-        if fw in fname:
-            framework = fw
-            break
-
-    if framework is None:
-        typer.echo("Cannot determine framework from filename.")
-        raise typer.Exit(code=1)
-
-    # Load framework schema
-    schema_dir = Path(__file__).parent.parent / "governance" / framework / "schema"
-    schema_file = schema_dir / f"{framework}.schema.json"
-    if not schema_file.exists():
-        typer.echo(f"Schema not found: {schema_file}")
-        raise typer.Exit(code=1)
-
-    with schema_file.open() as f:
-        schema = json.load(f)
-
-    try:
-        jsonschema.validate(instance=spec, schema=schema)
-        typer.echo(f"[PASS] {spec_file.name} conforms to {framework.upper()} schema.")
-    except jsonschema.ValidationError as e:
-        typer.echo(f"[FAIL] {spec_file.name}: {e.message}")
-        raise typer.Exit(code=1) from e
+governance_app.command("validate-spec")(governance_cli.validate_spec)
+governance_app.command("schemas")(governance_cli.schemas_command)
+governance_app.command("schema-diff")(governance_cli.schema_diff)
+governance_app.command("schema-release")(governance_cli.schema_release)
+governance_app.command("schema-approve")(governance_cli.schema_approve)
+governance_app.command("migrate-spec")(governance_cli.migrate_spec)
 
 
 # ---------------------------------------------------------------------------

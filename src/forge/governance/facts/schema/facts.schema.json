@@ -817,6 +817,16 @@
           "type": "string",
           "description": "Identifier of actor who approved current hash state."
         },
+        "schema_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "The schema version this spec was stamped and approved against (D-14, F-10)."
+        },
+        "schema_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "The hash of that schema version, from the framework's schema registry."
+        },
         "approved_at": {
           "type": "string",
           "format": "date-time",

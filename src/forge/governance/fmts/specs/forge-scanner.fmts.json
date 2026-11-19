@@ -95,6 +95,8 @@
     "hash_method": "sha256-c14n-v1",
     "spec_hash": "06afa74ab9961f7b85a1f11e1718c7a26f6c835fecc89947e6dac102310dfb5f",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-18T16:58:52Z"
+    "approved_at": "2026-11-18T16:58:52Z",
+    "schema_version": "0.2.0",
+    "schema_hash": "849a1bbcf3a9c8c421e08fc7f884616f79c3dd027a258a743cc87dc4e76a6375"
   }
 }
