@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-19` against the repository `reh3376/forge` at the merge of PR 125 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-19` against the repository `reh3376/forge` at the merge of PR 126 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -245,7 +245,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 125:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 126:
 
 **Working**
 
@@ -280,7 +280,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 125:
 | Measure | Value (2026-11-19) |
 |---|---|
 | Python hub (`src/forge`) | 354 files, ~74,100 lines |
-| Python tests | 282 files, 4,936 collected, full suite green on the locked dependency set |
+| Python tests | 283 files, 4,949 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -353,7 +353,7 @@ note:
 | `src/forge/adapters` | the Python adapters of eight modules (`forge_wms`, `forge_mes`, `forge_cmms`, `forge_nms`, `forge_ims`, `forge_historian`, `forge_scanner`, `forge_integ_erp_netsuite`), each with its manifest and config, and four empty generic packages (FB-148) |
 | `go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
-| `tests/` | 282 files mirroring `src/`; `tests/governance/` holds the gates of every framework |
+| `tests/` | 283 files mirroring `src/`; `tests/governance/` holds the gates of every framework |
 | `docs/` | the key documents, `FxTS/` (the framework pages), `decisions/` (the signed records), `deployment/`, `governance/`, `tutorial.md` (this deck's source) |
 | `deploy/docker` | the development compose stack and the hub image |
 
@@ -1960,7 +1960,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q -rsx                    # 4,936 tests, ~1 minute; lists each skip with its reason
+uv run pytest tests -q -rsx                    # 4,949 tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2046,7 +2046,7 @@ note:
 | fix something you found while doing something else | finish the item; add a `BACKLOG.md` row (ID, severity, problem, where, suggested fix) if you did not fix it |
 | add or change a hub route | add or update the FATS spec; the hub test holds both directions |
 | add a module | scaffold with the module builder; write its FACTS spec and its FMTS spec; run `forge governance run facts <module>` and `forge governance run fmts <module>`; the module registers only when its manifest matches the approved FACTS spec |
-| change what crosses the wire | read `docs/decisions/transport-contract.md` first; within `forge.v1` only add; a wire change re-stamps the specs it touches |
+| change what crosses the wire | read `docs/decisions/transport-contract.md` first; within `forge.v1` only add; a wire change re-stamps the specs it touches. A proto file lives in three places (`src/forge/proto`, `go/proto/forge/v1`, the interim MES bridge's `backend/src/forge/proto`): change all three in the same change, keep the Go copy's own `go_package` line, and regenerate. `tests/test_proto_copies.py` fails otherwise. |
 | build something that will be done more than once | find its FxTS framework and build to the spec; if none fits, record that in `BACKLOG.md` |
 | add a module function, a protocol, a data class or a pruning strategy | edit the governed list in `src/forge/governance/lists/`, `forge governance stamp` it; the owner approves it. Not a schema change. |
 | skip a test | give the reason (`reason=`, a `// skip reason:` comment, a message to `t.Skip`); if the reason is "needs work", add a backlog item |
@@ -2100,7 +2100,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 282 files, 4,936 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/` mirrors `src/`: 283 files, 4,949 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
