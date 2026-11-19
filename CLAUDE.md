@@ -39,7 +39,7 @@ These documents are the authority (A-12). Where Jiminy or MDEMG guidance injecte
 - **All user interfaces come from forge-display (A-3)**, for every module, and the hub's own UI. No module ships its own UI. forge-display is the first module to be built (A-14). The bridge's Next.js frontend stays only until forge-display exists.
 - **One clock.** The top hub is the time authority. Every stored time is UTC and timezone-aware, time checks are mandatory and fail closed, and a module that does not implement the time exchange is refused (`docs/decisions/one-clock-ot-source-time.md`).
 - **Every module meets the forge module requirements (A-11, D-12)**: `docs/decisions/forge-module-requirements.md`, signed 2026-11-17. Eleven baseline requirements and a time contract, checked by the FMTS framework (`docs/FxTS/FMTS.md`).
-- **No silent failure.** A refusal or a fail-closed state is visible on status, health, API and CLI with its cause. A log line alone is not enough.
+- **No silent failure.** A refusal or a fail-closed state is visible on status, health, API and CLI with its cause. A log line alone is not enough. The same holds for tests: a skipped test states its reason (A-20), and an FxTS check that was not run is reported as not run.
 - **Production runs on Kubernetes.** Docker Compose is for development only.
 - **Configuration comes from the environment.** Never hardcode credentials, addresses or keys.
 
@@ -72,7 +72,7 @@ Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `build:`)
 
 ```bash
 uv sync --locked --extra dev --extra ot      # install from the lock file
-uv run pytest tests -q                       # the Python suite, about a minute
+uv run pytest tests -q -rsx                  # the Python suite, about a minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # the whole repository, as CI does
 uv run forge governance specs                # spec states and hash checks
 cd go && gofmt -l . && go vet ./... && go test ./...
