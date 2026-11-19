@@ -78,7 +78,7 @@ def _expected_fails(spec: dict[str, Any]) -> set[str]:
     leaves the spec ``pending_review``, which the runner reports as it should."""
     if spec["integrity"]["hash_state"] == "approved":
         return set()
-    return {"facts:integrity-hash-state"}
+    return {"facts:hash-approved"}
 
 
 def _run(coro):
@@ -857,8 +857,14 @@ class TestCheckIntegrity:
     def test_no_integrity_block(self, runner, verdict_status):
         spec = _minimal_spec()
         del spec["integrity"]
-        verdicts = runner._check_integrity(spec)
-        assert any(v.status == verdict_status.SKIP for v in verdicts)
+        # FACTS's own check has nothing to say; the shared runner fails the spec twice
+        # (it was a SKIP before D-14: a spec with no hash can change unnoticed)
+        assert runner._check_integrity(spec) == []
+        shared = {v.check_id: v.status for v in runner.integrity_verdicts(spec)}
+        assert shared == {
+            "facts:hash-verified": verdict_status.FAIL,
+            "facts:hash-approved": verdict_status.FAIL,
+        }
 
     def test_invalid_hash_format(self, runner, verdict_status):
         spec = _minimal_spec()
@@ -871,9 +877,10 @@ class TestCheckIntegrity:
         spec = _minimal_spec()
         spec["integrity"]["hash_state"] = "modified"
         spec["integrity"]["spec_hash"] = "a" * 64
-        verdicts = runner._check_integrity(spec)
-        state_check = [v for v in verdicts if "hash-state" in v.check_id]
-        assert any(v.status == verdict_status.FAIL for v in state_check)
+        # approval is the shared runner's verdict since FB-149
+        shared = {v.check_id: v.status for v in runner.integrity_verdicts(spec)}
+        assert shared["facts:hash-approved"] == verdict_status.FAIL
+        assert not [v for v in runner._check_integrity(spec) if "hash-state" in v.check_id]
 
 
 # =========================================================================

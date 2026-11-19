@@ -610,12 +610,12 @@ class TestFACTSSpec:
 
         runner = FACTSRunner()
         report = await runner.run(target="forge-historian", spec=spec)
-        # `facts:integrity-hash-state` is FAIL while the FB-080 re-stamp awaits the
+        # `facts:hash-approved` is FAIL while the FB-080 re-stamp awaits the
         # owner's approval (only the owner sets `approved`).
         errors = [
             v
             for v in report.verdicts
-            if v.status == VerdictStatus.FAIL and v.check_id != "facts:integrity-hash-state"
+            if v.status == VerdictStatus.FAIL and v.check_id != "facts:hash-approved"
         ]
         assert len(errors) == 0, "FACTS runner failed: " + "; ".join(
             f"[{e.check_id}] {e.message}" for e in errors

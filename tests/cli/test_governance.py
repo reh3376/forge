@@ -262,18 +262,16 @@ def test_run_facts_by_adapter_id_and_by_file(root: Path) -> None:
 
 
 def test_run_facts_reports_a_pending_stamp_as_the_one_failed_check(root: Path) -> None:
-    """A stamp the owner has not approved fails the approval checks alone, exit 1 (FB-021).
+    """A stamp the owner has not approved fails the approval check alone, exit 1 (FB-021).
 
-    Two verdicts say so: FACTS's own ``integrity-hash-state`` and the one every framework
-    gives since D-14, ``hash-approved`` (FB-159).
+    The check is the one every framework gets from the shared runner (D-14, FB-159).
     """
     path = root / "facts" / "specs" / "forge-nms.facts.json"
     code, out = run("run", "facts", str(path))
     assert code == 1
     assert "[FAIL] FACTS — forge-nms" in out and "Failed checks:" in out
-    assert out.count("[FAIL] facts:") == 2
-    assert "facts:integrity-hash-state" in out and "facts:hash-approved" in out
-    assert "pending_review" in out and "requires approval" in out
+    assert out.count("[FAIL] facts:") == 1 and "facts:hash-approved" in out
+    assert "pending_review" in out and "not binding until the owner approves it" in out
 
 
 def test_run_lists_the_failed_checks_and_exits_1(tmp_path: Path) -> None:

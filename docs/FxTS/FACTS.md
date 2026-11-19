@@ -30,7 +30,7 @@ Without FACTS, adapter development is ad hoc. Each adapter would make its own as
 ## Schema
 
 **Location:** `src/forge/governance/facts/schema/facts.schema.json`
-**Status:** ✅ Implemented (Sprint 1 complete — 60/60 tests passing)
+**Status:** ✅ Implemented: nine specs, all hashed and approved by the owner
 
 ### Adapter Specs
 
@@ -259,3 +259,7 @@ Context fields: `work_order_id` (production order), `batch_id`, `process_definit
 3. **Why context_mapping is a top-level section?** Context is Forge's core differentiator. Every record must carry operational context (batch, lot, shift, equipment, recipe). Making this explicit in the FACTS spec forces adapter developers to think about context mapping upfront, not as an afterthought.
 
 4. **Why the hashing lock?** (Inherited from UxTS, extended by FHTS) Without the integrity hash, a spec could be silently modified — for example, an AI coding agent could relax a timeout, remove a required context field, or weaken an error handling requirement. The hashing lock operates at two layers: Layer 1 (self-contained hash in the spec) detects content drift; Layer 2 (FHTS cross-cutting registry) tracks change history, records who made each change, and flags unapproved agent modifications. This is particularly important for FACTS because adapter conformance specs are long-lived contracts that shouldn't change without review. See [FHTS.md](FHTS.md) for the full hash governance framework.
+
+## Integrity
+
+Whether a spec carries a hash, whether it verifies and whether the owner approved it are the two verdicts every framework gets from the shared runner since 2026-11-18 (D-14): `facts:hash-verified` and `facts:hash-approved`. FACTS's own `integrity-present` and `integrity-hash-state` said the same less strictly and were removed on 2026-11-19; `facts:integrity-hash-format` stays. A FACTS spec edited after its approval now fails its run.

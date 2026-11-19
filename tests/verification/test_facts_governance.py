@@ -109,7 +109,7 @@ class TestFACTSRunnerValidation:
             v
             for v in verdict_list
             if v.status in (VerdictStatus.FAIL, VerdictStatus.ERROR)
-            and not (pending and v.check_id == "facts:integrity-hash-state")
+            and not (pending and v.check_id == "facts:hash-approved")
         ]
         assert len(failures) == 0, "FACTS validation failures:\n" + "\n".join(
             f"  {v.check_id}: {v.message}" for v in failures
