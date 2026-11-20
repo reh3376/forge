@@ -152,7 +152,7 @@ To add an entry: edit the list, `forge governance stamp <list> --by <you> --reas
 | forge-integ-erp-netsuite | integration | M-10 (FB-141); M-12 to M-14 (FB-164) | **approved by the owner 2026-11-19**; the same |
 | forge-scanner | management | M-3 (FB-117), M-10 (FB-141); M-12 to M-14 (FB-164) | **approved by the owner 2026-11-19**, which is what makes its time-keeping waiver count; M-6 not checked (no sample events) |
 | forge-ot | ot | M-10 (FB-141), M-11 (FB-146); M-12 to M-15 (FB-164) | **approved by the owner 2026-11-19**; it declares process-control writes, so M-15 binds it and its waiver is admin-level; M-4 to M-7 run by the kit through the module's own hook |
-| forge-mes (the interim bridge) | management | M-3 (FB-145), M-8 (FB-057), M-9 (FB-143), M-10 (FB-141), M-11 (FB-076); M-12 to M-14 and M-16 (FB-164): it declares business write-backs | `pending_review` by the owner's decision: M-4 to M-7 are not checked, because the kit cannot drive a TypeScript process (FB-155); `waivers` fails until approved (the M-3 waiver needs admin privileges) |
+| forge-mes (the interim bridge) | management | M-3 (FB-145), M-8 (FB-057), M-9 (FB-181), M-10 (FB-141), M-11 (FB-076); M-12 to M-14 and M-16 (FB-164): it declares business write-backs | `pending_review` by the owner's decision: M-4 to M-7 are not checked, because the kit cannot drive a TypeScript process (FB-155); `waivers` fails until approved (the M-3 waiver needs admin privileges) |
 
 The owner reviewed all nine on 2026-11-18, the first line by line, and approves a module spec only when the conformance kit has run M-4 to M-7 against the module.
 
