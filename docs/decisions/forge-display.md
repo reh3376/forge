@@ -1,6 +1,6 @@
 # forge-display — design record
 
-**Status:** approved by reh3376 on 2026-11-20 (the owner answered Q-1 to Q-17 one at a time on 2026-11-19 and 20 and declared the answers the signature, with the five proposals of §5 confirmed; the status line was set on that word). Three points are provisional until the spike of Q-17 and are named in §6. · **Backlog:** FB-143 (with FB-176 to FB-185) · **Roadmap:** decisions A-3, A-14, A-19, D-16
+**Status:** approved by reh3376 on 2026-11-20 (the owner answered Q-1 to Q-17 one at a time on 2026-11-19 and 20 and declared the answers the signature, with the five proposals of §5 confirmed; the status line was set on that word). The three points that were provisional until the spike of Q-17 were made final by the owner on 2026-11-20 with its measurements (§6). · **Backlog:** FB-143 (with FB-176 to FB-185) · **Roadmap:** decisions A-3, A-14, A-19, D-16
 **Participants:** reh3376 (owner, decides and signs), Claude (surveys, asks, records, proposes)
 
 Every statement is tagged **[OWNER]** (decided by the owner, with the date), **[FACT]** (what the code, a signed record or a cited source says, with where) or **[PROPOSED]** (Claude's recommendation, not approved).
@@ -205,13 +205,48 @@ Five points from the owner's recommendation, written as proposals and confirmed 
 | P-4 | The desktop and kiosk shell and the mobile wrapper are chosen when the first control-room screen exists. The mobile profile is the web client wrapped, not a separate native application. |
 | P-5 | Structure and ideas are taken from Grafana and Ignition, not code. A licence check precedes the use of any package from either. |
 
-## 6. Provisional until the spike
+## 6. The spike, and what it made final (2026-11-20)
 
-Final only when the spike of Q-17 has been measured and the numbers have been put to the owner:
+Run on 2026-11-20 in a scratch folder outside the repository, with the owner's approval to install its packages there (Q-17). Nothing from it is in the repository; the code is discarded. All of §6.1 is **[FACT]**: measured, on the conditions stated.
 
-- **Connect only for the live session** (Q-4). If it falls short, the WebSocket question returns to the owner.
-- **CEL for expressions** (Q-14), on the soundness of its TypeScript implementation.
-- **The client state library and the designer canvas approach**, which the owner's recommendation left open.
+### 6.1 What was measured
+
+**Conditions.** The owner's Apple-silicon Mac, headless Chrome at 1920 by 1080, a Go server streaming over Connect. The worst case throughout: every widget's value changes on every update, 20 times a second. "Slower" is Chrome's processor throttling at six times. Not measured: real control-room hardware, a real reverse proxy, a phone wrapper. The longest run was ten minutes, not the hour first proposed.
+
+| Case | Frames a second | Value-to-screen delay, 95th percentile |
+|---|---|---|
+| 500 widgets | 60 | 6 to 18 ms |
+| 500 widgets, slower | 57 to 60 | 12 to 18 ms |
+| 500 widgets, slower, expressions on (20,000 evaluations a second) | 56 to 60 | 15 to 16 ms |
+| 2,000 widgets | 59 to 60 | 8 to 13 ms |
+| 2,000 widgets, slower, every update applied | 7 to 9 | 240 to 620 ms, growing |
+| 2,000 widgets, slower, the newest value once per frame | 7 | 60 to 65 ms, bounded |
+| 500 widgets for ten minutes, expressions on, TLS and HTTP/2 | 60, no frame over 50 ms | 19 ms; memory between 8 and 24 MB, no growth |
+
+- A subscription change (an ordinary call, until the first value of the new point arrives on the stream): about 50 ms, 95 ms when slower.
+- A stream dropped by the server: values flowing again in 305 to 308 ms, four of four.
+- A widget that throws: it alone shows an error; the other 499 keep 60 frames a second.
+- **Plain HTTP/1.1: of nine screens in one browser, six receive values**, the browser's limit of six connections to one origin, each stream holding one. With six streams open, an ordinary call from one of those screens got no answer in five seconds. **TLS with HTTP/2: nine of nine and thirty of thirty receive values, and a call is answered in 26 to 49 ms.**
+- **CEL**: fifteen expressions with the same inputs gave the same result in the browser (`@bufbuild/cel` 0.6.2) and in Go (`cel.dev/cel-go` 0.33.4), fifteen of fifteen. Go rejects an invalid expression when it is compiled; the browser library reports it only when it is evaluated. The browser library is before version 1.0.
+- **Four ways of holding live values** (a store of about ten lines on React's own hook for external stores; zustand; jotai; MobX) were equal within noise at every load. They add nothing, about 0.5 kB, 3 kB and 18 kB compressed, and none has dependencies of its own.
+- **A designer test** of 66 lines: a hand-written drawing area (select, drag, resize, a property editor, a binding with an expression) and a three-block flow on the xyflow library; one render function drew a widget in both modes; the result was a plain data document. It was a toy: it shows the approach works, not what a usable designer costs.
+- **Size**: the run-time client with React, Connect, CEL and all four stores was 129 kB compressed; the designer added 86 kB, loaded only in design mode. Every licence was MIT or Apache-2.0.
+
+### 6.2 What the owner made final
+
+| # | Point | Answer |
+|---|---|---|
+| S-1 | The live session (Q-4). | **Final 2026-11-20: Connect only, with two conditions that are now requirements.** forge-display is always served over TLS with HTTP/2, in development too: without it a seventh screen gets no values and a write can hang. The client core keeps only the newest value of each point and applies them once per frame, so an overloaded client's delay stays bounded. The WebSocket question is closed. |
+| S-2 | Expressions (Q-14). | **Final 2026-11-20: CEL, checked by Go, pinned and wrapped.** The Go server compiles and type-checks every expression when a view document is saved or loaded and refuses a document with a bad one, so the browser evaluates only what Go accepted. The browser library is pinned to an exact version, used through one function of the core, and a test holds the browser and Go to the same results. The owner's words: "I am not concerned about how it runs on a slow computer, forge will run on a server with all the resources it needs. Users computer resources will not be overly relevant as long as they can run a browser". **[FACT]** the screen is drawn, and expressions evaluated, in the browser on the user's device, not on the server; the measurements support the owner's conclusion for ordinary screens (500 widgets all changing held 57 to 60 frames a second at one sixth of the processor), and a very large screen on a weak tablet is the case to watch. |
+| S-3 | Where live values are kept in the browser. | **Final 2026-11-20: Forge writes it.** About ten lines in the React-free core; no outside library on the path a live value takes. |
+| S-4 | The designer's drawing area. | **Final 2026-11-20: Forge owns it; focused libraries case by case.** The owner asked for the cons before deciding. For: design and run cannot drift apart, the saved screen stays in Forge's format, no dependency on the part users touch most. Against: months of work, not days (several widgets selected at once, alignment guides, undo and redo, copy and paste, zoom, touch); edge cases mature libraries already solved; Forge's to maintain. Decided: the drawing area and the saved format are Forge's own; a small library may be used for one specific hard interaction, behind Forge's own code so that it never appears in a saved screen, each confirmed with the owner before it is installed. |
+| S-5 | The flow editor. | **Final 2026-11-20: use the flow library** (xyflow, MIT). The saved flow is Forge's own governed format (D-13, B-2), so the library only draws it; it is loaded only in design mode and is installed, with the owner's confirmation, when the integration builder is built. |
+
+### 6.3 Raised by the spike, not decided
+
+- **How a screen adapts to its device.** The spike placed widgets at fixed positions, which suits a control room and not a phone. **[OWNER]** Answered 2026-11-20, with the FUTS schema (FB-176): **container kinds, mixed freely.** A screen is built from containers and each has a kind: fixed positions, reflowing, or one that switches between arrangements by device width. The kinds are a governed list, so more can be added without changing saved screens.
+- **The first widgets.** **[OWNER]** Answered 2026-11-20 (FB-176): **these twelve.** For any screen: text label, value display, status indicator, table, button, input field, link to another screen. For plant-floor screens: bar or level, two-state symbol, trend chart, alarm list, alarm banner. Each gets a widget spec; more are added later as new specs.
+- **The measurements are from one machine.** Real control-room hardware and a real reverse proxy are measured with the first control-room screen (FB-181).
 
 ## 7. The design in one table
 
@@ -226,8 +261,9 @@ Final only when the spike of Q-17 has been measured and the numbers have been pu
 | DS-7 | A browser reaches only forge-display; forge-display reaches everything through its hub session, carrying the user's identity; the core decides every permission. One forge-display per hub. | Q-11 |
 | DS-8 | Any number of UI clients. Whether a module may run as more than one server instance is declared in its spec: forge-display yes, forge-ot no. | Q-6 |
 | DS-9 | Any client whose user has the role may write, on any render profile; the activity chain records who did what, from which profile. No station-in-control. A site may switch writes off for a profile. | Q-7, Q-8 |
-| DS-10 | Values and alarms come down one Connect stream per screen; subscribing, writing and acknowledging are ordinary Connect calls. Provisional. | Q-4 |
-| DS-11 | Bindings: direct, or a CEL expression evaluated in the browser and identically in the Go server; Python never on the path of a live value. Provisional. | Q-14 |
+| DS-10 | Values and alarms come down one Connect stream per screen; subscribing, writing and acknowledging are ordinary Connect calls. Always over TLS with HTTP/2. The client core keeps the newest value of each point and applies them once per frame. | Q-4, S-1 |
+| DS-11 | Bindings: direct, or a CEL expression that the Go server has compiled and type-checked and the browser evaluates; Python never on the path of a live value. | Q-14, S-2 |
+| DS-15 | The live-value store and the designer's drawing area are Forge's own code; the flow editor uses a library; any other library for one hard interaction is confirmed with the owner first. | S-3, S-4, S-5 |
 | DS-12 | Python scripting for every module: supervised CPython worker processes in the module SDK; the standard library, the Forge scripting API, and the packages a hub admin has approved for that hub; no network, no credentials. | Q-5 |
 | DS-13 | The hub's first screens: status and health, modules, governance, users and roles. The hub gets its own view spec and object schemas. | Q-15 |
 | DS-14 | When forge-display is down the `forge` command line is the way in. | Q-9 |
@@ -239,7 +275,7 @@ Each change is the owner's, made by the answer named, and is written into the re
 | Record | Was | Now | By |
 |---|---|---|---|
 | D-4, item 3 (`docs/FxTS/FVTS.md`) | only the `desktop_hmi` profile writes tags | every profile may write; the user's role decides; a site may switch writes off for a profile | Q-8 |
-| D-4, item 6 | Connect, no WebSocket side path | unchanged, and to be confirmed by measurement | Q-4 |
+| D-4, item 6 | Connect, no WebSocket side path | unchanged, confirmed by measurement, with TLS and HTTP/2 required | Q-4, S-1 |
 | D-13, B-3 and B-4 (`integration-module-builder.md`) | no code from outside Forge is loaded; a script reaches only the Forge scripting API; an in-process sandbox | nothing a hub admin has not approved is loaded; the Forge API, the standard library and that hub's approved packages; isolation by worker processes | Q-5 |
 | D-15, T-4 (`transport-contract.md`) | one session per module id | a session belongs to an instance (module id plus instance id); a module's spec declares whether more than one instance may run | Q-6 |
 | A-2 (`ROADMAP.md`) | modules are Go | unchanged for the module; forge-display's client, which the module serves, is TypeScript and React: the one exception | Q-2 |
@@ -252,7 +288,7 @@ One backlog item and one pull request per step, in the order of Q-16.
 | Step | What | Item |
 |---|---|---|
 | 1 | FUTS: the schemas for the view document and the widget spec, the runner, the first widget specs; the hub's own view spec and object schemas; the FVTS schema's next version for Q-8 | FB-176, FB-177, FB-178 |
-| 2 | The spike, outside the repository; its numbers to the owner | FB-179 |
+| 2 | ~~The spike, outside the repository; its numbers to the owner~~ done 2026-11-20 (§6) | FB-179 |
 | 3 | The role model in force on the hub | FB-075 |
 | 4 | The Go module SDK with the parts of the transport contract forge-display needs (instances among them), and the view service messages | FB-017, FB-164, FB-180 |
 | 5 | The forge-display server and the runtime renderer with a few widgets: the four hub screens, then forge-ot's HMI screens on live data | FB-181 |
@@ -260,4 +296,4 @@ One backlog item and one pull request per step, in the order of Q-16.
 | 7 | The designer | FB-184 |
 | 8 | The management modules in Go, forge-mes first; then the integration builder | FB-076, FB-154 |
 
-Also: the `forge` command line is checked against "everything needed to bring the system back" when the hub's screens are specified (FB-185). The deployment requirement gains HTTP/2 from end to end in front of forge-display (with FB-181).
+Also: the `forge` command line is checked against "everything needed to bring the system back" when the hub's screens are specified (FB-185). The deployment requirement gains TLS with HTTP/2 from end to end in front of forge-display, in development too (S-1, with FB-181).
