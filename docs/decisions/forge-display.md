@@ -244,7 +244,8 @@ Run on 2026-11-20 in a scratch folder outside the repository, with the owner's a
 
 ### 6.3 Raised by the spike, not decided
 
-- **How a screen adapts to its device.** The spike placed widgets at fixed positions, which suits a control room and not a phone. Since one client serves all four profiles, the view document needs kinds of container, some with fixed positions and some that reflow. It is designed in the FUTS schema and put to the owner there (FB-176).
+- **How a screen adapts to its device.** The spike placed widgets at fixed positions, which suits a control room and not a phone. **[OWNER]** Answered 2026-11-20, with the FUTS schema (FB-176): **container kinds, mixed freely.** A screen is built from containers and each has a kind: fixed positions, reflowing, or one that switches between arrangements by device width. The kinds are a governed list, so more can be added without changing saved screens.
+- **The first widgets.** **[OWNER]** Answered 2026-11-20 (FB-176): **these twelve.** For any screen: text label, value display, status indicator, table, button, input field, link to another screen. For plant-floor screens: bar or level, two-state symbol, trend chart, alarm list, alarm banner. Each gets a widget spec; more are added later as new specs.
 - **The measurements are from one machine.** Real control-room hardware and a real reverse proxy are measured with the first control-room screen (FB-181).
 
 ## 7. The design in one table
