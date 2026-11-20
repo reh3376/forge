@@ -202,6 +202,6 @@ Asked one at a time, each with a debt check (does the answer pin the framework i
 `docs/decisions/forge-display.md`. Two of the decisions above are touched:
 
 - **Item 3, write authority by profile, is replaced.** The owner's words: "No any running instance with the correct permissions can make changes to any portion of the process. ... it is how effective teams operate on the factory floor and it keeps operators mobile. They can carry a tablet or laptop around and still monitor and control processes if they need to leave the control room for any reason." Every profile may write; the user's role for that area and tag, enforced by the core, decides; a site may switch writes off for a profile; the audit records the profile each write came from. The schema rule that only `desktop_hmi` actions write tags, and the profile baseline in `profiles.py`, still say the old thing until the schema's next version (FB-178).
-- **Item 6, Connect with no WebSocket side path, stands**, and is confirmed by measurement before it is final (the spike, FB-179).
+- **Item 6, Connect with no WebSocket side path, stands**, confirmed by measurement on 2026-11-20 and made final by the owner, with one condition the measurement found: forge-display is always served over TLS with HTTP/2, because over plain HTTP/1.1 a browser gives only six screens their values and a write can hang (`forge-display.md` §6).
 
 The follow-on spec of item 7, the configured-screen format, is the view document of the new framework FUTS (FB-176).

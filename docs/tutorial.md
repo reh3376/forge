@@ -1306,7 +1306,7 @@ Set by the owner on 2026-11-20 (the forge-display design record, D-16). The spec
 | # | Step |
 |---|---|
 | 1 | **The FUTS schemas** for view documents and widgets, with the hub's own view spec and object schemas |
-| 2 | **A spike**, outside the repository, that measures three provisional choices |
+| 2 | ~~**A spike**~~ done 2026-11-20: three provisional choices measured and made final |
 | 3 | **The role model in force** on the hub: a write is only as accountable as the sign-in behind it |
 | 4 | **The Go module SDK**, with the parts of the transport contract forge-display needs |
 | 5 | **forge-display**: the server and runtime renderer; the hub's four screens, then forge-ot's HMI screens on live data |
@@ -1427,7 +1427,8 @@ Signed by the owner on 2026-11-20: `docs/decisions/forge-display.md` (D-16). Not
 note:
 - Two models: Ignition for scope (a gateway for configuration and administration, a designer, strong Python scripting) and Grafana for structure (a Go backend, a TypeScript and React client, types generated from schemas). Structure and ideas are taken from them, not code.
 - Why React and not something that would outlast it: Forge alone writes the widgets, and what installations build is view documents in Forge's own schema, so a later change of framework rewrites the shell and a bounded set of widgets and nothing an installation built.
-- Provisional until a spike has measured them: Connect only for the live session, CEL, and the client's state library and canvas approach.
+- Measured in a throwaway spike on 2026-11-20 and then made final by the owner: 500 widgets all changing 20 times a second held 60 frames a second over one Connect stream; CEL gave the same results in the browser and in Go. Two requirements came out of it. **forge-display is always served over TLS with HTTP/2**: over plain HTTP/1.1 a browser gives only six screens their values, and with six open a write can hang. **The client keeps only the newest value of each point per frame**, so a struggling device falls behind by a bounded amount, not without limit.
+- Forge writes the live-value store and the designer's drawing area itself; the flow editor uses a library. Any further library is confirmed with the owner first.
 - A module can only **tighten** the profile baseline, never loosen it. forge-display ships staleness marking, bad-quality handling, ISA-101 presentation, alarm annunciation and action feedback; it enforces nothing safety-critical itself.
 - Today: the FVTS schema, a runner, the render-profile baseline, a reference renderer, golden messages and a CI gate. The schema and the baseline still carry the old write rule until their next version (FB-178).
 
@@ -1470,7 +1471,7 @@ note:
 | Gap | Backlog / decision |
 |---|---|
 | forge-display: designed and signed (D-16), no code. Its framework for view documents and widgets (FUTS), the hub's own view spec, the view service and the designer do not exist | FB-176, FB-177, FB-180, FB-181, FB-184 |
-| Three forge-display choices are provisional until measured | FB-179 |
+| How a screen adapts to its device (fixed positions for a control room, reflowing for a phone) is not designed | FB-176 |
 | Python scripting for Go modules: worker processes and an approved-package list per hub are decided, not built; today's engine runs inside the hub's process | FB-182, FB-183 |
 | The Go module SDK template; any module in Go | FB-017, FB-076 (D-3) |
 | The management modules are data contracts in Python adapters; their logic, storage and screens are not built | each module's FMTS spec says so |
@@ -2226,9 +2227,9 @@ note:
 | D-13 | The integration module builder (`integration-module-builder.md`) | signed 2026-11-18; nothing built |
 | D-14 | What every FxTS framework provides (`fxts-framework-baseline.md`) | signed 2026-11-18; built (all five steps) |
 | D-15 | The hub-to-module transport contract (`transport-contract.md`) | signed 2026-11-18, amended 2026-11-19; nothing built |
-| D-16 | The forge-display design (`forge-display.md`) | signed 2026-11-20; three points provisional until a spike; nothing built |
+| D-16 | The forge-display design (`forge-display.md`) | signed 2026-11-20; its three provisional points measured and made final the same day; nothing built |
 
-**Waiting for the owner**: the spike's numbers, to make three forge-display choices final (FB-179); the numbers of each data class, when the transport contract is built (FB-164); forge-creds (FB-142); a new site id and the last old names (FB-150).
+**Waiting for the owner**: how a screen adapts to its device, with the FUTS schema (FB-176); the numbers of each data class, when the transport contract is built (FB-164); forge-creds (FB-142); a new site id and the last old names (FB-150).
 
 On 2026-11-03 the owner answered the open questions **one at a time** (34 answers) and declared the answers the signature; every gated item can start. Two standing rules came with the answers: no silent failure, and no decision that pins the platform in.
 
@@ -2242,7 +2243,7 @@ note:
 The owner's order of 2026-11-20:
 
 1. **The FUTS schemas** for view documents and widgets, with the hub's own view spec and object schemas (FB-176, FB-177, FB-178).
-2. **The spike**, outside the repository; its numbers to the owner (FB-179).
+2. ~~**The spike**~~ done 2026-11-20 (FB-179).
 3. **The role model in force** on the hub (FB-075).
 4. **The Go module SDK** with the parts of the transport contract forge-display needs, and the view service messages (FB-017, FB-164, FB-180).
 5. **forge-display**: the server and runtime renderer, the four hub screens, then forge-ot's HMI screens on live data (FB-181).
