@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-19` against the repository `reh3376/forge` at the merge of PR 126 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-20` against the repository `reh3376/forge` at the merge of PR 127 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -245,7 +245,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-19 at PR 126:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-20 at PR 127:
 
 **Working**
 
@@ -1082,7 +1082,7 @@ flowchart TD
 - A write to a controller tag is a **command**, the only thing the transport contract calls one, and commands follow its OT half (F2): delivered at most once, never stored or queued, with an expiry. forge-ot declares process-control writes in its module spec, so requirement M-15 (refuse a command past its expiry) binds it. A write that could not be delivered at once is reported, and the person or logic that issued it decides again. Expiry is decided (D-15) and not built.
 - Server-side two-step review with reason codes and `REJECTED_REVIEW` since FB-074; multi-party approval follows the role model (D-1, signed 2026-11-03; FB-075).
 - The audit record goes to the hub store and to an external publisher (FB-066, FB-067).
-- The FVTS contract binds every UI action to a required role, a confirmation mode and the statuses it must handle; the render profile decides whether a surface may write at all.
+- The FVTS contract binds every UI action to a required role, a confirmation mode and the statuses it must handle; the user's role decides whether a write is allowed, on any render profile (owner, 2026-11-19; a site may switch writes off for a profile).
 
 note:
 - "Solved when": no path exists from any interface to a PLC that does not pass the chain, and every write is reconstructible from the audit log (`docs/VISION.md` P-6).
@@ -1301,15 +1301,23 @@ note:
 
 ## The Order of Building
 
-1. **The documentation and the core specifications** come first: the module requirements, the framework baseline, the transport contract. That is the work in progress.
-2. **forge-display is the first module built** (A-14). Every user interface in the platform, the hub's own included, comes from it, so no other module can be finished without it.
-3. **The management modules** follow, in Go, from the module SDK.
-4. **Integration modules** come last, and most of them are not built here at all: an installation's developer users build them in the designer (next slides).
+Set by the owner on 2026-11-20 (the forge-display design record, D-16). The specifications of the first stage are written; this is what follows.
+
+| # | Step |
+|---|---|
+| 1 | **The FUTS schemas** for view documents and widgets, with the hub's own view spec and object schemas |
+| 2 | **A spike**, outside the repository, that measures three provisional choices |
+| 3 | **The role model in force** on the hub: a write is only as accountable as the sign-in behind it |
+| 4 | **The Go module SDK**, with the parts of the transport contract forge-display needs |
+| 5 | **forge-display**: the server and runtime renderer; the hub's four screens, then forge-ot's HMI screens on live data |
+| 6 | **Python scripting** for every Go module: the worker pool in the SDK |
+| 7 | **The designer** |
+| 8 | **The management modules in Go**, forge-mes first; then the integration builder |
 
 In the owner's words: "the first fully functioning forge module that we must build is the forge-display module. It will be used to build the frontend of the entire forge platform to include the hub UI, therefore it must exist before any other module can be completed."
 
 note:
-- The roadmap's older sequence put forge-mes before forge-display; it is marked superseded and is to be redone with the owner (FB-143). forge-display has no design record yet.
+- This replaces the older sequence that put the Go SDK and forge-mes before forge-display. `docs/ROADMAP.md` §4 has the backlog item of every step.
 
 ---
 
@@ -1321,7 +1329,7 @@ note:
 | Modules | **Go**, generated from the module SDK, with **Python scripting** for customization (A-2, A-5) | decided; no module is in Go yet and the Go SDK template does not exist (FB-017) |
 | Today's modules | Python adapters hosted in the hub, and forge-ot, a Python module hosted in the hub | in force, interim for the management modules |
 | forge-mes today | the imported NestJS/Next.js application, the **interim MES bridge**, until the Go module replaces it | bridge in place; the Go design is signed (D-3) |
-| User interfaces | none in modules: forge-display renders every screen from FVTS specs (A-3) | the contract, a runner and a reference renderer exist; forge-display does not |
+| User interfaces | none in modules: forge-display renders every screen (A-3). Its server is Go; its client is TypeScript with React, the one exception to "modules are Go" (A-21) | designed and signed (D-16); the contract, a runner and a reference renderer exist; forge-display does not |
 
 note:
 - The hub stays Python. The decision that modules are Go is about what is built from the SDK and deployed beside a hub.
@@ -1391,23 +1399,37 @@ note:
 
 ```mermaid
 flowchart LR
-  M["Any module, and the hub itself"] -- "FVTS spec<br/>points · alarms · actions · surfaces · profiles" --> R["forge-display"]
-  R --> RUN["RUN MODE<br/>renders the screens"]
-  R --> DES["DESIGN MODE · the forge designer<br/>users build screens and integration modules"]
-  RUN --> P1["desktop_hmi<br/>20 Hz · writes · all alarm ops · kiosk"]
-  RUN --> P2["desktop_app<br/>10 Hz · no writes · acknowledge only"]
-  RUN --> P3["web<br/>4 Hz"]
-  RUN --> P4["mobile<br/>1 Hz"]
+  M["Any module, and the hub itself"] -- "its view spec (FVTS)<br/>and the schemas of its objects" --> S["forge-display server<br/>a Go module of its hub"]
+  S -- "serves the client · one Connect stream per screen" --> C["One web client<br/>TypeScript · React shell"]
+  C --> RUN["RUN MODE<br/>renders view documents"]
+  C --> DES["DESIGN MODE · the forge designer<br/>the same renderer, plus selection,<br/>a property editor and a palette"]
+  C --> ADM["The hub's own screens<br/>status · modules · governance · users and roles"]
+  S -- "every request carries the user's identity;<br/>the core decides" --> H["The hub"]
 ```
 
-- A module publishes points (units, precision, ranges, staleness), alarms, actions, surfaces and the render profiles it supports; a module can only **tighten** the baseline, never loosen it.
-- forge-display enforces nothing safety-critical itself (the core does); it ships staleness marking, bad-quality handling, ISA-101 presentation, alarm annunciation and action feedback with audit confirmation.
-- **Design mode is the forge designer** (D-13): where an installation builds its screens and its integration modules, with tools and widgets that are each governed by an FxTS spec. A user builds only within what the specs allow; only a hub admin, a dev or the super admin can change a schema; anything beyond is requested and goes through the Forge support pipeline for review.
-- Today: FVTS v0.1.0 schema, a runner, the render-profile baseline, a reference renderer, golden messages and a CI gate (FB-077). forge-display itself has no code and no design record (FB-143).
+Signed by the owner on 2026-11-20: `docs/decisions/forge-display.md` (D-16). Nothing of it is built.
+
+- **A Go module plus one web client.** The server is a module like any other. The client is the one place in the platform that is neither Go nor Python: TypeScript, with React for the shell and the designer. One client does run mode, design mode and the hub's configuration and administration screens.
+- **Schema-first.** Each module carries its view spec and versioned schemas of its own objects; forge-display generates forms, tables and detail pages from them and holds nothing specific to any module. The Go and TypeScript types are generated from the schemas, never written by hand.
+- **What an installation builds is data.** A screen is a view document (component tree, properties, bindings, event handlers, script references) in a new framework, **FUTS**, which also holds the widget specs. Forge's standard screens are files in the repository; an installation's are in its hub's database, versioned, hashed and approved on that hub.
+- **The core decides.** A browser reaches only forge-display; forge-display reaches data only through its hub session and never decides a permission itself.
+- **Any number of clients, and any of them may act.** Whoever has the role may write, from a control room, a laptop or a tablet; there is no station-in-control. The activity chain records who did what, and from which profile. This replaces the earlier rule that only the control-room profile writes.
+- **Design mode is the forge designer** (D-13): the same renderer plus selection, a property editor and a palette. An installation builds its screens there with widgets that are each governed by a spec; a user builds only within what the specs allow, and Forge alone writes the widgets.
+- **Bindings stay fast.** A value is bound directly or through a small expression (CEL) evaluated in the browser. Python handles event handlers and explicit transforms, in worker processes on the server, never on the path of a live value.
+
+| Profile | Rate | What it is |
+|---|---|---|
+| `desktop_hmi` | 20 Hz | the control room, kiosk |
+| `desktop_app` | 10 Hz | an installed application |
+| `web` | 4 Hz | a browser |
+| `mobile` | 1 Hz | the web client wrapped for a phone or tablet |
 
 note:
-- "Solved when": no module in the repository contains UI code, and the same FVTS spec renders on all four profiles (`docs/VISION.md` P-8).
-- Forge is a dynamic framework (A-19): the designer is how an installation's build-out is done, which is why forge-display is first.
+- Two models: Ignition for scope (a gateway for configuration and administration, a designer, strong Python scripting) and Grafana for structure (a Go backend, a TypeScript and React client, types generated from schemas). Structure and ideas are taken from them, not code.
+- Why React and not something that would outlast it: Forge alone writes the widgets, and what installations build is view documents in Forge's own schema, so a later change of framework rewrites the shell and a bounded set of widgets and nothing an installation built.
+- Provisional until a spike has measured them: Connect only for the live session, CEL, and the client's state library and canvas approach.
+- A module can only **tighten** the profile baseline, never loosen it. forge-display ships staleness marking, bad-quality handling, ISA-101 presentation, alarm annunciation and action feedback; it enforces nothing safety-critical itself.
+- Today: the FVTS schema, a runner, the render-profile baseline, a reference renderer, golden messages and a CI gate. The schema and the baseline still carry the old write rule until their next version (FB-178).
 
 ---
 
@@ -1447,7 +1469,9 @@ note:
 
 | Gap | Backlog / decision |
 |---|---|
-| forge-display: no code and no design record; the roadmap's sequence still puts forge-mes first | FB-143 (A-14) |
+| forge-display: designed and signed (D-16), no code. Its framework for view documents and widgets (FUTS), the hub's own view spec, the view service and the designer do not exist | FB-176, FB-177, FB-180, FB-181, FB-184 |
+| Three forge-display choices are provisional until measured | FB-179 |
+| Python scripting for Go modules: worker processes and an approved-package list per hub are decided, not built; today's engine runs inside the hub's process | FB-182, FB-183 |
 | The Go module SDK template; any module in Go | FB-017, FB-076 (D-3) |
 | The management modules are data contracts in Python adapters; their logic, storage and screens are not built | each module's FMTS spec says so |
 | The designer, the flow format, the integration host | FB-154 (D-13) |
@@ -2153,7 +2177,7 @@ note:
 
 ## The Largest Gaps Against the Vision
 
-1. **No forge-display**: the contract and a runner exist; the module that renders every screen, and the designer in it, do not, and it has no design record. It is the first module to be built.
+1. **No forge-display**: its design is signed (D-16) and the view contract and a runner exist; the module that renders every screen, its framework for view documents and widgets, and the designer in it do not. It is the first module to be built.
 2. **No module is the module it will be**: the management modules are data contracts in Python adapters; the interim MES bridge stands in for forge-mes; the Go SDK template does not exist.
 3. **The transport contract is signed and not built**: no store and forward outside forge-ot, no de-duplication, no command expiry, no deadlines, TLS optional.
 4. **No scoped roles in force**: the gateway's auth is off by default; the role model is signed and not enforced; roles per hub and the super admin are stated and not designed in.
@@ -2176,13 +2200,13 @@ note:
 |---|---|---|
 | **M1 · Contract and governance floor** | hub ↔ spoke end to end; OT module in the hub; FATS, FACTS, FTTS, FVTS with runners and gates; FHTS hashing | **Done** (PRs through 36) |
 | **M2 · Decisions and designs** | role model (D-1), forge-mes Go design (D-3), FVTS open items (D-4), OT FACTS vocabulary (D-8), one clock (D-9), one schema registry (D-10), process control (D-11); OT reference FVTS spec approved | **Mostly done**: six decisions signed 2026-11-03, D-11 on 2026-11-13; the OT FVTS spec (FB-078) open |
-| **M3 · Go SDK and the first Go module** | Go module template; forge-mes phase 1 against the hub; `mod_mes`; changeover and MQTT in Go; cut-over | not started |
-| **M4 · forge-display** | renderer scaffold and spike; MES surfaces first, then OT HMI | unblocked 2026-11-03 (D-4 decided) |
+| **M3 · forge-display** | the FUTS schemas and the hub's view spec; the role model in force; the Go SDK; the server and runtime renderer; the hub screens, then the OT HMI; Python workers; the designer | design signed 2026-11-20 (D-16); not started |
+| **M4 · The management modules in Go** | forge-mes first, with `mod_mes`, changeover and MQTT in Go, cut-over; then the others and the integration builder | after M3 |
 | **M5 · Hub platform hardening** | Context Engine and Schema Registry (done), scoped roles, persistent access control (done), FDTS/FQTS/FSTS from planned to gate | started |
 | **M6 · Enterprise** | hub of hubs, identity methods, offline tokens, Kubernetes, backups and SLOs; forge-cmms and forge-wms in Go; forge-ignition | not started |
 
 note:
-- **The order changed on 2026-11-17 (A-14):** forge-display is the first module built, because it builds the frontend of the whole platform, the hub's UI included. The table above is in the old order until it is redone with the owner (FB-143): read M4 before the forge-mes part of M3.
+- **The order was set by the owner on 2026-11-20** (D-16): forge-display before every other module. M3 and M4 were the other way round before.
 
 ---
 
@@ -2201,9 +2225,10 @@ note:
 | D-12 | The forge module requirements (`forge-module-requirements.md`) | signed 2026-11-17; the checker and the conformance kit are built; the check at Register is not |
 | D-13 | The integration module builder (`integration-module-builder.md`) | signed 2026-11-18; nothing built |
 | D-14 | What every FxTS framework provides (`fxts-framework-baseline.md`) | signed 2026-11-18; built (all five steps) |
-| D-15 | The hub-to-module transport contract (`transport-contract.md`) | signed 2026-11-18; nothing built |
+| D-15 | The hub-to-module transport contract (`transport-contract.md`) | signed 2026-11-18, amended 2026-11-19; nothing built |
+| D-16 | The forge-display design (`forge-display.md`) | signed 2026-11-20; three points provisional until a spike; nothing built |
 
-**Waiting for the owner**: the forge-display design record and the redone sequence (FB-143); the numbers of each data class, when the transport contract is built (FB-164); forge-creds (FB-142); a new site id and the last old names (FB-150).
+**Waiting for the owner**: the spike's numbers, to make three forge-display choices final (FB-179); the numbers of each data class, when the transport contract is built (FB-164); forge-creds (FB-142); a new site id and the last old names (FB-150).
 
 On 2026-11-03 the owner answered the open questions **one at a time** (34 answers) and declared the answers the signature; every gated item can start. Two standing rules came with the answers: no silent failure, and no decision that pins the platform in.
 
@@ -2214,14 +2239,18 @@ note:
 
 ## What Is Next
 
-1. **Finish the specifications.** The module requirements, the framework baseline, the transport contract and the module spec are written; what remains is versioning the JSON documents outside the frameworks (FB-171) and the last old names (FB-150).
-2. **Design forge-display** with the owner, design mode included, and redo the sequence around it (FB-143).
-3. **Build the transport contract** in its ten steps (FB-164), with the conformance kit gaining a check at each; a kit driver for modules in another process (FB-155).
-4. **The Go module SDK** (FB-017), written to the contract spec; its first consumer is forge-display.
-5. **forge-display**, then the management modules in Go, forge-mes among them (FB-076) with `mod_mes` in the hub (FB-057).
-6. **Hub platform**: scoped roles per hub (FB-075), forge-creds (FB-142), the one-registry steps (FB-097), retiring the REST ingest (FB-123).
-7. **The integration builder** (FB-154), after forge-display and the management modules.
-8. **Process control** (D-11): the framework FSD, then the PC-L1, PC-L2 and PC-L3 FSDs, each contract an FxTS spec before code.
+The owner's order of 2026-11-20:
+
+1. **The FUTS schemas** for view documents and widgets, with the hub's own view spec and object schemas (FB-176, FB-177, FB-178).
+2. **The spike**, outside the repository; its numbers to the owner (FB-179).
+3. **The role model in force** on the hub (FB-075).
+4. **The Go module SDK** with the parts of the transport contract forge-display needs, and the view service messages (FB-017, FB-164, FB-180).
+5. **forge-display**: the server and runtime renderer, the four hub screens, then forge-ot's HMI screens on live data (FB-181).
+6. **Python scripting**: the worker pool in the SDK and the approved-package list per hub (FB-182, FB-183).
+7. **The designer** (FB-184).
+8. **The management modules in Go**, forge-mes first, then the integration builder (FB-076, FB-154).
+
+Beside it: process control (D-11), the last old names (FB-150), the JSON documents outside the frameworks (FB-171).
 
 note:
 - The current next step is always the "Pick-up point" at the top of `docs/WHERE-WE-ARE.md`. This list is the shape of the road; that paragraph is where the work stands today.
@@ -2596,7 +2625,7 @@ sequenceDiagram
 - Some tags require **two-step review**: the core shows you the current value and gives you a one-time token; the commit must present the token and a reason from the site's own list.
 - **Interlocks** block writes when a condition is unsafe; only an administrator can bypass one, with a reason that is recorded.
 - Every write is **reconstructible from the audit log**: who, what, when, which interlocks were evaluated, what the equipment read back.
-- Whether a screen may write at all depends on the kind of screen: a desktop HMI may; a web page or a phone may not.
+- **Whether you may write depends on your role, not on the device.** An operator with the right role can act from the control room, a laptop or a tablet carried onto the floor. Every write, from anywhere, goes through the same checks and is recorded with who made it and from what kind of screen. A site can switch writes off for a kind of screen if it chooses to.
 
 note:
 - Multi-party approval (two people) for certain writes is designed; the role model it needs is signed (D-1, 2026-11-03) and FB-075 builds it.
@@ -2751,13 +2780,14 @@ What you will look at, and what you look at today.
 
 In the finished system no module ships its own screens. A module **describes** what it has (points with units and ranges, alarms, actions with the role and confirmation each needs, surfaces) and **forge-display** renders it on four profiles:
 
-| Profile | Rate | May write? | Alarms |
-|---|---|---|---|
-| desktop HMI (the control room, kiosk) | 20 Hz | yes | all operations |
-| desktop app | 10 Hz | no | acknowledge only |
-| web | 4 Hz | no | view |
-| mobile | 1 Hz | no | view |
+| Profile | Rate | For |
+|---|---|---|
+| desktop HMI | 20 Hz | the control room, a kiosk |
+| desktop app | 10 Hz | an installed application |
+| web | 4 Hz | a browser |
+| mobile | 1 Hz | a phone or tablet |
 
+- **Any number of people can watch and operate the same process at once**: three control rooms, a lab technician and a supervisor are five clients of the same screens. What each may do follows their own sign-in and role.
 - A module may make a screen stricter than the baseline, never looser.
 - Stale values are marked, bad quality is shown, alarms are annunciated and styled by one standard (ISA-101), and every action shows its result with the audit confirmation.
 
@@ -2788,7 +2818,7 @@ note:
 
 ## What You Look at Today · Honest
 
-- **forge-display does not exist yet, and it is the first module that will be built** (the owner's decision of 2026-11-17): every screen of the platform, the hub's own included, comes from it, so the other modules cannot be finished without it. Its contract (FVTS), the checker, a render-profile baseline, a reference renderer and example messages exist; its design is to be written with the owner.
+- **forge-display does not exist yet, and it is the first module that will be built.** Its design was signed by the owner on 2026-11-20: one web client for the screens you operate, the designer your site builds with, and the hub's own configuration and administration screens (status, modules, governance, users and roles). What exists today is its contract with the modules and the checker for it.
 - The manufacturing system's screens today are the **interim MES bridge's** own web frontend, imported with it; they will be retired when forge-display renders the MES surfaces.
 - Plant-floor screens today are the vendor's where a site keeps them; the plant-floor module serves the data behind them and its REST interfaces.
 

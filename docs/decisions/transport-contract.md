@@ -146,6 +146,12 @@ T-6 said a full buffer drops the oldest and counts the loss. **[OWNER]** "I agre
 - **The last will** a module declares is a message for the operator and the priority of the alarm raised (none, low, medium, high, critical). The state the hub records is fixed: lost, with the time last heard.
 - **The keepalive** comes from the strictest data class a module carries. A module may declare a longest interval it accepts; that can only tighten it.
 
+### A session belongs to an instance (T-4, the owner on 2026-11-19, after the signature)
+
+Decided while the forge-display design was settled (`forge-display.md`, D-16, Q-6). **[OWNER]** "There will certainly be multiple instances of UIs running against a given hub." Three things are kept apart: UI clients (any number; each a user's session, not a module instance), the server instances of a module, and the one forge-ot instance that holds the controller connections.
+
+T-4 is amended: a session belongs to an **instance**, identified by the module id plus an instance id. A module's spec declares whether more than one instance may run; the default is no. forge-display declares yes, so that screens stay up while one instance restarts. A second instance of a module that declares no is refused and recorded as a restart event, as signed. The hub shows one module with its instances.
+
 ## 6. What this changes in work already planned
 
 - **The module requirements (D-12).** T-5, T-6, T-8 and T-11 are behaviour every module must show, so the baseline gains requirements and the conformance kit gains checks for them: a stable record id, store and forward with its capacity, the goodbye and the last will, refusing a late command. That is a change to a signed record and needs the owner's word.

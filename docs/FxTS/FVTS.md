@@ -196,3 +196,12 @@ Asked one at a time, each with a debt check (does the answer pin the framework i
 5. **Rate ceilings** — 20 / 10 / 4 / 1 Hz per profile confirmed as starting values, revisited with measurements from the first forge-display surfaces. Debt check: numbers in the baseline, enforced server-side.
 6. **Contract encoding on the wire** — proto messages for subscription, history and action results, defined under FTTS and served over the Connect protocol (the Go tree's `connect-go`), which browsers reach over HTTP without a gRPC-Web proxy; no WebSocket or SSE side path. Debt check: one protocol for hub, modules and browsers; a second transport would have needed its own auth, versioning and tests.
 7. **Configured-screen format** — a follow-on spec, not part of v0.1.0; v0.1.0 surfaces are declared, not laid out, and no interim layout file ships before that spec. Debt check: nothing to migrate when the layout spec arrives.
+
+## Amended by the forge-display design record (owner, 2026-11-19 and 20, D-16)
+
+`docs/decisions/forge-display.md`. Two of the decisions above are touched:
+
+- **Item 3, write authority by profile, is replaced.** The owner's words: "No any running instance with the correct permissions can make changes to any portion of the process. ... it is how effective teams operate on the factory floor and it keeps operators mobile. They can carry a tablet or laptop around and still monitor and control processes if they need to leave the control room for any reason." Every profile may write; the user's role for that area and tag, enforced by the core, decides; a site may switch writes off for a profile; the audit records the profile each write came from. The schema rule that only `desktop_hmi` actions write tags, and the profile baseline in `profiles.py`, still say the old thing until the schema's next version (FB-178).
+- **Item 6, Connect with no WebSocket side path, stands**, and is confirmed by measurement before it is final (the spike, FB-179).
+
+The follow-on spec of item 7, the configured-screen format, is the view document of the new framework FUTS (FB-176).

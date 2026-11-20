@@ -54,7 +54,7 @@ WAIVED: dict[str, dict[str, str]] = {
     "forge-mes": {
         "M-3": "FB-145",
         "M-8": "FB-057",
-        "M-9": "FB-143",
+        "M-9": "FB-181",
         "M-10": "FB-141",
         "M-11": "FB-076",
         **TRANSPORT,

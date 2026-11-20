@@ -69,7 +69,7 @@
     {
       "requirement": "M-9",
       "reason": "The interim bridge ships its own Next.js frontend as the MES user interface until forge-display exists.",
-      "backlog_item": "FB-143"
+      "backlog_item": "FB-181"
     },
     {
       "requirement": "M-10",
@@ -133,8 +133,17 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": "81fa2662182d4fa6d630156312ef2a19bb84f1a104d30ecd6cf1b83543acc300",
+    "previous_hash": "1bc87dacd7876e04d886de8ce855db5a5030c15a14f9ef2c5a92a71bb12b6999",
     "change_history": [
+      {
+        "previous_hash": "1bc87dacd7876e04d886de8ce855db5a5030c15a14f9ef2c5a92a71bb12b6999",
+        "new_hash": "f0d1834f0bfd640ccbc73f9a9e0dfde58dae8c704c2a95fa1a89c4a9dcac02f8",
+        "changed_at": "2026-11-20T13:29:56Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-143 closed with the signed design record: the M-9 waiver now names FB-181, the item that builds forge-display"
+      },
       {
         "previous_hash": "81fa2662182d4fa6d630156312ef2a19bb84f1a104d30ecd6cf1b83543acc300",
         "new_hash": "1bc87dacd7876e04d886de8ce855db5a5030c15a14f9ef2c5a92a71bb12b6999",
@@ -152,19 +161,10 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "structural",
         "reason": "FB-165: FMTS 1.0.0, the transport contract's requirements M-12 to M-16 (D-12 amendment, owner 2026-11-19); each one that binds the module waived until FB-164"
-      },
-      {
-        "previous_hash": "15c1953615c0dea524b872aa426ae38b11d64f6e4d29f2a370c564e1684cae47",
-        "new_hash": "f6d8a7e8e90b40ae5645be762fb8e61081c6d17ff033ca778ffe490cf2c197cd",
-        "changed_at": "2026-11-18T15:32:41Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "structural",
-        "reason": "FMTS 0.2.0: module_identity.alias (owner 2026-11-18)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "1bc87dacd7876e04d886de8ce855db5a5030c15a14f9ef2c5a92a71bb12b6999",
+    "spec_hash": "f0d1834f0bfd640ccbc73f9a9e0dfde58dae8c704c2a95fa1a89c4a9dcac02f8",
     "schema_version": "2.0.0",
     "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e"
   }
