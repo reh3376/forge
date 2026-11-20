@@ -1,0 +1,90 @@
+{
+  "spec_version": "0.1.0",
+  "spec_kind": "widget",
+  "identity": {
+    "id": "action-button",
+    "name": "Button",
+    "version": "0.1.0",
+    "description": "Asks the core to do one declared action. The core decides whether it is allowed and the result is always shown."
+  },
+  "widget": {
+    "category": "general",
+    "properties": [
+      {
+        "prop_name": "label",
+        "prop_type": "string",
+        "prop_required": true,
+        "prop_description": "The text on the button."
+      },
+      {
+        "prop_name": "style",
+        "prop_type": "enum",
+        "prop_required": false,
+        "prop_enum": [
+          "primary",
+          "secondary",
+          "danger"
+        ],
+        "prop_default": "secondary",
+        "prop_description": "How it is shown."
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "enabled",
+        "value_type": "boolean",
+        "binding_required": false,
+        "expression_allowed": true,
+        "binding_description": "Whether it can be pressed."
+      }
+    ],
+    "shows": {
+      "quality": true,
+      "staleness": true
+    },
+    "actions": [
+      {
+        "action_name": "press",
+        "action_kind": "module_command",
+        "action_description": "The action asked for."
+      },
+      {
+        "action_name": "write",
+        "action_kind": "tag_write",
+        "action_description": "A write to a tag, through the core's write chain."
+      },
+      {
+        "action_name": "alarm",
+        "action_kind": "alarm_operation",
+        "action_description": "An alarm operation."
+      }
+    ],
+    "events": [
+      {
+        "event_name": "pressed",
+        "event_description": "The button was pressed."
+      },
+      {
+        "event_name": "result",
+        "event_description": "The core answered."
+      }
+    ],
+    "profiles": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "6882188e4ec00550e8e87709d4ff3faa17237813f7cc93484e3b8b280fc6e5df",
+    "schema_version": "0.1.0",
+    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T17:07:55Z"
+  }
+}

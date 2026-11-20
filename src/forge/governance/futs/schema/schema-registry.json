@@ -1,0 +1,17 @@
+{
+  "framework": "futs",
+  "hash_method": "sha256-c14n-v1",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "file": "versions/futs.v0.1.0.schema.json",
+      "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+      "hash_state": "approved",
+      "step": "baseline",
+      "summary": "FB-176: the first FUTS schema: widget specs and view documents (D-16, signed 2026-11-20)",
+      "released_at": "2026-11-20T16:54:02Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-20T16:59:40Z"
+    }
+  ]
+}

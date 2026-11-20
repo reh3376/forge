@@ -1,0 +1,92 @@
+{
+  "spec_version": "0.1.0",
+  "spec_kind": "widget",
+  "identity": {
+    "id": "input-field",
+    "name": "Input field",
+    "version": "0.1.0",
+    "description": "Lets a user enter one value for an action or a setting."
+  },
+  "widget": {
+    "category": "general",
+    "properties": [
+      {
+        "prop_name": "label",
+        "prop_type": "string",
+        "prop_required": true,
+        "prop_description": "The field's label."
+      },
+      {
+        "prop_name": "kind",
+        "prop_type": "enum",
+        "prop_required": false,
+        "prop_enum": [
+          "text",
+          "number",
+          "choice",
+          "toggle"
+        ],
+        "prop_default": "text",
+        "prop_description": "What is entered."
+      },
+      {
+        "prop_name": "choices",
+        "prop_type": "string",
+        "prop_required": false,
+        "prop_description": "Comma-separated choices for kind choice."
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "value",
+        "value_type": "any",
+        "binding_required": false,
+        "expression_allowed": false,
+        "binding_description": "The current value shown before editing."
+      }
+    ],
+    "shows": {
+      "quality": true,
+      "staleness": true
+    },
+    "actions": [
+      {
+        "action_name": "submit",
+        "action_kind": "tag_write",
+        "action_description": "Write the entered value."
+      },
+      {
+        "action_name": "command",
+        "action_kind": "module_command",
+        "action_description": "Send the entered value with a module command."
+      }
+    ],
+    "events": [
+      {
+        "event_name": "submitted",
+        "event_description": "The value was submitted."
+      },
+      {
+        "event_name": "result",
+        "event_description": "The core answered."
+      }
+    ],
+    "profiles": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "f1dadd1bb1969f54d7181da1ba006e4bc73cbada227bbd80c8d131bceaf21d39",
+    "schema_version": "0.1.0",
+    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T17:07:55Z"
+  }
+}

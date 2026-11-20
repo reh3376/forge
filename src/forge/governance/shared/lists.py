@@ -27,7 +27,11 @@ MODULE_FUNCTIONS = "module-functions"
 APPLICATION_PROTOCOLS = "application-protocols"
 DATA_CLASSES = "data-classes"
 PRUNING_STRATEGIES = "pruning-strategies"
+CONTAINER_KINDS = "container-kinds"
+#: The lists a module spec (FMTS) chooses from.
 NAMES = (MODULE_FUNCTIONS, APPLICATION_PROTOCOLS, DATA_CLASSES, PRUNING_STRATEGIES)
+#: Every governed list in the tree.
+ALL_NAMES = (*NAMES, CONTAINER_KINDS)
 
 
 @dataclass(frozen=True)

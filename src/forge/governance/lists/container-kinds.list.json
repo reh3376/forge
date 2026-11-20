@@ -1,0 +1,44 @@
+{
+  "list": "container-kinds",
+  "title": "Container kinds",
+  "description": "How a container of a view document arranges its children. A screen is built from containers, mixed freely, so one screen can hold a process graphic with fixed positions beside a form that reflows (owner, 2026-11-20, FB-176). Adding a kind is one approved change to this list and never changes a saved screen.",
+  "entries": [
+    {
+      "id": "fixed",
+      "description": "Every child sits at an exact position and size; the whole container scales to fit or keeps its size. For a process graphic.",
+      "layout_fields": [
+        "width",
+        "height",
+        "scale"
+      ],
+      "children_need_place": true
+    },
+    {
+      "id": "reflow",
+      "description": "Children are arranged in a row or a column that wraps and stacks as the display narrows. For forms, tables and dashboards.",
+      "layout_fields": [
+        "direction",
+        "wrap",
+        "gap"
+      ],
+      "children_need_place": false
+    },
+    {
+      "id": "switch",
+      "description": "Shows one of its children, chosen by the width of the display. For a screen that must be arranged differently on a phone.",
+      "layout_fields": [
+        "breakpoints"
+      ],
+      "children_need_place": false
+    }
+  ],
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "77f34ff2b96cb3d4d95ad163e84df41f25700064a7ed9e709854ea4ed451f120",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T16:59:40Z"
+  }
+}

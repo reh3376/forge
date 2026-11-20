@@ -200,7 +200,7 @@ Decided by the owner on 2026-11-20 (the forge-display design record, Q-16). It r
 
 | # | Step | Items |
 |---|---|---|
-| 1 | **The FUTS schemas** for view documents and widgets, with the hub's own view spec and object schemas, and the FVTS schema's next version | FB-176, FB-177, FB-178 |
+| 1 | **The FUTS schemas** for view documents and widgets (done 2026-11-20, FB-176; generated types are FB-186), with the hub's own view spec and object schemas, and the FVTS schema's next version | FB-177, FB-178, FB-186 |
 | 2 | ~~**The spike**~~ done 2026-11-20: Connect only held 60 frames a second with 500 widgets all changing at 20 Hz; TLS with HTTP/2 found to be required; CEL agreed with Go; the three provisional points made final | FB-179 |
 | 3 | **The role model in force on the hub** | FB-075 |
 | 4 | **The Go module SDK**, with the parts of the transport contract forge-display needs and the view service messages | FB-017, FB-164, FB-180 |

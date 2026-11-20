@@ -1,0 +1,77 @@
+{
+  "spec_version": "0.1.0",
+  "spec_kind": "widget",
+  "identity": {
+    "id": "data-table",
+    "name": "Table",
+    "version": "0.1.0",
+    "description": "Rows of a module's objects, generated from the object's schema, with sorting and filtering."
+  },
+  "widget": {
+    "category": "general",
+    "properties": [
+      {
+        "prop_name": "object_schema",
+        "prop_type": "string",
+        "prop_required": true,
+        "prop_description": "The schema of the objects listed."
+      },
+      {
+        "prop_name": "columns",
+        "prop_type": "string",
+        "prop_required": false,
+        "prop_description": "Comma-separated field names; every field when not set."
+      },
+      {
+        "prop_name": "page_size",
+        "prop_type": "number",
+        "prop_required": false,
+        "prop_default": 25,
+        "prop_description": "Rows per page."
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "rows",
+        "value_type": "any",
+        "binding_required": false,
+        "expression_allowed": false,
+        "binding_description": "The rows shown."
+      }
+    ],
+    "shows": {
+      "quality": true,
+      "staleness": true
+    },
+    "actions": [
+      {
+        "action_name": "open_row",
+        "action_kind": "navigate",
+        "action_description": "Open the detail screen of a row."
+      }
+    ],
+    "events": [
+      {
+        "event_name": "row_selected",
+        "event_description": "A row was selected."
+      }
+    ],
+    "profiles": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "5a4f34e0275cecc220d4d4ee8f448c123f148154e4164e00365c0f0e71ff197e",
+    "schema_version": "0.1.0",
+    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T17:07:55Z"
+  }
+}

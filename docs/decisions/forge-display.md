@@ -287,7 +287,7 @@ One backlog item and one pull request per step, in the order of Q-16.
 
 | Step | What | Item |
 |---|---|---|
-| 1 | FUTS: the schemas for the view document and the widget spec, the runner, the first widget specs; the hub's own view spec and object schemas; the FVTS schema's next version for Q-8 | FB-176, FB-177, FB-178 |
+| 1 | FUTS: the schema for the view document and the widget spec, the runner, the first widget specs (done 2026-11-20, FB-176); types generated from it (FB-186); the hub's own view spec and object schemas; the FVTS schema's next version for Q-8 | FB-176, FB-177, FB-178, FB-186 |
 | 2 | ~~The spike, outside the repository; its numbers to the owner~~ done 2026-11-20 (§6) | FB-179 |
 | 3 | The role model in force on the hub | FB-075 |
 | 4 | The Go module SDK with the parts of the transport contract forge-display needs (instances among them), and the view service messages | FB-017, FB-164, FB-180 |

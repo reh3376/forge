@@ -1,0 +1,71 @@
+{
+  "spec_version": "0.1.0",
+  "spec_kind": "widget",
+  "identity": {
+    "id": "value-display",
+    "name": "Value display",
+    "version": "0.1.0",
+    "description": "A number or a state with its unit, its quality and its staleness."
+  },
+  "widget": {
+    "category": "general",
+    "properties": [
+      {
+        "prop_name": "label",
+        "prop_type": "string",
+        "prop_required": false,
+        "prop_description": "Shown beside the value."
+      },
+      {
+        "prop_name": "show_unit",
+        "prop_type": "boolean",
+        "prop_required": false,
+        "prop_default": true,
+        "prop_description": "Show the engineering unit of the point."
+      },
+      {
+        "prop_name": "precision",
+        "prop_type": "number",
+        "prop_required": false,
+        "prop_description": "Decimal places; the point's own precision when not set."
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "value",
+        "value_type": "any",
+        "binding_required": true,
+        "expression_allowed": true,
+        "binding_description": "The value shown."
+      }
+    ],
+    "shows": {
+      "quality": true,
+      "staleness": true
+    },
+    "actions": [],
+    "events": [
+      {
+        "event_name": "changed",
+        "event_description": "The value changed."
+      }
+    ],
+    "profiles": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "9f94983999ef79644f3a0cef3da58a7f4ac1e42171cc036ec09dc2fb5b264162",
+    "schema_version": "0.1.0",
+    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T17:07:56Z"
+  }
+}

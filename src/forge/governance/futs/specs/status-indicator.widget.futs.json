@@ -1,0 +1,65 @@
+{
+  "spec_version": "0.1.0",
+  "spec_kind": "widget",
+  "identity": {
+    "id": "status-indicator",
+    "name": "Status indicator",
+    "version": "0.1.0",
+    "description": "A coloured state with its reason: healthy, degraded, refused, lost."
+  },
+  "widget": {
+    "category": "general",
+    "properties": [
+      {
+        "prop_name": "label",
+        "prop_type": "string",
+        "prop_required": false,
+        "prop_description": "Shown beside the state."
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "state",
+        "value_type": "enum",
+        "binding_required": true,
+        "expression_allowed": true,
+        "binding_description": "The state shown."
+      },
+      {
+        "binding_name": "reason",
+        "value_type": "string",
+        "binding_required": false,
+        "expression_allowed": false,
+        "binding_description": "Why it is in that state."
+      }
+    ],
+    "shows": {
+      "quality": true,
+      "staleness": true
+    },
+    "actions": [],
+    "events": [
+      {
+        "event_name": "changed",
+        "event_description": "The state changed."
+      }
+    ],
+    "profiles": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "c19f5a4f97e51b3ed714b8d1b656b2d56024d6d06cbfd3d8876e457870567e79",
+    "schema_version": "0.1.0",
+    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T17:07:56Z"
+  }
+}

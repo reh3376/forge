@@ -1,0 +1,65 @@
+{
+  "spec_version": "0.1.0",
+  "spec_kind": "widget",
+  "identity": {
+    "id": "level-bar",
+    "name": "Bar or level",
+    "version": "0.1.0",
+    "description": "A value shown as a bar between the point's low and high range, with its limits."
+  },
+  "widget": {
+    "category": "plant-floor",
+    "properties": [
+      {
+        "prop_name": "orientation",
+        "prop_type": "enum",
+        "prop_required": false,
+        "prop_enum": [
+          "vertical",
+          "horizontal"
+        ],
+        "prop_default": "vertical",
+        "prop_description": "Which way the bar grows."
+      },
+      {
+        "prop_name": "show_limits",
+        "prop_type": "boolean",
+        "prop_required": false,
+        "prop_default": true,
+        "prop_description": "Mark the alarm limits."
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "value",
+        "value_type": "number",
+        "binding_required": true,
+        "expression_allowed": true,
+        "binding_description": "The value shown."
+      }
+    ],
+    "shows": {
+      "quality": true,
+      "staleness": true
+    },
+    "actions": [],
+    "events": [],
+    "profiles": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "fa9def4ab8748edbd039a423f9eeee7bd53aae1a54b5606eafdb597277346c0f",
+    "schema_version": "0.1.0",
+    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T17:07:56Z"
+  }
+}

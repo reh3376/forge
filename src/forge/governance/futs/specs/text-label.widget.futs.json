@@ -1,0 +1,65 @@
+{
+  "spec_version": "0.1.0",
+  "spec_kind": "widget",
+  "identity": {
+    "id": "text-label",
+    "name": "Text label",
+    "version": "0.1.0",
+    "description": "Fixed text, or text taken from a point."
+  },
+  "widget": {
+    "category": "general",
+    "properties": [
+      {
+        "prop_name": "text",
+        "prop_type": "string",
+        "prop_required": false,
+        "prop_description": "The text shown when nothing is bound."
+      },
+      {
+        "prop_name": "emphasis",
+        "prop_type": "enum",
+        "prop_required": false,
+        "prop_enum": [
+          "normal",
+          "strong",
+          "muted"
+        ],
+        "prop_default": "normal",
+        "prop_description": "How strongly it is shown."
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "text",
+        "value_type": "any",
+        "binding_required": false,
+        "expression_allowed": true,
+        "binding_description": "Replaces the text."
+      }
+    ],
+    "shows": {
+      "quality": true,
+      "staleness": true
+    },
+    "actions": [],
+    "events": [],
+    "profiles": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "a2414ce626c9cbc9e5864a777786abc1b8fea96f12098923d238a317927ff1d8",
+    "schema_version": "0.1.0",
+    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T17:07:56Z"
+  }
+}
