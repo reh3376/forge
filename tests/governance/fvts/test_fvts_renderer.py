@@ -7,6 +7,7 @@ from typing import Any
 
 import pytest
 
+from forge.governance.fvts.profiles import PROFILE_BASELINE, SitePolicy, effective_profile
 from forge.governance.fvts.renderer import (
     WRITE_STATUSES,
     GoldenRenderError,
@@ -197,11 +198,21 @@ class TestActionsAndSurfaces:
     def result(self, action_id: str, status: str, **extra: Any) -> dict[str, Any]:
         return {"message_type": "action_result", "action_id": action_id, "status": status, **extra}
 
-    def test_result_only_for_permitted_actions(self, hmi, web) -> None:
-        assert hmi.render(self.result("ferm.write_temperature_sp", "CONFIRMED"))["audited"] is True
+    def test_result_only_for_permitted_actions(self, hmi, web, reference_spec) -> None:
+        write = self.result("ferm.write_temperature_sp", "CONFIRMED")
+        assert hmi.render(write)["audited"] is True
+        # The role decides, on every profile (owner, 2026-11-19): a browser may write too.
+        assert web.render(write)["audited"] is True
+        # A site may switch writes off for a profile; then the result is not one it can show.
+        no_web_writes = ReferenceRenderer(
+            reference_spec, "web", SitePolicy(writes_off=frozenset({"web"}))
+        )
         with pytest.raises(GoldenRenderError, match="is not permitted on web"):
-            web.render(self.result("ferm.write_temperature_sp", "CONFIRMED"))
-        assert web.render(self.result("alarm.acknowledge", "CONFIRMED"))["status"] == "CONFIRMED"
+            no_web_writes.render(write)
+        assert (
+            no_web_writes.render(self.result("alarm.acknowledge", "CONFIRMED"))["status"]
+            == "CONFIRMED"
+        )
 
     def test_statuses_must_be_handled(self, hmi, reference_spec) -> None:
         with pytest.raises(GoldenRenderError, match="is not a WriteStatus"):
@@ -225,13 +236,21 @@ class TestActionsAndSurfaces:
         )
         assert view["interlock_feedback"] == "IL-1: CIP running"
 
-    def test_surface_actions_filtered_per_profile(self, hmi, web) -> None:
+    def test_surface_actions_filtered_per_profile(self, hmi, web, reference_spec) -> None:
         message = {"message_type": "surface_render", "surface_id": "ferm.overview"}
-        assert web.render(message)["actions_hidden"] == [
+        assert web.render(message)["actions_hidden"] == []
+        assert hmi.render(message)["actions_hidden"] == []
+        site = SitePolicy(writes_off=frozenset({"web"}), alarm_operations_off=frozenset({"web"}))
+        restricted = ReferenceRenderer(reference_spec, "web", site).render(message)
+        assert restricted["actions_hidden"] == [
             "ferm.write_temperature_sp",
+            "alarm.acknowledge",
             "alarm.shelve",
         ]
-        assert hmi.render(message)["actions_hidden"] == []
+        assert (
+            ReferenceRenderer(reference_spec, "desktop_hmi", site).render(message)["actions_hidden"]
+            == []
+        )
         assert hmi.render(message)["points"] == [
             "ferm.temperature",
             "ferm.temperature_sp",
@@ -292,3 +311,30 @@ class TestGoldenSet:
         (tmp_path / "x.json").write_text("[1]", encoding="utf-8")
         with pytest.raises(GoldenRenderError, match="must be a JSON object"):
             load_golden_messages(tmp_path)
+
+
+class TestTheSitePolicy:
+    """A site can switch writes or alarm operations off for a profile, and nothing more."""
+
+    def test_by_default_every_profile_may_write_and_do_every_alarm_operation(self) -> None:
+        for profile, base in PROFILE_BASELINE.items():
+            assert base.writes_permitted is True, profile
+            assert "SHELVE" in base.alarm_operations and "RESET" in base.alarm_operations
+
+    def test_a_site_switches_a_kind_off_for_one_profile_only(self, reference_spec) -> None:
+        site = SitePolicy(writes_off=frozenset({"mobile"}))
+        assert effective_profile(reference_spec, "mobile", site).writes_permitted is False
+        assert effective_profile(reference_spec, "mobile", site).alarm_operations
+        assert effective_profile(reference_spec, "web", site).writes_permitted is True
+        off = SitePolicy(alarm_operations_off=frozenset({"web"}))
+        assert effective_profile(reference_spec, "web", off).alarm_operations == frozenset()
+        assert effective_profile(reference_spec, "web", off).writes_permitted is True
+
+    def test_a_site_policy_cannot_undo_what_a_spec_tightened(self, reference_spec) -> None:
+        tightened = copy.deepcopy(reference_spec)
+        tightened["render_profiles"]["overrides"]["web"] = {"writes_permitted": False}
+        assert effective_profile(tightened, "web", SitePolicy()).writes_permitted is False
+
+    def test_an_unknown_profile_in_a_policy_is_refused(self) -> None:
+        with pytest.raises(ValueError, match="unknown render profile"):
+            SitePolicy(writes_off=frozenset({"watch"}))

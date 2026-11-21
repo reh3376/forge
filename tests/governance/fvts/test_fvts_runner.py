@@ -274,9 +274,14 @@ class TestActionTarget:
 
 class TestProfiles:
     async def test_action_profile_permitted(self, check, spec) -> None:
+        # The role decides, on every profile (owner, 2026-11-19 and 21): the reference
+        # offers the setpoint write and SHELVE on a browser and a phone, and that passes.
         assert (await check(spec, "fvts:action-profile-permitted")).status is PASS
-        spec["actions"][0]["allowed_profiles"].append("web")  # tag write from a browser
-        spec["actions"][2]["allowed_profiles"].append("mobile")  # SHELVE from a phone
+        assert {"web", "mobile"} <= set(spec["actions"][0]["allowed_profiles"])
+        assert {"web", "mobile"} <= set(spec["actions"][2]["allowed_profiles"])
+        # A spec may still tighten a profile; an action offered there is then a contradiction.
+        spec["render_profiles"]["overrides"]["web"] = {"writes_permitted": False}
+        spec["render_profiles"]["overrides"]["mobile"]["alarm_operations_permitted"] = False
         verdict = await check(spec, "fvts:action-profile-permitted")
         assert verdict.status is FAIL
         assert "tag_write is not permitted on 'web'" in _messages(verdict)
@@ -305,21 +310,20 @@ class TestProfiles:
         assert effective["mobile"]["max_update_rate_hz"] == 1.0
         assert effective["web"] == {
             "max_update_rate_hz": 4.0,
-            "writes_permitted": False,
-            "alarm_operations": ["ACKNOWLEDGE"],
+            "writes_permitted": True,
+            "alarm_operations": ["ACKNOWLEDGE", "DISABLE", "ENABLE", "RESET", "SHELVE", "UNSHELVE"],
         }
 
     async def test_profile_baseline_rejects_loosening(self, check, spec) -> None:
+        # The update rate is the one limit a profile still carries; an override cannot raise it.
+        # Writes and alarm operations are open on every profile, so naming them is not loosening.
         spec["render_profiles"]["overrides"] = {
             "mobile": {"max_update_rate_hz": 30},
             "web": {"writes_permitted": True, "alarm_operations_permitted": True},
         }
         verdict = await check(spec, "fvts:profile-baseline")
         assert verdict.status is FAIL
-        found = _messages(verdict)
-        assert "loosens the 'mobile' rate ceiling (30 > 1 Hz)" in found
-        assert "grants tag writes on 'web'" in found
-        assert "claims all alarm operations on 'web'" in found
+        assert _messages(verdict) == "override loosens the 'mobile' rate ceiling (30 > 1 Hz)"
 
     async def test_profile_baseline_tightening_is_allowed_and_applied(self, check, spec) -> None:
         spec["render_profiles"]["overrides"] = {
@@ -337,10 +341,13 @@ class TestProfiles:
         assert verdict.status is PASS
         table = verdict.evidence["filter"]
         assert table["ferm.overview@web"] == {
-            "visible": ["alarm.acknowledge"],
-            "hidden": ["ferm.write_temperature_sp", "alarm.shelve"],
+            "visible": ["ferm.write_temperature_sp", "alarm.acknowledge", "alarm.shelve"],
+            "hidden": [],
         }
         assert table["ferm.overview@desktop_hmi"]["hidden"] == []
+        # An action the spec itself keeps off a profile is hidden there; a surface whose
+        # every action is hidden on every profile it allows is a contradiction.
+        spec["actions"][2]["allowed_profiles"] = ["desktop_hmi"]
         spec["surfaces"][1]["allowed_profiles"] = ["mobile"]
         spec["surfaces"][1]["actions"] = ["alarm.shelve"]
         verdict = await check(spec, "fvts:profile-action-filter")

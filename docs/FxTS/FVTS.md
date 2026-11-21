@@ -58,14 +58,14 @@ Live updates with `transport: grpc_stream` ride the FTTS-governed gRPC transport
 
 ## Render profiles — normative baseline
 
-Specs may **tighten** these (via `render_profiles.overrides`), never loosen them. Runner check `fvts:profile-baseline`. The table is code: `src/forge/governance/fvts/profiles.py` (`PROFILE_BASELINE`, `effective_profile()`, `action_permitted()`).
+A profile carries one platform limit, the update rate. **Who may act is decided by the user's role, on every profile** (owner, 2026-11-19 and 21; `docs/decisions/forge-display.md`, Q-7 and Q-8): a tag write and every alarm operation are open on all four, so an operator can monitor and control a process from a carried tablet or laptop, and the activity record names the profile each action came from. Two things can narrow a profile and neither can widen it: a spec may **tighten** it (via `render_profiles.overrides`, and by the profiles an action lists), and a site may switch tag writes or alarm operations off for a profile (`SitePolicy`). Runner check `fvts:profile-baseline`. The table is code: `src/forge/governance/fvts/profiles.py` (`PROFILE_BASELINE`).
 
 | Profile | Intended renderer | Max update rate | Tag writes | Alarm operations | Kiosk / fullscreen | Notes |
 |---------|-------------------|-----------------|------------|------------------|--------------------|-------|
-| `desktop_hmi` | Operator HMI on plant-floor industrial PCs | 20 Hz | Permitted | All, per role | Yes | Must keep displaying (marked stale) through network loss |
-| `desktop_app` | MES, forge-core admin, engineering tools | 10 Hz | Not permitted (v0.1.0) | ACKNOWLEDGE only | No | Settings and configuration live here |
-| `web` | Remote and cross-site dashboards | 4 Hz | Not permitted | ACKNOWLEDGE only | No | Read-mostly by design |
-| `mobile` | Phones and tablets | 1 Hz | Not permitted | ACKNOWLEDGE only | No | Notification-driven; reduced payloads |
+| `desktop_hmi` | Operator HMI on plant-floor industrial PCs | 20 Hz | Per role | All, per role | Yes | Must keep displaying (marked stale) through network loss |
+| `desktop_app` | MES, forge-core admin, engineering tools | 10 Hz | Per role | All, per role | No | Settings and configuration live here |
+| `web` | A browser: remote dashboards, a carried laptop | 4 Hz | Per role | All, per role | No | A cross-site view stays read-only (`fvts:cross-site-read-only`) |
+| `mobile` | Phones and tablets | 1 Hz | Per role | All, per role | No | Notification-driven; reduced payloads |
 
 Consequences enforced by the runner:
 
@@ -201,7 +201,8 @@ Asked one at a time, each with a debt check (does the answer pin the framework i
 
 `docs/decisions/forge-display.md`. Two of the decisions above are touched:
 
-- **Item 3, write authority by profile, is replaced.** The owner's words: "No any running instance with the correct permissions can make changes to any portion of the process. ... it is how effective teams operate on the factory floor and it keeps operators mobile. They can carry a tablet or laptop around and still monitor and control processes if they need to leave the control room for any reason." Every profile may write; the user's role for that area and tag, enforced by the core, decides; a site may switch writes off for a profile; the audit records the profile each write came from. The schema rule that only `desktop_hmi` actions write tags, and the profile baseline in `profiles.py`, still say the old thing until the schema's next version (FB-178).
+- **Item 3, write authority by profile, is replaced.** The owner's words: "No any running instance with the correct permissions can make changes to any portion of the process. ... it is how effective teams operate on the factory floor and it keeps operators mobile. They can carry a tablet or laptop around and still monitor and control processes if they need to leave the control room for any reason." Every profile may write; the user's role for that area and tag, enforced by the core, decides; a site may switch writes off for a profile; the audit records the profile each write came from. **Done 2026-11-21 (FB-178):** the profile baseline in `profiles.py` opens tag writes on all four profiles; `SitePolicy` is the per-site switch; the reference spec offers its actions on every profile. The schema needed no new version: the rule was in the baseline, not in the schema.
+- **Alarm operations follow the role too.** Asked on 2026-11-21, because the baseline also limited alarm operations by device (only the control-room profile could shelve, disable or reset): the owner answered that the role decides on every profile, and that a site may switch alarm operations off for a profile as it can for writes.
 - **Item 6, Connect with no WebSocket side path, stands**, confirmed by measurement on 2026-11-20 and made final by the owner, with one condition the measurement found: forge-display is always served over TLS with HTTP/2, because over plain HTTP/1.1 a browser gives only six screens their values and a write can hang (`forge-display.md` §6).
 
 The follow-on spec of item 7, the configured-screen format, is the view document of the new framework FUTS (FB-176).
