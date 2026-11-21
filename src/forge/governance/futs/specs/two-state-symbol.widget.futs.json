@@ -1,0 +1,76 @@
+{
+  "spec_version": "0.1.0",
+  "spec_kind": "widget",
+  "identity": {
+    "id": "two-state-symbol",
+    "name": "Two-state symbol",
+    "version": "0.1.0",
+    "description": "A valve, pump or motor shown in one of two states, by ISA-101 presentation."
+  },
+  "widget": {
+    "category": "plant-floor",
+    "properties": [
+      {
+        "prop_name": "symbol",
+        "prop_type": "enum",
+        "prop_required": true,
+        "prop_enum": [
+          "valve",
+          "pump",
+          "motor",
+          "generic"
+        ],
+        "prop_description": "What is drawn."
+      },
+      {
+        "prop_name": "label",
+        "prop_type": "string",
+        "prop_required": false,
+        "prop_description": "Shown beside the symbol."
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "state",
+        "value_type": "boolean",
+        "binding_required": true,
+        "expression_allowed": true,
+        "binding_description": "True is open or running."
+      }
+    ],
+    "shows": {
+      "quality": true,
+      "staleness": true
+    },
+    "actions": [
+      {
+        "action_name": "command",
+        "action_kind": "tag_write",
+        "action_description": "Open or close, start or stop, through the core's write chain."
+      }
+    ],
+    "events": [
+      {
+        "event_name": "changed",
+        "event_description": "The state changed."
+      }
+    ],
+    "profiles": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "dcbe74356769e171df44d9e22f01282822195f60d223fa4ce122e652bd9e6c28",
+    "schema_version": "0.1.0",
+    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T17:07:56Z"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "spec_version": "0.1.0",
+  "spec_kind": "widget",
+  "identity": {
+    "id": "view-link",
+    "name": "Link to another screen",
+    "version": "0.1.0",
+    "description": "Opens another screen."
+  },
+  "widget": {
+    "category": "general",
+    "properties": [
+      {
+        "prop_name": "label",
+        "prop_type": "string",
+        "prop_required": true,
+        "prop_description": "The link's text."
+      }
+    ],
+    "bindings": [],
+    "shows": {
+      "quality": false,
+      "staleness": false
+    },
+    "actions": [
+      {
+        "action_name": "open",
+        "action_kind": "navigate",
+        "action_description": "The screen to open."
+      }
+    ],
+    "events": [
+      {
+        "event_name": "opened",
+        "event_description": "The link was followed."
+      }
+    ],
+    "profiles": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "0fb095f5e1f0f9c48d38b7371250b20fbb4ebe6e98e1102767fcb15e7f679799",
+    "schema_version": "0.1.0",
+    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T17:07:56Z"
+  }
+}

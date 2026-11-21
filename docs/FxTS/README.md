@@ -184,6 +184,7 @@ Every FxTS framework follows the same structure:
 | [FPTS](FPTS.md) | Forge Performance Test Specification | Throughput and latency benchmarks | Soft-fail | Planned |
 | [FHTS](FHTS.md) | Forge Hash Test Specification | Cross-cutting hash integrity and AI agent governance | Hard-fail | Implemented |
 | [FVTS](FVTS.md) | Forge View Test Specification | Module ↔ forge-display contract: bindings, alarms, actions, surfaces, render profiles | Hard-fail | Schema + Runner + reference renderer implemented; 1 spec, hashed, awaiting the owner's approval (FB-078) |
+| [FUTS](FUTS.md) | Forge UI Test Specification | What a screen is made of: widget specs and view documents (laid-out screens) | Hard-fail | Schema + runner; 13 specs (twelve widgets, one reference view document); nothing renders them yet (FB-181) |
 | [FMTS](FMTS.md) | Forge Module Test Specification | The requirements every module meets: the baseline, the time contract, references to its other specs, waivers (`docs/decisions/forge-module-requirements.md`, D-12) | Hard-fail | Schema + Runner + conformance kit implemented; 9 specs, 8 approved (the interim MES bridge is pending, FB-155) |
 | [FTTS](FTTS.md) | Forge Transport Test Specification | The transport between a hub and every module: wire format, RPCs, errors | Hard-fail | Schema + Runner implemented; 1 spec, hashed and approved 2026-11-18; the signed transport contract is not built (D-15, FB-164) |
 

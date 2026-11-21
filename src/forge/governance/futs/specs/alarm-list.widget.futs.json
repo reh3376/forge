@@ -1,0 +1,70 @@
+{
+  "spec_version": "0.1.0",
+  "spec_kind": "widget",
+  "identity": {
+    "id": "alarm-list",
+    "name": "Alarm list",
+    "version": "0.1.0",
+    "description": "The module's active alarms and their states, by ISA-18.2, with the operations the core allows."
+  },
+  "widget": {
+    "category": "plant-floor",
+    "properties": [
+      {
+        "prop_name": "show_history",
+        "prop_type": "boolean",
+        "prop_required": false,
+        "prop_default": false,
+        "prop_description": "Include cleared alarms."
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "alarms",
+        "value_type": "alarms",
+        "binding_required": true,
+        "expression_allowed": false,
+        "binding_description": "The alarms listed."
+      }
+    ],
+    "shows": {
+      "quality": true,
+      "staleness": true
+    },
+    "actions": [
+      {
+        "action_name": "acknowledge",
+        "action_kind": "alarm_operation",
+        "action_description": "Acknowledge an alarm."
+      },
+      {
+        "action_name": "shelve",
+        "action_kind": "alarm_operation",
+        "action_description": "Shelve an alarm for a time."
+      }
+    ],
+    "events": [
+      {
+        "event_name": "alarm_selected",
+        "event_description": "An alarm was selected."
+      }
+    ],
+    "profiles": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "5592c3706b36c65827777fe21806a58cc1132ae81f86a79bbfe8e9e81d0d9f7f",
+    "schema_version": "0.1.0",
+    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T17:07:55Z"
+  }
+}

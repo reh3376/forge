@@ -233,7 +233,7 @@ governance_app.command("approve")(governance_cli.approve)
 
 @governance_app.command("run")
 def governance_run(
-    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts")],
+    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts | futs")],
     target: Annotated[
         str,
         typer.Argument(

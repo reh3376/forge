@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-@pytest.mark.parametrize("name", lists.NAMES)
+@pytest.mark.parametrize("name", lists.ALL_NAMES)
 def test_every_list_verifies_and_is_approved_by_the_owner(name: str) -> None:
     governed = lists.load(name)
     assert governed.problems == []
@@ -30,9 +30,9 @@ def test_every_list_verifies_and_is_approved_by_the_owner(name: str) -> None:
 
 def test_the_lists_are_listed_with_the_specs() -> None:
     listed = {path.name for path in spec_files(SPEC_ROOT)}
-    assert {f"{name}{lists.SUFFIX}" for name in lists.NAMES} <= listed
+    assert {f"{name}{lists.SUFFIX}" for name in lists.ALL_NAMES} <= listed
     on_disk = {path.name for path in lists.LISTS_DIR.glob("*.json")}
-    assert on_disk == {f"{name}{lists.SUFFIX}" for name in lists.NAMES}
+    assert on_disk == {f"{name}{lists.SUFFIX}" for name in lists.ALL_NAMES}
 
 
 def test_the_first_lists_are_the_owners_answers() -> None:

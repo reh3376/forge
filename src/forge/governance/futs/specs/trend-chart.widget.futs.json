@@ -1,0 +1,66 @@
+{
+  "spec_version": "0.1.0",
+  "spec_kind": "widget",
+  "identity": {
+    "id": "trend-chart",
+    "name": "Trend chart",
+    "version": "0.1.0",
+    "description": "The history of one or more numeric points over a chosen time, decimated by the server."
+  },
+  "widget": {
+    "category": "plant-floor",
+    "properties": [
+      {
+        "prop_name": "span_minutes",
+        "prop_type": "number",
+        "prop_required": false,
+        "prop_default": 60,
+        "prop_description": "The time shown."
+      },
+      {
+        "prop_name": "show_limits",
+        "prop_type": "boolean",
+        "prop_required": false,
+        "prop_default": false,
+        "prop_description": "Mark the alarm limits."
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "series",
+        "value_type": "series",
+        "binding_required": true,
+        "expression_allowed": false,
+        "binding_description": "The points trended."
+      }
+    ],
+    "shows": {
+      "quality": true,
+      "staleness": true
+    },
+    "actions": [],
+    "events": [
+      {
+        "event_name": "span_changed",
+        "event_description": "The time shown changed."
+      }
+    ],
+    "profiles": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "8f2b12a9b4f195dbbf5324d99b132413b9fa23f8ee49cb076d870be566823e46",
+    "schema_version": "0.1.0",
+    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-20T17:07:56Z"
+  }
+}

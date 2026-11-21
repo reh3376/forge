@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-20` against the repository `reh3376/forge` at the merge of PR 128 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-21` against the repository `reh3376/forge` at the merge of PR 129 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -245,14 +245,14 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-20 at PR 128:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-21 at PR 129:
 
 **Working**
 
 1. **The hub-to-module contract works end to end.** A module registers, is checked against its FACTS spec, pushes records that are persisted, is pulled (Collect, Backfill, Subscribe) and receives write-backs, over TLS/mTLS both ways with per-module tokens.
 2. **One clock is enforced on the links that exist.** Every Register, Health and Ingest is a time exchange. The hub refuses a module whose clock is outside its class or that reports no measurement; forge-ot does the same to each PLC connection. No record builder invents a source time.
 3. **forge-ot runs inside the hub**: OPC UA connections, the tag engine, the control-write defense chain, and the MES changeover sequence.
-4. **Governance is real for five frameworks** (FACTS, FATS, FTTS, FVTS, FMTS) plus FHTS hashing. All 48 specs carry a hash; 46 are approved by the owner. So do the schemas they are written against and the four governed lists they choose values from. A run fails in every framework when a hash does not verify or is not approved. A test checks every framework against ten requirements on every run.
+4. **Governance is real for six frameworks** (FACTS, FATS, FTTS, FVTS, FMTS, FUTS) plus FHTS hashing. All 61 specs carry a hash; 59 are approved by the owner. So do the schemas they are written against and the five governed lists they choose values from. A run fails in every framework when a hash does not verify or is not approved. A test checks every framework against ten requirements on every run.
 5. **Every module is checked against the module requirements.** Nine modules have an FMTS spec; eight are approved. A conformance kit runs each Python module against a reference hub with its clock set wrong, to prove it stops and says why.
 
 **The modules, as they are**
@@ -280,13 +280,13 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-20 at PR 128:
 | Measure | Value (2026-11-19) |
 |---|---|
 | Python hub (`src/forge`) | 354 files, ~74,100 lines |
-| Python tests | 283 files, 4,949 collected, full suite green on the locked dependency set |
+| Python tests | 285 files, 5,003 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
 | Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
 | Storage migrations | 12 |
-| Specs | 9 FACTS · 28 FATS · 9 FMTS · 1 FTTS · 1 FVTS |
+| Specs | 9 FACTS · 28 FATS · 9 FMTS · 1 FTTS · 1 FVTS · 13 FUTS |
 | Signed decision records | 9 |
 | Backlog | 170 items recorded, 75 done; every finding is fixed or recorded |
 
@@ -353,7 +353,7 @@ note:
 | `src/forge/adapters` | the Python adapters of eight modules (`forge_wms`, `forge_mes`, `forge_cmms`, `forge_nms`, `forge_ims`, `forge_historian`, `forge_scanner`, `forge_integ_erp_netsuite`), each with its manifest and config, and four empty generic packages (FB-148) |
 | `go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
-| `tests/` | 283 files mirroring `src/`; `tests/governance/` holds the gates of every framework |
+| `tests/` | 285 files mirroring `src/`; `tests/governance/` holds the gates of every framework |
 | `docs/` | the key documents, `FxTS/` (the framework pages), `decisions/` (the signed records), `deployment/`, `governance/`, `tutorial.md` (this deck's source) |
 | `deploy/docker` | the development compose stack and the hub image |
 
@@ -779,6 +779,7 @@ note:
 | **FTTS** · Forge Transport Test Specification | the hub-to-module transport | schema + runner + 1 spec, approved; the signed transport contract is not built (FB-164) |
 | **FVTS** · Forge View Test Specification | module ↔ forge-display: points, alarms, actions, surfaces, profiles | schema + runner + reference renderer + golden messages + 1 spec, awaiting approval (FB-078) |
 | **FMTS** · Forge Module Test Specification | what every module must do: sixteen requirements, the time contract, waivers | schema + runner + conformance kit + 9 specs, 8 approved |
+| **FUTS** · Forge UI Test Specification | what a screen is made of: widget specs and view documents (laid-out screens) | schema + runner + 13 specs (twelve widgets, one reference view), all approved; nothing renders them yet (FB-181) |
 | **FHTS** · Forge Hash Test Specification | the hash and owner approval of every spec above | hashing, verification, approval, revert, registry |
 | FQTS · FSTS · FDTS · FLTS · FNTS · FOTS · FPTS | data quality · security · schema evolution · lineage · normalization · observability · performance | planned: a documentation page each, nothing in the code |
 
@@ -911,7 +912,7 @@ note:
 
 ## Governed Lists · Values That Can Grow
 
-Some fields take a value from a list that must be able to grow: a new module function, a new protocol, a new data class. If the list lived in the schema, every new entry would be a new schema version. So four lists live outside it (owner, 2026-11-19).
+Some fields take a value from a list that must be able to grow: a new module function, a new protocol, a new data class. If the list lived in the schema, every new entry would be a new schema version. So five lists live outside it (owner, 2026-11-19 and 20).
 
 | List | A spec uses it for | Entries today |
 |---|---|---|
@@ -919,6 +920,7 @@ Some fields take a value from a list that must be able to grow: a new module fun
 | Application-side protocols | how an integration module reaches its application | rest, graphql, mqtt, opc-ua, sql, amqp, file |
 | Data classes | what a module carries on its link | thirteen parents (next table) |
 | Pruning strategies | what a module does when its buffer is full | drop-oldest (the default), by-class-priority |
+| Container kinds | how a container of a screen arranges its children | fixed, reflow, switch |
 
 - Each list is a file in `src/forge/governance/lists/`, **hashed and approved by the owner like a spec**. `forge governance specs` shows it; `stamp` and `approve` work on it.
 - The schema says only "an entry of the list"; the runner checks it. A list that does not verify, or that the owner has not approved, fails every module spec.
@@ -960,7 +962,7 @@ forge governance approve <spec.json> --by reh3376   # the owner, on their own wo
 - The FVTS runner has a render-profile baseline and golden messages; a module can only tighten the baseline, never loosen it.
 
 note:
-- When you add a hub route you add a FATS spec; when you add a module you add its FACTS and FMTS specs; when a module exposes a screen it adds an FVTS spec. The gate is where you find out you forgot.
+- When you add a hub route you add a FATS spec; when you add a module you add its FACTS and FMTS specs; when a module exposes a screen it adds an FVTS spec; a new widget gets a FUTS widget spec and a standard screen is a FUTS view document. The gate is where you find out you forgot.
 - After any edit to a spec, `stamp` it. It then awaits the owner. Never write an approval yourself.
 
 ---
@@ -1305,7 +1307,7 @@ Set by the owner on 2026-11-20 (the forge-display design record, D-16). The spec
 
 | # | Step |
 |---|---|
-| 1 | **The FUTS schemas** for view documents and widgets, with the hub's own view spec and object schemas |
+| 1 | **The FUTS schemas** for view documents and widgets (done 2026-11-20), with the hub's own view spec and object schemas |
 | 2 | ~~**A spike**~~ done 2026-11-20: three provisional choices measured and made final |
 | 3 | **The role model in force** on the hub: a write is only as accountable as the sign-in behind it |
 | 4 | **The Go module SDK**, with the parts of the transport contract forge-display needs |
@@ -1411,7 +1413,9 @@ Signed by the owner on 2026-11-20: `docs/decisions/forge-display.md` (D-16). Not
 
 - **A Go module plus one web client.** The server is a module like any other. The client is the one place in the platform that is neither Go nor Python: TypeScript, with React for the shell and the designer. One client does run mode, design mode and the hub's configuration and administration screens.
 - **Schema-first.** Each module carries its view spec and versioned schemas of its own objects; forge-display generates forms, tables and detail pages from them and holds nothing specific to any module. The Go and TypeScript types are generated from the schemas, never written by hand.
-- **What an installation builds is data.** A screen is a view document (component tree, properties, bindings, event handlers, script references) in a new framework, **FUTS**, which also holds the widget specs. Forge's standard screens are files in the repository; an installation's are in its hub's database, versioned, hashed and approved on that hub.
+- **What an installation builds is data.** A screen is a view document (a tree of containers and widget instances with their properties, bindings, actions and event handlers) in a new framework, **FUTS**, which also holds the widget specs. Forge's standard screens are files in the repository; an installation's are in its hub's database, versioned, hashed and approved on that hub.
+- **A screen adapts to its device through its containers.** Each container has a kind, mixed freely on one screen: `fixed` (exact positions, for a process graphic), `reflow` (rows and columns that wrap and stack, for forms and tables) and `switch` (one of several arrangements, chosen by the width of the display).
+- **FUTS exists** (2026-11-20): the schema, a runner, the first twelve widget specs and one reference view document, all approved. A view document may use only the points and actions of the surface it lays out, and only widgets whose spec the owner approved. `docs/FxTS/FUTS.md`.
 - **The core decides.** A browser reaches only forge-display; forge-display reaches data only through its hub session and never decides a permission itself.
 - **Any number of clients, and any of them may act.** Whoever has the role may write, from a control room, a laptop or a tablet; there is no station-in-control. The activity chain records who did what, and from which profile. This replaces the earlier rule that only the control-room profile writes.
 - **Design mode is the forge designer** (D-13): the same renderer plus selection, a property editor and a palette. An installation builds its screens there with widgets that are each governed by a spec; a user builds only within what the specs allow, and Forge alone writes the widgets.
@@ -1470,8 +1474,8 @@ note:
 
 | Gap | Backlog / decision |
 |---|---|
-| forge-display: designed and signed (D-16), no code. Its framework for view documents and widgets (FUTS), the hub's own view spec, the view service and the designer do not exist | FB-176, FB-177, FB-180, FB-181, FB-184 |
-| How a screen adapts to its device (fixed positions for a control room, reflowing for a phone) is not designed | FB-176 |
+| forge-display: designed and signed (D-16), no code. Its framework for view documents and widgets exists (FUTS); the hub's own view spec, the view service and the designer do not, and nothing renders a view document | FB-177, FB-180, FB-181, FB-184 |
+| A view document's expressions are not compiled or type-checked (the Go server does that), and no Go or TypeScript types are generated from the schemas yet | FB-181, FB-186 |
 | Python scripting for Go modules: worker processes and an approved-package list per hub are decided, not built; today's engine runs inside the hub's process | FB-182, FB-183 |
 | The Go module SDK template; any module in Go | FB-017, FB-076 (D-3) |
 | The management modules are data contracts in Python adapters; their logic, storage and screens are not built | each module's FMTS spec says so |
@@ -1985,7 +1989,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q -rsx                    # 4,949 tests, ~1 minute; lists each skip with its reason
+uv run pytest tests -q -rsx                    # 5,003 tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2125,7 +2129,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 283 files, 4,949 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/` mirrors `src/`: 285 files, 5,003 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -2229,7 +2233,7 @@ note:
 | D-15 | The hub-to-module transport contract (`transport-contract.md`) | signed 2026-11-18, amended 2026-11-19; nothing built |
 | D-16 | The forge-display design (`forge-display.md`) | signed 2026-11-20; its three provisional points measured and made final the same day; nothing built |
 
-**Waiting for the owner**: how a screen adapts to its device, with the FUTS schema (FB-176); the numbers of each data class, when the transport contract is built (FB-164); forge-creds (FB-142); a new site id and the last old names (FB-150).
+**Waiting for the owner**: the generator for Go and TypeScript types (FB-186, an install); the numbers of each data class, when the transport contract is built (FB-164); forge-creds (FB-142); a new site id and the last old names (FB-150).
 
 On 2026-11-03 the owner answered the open questions **one at a time** (34 answers) and declared the answers the signature; every gated item can start. Two standing rules came with the answers: no silent failure, and no decision that pins the platform in.
 
@@ -2242,7 +2246,7 @@ note:
 
 The owner's order of 2026-11-20:
 
-1. **The FUTS schemas** for view documents and widgets, with the hub's own view spec and object schemas (FB-176, FB-177, FB-178).
+1. **The FUTS schemas** for view documents and widgets (done 2026-11-20, FB-176), then the hub's own view spec and object schemas and the view contract's next version (FB-177, FB-178).
 2. ~~**The spike**~~ done 2026-11-20 (FB-179).
 3. **The role model in force** on the hub (FB-075).
 4. **The Go module SDK** with the parts of the transport contract forge-display needs, and the view service messages (FB-017, FB-164, FB-180).

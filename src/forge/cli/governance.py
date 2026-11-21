@@ -19,7 +19,7 @@ Writes replace only the top-level ``integrity`` block in the file: the rest
 keeps its bytes (key order, line wrapping, escaping), so the review diff of
 an approval is the approval.
 
-``run`` takes the framework (``fats``, ``facts``, ``fvts``, ``ftts``, ``fmts``) and a
+``run`` takes the framework (``fats``, ``facts``, ``fvts``, ``ftts``, ``fmts``, ``futs``) and a
 target that is either a spec file or the id the framework checks identity
 against (endpoint path, ``adapter_id``, ``view_id``, ``transport_id``,
 ``module_id``); an
@@ -314,6 +314,12 @@ def _ftts_runner(schema: Path) -> FxTSRunner:
     return FTTSRunner(schema_path=schema)
 
 
+def _futs_runner(schema: Path) -> FxTSRunner:
+    from forge.governance.futs.runners.futs_runner import FUTSRunner
+
+    return FUTSRunner(schema_path=schema)
+
+
 def _fmts_runner(schema: Path) -> FxTSRunner:
     from forge.governance.fmts.runners.fmts_runner import FMTSRunner
 
@@ -369,6 +375,15 @@ FRAMEWORKS: dict[str, Framework] = {
         ("transport_identity", "transport_id"),
         _ftts_runner,
         live=True,
+    ),
+    "futs": Framework(
+        "FUTS",
+        SPEC_ROOT / "futs" / "specs",
+        "*.futs.json",
+        SPEC_ROOT / "futs" / "schema" / "futs.schema.json",
+        ("identity", "id"),
+        _futs_runner,
+        live=False,
     ),
     "fmts": Framework(
         "FMTS",
@@ -554,7 +569,7 @@ def _version_row(schema_dir: Path, version: str) -> schemas.SchemaVersion:
 
 
 def schema_diff(
-    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts")],
+    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts | futs")],
     old: Annotated[str, typer.Argument(help="The earlier version, e.g. 0.1.0")],
     new: Annotated[
         str | None,
@@ -583,7 +598,7 @@ def schema_diff(
 
 
 def schema_release(
-    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts")],
+    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts | futs")],
     summary: Annotated[str, typer.Option("--summary", help="What changed and why (FB-nnn: ...)")],
 ) -> None:
     """Register the edited schema file as a new version, awaiting the owner's approval.
@@ -605,7 +620,7 @@ def schema_release(
 
 
 def schema_approve(
-    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts")],
+    framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts | futs")],
     version: Annotated[str, typer.Argument(help="The version to approve, e.g. 0.2.0")],
     by: Annotated[str, typer.Option("--by", help="The approving owner (recorded as approved_by)")],
 ) -> None:
