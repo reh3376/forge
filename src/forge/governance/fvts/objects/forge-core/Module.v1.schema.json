@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://schemas/forge-core/Module/v1",
+  "title": "Module",
+  "description": "One module registered with this hub.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "module_id",
+    "name",
+    "kind",
+    "function",
+    "version",
+    "state",
+    "instances"
+  ],
+  "properties": {
+    "module_id": {
+      "type": "string",
+      "description": "Its id, forge-<service> or forge-integ-<function>-<product>."
+    },
+    "name": {
+      "type": "string",
+      "description": "Its name."
+    },
+    "alias": {
+      "type": "string",
+      "description": "Its shortcut name."
+    },
+    "kind": {
+      "type": "string",
+      "description": "How it comes to exist.",
+      "enum": [
+        "management",
+        "integration",
+        "ot",
+        "display"
+      ]
+    },
+    "function": {
+      "type": "string",
+      "description": "The service it performs, from the governed list of module functions."
+    },
+    "version": {
+      "type": "string",
+      "description": "Its version."
+    },
+    "state": {
+      "type": "string",
+      "description": "Its state at the hub.",
+      "enum": [
+        "registered",
+        "healthy",
+        "degraded",
+        "refused",
+        "stopped",
+        "lost"
+      ]
+    },
+    "refusal_cause": {
+      "type": "string",
+      "description": "Why the hub refuses it; empty when it does not."
+    },
+    "clock_offset_seconds": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "description": "How far its clock is from the hub's, from the last two-way measurement."
+    },
+    "tolerance_class": {
+      "type": "string",
+      "description": "The tolerance class its clock is held to."
+    },
+    "instances": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many of its server instances are connected."
+    },
+    "data_classes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The data classes it carries."
+    },
+    "waived": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The requirements its spec waives."
+    },
+    "last_heard_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the hub last heard from it. UTC."
+    }
+  }
+}

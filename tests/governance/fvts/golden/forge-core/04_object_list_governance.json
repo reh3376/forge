@@ -1,0 +1,34 @@
+[
+  {
+    "message_type": "object_list",
+    "object_id": "hub.governed_file",
+    "items": [
+      {
+        "file": "forge-wms.fmts.json",
+        "framework": "fmts",
+        "hash_state": "approved",
+        "spec_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "verified": true,
+        "approved_by": "owner",
+        "approved_at": "2026-11-19T22:07:00Z",
+        "schema_version": "2.0.0"
+      }
+    ]
+  },
+  {
+    "message_type": "object_list",
+    "object_id": "hub.schema_version",
+    "items": [
+      {
+        "id": "fmts/2.0.0",
+        "framework": "fmts",
+        "version": "2.0.0",
+        "current": true,
+        "step": "major",
+        "hash_state": "approved",
+        "schema_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "specs": 9
+      }
+    ]
+  }
+]

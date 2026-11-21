@@ -12,6 +12,17 @@
       "released_at": "2026-11-19T00:00:00Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-19T18:03:47Z"
+    },
+    {
+      "version": "0.2.0",
+      "file": "versions/fvts.v0.2.0.schema.json",
+      "schema_hash": "1a9785248467232def2fe2f01959988cfaffad20c1098382510a7c3d125b1ec7",
+      "hash_state": "approved",
+      "step": "minor",
+      "summary": "FB-177: objects beside points: a module declares the collections it shows, each with its schema; a command may target an object; a surface lists the objects it shows; a contract may have no points (D-16, Q-3 and Q-15)",
+      "released_at": "2026-11-21T16:05:31Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-21T16:15:33Z"
     }
   ]
 }

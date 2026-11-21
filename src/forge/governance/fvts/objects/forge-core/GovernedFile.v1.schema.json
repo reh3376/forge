@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://schemas/forge-core/GovernedFile/v1",
+  "title": "Spec or governed list",
+  "description": "One governed file: a spec of a framework, or a governed list.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "file",
+    "framework",
+    "hash_state",
+    "spec_hash",
+    "verified"
+  ],
+  "properties": {
+    "file": {
+      "type": "string",
+      "description": "Its file name."
+    },
+    "framework": {
+      "type": "string",
+      "description": "Its framework, or lists."
+    },
+    "hash_state": {
+      "type": "string",
+      "description": "Its state.",
+      "enum": [
+        "approved",
+        "pending_review",
+        "modified",
+        "reverted",
+        "unknown"
+      ]
+    },
+    "spec_hash": {
+      "type": "string",
+      "description": "Its recorded hash."
+    },
+    "verified": {
+      "type": [
+        "boolean",
+        "null"
+      ],
+      "description": "Whether its content matches its hash."
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "Who approved it."
+    },
+    "approved_at": {
+      "type": "string",
+      "description": "When."
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "The schema version it was approved against."
+    }
+  }
+}

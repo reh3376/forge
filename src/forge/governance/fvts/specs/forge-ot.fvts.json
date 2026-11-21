@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "view_identity": {
     "view_id": "forge-ot-views",
     "name": "Forge OT/SCADA Module — Operator Views",
@@ -325,8 +325,17 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": "948d0fed76e0f89ad3d5b492e3c9bda1f99afc6533dec3e652d88d497a097db4",
+    "previous_hash": "6f46a3c215b2aa71b3657adc02aad18a205cbc278e369fe8d3ea98163b34d118",
     "change_history": [
+      {
+        "previous_hash": "6f46a3c215b2aa71b3657adc02aad18a205cbc278e369fe8d3ea98163b34d118",
+        "new_hash": "52c24d95c2fc918dfb22b25529e136e6b4589522faf812a413f577d33cc60c19",
+        "changed_at": "2026-11-21T16:05:32Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "schema fvts 0.1.0 -> 0.2.0"
+      },
       {
         "previous_hash": "948d0fed76e0f89ad3d5b492e3c9bda1f99afc6533dec3e652d88d497a097db4",
         "new_hash": "6f46a3c215b2aa71b3657adc02aad18a205cbc278e369fe8d3ea98163b34d118",
@@ -344,20 +353,11 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
         "reason": "Owner review 2026-11-18: the OT module's one id is forge-ot (FB-144)"
-      },
-      {
-        "previous_hash": "d2344754a70a9b501267ca7cdc42be89b10bd576503f8640a32d9e83f926d179",
-        "new_hash": "c7d1c3d44175dc1b4927bfdbf463b018eee6f413809555b54c4d3aef9d95c725",
-        "changed_at": "2026-10-17T17:43:03.508335+00:00",
-        "source": "agent",
-        "changed_by": "claude-code",
-        "change_type": "structural",
-        "reason": "FB-074: REJECTED_REVIEW added to handled_statuses of the setpoint write and the description names the review layer; forge-core now enforces two_step_with_review and reason codes server-side. Awaiting owner approval."
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "6f46a3c215b2aa71b3657adc02aad18a205cbc278e369fe8d3ea98163b34d118",
-    "schema_version": "0.1.0",
-    "schema_hash": "9e4bf0b831f13978b92d38e6ecaba49e6245bc0716bee301337bdd290ad4a350"
+    "spec_hash": "52c24d95c2fc918dfb22b25529e136e6b4589522faf812a413f577d33cc60c19",
+    "schema_version": "0.2.0",
+    "schema_hash": "1a9785248467232def2fe2f01959988cfaffad20c1098382510a7c3d125b1ec7"
   }
 }

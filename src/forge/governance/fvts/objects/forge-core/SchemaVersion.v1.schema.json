@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://schemas/forge-core/SchemaVersion/v1",
+  "title": "Schema version",
+  "description": "One released version of a framework's schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "framework",
+    "version",
+    "current",
+    "step",
+    "hash_state",
+    "schema_hash",
+    "specs"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "framework and version, joined by a slash."
+    },
+    "framework": {
+      "type": "string",
+      "description": "The framework."
+    },
+    "version": {
+      "type": "string",
+      "description": "The version."
+    },
+    "current": {
+      "type": "boolean",
+      "description": "Whether it is the current version."
+    },
+    "step": {
+      "type": "string",
+      "description": "The step it was released as.",
+      "enum": [
+        "baseline",
+        "patch",
+        "minor",
+        "major"
+      ]
+    },
+    "hash_state": {
+      "type": "string",
+      "description": "Its state.",
+      "enum": [
+        "approved",
+        "pending_review",
+        "historical"
+      ]
+    },
+    "schema_hash": {
+      "type": "string",
+      "description": "Its hash."
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "Who approved it."
+    },
+    "specs": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "How many specs are written against it."
+    },
+    "summary": {
+      "type": "string",
+      "description": "What changed."
+    }
+  }
+}

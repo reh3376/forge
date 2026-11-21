@@ -1,0 +1,18 @@
+{
+  "message_type": "object_list",
+  "object_id": "hub.component",
+  "items": [
+    {
+      "name": "hub",
+      "status": "up",
+      "reason": "",
+      "checked_at": "2026-11-21T12:00:00Z"
+    },
+    {
+      "name": "timescaledb",
+      "status": "down",
+      "reason": "connection refused",
+      "checked_at": "2026-11-21T12:00:00Z"
+    }
+  ]
+}

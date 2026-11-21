@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://schemas/forge-core/RoleAssignment/v1",
+  "title": "Role assignment",
+  "description": "One role given to one user, with where it applies.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "assignment_id",
+    "user_id",
+    "role_id",
+    "applies_to",
+    "assigned_by",
+    "assigned_at"
+  ],
+  "properties": {
+    "assignment_id": {
+      "type": "string",
+      "description": "Its id."
+    },
+    "user_id": {
+      "type": "string",
+      "description": "The user."
+    },
+    "role_id": {
+      "type": "string",
+      "description": "The role."
+    },
+    "applies_to": {
+      "type": "string",
+      "description": "Where it applies: an area, equipment or module, as a constraint."
+    },
+    "assigned_by": {
+      "type": "string",
+      "description": "Who assigned it."
+    },
+    "assigned_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When. UTC."
+    },
+    "source_hub": {
+      "type": "string",
+      "description": "The hub it was assigned at; assignments are inherited downward and never edited below."
+    }
+  }
+}

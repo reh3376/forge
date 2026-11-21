@@ -102,6 +102,7 @@ _ACTION = frozenset(
         "label",
         "kind",
         "target_point",
+        "target_object",
         "alarm_operation",
         "command",
         "parameters_schema_ref",
@@ -125,8 +126,23 @@ _SURFACE = frozenset(
         "allowed_profiles",
         "points",
         "actions",
+        "objects",
     }
 )
+_OBJECT = frozenset(
+    {
+        "object_id",
+        "object_label",
+        "schema_ref",
+        "schema_path",
+        "schema_hash",
+        "key_field",
+        "delivery",
+        "object_description",
+    }
+)
+#: The hub's id as the owner of a view spec. It is not a module and has no FACTS spec.
+HUB_OWNER = "forge-core"
 
 
 def load_facts_specs(directory: Path = FACTS_SPECS_DIR) -> dict[str, dict[str, Any]]:
@@ -187,7 +203,7 @@ class FVTSRunner(FxTSRunner):
     version = "0.1.0"
 
     _ENFORCED_FIELDS: ClassVar[set[str]] = set(_TOP_LEVEL) | {
-        f"$.{field}" for field in _POINT | _ACTION | _SURFACE
+        f"$.{field}" for field in _POINT | _ACTION | _SURFACE | _OBJECT
     }
 
     def __init__(self, schema_path: Path | str | None = None) -> None:
@@ -220,6 +236,7 @@ class FVTSRunner(FxTSRunner):
             self._check_owner_in_facts(spec, facts_specs, repo_root),
             self._check_unique_ids(spec),
             self._check_surface_refs(spec),
+            self._check_objects(spec, repo_root),
             self._check_action_target(spec, facts_specs, kwargs.get("write_config")),
             self._check_action_profile_permitted(spec),
             self._check_profile_supported(spec),
@@ -268,6 +285,10 @@ class FVTSRunner(FxTSRunner):
     @staticmethod
     def _points(spec: dict[str, Any]) -> dict[str, dict[str, Any]]:
         return {p.get("point_id"): p for p in spec.get("data_bindings", {}).get("points", [])}
+
+    @staticmethod
+    def _objects(spec: dict[str, Any]) -> dict[str, dict[str, Any]]:
+        return {o.get("object_id"): o for o in spec.get("data_bindings", {}).get("objects", [])}
 
     @staticmethod
     def _actions(spec: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -405,7 +426,9 @@ class FVTSRunner(FxTSRunner):
         owner = identity.get("owner_module", "")
         violations = []
         facts = facts_specs.get(owner)
-        if facts is None:
+        # The hub describes its own screens like any module (D-16, Q-15), but it is not a
+        # module: it has no FACTS spec to be bound to.
+        if facts is None and owner != HUB_OWNER:
             violations.append(
                 SpecViolation(
                     field="view_identity.owner_module",
@@ -452,6 +475,11 @@ class FVTSRunner(FxTSRunner):
         violations = []
         groups = (
             ("data_bindings.points", spec.get("data_bindings", {}).get("points", []), "point_id"),
+            (
+                "data_bindings.objects",
+                spec.get("data_bindings", {}).get("objects", []),
+                "object_id",
+            ),
             ("actions", spec.get("actions", []), "action_id"),
             ("surfaces", spec.get("surfaces", []), "surface_id"),
         )
@@ -465,11 +493,141 @@ class FVTSRunner(FxTSRunner):
                     )
                 )
         return self._verdict(
-            "unique-ids", "ids", violations, "point, action and surface ids are unique."
+            "unique-ids", "ids", violations, "point, object, action and surface ids are unique."
+        )
+
+    def _check_objects(self, spec: dict[str, Any], repo_root: Path) -> FxTSVerdict:
+        """``fvts:objects``: each declared object's schema is the file the spec was approved with.
+
+        The object's schema document is found, is a valid JSON Schema, carries the id the
+        spec names, and has the hash the spec records, so a schema changed after approval
+        fails here until the spec is stamped and approved again. Its owner is this spec's
+        owner. A command that targets an object targets a declared one.
+        """
+        import jsonschema
+
+        from forge.governance.shared.runner import sha256_hex_obj
+
+        owner = spec.get("view_identity", {}).get("owner_module", "")
+        declared = spec.get("data_bindings", {}).get("objects", [])
+        violations: list[SpecViolation] = []
+        if not declared and not spec.get("data_bindings", {}).get("points"):
+            violations.append(
+                SpecViolation(
+                    field="data_bindings",
+                    message="the contract declares no point and no object: it shows nothing",
+                )
+            )
+        root = repo_root.resolve()
+        for entry in declared:
+            oid = entry.get("object_id")
+            where = f"data_bindings.objects[{oid}]"
+            path = (repo_root / str(entry.get("schema_path"))).resolve()
+            if root not in path.parents or not path.is_file():
+                violations.append(
+                    SpecViolation(
+                        field=f"{where}.schema_path",
+                        actual=entry.get("schema_path"),
+                        message=(
+                            f"object '{oid}': {entry.get('schema_path')} is not a file in "
+                            "the repository"
+                        ),
+                    )
+                )
+                continue
+            try:
+                document = json.loads(path.read_text(encoding="utf-8"))
+                jsonschema.Draft202012Validator.check_schema(document)
+            except (ValueError, jsonschema.SchemaError) as exc:
+                violations.append(
+                    SpecViolation(
+                        field=f"{where}.schema_path",
+                        message=f"object '{oid}': its schema is not a valid JSON Schema ({exc})"[
+                            :300
+                        ],
+                    )
+                )
+                continue
+            ref = str(entry.get("schema_ref"))
+            if document.get("$id") != ref:
+                violations.append(
+                    SpecViolation(
+                        field=f"{where}.schema_ref",
+                        expected=ref,
+                        actual=document.get("$id"),
+                        message=(
+                            f"object '{oid}': the document's $id is "
+                            f"{document.get('$id')!r}, not {ref!r}"
+                        ),
+                    )
+                )
+            if not ref.startswith(f"forge://schemas/{owner}/"):
+                violations.append(
+                    SpecViolation(
+                        field=f"{where}.schema_ref",
+                        message=f"object '{oid}': {ref} is not a schema of '{owner}'",
+                    )
+                )
+            found = sha256_hex_obj(document)
+            if found != entry.get("schema_hash"):
+                violations.append(
+                    SpecViolation(
+                        field=f"{where}.schema_hash",
+                        expected=entry.get("schema_hash"),
+                        actual=found,
+                        message=(
+                            f"object '{oid}': its schema has changed since this spec was "
+                            "stamped; record the new hash, stamp the spec, and the owner "
+                            "approves it again"
+                        ),
+                    )
+                )
+            key = entry.get("key_field")
+            if key not in document.get("properties", {}) or key not in document.get("required", []):
+                violations.append(
+                    SpecViolation(
+                        field=f"{where}.key_field",
+                        actual=key,
+                        message=(
+                            f"object '{oid}': key field '{key}' is not a required field "
+                            "of its schema"
+                        ),
+                    )
+                )
+        ids = {entry.get("object_id") for entry in declared}
+        for action in spec.get("actions", []):
+            target = action.get("target_object")
+            if target is None:
+                continue
+            aid = action.get("action_id")
+            if target not in ids:
+                violations.append(
+                    SpecViolation(
+                        field=f"actions[{aid}].target_object",
+                        actual=target,
+                        message=f"action '{aid}' targets unknown object '{target}'",
+                    )
+                )
+            if action.get("kind") != "module_command":
+                violations.append(
+                    SpecViolation(
+                        field=f"actions[{aid}].target_object",
+                        message=f"action '{aid}' targets an object but is not a module_command",
+                    )
+                )
+        return self._verdict(
+            "objects",
+            "data_bindings/objects",
+            violations,
+            f"{len(declared)} object(s), each with the schema this spec was approved with."
+            if declared
+            else "No objects; the contract shows points.",
+            evidence={"objects": sorted(str(i) for i in ids)},
         )
 
     def _check_surface_refs(self, spec: dict[str, Any]) -> FxTSVerdict:
         points, actions = self._points(spec), self._actions(spec)
+        objects = self._objects(spec)
         violations = []
         for surface in spec.get("surfaces", []):
             sid = surface.get("surface_id")
@@ -480,6 +638,15 @@ class FVTSRunner(FxTSRunner):
                             field=f"surfaces[{sid}].points",
                             actual=point_id,
                             message=f"surface '{sid}' binds unknown point '{point_id}'",
+                        )
+                    )
+            for object_id in surface.get("objects", []):
+                if object_id not in objects:
+                    violations.append(
+                        SpecViolation(
+                            field=f"surfaces[{sid}].objects",
+                            actual=object_id,
+                            message=f"surface '{sid}' shows unknown object '{object_id}'",
                         )
                     )
             for action_id in surface.get("actions", []):
