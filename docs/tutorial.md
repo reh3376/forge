@@ -949,6 +949,8 @@ note:
 ```bash
 forge governance specs                       # every spec's hash state, approver, hash still verifies?
 forge governance specs --pending             # what awaits the owner
+forge archive list                           # what was retired from the tree, and where its last version is
+forge archive show <id>                      # read a retired file from the history
 forge governance validate-spec <spec.json>   # against the schema version it declares
 forge governance schemas                     # every schema version, its step, hash and approval
 forge governance run facts forge-wms           # one framework, one spec; exit 1 on any failure
@@ -2500,6 +2502,7 @@ note:
 | `forge version`, `forge health`, `forge init` | version, health, a new instance |
 | `forge adapter list`, `forge adapter status <id>` | registered modules and their state |
 | `forge governance specs [--pending]` | every contract's approval state; what awaits the owner |
+| `forge archive list`, `forge archive show <id>` | documents retired from the repository: what each was for, what replaced it, and its last version read from the history (the old text is not kept in the tree, so it cannot be mistaken for current) |
 | `forge governance run <framework> <spec>` | run one contract's checks |
 | `forge migrate up`, `status`, `down` | apply, show or roll back database migrations |
 | `forge db access grant / revoke / list / issue` | give a module access to a schema and hand it a credential, printed once |
