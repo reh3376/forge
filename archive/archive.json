@@ -1,0 +1,128 @@
+{
+  "scope": "forge",
+  "about": "Documents and files retired from this directory. The content is not kept in the tree; each row names the commit that still holds it. Read one with: forge archive show <id>",
+  "entries": [
+    {
+      "id": "fvts-0-1-0-agent-context",
+      "name": "FVTS 0.1.0 decision context for agents",
+      "purpose": "Working context handed to a coding agent before the first view contract was written.",
+      "retired": "2026-11-22",
+      "reason": "Superseded by the FVTS page and the approved FVTS schema; D-17 U-2.",
+      "replaced_by": "docs/FxTS/FVTS.md",
+      "commit": "83c9880b624584bc42a0e27bf639cef85a12173f",
+      "paths": [
+        "docs/personal/FVTS-v0.1.0-Context-for-Agent.md"
+      ]
+    },
+    {
+      "id": "fvts-0-1-0-review-package",
+      "name": "FVTS 0.1.0 review package",
+      "purpose": "The draft view contract with all proposed file contents, for the owner's review.",
+      "retired": "2026-11-22",
+      "reason": "Superseded by the FVTS page and the approved FVTS schema; D-17 U-2.",
+      "replaced_by": "docs/FxTS/FVTS.md",
+      "commit": "83c9880b624584bc42a0e27bf639cef85a12173f",
+      "paths": [
+        "docs/personal/FVTS-v0.1.0-Review.md"
+      ]
+    },
+    {
+      "id": "frontend-framework-survey",
+      "name": "Survey of Rust frontend frameworks",
+      "purpose": "Research into client frameworks before the forge-display design.",
+      "retired": "2026-11-22",
+      "reason": "Superseded by the signed forge-display design (D-16); D-17 U-2.",
+      "replaced_by": "docs/decisions/forge-display.md",
+      "commit": "83c9880b624584bc42a0e27bf639cef85a12173f",
+      "paths": [
+        "docs/personal/Rust Frontend Frameworks (1).md"
+      ]
+    },
+    {
+      "id": "sign-in-vendor-overview",
+      "name": "Overview of a commercial sign-in service",
+      "purpose": "Notes on one vendor's product and pricing, gathered before the role model.",
+      "retired": "2026-11-22",
+      "reason": "Named an existing company in a public repository; the role record decides sign-in; D-17 U-2.",
+      "replaced_by": "docs/decisions/roles.md",
+      "commit": "83c9880b624584bc42a0e27bf639cef85a12173f",
+      "paths": [
+        "docs/development/workos_overview.md"
+      ]
+    },
+    {
+      "id": "forge-ot-phases-1-6-bundle",
+      "name": "Git bundle of forge-ot phases 1 to 6",
+      "purpose": "A transport copy of the first plant-floor commits, from before they were merged.",
+      "retired": "2026-11-22",
+      "reason": "The commits are in the history; a one-time artefact; D-17 U-3.",
+      "replaced_by": null,
+      "commit": "83c9880b624584bc42a0e27bf639cef85a12173f",
+      "paths": [
+        "p7-forge-ot-phases1-6.bundle"
+      ]
+    },
+    {
+      "id": "forge-ot-phases-1-6-patches",
+      "name": "Patch files of forge-ot phases 1 to 6",
+      "purpose": "The same early work as two patch files.",
+      "retired": "2026-11-22",
+      "reason": "The commits are in the history; a one-time artefact; D-17 U-3.",
+      "replaced_by": null,
+      "commit": "83c9880b624584bc42a0e27bf639cef85a12173f",
+      "paths": [
+        "patches/0001-feat-forge-ot-P7-Phases-1-6-OPC-UA-adapter-alarm-en.patch",
+        "patches/0002-docs-comprehensive-README-with-full-architecture-mod.patch"
+      ]
+    },
+    {
+      "id": "d3-12-verification-report",
+      "name": "D3.12 verification report",
+      "purpose": "A one-time verification of the hub API, the pipeline, FACTS governance and the SDK round trip, with its script.",
+      "retired": "2026-11-22",
+      "reason": "A frozen snapshot of a past milestone; the live suite under tests/ covers it; D-17 U-3.",
+      "replaced_by": "tests/",
+      "commit": "83c9880b624584bc42a0e27bf639cef85a12173f",
+      "paths": [
+        "reports/d3-12-verification/__init__.py",
+        "reports/d3-12-verification/conftest.py",
+        "reports/d3-12-verification/report.json",
+        "reports/d3-12-verification/test_facts_governance.py",
+        "reports/d3-12-verification/test_hub_api.py",
+        "reports/d3-12-verification/test_pipeline_e2e.py",
+        "reports/d3-12-verification/test_sdk_roundtrip.py",
+        "reports/d3-12-verification/verify_d3.py",
+        "scripts/verify_d3.py"
+      ]
+    },
+    {
+      "id": "top-level-cli-copy",
+      "name": "Stray copy of the command line at the top of the repository",
+      "purpose": "An early copy of the forge command's entry file.",
+      "retired": "2026-11-22",
+      "reason": "Nothing used it; the command is src/forge/cli/main.py; D-17 U-3.",
+      "replaced_by": "src/forge/cli/main.py",
+      "commit": "83c9880b624584bc42a0e27bf639cef85a12173f",
+      "paths": [
+        "cli_main.py"
+      ]
+    },
+    {
+      "id": "mes-bridge-sidecar",
+      "name": "TypeScript sidecar for the interim MES bridge",
+      "purpose": "An early attempt to let the interim MES bridge speak to the hub over gRPC.",
+      "retired": "2026-11-22",
+      "reason": "Never built, tested or used, and it carried the old name prefix; the Go forge-mes is the route to the hub; D-17 U-4.",
+      "replaced_by": "docs/decisions/forge-mes-go.md",
+      "commit": "83c9880b624584bc42a0e27bf639cef85a12173f",
+      "paths": [
+        "sidecars/whk-sidecar/package.json",
+        "sidecars/whk-sidecar/src/adapter-bridge.ts",
+        "sidecars/whk-sidecar/src/grpc-client.ts",
+        "sidecars/whk-sidecar/src/index.ts",
+        "sidecars/whk-sidecar/src/types.ts",
+        "sidecars/whk-sidecar/tsconfig.json"
+      ]
+    }
+  ]
+}
