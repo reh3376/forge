@@ -3,7 +3,7 @@
 **Framework ID:** FUTS
 **Full Name:** Forge UI Test Specification
 **CI Gate:** Hard-fail (merge-blocking)
-**Status:** v0.1.0 (2026-11-20, FB-176). Schema, runner (`futs_runner.py`) and 13 specs: twelve widget specs and one reference view document. Nothing renders them yet: forge-display has no code (FB-181).
+**Status:** v0.2.0 (2026-11-22, FB-187: a binding names a point or an object). Schema, runner (`futs_runner.py`) and 17 specs: twelve widget specs, the hub's four standard screens and one reference view document, all approved by the owner. Nothing renders them yet: forge-display has no code (FB-181).
 **Decided in:** `docs/decisions/forge-display.md` (D-16, signed 2026-11-20), Q-12 and Q-13
 
 ---
@@ -54,7 +54,7 @@ Forge alone writes widgets (D-16, Q-10). An installation builds with them and ca
 | `view.owner_module`, `view.fvts_spec`, `view.surface_id` | the module, its view spec, and the surface of it this screen lays out |
 | `view.root` | a container |
 | a container | `node_id`, `container` (its kind), `layout`, `children`, and a `place` when its parent places its children |
-| a widget instance | `node_id`, `widget`, `props`, `bind` (by binding name: a point, and an optional expression), `act` (by action name: an action of the surface), `on` (by event name: a script), and a `place` |
+| a widget instance | `node_id`, `widget`, `props`, `bind` (by binding name: a point with an optional expression, or an object), `act` (by action name: an action of the surface), `on` (by event name: a script), and a `place` |
 | `view.scripts` | the Python event handlers the screen refers to; they run in the server's workers, never in the browser |
 
 ## Containers: how a screen adapts to its device
@@ -94,7 +94,7 @@ A view document also gets:
 | `futs:view-spec` | the module's view spec is missing, edited since its hash, not that module's, or has no such surface |
 | `futs:widgets` | a widget has no spec, or its spec is edited or not approved |
 | `futs:props` | a property is not the widget's, is of the wrong type, or a required one is not set |
-| `futs:bindings` | a binding is not the widget's; a required one is not bound; the point is not of the surface; the point's type does not fit; an expression is used where the widget takes none |
+| `futs:bindings` | a binding is not the widget's; a required one is not bound; it names both a point and an object, or neither; the point or object is not of the surface; the point's type does not fit; a widget that takes an object is given a point, or the other way round; a table's column is not a field of the object's schema; an expression is used where none is taken |
 | `futs:expressions` | never fails here: reported as `NOT CHECKED` when the document has expressions |
 | `futs:actions` | an action is not the widget's, not of the surface, or of another kind |
 | `futs:events` | an event is not the widget's, or its script is not declared or not a file in the repository |
@@ -106,6 +106,7 @@ A view document also gets:
 |---|---|---|
 | `text-label`, `value-display`, `status-indicator`, `data-table`, `action-button`, `input-field`, `view-link` | widget, general | the seven for any screen |
 | `level-bar`, `two-state-symbol`, `trend-chart`, `alarm-list`, `alarm-banner` | widget, plant-floor | the five for control-room screens |
+| `forge-core-status`, `forge-core-modules`, `forge-core-governance`, `forge-core-access` | view | the hub's four standard screens (D-16, Q-15): one reflowing column each, a title, a line of guidance and a table per object. Forge's first standard screens |
 | `forge-ot-ferm-overview` | view | the reference view document: the fermenter overview surface of forge-ot's view spec, laid out with every container kind. Not a screen for a plant; the example the runner and the tests are held to |
 
 The twelve widgets are the first set the owner chose on 2026-11-20. More are added as new widget specs.
@@ -120,6 +121,8 @@ forge governance validate-spec src/forge/governance/futs/specs/level-bar.widget.
 
 `tests/governance/futs/test_futs.py` runs every spec in CI and names each failure it allows.
 
+A spec is held to the schema version it declares: the eleven widget specs written against 0.1.0 are validated against 0.1.0 and stay approved, and an object binding in a document that declares 0.1.0 is refused.
+
 ## What is not built
 
 | Gap | Item |
@@ -129,5 +132,4 @@ forge governance validate-spec src/forge/governance/futs/specs/level-bar.widget.
 | Go and TypeScript types are not generated from the schema; the generator is chosen with the owner | FB-176 (the remaining part) |
 | An installation's view documents: storage in the hub, versions, approval per hub, export, migration | FB-184 |
 | A `navigate` action's target is not checked against the views that exist | FB-184 |
-| The hub's four screens have a view spec (FB-177) and no view document yet | FB-187 |
-| A binding cannot name an object: `data-table` takes an object's schema as a property, not the object as a binding | FB-187 |
+| A widget cannot yet show one field of one item of a collection (a single module's state as a status indicator): a table is the only widget that takes an object | with the first screens that need it (FB-181) |

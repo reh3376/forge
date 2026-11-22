@@ -40,6 +40,13 @@ FIRST_WIDGETS = [
     "status-indicator", "text-label", "trend-chart", "two-state-symbol", "value-display",
     "view-link",
 ]  # fmt: skip
+#: The hub's four standard screens (D-16, Q-15; FB-187), by view id and the surface each lays out.
+HUB_SCREENS = {
+    "forge-core-status": "hub.status",
+    "forge-core-modules": "hub.modules",
+    "forge-core-governance": "hub.governance",
+    "forge-core-access": "hub.access",
+}
 #: Failures the gate allows, by spec id. A spec the owner approved is allowed none.
 ALLOWED_FAILURES: dict[str, frozenset[str]] = {}
 #: Checks that could not be run, by spec id: CEL is compiled by the Go server (FB-181).
@@ -100,7 +107,7 @@ def _node(view: dict[str, Any], node_id: str) -> dict[str, Any]:
 class TestSchemaAndParity:
     def test_the_schema_is_valid_and_registered(self) -> None:
         Draft202012Validator.check_schema(SCHEMA)
-        assert SCHEMA["$id"] == "forge://fxts/futs/v0.1.0"
+        assert SCHEMA["$id"] == "forge://fxts/futs/v0.2.0"
         assert schemas.registry_problems(SCHEMA_PATH.parent) == []
 
     def test_the_runner_enforces_every_schema_field(self, runner: FUTSRunner) -> None:
@@ -117,7 +124,7 @@ class TestSchemaAndParity:
 class TestTheSpecs:
     def test_the_first_widgets_are_the_owners_twelve(self) -> None:
         assert WIDGETS == FIRST_WIDGETS
-        assert len(SPEC_FILES) == len(FIRST_WIDGETS) + 1
+        assert len(SPEC_FILES) == len(FIRST_WIDGETS) + 1 + len(HUB_SCREENS)
 
     @pytest.mark.parametrize("path", SPEC_FILES, ids=lambda p: p.name.split(".")[0])
     async def test_every_spec_meets_the_runner(self, runner: FUTSRunner, path: Path) -> None:
@@ -307,6 +314,91 @@ class TestAViewDocument:
         path.write_text(json.dumps(document), encoding="utf-8")
         verdict = await _one(runner, view, "lists", lists_dir=copy_dir)
         assert verdict.status == FAIL and "container-kinds" in _text(verdict)
+
+
+class TestBindingACollection:
+    """A binding names a point or an object (FUTS 0.2.0, FB-187)."""
+
+    @pytest.fixture
+    def screen(self) -> dict[str, Any]:
+        return _load("forge-core-governance.view.futs.json")
+
+    def test_the_four_hub_screens_lay_out_the_four_surfaces(self) -> None:
+        found = {}
+        for view_id in HUB_SCREENS:
+            view = _load(f"{view_id}.view.futs.json")
+            assert view["view"]["owner_module"] == "forge-core"
+            assert view["view"]["root"]["container"] == "reflow"  # works on a phone
+            found[view_id] = view["view"]["surface_id"]
+        assert found == HUB_SCREENS
+
+    def test_every_object_of_a_surface_is_on_its_screen(self) -> None:
+        fvts = json.loads(
+            (REPO_ROOT / "src/forge/governance/fvts/specs/forge-core.fvts.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        surfaces = {s["surface_id"]: set(s["objects"]) for s in fvts["surfaces"]}
+        for view_id, surface_id in HUB_SCREENS.items():
+            view = _load(f"{view_id}.view.futs.json")
+            shown = {
+                bound["object"]
+                for node in _nodes(view["view"]["root"])
+                for bound in node.get("bind", {}).values()
+                if "object" in bound
+            }
+            assert shown == surfaces[surface_id], view_id
+
+    async def test_an_object_must_be_one_of_the_surface(self, runner, screen) -> None:
+        _node(screen, "files")["bind"]["rows"]["object"] = "hub.module"
+        verdict = await _one(runner, screen, "bindings")
+        assert verdict.status == FAIL and "not an object of the surface" in _text(verdict)
+
+    async def test_a_binding_names_one_of_the_two(self, runner, screen) -> None:
+        _node(screen, "files")["bind"]["rows"] = {"object": "hub.governed_file", "point": "x"}
+        assert "names a point or an object, one of them" in _text(
+            await _one(runner, screen, "bindings")
+        )
+        _node(screen, "files")["bind"]["rows"] = {}
+        assert "names a point or an object, one of them" in _text(
+            await _one(runner, screen, "bindings")
+        )
+
+    async def test_a_table_takes_an_object_and_a_value_takes_a_point(
+        self, runner, screen, view
+    ) -> None:
+        _node(screen, "files")["bind"]["rows"] = {"point": "hub.governed_file"}
+        assert "takes an object, not a point" in _text(await _one(runner, screen, "bindings"))
+        # The reference view is written against 0.1.0, which has no object bindings:
+        # the same change there is refused by its own schema version.
+        _node(view, "temp")["bind"]["value"] = {"object": "ferm.temperature"}
+        old_format = await runner.run(target=VIEW, spec=sign(copy.deepcopy(view)))
+        assert {v.check_id: v.status for v in old_format.verdicts}["futs:schema-valid"] == FAIL
+        view["spec_version"] = "0.2.0"
+        assert "takes a point, not an object" in _text(await _one(runner, view, "bindings"))
+
+    async def test_columns_are_fields_of_the_objects_schema(self, runner, screen) -> None:
+        _node(screen, "schemas")["props"]["columns"] = "framework,version,colour"
+        verdict = await _one(runner, screen, "props")
+        assert verdict.status == PASS  # a string, as the widget declares
+        text = _text(await _one(runner, screen, "bindings"))
+        assert "'colour' is not a field of 'hub.schema_version'" in text
+
+    async def test_a_collection_takes_no_expression(self, runner, screen, tmp_path) -> None:
+        specs = tmp_path / "specs"
+        shutil.copytree(SPECS_DIR, specs)
+        path = specs / "data-table.widget.futs.json"
+        spec = json.loads(path.read_text(encoding="utf-8"))
+        spec["widget"]["bindings"][0]["expression_allowed"] = True
+        path.write_text(json.dumps(sign(spec)), encoding="utf-8")
+        _node(screen, "files")["bind"]["rows"]["expression"] = "v"
+        text = _text(await _one(runner, screen, "bindings", specs_dir=specs))
+        assert "a collection takes no expression" in text
+
+    async def test_the_screens_one_action_is_the_surfaces(self, runner, screen) -> None:
+        assert (await _one(runner, screen, "actions")).status == PASS
+        _node(screen, "run")["act"]["press"] = "governance.approve"
+        assert "not an action of the surface" in _text(await _one(runner, screen, "actions"))
 
 
 def test_the_reference_view_is_inside_the_repository() -> None:

@@ -12,6 +12,17 @@
       "released_at": "2026-11-20T16:54:02Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-20T16:59:40Z"
+    },
+    {
+      "version": "0.2.0",
+      "file": "versions/futs.v0.2.0.schema.json",
+      "schema_hash": "05fa4883f7f52ce66c03e0025d923b46a0a4721f947283dae329a43c45368b51",
+      "hash_state": "approved",
+      "step": "minor",
+      "summary": "FB-187: a binding names a point or an object; a widget binding may take objects (a collection of the module's view spec)",
+      "released_at": "2026-11-22T15:26:46Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-22T15:30:29Z"
     }
   ]
 }
