@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 132 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 133 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -245,7 +245,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 132:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 133:
 
 **Working**
 
@@ -2253,7 +2253,7 @@ The owner's order of 2026-11-20:
 
 1. **The FUTS schemas** for view documents and widgets (done 2026-11-20, FB-176), the view contract's profile table for role-based writes and alarm operations (done 2026-11-21, FB-178), the hub's own view spec and object schemas (done 2026-11-21, FB-177), and the hub's four screens as view documents (done 2026-11-22, FB-187). Step 1 is complete apart from generated types (FB-186).
 2. ~~**The spike**~~ done 2026-11-20 (FB-179).
-3. **The role model in force** on the hub (FB-075).
+3. **The role model in force** on the hub (FB-075), in seven steps of its own: scopes and roles as data, subjects and assignments, the decision point, tokens, sign-in, enforcement on every route, the copy at a site hub (FB-189 to FB-195).
 4. **The Go module SDK** with the parts of the transport contract forge-display needs, and the view service messages (FB-017, FB-164, FB-180).
 5. **forge-display**: the server and runtime renderer, the four hub screens, then forge-ot's HMI screens on live data (FB-181).
 6. **Python scripting**: the worker pool in the SDK and the approved-package list per hub (FB-182, FB-183).
