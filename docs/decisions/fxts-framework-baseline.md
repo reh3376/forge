@@ -53,7 +53,7 @@ A framework that has specs meets all of these. Each is checked by one test that 
 | F-2 | **A versioned schema**, with one `$id` convention, every released version kept in the tree, and a hash for each version (FB-151). |
 | F-3 | **A runner with schema-runner parity**: every schema field is enforced or the run fails. |
 | F-4 | **Every spec carries an integrity block**, and the runner gives two verdicts for it: the hash verifies, and the hash is approved by the owner. A spec whose content does not match its hash fails. |
-| F-5 | **Every spec lives in the framework's `specs/` directory** and is listed by `forge governance specs`. No spec file exists outside it. |
+| F-5 | **Every spec lives in the `specs/` folder of what it describes** and is listed by `forge governance specs`. No spec file exists outside such a folder. *Reworded by the owner on 2026-11-22 (D-17, `repository-structure.md` Q-6); it read "Every spec lives in the framework's `specs/` directory … No spec file exists outside it", and that is still how the files lie until FB-200 and FB-201 move them.* |
 | F-6 | **A blocking gate in CI** that runs every spec and names each failure it allows, with the backlog item that removes it. |
 | F-7 | **A check that was not run is reported as not run**, never as passed. |
 | F-8 | **A documentation page and a row in the summary** (`docs/FxTS/README.md`), both stating the framework's real state. |
