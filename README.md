@@ -365,7 +365,7 @@ uv sync --locked --extra dev --extra ot && uv run pytest   # then commit uv.lock
 ### Test Coverage
 
 ```
-Total:  5,023 tests collected (full suite green on 2026-11-21)
+Total:  5,023 tests collected (full suite green on 2026-11-22)
         286 test files
         354 source files
 
