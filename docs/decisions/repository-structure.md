@@ -175,3 +175,129 @@ One backlog item and one pull request per step. Every step leaves the full suite
 | 5 | forge-modules: one folder per module with its specs and tests; remove the four copies; move the bridge and its CI job | FB-201 |
 | 6 | The Go tree, the proto folders, the top-level leftovers | FB-202 |
 | 7 | The documents: `CLAUDE.md`, the tutorial's repository tour and both tracks, the README, the dated note in each signed record | FB-203 |
+
+---
+
+## 10. Amendment 1 (draft): one standard structure in every major directory
+
+**Status of this section:** draft. A-1 to A-3 are the owner's, decided 2026-11-22; everything else is **[PROPOSED]** and waits for the owner. Where this section and §5 disagree, §5 stands until this section is signed. Backlog: FB-206.
+
+### 10.1 What the owner said (2026-11-22)
+
+**[OWNER]** "Each major directory (forge, forge-core, forge-hub, & forge-module) will have a standard directory structure; there can be directories in one dir and not in the others but there will be several directories in each of the core directories that are the same for each. […] each should have a docs directory and docs with a global scope should remain in the ~/forge directory, just as forge-hub scoped documents should be held in the ~/forge/forge-hub directory. […] This is only a single example of potentially 100s of such decisions that must be methodically walked through."
+
+This contradicts §5, which keeps `docs/`, `deploy/`, `scripts/` and `tests/` only at the top, and names the spec folder `specs/`.
+
+### 10.2 Decided
+
+| # | Decision |
+|---|---|
+| A-1 | **[OWNER]** All signed decision records stay together at the root (`docs/decisions/`), whatever layer they mostly concern. A record is found by its number. |
+| A-2 | **[OWNER]** A document that exists at more than one level is **written once, at the bottom, and generated above, held by a test.** The lowest level carries the full detail; each level above is a summary built from it by a command; a stale generated file fails the suite. Hand-written text at an upper level is orientation only: it links down and carries no counts, versions or lists. |
+| A-3 | **[OWNER]** The folder of governed files in each major directory is named `fxts/` (not `specs/`). It holds that directory's specs and its generated index. The root `fxts/` holds the overview of every framework and every spec, generated from the levels below. |
+
+### 10.3 The standard structure
+
+**[PROPOSED]** A major directory is the root, `forge-core`, `forge-hub` and each folder under `forge-modules/`.
+
+| Entry | In every major directory | Holds |
+|---|---|---|
+| `README.md` | required | what the directory is and its scope; orientation only (A-2) |
+| `docs/` | required | documents whose scope is this directory and nothing wider |
+| `fxts/` | required | its governed files and their generated index (A-3) |
+| `src/` | required below the root | its code; one folder per language where there are two (`src/python`, `src/go`) |
+| `tests/` | required | its tests; at the root, only tests that span layers |
+| `deploy/`, `scripts/` | where needed | deployment files and tools of this scope |
+| `contract/` | forge-core only | proto files, framework schemas, governed lists |
+| `bridge/` | forge-mes only | the interim MES bridge, until it is retired |
+
+Only at the root: `CLAUDE.md`, `BACKLOG.md`, `SECURITY.md`, `.github/`, the manifest and lock file, the `Makefile`.
+
+### 10.4 Placement rules
+
+**[PROPOSED]** Applied in order; the first that matches decides.
+
+| # | Rule |
+|---|---|
+| P-1 | A signed decision record: root `docs/decisions/` (A-1). |
+| P-2 | A file about exactly one module: that module's folder. |
+| P-3 | A file about the hub and no module: `forge-hub`. |
+| P-4 | A file about what hubs and modules share (the contract, the frameworks, the SDK, the shared models): `forge-core`. |
+| P-5 | A file that spans layers (vision, roadmap, state, tutorial, backlog, CI, cross-layer tests): the root. |
+| P-6 | A file that is none of these (a one-time artefact, a leftover, a personal note): it is not placed; it is put to the owner (§10.6). |
+
+### 10.5 The mapping
+
+**[PROPOSED]** Every tracked path outside the interim bridge (which moves whole, Q-4). Counts are tracked files on 2026-11-22.
+
+**Documents**
+
+| Today | Files | Goes to | Rule |
+|---|---|---|---|
+| `docs/VISION.md`, `ROADMAP.md`, `WHERE-WE-ARE.md`, `WHERE-WE-ARE-GOING.md`, `PRINCIPLES.md`, `tutorial.md` | 6 | stay | P-5 |
+| `docs/decisions/` | 11 | stay | P-1 |
+| `docs/FxTS/` (the framework pages and the summary) | 15 | `forge-core/docs/fxts/`; the summary (`README.md`) becomes the generated root `fxts/README.md` | P-4, A-2 |
+| `docs/governance/facts-developer-guide.md`, `docs/MODULE_BUILDER.md`, `docs/core/manufacturing-entity-catalog.md` | 3 | `forge-core/docs/` | P-4 |
+| `docs/DB_ORCHESTRATION_FRAMEWORK.md`, `docs/deployment/clock-discipline.md` | 2 | `forge-hub/docs/` | P-3 |
+| `docs/p7-forge-ot/` | 8 | `forge-modules/forge-ot/docs/` | P-2 |
+| `docs/spokes/{cmms,erpi,nms}/DISCOVERY.md` | 3 | the `docs/` of forge-cmms, forge-integ-erp-netsuite, forge-nms | P-2 |
+| `docs/spoke-onboarding/` | 2 | the `docs/` of forge-ims and forge-wms | P-2 |
+| `docs/MDEMG-INIT-BUGS.md`, `docs/MDEMG-PORT-OWNERSHIP-REPORT.md` | 2 | stay (reports to another project's agent) | P-5 |
+| `docs/development/workos_overview.md`, `docs/personal/` | 5 | undecided | P-6 |
+
+**Code and governed files** (`src/forge`, 496 files)
+
+| Today | Goes to | Rule |
+|---|---|---|
+| `core/`, `proto_gen/`, `sdk/`, `adapters/base/`, the module's end of `transport/` | `forge-core/src/python/forge_core/` | P-4 |
+| `proto/`, `governance/lists/`, each framework's `schema/` | `forge-core/contract/` | P-4 |
+| `governance/shared/`, `fhts/`, each framework's `runners/` and package code | `forge-core/src/python/forge_core/fxts/` | P-4 |
+| `governance/fats/specs/` (28), `ftts/specs/` (1), the hub's view spec, object schemas and four view documents | `forge-hub/fxts/` | P-3 |
+| `governance/{facts,fmts,fvts,futs}/specs/` of one module | that module's `fxts/` | P-2 |
+| the twelve widget specs (`futs`) | `forge-modules/forge-display/fxts/` | P-2 |
+| `governance/fmts/conformance.py` | `forge-hub/src/forge_hub/conformance/` | P-3 |
+| `api/`, `gateway/`, `ingest/`, `storage/` (with its migrations), `registry/`, `context/`, `curation/`, `broker/`, `observer/`, `cli/`, the hub's end of `transport/` | `forge-hub/src/forge_hub/` | P-3 |
+| `adapters/forge_<x>/` (eight), `modules/ot/` | `forge-modules/forge-<x>/src/forge_<x>/` | P-2 |
+| `adapters/{csv_file,mqtt_sparkplug,opcua,rest_generic}/` | undecided | P-6 |
+
+**Tests** (`tests`, 305 files): each folder follows the code it tests (`tests/core`, `sdk`, most of `governance`, the module's end of `transport` to `forge-core/tests`; `tests/api`, `gateway`, `storage`, … to `forge-hub/tests`; `tests/adapters/forge_<x>`, `tests/modules/ot` to the module). At the root stay the tests that span layers: `test_docs_current.py`, `test_layer_imports.py`, `test_proto_copies.py`, `test_dependency_lock.py`, `test_skips_have_reasons.py`, `test_ci_changed_paths.py`, the framework baseline, `tests/integration/` and `tests/verification/`.
+
+**Everything else**
+
+| Today | Files | Goes to | Rule |
+|---|---|---|---|
+| `.github/`, `pyproject.toml`, `uv.lock`, `Makefile`, `CLAUDE.md`, `BACKLOG.md`, `README.md`, `SECURITY.md`, `.gitignore`, `.gitleaks.toml`, `.dockerignore`, `tutorial.config.json` | 16 | stay | P-5 |
+| `scripts/` (the tutorial tools and checks) | 19 | stay | P-5 |
+| `deploy/docker/` | 4 | stay (it starts hub and modules together, development only) | P-5 |
+| `deploy/ot/ot-control.example.json` | 1 | `forge-modules/forge-ot/deploy/` | P-2 |
+| `go/` | 44 | `forge-core/src/go/`; `go/proto/scanner` and `proto/scanner` to `forge-modules/forge-scanner/` | P-4, P-2 |
+| `sdk/` (top level) | 6 | removed: a second copy of `src/forge/sdk/module_builder` (FB-019) | Q-4 |
+| `modules/Forge {CMMS,ERPI,NMS,DB Orchestration}/` | 73 | removed (Q-4) | Q-4 |
+| `benchmarks/bench_transport.py` | 1 | `forge-core/tests/benchmarks/` | P-4 |
+| `.claude/hooks/`, `.serena/` | 5 | stay (tool configuration of the repository) | P-5 |
+| `cli_main.py`, `p7-forge-ot-phases1-6.bundle`, `patches/`, `reports/d3-12-verification/`, `scripts/verify_d3.py`, `sidecars/whk-sidecar/` | 20 | undecided | P-6 |
+
+### 10.6 What the rules do not settle
+
+| # | Question | Proposal |
+|---|---|---|
+| U-1 | The four generic adapters (CSV, MQTT Sparkplug, OPC UA, REST): building blocks, not modules of their own. | `forge-core/src/python/forge_core/adapter/generic/`: they are what a module is built from. §5 put them in `forge-modules/generic/`. |
+| U-2 | `docs/personal/` (four tracked files) and `docs/development/workos_overview.md`. | The owner decides for each: into the documents proper, or out of the repository; then the folder is ignored (FB-205). |
+| U-3 | One-time artefacts: `p7-forge-ot-phases1-6.bundle`, `patches/` (2), `reports/d3-12-verification/` (8) with `scripts/verify_d3.py`, `cli_main.py`. | Remove; the history keeps them. |
+| U-4 | `sidecars/whk-sidecar/` (6 files, the old company prefix). | With FB-150: remove if nothing uses it, or rename and move under forge-mes beside the bridge. |
+| U-5 | A `CLAUDE.md` in each major directory, as the bridge has today. | Allowed, not required; the root file stays the authority and a lower one may only add. |
+| U-6 | One backlog. | One `BACKLOG.md` at the root; the FB numbers are cited everywhere. A generated view by layer is possible later (A-2). |
+
+### 10.7 What is generated (A-2)
+
+| Generated file | From |
+|---|---|
+| `<major directory>/fxts/README.md` | the governed files in that folder: id, framework, state, hash, and each file's own summary |
+| root `fxts/README.md` | every `fxts/` below: per framework its purpose (from its page in `forge-core/docs/fxts/`), its schema version, its specs and their states |
+| the counts in the root `README.md` and `docs/WHERE-WE-ARE.md` | the tree and the test collection |
+
+One command builds them and one test fails when any is stale. A spec whose content changed while its summary did not is reported, as a prompt to look, not as a failure.
+
+### 10.8 What holds the structure
+
+One test: every major directory has the required entries of §10.3, no governed file lies outside an `fxts/` or `contract/` folder, and no tracked path lies outside what §10.3 to §10.5 allow. A new top-level folder fails the suite until this record names it.
