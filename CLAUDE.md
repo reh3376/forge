@@ -68,6 +68,7 @@ Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `build:`)
 - **The repository is public.** Nothing is imported without a secrets scan of its history, and no secret enters a commit. Ask the owner before committing design material for work that is not yet public.
 - **Weigh each decision against the finished product.** Flag anything that would pin the platform in before it reaches a record.
 - **Question the owner's proposals too.** The owner, 2026-11-19: "I am open to discussion and I encourage you to question my choices." Say where a proposal conflicts with a signed record or carries a risk, and say where it is better than what is signed.
+- **A signed decision is the current best answer, not a fence.** The owner, 2026-11-22: "we cannot get overly caught up in old decisions." When new information favours a better decision, say which signed record and rule it contradicts, review how it affects the whole system, and recommend on the merits. On the owner's word the older record is amended with a dated note and everything that depended on it is brought along.
 
 ## Commands
 
