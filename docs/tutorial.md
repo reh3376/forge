@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-21` against the repository `reh3376/forge` at the merge of PR 129 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-21` against the repository `reh3376/forge` at the merge of PR 130 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -245,7 +245,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-21 at PR 129:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-21 at PR 130:
 
 **Working**
 
@@ -280,7 +280,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-21 at PR 129:
 | Measure | Value (2026-11-19) |
 |---|---|
 | Python hub (`src/forge`) | 354 files, ~74,100 lines |
-| Python tests | 285 files, 5,003 collected, full suite green on the locked dependency set |
+| Python tests | 285 files, 5,007 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -1434,7 +1434,7 @@ note:
 - Measured in a throwaway spike on 2026-11-20 and then made final by the owner: 500 widgets all changing 20 times a second held 60 frames a second over one Connect stream; CEL gave the same results in the browser and in Go. Two requirements came out of it. **forge-display is always served over TLS with HTTP/2**: over plain HTTP/1.1 a browser gives only six screens their values, and with six open a write can hang. **The client keeps only the newest value of each point per frame**, so a struggling device falls behind by a bounded amount, not without limit.
 - Forge writes the live-value store and the designer's drawing area itself; the flow editor uses a library. Any further library is confirmed with the owner first.
 - A module can only **tighten** the profile baseline, never loosen it. forge-display ships staleness marking, bad-quality handling, ISA-101 presentation, alarm annunciation and action feedback; it enforces nothing safety-critical itself.
-- Today: the FVTS schema, a runner, the render-profile baseline, a reference renderer, golden messages and a CI gate. The schema and the baseline still carry the old write rule until their next version (FB-178).
+- Today: the FVTS schema, a runner, the render-profile baseline, a reference renderer, golden messages and a CI gate. Since 2026-11-21 the profile baseline opens tag writes and every alarm operation on all four profiles, and a site policy can switch either off for a profile (FB-178).
 
 ---
 
@@ -1989,7 +1989,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q -rsx                    # 5,003 tests, ~1 minute; lists each skip with its reason
+uv run pytest tests -q -rsx                    # 5,007 tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2129,7 +2129,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 285 files, 5,003 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/` mirrors `src/`: 285 files, 5,007 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -2246,7 +2246,7 @@ note:
 
 The owner's order of 2026-11-20:
 
-1. **The FUTS schemas** for view documents and widgets (done 2026-11-20, FB-176), then the hub's own view spec and object schemas and the view contract's next version (FB-177, FB-178).
+1. **The FUTS schemas** for view documents and widgets (done 2026-11-20, FB-176), the view contract's profile table for role-based writes and alarm operations (done 2026-11-21, FB-178), then the hub's own view spec and object schemas (FB-177).
 2. ~~**The spike**~~ done 2026-11-20 (FB-179).
 3. **The role model in force** on the hub (FB-075).
 4. **The Go module SDK** with the parts of the transport contract forge-display needs, and the view service messages (FB-017, FB-164, FB-180).
@@ -2791,6 +2791,8 @@ In the finished system no module ships its own screens. A module **describes** w
 | desktop app | 10 Hz | an installed application |
 | web | 4 Hz | a browser |
 | mobile | 1 Hz | a phone or tablet |
+
+What a person may do on any of them, writing a value or shelving an alarm included, follows their role. Your site can switch writes or alarm operations off for one kind of screen, for example no writes from phones.
 
 - **Any number of people can watch and operate the same process at once**: three control rooms, a lab technician and a supervisor are five clients of the same screens. What each may do follows their own sign-in and role.
 - A module may make a screen stricter than the baseline, never looser.

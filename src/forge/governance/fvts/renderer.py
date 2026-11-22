@@ -36,7 +36,9 @@ from pathlib import Path
 from typing import Any
 
 from forge.governance.fvts.profiles import (
+    NO_SITE_POLICY,
     PROFILE_BASELINE,
+    SitePolicy,
     action_permitted,
     effective_profile,
     visible_actions,
@@ -143,9 +145,11 @@ def _parse_time(value: Any, what: str) -> datetime:
 
 
 class ReferenceRenderer:
-    """Renders contract messages for one profile under one spec."""
+    """Renders contract messages for one profile under one spec and one site's policy."""
 
-    def __init__(self, spec: dict[str, Any], profile: str) -> None:
+    def __init__(
+        self, spec: dict[str, Any], profile: str, site: SitePolicy = NO_SITE_POLICY
+    ) -> None:
         if profile not in PROFILE_BASELINE:
             msg = f"unknown render profile {profile!r}"
             raise GoldenRenderError(msg)
@@ -154,6 +158,7 @@ class ReferenceRenderer:
             raise GoldenRenderError(msg)
         self.spec = spec
         self.profile = profile
+        self.site = site
         self.effective = effective_profile(spec, profile)
         self.points = {
             p.get("point_id"): p for p in spec.get("data_bindings", {}).get("points", [])
@@ -382,7 +387,7 @@ class ReferenceRenderer:
     def _render_action_result(self, message: dict[str, Any]) -> dict[str, Any]:
         action_id = message.get("action_id")
         action = self._action(action_id)
-        if not action_permitted(self.spec, action, self.profile):
+        if not action_permitted(self.spec, action, self.profile, self.site):
             msg = (
                 f"action {action_id} is not permitted on {self.profile}; a renderer never "
                 "invokes it there, so it never receives a result for it"
@@ -423,7 +428,7 @@ class ReferenceRenderer:
             raise GoldenRenderError(msg)
         for point_id in surface.get("points", []):
             self._point(point_id)
-        visible, hidden = visible_actions(self.spec, surface, self.profile)
+        visible, hidden = visible_actions(self.spec, surface, self.profile, self.site)
         return {
             "view": "surface",
             "surface_id": surface_id,

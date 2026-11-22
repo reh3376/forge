@@ -1,14 +1,25 @@
 """Render-profile baseline — the normative table in ``docs/FxTS/FVTS.md``.
 
-Every forge-display render profile has platform-wide limits: the update
-rate it may receive, whether it may write tags and which alarm operations
-it may perform. A spec may *tighten* these through
-``render_profiles.overrides`` and never loosen them (runner check
-``fvts:profile-baseline``). The effective limit for a profile is the
-tightest of the baseline, the spec's own ``live_updates`` ceiling and the
-override, and an action is permitted on a profile only when the spec lists
-the profile, supports it and the effective limits allow the action's kind
-(``fvts:action-profile-permitted``).
+Every forge-display render profile has a platform-wide limit on the update
+rate it may receive. A profile no longer decides who may act: the owner decided
+on 2026-11-19 and 21 (``docs/decisions/forge-display.md``, Q-7 and Q-8, and the
+answer on alarm operations) that a tag write and every alarm operation follow
+the user's role on any profile, so that an operator can monitor and control a
+process from a carried tablet or laptop. The core's write chain and the
+activity record are the control, and the record names the profile an action
+came from.
+
+Two things can still narrow what a profile offers, and neither can widen it:
+
+* a spec may *tighten* a profile through ``render_profiles.overrides`` (runner
+  check ``fvts:profile-baseline``), and an action lists the profiles it is
+  offered on;
+* a site may switch tag writes or alarm operations off for a profile
+  (:class:`SitePolicy`), for example no writes from phones.
+
+An action is permitted on a profile only when the spec supports the profile,
+the action lists it, and neither the spec nor the site has switched its kind off
+there (``fvts:action-profile-permitted``).
 """
 
 from __future__ import annotations
@@ -17,7 +28,6 @@ from dataclasses import dataclass
 from typing import Any
 
 ALARM_OPERATIONS = frozenset({"ACKNOWLEDGE", "SHELVE", "UNSHELVE", "DISABLE", "ENABLE", "RESET"})
-ACKNOWLEDGE_ONLY = frozenset({"ACKNOWLEDGE"})
 
 
 @dataclass(frozen=True)
@@ -33,11 +43,33 @@ class ProfileBaseline:
 
 PROFILE_BASELINE: dict[str, ProfileBaseline] = {
     "desktop_hmi": ProfileBaseline("desktop_hmi", 20.0, True, ALARM_OPERATIONS, True),
-    "desktop_app": ProfileBaseline("desktop_app", 10.0, False, ACKNOWLEDGE_ONLY, False),
-    "web": ProfileBaseline("web", 4.0, False, ACKNOWLEDGE_ONLY, False),
-    "mobile": ProfileBaseline("mobile", 1.0, False, ACKNOWLEDGE_ONLY, False),
+    "desktop_app": ProfileBaseline("desktop_app", 10.0, True, ALARM_OPERATIONS, False),
+    "web": ProfileBaseline("web", 4.0, True, ALARM_OPERATIONS, False),
+    "mobile": ProfileBaseline("mobile", 1.0, True, ALARM_OPERATIONS, False),
 }
 PROFILES = tuple(PROFILE_BASELINE)
+
+
+@dataclass(frozen=True)
+class SitePolicy:
+    """What a site has switched off, by profile (D-16, Q-8).
+
+    The default switches nothing off. A site that does not want tag writes from
+    phones lists ``mobile`` in ``writes_off``. It can only narrow: nothing here
+    lets a profile do what the spec or the user's role does not allow.
+    """
+
+    writes_off: frozenset[str] = frozenset()
+    alarm_operations_off: frozenset[str] = frozenset()
+
+    def __post_init__(self) -> None:
+        unknown = (self.writes_off | self.alarm_operations_off) - set(PROFILE_BASELINE)
+        if unknown:
+            msg = f"unknown render profile(s) in the site policy: {sorted(unknown)}"
+            raise ValueError(msg)
+
+
+NO_SITE_POLICY = SitePolicy()
 
 
 @dataclass(frozen=True)
@@ -50,8 +82,13 @@ class EffectiveProfile:
     alarm_operations: frozenset[str]
 
 
-def effective_profile(spec: dict[str, Any], profile: str) -> EffectiveProfile:
-    """Tightest limits for ``profile`` under ``spec`` (unknown profile → KeyError)."""
+def effective_profile(
+    spec: dict[str, Any], profile: str, site: SitePolicy = NO_SITE_POLICY
+) -> EffectiveProfile:
+    """Tightest limits for ``profile`` under ``spec`` and the site's policy.
+
+    An unknown profile raises ``KeyError``.
+    """
     base = PROFILE_BASELINE[profile]
     live = spec.get("live_updates", {})
     rate = min(
@@ -66,6 +103,10 @@ def effective_profile(spec: dict[str, Any], profile: str) -> EffectiveProfile:
         writes = False
     if override.get("alarm_operations_permitted") is False:
         operations = frozenset()
+    if profile in site.writes_off:
+        writes = False
+    if profile in site.alarm_operations_off:
+        operations = frozenset()
     return EffectiveProfile(profile, rate, writes, operations)
 
 
@@ -79,19 +120,24 @@ def kind_permitted(action: dict[str, Any], effective: EffectiveProfile) -> bool:
     return kind == "module_command"
 
 
-def action_permitted(spec: dict[str, Any], action: dict[str, Any], profile: str) -> bool:
-    """Spec lists the profile for the action, supports it, and the baseline allows the kind."""
+def action_permitted(
+    spec: dict[str, Any], action: dict[str, Any], profile: str, site: SitePolicy = NO_SITE_POLICY
+) -> bool:
+    """The spec supports the profile, the action lists it, and nothing switched its kind off."""
     if profile not in PROFILE_BASELINE:
         return False
     if profile not in spec.get("render_profiles", {}).get("supported", []):
         return False
     if profile not in action.get("allowed_profiles", []):
         return False
-    return kind_permitted(action, effective_profile(spec, profile))
+    return kind_permitted(action, effective_profile(spec, profile, site))
 
 
 def visible_actions(
-    spec: dict[str, Any], surface: dict[str, Any], profile: str
+    spec: dict[str, Any],
+    surface: dict[str, Any],
+    profile: str,
+    site: SitePolicy = NO_SITE_POLICY,
 ) -> tuple[list[str], list[str]]:
     """Split a surface's action list into (visible, hidden) for a profile.
 
@@ -103,7 +149,7 @@ def visible_actions(
     hidden: list[str] = []
     for action_id in surface.get("actions", []):
         action = actions.get(action_id)
-        if action is not None and action_permitted(spec, action, profile):
+        if action is not None and action_permitted(spec, action, profile, site):
             visible.append(action_id)
         else:
             hidden.append(action_id)
