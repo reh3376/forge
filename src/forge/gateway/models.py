@@ -3,41 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import StrEnum
 
-
-class Role(StrEnum):
-    """Gateway role hierarchy: admin > operator > viewer."""
-
-    ADMIN = "admin"
-    OPERATOR = "operator"
-    VIEWER = "viewer"
-
-
-# Numeric rank for hierarchy comparison (higher = more privileged)
-ROLE_RANK: dict[Role, int] = {
-    Role.VIEWER: 0,
-    Role.OPERATOR: 1,
-    Role.ADMIN: 2,
-}
-
-
-@dataclass(frozen=True)
-class ForgeUser:
-    """Authenticated user identity extracted from JWT or API key."""
-
-    user_id: str
-    role: Role = Role.VIEWER
-    scopes: frozenset[str] = field(default_factory=frozenset)
-    source: str = "jwt"  # "jwt" or "api_key"
-
-    def has_scope(self, scope: str) -> bool:
-        """Check if the user has a specific scope."""
-        return scope in self.scopes
-
-    def has_role_or_higher(self, required: Role) -> bool:
-        """Check if the user's role meets or exceeds the required role."""
-        return ROLE_RANK[self.role] >= ROLE_RANK[required]
+from forge.core.models.identity import ROLE_RANK, ForgeUser, Role
 
 
 @dataclass
@@ -66,3 +33,6 @@ class RateLimitConfig:
     redis_url: str = "redis://localhost:6379"
     default_rpm: int = 120
     default_burst: int = 10
+
+
+__all__ = ["ROLE_RANK", "AuthConfig", "ForgeUser", "RBACConfig", "Role"]

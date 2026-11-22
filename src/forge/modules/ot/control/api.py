@@ -47,8 +47,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from forge.core.clock import ClockRefusedError
-from forge.gateway.models import ForgeUser, Role
-from forge.gateway.rbac import require_scope
+from forge.core.models.identity import ForgeUser, Role
 from forge.modules.ot.control.changeover_orchestrator import ChangeoverSequenceError
 from forge.modules.ot.control.models import DataType, WriteRequest, WriteRole
 from forge.modules.ot.control.runtime import ControlRuntime
@@ -57,6 +56,10 @@ RuntimeSource = ControlRuntime | Callable[[], ControlRuntime | None]
 
 #: Hub scope the write endpoints require (FB-063's write scope; FB-075 narrows it).
 WRITE_SCOPE = "adapters:write"
+
+# The hub's scope check, handed in by whoever mounts the routes: given a scope, it returns the
+# FastAPI dependency that yields the signed-in user or refuses. A module never imports the hub.
+ScopeCheck = Callable[[str], Callable[..., Any]]
 
 
 class ClockProbeIntervalBody(BaseModel):
@@ -123,7 +126,9 @@ def _subject(user: ForgeUser, body: WriteBody) -> tuple[str, WriteRole]:
     return requestor, body.role
 
 
-def create_control_router(runtime: RuntimeSource, *, prefix: str = "/api/v1/ot") -> APIRouter:
+def create_control_router(
+    runtime: RuntimeSource, *, require_scope: ScopeCheck, prefix: str = "/api/v1/ot"
+) -> APIRouter:
     router = APIRouter(prefix=prefix, tags=["OT Control"])
 
     def _runtime() -> ControlRuntime:

@@ -63,7 +63,7 @@ The fields the offset and the uncertainty travel in already exist on the record 
 
 ## The conformance kit
 
-`src/forge/governance/fmts/conformance.py`. M-4 to M-7 can only be checked on a running module, so the kit runs one:
+`src/forge/governance/fmts/conformance.py`. M-4 to M-7 can only be checked on a running module, so the kit runs one. The kit runs a real hub, so it belongs to the hub and is handed to the runner (`FMTSRunner(conformance_kit=...)`; the `forge governance` command does this); a runner handed none reports the four as not checked, with that reason (D-17):
 
 - **The reference hub** is the real hub servicer on clocks the kit controls. A refusal that takes three probes a second apart on a plant network takes no time here, and the hub that judges the module is the one in production.
 - **A driver** is how the kit reaches a module, and is the only part written per kind of module. `PythonAdapterDriver` drives any `AdapterBase` through the transport Python modules ship with.

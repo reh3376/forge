@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from forge.modules.ot.adapter import OTModuleAdapter
-from forge.modules.ot.control.api import create_control_router
+from forge.modules.ot.control.api import ScopeCheck, create_control_router
 from forge.modules.ot.control.runtime import ControlDependencies
 from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
 from forge.modules.ot.tag_engine.registry import TagRegistry
@@ -93,9 +93,11 @@ class OTModuleHost:
         self.started = False
         logger.info("OT module stopped")
 
-    def mount(self, app: FastAPI) -> None:
+    def mount(self, app: FastAPI, *, require_scope: ScopeCheck) -> None:
         """Mount the control API (and i3X browse) on the hub app."""
-        app.include_router(create_control_router(lambda: self.adapter.control_runtime))
+        app.include_router(
+            create_control_router(lambda: self.adapter.control_runtime, require_scope=require_scope)
+        )
         try:
             from forge.modules.ot.i3x.router import create_i3x_router
             from forge.modules.ot.tag_engine.builtin_templates import create_builtin_registry

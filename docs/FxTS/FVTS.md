@@ -49,10 +49,10 @@ FVTS does not invent parallel vocabularies. Its enums mirror the models already 
 | `qualityCode` | `forge.core.models.contextual_record.QualityCode` |
 | `contextField` | `forge.core.models.contextual_record.RecordContext` fields |
 | `timestampBasis` | `RecordTimestamp.TIME_BASES` (`source_time`, `server_time`, `ingestion_time`); `spoke_time` (the spoke's own send time; `sent_time` and hub-local until FB-092) is a clock-offset input (FB-087/FB-089), not a basis |
-| `alarmState`, `alarmPriority` | `forge.modules.ot.alarming.models.AlarmState` / `AlarmPriority` |
+| `alarmState`, `alarmPriority` | `forge.core.models.alarm.AlarmState` / `AlarmPriority` |
 | `alarmOperation` | Operator-initiated subset of `AlarmAction` (system actions are never UI actions) |
-| `role` | `forge.modules.ot.control.models.WriteRole` **plus `VIEWER`** (read-only; see open decisions) |
-| `writeStatus` | `forge.modules.ot.control.models.WriteStatus` |
+| `role` | `forge.core.models.control.WriteRole` **plus `VIEWER`** (read-only; see open decisions) |
+| `writeStatus` | `forge.core.models.control.WriteStatus` |
 
 Live updates with `transport: grpc_stream` ride the FTTS-governed gRPC transport.
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Any
 
+from forge.governance.fmts import SCHEMA_PATH
 from forge.governance.fmts.runners.fmts_runner import (
     ADMIN_WAIVABLE,
     CONFORMANCE_KIT,
@@ -95,6 +96,15 @@ class TestAModuleThatMeetsTheBaseline:
             assert "NOT CHECKED" in verdict.message and "FB-155" in verdict.message
             assert "not in an importable Forge package" in verdict.message
             assert verdict.evidence == {"waived": False, "unverified": True, "blocked_on": "FB-155"}
+
+    async def test_a_runner_handed_no_kit_says_so(self, spec, repo) -> None:
+        """The kit belongs to the hub and is handed in (D-17, S-1); without it nothing is
+        claimed: the four requirements are not checked, with the reason."""
+        verdicts = _by_id(await _run(FMTSRunner(schema_path=SCHEMA_PATH), spec, repo))
+        for requirement in ("m4", "m5", "m6", "m7"):
+            verdict = verdicts[f"fmts:{requirement}"]
+            assert verdict.status == SKIP
+            assert "no conformance kit was handed to this runner" in verdict.message
 
     async def test_a_module_off_the_python_template_is_reported_as_not_checked(
         self, runner, unsigned, repo
