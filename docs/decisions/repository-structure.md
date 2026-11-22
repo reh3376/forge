@@ -1,6 +1,6 @@
 # The structure of the repository: forge-core, forge-hub, forge-modules — design record
 
-**Status:** approved by reh3376 on 2026-11-22 as D-17 (the owner answered Q-1 to Q-6 one at a time and signed the record as written, Q-7). Nothing is moved yet: §9 is the plan, and the code is still laid out as §2 describes. · **Backlog:** FB-196 (with FB-197 to FB-203) · **Roadmap:** decision A-1
+**Status:** approved by reh3376 on 2026-11-22 as D-17, amended the same day by §10 (one standard structure in every major directory), which replaces §5 where they differ. Signed as D-17 (the owner answered Q-1 to Q-6 one at a time and signed the record as written, Q-7). Nothing is moved yet: §9 is the plan, and the code is still laid out as §2 describes. · **Backlog:** FB-196 (with FB-197 to FB-203) · **Roadmap:** decision A-1
 **Participants:** reh3376 (owner, decides and signs), Claude (surveys, asks, records, proposes)
 
 Every statement is tagged **[OWNER]** (decided by the owner, with the date), **[FACT]** (what the code says today, with where) or **[PROPOSED]** (Claude's recommendation, not approved).
@@ -176,11 +176,13 @@ One backlog item and one pull request per step. Every step leaves the full suite
 | 6 | The Go tree, the proto folders, the top-level leftovers | FB-202 |
 | 7 | The documents: `CLAUDE.md`, the tutorial's repository tour and both tracks, the README, the dated note in each signed record | FB-203 |
 
+Added by §10, in this order around the steps above: the clean-up of what belongs to no layer, before step 3 (FB-207: the removals of U-2 to U-4, `docs/personal/` ignored, the process-control context note beside D-11); with each move, that layer's `docs/`, `fxts/` and `README.md`; after step 6, the generated indexes with their command and test (FB-208) and the test that holds the structure (FB-209).
+
 ---
 
-## 10. Amendment 1 (draft): one standard structure in every major directory
+## 10. Amendment 1: one standard structure in every major directory
 
-**Status of this section:** draft. A-1 to A-3 and U-1 to U-6 are the owner's, decided 2026-11-22; the structure of §10.3, the rules of §10.4, the mapping of §10.5 and §10.7 to §10.8 are **[PROPOSED]** and wait for the owner's signature. Where this section and §5 disagree, §5 stands until this section is signed. Backlog: FB-206.
+**Status of this section:** approved by reh3376 on 2026-11-22 (A-1 to A-3 and U-1 to U-6 answered one at a time; the section signed as written). Where this section and §5 disagree, this section replaces §5: `fxts/` for `specs/`, `src/python` and `src/go` inside forge-core, a `docs/` in every major directory, the generic adapters in forge-core. Nothing is moved yet. Backlog: FB-206, built by FB-207 to FB-209 and the moves of §9.
 
 ### 10.1 What the owner said (2026-11-22)
 
@@ -198,7 +200,7 @@ This contradicts §5, which keeps `docs/`, `deploy/`, `scripts/` and `tests/` on
 
 ### 10.3 The standard structure
 
-**[PROPOSED]** A major directory is the root, `forge-core`, `forge-hub` and each folder under `forge-modules/`.
+**[OWNER]** Signed 2026-11-22. A major directory is the root, `forge-core`, `forge-hub` and each folder under `forge-modules/`.
 
 | Entry | In every major directory | Holds |
 |---|---|---|
@@ -215,7 +217,7 @@ Only at the root: `CLAUDE.md`, `BACKLOG.md`, `SECURITY.md`, `.github/`, the mani
 
 ### 10.4 Placement rules
 
-**[PROPOSED]** Applied in order; the first that matches decides.
+**[OWNER]** Signed 2026-11-22. Applied in order; the first that matches decides.
 
 | # | Rule |
 |---|---|
@@ -228,7 +230,7 @@ Only at the root: `CLAUDE.md`, `BACKLOG.md`, `SECURITY.md`, `.github/`, the mani
 
 ### 10.5 The mapping
 
-**[PROPOSED]** Every tracked path outside the interim bridge (which moves whole, Q-4). Counts are tracked files on 2026-11-22.
+**[OWNER]** Signed 2026-11-22. Every tracked path outside the interim bridge (which moves whole, Q-4). Counts are tracked files on 2026-11-22.
 
 **Documents**
 
