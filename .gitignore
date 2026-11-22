@@ -55,3 +55,6 @@ scripts/tutorial-forge/node_modules/
 scripts/tutorial-forge/example/dist/
 build/tutorial-static/
 forge-tutorial.zip
+
+# The owner's private working folder (D-17 §10.6, U-2): nothing in it is committed.
+docs/personal/

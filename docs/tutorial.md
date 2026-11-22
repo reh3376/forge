@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 137 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 138 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -245,7 +245,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 137:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 138:
 
 **Working**
 
@@ -1175,7 +1175,7 @@ flowchart TD
 - **Strict adjacency** (H-1): PC-L3 reaches PC-L1 only through PC-L2; if PC-L2 is offline, PC-L3 writes recommendation logs only (H-8).
 
 note:
-- Source: `docs/decisions/process-control-framework.md` §1, §2.1 and §2.2, with the companion context in `docs/personal/`. The layers are named PC-L1/2/3 so they cannot be confused with the reference architecture's L1–L5 or with ISA-95 levels (V-5).
+- Source: `docs/decisions/process-control-framework.md` §1, §2.1 and §2.2, with the companion context in `docs/decisions/process-control-framework-context.md`. The layers are named PC-L1/2/3 so they cannot be confused with the reference architecture's L1–L5 or with ISA-95 levels (V-5).
 
 ---
 

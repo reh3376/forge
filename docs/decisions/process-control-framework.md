@@ -2,7 +2,7 @@
 
 **Status:** approved by reh3376 on 2026-11-13 (rounds 1 to 3: the owner answered Q-1 to Q-50 on 2026-11-13 and, at Q-47, declared the answers the signature; the status line was set on that word; §5 records the answers) · **Backlog:** FB-110 (with FB-111, the prior-art search of S-3) · **Roadmap:** D-11
 **Participants:** reh3376 (owner, decides and signs), Claude (asks, records, proposes)
-**Companion:** [Context for the AI coding agent](../personal/Process-Control-Framework-Context-for-Agent.md) (orientation only; it decides nothing)
+**Companion:** [Context for the AI coding agent](process-control-framework-context.md) (orientation only; it decides nothing)
 
 This record captures the owner's decisions on the three-layer process control framework that is to be added to Forge. It is the input to the framework's functional specifications (FSDs, S-1). It was taken **before** the full review of Forge's current state, SDK and module definitions: it cites the code only where a question needed a fact, and it does not yet place the framework in Forge's modules (O-3). Every statement is tagged **[OWNER]** (decided by the owner on 2026-11-13, with the question it answers in §5), **[FACT]** (what the repository or an existing record says, with its source in §6), **[PROPOSED]** (Claude's reading or recommendation; the signature does not cover these) or **[OPEN]** (a question outstanding, collected in §4). Nothing in this record was implemented before the signature; implementation follows the Forge review and the FSDs.
 
