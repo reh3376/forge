@@ -1,0 +1,95 @@
+{
+  "spec_version": "0.2.0",
+  "spec_kind": "view",
+  "identity": {
+    "id": "forge-core-access",
+    "name": "Users and roles",
+    "version": "0.1.0",
+    "description": "Who may do what on this hub: users, roles and the assignments between them. Read-only until the role model is built (FB-075). One of the hub's four standard screens."
+  },
+  "view": {
+    "owner_module": "forge-core",
+    "fvts_spec": "src/forge/governance/fvts/specs/forge-core.fvts.json",
+    "surface_id": "hub.access",
+    "root": {
+      "node_id": "screen",
+      "container": "reflow",
+      "layout": {
+        "direction": "column",
+        "wrap": false,
+        "gap": 12
+      },
+      "children": [
+        {
+          "node_id": "title",
+          "widget": "text-label",
+          "props": {
+            "text": "Users and roles",
+            "emphasis": "strong"
+          }
+        },
+        {
+          "node_id": "hint",
+          "widget": "text-label",
+          "props": {
+            "text": "Roles are scoped: an assignment always says where it applies. Assignments made at a hub above are inherited and are not edited here.",
+            "emphasis": "muted"
+          }
+        },
+        {
+          "node_id": "users",
+          "widget": "data-table",
+          "props": {
+            "title": "Users",
+            "columns": "user_id,display_name,identity_method,active,last_sign_in_at",
+            "page_size": 25
+          },
+          "bind": {
+            "rows": {
+              "object": "hub.user"
+            }
+          }
+        },
+        {
+          "node_id": "roles",
+          "widget": "data-table",
+          "props": {
+            "title": "Roles",
+            "columns": "role_id,module,scopes,inherits",
+            "page_size": 25
+          },
+          "bind": {
+            "rows": {
+              "object": "hub.role"
+            }
+          }
+        },
+        {
+          "node_id": "assignments",
+          "widget": "data-table",
+          "props": {
+            "title": "Role assignments",
+            "columns": "user_id,role_id,applies_to,assigned_by,assigned_at,source_hub",
+            "page_size": 25
+          },
+          "bind": {
+            "rows": {
+              "object": "hub.assignment"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "7309338b9f1b8eee41d5424bedf661377cb724a7ead14b01e12ea5099bfc02f0",
+    "schema_version": "0.2.0",
+    "schema_hash": "05fa4883f7f52ce66c03e0025d923b46a0a4721f947283dae329a43c45368b51",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-22T15:31:14Z"
+  }
+}

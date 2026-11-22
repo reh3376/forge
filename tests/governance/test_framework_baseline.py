@@ -133,7 +133,7 @@ class TestTheSetOfFrameworks:
     def test_the_spec_listing_sees_every_spec(self) -> None:
         listed = {path.name for path in spec_files(SPEC_ROOT)}
         expected = {path.name for fw in BUILT for path in _specs(fw)}
-        assert expected <= listed and len(expected) == 62
+        assert expected <= listed and len(expected) == 66
 
 
 @pytest.mark.parametrize("fw", BUILT)

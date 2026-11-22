@@ -44,6 +44,7 @@ ACCEPTS: dict[str, frozenset[str] | None] = {
     "enum": frozenset({"ENUM", "BOOLEAN", "BOOL", "STRING"}),
     "string": frozenset({"STRING", "ENUM"}),
     "any": None,
+    "objects": None,
 }
 PROP_TYPES: dict[str, tuple[type, ...]] = {
     "string": (str,),
@@ -70,7 +71,8 @@ _DEFS = frozenset(
         "node_id", "container", "place", "layout", "children", "min_width", "show",
         "x", "y", "w", "h",
         # widgetInstance, bound, scriptRef
-        "widget", "props", "bind", "act", "on", "point", "expression", "script_id", "script_path",
+        "widget", "props", "bind", "act", "on", "point", "object", "expression",
+        "script_id", "script_path",
     }
 )  # fmt: skip
 
@@ -98,6 +100,7 @@ class FUTSRunner(FxTSRunner):
     version = "0.1.0"
 
     _ENFORCED_FIELDS: ClassVar[set[str]] = set(_TOP_LEVEL) | {f"$.{name}" for name in _DEFS}
+    _repo_root: Path = REPO_ROOT
 
     def implemented_fields(self) -> set[str]:
         return set(self._ENFORCED_FIELDS)
@@ -169,7 +172,8 @@ class FUTSRunner(FxTSRunner):
                 status=VerdictStatus.ERROR,
                 message="No schema configured.",
             )
-        validator = jsonschema.Draft202012Validator(self.schema)
+        schema = self.schema_for(spec) or self.schema
+        validator = jsonschema.Draft202012Validator(schema)
         violations = [
             SpecViolation(
                 field="/".join(str(part) for part in error.absolute_path) or "<root>",
@@ -178,7 +182,7 @@ class FUTSRunner(FxTSRunner):
             for error in sorted(validator.iter_errors(spec), key=lambda e: list(e.absolute_path))
         ]
         return self._verdict(
-            "schema-valid", "schema", violations, f"Spec validates against {self.schema['$id']}."
+            "schema-valid", "schema", violations, f"Spec validates against {schema['$id']}."
         )
 
     def _check_identity(self, spec: dict[str, Any], target: str) -> FxTSVerdict:
@@ -296,6 +300,7 @@ class FUTSRunner(FxTSRunner):
         self, view: dict[str, Any], *, repo_root: Path, specs_dir: Path, lists_dir: Path | None
     ) -> list[FxTSVerdict]:
         kinds = lists.load(CONTAINER_KINDS, lists_dir)
+        self._repo_root = repo_root
         nodes = list(_walk(view["root"]))
         instances = [(node, parent) for node, parent in nodes if "widget" in node]
         fvts, fvts_error = _load(repo_root / view["fvts_spec"])
@@ -557,6 +562,11 @@ class FUTSRunner(FxTSRunner):
         if isinstance(fvts, dict):
             points = {p["point_id"]: p for p in (fvts.get("data_bindings") or {}).get("points", [])}
         on_surface = set(surface.get("points", [])) if surface else set()
+        objects = {}
+        if isinstance(fvts, dict):
+            objects = {
+                o["object_id"]: o for o in (fvts.get("data_bindings") or {}).get("objects", [])
+            }
         for node, _ in instances:
             widget, _why = widgets[node["widget"]]
             if widget is None:
@@ -580,8 +590,41 @@ class FUTSRunner(FxTSRunner):
                             )
                         )
                     continue
-                point_id = bound[name]["point"]
+                point_id = bound[name].get("point")
+                object_id = bound[name].get("object")
                 expression = bound[name].get("expression")
+                if (point_id is None) == (object_id is None):
+                    violations.append(
+                        SpecViolation(
+                            field=f"{where}.{name}",
+                            message=(
+                                f"'{node['node_id']}.{name}' names a point or an object, "
+                                "one of them"
+                            ),
+                        )
+                    )
+                    continue
+                takes_objects = binding["value_type"] == "objects"
+                if takes_objects != (object_id is not None):
+                    violations.append(
+                        SpecViolation(
+                            field=f"{where}.{name}",
+                            message=(
+                                f"'{node['widget']}.{name}' takes "
+                                + (
+                                    "an object, not a point"
+                                    if takes_objects
+                                    else "a point, not an object"
+                                )
+                            ),
+                        )
+                    )
+                    continue
+                if object_id is not None:
+                    violations.extend(
+                        self._object_violations(node, name, object_id, objects, surface)
+                    )
+                    continue
                 if expression and not binding["expression_allowed"]:
                     violations.append(
                         SpecViolation(
@@ -632,6 +675,44 @@ class FUTSRunner(FxTSRunner):
                 "surface, of a fitting type."
             ),
         )
+
+    def _object_violations(
+        self,
+        node: dict[str, Any],
+        name: str,
+        object_id: str,
+        objects: dict[str, dict[str, Any]],
+        surface: dict[str, Any] | None,
+    ) -> list[SpecViolation]:
+        """A binding to one of the module's collections, and the columns shown from it."""
+        where = f"view.{node['node_id']}.bind.{name}"
+        if node["bind"][name].get("expression"):
+            return [SpecViolation(field=where, message="a collection takes no expression")]
+        if object_id not in set(surface.get("objects", []) if surface else []):
+            return [
+                SpecViolation(
+                    field=f"{where}.object",
+                    actual=object_id,
+                    message=f"'{object_id}' is not an object of the surface this screen lays out",
+                )
+            ]
+        columns = [c.strip() for c in str(node.get("props", {}).get("columns", "")).split(",")]
+        columns = [c for c in columns if c]
+        if not columns:
+            return []
+        schema, error = _load(self._repo_root / objects[object_id]["schema_path"])
+        if not isinstance(schema, dict):
+            return [SpecViolation(field=where, message=f"the schema of '{object_id}': {error}")]
+        fields = set(schema.get("properties", {}))
+        return [
+            SpecViolation(
+                field=f"view.{node['node_id']}.props.columns",
+                actual=column,
+                message=f"'{column}' is not a field of '{object_id}'",
+            )
+            for column in columns
+            if column not in fields
+        ]
 
     def _check_expressions(self, instances: list) -> FxTSVerdict:
         """Named on every run: this runner cannot compile CEL; the Go server does (S-2)."""

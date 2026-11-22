@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://fxts/futs/v0.1.0",
+  "$id": "forge://fxts/futs/v0.2.0",
   "title": "FUTS — Forge UI Test Specification",
   "description": "What a screen is made of. Two kinds of spec: a widget spec (what one widget accepts) and a view document (a laid-out screen, built from containers and widget instances). Decided in docs/decisions/forge-display.md (D-16, signed 2026-11-20).",
   "type": "object",
@@ -13,7 +13,7 @@
   "properties": {
     "spec_version": {
       "type": "string",
-      "const": "0.1.0",
+      "const": "0.2.0",
       "description": "FUTS schema version this spec is written against."
     },
     "spec_kind": {
@@ -316,9 +316,10 @@
             "string",
             "any",
             "series",
-            "alarms"
+            "alarms",
+            "objects"
           ],
-          "description": "What the bound point must be. series: the history of a numeric point. alarms: the alarm set of the module."
+          "description": "What the binding takes. For a point: number, boolean, enum, string or any. series: the history of a numeric point. alarms: the alarm set of the module. objects: one of the module's collections."
         },
         "binding_required": {
           "type": "boolean"
@@ -603,20 +604,22 @@
     "bound": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "point"
-      ],
       "properties": {
         "point": {
           "type": "string",
           "minLength": 1,
-          "description": "A point id of the module's view spec."
+          "description": "A point id of the module's view spec: one live value."
         },
         "expression": {
           "type": "string",
           "minLength": 1,
           "maxLength": 500,
           "description": "A CEL expression over `v` (the value) and `q` (its quality). Compiled and type-checked by the Go server; the browser evaluates only what Go accepted."
+        },
+        "object": {
+          "type": "string",
+          "minLength": 1,
+          "description": "An object id of the module's view spec: a collection, shown by a widget whose binding takes `objects`. A binding names a point or an object, never both (runner check futs:bindings)."
         }
       }
     },

@@ -1,26 +1,26 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "spec_kind": "widget",
   "identity": {
     "id": "data-table",
     "name": "Table",
-    "version": "0.1.0",
-    "description": "Rows of a module's objects, generated from the object's schema, with sorting and filtering."
+    "version": "0.2.0",
+    "description": "Rows of one of a module's collections, with sorting and filtering. Its columns come from the object's schema."
   },
   "widget": {
     "category": "general",
     "properties": [
       {
-        "prop_name": "object_schema",
+        "prop_name": "title",
         "prop_type": "string",
-        "prop_required": true,
-        "prop_description": "The schema of the objects listed."
+        "prop_required": false,
+        "prop_description": "Shown above the table."
       },
       {
         "prop_name": "columns",
         "prop_type": "string",
         "prop_required": false,
-        "prop_description": "Comma-separated field names; every field when not set."
+        "prop_description": "Comma-separated field names of the object's schema, in order; every field when not set."
       },
       {
         "prop_name": "page_size",
@@ -33,10 +33,10 @@
     "bindings": [
       {
         "binding_name": "rows",
-        "value_type": "any",
-        "binding_required": false,
+        "value_type": "objects",
+        "binding_required": true,
         "expression_allowed": false,
-        "binding_description": "The rows shown."
+        "binding_description": "The collection listed."
       }
     ],
     "shows": {
@@ -65,13 +65,23 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": null,
-    "change_history": [],
+    "previous_hash": "5a4f34e0275cecc220d4d4ee8f448c123f148154e4164e00365c0f0e71ff197e",
+    "change_history": [
+      {
+        "previous_hash": "5a4f34e0275cecc220d4d4ee8f448c123f148154e4164e00365c0f0e71ff197e",
+        "new_hash": "48e1472ec24b9bd35337fe0e8f1b03adad3f4824a0b8d2d90a89620ac1976bfa",
+        "changed_at": "2026-11-22T15:26:46Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "schema futs 0.1.0 -> 0.2.0"
+      }
+    ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "5a4f34e0275cecc220d4d4ee8f448c123f148154e4164e00365c0f0e71ff197e",
-    "schema_version": "0.1.0",
-    "schema_hash": "80f42ac6a5ec016d02ebf94c564e6b26dc01e42e9e2371daf8589d1375789920",
+    "spec_hash": "48e1472ec24b9bd35337fe0e8f1b03adad3f4824a0b8d2d90a89620ac1976bfa",
+    "schema_version": "0.2.0",
+    "schema_hash": "05fa4883f7f52ce66c03e0025d923b46a0a4721f947283dae329a43c45368b51",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-20T17:07:55Z"
+    "approved_at": "2026-11-22T15:30:30Z"
   }
 }

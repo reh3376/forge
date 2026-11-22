@@ -714,6 +714,28 @@ class FxTSRunner(abc.ABC):
             ),
         ]
 
+    def schema_for(self, spec: dict[str, Any]) -> dict[str, Any] | None:
+        """The schema a spec is held to: the registered version its ``spec_version`` names.
+
+        A spec written against an earlier minor or patch version stays valid (D-14, Q-5),
+        so it is validated against that version's frozen schema, not against the current
+        one. A spec that names no registered version gets the runner's own schema, whose
+        ``const`` on ``spec_version`` then fails it.
+        """
+        from forge.governance.shared import schemas
+
+        if self._schema_path is None:
+            return None
+        schema_dir = self._schema_path.parent
+        if schema_dir.name == "versions":
+            schema_dir = schema_dir.parent
+        if not (schema_dir / schemas.REGISTRY_NAME).is_file():
+            return self.schema
+        path = schemas.schema_for_spec(schema_dir, spec)
+        if path == self._schema_path:
+            return self.schema
+        return load_schema(path)
+
     def schema_verdict(self, spec: dict[str, Any]) -> FxTSVerdict | None:
         """``<fw>:schema-current``: the spec's record of its schema stands (D-14, F-10).
 
