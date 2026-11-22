@@ -180,7 +180,7 @@ One backlog item and one pull request per step. Every step leaves the full suite
 
 ## 10. Amendment 1 (draft): one standard structure in every major directory
 
-**Status of this section:** draft. A-1 to A-3 are the owner's, decided 2026-11-22; everything else is **[PROPOSED]** and waits for the owner. Where this section and §5 disagree, §5 stands until this section is signed. Backlog: FB-206.
+**Status of this section:** draft. A-1 to A-3 and U-1 to U-6 are the owner's, decided 2026-11-22; the structure of §10.3, the rules of §10.4, the mapping of §10.5 and §10.7 to §10.8 are **[PROPOSED]** and wait for the owner's signature. Where this section and §5 disagree, §5 stands until this section is signed. Backlog: FB-206.
 
 ### 10.1 What the owner said (2026-11-22)
 
@@ -243,7 +243,8 @@ Only at the root: `CLAUDE.md`, `BACKLOG.md`, `SECURITY.md`, `.github/`, the mani
 | `docs/spokes/{cmms,erpi,nms}/DISCOVERY.md` | 3 | the `docs/` of forge-cmms, forge-integ-erp-netsuite, forge-nms | P-2 |
 | `docs/spoke-onboarding/` | 2 | the `docs/` of forge-ims and forge-wms | P-2 |
 | `docs/MDEMG-INIT-BUGS.md`, `docs/MDEMG-PORT-OWNERSHIP-REPORT.md` | 2 | stay (reports to another project's agent) | P-5 |
-| `docs/development/workos_overview.md`, `docs/personal/` | 5 | undecided | P-6 |
+| `docs/personal/Process-Control-Framework-Context-for-Agent.md` | 1 | `docs/decisions/` | U-2 |
+| the other three files of `docs/personal/`, `docs/development/workos_overview.md` | 4 | removed; `docs/personal/` ignored | U-2 |
 
 **Code and governed files** (`src/forge`, 496 files)
 
@@ -258,7 +259,7 @@ Only at the root: `CLAUDE.md`, `BACKLOG.md`, `SECURITY.md`, `.github/`, the mani
 | `governance/fmts/conformance.py` | `forge-hub/src/forge_hub/conformance/` | P-3 |
 | `api/`, `gateway/`, `ingest/`, `storage/` (with its migrations), `registry/`, `context/`, `curation/`, `broker/`, `observer/`, `cli/`, the hub's end of `transport/` | `forge-hub/src/forge_hub/` | P-3 |
 | `adapters/forge_<x>/` (eight), `modules/ot/` | `forge-modules/forge-<x>/src/forge_<x>/` | P-2 |
-| `adapters/{csv_file,mqtt_sparkplug,opcua,rest_generic}/` | undecided | P-6 |
+| `adapters/{csv_file,mqtt_sparkplug,opcua,rest_generic}/` | `forge-core/src/python/forge_core/adapter/generic/` | U-1 |
 
 **Tests** (`tests`, 305 files): each folder follows the code it tests (`tests/core`, `sdk`, most of `governance`, the module's end of `transport` to `forge-core/tests`; `tests/api`, `gateway`, `storage`, … to `forge-hub/tests`; `tests/adapters/forge_<x>`, `tests/modules/ot` to the module). At the root stay the tests that span layers: `test_docs_current.py`, `test_layer_imports.py`, `test_proto_copies.py`, `test_dependency_lock.py`, `test_skips_have_reasons.py`, `test_ci_changed_paths.py`, the framework baseline, `tests/integration/` and `tests/verification/`.
 
@@ -275,18 +276,18 @@ Only at the root: `CLAUDE.md`, `BACKLOG.md`, `SECURITY.md`, `.github/`, the mani
 | `modules/Forge {CMMS,ERPI,NMS,DB Orchestration}/` | 73 | removed (Q-4) | Q-4 |
 | `benchmarks/bench_transport.py` | 1 | `forge-core/tests/benchmarks/` | P-4 |
 | `.claude/hooks/`, `.serena/` | 5 | stay (tool configuration of the repository) | P-5 |
-| `cli_main.py`, `p7-forge-ot-phases1-6.bundle`, `patches/`, `reports/d3-12-verification/`, `scripts/verify_d3.py`, `sidecars/whk-sidecar/` | 20 | undecided | P-6 |
+| `cli_main.py`, `p7-forge-ot-phases1-6.bundle`, `patches/`, `reports/d3-12-verification/`, `scripts/verify_d3.py`, `sidecars/whk-sidecar/` | 20 | removed | U-3, U-4 |
 
-### 10.6 What the rules do not settle
+### 10.6 What the rules did not settle: the owner's answers (2026-11-22)
 
-| # | Question | Proposal |
+| # | Question | Answer |
 |---|---|---|
-| U-1 | The four generic adapters (CSV, MQTT Sparkplug, OPC UA, REST): building blocks, not modules of their own. | `forge-core/src/python/forge_core/adapter/generic/`: they are what a module is built from. §5 put them in `forge-modules/generic/`. |
-| U-2 | `docs/personal/` (four tracked files) and `docs/development/workos_overview.md`. | The owner decides for each: into the documents proper, or out of the repository; then the folder is ignored (FB-205). |
-| U-3 | One-time artefacts: `p7-forge-ot-phases1-6.bundle`, `patches/` (2), `reports/d3-12-verification/` (8) with `scripts/verify_d3.py`, `cli_main.py`. | Remove; the history keeps them. |
-| U-4 | `sidecars/whk-sidecar/` (6 files, the old company prefix). | With FB-150: remove if nothing uses it, or rename and move under forge-mes beside the bridge. |
-| U-5 | A `CLAUDE.md` in each major directory, as the bridge has today. | Allowed, not required; the root file stays the authority and a lower one may only add. |
-| U-6 | One backlog. | One `BACKLOG.md` at the root; the FB numbers are cited everywhere. A generated view by layer is possible later (A-2). |
+| U-1 | The four generic adapters (CSV, MQTT Sparkplug, OPC UA, REST). | **[OWNER]** In forge-core, as building blocks, beside the adapter base class (`forge_core/adapter/generic/`). §5 had put them in `forge-modules/generic/`, where no module could import them. |
+| U-2 | `docs/personal/` (four tracked files) and `docs/development/workos_overview.md`. | **[OWNER]** The process-control context note moves to `docs/decisions/` beside D-11, which the roadmap and the tutorial cite it with. The two FVTS 0.1.0 working notes, the frontend-framework survey and the vendor overview are removed (the history keeps them). `docs/personal/` is ignored by git and is the owner's private working folder (FB-205). |
+| U-3 | One-time artefacts: `p7-forge-ot-phases1-6.bundle`, `patches/`, `reports/d3-12-verification/` with `scripts/verify_d3.py`, `cli_main.py`. | **[OWNER]** Removed; the history keeps them. Any found still in use is not removed and goes back to the owner by name. |
+| U-4 | `sidecars/whk-sidecar/`. | **[OWNER]** Removed. Nothing builds, tests or imports it, and the Go forge-mes is the route to the hub (FB-034). |
+| U-5 | A `CLAUDE.md` in each major directory. | **[OWNER]** Allowed, not required. The root file is the authority; a lower one may only add to it. |
+| U-6 | The backlog. | **[OWNER]** One `BACKLOG.md` at the root. A view by layer may be generated from it later (A-2). |
 
 ### 10.7 What is generated (A-2)
 
