@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 134 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 135 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -245,7 +245,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 134:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 135:
 
 **Working**
 
@@ -280,7 +280,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 134:
 | Measure | Value (2026-11-19) |
 |---|---|
 | Python hub (`src/forge`) | 354 files, ~74,100 lines |
-| Python tests | 286 files, 5,035 collected, full suite green on the locked dependency set |
+| Python tests | 286 files, 5,036 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -892,7 +892,7 @@ FACTS says what a module's data looks like. FMTS says what a module must do befo
 | M-15 | Refuses a command that arrives after its expiry; only for a module that declares process-control writes | not yet (FB-164); the declaration is checked now |
 | M-16 | Applies each business write-back once by its id and confirms it; only for a module that declares it takes them | not yet (FB-164); the declaration is checked now |
 
-- **The conformance kit** (`src/forge/governance/fmts/conformance.py`) runs the real hub on clocks it controls, puts the module's clock 5 s out, and checks that the hub refuses the module, that nothing is delivered, that the module's own health says why, and that it is readmitted when the clock is put right.
+- **The conformance kit** (`src/forge/governance/fmts/conformance.py`) runs the real hub on clocks it controls, puts the module's clock 5 s out, and checks that the hub refuses the module, that nothing is delivered, that the module's own health says why, and that it is readmitted when the clock is put right. The kit belongs to the hub and is handed to the runner; a runner handed none reports these checks as not run.
 - **A waiver** is a requirement a module cannot meet yet, written in its spec with the reason and the backlog item that removes it. The owner approves it through the spec's hash; every run names it; it expires when its backlog item is closed. Three requirements are waived only with admin privileges: the two for time keeping (M-3, M-4) and refusing a late command (M-15).
 - **A check that could not run is reported as `NOT CHECKED`**, never as passed.
 
@@ -1994,7 +1994,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q -rsx                    # 5,035 tests, ~1 minute; lists each skip with its reason
+uv run pytest tests -q -rsx                    # 5,036 tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2134,7 +2134,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 286 files, 5,035 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/` mirrors `src/`: 286 files, 5,036 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.

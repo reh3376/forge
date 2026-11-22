@@ -230,9 +230,14 @@ class FMTSRunner(FxTSRunner):
         f"$.{field}" for field in _WAIVER | _DATABASE | _THIRD_PARTY
     }
 
-    def __init__(self, schema_path: Path | str | None = None) -> None:
+    def __init__(
+        self, schema_path: Path | str | None = None, *, conformance_kit: Any = None
+    ) -> None:
         super().__init__(schema_path=schema_path)
         self._validator: Any = None
+        # The kit runs a module against a real hub, so it belongs to the hub and is handed in
+        # (D-17, S-1). Without one, the requirements it proves are reported as not checked.
+        self._kit: Any = conformance_kit
 
     def implemented_fields(self) -> set[str]:
         return set(self._ENFORCED_FIELDS)
@@ -670,7 +675,9 @@ class FMTSRunner(FxTSRunner):
         self, spec: dict[str, Any], repo_root: Path
     ) -> tuple[dict[str, FxTSVerdict], str]:
         """Run the conformance kit on the module; the verdicts, or why it could not run."""
-        from forge.governance.fmts import conformance
+        conformance = self._kit
+        if conformance is None:
+            return {}, "no conformance kit was handed to this runner (the hub supplies it)"
 
         template = spec["scaffold"]["template"]
         paths = spec["module_identity"]["source_paths"]

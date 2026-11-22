@@ -369,9 +369,9 @@ class FVTSRunner(FxTSRunner):
                 status=VerdictStatus.ERROR,
                 message="No schema configured; cannot compare enums.",
             )
+        from forge.core.models.alarm import AlarmAction, AlarmPriority, AlarmState
         from forge.core.models.contextual_record import QualityCode, RecordContext, RecordTimestamp
-        from forge.modules.ot.alarming.models import AlarmAction, AlarmPriority, AlarmState
-        from forge.modules.ot.control.models import WriteRole, WriteStatus
+        from forge.core.models.control import WriteRole, WriteStatus
 
         expected: dict[str, set[str]] = {
             "qualityCode": {e.value for e in QualityCode},

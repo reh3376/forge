@@ -375,7 +375,7 @@ def create_app(
     app.state.grpc_server = None
     app.state.ot_module = None
     if ot_host is not None:
-        ot_host.mount(app)
+        ot_host.mount(app, require_scope=require_scope)
     # Where each hub-served service answers; ``/v1/info`` reports it.
     services: dict[str, str | None] = {
         "context": "/v1/context",

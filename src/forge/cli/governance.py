@@ -321,9 +321,10 @@ def _futs_runner(schema: Path) -> FxTSRunner:
 
 
 def _fmts_runner(schema: Path) -> FxTSRunner:
+    from forge.governance.fmts import conformance
     from forge.governance.fmts.runners.fmts_runner import FMTSRunner
 
-    return FMTSRunner(schema_path=schema)
+    return FMTSRunner(schema_path=schema, conformance_kit=conformance)
 
 
 @dataclass(frozen=True)

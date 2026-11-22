@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any
 import pytest
 
 from forge.governance.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
-from forge.governance.fmts import REPO_ROOT, SCHEMA_PATH
+from forge.governance.fmts import REPO_ROOT, SCHEMA_PATH, conformance
 from forge.governance.fmts.runners.fmts_runner import FMTSRunner
 from forge.governance.shared import schemas
 from forge.governance.shared.runner import add_spec_hash, approve_spec_hash
@@ -58,7 +58,7 @@ def schema() -> dict[str, Any]:
 
 @pytest.fixture
 def runner() -> FMTSRunner:
-    return FMTSRunner(schema_path=SCHEMA_PATH)
+    return FMTSRunner(schema_path=SCHEMA_PATH, conformance_kit=conformance)
 
 
 @pytest.fixture

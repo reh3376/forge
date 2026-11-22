@@ -19,6 +19,7 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge.gateway.rbac import require_scope
 from forge.modules.ot.control import (
     ControlDependencies,
     ControlRuntime,
@@ -326,7 +327,7 @@ async def test_full_changeover_over_the_embedded_broker() -> None:
 
         # 3. The operator confirms the start over REST.
         app = FastAPI()
-        app.include_router(create_control_router(rt))
+        app.include_router(create_control_router(rt, require_scope=require_scope))
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(transport=transport, base_url="http://ot") as client:
             await broker.publish(
@@ -446,7 +447,7 @@ async def test_runtime_without_areas_is_engine_only() -> None:
     assert rt.ingress is None and rt.status()["changeover"] is None and rt.status()["cip"] == {}
 
     app = FastAPI()
-    app.include_router(create_control_router(rt))
+    app.include_router(create_control_router(rt, require_scope=require_scope))
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app), base_url="http://ot"
     ) as client:
@@ -458,7 +459,7 @@ async def test_runtime_without_areas_is_engine_only() -> None:
 
 async def test_router_before_runtime_exists_is_503() -> None:
     app = FastAPI()
-    app.include_router(create_control_router(lambda: None))
+    app.include_router(create_control_router(lambda: None, require_scope=require_scope))
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app), base_url="http://ot"
     ) as client:
@@ -662,7 +663,7 @@ async def test_connections_are_composed_started_and_served_over_rest() -> None:
     assert result.status is WriteStatus.CONFIRMED and client.values[SP_NODE] == 150.0
 
     app = FastAPI()
-    app.include_router(create_control_router(rt))
+    app.include_router(create_control_router(rt, require_scope=require_scope))
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://ot") as c:
         r = await c.get("/api/v1/ot/control/connections")
         assert r.status_code == 200 and r.json()["connections"]["WHK01"]["connected"] is True
@@ -774,7 +775,7 @@ async def test_a_refused_clock_raises_the_alarm_refuses_writes_and_is_not_restar
     )
 
     app = FastAPI()
-    app.include_router(create_control_router(rt))
+    app.include_router(create_control_router(rt, require_scope=require_scope))
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://ot") as c:
         r = await c.get("/api/v1/ot/control/connections")
         assert r.json()["connections"]["WHK01"]["clock_state"] == "CLOCK_UNREADABLE"
@@ -810,7 +811,7 @@ async def test_connections_need_a_registry_and_absent_connections_report_empty()
     rt, _mes, _plc, _sink = runtime(document(mqtt={"mode": "none"}, areas=False))
     assert rt.connections is None and rt.status()["connections"] is None
     app = FastAPI()
-    app.include_router(create_control_router(rt))
+    app.include_router(create_control_router(rt, require_scope=require_scope))
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://ot") as c:
         assert (await c.get("/api/v1/ot/control/connections")).json()["total"] == 0
         assert (await c.post("/api/v1/ot/control/connections/WHK01/restart")).status_code == 404
@@ -896,7 +897,7 @@ async def test_two_step_write_over_rest() -> None:
     plc.values[SP] = 150.0
     await rt.start()
     app = FastAPI()
-    app.include_router(create_control_router(rt))
+    app.include_router(create_control_router(rt, require_scope=require_scope))
     try:
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app), base_url="http://ot"
@@ -1014,7 +1015,7 @@ async def test_write_endpoints_use_the_hub_identity() -> None:
     }
     configure_auth(AuthConfig(enabled=True, api_keys=keys))
     app = FastAPI()
-    app.include_router(create_control_router(rt))
+    app.include_router(create_control_router(rt, require_scope=require_scope))
     try:
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app), base_url="http://ot"
@@ -1108,7 +1109,7 @@ async def test_operator_actions_use_the_hub_identity() -> None:
     op = {"X-API-Key": "op-key"}
     configure_auth(AuthConfig(enabled=True, api_keys=keys))
     app = FastAPI()
-    app.include_router(create_control_router(rt))
+    app.include_router(create_control_router(rt, require_scope=require_scope))
     transport = httpx.ASGITransport(app=app)
     try:
         async with httpx.AsyncClient(transport=transport, base_url="http://ot") as client:
