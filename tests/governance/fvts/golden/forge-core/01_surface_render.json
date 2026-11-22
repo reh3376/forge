@@ -1,0 +1,18 @@
+[
+  {
+    "message_type": "surface_render",
+    "surface_id": "hub.status"
+  },
+  {
+    "message_type": "surface_render",
+    "surface_id": "hub.modules"
+  },
+  {
+    "message_type": "surface_render",
+    "surface_id": "hub.governance"
+  },
+  {
+    "message_type": "surface_render",
+    "surface_id": "hub.access"
+  }
+]

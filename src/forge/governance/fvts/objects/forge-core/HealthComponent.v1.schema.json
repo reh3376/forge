@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://schemas/forge-core/HealthComponent/v1",
+  "title": "Hub component",
+  "description": "One part of a hub: the hub itself or one of its stores.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "status",
+    "checked_at"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The component: hub, postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio."
+    },
+    "status": {
+      "type": "string",
+      "description": "Its state.",
+      "enum": [
+        "up",
+        "degraded",
+        "down",
+        "unknown"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why it is in that state; empty when up."
+    },
+    "checked_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When it was last checked. UTC."
+    }
+  }
+}

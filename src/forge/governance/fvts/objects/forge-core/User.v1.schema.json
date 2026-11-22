@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://schemas/forge-core/User/v1",
+  "title": "User",
+  "description": "One identity known to this hub: a person or a service.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "user_id",
+    "display_name",
+    "identity_method",
+    "active"
+  ],
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Its id at this hub."
+    },
+    "display_name": {
+      "type": "string",
+      "description": "The name shown."
+    },
+    "identity_method": {
+      "type": "string",
+      "description": "How it signs in.",
+      "enum": [
+        "oidc",
+        "local",
+        "service",
+        "ldap",
+        "saml"
+      ]
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether it may sign in."
+    },
+    "last_sign_in_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "When it last signed in. UTC."
+    }
+  }
+}

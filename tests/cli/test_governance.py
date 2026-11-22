@@ -290,7 +290,7 @@ def test_run_fvts_reference_only_waits_on_the_owner(tmp_path: Path) -> None:
     code, out = run("run", "fvts", "forge-ot-views", "--format", "json", "--output", str(out_file))
     report = json.loads(out)
     assert report == json.loads(out_file.read_text(encoding="utf-8"))
-    assert report["framework"] == "FVTS" and len(report["verdicts"]) == 20
+    assert report["framework"] == "FVTS" and len(report["verdicts"]) == 21
     not_ok = {v["check_id"] for v in report["verdicts"] if v["status"] not in ("PASS", "SKIP")}
     assert not_ok <= {"fvts:hash-approved"}  # pending the owner's approval, nothing else
     assert code == (1 if not_ok else 0)

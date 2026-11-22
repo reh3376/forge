@@ -1,0 +1,39 @@
+{
+  "message_type": "object_list",
+  "object_id": "hub.module",
+  "items": [
+    {
+      "module_id": "forge-ot",
+      "name": "Forge OT",
+      "alias": "ot",
+      "kind": "ot",
+      "function": "ot",
+      "version": "0.5.0",
+      "state": "healthy",
+      "refusal_cause": "",
+      "clock_offset_seconds": 0.002,
+      "tolerance_class": "T0",
+      "instances": 1,
+      "data_classes": [
+        "raw",
+        "alarm",
+        "control"
+      ],
+      "waived": [
+        "M-10"
+      ],
+      "last_heard_at": "2026-11-21T12:00:00Z"
+    },
+    {
+      "module_id": "forge-wms",
+      "name": "Forge WMS",
+      "kind": "management",
+      "function": "wms",
+      "version": "0.1.0",
+      "state": "refused",
+      "refusal_cause": "CLOCK_OUT_OF_TOLERANCE",
+      "clock_offset_seconds": 5.0,
+      "instances": 0
+    }
+  ]
+}

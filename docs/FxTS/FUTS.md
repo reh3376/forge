@@ -129,5 +129,5 @@ forge governance validate-spec src/forge/governance/futs/specs/level-bar.widget.
 | Go and TypeScript types are not generated from the schema; the generator is chosen with the owner | FB-176 (the remaining part) |
 | An installation's view documents: storage in the hub, versions, approval per hub, export, migration | FB-184 |
 | A `navigate` action's target is not checked against the views that exist | FB-184 |
-| The hub's own screens: it has no view spec to lay out | FB-177 |
-| A module's object schemas, which `data-table` names, do not exist | FB-177 |
+| The hub's four screens have a view spec (FB-177) and no view document yet | FB-187 |
+| A binding cannot name an object: `data-table` takes an object's schema as a property, not the object as a binding | FB-187 |

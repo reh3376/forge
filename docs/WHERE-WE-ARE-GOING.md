@@ -54,7 +54,7 @@ From [`ROADMAP.md`](ROADMAP.md) §1 and [`docs/decisions/roles.md`](decisions/ro
 
 The sequence in [`ROADMAP.md`](ROADMAP.md) §4, set by the owner on 2026-11-20:
 
-1. The FUTS schemas for view documents and widgets (done 2026-11-20, FB-176), the view contract's profile table (done 2026-11-21, FB-178), with the hub's own view spec and object schemas (FB-177) and generated types (FB-186).
+1. The FUTS schemas for view documents and widgets (done 2026-11-20, FB-176), the view contract's profile table (done 2026-11-21, FB-178), the hub's own view spec and object schemas (done 2026-11-21, FB-177), with the hub's four screens as view documents (FB-187) and generated types (FB-186).
 2. ~~The spike~~ done 2026-11-20; the three provisional points are final (FB-179).
 3. The role model in force on the hub (FB-075).
 4. The Go module SDK with the parts of the transport contract forge-display needs, and the view service messages (FB-017, FB-164, FB-180).

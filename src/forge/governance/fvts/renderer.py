@@ -69,6 +69,7 @@ MESSAGE_TYPES = frozenset(
         "alarm_event",
         "action_result",
         "surface_render",
+        "object_list",
     }
 )
 
@@ -163,9 +164,13 @@ class ReferenceRenderer:
         self.points = {
             p.get("point_id"): p for p in spec.get("data_bindings", {}).get("points", [])
         }
+        self.objects = {
+            o.get("object_id"): o for o in spec.get("data_bindings", {}).get("objects", [])
+        }
         self.actions = {a.get("action_id"): a for a in spec.get("actions", [])}
         self.surfaces = {s.get("surface_id"): s for s in spec.get("surfaces", [])}
         self._last_display: dict[str, str] = {}
+        self._object_schemas: dict[str, dict[str, Any]] = {}
 
     # -- dispatch -----------------------------------------------------------
 
@@ -196,6 +201,58 @@ class ReferenceRenderer:
             msg = f"point {point_id!r} is not declared in data_bindings.points"
             raise GoldenRenderError(msg)
         return point
+
+    def _object(self, object_id: Any) -> dict[str, Any]:
+        declared = self.objects.get(object_id)
+        if declared is None:
+            msg = f"object {object_id!r} is not declared in data_bindings.objects"
+            raise GoldenRenderError(msg)
+        return declared
+
+    def _object_schema(self, declared: dict[str, Any]) -> dict[str, Any]:
+        object_id = declared["object_id"]
+        if object_id not in self._object_schemas:
+            from forge.governance.fvts import REPO_ROOT
+
+            path = REPO_ROOT / declared["schema_path"]
+            try:
+                self._object_schemas[object_id] = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError) as exc:
+                msg = f"object {object_id}: its schema {declared['schema_path']} cannot be read"
+                raise GoldenRenderError(msg) from exc
+        return self._object_schemas[object_id]
+
+    def _render_object_list(self, message: dict[str, Any]) -> dict[str, Any]:
+        """A list of one of the module's objects: every item is held to the object's schema.
+
+        The columns come from the schema, not from the items, so a table looks the same
+        whatever rows arrive (D-16, Q-3: forge-display generates tables from the schema).
+        """
+        import jsonschema
+
+        declared = self._object(message.get("object_id"))
+        object_id = declared["object_id"]
+        schema = self._object_schema(declared)
+        key = declared["key_field"]
+        validator = jsonschema.Draft202012Validator(schema)
+        seen: set[Any] = set()
+        for index, item in enumerate(message.get("items", [])):
+            errors = sorted(validator.iter_errors(item), key=lambda e: list(e.absolute_path))
+            if errors:
+                msg = f"object {object_id} item {index}: {errors[0].message}"
+                raise GoldenRenderError(msg)
+            if item[key] in seen:
+                msg = f"object {object_id}: two items share the key {key}={item[key]!r}"
+                raise GoldenRenderError(msg)
+            seen.add(item[key])
+        return {
+            "view": "objects",
+            "object_id": object_id,
+            "key_field": key,
+            "columns": list(schema.get("properties", {})),
+            "rows": len(seen),
+            "delivery": declared["delivery"],
+        }
 
     def _action(self, action_id: Any) -> dict[str, Any]:
         action = self.actions.get(action_id)
@@ -428,12 +485,15 @@ class ReferenceRenderer:
             raise GoldenRenderError(msg)
         for point_id in surface.get("points", []):
             self._point(point_id)
+        for object_id in surface.get("objects", []):
+            self._object(object_id)
         visible, hidden = visible_actions(self.spec, surface, self.profile, self.site)
         return {
             "view": "surface",
             "surface_id": surface_id,
             "kind": surface.get("kind"),
             "points": list(surface.get("points", [])),
+            "objects": list(surface.get("objects", [])),
             "actions_visible": visible,
             "actions_hidden": hidden,
         }

@@ -1,0 +1,5 @@
+{
+  "message_type": "action_result",
+  "action_id": "governance.run_checks",
+  "status": "CONFIRMED"
+}

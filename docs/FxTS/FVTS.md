@@ -3,7 +3,7 @@
 **Framework ID:** FVTS
 **Full Name:** Forge View Test Specification
 **CI Gate:** Hard-fail (merge-blocking) — `tests/governance/fvts/` runs in the `hub-python` job
-**Status:** v0.1.0 — Schema, runner (`fvts_runner.py`, 20 checks), reference renderer, golden set and reference spec (`forge-ot.fvts.json`, `pending_review` until FB-078)
+**Status:** v0.2.0 (2026-11-21, FB-177: objects beside points, a minor step released and approved under the schema version rules). Schema, runner (`fvts_runner.py`, 21 checks), reference renderer, two golden sets and two specs: the hub's own (`forge-core.fvts.json`, approved by the owner) and the plant-floor reference (`forge-ot.fvts.json`, `pending_review` until FB-078). forge-display itself has no code (FB-181).
 **Phase:** TBD (forge-display)
 **MDEMG Analog:** None — new for forge-display
 
@@ -55,6 +55,27 @@ FVTS does not invent parallel vocabularies. Its enums mirror the models already 
 | `writeStatus` | `forge.modules.ot.control.models.WriteStatus` |
 
 Live updates with `transport: grpc_stream` ride the FTTS-governed gRPC transport.
+
+## Objects: collections with a schema
+
+A point is one live value. Most of what a hub or a management module shows is not that: it is a list of things, such as modules, specs, lots or work orders. Since v0.2.0 a module declares those as **objects** in `data_bindings.objects`, beside its points (owner, 2026-11-21).
+
+| Field | Meaning |
+|---|---|
+| `object_id`, `object_label` | its id in this contract and the name shown |
+| `schema_ref` | the schema of one of these things as the one schema registry knows it (D-10): `forge://schemas/<owner>/<Entity>/v<version>` |
+| `schema_path` | where that JSON Schema document is in the repository |
+| `schema_hash` | the hash of that document |
+| `key_field` | the field that identifies one of them |
+| `delivery` | `request` (fetched when a screen asks) or `push` (changes are sent as they happen) |
+
+- **forge-display generates tables, forms and detail pages from the object's schema** (D-16, Q-3). A field added to the schema appears on the screens without forge-display changing.
+- **An object's schema is covered by the spec's approval.** Its hash is part of the spec's content, so a schema changed after approval fails `fvts:objects` until the spec is stamped and the owner approves it again.
+- **A surface lists the objects it shows**, as it lists its points. A `module_command` may name the object it acts on (`target_object`); the same role, confirmation and audit rules apply as for any action.
+- **A contract declares at least one point or one object.** The hub's has no points.
+- A reference renderer message, `object_list`, holds every item to the object's schema and takes its columns from the schema, not from the items.
+
+Runner check `fvts:objects`: each schema is a file in the repository, a valid JSON Schema, with the id the spec names, the hash the spec records, and the owner's own namespace; the key is a required field; a command's target is a declared object.
 
 ## Render profiles — normative baseline
 
@@ -172,6 +193,7 @@ A golden message may carry `"profiles": [...]` to apply to some renderers only (
 
 | Spec | Status | Notes |
 |------|--------|-------|
+| `forge-core.fvts.json` | approved by the owner 2026-11-21 | The hub's own screens, the first thing forge-display renders (D-16, Q-15): status and health, modules, governance, users and roles. No points; seven objects, each with a schema under `src/forge/governance/fvts/objects/forge-core/`. Read-only except for running a spec's checks: approving a spec and assigning a role stay off the screens until roles are enforced (FB-075). The hub is not a module and has no FACTS spec. Suite: `tests/governance/fvts/test_hub_views.py`. |
 | `forge-ot.fvts.json` | `hash_state: pending_review` (FB-078) | Reference contract: fermenter HMI screen, trend, alarm summary, settings; setpoint write via two-step review. Passes every runner check except `fvts:hash-approved`; with the OT write config (`deploy/ot/ot-control.example.json`) `fvts:action-target` fails because the fermenter points are invented — FB-078 replaces them. |
 
 ## Relationship to other FxTS frameworks
