@@ -179,3 +179,40 @@ Resolved in round 3: Q11 (the PKI follows the hub tree, restated in §8), Q12 (n
 - **Q20 (round 4):** the owner decided where roles are assigned (R-16); whether the four-role ladder ships as a preset is re-asked as Q22.
 - **Resolved Q21 (2026-11-03) the site hub's working copy:** assignments are mastered at the managing hub (R-16), and local sign-in must survive a WAN outage (A12). The owner chose the **derived copy**: refreshed from the managing hub, never edited locally, the managing hub the single source of truth, tokens issued at the site carrying the scopes from the copy, the copy's age visible (R-18). Debt check: a cache with a visible staleness age pins nothing; the alternative (fetch at every sign-in) would have made every site's sign-in depend on the WAN.
 - **Resolved Q22 (2026-11-03) ladder preset:** **yes**, the four generic roles ship as an optional preset, off by default and chosen at setup (R-19). Debt check: the preset is data over the one model (§3), so it pins nothing.
+
+## 14. Statements after the signature, and how the record is built (2026-11-18 and 22, FB-075)
+
+Everything above stands as signed. This section records what the owner said afterwards, in the owner's words, and what each statement was found to mean when the build was planned.
+
+**[OWNER]** 2026-11-18 (in the integration builder record, Q-2): "each hub must be independent as far as role permissions are concerned. The approver for one hub may or may not be the same for a second area hub on the same site. There should be a super admin that has full access to all hubs in an enterprise but the rest of the roles need to be scoped by hub."
+
+**[OWNER]** 2026-11-18: only a hub admin, a dev or the super admin can change an FxTS schema.
+
+| # | Question | Answer |
+|---|---|---|
+| S-Q1 | R-16 and R-18 say roles are assigned at the managing hub and inherited downward, never edited at a hub below. What "independent" means beside that. | **Answered 2026-11-22: independent in reach, managed from the top.** Every assignment says where it applies (R-7), so the approver on one area hub and the approver on another are two assignments that can go to different people. All assignments are made at the managing hub and copied down. R-16 and R-18 are unchanged. |
+| S-Q2 | How many people may hold super admin. | **Answered 2026-11-22: a role a few people may hold, at least two.** Super admin is a role shipped as data: every scope, with no limit on where it applies. Forge warns when fewer than two active subjects hold it. Every use is recorded like any other action. |
+
+So the three privileged kinds of person the owner named are roles over the one model (§3), not a second mechanism:
+
+| Role | Scopes | Where it applies |
+|---|---|---|
+| super admin | every scope | everywhere in the enterprise |
+| hub admin | the hub's administration scopes | one hub and what is below it |
+| dev | changing specs and schemas; not administering users | as assigned |
+
+Changing an FxTS schema is itself a scope, held by those three roles and no other.
+
+### The order of building
+
+One backlog item and one pull request per step.
+
+| Step | What | Depends on |
+|---|---|---|
+| 1 | Scopes and roles as data: every permission a named scope; each module ships its roles as a governed file | nothing |
+| 2 | Subjects and assignments: a stable id per person or service (§4); an assignment says who, which role, and where it applies | step 1 |
+| 3 | The decision point: one function answers whether a subject may do something somewhere, with its reason, and records every decision (§5) | step 2 |
+| 4 | Tokens (§7): signed access tokens with scopes and constraints, verified offline; refresh; a published key set | step 3; a cryptography library, confirmed with the owner |
+| 5 | Sign-in (R-10): local accounts and service identities, then OIDC; LDAP and SAML later | step 4; each protocol's library confirmed with the owner |
+| 6 | Enforcement everywhere: every hub route and call names a scope; reads constrained (R-11); the OT write engine and the view contract move from role names to scopes (§12) | step 3 |
+| 7 | The hub hierarchy: the derived copy at a site hub (R-18) | hub-to-hub links (FB-118, M6) |
