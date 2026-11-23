@@ -20,7 +20,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[1]
 HUB = REPO / "forge-core" / "contract" / "proto"
 GO = REPO / "forge-core" / "src" / "go" / "proto" / "forge" / "v1"
-BRIDGE = REPO / "modules" / "Forge MES" / "backend" / "src" / "forge"
+BRIDGE = REPO / "forge-modules" / "forge-mes" / "bridge" / "backend" / "src" / "forge"
 BRIDGE_PROTO = BRIDGE / "proto" / "forge" / "v1"
 HUB_MANIFEST = REPO / "src" / "forge" / "adapters" / "forge_mes" / "manifest.json"
 BRIDGE_MANIFEST = BRIDGE / "forge-mes.manifest.json"

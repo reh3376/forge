@@ -4,4 +4,4 @@
 # Governance specs and the hub-side spoke contracts need the owner's approval.
 /forge-core/src/python/forge_core/fxts/  @reh3376
 /specs/                 @reh3376
-/modules/Forge\ MES/    @reh3376
+/forge-modules/forge-mes/bridge/    @reh3376

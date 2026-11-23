@@ -63,7 +63,7 @@ This is the short form. [`docs/WHERE-WE-ARE.md`](docs/WHERE-WE-ARE.md) has every
 | Eight adapters for other systems, as Python reference implementations | [`src/forge/adapters/`](src/forge/adapters) |
 | Six FxTS frameworks with their specs, and the governed lists, each hashed and approved by the owner | [`forge-core/contract/`](forge-core/contract), [`forge-core/src/python/forge_core/fxts/`](forge-core/src/python/forge_core/fxts) |
 | Exhaustive checks of two laws of forge-ot, each with a project skill | [`.claude/skills/`](.claude/skills) |
-| The interim MES bridge, kept running until the Go forge-mes replaces it | [`modules/Forge MES/`](modules/Forge%20MES) |
+| The interim MES bridge, kept running until the Go forge-mes replaces it | [`forge-modules/forge-mes/bridge/`](forge-modules/forge-mes/bridge) |
 
 | Not built yet | Tracked as |
 |---|---|
@@ -84,7 +84,7 @@ The repository is being reorganised into three self-contained parts, forge-core,
 | [`forge-hub/`](forge-hub) | The hub: `src/python/forge_hub` (`link`, `ingest`, `context`, `storage`, `registry`, `curation`, `broker`, `api`, `gateway`, `observer`, `cli`), `fxts/` (its own specs), `tests/`, `docs/`, and its own README |
 | [`src/forge/`](src/forge) | The modules, until they move: `adapters/` and `modules/ot` |
 | [`tests/`](tests) | Tests of the modules (until they follow their code), and tests that span layers |
-| [`modules/Forge MES/`](modules/Forge%20MES) | The interim MES bridge (NestJS and Next.js). It has its own [`CLAUDE.md`](modules/Forge%20MES/CLAUDE.md) |
+| [`forge-modules/forge-mes/bridge/`](forge-modules/forge-mes/bridge) | The interim MES bridge (NestJS and Next.js). It has its own [`CLAUDE.md`](forge-modules/forge-mes/bridge/CLAUDE.md) |
 | [`docs/`](docs) | The state and direction documents, the signed decision records, the tutorial's source |
 | [`deploy/`](deploy) | The container image and the Compose stack. Compose is for development only; production runs on Kubernetes |
 | [`scripts/`](scripts) | The tutorial tools, the pinned TLA+ model checker, the restructuring scripts |

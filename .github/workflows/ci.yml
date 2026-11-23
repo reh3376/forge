@@ -92,7 +92,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: modules/Forge MES
+        working-directory: forge-modules/forge-mes/bridge
     steps:
       - uses: actions/checkout@v7
         with:
@@ -105,7 +105,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: >
           .github/scripts/changed-paths.sh mes-module
-          "modules/Forge MES/" forge-core/contract/proto/ src/forge/adapters/forge_mes/manifest.json
+          "forge-modules/forge-mes/bridge/" forge-core/contract/proto/ src/forge/adapters/forge_mes/manifest.json
           .github/workflows/ci.yml .github/scripts/
         env:
           EVENT_NAME: ${{ github.event_name }}
@@ -117,7 +117,7 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: modules/Forge MES/package-lock.json
+          cache-dependency-path: forge-modules/forge-mes/bridge/package-lock.json
       - run: npm ci --no-audit --no-fund
         if: steps.changes.outputs.run == 'true'
       - name: shared build
@@ -126,24 +126,24 @@ jobs:
       - name: backend prisma generate
         if: steps.changes.outputs.run == 'true'
         run: npx prisma generate
-        working-directory: modules/Forge MES/backend
+        working-directory: forge-modules/forge-mes/bridge/backend
       - name: backend type-check
         if: steps.changes.outputs.run == 'true'
         run: npx tsc --noEmit -p tsconfig.json
-        working-directory: modules/Forge MES/backend
+        working-directory: forge-modules/forge-mes/bridge/backend
       - name: backend unit tests (advisory until BACKLOG FB-036 is verified)
         if: steps.changes.outputs.run == 'true'
         # --forceExit: Jest finishes in ~5 min but open Prisma/RabbitMQ handles from the DB-less
         # suites (FB-036) kept the process alive ~15 min more (BACKLOG FB-052).
         run: npx jest --ci --passWithNoTests --forceExit
-        working-directory: modules/Forge MES/backend
+        working-directory: forge-modules/forge-mes/bridge/backend
         continue-on-error: true
       - name: frontend type-check
         if: steps.changes.outputs.run == 'true'
         # Blocking since BACKLOG FB-028 (2026-11-17): the interim frontend type-checks clean
         # under its strict flags, and a new type error fails the job.
         run: npx tsc --noEmit -p tsconfig.json
-        working-directory: modules/Forge MES/frontend
+        working-directory: forge-modules/forge-mes/bridge/frontend
 
   secrets-scan:
     name: secrets-scan

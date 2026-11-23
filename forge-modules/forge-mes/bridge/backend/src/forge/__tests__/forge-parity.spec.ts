@@ -10,7 +10,7 @@ import * as path from "path";
 import { FORGE_MES_MANIFEST, toProtoManifest } from "../forge-manifest";
 import { ADAPTER_SERVICE_PROTO, PROTO_DIR, getAdapterService, loadForgeV1 } from "../proto";
 
-const REPO_ROOT = path.resolve(__dirname, "../../../../../..");
+const REPO_ROOT = path.resolve(__dirname, "../../../../../../..");
 const HUB_ROOT = path.join(REPO_ROOT, "src", "forge");
 // The proto files are part of forge-core's contract (D-17, FB-227).
 const CONTRACT_PROTO = path.join(REPO_ROOT, "forge-core", "contract", "proto");

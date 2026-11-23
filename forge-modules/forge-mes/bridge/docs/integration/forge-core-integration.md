@@ -330,7 +330,7 @@ spoke's certificate, so both directions are mTLS under one trust root.
 # hub (repo root): REST on 8000, gRPC on 50051
 FORGE_GRPC_ENABLED=true FORGE_GRPC_PORT=50051 uvicorn forge.api.main:app --port 8000
 
-# backend (modules/Forge MES/backend): spoke server on 50052, advertised as localhost:50052
+# backend (forge-modules/forge-mes/bridge/backend): spoke server on 50052, advertised as localhost:50052
 FORGE_HUB_ENABLED=true FORGE_HUB_GRPC_URL=localhost:50051 npm run start
 curl -H "Authorization: Bearer <token>" http://localhost:3000/api/forge/status
 

@@ -20,7 +20,7 @@ REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / ".github" / "scripts" / "changed-paths.sh"
 WORKFLOW = (REPO / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
 MES = (
-    "modules/Forge MES/",
+    "forge-modules/forge-mes/bridge/",
     "forge-core/contract/proto/",
     "src/forge/adapters/forge_mes/manifest.json",
 )
@@ -94,9 +94,12 @@ class TestABranch:
         assert run == "false" and "nothing to check" in message and "skipped" in message
 
     def test_a_relevant_file_changed(self, repo: Path) -> None:
-        _commit(repo, "modules/Forge MES/backend/src/main.ts")
+        _commit(repo, "forge-modules/forge-mes/bridge/backend/src/main.ts")
         run, message = decide(repo, *MES)
-        assert run == "true" and "modules/Forge MES/backend/src/main.ts changed" in message
+        assert (
+            run == "true"
+            and "forge-modules/forge-mes/bridge/backend/src/main.ts changed" in message
+        )
 
     def test_an_exact_file_is_a_prefix_too(self, repo: Path) -> None:
         _commit(repo, "src/forge/adapters/forge_mes/manifest.json")
@@ -111,7 +114,7 @@ class TestABranch:
     def test_an_earlier_commit_on_the_branch_still_counts(self, repo: Path) -> None:
         """The whole branch is compared, not only the last push: a docs-only last commit
         must not hide a change to the bridge made before it."""
-        _commit(repo, "modules/Forge MES/frontend/app/page.tsx")
+        _commit(repo, "forge-modules/forge-mes/bridge/frontend/app/page.tsx")
         _commit(repo, "docs/tutorial.md")
         assert decide(repo, *MES)[0] == "true"
 
@@ -167,7 +170,7 @@ class TestTheWorkflow:
         ("job", "paths"),
         [
             ("hub-go", ["forge-core/src/go/", "forge-core/contract/proto/"]),
-            ("mes-module", ['"modules/Forge MES/"', *MES[1:]]),
+            ("mes-module", ['"forge-modules/forge-mes/bridge/"', *MES[1:]]),
         ],
     )
     def test_the_job_names_what_it_checks_and_its_own_definition(

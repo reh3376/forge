@@ -27,10 +27,10 @@ PYTHON_ROOTS = (
     "forge-hub/tests",
 )
 TS_ROOTS = (
-    "modules/Forge MES/backend/src",
-    "modules/Forge MES/backend/test",
-    "modules/Forge MES/frontend",
-    "modules/Forge MES/shared/src",
+    "forge-modules/forge-mes/bridge/backend/src",
+    "forge-modules/forge-mes/bridge/backend/test",
+    "forge-modules/forge-mes/bridge/frontend",
+    "forge-modules/forge-mes/bridge/shared/src",
 )
 MARKERS = {"skip", "skipif", "xfail"}
 TS_SKIP = re.compile(r"\b(?:it|test|describe)\.(?:skip|todo)\(|\bx(?:it|test|describe)\(")

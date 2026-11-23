@@ -140,7 +140,7 @@ Forge is industry-general; the Whiskey House (WHK) deployment is its reference i
 | Forge module | Origin | Replaces |
 |---|---|---|
 | forge-ot (OT module) | New build (Python, asyncua) | Ignition SCADA and the Ignition Global Jython middleware; direct PLC connectivity, tag acquisition, alarming, control writes. Target: Ignition decommissioned by 2027, with the Ignition bridge adapter carrying existing screens meanwhile |
-| forge-mes | `whk-mes`, migrated into this repo as `modules/Forge MES` on 2026-10-15 | Production orders, recipes, scheduling, quality, ERP sync |
+| forge-mes | `whk-mes`, migrated into this repo as `forge-modules/forge-mes/bridge` on 2026-10-15 | Production orders, recipes, scheduling, quality, ERP sync |
 | forge-wms | `forge-wms` (barrel tracking, ownership, transfers, lots) | — |
 | forge-cmms | `forge-cmms` | PM scheduling, work orders, assets, inventory |
 | forge-qms | New build (Intellect QMS integration service and the ISO planning repo as scope references) | Intellect QMS: document control, CAPA, audits, GRC |
