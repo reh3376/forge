@@ -72,6 +72,23 @@ Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `build:`)
 - **Question the owner's proposals too.** The owner, 2026-11-19: "I am open to discussion and I encourage you to question my choices." Say where a proposal conflicts with a signed record or carries a risk, and say where it is better than what is signed.
 - **A signed decision is the current best answer, not a fence.** The owner, 2026-11-22: "we cannot get overly caught up in old decisions." When new information favours a better decision, say which signed record and rule it contradicts, review how it affects the whole system, and recommend on the merits. On the owner's word the older record is amended with a dated note and everything that depended on it is brought along.
 
+## Working principles
+
+Ten habits, adopted by the owner on 2026-11-22. They began as principles of the pstack plugin and are written here in forge's own words, with forge's limits beside them. Where pstack's text says more than this, this is what holds.
+
+1. **Prove it on the real thing.** Before saying a piece of work is done, check the artifact itself: run it, read the value it produced, read the diff. "It compiles" and "the tests are green" are not that check. When a check fails, first ask whether the check observed the right thing, and then report the failure either way. *Limit:* running the real thing never means writing to a real controller.
+2. **Fix where it first went wrong.** Trace a symptom back to the first wrong decision and fix it there. A guard, a retry, a clamp or a swallowed error is a fix only when the state it handles is legitimate; if that state should never exist, find what produced it. If finding the cause took a deep dig, propose the cheap signal that would have shown it at once. *Limit:* other places with the same fault go to `BACKLOG.md`, not into the same pull request.
+3. **Model the domain in data.** A state machine over a set of flags, a closed list over a free string, a typed model over loose parameters, so that an invalid state cannot be written. Keep plain code plain when its shape is clear and local.
+4. **Check at the boundary, then trust.** Validate and coerce where data enters (a request, a config file, a record from a module, a spec), and let the code behind it rely on that. *Limit:* the layers on the path of a write to a process controller (validation, the review gate, interlocks, authorization) are each there on purpose; none is redundant and none is removed.
+5. **Meet a new requirement by asking what would have been built with it from the start.** Compare that with what exists and say plainly where they differ. *Limit:* that is a proposal. A signed record, a released schema and the proto change only the ways they are allowed to, on the owner's word.
+6. **Shape before logic.** Settle the core types and how they are read before writing the code around them. Before two actors share a piece of state, ask what happens when one changes it under the other.
+7. **Guard the working context.** Hand bulk reading to a subagent and keep its conclusion; do not pour raw output into the main thread. *Limit:* a summary can drop what matters, so read the source yourself before a decision rests on it.
+8. **Make an operation safe to run twice.** A step that changes state reads what exists, compares it with the goal and applies the difference, so that a retry or a restart ends in the same place; what a stopped run leaves behind is recognisable as stale. *Limit:* this does not apply to a command to a process controller, which is delivered at most once, never stored and never retried (D-15).
+9. **A lesson repeated twice becomes a check.** Turn it into a test, a schema rule or a runner check that fails with a message naming what to do. *Limit:* the written rule stays in this file or its record beside the check; the check does not replace it.
+10. **Remove sharing before adding a lock.** When two actors might write the same file, key or object, first ask whether each can own its part and the parts be combined where they are read. Serialize (one writer, a queue, compare-and-swap) only where one shared target is a real invariant, as a tag in a controller is.
+
+Principles 3 to 6 are the checklist for designing a spec, a schema or a framework: `docs/FxTS/README.md`, "Designing a spec, a schema or a framework".
+
 ## Skills from the pstack plugin
 
 The pstack plugin (marketplace `cursor-plugins`) is installed per user, not in the repository. Seven of its skills are adopted here (the owner, 2026-11-22). Each is typed as `/pstack:<name>`; none runs by itself.
