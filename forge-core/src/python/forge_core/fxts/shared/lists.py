@@ -88,8 +88,6 @@ def _shape_problems(name: str, document: dict[str, Any]) -> list[str]:
         seen.add(entry_id)
         if not str(entry.get("description") or "").strip():
             problems.append(f"{name}: {entry_id} has no description")
-        if name == HARD_LIMITS:
-            problems.extend(_hard_limit_problems(name, entry_id, entry))
     return problems
 
 
@@ -132,66 +130,6 @@ def _data_class_problems(document: dict[str, Any]) -> list[str]:
     return problems
 
 
-#: What a hard limit is, as data the hub's decision point can test (D-17 §11.5).
-LIMIT_KINDS = ("scope", "relation")
-#: A scope the limit covers is written as the roles record writes one, with ``*`` for any.
-LIMIT_SCOPE = re.compile(r"^(\*|[a-z][a-z0-9_]*):(\*|[a-z][a-z0-9_]*):(\*|[a-z][a-z0-9_]*)$")
-#: A relation between the one who grants and the one who receives.
-LIMIT_RELATIONS = ("grantor-is-grantee", "grant-exceeds-grantor")
-#: ``interim``: only an interim decision is forbidden, the behavioral contract may permit
-#: the act. ``always``: no decision, and no contract, permits it.
-LIMIT_APPLIES = ("interim", "always")
-LIMIT_HOLDERS = ("contract", "level-above", "owner")
-LIMIT_STATUS = ("active", "retired")
-_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-
-
-def _hard_limit_problems(name: str, entry_id: str, entry: dict[str, Any]) -> list[str]:
-    """A limit says what it covers in a form that can be tested, why, and who holds it."""
-    found = [
-        f"{name}: {entry_id} does not say its {key}"
-        for key in ("reason", "held_how")
-        if not str(entry.get(key) or "").strip()
-    ]
-    for key, allowed in (
-        ("kind", LIMIT_KINDS),
-        ("applies", LIMIT_APPLIES),
-        ("held_by", LIMIT_HOLDERS),
-        ("status", LIMIT_STATUS),
-    ):
-        if entry.get(key) not in allowed:
-            found.append(f"{name}: {entry_id} has {key} {entry.get(key)!r}, not one of {allowed}")
-    scopes, relation = entry.get("scopes"), entry.get("relation")
-    if entry.get("kind") == "scope":
-        if not isinstance(scopes, list) or not scopes:
-            found.append(f"{name}: {entry_id} is of kind scope and lists no scopes")
-        else:
-            found.extend(
-                f"{name}: {entry_id} has the scope {scope!r}, not <domain>:<object>:<action>"
-                for scope in scopes
-                if not isinstance(scope, str) or not LIMIT_SCOPE.match(scope)
-            )
-        if relation is not None:
-            found.append(f"{name}: {entry_id} is of kind scope and also names a relation")
-    if entry.get("kind") == "relation":
-        if relation not in LIMIT_RELATIONS:
-            found.append(f"{name}: {entry_id} names the unknown relation {relation!r}")
-        if scopes is not None:
-            found.append(f"{name}: {entry_id} is of kind relation and also lists scopes")
-    if not _DATE.match(str(entry.get("added") or "")):
-        found.append(f"{name}: {entry_id} has no date it was added (YYYY-MM-DD)")
-    retired = entry.get("retired")
-    if entry.get("status") == "retired" and not _DATE.match(str(retired or "")):
-        found.append(f"{name}: {entry_id} is retired and has no date it was retired")
-    if entry.get("status") == "active" and retired is not None:
-        found.append(f"{name}: {entry_id} is active and carries a retired date")
-    if not isinstance(entry.get("enforced_by"), list):
-        found.append(
-            f"{name}: {entry_id} does not list what enforces it (an empty list if nothing)"
-        )
-    return found
-
-
 def active_hard_limits(lists_dir: Path | None = None) -> list[dict[str, Any]]:
     """The limits in force: every listed limit that is not retired."""
     return [e for e in load(HARD_LIMITS, lists_dir).entries if e.get("status") == "active"]
@@ -200,6 +138,41 @@ def active_hard_limits(lists_dir: Path | None = None) -> list[dict[str, Any]]:
 def unenforced_hard_limits(lists_dir: Path | None = None) -> list[str]:
     """Active limits that nothing enforces yet. A limit nobody checks is said to be so."""
     return [str(e["id"]) for e in active_hard_limits(lists_dir) if not e.get("enforced_by")]
+
+
+#: The schema of a governed list, with its released versions (BACKLOG FB-234).
+SCHEMA_DIR = contract.LISTS_DIR / "schema"
+
+
+def _format_problems(name: str, document: dict[str, Any]) -> list[str]:
+    """What the list's own schema says is wrong with it.
+
+    A list is checked against the version of the format it declares, not the newest. One
+    written in a version this forge-core does not know is refused and said to be so: a
+    receiver that guessed at a list of limits it did not understand would be worse than
+    one that kept the last list it did.
+    """
+    from jsonschema import Draft202012Validator
+
+    from forge_core.fxts.shared import schemas
+
+    if not isinstance(document, dict):
+        return [f"{name}: a list is a JSON object"]
+    declared = document.get("spec_version")
+    known = [row.version for row in schemas.versions(SCHEMA_DIR)]
+    if declared not in known:
+        return [
+            f"{name}: it is written in list format {declared!r}, which this forge-core does "
+            f"not know (it knows {', '.join(known) or 'none'}); it is refused"
+        ]
+    schema = json.loads(schemas.schema_for_spec(SCHEMA_DIR, document).read_text(encoding="utf-8"))
+    errors = sorted(
+        Draft202012Validator(schema).iter_errors(document), key=lambda e: list(e.absolute_path)
+    )
+    return [
+        f"{name}: /{'/'.join(str(part) for part in error.absolute_path)}: {error.message[:160]}"
+        for error in errors
+    ]
 
 
 def load(name: str, lists_dir: Path | None = None) -> GovernedList:
@@ -211,7 +184,7 @@ def load(name: str, lists_dir: Path | None = None) -> GovernedList:
         document = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         return GovernedList(name, path, {}, [f"{name}: not readable as JSON: {exc}"])
-    problems = _shape_problems(name, document)
+    problems = _format_problems(name, document) + _shape_problems(name, document)
     if name == DATA_CLASSES:
         problems += _data_class_problems(document)
     integrity = document.get("integrity")

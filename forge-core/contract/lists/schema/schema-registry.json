@@ -1,0 +1,17 @@
+{
+  "framework": "lists",
+  "hash_method": "sha256-c14n-v1",
+  "versions": [
+    {
+      "version": "0.1.0",
+      "file": "versions/lists.v0.1.0.schema.json",
+      "schema_hash": "c9cb17e17a24bba4afcd76f6d87fbe0719064b6a853e91eedc4240ab129e668b",
+      "hash_state": "approved",
+      "step": "baseline",
+      "summary": "FB-234: the first schema of a governed list; every list declares the format it is written in, hard-limits is held to the shape of a limit, and data-classes to its three vocabularies",
+      "released_at": "2026-11-23T05:34:58Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-23T05:38:09Z"
+    }
+  ]
+}

@@ -1,0 +1,332 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://fxts/lists/v0.1.0",
+  "title": "Governed list",
+  "description": "A governed list: a closed set of named values that specs, hubs and modules choose from or are held to. Sender: forge-core, where the owner approves it. Transmission: in the contract, and down the chain of command one level at a time, where it may arrive late or after this format has moved on. Receiver: a runner, a hub's decision point or a person, who must be able to tell from the list alone what it is (list), which construction it is (spec_version), that it is the approved one (integrity) and what each value means (entries). A receiver that does not know the spec_version refuses the list and keeps the last one it understood. A list that needs a vocabulary of its own beside its entries is named in this schema with the fields it adds, as data-classes is; no other list carries them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spec_version",
+    "list",
+    "title",
+    "description",
+    "entries",
+    "integrity"
+  ],
+  "properties": {
+    "spec_version": {
+      "type": "string",
+      "const": "0.1.0",
+      "description": "The version of this format the list is written in."
+    },
+    "list": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "The list's name; the file is <list>.list.json."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What the list is, in a few words."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What the values are for, who chooses from them, and the decision that set the list."
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/entry"
+      },
+      "description": "The values. Order is kept."
+    },
+    "directions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "description": "data-classes only: the directions a class of data may travel."
+    },
+    "deliveries": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "description": "data-classes only: the delivery rules a class may have."
+    },
+    "links": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "description": "data-classes only: the links a class may travel."
+    },
+    "integrity": {
+      "type": "object",
+      "description": "The FHTS block: the hash of everything else in the list, its state, and who approved it."
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": [
+        "id",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)?$",
+          "description": "The value as it is written where it is chosen. Dotted for a child of another entry."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the value means."
+        }
+      },
+      "description": "One value. A list may give its entries more fields; a list named below is held to the shape given for it."
+    },
+    "hardLimit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "description",
+        "kind",
+        "applies",
+        "held_by",
+        "held_how",
+        "reason",
+        "status",
+        "added",
+        "enforced_by"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "scope",
+            "relation"
+          ],
+          "description": "How the limit is tested: by the scopes a decision exercises or grants, or by a relation between who grants and who receives."
+        },
+        "scopes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(\\*|[a-z][a-z0-9_]*):(\\*|[a-z][a-z0-9_]*):(\\*|[a-z][a-z0-9_]*)$"
+          },
+          "description": "Scopes the limit covers, <domain>:<object>:<action>, with * for any."
+        },
+        "relation": {
+          "enum": [
+            "grantor-is-grantee",
+            "grant-exceeds-grantor"
+          ]
+        },
+        "applies": {
+          "enum": [
+            "interim",
+            "always"
+          ],
+          "description": "interim: only an interim decision is forbidden, and a behavioral contract may permit the act. always: no decision and no contract permits it."
+        },
+        "held_by": {
+          "enum": [
+            "contract",
+            "level-above",
+            "owner"
+          ],
+          "description": "Who may do it instead."
+        },
+        "held_how": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why no later rejection can put the act right."
+        },
+        "status": {
+          "enum": [
+            "active",
+            "retired"
+          ],
+          "description": "A retired limit stays listed so that a record naming it still resolves; its id is never used again."
+        },
+        "added": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "retired": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "enforced_by": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "What holds the limit today: tests or checks, by path or id. Empty when nothing does."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "scope"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "scopes"
+            ],
+            "not": {
+              "required": [
+                "relation"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "relation"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "relation"
+            ],
+            "not": {
+              "required": [
+                "scopes"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "retired"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "retired"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "retired"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "list": {
+            "const": "hard-limits"
+          }
+        },
+        "required": [
+          "list"
+        ]
+      },
+      "then": {
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/$defs/hardLimit"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "list": {
+            "const": "data-classes"
+          }
+        },
+        "required": [
+          "list"
+        ]
+      },
+      "then": {
+        "required": [
+          "directions",
+          "deliveries",
+          "links"
+        ]
+      },
+      "else": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "directions"
+              ]
+            },
+            {
+              "required": [
+                "deliveries"
+              ]
+            },
+            {
+              "required": [
+                "links"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
