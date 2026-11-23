@@ -36,7 +36,7 @@ def test_each_gate_has_its_keywords() -> None:
         "go", "+standard", "+problem", "+ground", "+sharpen", "+shape", "+arena", "+cases",
         "+attack", "+laws", "+chart", "+design",
     }  # fmt: skip
-    assert set(SHIP) == {"go", "+blast", "+verify", "+attack", "+ship"}
+    assert set(SHIP) == {"go", "+blast", "+verify", "+attack", "+prove", "+ship"}
 
 
 def test_each_gate_has_a_plain_go_and_a_standard_answer() -> None:
@@ -44,7 +44,7 @@ def test_each_gate_has_a_plain_go_and_a_standard_answer() -> None:
     for gate in (DESIGN, SHIP):
         assert next(iter(gate)) == "go", "go is the first row of each gate's table"
     assert re.findall(r"\+[a-z]+", DESIGN["+standard"]) == ["+problem", "+ground", "+cases"]
-    assert re.findall(r"\+[a-z]+", SHIP["+ship"]) == ["+blast", "+verify"]
+    assert re.findall(r"\+[a-z]+", SHIP["+ship"]) == ["+blast", "+verify", "+prove"]
 
 
 def test_a_composite_names_only_keywords_of_its_own_gate() -> None:

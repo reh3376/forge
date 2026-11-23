@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 174 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 175 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,11 +249,11 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 174:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 175:
 
 **Working**
 
-1. **The hub-to-module contract works end to end.** A module registers, is checked against its FACTS spec, pushes records that are persisted, is pulled (Collect, Backfill, Subscribe) and receives write-backs, over TLS/mTLS both ways with per-module tokens.
+1. **The hub-to-module contract works end to end.** A module registers, is checked against its FACTS spec, pushes records that are persisted, is pulled (Collect, Backfill, Subscribe) and receives write-backs, over TLS/mTLS both ways with per-module tokens. The check at Register is weaker than the signed module requirements: a module with no spec is accepted with a warning, approval is not read, and the REST and pull routes and the hosted module are not checked at all. The design that closes this is signed (D-18) and not built (FB-256 to FB-263).
 2. **One clock is enforced on the links that exist.** Every Register, Health and Ingest is a time exchange. The hub refuses a module whose clock is outside its class or that reports no measurement; forge-ot does the same to each PLC connection. No record builder invents a source time.
 3. **forge-ot runs inside the hub**: OPC UA connections, the tag engine, the control-write defense chain, and the MES changeover sequence.
 4. **Governance is real for six frameworks** (FACTS, FATS, FTTS, FVTS, FMTS, FUTS) plus FHTS hashing. All 66 specs carry a hash; 64 are approved by the owner. So do the schemas they are written against and the five governed lists they choose values from. A run fails in every framework when a hash does not verify or is not approved. A test checks every framework against ten requirements on every run.
@@ -2253,7 +2253,8 @@ note:
 | D-14 | What every FxTS framework provides (`fxts-framework-baseline.md`) | signed 2026-11-18; built (all five steps) |
 | D-15 | The hub-to-module transport contract (`transport-contract.md`) | signed 2026-11-18, amended 2026-11-19; nothing built |
 | D-16 | The forge-display design (`forge-display.md`) | signed 2026-11-20; its three provisional points measured and made final the same day; nothing built |
-| D-17 | The structure of the repository (`repository-structure.md`) | signed 2026-11-22: forge-core (shared foundation), forge-hub (the hub), forge-modules, each a self-contained folder with the same standard entries (`README.md`, `docs/`, `fxts/`, `src/`, `tests/`; amended the same day); nothing moved yet (FB-199 to FB-209) |
+| D-17 | The structure of the repository (`repository-structure.md`) | signed 2026-11-22: forge-core (shared foundation), forge-hub (the hub), forge-modules, each a self-contained folder with the same standard entries (`README.md`, `docs/`, `fxts/`, `src/`, `tests/`; amended the same day); the three layers are in place, the modules' tests and documents remain (FB-201) |
+| D-18 | Admission: how a hub decides that a module may attach (`approved-spec-register.md`) | signed 2026-11-23: one decision for every way of attaching, on a spec promoted on that hub; what admission requires and who may approve are data; nothing built (FB-256 to FB-263) |
 
 **Waiting for the owner**: the generator for Go and TypeScript types (FB-186, an install); the numbers of each data class, when the transport contract is built (FB-164); forge-creds (FB-142); a new site id and the last old names (FB-150).
 
