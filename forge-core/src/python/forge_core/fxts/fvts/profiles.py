@@ -1,4 +1,4 @@
-"""Render-profile baseline — the normative table in ``docs/FxTS/FVTS.md``.
+"""Render-profile baseline — the normative table in ``forge-core/docs/fxts/FVTS.md``.
 
 Every forge-display render profile has a platform-wide limit on the update
 rate it may receive. A profile no longer decides who may act: the owner decided

@@ -77,6 +77,6 @@ Still to be decided for the manager: where it runs, and whether the time authori
 | What every module must meet | [`docs/decisions/forge-module-requirements.md`](../docs/decisions/forge-module-requirements.md) |
 | Roles, and where they are mastered | [`docs/decisions/roles.md`](../docs/decisions/roles.md) |
 | One clock | [`docs/decisions/one-clock-ot-source-time.md`](../docs/decisions/one-clock-ot-source-time.md) |
-| The FxTS frameworks, and how to design a spec or a schema | [`docs/FxTS/README.md`](../docs/FxTS/README.md) |
+| The FxTS frameworks, and how to design a spec or a schema | [`forge-core/docs/fxts/README.md`](docs/fxts/README.md) |
 | Every known problem and what is planned | [`BACKLOG.md`](../BACKLOG.md) |
 | The rules every change is held to | [`CLAUDE.md`](../CLAUDE.md) |

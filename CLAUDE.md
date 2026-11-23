@@ -38,7 +38,7 @@ These documents are the authority (A-12). Where Jiminy or MDEMG guidance injecte
 - **Modules are Go (A-2)**, built from the module SDK. The NestJS/Next.js code under `modules/Forge MES` is the interim MES bridge; forge-mes is Go and is not built yet. Say "the interim MES bridge", never "the TypeScript forge-mes".
 - **All user interfaces come from forge-display (A-3)**, for every module, and the hub's own UI. No module ships its own UI. forge-display is the first module to be built (A-14). It is a Go module plus one web client; the client (TypeScript, with React for the shell and designer) is the one exception to "modules are Go", and it is built schema-first: each module carries its view spec and object schemas (A-21, `docs/decisions/forge-display.md`). The bridge's Next.js frontend stays only until forge-display exists.
 - **One clock.** The top hub is the time authority. Every stored time is UTC and timezone-aware, time checks are mandatory and fail closed, and a module that does not implement the time exchange is refused (`docs/decisions/one-clock-ot-source-time.md`).
-- **Every module meets the forge module requirements (A-11, D-12)**: `docs/decisions/forge-module-requirements.md`, signed 2026-11-17, amended 2026-11-19. Sixteen baseline requirements and a time contract, checked by the FMTS framework (`docs/FxTS/FMTS.md`).
+- **Every module meets the forge module requirements (A-11, D-12)**: `docs/decisions/forge-module-requirements.md`, signed 2026-11-17, amended 2026-11-19. Sixteen baseline requirements and a time contract, checked by the FMTS framework (`forge-core/docs/fxts/FMTS.md`).
 - **No silent failure.** A refusal or a fail-closed state is visible on status, health, API and CLI with its cause. A log line alone is not enough. The same holds for tests: a skipped test states its reason (A-20), and an FxTS check that was not run is reported as not run.
 - **Production runs on Kubernetes.** Docker Compose is for development only.
 - **Configuration comes from the environment.** Never hardcode credentials, addresses or keys.
@@ -87,7 +87,7 @@ Ten habits, adopted by the owner on 2026-11-22. They began as principles of the 
 9. **A lesson repeated twice becomes a check.** Turn it into a test, a schema rule or a runner check that fails with a message naming what to do. *Limit:* the written rule stays in this file or its record beside the check; the check does not replace it.
 10. **Remove sharing before adding a lock.** When two actors might write the same file, key or object, first ask whether each can own its part and the parts be combined where they are read. Serialize (one writer, a queue, compare-and-swap) only where one shared target is a real invariant, as a tag in a controller is.
 
-Principles 3 to 6 are the checklist for designing a spec, a schema or a framework: `docs/FxTS/README.md`, "Designing a spec, a schema or a framework".
+Principles 3 to 6 are the checklist for designing a spec, a schema or a framework: `forge-core/docs/fxts/README.md`, "Designing a spec, a schema or a framework".
 
 ## Skills from the pstack plugin
 

@@ -13,7 +13,7 @@ the content, so an approval always attests to exactly what is in the file.
 
 Only the spec owner approves, on their own word; the command records the
 name given to ``--by`` and nothing else, so it must be the owner who runs
-it (see ``docs/governance/facts-developer-guide.md``).
+it (see ``forge-core/docs/facts-developer-guide.md``).
 
 Writes replace only the top-level ``integrity`` block in the file: the rest
 keeps its bytes (key order, line wrapping, escaping), so the review diff of

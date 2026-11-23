@@ -36,7 +36,7 @@ A distillery runs on a dozen systems bought at different times from different ve
 
 A tag value `TIT_2010 = 61.2` is useless without knowing it is Cooker 01's temperature, in the Granary area, during lot L-2026-0412, on the night shift, in `Cooking` mode. Historians store values; context lives in people's heads or in spreadsheet lookups.
 
-**Forge:** context is a first-class, declared part of every integration. A spoke's FACTS specification maps source fields to Forge context fields and declares enrichment rules; the hub's enrichment pipeline fills what the source cannot (shift from timestamp, area from location, lot from the active batch). The manufacturing entity catalog (`docs/core/manufacturing-entity-catalog.md`) and the ISA-95 / ISA-88 typed hierarchy define what context *means*, so "area" is the same thing in every spoke.
+**Forge:** context is a first-class, declared part of every integration. A spoke's FACTS specification maps source fields to Forge context fields and declares enrichment rules; the hub's enrichment pipeline fills what the source cannot (shift from timestamp, area from location, lot from the active batch). The manufacturing entity catalog (`forge-core/docs/manufacturing-entity-catalog.md`) and the ISA-95 / ISA-88 typed hierarchy define what context *means*, so "area" is the same thing in every spoke.
 
 **Component:** FACTS context mapping, `forge.context` (Context Engine), `forge_core.models.manufacturing`, the OT module's context resolvers.
 

@@ -61,7 +61,7 @@ Rules carried over from UxTS and confirmed in practice:
 - Parity: schema fields the runner does not enforce are reported, never ignored (§2).
 - **Hashing (FHTS).** The content hash excludes the whole `integrity` block, because `change_history[].new_hash` refers to the hash itself; `hash_state`, `approved_by` and the history are metadata about the spec, not governed content. Canonical JSON uses sorted keys, compact separators and ASCII escaping so the digest is portable across platforms.
 - **Only the owner approves** a spec hash (`forge governance approve <spec> --by reh3376`); agents re-stamp to `pending_review` and never approve on the owner's behalf.
-- Framework inventory and status: [`VISION.md`](VISION.md) §3.5 and [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md) §3.9; developer guide: [`governance/facts-developer-guide.md`](governance/facts-developer-guide.md); CLI: `forge governance specs | stamp | approve | run | validate-spec`.
+- Framework inventory and status: [`VISION.md`](VISION.md) §3.5 and [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md) §3.9; developer guide: [`governance/facts-developer-guide.md`](../forge-core/docs/facts-developer-guide.md); CLI: `forge governance specs | stamp | approve | run | validate-spec`.
 
 ---
 

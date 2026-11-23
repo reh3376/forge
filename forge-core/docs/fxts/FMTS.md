@@ -4,7 +4,7 @@
 **Full Name:** Forge Module Test Specification
 **CI Gate:** Hard-fail (merge-blocking): `tests/governance/fmts/` runs in the `hub-python` job
 **Status:** v2.0.0 (2026-11-19, FB-153: the module's function, the integration section, and in `transport` the data classes, the buffer, the last will and a keepalive limit; values come from four governed lists). Earlier the same day 1.0.0 added the transport contract's five requirements, M-12 to M-16 (FB-165); 0.2.0 added the module alias; 0.1.0 is kept for history. Schema, runner (`fmts_runner.py`, 29 verdicts per spec) and nine module specs, eight approved by the owner. The conformance kit runs four of the sixteen requirements against every module on the Python adapter template (FB-137); for the modules it cannot drive they are reported as not checked (FB-155). The five transport requirements have no kit check yet, because the transport contract is not built (FB-164): every module waives the ones that bind it.
-**Decided in:** [`docs/decisions/forge-module-requirements.md`](../decisions/forge-module-requirements.md) (D-12, signed by the owner on 2026-11-17)
+**Decided in:** [`docs/decisions/forge-module-requirements.md`](../../../docs/decisions/forge-module-requirements.md) (D-12, signed by the owner on 2026-11-17)
 **MDEMG Analog:** None
 
 ---
