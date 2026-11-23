@@ -56,7 +56,7 @@ So a hub that is cut off does not wait for permission to keep its plant running,
 | The foundation in Go (models, generated bindings, the module scaffold) | built | [`src/go`](src/go) |
 | The index of forge-core's governed files, generated | built | [`fxts/README.md`](fxts/README.md), by `forge governance index` |
 | The foundation's documents: a page per framework, the FACTS developer guide, the module builder guide | built | [`docs/`](docs) |
-| The foundation's own tests | built | [`tests/`](tests); some framework tests are still under [`../tests/governance`](../tests/governance) |
+| The foundation's own tests | built | [`tests/`](tests). Framework tests that also use the hub or a module's spec are root tests: [`../tests/governance`](../tests/governance) |
 | **The manager** | **not built** | no inventory, no deployment-wide state, no distribution of changes, no behavioral contract, no review of interim decisions |
 
 Still to be decided for the manager: where it runs, and whether the time authority stays with the top hub. These are among C-1 to C-7 in the record. The manager is tracked as FB-232 and the authority model as FB-233 in [`BACKLOG.md`](../BACKLOG.md).

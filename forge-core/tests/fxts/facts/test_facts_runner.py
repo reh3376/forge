@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -21,11 +20,6 @@ import pytest
 from forge_core import contract
 from forge_core.fxts import FXTS_ROOT
 
-# ---------------------------------------------------------------------------
-# Path setup — runner lives under src/
-# ---------------------------------------------------------------------------
-
-SRC_ROOT = Path(__file__).resolve().parents[3] / "src"
 SCHEMA_PATH = contract.schema_path("facts")
 WMS_SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
 MES_SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-mes.facts.json"
@@ -57,9 +51,6 @@ def mes_spec() -> dict[str, Any]:
 @pytest.fixture(scope="module")
 def runner():
     """Instantiate the FACTSRunner with schema loaded."""
-    import sys
-
-    sys.path.insert(0, str(SRC_ROOT))
     from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
 
     return FACTSRunner(schema_path=str(SCHEMA_PATH))
@@ -67,9 +58,6 @@ def runner():
 
 @pytest.fixture(scope="module")
 def verdict_status():
-    import sys
-
-    sys.path.insert(0, str(SRC_ROOT))
     from forge_core.fxts.shared.runner import VerdictStatus
 
     return VerdictStatus
