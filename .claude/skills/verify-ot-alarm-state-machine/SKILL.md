@@ -65,7 +65,7 @@ The numbered lines are the actions in order from a new alarm. `(to return to X)`
 
 ## A design point the check records and does not judge
 
-An unacknowledged alarm that is suppressed, clears while suppressed, and is then unsuppressed returns to NORMAL without ever being acknowledged. In service the same alarm would wait in CLEAR_UNACK for an acknowledgement. `state_machine.py` says this is intended ("or NORMAL if cleared while admin"). The check holds the in-service rule only (`test_an_unacknowledged_alarm_needs_an_acknowledgement_while_in_service`). Whether it should stay that way is the owner's question, BACKLOG FB-225.
+An unacknowledged alarm that is suppressed, clears while suppressed, and is then unsuppressed returns to NORMAL without ever being acknowledged. In service the same alarm would wait in CLEAR_UNACK for an acknowledgement. `state_machine.py` says this is intended ("or NORMAL if cleared while admin"). The check holds the in-service rule only (`test_an_unacknowledged_alarm_needs_an_acknowledgement_while_in_service`). The owner decided on 2026-11-22 to keep it (BACKLOG FB-225): do not report it as a finding.
 
 ## When the code changes on purpose
 
