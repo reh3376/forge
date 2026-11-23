@@ -4,7 +4,7 @@
   "version": "0.5.0",
   "type": "BIDIRECTIONAL",
   "protocol": "opcua+mqtt+amqp",
-  "tier": "OT_SCADA",
+  "tier": "OT",
   "capabilities": {
     "read": true,
     "write": true,
@@ -14,14 +14,11 @@
   },
   "data_contract": {
     "schema_ref": "forge://schemas/forge-ot/v0.3.0",
-    "output_format": "tag_value",
+    "output_format": "contextual_record",
     "context_fields": [
-      "tag_path",
-      "quality_code",
-      "source_timestamp",
-      "server_timestamp",
-      "data_type",
-      "node_class"
+      "area",
+      "equipment_id",
+      "operating_mode"
     ]
   },
   "health_check_interval_ms": 10000,

@@ -25,7 +25,8 @@ one.
 | Schema | Version | Step | State | Hash | Approved by |
 |---|---|---|---|---|---|
 | facts | 0.1.0 | baseline | approved | `fd84db40f1a7` | reh3376 |
-| facts | 0.1.1* | patch | approved | `c0c31a8e69bd` | reh3376 |
+| facts | 0.1.1 | patch | approved | `c0c31a8e69bd` | reh3376 |
+| facts | 0.2.0* | minor | approved | `3bd3ba948e64` | reh3376 |
 | fats | 0.1.0* | baseline | approved | `3de49ce1d8c5` | reh3376 |
 | fmts | 0.1.0 | baseline | historical | `8052f7932a90` |  |
 | fmts | 0.2.0 | baseline | approved | `849a1bbcf3a9` | reh3376 |

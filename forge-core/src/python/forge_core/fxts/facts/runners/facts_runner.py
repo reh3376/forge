@@ -313,23 +313,31 @@ class FACTSRunner(FxTSRunner):
     # ------------------------------------------------------------------
 
     def _check_spec_version(self, spec: dict[str, Any]) -> FxTSVerdict:
+        """The spec declares a released version of the schema (D-14, F-10).
+
+        Which version it is validated against is ``facts:schema-valid``; whether the owner
+        approved that version is ``facts:schema-current``.
+        """
+        from forge_core.fxts.shared import schemas
+
         version = spec.get("spec_version")
-        if version == "0.1.0":
+        released = [row.version for row in schemas.versions(contract.schema_dir("facts"))]
+        if version in released:
             return FxTSVerdict(
                 check_id="facts:spec-version",
                 spec_ref="FACTS/spec_version",
                 status=VerdictStatus.PASS,
-                message="Spec version is 0.1.0.",
+                message=f"Spec version is {version}.",
             )
         return FxTSVerdict(
             check_id="facts:spec-version",
             spec_ref="FACTS/spec_version",
             status=VerdictStatus.FAIL,
-            message=f"Expected spec_version '0.1.0', got '{version}'.",
+            message=f"spec_version '{version}' is not a released FACTS version ({released}).",
             violations=[
                 SpecViolation(
                     field="spec_version",
-                    expected="0.1.0",
+                    expected=" | ".join(released),
                     actual=version,
                     message="Unsupported spec version.",
                 ),

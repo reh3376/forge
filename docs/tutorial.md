@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 167 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 168 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -246,7 +246,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 167:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 168:
 
 **Working**
 
@@ -283,7 +283,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 167:
 | Python: forge-core (`forge-core/src/python/forge_core`) | 118 files, ~26,500 lines |
 | Python: forge-hub (`forge-hub/src/python/forge_hub`) | 90 files, ~17,300 lines |
 | Python: the modules (`src/forge`) | 154 files, ~33,400 lines |
-| Python tests | 280 files, 5,154 collected, full suite green on the locked dependency set |
+| Python tests | 280 files, 5,159 collected, full suite green on the locked dependency set |
 | Go (`forge-core/src/go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -793,7 +793,7 @@ Governance is declarative by invariant: quality, lineage, normalization and secu
 
 note:
 - `forge-core/docs/fxts/README.md` is the summary of this table with a page per framework; a test keeps it true to the code.
-- The OT FACTS spec fails schema validation until FB-079 extends the vocabulary (D-8, decided 2026-11-03).
+- Every FACTS spec validates. forge-ot's is written against schema 0.2.0, which added the words an OT adapter needs (FB-079, D-8).
 
 ---
 
@@ -869,7 +869,7 @@ note:
 - The developer guide, `forge-core/docs/facts-developer-guide.md`, walks the schema, how to write a spec, running the runner, common failures and cross-spoke consistency.
 
 note:
-- Adapter tiers and what they mean: `docs/PRINCIPLES.md` §5. The OT tier's vocabulary gap in FACTS v0.1.0 is decision D-8 (decided 2026-11-03: extend the enums, FB-079).
+- Adapter tiers and what they mean: `docs/PRINCIPLES.md` §5. The OT tier's words entered FACTS with schema 0.2.0 (D-8, FB-079): a word only for a new meaning.
 
 ---
 
@@ -982,7 +982,6 @@ note:
 | Gap | Backlog / decision |
 |---|---|
 | The time contract is declared by every module and checked for form; nothing reads the clocks of databases or third-party systems yet | FB-138, FB-139 (with FB-117 and FB-120) |
-| The OT FACTS spec fails `facts:schema-valid` and eight vocabulary checks | FB-079, D-8 |
 | The JSON documents outside FxTS (adapter manifests, the OT control configuration, the golden-message sets) carry no schema version | FB-171 |
 | The FATS specs declare no request or response shapes | FB-162 |
 | The hub does not demand an approved FMTS spec at Register; the scaffold does not generate one | FB-140 |
@@ -2004,7 +2003,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest -q -rsx                          # 5,154 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
+uv run pytest -q -rsx                          # 5,159 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2144,7 +2143,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/`, `forge-core/tests` and `forge-hub/tests`: 280 files, 5,154 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/`, `forge-core/tests` and `forge-hub/tests`: 280 files, 5,159 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -2238,7 +2237,7 @@ note:
 | D-3 | forge-mes Go design (`docs/decisions/forge-mes-go.md`) | signed 2026-11-03; ten steps, the Go SDK scaffold first |
 | D-4 | FVTS open items (name, write authority per profile, mobile acknowledge, transport, layout) | decided 2026-11-03; forge-display design next |
 | D-7 | Scope of the Go standard (OT module, Python adapters) | open |
-| D-8 | FACTS vocabulary for OT adapters | decided 2026-11-03: extend the enums; FB-079 can start |
+| D-8 | FACTS vocabulary for OT adapters | decided 2026-11-03, narrowed 2026-11-23 (a word only for a new meaning); done with FACTS 0.2.0 (FB-079) |
 | D-9 | One clock: which established standards to adopt (`docs/decisions/one-clock-ot-source-time.md`) | signed 2026-11-03; FB-088, FB-094 (steps 2, 3, 6) and FB-090 done 2026-11-13; FB-093's OT half and FB-092 done 2026-11-15; FB-093's hub half done 2026-11-17; FB-091 follows |
 | D-10 | One schema registry (`docs/decisions/one-schema-registry.md`) | signed 2026-11-03; FB-097's eight steps |
 | D-11 | Three-layer process control framework, PC-L1/PC-L2/PC-L3 (`docs/decisions/process-control-framework.md`) | signed 2026-11-13 by the owner; Forge review done; the FSDs follow the owner's round-4 answers (FB-110) |
@@ -2574,7 +2573,7 @@ Each module has two contracts. Its **data contract** (FACTS) says what it is, wh
 |---|---|
 | the nine data contracts | all approved by the owner |
 | the nine module contracts | eight approved; forge-mes waits until the test hub can drive the interim bridge (FB-155) |
-| forge-ot's data contract | approved, but it still fails one format check until the plant-floor vocabulary is extended (FB-079) |
+| forge-ot's data contract | approved by the owner on 2026-11-23; it passes every check |
 
 note:
 - "Approved" means the owner approved this exact content. A contract goes back to pending whenever its content changes (a person or an AI agent re-stamps it) and the owner re-approves; "pending" does not mean broken.

@@ -31,24 +31,12 @@ SPEC_PATH = (
     Path(__file__).resolve().parents[3]
     / "forge-core/src/python/forge_core/fxts/facts/specs/forge-ot.facts.json"
 )
+MODULE_DIR = Path(__file__).resolve().parents[3] / "src" / "forge" / "modules" / "ot"
 FHTS_STATES = frozenset({"approved", "modified", "pending_review", "reverted", "unknown"})
 
-#: FACTS vocabulary the OT spec does not speak yet. Tracked by BACKLOG FB-079;
-#: remove an id here when FB-079 brings that section into conformance.
-#: ``facts:schema-valid`` (FB-080) fails for the same reason and leaves with them.
-KNOWN_VOCABULARY_FAILURES = frozenset(
-    {
-        "facts:schema-valid",
-        "facts:identity-tier",
-        "facts:lifecycle-state-transitions",
-        "facts:connection-params-valid",
-        "facts:connection-auth-methods",
-        "facts:data-contract-output-format",
-        "facts:data-contract-sources-valid",
-        "facts:context-enrichment-valid",
-        "facts:cross-write-sources",
-    }
-)
+#: Checks the OT spec is allowed to fail. Empty since FACTS 0.2.0 (FB-079): the spec speaks
+#: the schema's vocabulary. Only the owner's approval can be outstanding.
+KNOWN_VOCABULARY_FAILURES: frozenset[str] = frozenset()
 
 
 @pytest.fixture(scope="module")
@@ -147,9 +135,28 @@ class TestHubRegistrationCheck:
     """`forge_hub.ingest.facts_check` is what the hub runs at Register."""
 
     def test_spec_hash_verifies_for_the_hub(self) -> None:
-        # The adapter class still identifies as 'forge-ot' (BACKLOG FB-079);
-        # the spec is filed under 'forge-ot'.
-        manifest = OTModuleAdapter.manifest.model_copy(update={"adapter_id": "forge-ot"})
-        result = check_manifest_against_facts(manifest)
+        result = check_manifest_against_facts(OTModuleAdapter.manifest)
         assert result.spec_found is True
         assert not [p for p in result.problems + result.warnings if "integrity" in p]
+
+    def test_the_running_adapter_and_its_spec_are_one_identity(self) -> None:
+        """FB-079: the adapter's manifest, the module's manifest file and the spec agreed on
+        nothing but the name. The hub's check at Register now finds no difference."""
+        result = check_manifest_against_facts(OTModuleAdapter.manifest)
+        assert result.problems == []
+        differences = [w for w in result.warnings if "integrity" not in w and "approved" not in w]
+        assert differences == [], differences
+
+    def test_the_manifest_file_says_what_the_adapter_says(self, spec: dict) -> None:
+        document = json.loads((MODULE_DIR / "manifest.json").read_text(encoding="utf-8"))
+        manifest = OTModuleAdapter.manifest
+        assert (
+            document["adapter_id"] == manifest.adapter_id == spec["adapter_identity"]["adapter_id"]
+        )
+        assert document["version"] == manifest.version == spec["adapter_identity"]["version"]
+        assert document["tier"] == manifest.tier.value == spec["adapter_identity"]["tier"]
+        contract = document["data_contract"]
+        assert contract["schema_ref"] == manifest.data_contract.schema_ref
+        assert contract["output_format"] == manifest.data_contract.output_format
+        assert contract["context_fields"] == list(manifest.data_contract.context_fields)
+        assert contract == {key: spec["data_contract"][key] for key in contract}
