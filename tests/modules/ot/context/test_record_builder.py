@@ -4,10 +4,6 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from forge.modules.ot.context.record_builder import _map_quality, build_ot_record
-from forge.modules.ot.context.resolvers import EnrichmentContext
-from forge.modules.ot.opcua_client.types import DataType, QualityCode
-from forge.modules.ot.tag_engine.models import MemoryTag, StandardTag, TagValue
 from forge_core.clock import ClockEstimate, SourceStampMissingError
 from forge_core.models.contextual_record import (
     ContextualRecord,
@@ -15,6 +11,10 @@ from forge_core.models.contextual_record import (
 from forge_core.models.contextual_record import (
     QualityCode as CoreQualityCode,
 )
+from forge_ot.context.record_builder import _map_quality, build_ot_record
+from forge_ot.context.resolvers import EnrichmentContext
+from forge_ot.opcua_client.types import DataType, QualityCode
+from forge_ot.tag_engine.models import MemoryTag, StandardTag, TagValue
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -232,7 +232,7 @@ class TestBuildOtRecord:
 
     def test_a_query_tag_is_bounded_by_its_poll_interval(self, full_enrichment):
         """The acquisition's own bound goes on the value (one-clock record P-6)."""
-        from forge.modules.ot.tag_engine.models import QueryTag
+        from forge_ot.tag_engine.models import QueryTag
 
         tag = QueryTag(path="WH/WHK01/DB/Count", query="select 1", poll_interval_ms=5000)
         read_at = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)

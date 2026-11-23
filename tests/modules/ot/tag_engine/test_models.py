@@ -3,8 +3,8 @@
 import pytest
 from pydantic import TypeAdapter, ValidationError
 
-from forge.modules.ot.opcua_client.types import DataType, QualityCode
-from forge.modules.ot.tag_engine.models import (
+from forge_ot.opcua_client.types import DataType, QualityCode
+from forge_ot.tag_engine.models import (
     SCAN_CLASS_INTERVALS_MS,
     AlarmConfig,
     ClampConfig,

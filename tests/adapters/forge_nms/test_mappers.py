@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from forge.adapters.forge_nms.mappers import (
+from forge_core.models.manufacturing.enums import EventSeverity, UnitStatus
+from forge_nms.mappers import (
     map_alert,
     map_baseline_anomaly,
     map_device,
@@ -12,7 +13,6 @@ from forge.adapters.forge_nms.mappers import (
     map_spof_detection,
     map_trap_event,
 )
-from forge_core.models.manufacturing.enums import EventSeverity, UnitStatus
 
 
 class TestMapDevice:

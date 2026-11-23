@@ -22,7 +22,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from forge_core.fxts import FXTS_ROOT
+from forge_core.fxts import locations
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -32,7 +32,6 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_SPECS_DIR = FXTS_ROOT / "facts" / "specs"
 
 _CAPABILITY_NAMES = ("read", "write", "subscribe", "backfill", "discover")
 
@@ -79,9 +78,10 @@ def load_facts_spec(
     adapter_id: str, specs_dir: Path | None = None
 ) -> tuple[dict[str, Any] | None, Path | None]:
     """Return ``(spec, path)`` for ``adapter_id`` or ``(None, None)``."""
-    directory = specs_dir or DEFAULT_SPECS_DIR
-    path = directory / f"{adapter_id}.facts.json"
-    if not path.is_file():
+    name = f"{adapter_id}.facts.json"
+    # A module keeps its own spec (D-17 A-3): without a folder, every module's is searched.
+    path = specs_dir / name if specs_dir is not None else locations.find_spec("facts", name)
+    if path is None or not path.is_file():
         return None, None
     with path.open(encoding="utf-8") as fh:
         return json.load(fh), path

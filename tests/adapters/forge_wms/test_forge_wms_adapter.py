@@ -2,8 +2,8 @@
 
 import pytest
 
-from forge.adapters.forge_wms.adapter import ForgeWmsAdapter
 from forge_core.models.adapter import AdapterState, AdapterTier
+from forge_wms.adapter import ForgeWmsAdapter
 
 # ── Manifest Tests ─────────────────────────────────────────────────
 

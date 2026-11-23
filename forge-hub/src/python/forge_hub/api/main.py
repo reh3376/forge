@@ -247,7 +247,7 @@ def create_app(
     ot_host = None
     ot_config_path = os.getenv("FORGE_OT_CONTROL_CONFIG", "").strip()
     if ot_config_path:
-        from forge.modules.ot.host import OTModuleHost
+        from forge_ot.host import OTModuleHost
 
         ot_host = OTModuleHost(
             config_path=ot_config_path,

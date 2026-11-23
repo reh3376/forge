@@ -159,8 +159,8 @@
   ],
   "metadata": {
     "spoke": "forge-mes",
-    "hub_module": "forge.adapters.forge_mes",
-    "source_repo": "https://github.com/reh3376/forge/tree/main/modules/Forge%20MES",
+    "hub_module": "forge_mes",
+    "source_repo": "https://github.com/reh3376/forge/tree/main/forge-modules/forge-mes/bridge",
     "source_framework": "NestJS + Next.js 15",
     "isa_88_compliance": "Procedure > Unit Procedure > Operation > Equipment Phase > Phase Parameter"
   },

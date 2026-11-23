@@ -2,17 +2,17 @@
 
 from __future__ import annotations
 
-from forge.adapters.forge_mes.mappers.batch import map_batch
-from forge.adapters.forge_mes.mappers.business_entity import map_customer, map_vendor
-from forge.adapters.forge_mes.mappers.lot import map_lot
-from forge.adapters.forge_mes.mappers.material_item import map_item
-from forge.adapters.forge_mes.mappers.operational_event import (
+from forge_mes.mappers.batch import map_batch
+from forge_mes.mappers.business_entity import map_customer, map_vendor
+from forge_mes.mappers.lot import map_lot
+from forge_mes.mappers.material_item import map_item
+from forge_mes.mappers.operational_event import (
     map_production_event,
     map_step_event,
 )
-from forge.adapters.forge_mes.mappers.physical_asset import map_asset
-from forge.adapters.forge_mes.mappers.process_definition import map_recipe
-from forge.adapters.forge_mes.mappers.production_order import (
+from forge_mes.mappers.physical_asset import map_asset
+from forge_mes.mappers.process_definition import map_recipe
+from forge_mes.mappers.production_order import (
     map_production_order,
     map_schedule_order,
 )

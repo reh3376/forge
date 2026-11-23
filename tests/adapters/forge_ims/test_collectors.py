@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from forge.adapters.forge_ims.client import MockForgeImsClient
-from forge.adapters.forge_ims.collectors import (
+from forge_ims.client import MockForgeImsClient
+from forge_ims.collectors import (
     collect_asset_snapshots,
     collect_compliance,
     collect_events,

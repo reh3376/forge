@@ -3,8 +3,8 @@
 import pytest
 import pytest_asyncio
 
-from forge.modules.ot.opcua_client.types import DataType, QualityCode
-from forge.modules.ot.tag_engine.models import (
+from forge_ot.opcua_client.types import DataType, QualityCode
+from forge_ot.tag_engine.models import (
     DerivedSource,
     DerivedTag,
     ExpressionTag,
@@ -15,7 +15,7 @@ from forge.modules.ot.tag_engine.models import (
     TagType,
     TagValue,
 )
-from forge.modules.ot.tag_engine.registry import TagRegistry
+from forge_ot.tag_engine.registry import TagRegistry
 
 
 @pytest_asyncio.fixture

@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
+from tests.samples import module_manifest_path
 
 from forge_core.clock import ClockRefusedError
 from forge_core.link.grpc_channel import GrpcChannel
@@ -30,8 +30,7 @@ from forge_hub.link.hub_ingest import HubIngestServicer
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-MES_MANIFEST = Path(__file__).resolve().parents[3] / "src" / "forge" / "adapters"
-MES_MANIFEST = MES_MANIFEST / "forge_mes" / "manifest.json"
+MES_MANIFEST = module_manifest_path("forge-mes")
 SCHEMA_REF = "forge://schemas/forge-mes/v0.1.0"
 
 

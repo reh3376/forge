@@ -21,6 +21,7 @@ from typing import Annotated
 import typer
 
 import forge_hub
+from forge_core.sdk.module_builder.cli import module_app
 from forge_hub.cli import governance as governance_cli
 from forge_hub.cli.archive import archive_app
 from forge_hub.cli.db_access import access_app
@@ -226,6 +227,8 @@ governance_app = typer.Typer(
 )
 app.add_typer(governance_app, name="governance")
 app.add_typer(archive_app, name="archive")
+# The module builder is forge-core's SDK; the hub's command gives it a name (FB-201)
+app.add_typer(module_app, name="module")
 
 # Spec integrity: hash state listing, re-stamp after edits, owner approval (FB-021).
 governance_app.command("specs")(governance_cli.specs)

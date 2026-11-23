@@ -9,8 +9,8 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from forge.adapters.forge_integ_erp_netsuite import ForgeIntegErpNetsuiteAdapter
 from forge_core.models.adapter import AdapterState
+from forge_integ_erp_netsuite import ForgeIntegErpNetsuiteAdapter
 
 # ── Test Fixtures ──────────────────────────────────────────────
 

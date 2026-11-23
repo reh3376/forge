@@ -2,8 +2,8 @@
 
 import pytest
 
-from forge.adapters.forge_ims.adapter import ForgeImsAdapter
 from forge_core.models.adapter import AdapterState, AdapterTier
+from forge_ims.adapter import ForgeImsAdapter
 
 # ── Manifest Tests ─────────────────────────────────────────────────
 

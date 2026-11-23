@@ -4,16 +4,16 @@ import json
 
 import pytest
 
-from forge.adapters.forge_ims.context import build_record_context
-from forge.adapters.forge_ims.record_builder import (
+from forge_core.clock import SourceStampMissingError
+from forge_core.models.contextual_record import QualityCode
+from forge_ims.context import build_record_context
+from forge_ims.record_builder import (
     _event_tag_path,
     _parse_timestamp,
     _serialize_payload,
     build_asset_record,
     build_contextual_record,
 )
-from forge_core.clock import SourceStampMissingError
-from forge_core.models.contextual_record import QualityCode
 
 
 class TestParseTimestamp:

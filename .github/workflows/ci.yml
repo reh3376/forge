@@ -105,7 +105,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: >
           .github/scripts/changed-paths.sh mes-module
-          "forge-modules/forge-mes/bridge/" forge-core/contract/proto/ src/forge/adapters/forge_mes/manifest.json
+          "forge-modules/forge-mes/bridge/" forge-core/contract/proto/ forge-modules/forge-mes/src/python/forge_mes/manifest.json
           .github/workflows/ci.yml .github/scripts/
         env:
           EVENT_NAME: ${{ github.event_name }}

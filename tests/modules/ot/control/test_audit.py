@@ -15,16 +15,16 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from forge.modules.ot.control.audit import (
+from forge_ot.control.audit import (
     ContextualRecordAuditSink,
     LogAuditSink,
     MqttAuditSink,
     WriteAuditLogger,
     WriteAuditQuery,
 )
-from forge.modules.ot.control.authorization import WriteAuthorizer
-from forge.modules.ot.control.interlock import InterlockEngine
-from forge.modules.ot.control.models import (
+from forge_ot.control.authorization import WriteAuthorizer
+from forge_ot.control.interlock import InterlockEngine
+from forge_ot.control.models import (
     DataType,
     TagWriteConfig,
     WritePermission,
@@ -33,8 +33,8 @@ from forge.modules.ot.control.models import (
     WriteRole,
     WriteStatus,
 )
-from forge.modules.ot.control.validation import WriteValidator
-from forge.modules.ot.control.write_engine import ControlWriteEngine
+from forge_ot.control.validation import WriteValidator
+from forge_ot.control.write_engine import ControlWriteEngine
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -186,8 +186,8 @@ class TestContextualRecordAuditSink:
 
     @pytest.mark.asyncio
     async def test_quality_follows_the_outcome(self):
-        from forge.modules.ot.control.audit import write_result_to_record
         from forge_core.models.contextual_record import QualityCode as CoreQuality
+        from forge_ot.control.audit import write_result_to_record
 
         base = _make_result().to_dict()
         confirmed = write_result_to_record({**base, "status": "CONFIRMED"})
@@ -212,7 +212,7 @@ class TestContextualRecordAuditSink:
     @pytest.mark.asyncio
     async def test_review_fields_reach_the_record(self):
         """FB-074: origin, reason code, staging and the review rejection are audited."""
-        from forge.modules.ot.control.audit import write_result_to_record
+        from forge_ot.control.audit import write_result_to_record
 
         base = _make_result().to_dict()
         assert base["origin"] == "OPERATOR"

@@ -5,12 +5,12 @@ from __future__ import annotations
 import asyncio
 import json
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Any
 
 import grpc
 import grpc.aio
 import pytest
+from tests.samples import module_manifest_path
 
 from forge_core.link.proto_bridge import contextual_record_to_proto, timestamp_to_dt
 from forge_core.link.serialization import pydantic_to_proto
@@ -38,14 +38,7 @@ from forge_hub.link.spoke_pull import (
     collect_into_pipeline,
 )
 
-MANIFEST_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "src"
-    / "forge"
-    / "adapters"
-    / "forge_mes"
-    / "manifest.json"
-)
+MANIFEST_PATH = module_manifest_path("forge-mes")
 MANIFEST = AdapterManifest.model_validate(json.loads(MANIFEST_PATH.read_text()))
 SCHEMA_REF = MANIFEST.data_contract.schema_ref
 T0 = datetime(2026, 6, 1, 12, tzinfo=UTC)

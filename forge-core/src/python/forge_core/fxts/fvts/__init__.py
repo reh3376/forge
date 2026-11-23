@@ -18,5 +18,4 @@ from pathlib import Path
 from forge_core import contract
 
 SCHEMA_PATH = contract.schema_path("fvts")
-SPECS_DIR = Path(__file__).parent / "specs"
 REPO_ROOT = Path(__file__).resolve().parents[6]

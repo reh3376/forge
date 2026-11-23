@@ -6,8 +6,8 @@ MQTT publish to correct spBv1.0 topic namespace.
 
 import pytest
 
-from forge.modules.ot.mqtt.publisher import MqttConfig, OTMqttPublisher
-from forge.modules.ot.mqtt.sparkplug import (
+from forge_ot.mqtt.publisher import MqttConfig, OTMqttPublisher
+from forge_ot.mqtt.sparkplug import (
     SparkplugDataType,
     SparkplugEncoder,
     SparkplugMetric,

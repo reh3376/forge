@@ -2,13 +2,13 @@
 
 from datetime import UTC, datetime
 
-from forge.adapters.forge_wms.context import (
+from forge_core.models.contextual_record import RecordContext
+from forge_wms.context import (
     build_record_context,
     compose_location,
     derive_shift,
     normalize_event_type,
 )
-from forge_core.models.contextual_record import RecordContext
 
 # ── Shift Enrichment ───────────────────────────────────────────────
 

@@ -5,14 +5,6 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from forge.modules.ot.adapter import OTModuleAdapter
-from forge.modules.ot.context.store_forward import StoreForwardBuffer
-from forge.modules.ot.opcua_client.types import DataType, QualityCode
-from forge.modules.ot.tag_engine.models import (
-    MemoryTag,
-    StandardTag,
-    TagValue,
-)
 from forge_core.clock import (
     CLOCK_OK,
     CLOCK_OUT_OF_TOLERANCE,
@@ -22,6 +14,14 @@ from forge_core.clock import (
 )
 from forge_core.models.adapter import AdapterState
 from forge_core.models.contextual_record import ContextualRecord
+from forge_ot.adapter import OTModuleAdapter
+from forge_ot.context.store_forward import StoreForwardBuffer
+from forge_ot.opcua_client.types import DataType, QualityCode
+from forge_ot.tag_engine.models import (
+    MemoryTag,
+    StandardTag,
+    TagValue,
+)
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -435,7 +435,7 @@ class TestControlComposition:
 
     @pytest.mark.asyncio
     async def test_control_runtime_follows_the_adapter_lifecycle(self, mock_registry):
-        from forge.modules.ot.control import ControlDependencies
+        from forge_ot.control import ControlDependencies
 
         plc = self._Plc()
         adapter = OTModuleAdapter(
@@ -457,7 +457,7 @@ class TestControlComposition:
     async def test_control_config_path_is_loaded(self, mock_registry, tmp_path):
         import json
 
-        from forge.modules.ot.control import ControlDependencies
+        from forge_ot.control import ControlDependencies
 
         path = tmp_path / "ot.json"
         path.write_text(json.dumps(self._control_doc()), encoding="utf-8")
@@ -470,7 +470,7 @@ class TestControlComposition:
 
     @pytest.mark.asyncio
     async def test_standard_tag_writes_go_through_the_write_engine(self, mock_registry):
-        from forge.modules.ot.control import ControlDependencies
+        from forge_ot.control import ControlDependencies
 
         mock_registry.get_definition = AsyncMock(return_value=_make_tag(self.SP))
         plc = self._Plc()
@@ -493,7 +493,7 @@ class TestControlComposition:
 
     def test_the_facts_declaration_is_the_default_origin(self, mock_registry):
         """Without a connection-level declaration the manifest's section answers (FB-090)."""
-        from forge.modules.ot.tag_engine.models import StandardTag
+        from forge_ot.tag_engine.models import StandardTag
 
         adapter = OTModuleAdapter(registry=mock_registry)
         governance = adapter.manifest.time_governance
@@ -512,9 +512,9 @@ class TestControlComposition:
         """The control config's connection is the first home of the declaration (FB-094 step 2)."""
         from types import SimpleNamespace
 
-        from forge.modules.ot.control import ControlDependencies
-        from forge.modules.ot.tag_engine.models import StandardTag
-        from forge.modules.ot.tag_engine.registry import TagRegistry
+        from forge_ot.control import ControlDependencies
+        from forge_ot.tag_engine.models import StandardTag
+        from forge_ot.tag_engine.registry import TagRegistry
 
         adapter = OTModuleAdapter(
             registry=TagRegistry(),

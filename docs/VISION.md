@@ -58,7 +58,7 @@ The OT layer (tags, alarms, historian, scripting, HMI screens) is a vendor produ
 
 **Forge:** an OT module (forge-ot) that is a thin, open wrapper over OPC-UA (asyncua owns the wire protocol): a nine-type tag engine, ISA-18.2 alarming, a Python 3.12+ scripting SDK covering the `system.*` surface plants already use, an i3X-shaped REST interface, and history. Where a site keeps its vendor SCADA, an *integration module* (forge-ignition) bridges it; the dual-write validator proves parity before a cut-over. HMI/SCADA itself is an optional module (forge-hmi-scada) activated per site (decision A-4).
 
-**Component:** `forge.modules.ot` (opcua_client, tag_engine, alarming, bridge, i3x, scripting SDK under `forge_core.sdk.scripting`), forge-ignition, forge-hmi-scada.
+**Component:** `forge_ot` (opcua_client, tag_engine, alarming, bridge, i3x, scripting SDK under `forge_core.sdk.scripting`), forge-ignition, forge-hmi-scada.
 
 **Solved when:** a site can run its OT layer on Forge alone, or on its vendor product behind forge-ignition, with the same surfaces either way.
 
@@ -78,7 +78,7 @@ UIs write setpoints to PLCs with no role check, no interlock, no confirmation, n
 
 **Forge:** safety stays in the core (decision A-7). Every write passes a defense chain in forge-ot: validation (type, range, writability), write review (a tag may require two-step review, where the core stages the write, returns the current value and issues a single-use token the commit must present, and a reason code from the site's vocabulary), interlocks (fnmatch patterns, seven condition types, bypass only by an admin with a reason), authorization (role per area and tag pattern), the write with read-back confirmation, and an audit record written to the hub store and published externally. A UI can *ask* for a write; it cannot make one. The view contract (FVTS) binds every UI action to a required role, a confirmation mode and the statuses it must handle, and the render profile decides whether a surface may write at all (desktop HMI: yes; web and mobile: no).
 
-**Component:** `forge.modules.ot.control` (validation, interlock, authorization, write_engine, audit), FVTS actions and render profiles, the hub's write endpoint and audit log.
+**Component:** `forge_ot.control` (validation, interlock, authorization, write_engine, audit), FVTS actions and render profiles, the hub's write endpoint and audit log.
 
 **Solved when:** no path exists from any interface to a PLC that does not pass the chain, and every write is reconstructible from the audit log.
 

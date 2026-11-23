@@ -8,7 +8,7 @@ correctly derived.
 
 from __future__ import annotations
 
-from forge.adapters.forge_integ_erp_netsuite.context import build_record_context
+from forge_integ_erp_netsuite.context import build_record_context
 
 
 class TestTransactionFields:

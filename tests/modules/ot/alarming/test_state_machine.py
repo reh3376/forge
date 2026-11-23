@@ -12,14 +12,14 @@ Covers:
 
 import pytest
 
-from forge.modules.ot.alarming.models import (
+from forge_ot.alarming.models import (
     AlarmAction,
     AlarmInstance,
     AlarmPriority,
     AlarmState,
     AlarmType,
 )
-from forge.modules.ot.alarming.state_machine import (
+from forge_ot.alarming.state_machine import (
     AlarmStateMachine,
     InvalidTransitionError,
 )

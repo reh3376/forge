@@ -697,7 +697,8 @@ class FMTSRunner(FxTSRunner):
                 module_name = conformance.adapter_module_name(found[0]) if found else None
                 if module_name is None:
                     return {}, (
-                        "its adapter.py is not in an importable Forge package under src/forge"
+                        "its adapter.py is not in the module's own package under "
+                        "forge-modules/<module>/src/python"
                     )
                 factory = conformance.find_adapter_class(module_name)
             else:

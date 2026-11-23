@@ -8,18 +8,6 @@ from typing import Any
 
 import pytest
 
-from forge.modules.ot.control import (
-    AreaChangeoverConfig,
-    ChangeoverOrchestrator,
-    ChangeoverSequenceError,
-    CipPolicy,
-    CipResult,
-    MesChangeoverClient,
-    RecipeWriteResult,
-    parse_recipe_payload,
-)
-from forge.modules.ot.control.changeover_orchestrator import OT_ADAPTER_ID
-from forge.modules.ot.mqtt.subscriber import IncomingMessage, MqttSubscriber
 from forge_core.link.spoke_callback import WriteDispatchError, WriteOutcome
 from forge_core.models.contextual_record import (
     ContextualRecord,
@@ -30,6 +18,18 @@ from forge_core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge_ot.control import (
+    AreaChangeoverConfig,
+    ChangeoverOrchestrator,
+    ChangeoverSequenceError,
+    CipPolicy,
+    CipResult,
+    MesChangeoverClient,
+    RecipeWriteResult,
+    parse_recipe_payload,
+)
+from forge_ot.control.changeover_orchestrator import OT_ADAPTER_ID
+from forge_ot.mqtt.subscriber import IncomingMessage, MqttSubscriber
 
 # ---------------------------------------------------------------------------
 # Fakes: the hub dispatcher + MES state machine, the PLC recipe writer, a sink

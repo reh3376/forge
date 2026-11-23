@@ -2,14 +2,14 @@
 
 from datetime import UTC, datetime
 
-from forge.modules.ot.bridge.dual_write import ConsistencyReport
-from forge.modules.ot.bridge.health import (
+from forge_ot.bridge.dual_write import ConsistencyReport
+from forge_ot.bridge.health import (
     BridgeHealthDashboard,
     FailoverState,
     LatencyComparison,
     OperatorChecklistItem,
 )
-from forge.modules.ot.bridge.models import BridgeHealth, BridgeState
+from forge_ot.bridge.models import BridgeHealth, BridgeState
 
 # ---------------------------------------------------------------------------
 # LatencyComparison

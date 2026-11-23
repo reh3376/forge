@@ -27,7 +27,7 @@ Usage (programmatic)::
     )
 
     scaffolder = ModuleScaffolder(manifest)
-    scaffolder.generate("./src/forge/adapters/acme_plc/")
+    scaffolder.generate(scaffolder.package_dir("forge-modules"))
 
 Usage (CLI)::
 

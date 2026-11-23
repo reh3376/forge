@@ -17,8 +17,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from forge.modules.ot.alarming.engine import AlarmEngine
-from forge.modules.ot.alarming.integrations import (
+from forge_ot.alarming.engine import AlarmEngine
+from forge_ot.alarming.integrations import (
     AlarmCmmsIntegration,
     AlarmContextualRecordWriter,
     AlarmHistorianAnnotation,
@@ -29,7 +29,7 @@ from forge.modules.ot.alarming.integrations import (
     AlarmScriptDispatch,
     IntegrationConfig,
 )
-from forge.modules.ot.alarming.models import AlarmEvent
+from forge_ot.alarming.models import AlarmEvent
 
 
 def _make_event(**overrides) -> AlarmEvent:

@@ -16,7 +16,7 @@ from uuid import uuid4
 import pytest
 
 from forge_core import contract
-from forge_core.fxts import FXTS_ROOT
+from forge_core.fxts import locations
 
 # ── Path setup ────────────────────────────────────────────────────
 SRC_ROOT = Path(__file__).resolve().parents[2] / "src"
@@ -77,7 +77,7 @@ def barrel_events(barrel_event: dict) -> list[dict[str, Any]]:
 @pytest.fixture()
 def forge_wms_spec() -> dict[str, Any]:
     """Load the Forge WMS FACTS spec from the governance directory."""
-    spec_path = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
+    spec_path = locations.spec_path("facts", "forge-wms.facts.json")
     return json.loads(spec_path.read_text())
 
 

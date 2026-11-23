@@ -17,9 +17,9 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from forge.modules.ot.control.authorization import WriteAuthorizer
-from forge.modules.ot.control.interlock import InterlockEngine
-from forge.modules.ot.control.models import (
+from forge_ot.control.authorization import WriteAuthorizer
+from forge_ot.control.interlock import InterlockEngine
+from forge_ot.control.models import (
     DataType,
     InterlockCondition,
     InterlockRule,
@@ -29,8 +29,8 @@ from forge.modules.ot.control.models import (
     WriteRole,
     WriteStatus,
 )
-from forge.modules.ot.control.validation import WriteValidator
-from forge.modules.ot.control.write_engine import ControlWriteEngine
+from forge_ot.control.validation import WriteValidator
+from forge_ot.control.write_engine import ControlWriteEngine
 
 # ---------------------------------------------------------------------------
 # Helpers

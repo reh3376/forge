@@ -10,25 +10,6 @@ import httpx
 import pytest
 from fastapi import FastAPI
 
-from forge.modules.ot.control import (
-    ControlDependencies,
-    ControlRuntime,
-    RegistryTagIO,
-    WriteRequest,
-    WriteRole,
-    WriteStatus,
-    parse_control_config,
-)
-from forge.modules.ot.control.api import create_control_router
-from forge.modules.ot.mqtt.ingress import ExternalBrokerIngress
-from forge.modules.ot.opcua_client.types import ConnectionHealth as UaConnectionHealth
-from forge.modules.ot.opcua_client.types import ConnectionState as UaConnectionState
-from forge.modules.ot.opcua_client.types import DataType as UaDataType
-from forge.modules.ot.opcua_client.types import DataValue as UaDataValue
-from forge.modules.ot.opcua_client.types import QualityCode as UaQuality
-from forge.modules.ot.tag_engine.models import ExpressionTag, MemoryTag, StandardTag
-from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
-from forge.modules.ot.tag_engine.registry import TagRegistry
 from forge_core.link.spoke_callback import WriteDispatchError, WriteOutcome
 from forge_core.models.contextual_record import (
     ContextualRecord,
@@ -40,6 +21,25 @@ from forge_core.models.contextual_record import (
     RecordValue,
 )
 from forge_hub.gateway.rbac import require_scope
+from forge_ot.control import (
+    ControlDependencies,
+    ControlRuntime,
+    RegistryTagIO,
+    WriteRequest,
+    WriteRole,
+    WriteStatus,
+    parse_control_config,
+)
+from forge_ot.control.api import create_control_router
+from forge_ot.mqtt.ingress import ExternalBrokerIngress
+from forge_ot.opcua_client.types import ConnectionHealth as UaConnectionHealth
+from forge_ot.opcua_client.types import ConnectionState as UaConnectionState
+from forge_ot.opcua_client.types import DataType as UaDataType
+from forge_ot.opcua_client.types import DataValue as UaDataValue
+from forge_ot.opcua_client.types import QualityCode as UaQuality
+from forge_ot.tag_engine.models import ExpressionTag, MemoryTag, StandardTag
+from forge_ot.tag_engine.providers.acquisition import AcquisitionEngine
+from forge_ot.tag_engine.registry import TagRegistry
 
 SP = "WH/WHK01/Cooker01/TIT_2010/SP"
 RR = "WH/WHK01/Cooker01/TIT_2010/RampRate"

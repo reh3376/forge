@@ -7,13 +7,6 @@ from typing import Any
 
 import pytest
 
-from forge.modules.ot.control import (
-    CHANGEOVER_AREAS,
-    CHANGEOVER_COMMANDS,
-    MesChangeoverClient,
-    changeover_tag,
-    transition_from,
-)
 from forge_core.link.spoke_callback import WriteOutcome
 from forge_core.models.contextual_record import (
     ContextualRecord,
@@ -23,6 +16,13 @@ from forge_core.models.contextual_record import (
     RecordSource,
     RecordTimestamp,
     RecordValue,
+)
+from forge_ot.control import (
+    CHANGEOVER_AREAS,
+    CHANGEOVER_COMMANDS,
+    MesChangeoverClient,
+    changeover_tag,
+    transition_from,
 )
 
 

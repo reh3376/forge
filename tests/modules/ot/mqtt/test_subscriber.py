@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.modules.ot.mqtt.subscriber import (
+from forge_ot.mqtt.subscriber import (
     IncomingMessage,
     MqttSubscriber,
     Subscription,

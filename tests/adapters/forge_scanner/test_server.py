@@ -2,8 +2,8 @@
 
 import pytest
 
-from forge.adapters.forge_scanner.device_registry import DeviceRegistry
-from forge.adapters.forge_scanner.server import (
+from forge_scanner.device_registry import DeviceRegistry
+from forge_scanner.server import (
     MockScannerServiceHandler,
 )
 

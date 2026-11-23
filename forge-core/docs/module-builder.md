@@ -85,7 +85,7 @@ Forge Governance Pipeline (FACTS validation → storage → curation)
 Every Forge adapter module has exactly this structure:
 
 ```
-src/forge/adapters/my_adapter/
+forge-modules/my-adapter/src/python/my_adapter/
 ├── __init__.py          # Module init — exports the adapter class
 ├── manifest.json        # Identity, capabilities, connection params
 ├── adapter.py           # AdapterBase subclass with lifecycle + collect()
@@ -135,20 +135,19 @@ forge module init acme-erp \
 This generates 9 files:
 
 ```
-src/forge/adapters/acme_erp/
-├── __init__.py
-├── manifest.json
-├── adapter.py
-├── config.py
-├── context.py
-└── record_builder.py
-
-tests/adapters/
-├── conftest.py
-└── test_acme_erp.py
-
-forge-core/src/python/forge_core/fxts/facts/specs/
-└── acme-erp.facts.json
+forge-modules/acme-erp/            the module's own folder (the standard structure)
+├── src/python/acme_erp/           its Python package
+│   ├── __init__.py
+│   ├── manifest.json
+│   ├── adapter.py
+│   ├── config.py
+│   ├── context.py
+│   └── record_builder.py
+├── tests/
+│   ├── conftest.py                puts the module's package on the import path
+│   └── test_acme_erp.py
+└── fxts/facts/
+    └── acme-erp.facts.json        a spec lives with what it describes
 ```
 
 **After scaffolding, you need to:**
@@ -191,7 +190,7 @@ manifest = (
 # Step 2: Generate the module
 scaffolder = ModuleScaffolder(manifest)
 result = scaffolder.generate(
-    "./src/forge/adapters/acme_erp/",
+    scaffolder.package_dir("forge-modules"),
     include_tests=True,
     include_facts=True,
 )
@@ -597,14 +596,14 @@ Once your spec is finalized, compute and set the integrity hash:
 from forge_core.fxts.shared.runner import compute_spec_hash
 import json
 
-with open("forge-core/src/python/forge_core/fxts/facts/specs/acme-erp.facts.json") as f:
+with open("forge-modules/acme-erp/fxts/facts/acme-erp.facts.json") as f:
     spec = json.load(f)
 
 hash_value = compute_spec_hash(spec)
 spec["integrity"]["spec_hash"] = hash_value
 spec["integrity"]["hash_state"] = "pending_review"
 
-with open("forge-core/src/python/forge_core/fxts/facts/specs/acme-erp.facts.json", "w") as f:
+with open("forge-modules/acme-erp/fxts/facts/acme-erp.facts.json", "w") as f:
     json.dump(spec, f, indent=2)
 ```
 
@@ -678,7 +677,7 @@ Scaffold a new adapter module.
 | `--param` | `-p` | No | Connection param: `name:description:required\|optional[:default]`. Repeatable. |
 | `--context-field` | `-f` | No | Context field name. Repeatable. |
 | `--auth` | | No | Auth method. Repeatable. |
-| `--output` | `-o` | No | Parent directory for module (default: src/forge/adapters) |
+| `--output` | `-o` | No | The folder that holds the modules (default: forge-modules) |
 | `--no-tests` | | No | Skip test generation |
 | `--no-facts` | | No | Skip FACTS spec generation |
 | `--overwrite` | | No | Overwrite existing files |
@@ -689,7 +688,7 @@ List all adapter modules by scanning for `manifest.json` files.
 
 | Flag | Required | Description |
 |------|----------|-------------|
-| `--dir` | No | Adapters directory (default: src/forge/adapters) |
+| `--dir` | No | The folder that holds the modules (default: forge-modules) |
 
 ### `forge module validate <module-dir>`
 
@@ -875,7 +874,7 @@ Use `AdapterState.REGISTERED` as the fallback. The valid states are: `REGISTERED
 
 ### Generated code references wrong import path
 
-The generators assume adapters live at `forge.adapters.<snake_name>`. If your project uses a different package structure, use the low-level generators and customize the import paths.
+A generated module is its own package and imports itself by its name (`from <snake_name>.config import …`). It is importable once `forge-modules/<module-id>/src/python` is on the import path: the generated `tests/conftest.py` does that for the module's own tests, and the project manifest lists the package for everything else. For a different package structure, use the low-level generators and adjust the imports.
 
 ### FACTS integrity hash is invalid after editing spec
 

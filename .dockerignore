@@ -4,8 +4,6 @@
 !pyproject.toml
 !uv.lock
 !README.md
-!src/
-src/**/__pycache__/
 !forge-core/
 forge-core/*
 !forge-core/src/
@@ -16,3 +14,8 @@ forge-hub/*
 !forge-hub/src/
 forge-hub/src/**/__pycache__/
 !forge-hub/fxts/
+!forge-modules/
+forge-modules/forge-mes/bridge/
+forge-modules/**/__pycache__/
+forge-modules/*/tests/
+forge-modules/*/docs/

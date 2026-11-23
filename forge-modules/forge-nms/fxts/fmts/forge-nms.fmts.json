@@ -1,0 +1,147 @@
+{
+  "spec_version": "2.0.0",
+  "module_identity": {
+    "module_id": "forge-nms",
+    "name": "Forge Network Management System Adapter",
+    "alias": "nms",
+    "version": "0.1.0",
+    "kind": "management",
+    "function": "nms",
+    "language": "python",
+    "source_paths": [
+      "forge-modules/forge-nms/src/python/forge_nms"
+    ]
+  },
+  "hub_link": {
+    "protocol": "grpc",
+    "service": "forge.v1.AdapterService"
+  },
+  "transport": {
+    "process_control_writes": false,
+    "business_write_backs": false,
+    "data_classes": [
+      "raw",
+      "historical",
+      "status",
+      "config"
+    ]
+  },
+  "references": {
+    "facts": {
+      "path": "forge-modules/forge-nms/fxts/facts/forge-nms.facts.json",
+      "adapter_id": "forge-nms"
+    },
+    "manifest": "forge-modules/forge-nms/src/python/forge_nms/manifest.json"
+  },
+  "baseline": {
+    "M-1": "met",
+    "M-2": "met",
+    "M-3": "met",
+    "M-4": "met",
+    "M-5": "met",
+    "M-6": "met",
+    "M-7": "met",
+    "M-8": "met",
+    "M-9": "met",
+    "M-10": "waived",
+    "M-11": "met",
+    "M-12": "waived",
+    "M-13": "waived",
+    "M-14": "waived",
+    "M-15": "not_applicable",
+    "M-16": "not_applicable"
+  },
+  "waivers": [
+    {
+      "requirement": "M-10",
+      "reason": "No module ships a roles file yet: the roles file has no FxTS spec to be written against, and the hub still uses its own flat roles.",
+      "backlog_item": "FB-141"
+    },
+    {
+      "requirement": "M-12",
+      "reason": "The record id rule of the transport contract (T-5) is not built: records carry an id the adapter makes, and the hub does not yet keep each id once.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-13",
+      "reason": "Store and forward is not part of the module SDK yet (T-6): the module does not buffer what it cannot deliver.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-14",
+      "reason": "The goodbye and the last will of the transport contract (T-8) are not built: the hub learns of a shutdown only when calls stop.",
+      "backlog_item": "FB-164"
+    }
+  ],
+  "time_contract": {
+    "hub": {
+      "exchange": "four-timestamp",
+      "fail_closed": true
+    },
+    "plant_floor_devices": "none",
+    "databases": [
+      {
+        "name": "mod_nms",
+        "owner": "hub",
+        "engine": "PostgreSQL",
+        "access": "read-write",
+        "credential": "forge-issued",
+        "written_time_source": "module-clock",
+        "fail_closed": true
+      }
+    ],
+    "third_party_systems": []
+  },
+  "user_interface": {
+    "ships_ui_code": false,
+    "screens": false
+  },
+  "scaffold": {
+    "template": "python-adapter"
+  },
+  "metadata": {
+    "hosting": "hub-hosted Python adapter today",
+    "state": "This is Forge's own management module for this service, not an integration with another system. An existing application was the example it is built from: the Python adapter holds the data contract taken from that example (sources, context mapping, record shapes). The module's own logic, storage and screens are not built.",
+    "target": "A Go module built from the module SDK, with Python scripting for customization (owner, 2026-11-18). Its source path, language and template change in this spec when that code exists.",
+    "time_contract_state": "The hub database mod_nms is declared as the rule the module is built to: every time it writes there comes from its own governed clock. The adapter does not use the database yet. M-4 to M-7 are run by the conformance kit through the Python transport, against a reference hub."
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": "dadb7d89eea58b06bb7e56e0ef7b6714f2b179ba93817167168bc8ccbdcb0e67",
+    "change_history": [
+      {
+        "previous_hash": "dadb7d89eea58b06bb7e56e0ef7b6714f2b179ba93817167168bc8ccbdcb0e67",
+        "new_hash": "0a9cfbc5f1146c2a20c758e4675629731b8da0253fbfce7099945f2a30b1c8f0",
+        "changed_at": "2026-11-23T19:24:59Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "every module has a folder of its own (D-17 step 5, FB-201): the paths of the module's code, its manifest and its sibling specs follow it; nothing else changed"
+      },
+      {
+        "previous_hash": "9e4d00a24e9941f9529c9656f066815b4fc4f30c2b583086d549bd2cd0c7d605",
+        "new_hash": "dadb7d89eea58b06bb7e56e0ef7b6714f2b179ba93817167168bc8ccbdcb0e67",
+        "changed_at": "2026-11-23T02:07:48Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "paths follow the move of forge-core to its own folder (D-17 step 3, FB-199); nothing else changed"
+      },
+      {
+        "previous_hash": "25c0a932fe2b6bd02d33c020c074225feb608a20b72916d5a9303f938ab7430e",
+        "new_hash": "9e4d00a24e9941f9529c9656f066815b4fc4f30c2b583086d549bd2cd0c7d605",
+        "changed_at": "2026-11-19T21:46:24Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-153: FMTS 2.0.0, the module's function and the data classes it carries (owner, 2026-11-19)"
+      }
+    ],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "0a9cfbc5f1146c2a20c758e4675629731b8da0253fbfce7099945f2a30b1c8f0",
+    "schema_version": "2.0.0",
+    "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-23T19:47:52Z"
+  }
+}

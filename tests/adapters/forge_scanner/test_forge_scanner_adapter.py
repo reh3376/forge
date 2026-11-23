@@ -2,10 +2,10 @@
 
 import pytest
 
-from forge.adapters.forge_scanner.adapter import ForgeScannerAdapter
-from forge.adapters.forge_scanner.device_registry import DeviceRegistry
-from forge.adapters.forge_scanner.server import MockScannerServiceHandler
 from forge_core.models.adapter import AdapterState, AdapterTier
+from forge_scanner.adapter import ForgeScannerAdapter
+from forge_scanner.device_registry import DeviceRegistry
+from forge_scanner.server import MockScannerServiceHandler
 
 # ── Manifest Tests ─────────────────────────────────────────────────
 

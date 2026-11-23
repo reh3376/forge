@@ -2,7 +2,7 @@
  * The forge-mes adapter manifest the backend presents to the hub on Register.
  *
  * `forge-mes.manifest.json` is a copy of the hub's
- * `src/forge/adapters/forge_mes/manifest.json`; the parity test keeps them
+ * `forge-modules/forge-mes/src/python/forge_mes/manifest.json`; the parity test keeps them
  * identical. This module converts it to the proto `AdapterManifest` shape.
  */
 import manifestJson from "./forge-mes.manifest.json";

@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 import grpc
 import grpc.aio
 import pytest
+from tests.samples import module_manifest_path
 
 from forge_core.link.grpc_channel import GrpcChannel
 from forge_core.link.proto_bridge import contextual_record_to_proto, get_typed_value
@@ -36,8 +36,7 @@ from forge_core.proto_gen.forge.v1 import adapter_service_pb2_grpc as service_gr
 from forge_hub.link.grpc_server import GrpcServer
 from forge_hub.link.hub_ingest import HubIngestServicer
 
-MES_MANIFEST = Path(__file__).resolve().parents[3] / "src" / "forge" / "adapters"
-MES_MANIFEST = MES_MANIFEST / "forge_mes" / "manifest.json"
+MES_MANIFEST = module_manifest_path("forge-mes")
 
 
 def mes_manifest() -> AdapterManifest:

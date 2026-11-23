@@ -221,15 +221,18 @@ FIXTURES_DIR = "tests/governance/fmts/conformance"
 def adapter_module_name(source_path: str) -> str | None:
     """The importable module of a Python adapter's ``adapter.py``, from its source path.
 
-    ``src/forge/adapters/forge_wms`` gives ``forge.adapters.forge_wms.adapter``. Only
-    Forge's own package is imported; any other path gives None.
+    ``forge-modules/forge-wms/src/python/forge_wms`` gives ``forge_wms.adapter``. Only a
+    module's own package in the standard structure (D-17 §10.3) is imported: the folder
+    ``forge-modules/<module>/src/python/`` and, under it, the package named after the
+    module. Any other path gives None.
     """
     parts = [part for part in source_path.strip("/").split("/") if part]
-    if len(parts) < 3 or parts[0] != "src" or parts[1] != "forge":
+    if len(parts) < 5 or parts[0] != "forge-modules" or parts[2:4] != ["src", "python"]:
         return None
-    if not all(part.isidentifier() for part in parts[1:]):
+    package = parts[4:]
+    if package[0] != parts[1].replace("-", "_") or not all(part.isidentifier() for part in package):
         return None
-    return ".".join([*parts[1:], "adapter"])
+    return ".".join([*package, "adapter"])
 
 
 def find_adapter_class(module_name: str) -> Callable[[], AdapterBase]:

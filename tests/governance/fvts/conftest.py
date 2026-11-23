@@ -9,7 +9,8 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from forge_core.fxts.fvts import SCHEMA_PATH, SPECS_DIR
+from forge_core.fxts import locations
+from forge_core.fxts.fvts import SCHEMA_PATH
 from forge_core.fxts.fvts.runners.fvts_runner import FVTSRunner, load_facts_specs
 
 if TYPE_CHECKING:
@@ -17,7 +18,7 @@ if TYPE_CHECKING:
 
     from forge_core.fxts.shared.runner import FxTSVerdict
 
-REFERENCE_SPEC_PATH = SPECS_DIR / "forge-ot.fvts.json"
+REFERENCE_SPEC_PATH = locations.spec_path("fvts", "forge-ot.fvts.json")
 GOLDEN_DIR = Path(__file__).parent / "golden" / "forge-ot"
 
 

@@ -1,6 +1,6 @@
 """The gate: every module in the repository against its FMTS spec (BACKLOG FB-136).
 
-Each spec under ``forge_core/fxts/fmts/specs`` (in forge-core) runs through the
+Each module's spec (``forge-modules/<module>/fxts/fmts``) runs through the
 FMTSRunner against this checkout. Every check must pass or be a named skip, except the
 failures listed
 here. Each listed failure is a known gap with a backlog item, and its entry is removed
@@ -27,12 +27,10 @@ from typing import Any
 
 import pytest
 
-from forge_core.fxts import FXTS_ROOT
-from forge_core.fxts.fmts import REPO_ROOT, SPECS_DIR
+from forge_core.fxts import locations
+from forge_core.fxts.fmts import REPO_ROOT
 from forge_core.fxts.fmts.runners.fmts_runner import CONFORMANCE_KIT, FMTSRunner, load_backlog
 from forge_core.fxts.shared.runner import VerdictStatus
-
-FACTS_SPECS_DIR = FXTS_ROOT / "facts" / "specs"
 
 PENDING_APPROVAL = frozenset({"fmts:hash-approved"})
 ALLOWED_FAILURES: dict[str, frozenset[str]] = {
@@ -82,12 +80,14 @@ NOT_RUN: dict[str, frozenset[str]] = {
     "forge-ot": frozenset(),  # off the template; driven through its own conformance.py hook
 }
 
-SPEC_FILES = sorted(SPECS_DIR.glob("*.fmts.json"))
+SPEC_FILES = locations.spec_files("fmts", "*.fmts.json")
 MODULE_IDS = [path.name.removesuffix(".fmts.json") for path in SPEC_FILES]
 
 
 def _load(module_id: str) -> dict[str, Any]:
-    return json.loads((SPECS_DIR / f"{module_id}.fmts.json").read_text(encoding="utf-8"))
+    return json.loads(
+        locations.spec_path("fmts", f"{module_id}.fmts.json").read_text(encoding="utf-8")
+    )
 
 
 def _check(requirement: str) -> str:
@@ -97,7 +97,7 @@ def _check(requirement: str) -> str:
 def test_every_facts_spec_has_a_module_spec() -> None:
     adapters = sorted(
         json.loads(path.read_text(encoding="utf-8"))["adapter_identity"]["adapter_id"]
-        for path in FACTS_SPECS_DIR.glob("*.facts.json")
+        for path in locations.spec_files("facts", "*.facts.json")
     )
     assert adapters == MODULE_IDS
     assert len(MODULE_IDS) == 9

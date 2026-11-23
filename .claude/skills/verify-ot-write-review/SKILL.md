@@ -1,6 +1,6 @@
 ---
 name: verify-ot-write-review
-description: "Check a change to the plant-floor write path (forge-ot control: the two-step review gate, review tokens, the write engine's chain to the controller) against every sequence and interleaving in a bound. Use when a change touches src/forge/modules/ot/control/review.py, write_engine.py, validation.py, interlock.py or the write models, or for 'does a write still need review', 'can a token be reused', 'verify the write gate'."
+description: "Check a change to the plant-floor write path (forge-ot control: the two-step review gate, review tokens, the write engine's chain to the controller) against every sequence and interleaving in a bound. Use when a change touches forge-modules/forge-ot/src/python/forge_ot/control/review.py, write_engine.py, validation.py, interlock.py or the write models, or for 'does a write still need review', 'can a token be reused', 'verify the write gate'."
 ---
 
 # Verify the plant-floor write review gate
@@ -13,20 +13,20 @@ description: "Check a change to the plant-floor write path (forge-ot control: th
 
 ## Does your change touch it
 
-Run the check when a change touches any of these. Paths are as of the sync commit below; the code moves to `forge-modules/forge-ot/` with BACKLOG FB-201, and the paths here move with it.
+Run the check when a change touches any of these. The code moved to `forge-modules/forge-ot/` on 2026-11-23 (BACKLOG FB-201, from `src/forge/modules/ot`); the covered files changed only in their import lines, and the check passed unchanged.
 
 | File | What the check covers in it |
 |---|---|
-| `src/forge/modules/ot/control/review.py` | `WriteReviewer.check`, `stage`, `cancel`, `_same_write`, `_evict_expired`, `ReviewTicket.expired` |
-| `src/forge/modules/ot/control/write_engine.py` | `ControlWriteEngine.execute`, `stage`, `_value_to_write`, `_write_and_readback` (the order of the layers and what is written) |
-| `src/forge/modules/ot/control/validation.py` | `WriteValidator.validate` as the first layer |
-| `src/forge/modules/ot/control/interlock.py` | `InterlockEngine.check` as a layer that can refuse after the token is used |
-| `src/forge/modules/ot/control/models.py`, `forge-core/src/python/forge_core/models/control.py` | `WriteRequest`, `TagWriteConfig.coerce`, `ConfirmationMode`, `WriteOrigin` |
+| `forge-modules/forge-ot/src/python/forge_ot/control/review.py` | `WriteReviewer.check`, `stage`, `cancel`, `_same_write`, `_evict_expired`, `ReviewTicket.expired` |
+| `forge-modules/forge-ot/src/python/forge_ot/control/write_engine.py` | `ControlWriteEngine.execute`, `stage`, `_value_to_write`, `_write_and_readback` (the order of the layers and what is written) |
+| `forge-modules/forge-ot/src/python/forge_ot/control/validation.py` | `WriteValidator.validate` as the first layer |
+| `forge-modules/forge-ot/src/python/forge_ot/control/interlock.py` | `InterlockEngine.check` as a layer that can refuse after the token is used |
+| `forge-modules/forge-ot/src/python/forge_ot/control/models.py`, `forge-core/src/python/forge_core/models/control.py` | `WriteRequest`, `TagWriteConfig.coerce`, `ConfirmationMode`, `WriteOrigin` |
 
-**Sync commit:** `b508bb05` (2026-11-23). The check was confirmed to describe the code at this commit. See what changed since:
+**Sync commit:** `7b2ebff9` (2026-11-23). The check was confirmed to describe the code at this commit. See what changed since:
 
 ```bash
-git log --oneline b508bb05..HEAD -- src/forge/modules/ot/control/review.py src/forge/modules/ot/control/write_engine.py src/forge/modules/ot/control/validation.py src/forge/modules/ot/control/interlock.py src/forge/modules/ot/control/models.py forge-core/src/python/forge_core/models/control.py
+git log --oneline 7b2ebff9..HEAD -- forge-modules/forge-ot/src/python/forge_ot/control/review.py forge-modules/forge-ot/src/python/forge_ot/control/write_engine.py forge-modules/forge-ot/src/python/forge_ot/control/validation.py forge-modules/forge-ot/src/python/forge_ot/control/interlock.py forge-modules/forge-ot/src/python/forge_ot/control/models.py forge-core/src/python/forge_core/models/control.py
 ```
 
 If that prints commits you did not check, the verification needs a look before you trust a pass: read "When the code changes on purpose". Move the sync commit forward only after you have confirmed that the check still describes the code at the new commit.

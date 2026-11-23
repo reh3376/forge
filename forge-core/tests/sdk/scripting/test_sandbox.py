@@ -26,7 +26,10 @@ class TestModuleAllowlist:
         assert sandbox.is_module_allowed("forge")
         assert sandbox.is_module_allowed("forge.anything")
         assert sandbox.is_module_allowed("forge_core.sdk.scripting")
-        assert sandbox.is_module_allowed("forge.modules.ot")
+        # A module's own package and the hub's are not the scripting API: a script reaches
+        # the plant through ``forge.*`` and nothing else (FB-201).
+        assert not sandbox.is_module_allowed("forge_ot")
+        assert not sandbox.is_module_allowed("forge_hub.api")
 
     def test_blocked_modules(self):
         sandbox = ScriptSandbox()

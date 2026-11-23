@@ -10,18 +10,19 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from forge_core.fxts import FXTS_ROOT
-from forge_core.fxts.fmts import REPO_ROOT, SCHEMA_PATH
+from forge_core.fxts import locations
+from forge_core.fxts.fmts import SCHEMA_PATH
 from forge_core.fxts.fmts.runners.fmts_runner import FMTSRunner
 from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import add_spec_hash, approve_spec_hash
 from forge_hub import conformance
+from tests.samples import module_package_dir
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-FACTS_SPEC = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
-ADAPTER_DIR = REPO_ROOT / "src" / "forge" / "adapters" / "forge_wms"
+FACTS_SPEC = locations.spec_path("facts", "forge-wms.facts.json")
+ADAPTER_DIR = module_package_dir("forge-wms")
 
 BACKLOG = """# Backlog
 

@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from forge.modules.ot.control import (
+from forge_ot.control import (
     ConfirmationMode,
     ControlWriteEngine,
     DataType,

@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from forge.modules.ot.control import (
+from forge_ot.control import (
     CipPolicy,
     ConfigError,
     ConfirmationMode,

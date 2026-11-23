@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from forge.adapters.forge_wms.adapter import ForgeWmsAdapter
 from forge_core.fxts.fmts import REPO_ROOT
 from forge_core.fxts.shared.runner import VerdictStatus
 from forge_core.link.spoke_client import SpokeClient
@@ -22,12 +21,13 @@ from forge_hub.conformance import (
     placeholder_params,
     run_conformance,
 )
+from forge_wms.adapter import ForgeWmsAdapter
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
 PASS, FAIL, SKIP = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.SKIP
-MANIFEST = REPO_ROOT / "src/forge/adapters/forge_wms/manifest.json"
+MANIFEST = REPO_ROOT / "forge-modules/forge-wms/src/python/forge_wms/manifest.json"
 PARAMS = placeholder_params(json.loads(MANIFEST.read_text(encoding="utf-8")))
 EVENTS = [
     {"id": "B1", "barrel_id": "B1", "event_timestamp": "2026-04-06T10:00:00+00:00"},
@@ -131,11 +131,12 @@ class TestTheKitsOwnParts:
     @pytest.mark.parametrize(
         ("path", "module"),
         [
-            ("src/forge/adapters/forge_wms", "forge.adapters.forge_wms.adapter"),
-            ("src/forge/modules/ot/", "forge.modules.ot.adapter"),
+            ("forge-modules/forge-wms/src/python/forge_wms", "forge_wms.adapter"),
+            ("forge-modules/forge-ot/src/python/forge_ot/", "forge_ot.adapter"),
             ("src/wms", None),
             ("forge-modules/forge-mes/bridge/backend/src", None),
-            ("src/forge/adapters/not-a-package", None),
+            ("forge-modules/forge-wms/src/python/not-a-package", None),
+            ("forge-modules/forge-wms/src/python/forge_mes", None),  # another module's package
             ("../outside", None),
         ],
     )
@@ -143,9 +144,9 @@ class TestTheKitsOwnParts:
         assert adapter_module_name(path) == module
 
     def test_find_adapter_class(self) -> None:
-        assert find_adapter_class("forge.adapters.forge_wms.adapter") is ForgeWmsAdapter
+        assert find_adapter_class("forge_wms.adapter") is ForgeWmsAdapter
         with pytest.raises(ValueError, match="defines 0 adapter classes"):
-            find_adapter_class("forge.adapters.forge_wms.config")
+            find_adapter_class("forge_wms.config")
 
     def test_placeholder_params_fill_only_what_is_required(self) -> None:
         manifest = {
@@ -182,16 +183,18 @@ class TestAModuleOffTheTemplate:
     """The OT module is not on the adapter template: it supplies its own kit hook."""
 
     def test_the_hook_is_found_beside_the_adapter(self) -> None:
-        from forge.modules.ot import conformance as ot_hook
+        from forge_ot import conformance as ot_hook
 
-        factory, load = load_hook("src/forge/modules/ot")
+        factory, load = load_hook("forge-modules/forge-ot/src/python/forge_ot")
         assert factory is ot_hook.conformance_adapter and load is ot_hook.conformance_load
         assert load_hook("src/wms") is None  # not importable Forge code
         with pytest.raises(ModuleNotFoundError):
-            load_hook("src/forge/adapters/forge_wms")  # on the template: it has no hook
+            load_hook(
+                "forge-modules/forge-wms/src/python/forge_wms"
+            )  # on the template: it has no hook
 
     async def test_the_ot_module_conforms_on_a_real_registry(self) -> None:
-        from forge.modules.ot.conformance import conformance_adapter, conformance_load
+        from forge_ot.conformance import conformance_adapter, conformance_load
 
         results = await run_conformance(
             lambda hub: PythonAdapterDriver(hub, conformance_adapter, load=conformance_load)
@@ -208,7 +211,7 @@ class TestAModuleOffTheTemplate:
         """What the kit found: collect awaited a method only the test doubles had, the
         change callback's signature did not match the registry's call, and the records
         carried a schema_ref the hub rejects."""
-        from forge.modules.ot.conformance import conformance_adapter, conformance_load
+        from forge_ot.conformance import conformance_adapter, conformance_load
 
         adapter = conformance_adapter()
         seen: list[Any] = []

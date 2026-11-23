@@ -15,7 +15,8 @@ from typing import TYPE_CHECKING, Any
 import pytest
 from jsonschema import Draft202012Validator
 
-from forge_core.fxts.futs import REPO_ROOT, SCHEMA_PATH, SPECS_DIR
+from forge_core.fxts import locations
+from forge_core.fxts.futs import REPO_ROOT, SCHEMA_PATH
 from forge_core.fxts.futs.runners.futs_runner import FUTSRunner
 from forge_core.fxts.shared import lists, schemas
 from forge_core.fxts.shared.runner import (
@@ -30,13 +31,12 @@ if TYPE_CHECKING:
 
 PASS, FAIL, SKIP = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.SKIP
 SCHEMA = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
-#: The hub's own screens are in its folder of governed files; the widgets and the module's
-#: view are still in forge-core's framework folder (FB-201).
-HUB_SPECS_DIR = REPO_ROOT / "forge-hub" / "fxts" / "futs"
-SPEC_FILES = sorted(
-    [*SPECS_DIR.glob("*.futs.json"), *HUB_SPECS_DIR.glob("*.futs.json")], key=lambda p: p.name
+#: Every FUTS spec, each in the folder of what it describes: the widgets are
+#: forge-display's, a view is its module's or the hub's.
+SPEC_FILES = locations.spec_files("futs", "*.futs.json")
+WIDGETS = sorted(
+    p.name.removesuffix(".widget.futs.json") for p in SPEC_FILES if ".widget." in p.name
 )
-WIDGETS = sorted(p.name.removesuffix(".widget.futs.json") for p in SPECS_DIR.glob("*.widget.*"))
 VIEW = "forge-ot-ferm-overview"
 
 #: The twelve the owner chose on 2026-11-20.
@@ -59,8 +59,14 @@ NOT_RUN: dict[str, frozenset[str]] = {VIEW: frozenset({"futs:expressions"})}
 
 
 def _load(name: str) -> dict[str, Any]:
-    folder = HUB_SPECS_DIR if (HUB_SPECS_DIR / name).is_file() else SPECS_DIR
-    return json.loads((folder / name).read_text(encoding="utf-8"))
+    return json.loads(locations.spec_path("futs", name).read_text(encoding="utf-8"))
+
+
+def _copy_specs(target: Path) -> None:
+    """Every FUTS spec in one folder, for a test that edits a widget spec."""
+    target.mkdir()
+    for file in SPEC_FILES:
+        shutil.copy(file, target / file.name)
 
 
 def sign(spec: dict[str, Any]) -> dict[str, Any]:
@@ -195,7 +201,7 @@ class TestAViewDocument:
 
     async def test_a_widget_whose_spec_is_not_approved(self, runner, view, tmp_path) -> None:
         specs = tmp_path / "specs"
-        shutil.copytree(SPECS_DIR, specs)
+        _copy_specs(specs)
         path = specs / "value-display.widget.futs.json"
         spec = json.loads(path.read_text(encoding="utf-8"))
         spec["integrity"]["hash_state"] = "pending_review"
@@ -205,7 +211,7 @@ class TestAViewDocument:
 
     async def test_an_edited_widget_spec_is_not_trusted(self, runner, view, tmp_path) -> None:
         specs = tmp_path / "specs"
-        shutil.copytree(SPECS_DIR, specs)
+        _copy_specs(specs)
         path = specs / "value-display.widget.futs.json"
         spec = json.loads(path.read_text(encoding="utf-8"))
         spec["widget"]["shows"]["quality"] = False
@@ -301,7 +307,7 @@ class TestAViewDocument:
 
     async def test_a_widget_supports_the_surfaces_profiles(self, runner, view, tmp_path) -> None:
         specs = tmp_path / "specs"
-        shutil.copytree(SPECS_DIR, specs)
+        _copy_specs(specs)
         path = specs / "level-bar.widget.futs.json"
         spec = json.loads(path.read_text(encoding="utf-8"))
         spec["widget"]["profiles"] = ["desktop_hmi"]
@@ -390,7 +396,7 @@ class TestBindingACollection:
 
     async def test_a_collection_takes_no_expression(self, runner, screen, tmp_path) -> None:
         specs = tmp_path / "specs"
-        shutil.copytree(SPECS_DIR, specs)
+        _copy_specs(specs)
         path = specs / "data-table.widget.futs.json"
         spec = json.loads(path.read_text(encoding="utf-8"))
         spec["widget"]["bindings"][0]["expression_allowed"] = True

@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.modules.ot.mqtt.topic_router import (
+from forge_ot.mqtt.topic_router import (
     TopicRouter,
     TopicTemplate,
     TopicType,

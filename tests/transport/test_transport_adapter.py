@@ -14,14 +14,14 @@ from forge_hub.link.hub_server import InMemoryServicer
 
 
 try:
-    from forge.adapters.forge_wms.adapter import ForgeWmsAdapter
+    from forge_wms.adapter import ForgeWmsAdapter
 
     HAS_WMS = True
 except ImportError:
     HAS_WMS = False
 
 try:
-    from forge.adapters.forge_mes.adapter import ForgeMesAdapter
+    from forge_mes.adapter import ForgeMesAdapter
 
     HAS_MES = True
 except ImportError:

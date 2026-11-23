@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 
-from forge.adapters.forge_scanner.device_registry import (
+from forge_scanner.device_registry import (
     DeviceRecord,
     DeviceRegistry,
 )

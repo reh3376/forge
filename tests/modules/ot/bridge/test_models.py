@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from forge.modules.ot.bridge.models import (
+from forge_ot.bridge.models import (
     BridgeConfig,
     BridgeHealth,
     BridgeState,

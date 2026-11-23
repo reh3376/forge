@@ -16,7 +16,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from asyncua import ua
 
-from forge.modules.ot.opcua_client.client import (
+from forge_ot.opcua_client.client import (
     _VALID_TRANSITIONS,
     OpcUaClient,
     _build_security_string,
@@ -25,7 +25,7 @@ from forge.modules.ot.opcua_client.client import (
     _convert_quality,
     _forge_node_id_to_ua,
 )
-from forge.modules.ot.opcua_client.exceptions import (
+from forge_ot.opcua_client.exceptions import (
     ConfigurationError,
     ConnectionError,
     EndpointUnreachableError,
@@ -33,10 +33,10 @@ from forge.modules.ot.opcua_client.exceptions import (
     SubscriptionError,
     WriteError,
 )
-from forge.modules.ot.opcua_client.security import (
+from forge_ot.opcua_client.security import (
     SecurityConfig,
 )
-from forge.modules.ot.opcua_client.types import (
+from forge_ot.opcua_client.types import (
     ConnectionState,
     DataType,
     NodeClass,
@@ -65,7 +65,7 @@ def _mock_ua_client() -> AsyncMock:
 @pytest.fixture
 def mock_ua_client():
     """Patch asyncua.Client so OpcUaClient doesn't try real connections."""
-    with patch("forge.modules.ot.opcua_client.client.UaClient") as mock_cls:
+    with patch("forge_ot.opcua_client.client.UaClient") as mock_cls:
         mock_instance = _mock_ua_client()
         mock_cls.return_value = mock_instance
         yield mock_instance

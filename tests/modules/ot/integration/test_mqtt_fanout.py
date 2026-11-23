@@ -8,10 +8,10 @@ import json
 
 import pytest
 
-from forge.modules.ot.mqtt.publisher import MqttConfig, OTMqttPublisher
-from forge.modules.ot.mqtt.rate_limiter import MqttRateLimiter, RateLimiterConfig
-from forge.modules.ot.mqtt.tag_publisher import TagPublisher
-from forge.modules.ot.mqtt.topic_router import TopicRouter
+from forge_ot.mqtt.publisher import MqttConfig, OTMqttPublisher
+from forge_ot.mqtt.rate_limiter import MqttRateLimiter, RateLimiterConfig
+from forge_ot.mqtt.tag_publisher import TagPublisher
+from forge_ot.mqtt.topic_router import TopicRouter
 
 
 class TestMqttFanoutPipeline:

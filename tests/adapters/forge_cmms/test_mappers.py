@@ -4,19 +4,19 @@ from __future__ import annotations
 
 import pytest
 
-from forge.adapters.forge_cmms.mappers.equipment import (
+from forge_cmms.mappers.equipment import (
     map_asset,
     map_work_order_type,
     map_work_request_type,
 )
-from forge.adapters.forge_cmms.mappers.inventory import (
+from forge_cmms.mappers.inventory import (
     map_inventory_investigation,
     map_inventory_location,
     map_item,
     map_kit,
     map_vendor,
 )
-from forge.adapters.forge_cmms.mappers.maintenance import (
+from forge_cmms.mappers.maintenance import (
     map_work_order,
     map_work_request,
 )

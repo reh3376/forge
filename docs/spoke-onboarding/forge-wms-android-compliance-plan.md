@@ -133,7 +133,7 @@ This is intentionally minimal — edge devices speak a simple contract, and the 
 
 ### 4.1 Adapter Location
 ```
-forge-platform/src/forge/adapters/forge_scanner/
+forge-platform/forge-modules/forge-scanner/src/python/forge_scanner/
 ├── __init__.py
 ├── adapter.py             # ForgeAdapter subclass
 ├── scanner_grpc_server.py # ScannerService gRPC server (Android-facing)
@@ -185,7 +185,7 @@ A new FACTS spec (`specs/forge-scanner-adapter.facts.json`) will declare the gat
 
 - Define `scanner.v1` proto package (ScannerService, ScanEvent, DeviceIdentity messages)
 - Generate Python stubs (gateway side) and Kotlin stubs (Android side — build but don't integrate yet)
-- Create gateway adapter scaffold under `forge-platform/src/forge/adapters/forge_scanner/`
+- Create gateway adapter scaffold under `forge-platform/forge-modules/forge-scanner/src/python/forge_scanner/`
 - Write FACTS spec for the gateway adapter
 - Unit tests for routing logic and proto mapping
 

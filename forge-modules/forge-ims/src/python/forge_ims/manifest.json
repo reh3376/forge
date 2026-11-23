@@ -1,0 +1,119 @@
+{
+  "adapter_id": "forge-ims",
+  "name": "Forge Inventory Management System Adapter",
+  "version": "0.1.0",
+  "type": "INGESTION",
+  "protocol": "grpc+protobuf",
+  "tier": "MES_MOM",
+  "capabilities": {
+    "read": true,
+    "write": false,
+    "subscribe": true,
+    "backfill": true,
+    "discover": true
+  },
+  "data_contract": {
+    "schema_ref": "forge://schemas/forge-ims/v0.1.0",
+    "output_format": "contextual_record",
+    "context_fields": [
+      "asset_id",
+      "event_type",
+      "location_id",
+      "part_id",
+      "disposition",
+      "actor_id"
+    ]
+  },
+  "health_check_interval_ms": 15000,
+  "connection_params": [
+    {
+      "name": "grpc_host",
+      "description": "Forge IMS gRPC server host",
+      "required": true,
+      "secret": false,
+      "default": "localhost"
+    },
+    {
+      "name": "grpc_port",
+      "description": "Forge IMS gRPC server port",
+      "required": true,
+      "secret": false,
+      "default": "50050"
+    },
+    {
+      "name": "use_tls",
+      "description": "Enable TLS for gRPC connection",
+      "required": false,
+      "secret": false,
+      "default": "false"
+    },
+    {
+      "name": "tls_ca_cert",
+      "description": "Path to CA certificate for TLS verification",
+      "required": false,
+      "secret": false
+    },
+    {
+      "name": "tls_client_cert",
+      "description": "Path to client certificate for mTLS",
+      "required": false,
+      "secret": false
+    },
+    {
+      "name": "tls_client_key",
+      "description": "Path to client private key for mTLS",
+      "required": false,
+      "secret": true
+    },
+    {
+      "name": "spoke_id",
+      "description": "Spoke identity for Forge metadata headers",
+      "required": true,
+      "secret": false,
+      "default": "forge_ims_primary"
+    },
+    {
+      "name": "connect_timeout_ms",
+      "description": "gRPC connection timeout in milliseconds",
+      "required": false,
+      "secret": false,
+      "default": "5000"
+    },
+    {
+      "name": "request_timeout_ms",
+      "description": "Per-RPC request timeout in milliseconds",
+      "required": false,
+      "secret": false,
+      "default": "10000"
+    }
+  ],
+  "auth_methods": [
+    "mtls",
+    "none"
+  ],
+  "metadata": {
+    "spoke": "forge-ims",
+    "hub_module": "forge_ims",
+    "source_repo": "reference application, in a private repository",
+    "source_framework": "Go gRPC + Python sidecar + Next.js",
+    "proto_package": "ims.v1",
+    "proto_file_count": 16,
+    "grpc_service_count": 7,
+    "rpc_count": 45,
+    "isa_95_compliance": "Material Class > Material Definition > Material Lot > Material Sublot",
+    "state_dimensions": [
+      "disposition",
+      "system_state",
+      "asset_state"
+    ],
+    "event_model": "append-only TransactionEvent with SecurityContext"
+  },
+  "time_governance": {
+    "time_source": "hub-ntp",
+    "sync_protocol": "ntp",
+    "clock_probe_interval_seconds": 30,
+    "source_timestamp_origin": "server",
+    "tolerance_class": "it-lan",
+    "fail_closed": true
+  }
+}

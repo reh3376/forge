@@ -116,7 +116,7 @@ The twelve widgets are the first set the owner chose on 2026-11-20. More are add
 ```bash
 forge governance run futs value-display
 forge governance run futs forge-ot-ferm-overview
-forge governance validate-spec forge-core/src/python/forge_core/fxts/futs/specs/level-bar.widget.futs.json
+forge governance validate-spec forge-modules/forge-display/fxts/futs/level-bar.widget.futs.json
 ```
 
 `tests/governance/futs/test_futs.py` runs every spec in CI and names each failure it allows.

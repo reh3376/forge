@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 
-from forge.modules.ot.mqtt.sparkplug import (
+from forge_ot.mqtt.sparkplug import (
     SparkplugDataType,
     SparkplugEncoder,
     SparkplugMetric,
