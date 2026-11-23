@@ -63,6 +63,13 @@ _ADMIN_ACTIONS: dict[AlarmAction, AlarmState] = {
     AlarmAction.DISABLE: AlarmState.OUT_OF_SERVICE,
 }
 
+# A process event while suppressed, shelved or out of service leaves the alarm there and
+# sets the state it returns to (ISA-18.2: the event updates the return state)
+_PROCESS_EVENT_RETURN: dict[AlarmAction, AlarmState] = {
+    AlarmAction.CLEAR: AlarmState.NORMAL,
+    AlarmAction.TRIGGER: AlarmState.ACTIVE_UNACK,
+}
+
 # Return actions map from admin state
 _ADMIN_RETURN: dict[tuple[AlarmState, AlarmAction], bool] = {
     (AlarmState.SUPPRESSED, AlarmAction.UNSUPPRESS): True,
@@ -142,6 +149,10 @@ class AlarmStateMachine:
         ):
             alarm._state_before_admin = previous
 
+        # A process event while in an admin state updates the state to return to
+        if previous in _ADMIN_ACTIONS.values() and action in _PROCESS_EVENT_RETURN:
+            alarm._state_before_admin = _PROCESS_EVENT_RETURN[action]
+
         # Handle administrative state exit — restore return state
         if (alarm.state, action) in _ADMIN_RETURN:
             saved = alarm._state_before_admin
@@ -195,7 +206,7 @@ class AlarmStateMachine:
         """Resolve the target state for a transition.
 
         This is the core lookup logic — separated for use by both
-        ``can_transition`` and ``transition``.
+        ``can_transition`` and ``transition``. It reads the alarm and never writes it.
         """
         state = alarm.state
 
@@ -221,14 +232,10 @@ class AlarmStateMachine:
 
         # Handle CLEAR/TRIGGER while in administrative state
         # Per ISA-18.2: process events update the return state, not the admin state
-        if state in (AlarmState.SUPPRESSED, AlarmState.SHELVED, AlarmState.OUT_OF_SERVICE):
-            if action == AlarmAction.CLEAR:
-                # Process cleared while admin — update saved return state
-                alarm._state_before_admin = AlarmState.NORMAL
-                return state  # Stay in admin state
-            if action == AlarmAction.TRIGGER:
-                # Process re-triggered while admin — update saved return state
-                alarm._state_before_admin = AlarmState.ACTIVE_UNACK
-                return state  # Stay in admin state
+        if state in _ADMIN_ACTIONS.values() and action in _PROCESS_EVENT_RETURN:
+            # The alarm stays in its admin state; transition() updates the state it
+            # returns to. Nothing is written here: this lookup also answers
+            # can_transition(), and a question must not change the alarm (FB-219).
+            return state
 
         raise InvalidTransitionError(state, action, alarm.alarm_id)

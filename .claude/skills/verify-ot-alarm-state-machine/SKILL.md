@@ -35,16 +35,17 @@ If that prints commits you did not check, look before you trust a pass. Move the
 uv run pytest tests/modules/ot/alarming/test_state_machine_exhaustive.py -q
 ```
 
-Under a second. The expected result at the sync commit is `14 passed, 4 xfailed`. The four expected failures are three known findings (below).
+Under a second. The expected result at the sync commit is `17 passed, 2 xfailed`. The two expected failures are two known findings (below).
 
 ## What it does, and why a pass is a proof here
 
 The machine is finite. A transition reads and writes two fields of an alarm, `state` (7 values) and `_state_before_admin` (None or one of 7): 56 configurations, 10 actions.
 
 - **Every configuration and every action**, 560 cases, reachable or not, for the laws about one step: a refused action changes nothing; asking agrees with doing; RESET always ends in NORMAL.
-- **Every configuration reachable from a new alarm**, with the process condition tracked beside it (29 situations). The search stops when no step leads anywhere new, so there is no depth bound.
+- **Every configuration reachable from a new alarm**, with the process condition tracked beside it (29 situations; 29 as well when questions are allowed as steps, since a question changes nothing). The search stops when no step leads anywhere new, so there is no depth bound.
 - **The assumption is checked:** `test_only_two_fields_matter` sets every other field to an unusual value and runs all 560 cases again.
-- **Able to fail:** two broken machines (one forgets a re-trigger while suppressed, one drops an unacknowledged alarm on CLEAR) must each be caught.
+- **Able to fail:** three broken machines (one forgets a re-trigger while suppressed, one drops an unacknowledged alarm on CLEAR, one whose lookup writes the alarm) must each be caught.
+- **History:** the first run found that `can_transition` changed the alarm: asked whether CLEAR was possible on a suppressed alarm, it rewrote the state the alarm returns to, and a standing alarm came back as NORMAL (BACKLOG FB-219, the counterexample under "Reading a failure"). `_resolve` now only reads; `transition` does the write. `test_asking_changes_nothing` and `test_no_abnormal_condition_is_shown_as_normal_when_someone_asks` hold it.
 
 Nothing is sampled and nothing is bounded, so a pass covers this machine as written. It does not cover the alarm engine around it (detection, timers for shelving, persistence, the API).
 
@@ -66,7 +67,6 @@ The numbered lines are the actions in order from a new alarm. `(to return to X)`
 
 Each is a strict expected failure. When the code is fixed the test passes, the strict marker fails the run, and you remove the marker and the entry here.
 
-- **FB-219, `can_transition` changes the alarm.** Asked whether CLEAR or TRIGGER is possible on a suppressed, shelved or out-of-service alarm, it rewrites the state the alarm returns to (`_resolve` sets `_state_before_admin` and `can_transition` calls `_resolve`). The counterexample above is the result: a question makes a standing alarm return to NORMAL. Tests: `test_asking_changes_nothing`, `test_no_abnormal_condition_is_shown_as_normal_when_someone_asks`. Nothing in the product calls `can_transition` at the sync commit; a screen that asks which actions are possible would.
 - **FB-220, `get_valid_actions` leaves out CLEAR and TRIGGER** for a suppressed, shelved or out-of-service alarm, which `transition` accepts. Test: `test_the_list_of_valid_actions_is_what_the_machine_accepts`. It may be intended (the list is of operator actions, and those two come from the process); then the method's name and the test should say so.
 - **FB-221, RESET leaves a saved return state behind.** TRIGGER, SUPPRESS, RESET gives an alarm that is NORMAL and still remembers ACTIVE_UNACK. Harmless today, because entering an admin state always overwrites it. Test: `test_nothing_is_saved_outside_an_admin_state`.
 

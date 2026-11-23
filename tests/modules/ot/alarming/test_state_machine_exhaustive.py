@@ -31,7 +31,11 @@ from itertools import product
 import pytest
 
 from forge.modules.ot.alarming.models import AlarmAction, AlarmInstance, AlarmState
-from forge.modules.ot.alarming.state_machine import AlarmStateMachine, InvalidTransitionError
+from forge.modules.ot.alarming.state_machine import (
+    AlarmStateMachine,
+    InvalidTransitionError,
+    TransitionResult,
+)
 
 MACHINE = AlarmStateMachine()
 STATES = tuple(AlarmState)
@@ -104,14 +108,6 @@ class TestEveryStep:
                 step(config, action) is not None
             ), f"{action.value} in {words(config)}"
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "BACKLOG FB-219: can_transition changes the alarm. Asked about CLEAR or TRIGGER "
-            "on a suppressed, shelved or out-of-service alarm, it rewrites the state the "
-            "alarm returns to"
-        ),
-    )
     def test_asking_changes_nothing(self) -> None:
         """A question about an alarm is not a step: ``can_transition`` leaves it as it was."""
         for config, action in product(ALL_CONFIGS, ACTIONS):
@@ -271,14 +267,6 @@ class TestEveryReachableConfiguration:
         problem = lost_alarm(reachable())
         assert problem is None, problem
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "BACKLOG FB-219: with questions allowed as steps, asking whether CLEAR is "
-            "possible on a suppressed alarm makes it return to NORMAL while the condition "
-            "is still abnormal"
-        ),
-    )
     def test_no_abnormal_condition_is_shown_as_normal_when_someone_asks(self) -> None:
         problem = lost_alarm(reachable(asking=True))
         assert problem is None, problem
@@ -366,11 +354,21 @@ def test_only_two_fields_matter() -> None:
 class _ForgetsToSaveOnTrigger(AlarmStateMachine):
     """Broken: a TRIGGER while suppressed no longer updates the state to return to."""
 
-    def _resolve(self, alarm: AlarmInstance, action: AlarmAction) -> AlarmState:
-        saved = alarm._state_before_admin
-        resolved = super()._resolve(alarm, action)
-        if action is AlarmAction.TRIGGER and alarm.state in ADMIN:
+    def transition(self, alarm: AlarmInstance, action: AlarmAction) -> TransitionResult:
+        was_admin, saved = alarm.state in ADMIN, alarm._state_before_admin
+        result = super().transition(alarm, action)
+        if action is AlarmAction.TRIGGER and was_admin:
             alarm._state_before_admin = saved
+        return result
+
+
+class _WritesWhileLookingUp(AlarmStateMachine):
+    """Broken, as the machine was before FB-219: the lookup itself sets the return state."""
+
+    def _resolve(self, alarm: AlarmInstance, action: AlarmAction) -> AlarmState:
+        resolved = super()._resolve(alarm, action)
+        if alarm.state in ADMIN and action is AlarmAction.CLEAR:
+            alarm._state_before_admin = AlarmState.NORMAL
         return resolved
 
 
@@ -388,6 +386,14 @@ def test_a_machine_that_forgets_a_retrigger_is_caught(monkeypatch: pytest.Monkey
     problem = lost_alarm(reachable())
     assert problem is not None and "not an active state" in problem
     assert "TRIGGER" in problem and "CLEAR" in problem
+
+
+def test_a_machine_whose_lookup_writes_is_caught(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setitem(globals(), "MACHINE", _WritesWhileLookingUp())
+    with pytest.raises(AssertionError, match="asking whether CLEAR is possible"):
+        TestEveryStep().test_asking_changes_nothing()
+    problem = lost_alarm(reachable(asking=True))
+    assert problem is not None and "someone asks whether CLEAR is possible" in problem
 
 
 def test_a_machine_that_drops_an_unacknowledged_alarm_is_caught(
