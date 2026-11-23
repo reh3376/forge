@@ -160,7 +160,7 @@ its containers were healthy. The banner misreports the other instance's state as
 ## Bug 6: `ingest --incremental` drops most added files after its change filter
 
 **MDEMG version:** 0.11.0-beta.1
-**Discovered:** 2026-10-15 in the `forge` repo, after `git subtree add --prefix="modules/Forge MES"`
+**Discovered:** 2026-10-15 in the `forge` repo, after `git subtree add --prefix="forge-modules/forge-mes/bridge"`
 
 ```
 mdemg ingest --path /Users/reh3376/forge --space-id forge --include-tests --incremental --since e3cb42d
@@ -170,11 +170,11 @@ INFO === Ingestion Complete === total=287 ingested=287
 ```
 
 Git reported 3,846 added files, discovery found 8,545 elements, but the "changed files only"
-filter kept 287. The 3,800 files under `modules/Forge MES/` (a path containing a space, added
+filter kept 287. The 3,800 files under `forge-modules/forge-mes/bridge/` (a path containing a space, added
 in a subtree merge commit) were not ingested; a full non-incremental run was required.
 
 **Likely causes to check:** path comparison between `git diff --name-status` output (which
-quotes paths containing spaces, e.g. `"modules/Forge MES/..."`) and the discovered element
+quotes paths containing spaces, e.g. `"forge-modules/forge-mes/bridge/..."`) and the discovered element
 paths; or the filter only matching `modified`/`renamed` entries and not `added`.
 
 **Suggested fix:** unquote git paths (`git -c core.quotePath=false diff ...`) before matching,

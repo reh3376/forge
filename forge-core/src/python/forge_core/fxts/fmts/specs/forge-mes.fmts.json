@@ -9,9 +9,9 @@
     "function": "mes",
     "language": "typescript",
     "source_paths": [
-      "modules/Forge MES/backend/src",
-      "modules/Forge MES/frontend",
-      "modules/Forge MES/shared/src",
+      "forge-modules/forge-mes/bridge/backend/src",
+      "forge-modules/forge-mes/bridge/frontend",
+      "forge-modules/forge-mes/bridge/shared/src",
       "src/forge/adapters/forge_mes"
     ]
   },
@@ -35,7 +35,7 @@
       "path": "forge-core/src/python/forge_core/fxts/facts/specs/forge-mes.facts.json",
       "adapter_id": "forge-mes"
     },
-    "manifest": "modules/Forge MES/backend/src/forge/forge-mes.manifest.json"
+    "manifest": "forge-modules/forge-mes/bridge/backend/src/forge/forge-mes.manifest.json"
   },
   "baseline": {
     "M-1": "met",
@@ -128,13 +128,22 @@
     "template": "none"
   },
   "metadata": {
-    "hosting": "interim: NestJS backend and Next.js frontend under modules/Forge MES, with the hub-side spoke under src/forge/adapters/forge_mes",
+    "hosting": "interim: NestJS backend and Next.js frontend under forge-modules/forge-mes/bridge, with the hub-side spoke under src/forge/adapters/forge_mes",
     "note": "M-3 is a time-keeping requirement: its waiver counts only once the owner approves this spec (Q-10). The bridge's Redis cache and RabbitMQ broker were not assessed (FB-145). No FVTS spec describes the MES screens; M-9 is waived."
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": "f0d1834f0bfd640ccbc73f9a9e0dfde58dae8c704c2a95fa1a89c4a9dcac02f8",
+    "previous_hash": "69e7b6eedafb3a7c891426d0bb42c6943c33cd097fcfec3417c41355a0f47eb0",
     "change_history": [
+      {
+        "previous_hash": "69e7b6eedafb3a7c891426d0bb42c6943c33cd097fcfec3417c41355a0f47eb0",
+        "new_hash": "34fd5ef07df4db6d62dba4d1a00a42dbb6c9ab68f3ff0b4a5629c5f901f590ed",
+        "changed_at": "2026-11-23T18:47:20Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "the interim MES bridge is forge-modules/forge-mes/bridge (D-17 Q-4, FB-201): five paths follow it; nothing else changed"
+      },
       {
         "previous_hash": "f0d1834f0bfd640ccbc73f9a9e0dfde58dae8c704c2a95fa1a89c4a9dcac02f8",
         "new_hash": "69e7b6eedafb3a7c891426d0bb42c6943c33cd097fcfec3417c41355a0f47eb0",
@@ -152,19 +161,10 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
         "reason": "FB-143 closed with the signed design record: the M-9 waiver now names FB-181, the item that builds forge-display"
-      },
-      {
-        "previous_hash": "81fa2662182d4fa6d630156312ef2a19bb84f1a104d30ecd6cf1b83543acc300",
-        "new_hash": "1bc87dacd7876e04d886de8ce855db5a5030c15a14f9ef2c5a92a71bb12b6999",
-        "changed_at": "2026-11-19T21:46:24Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "structural",
-        "reason": "FB-153: FMTS 2.0.0, the module's function and the data classes it carries (owner, 2026-11-19)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "69e7b6eedafb3a7c891426d0bb42c6943c33cd097fcfec3417c41355a0f47eb0",
+    "spec_hash": "34fd5ef07df4db6d62dba4d1a00a42dbb6c9ab68f3ff0b4a5629c5f901f590ed",
     "schema_version": "2.0.0",
     "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e"
   }

@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 169 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 170 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 169:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 170:
 
 **Working**
 
@@ -288,7 +288,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 169:
 | Python: the modules (`src/forge`) | 154 files, ~33,400 lines |
 | Python tests | 280 files, 5,159 collected, full suite green on the locked dependency set |
 | Go (`forge-core/src/go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
-| Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
+| Interim MES bridge (`forge-modules/forge-mes/bridge`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
 | Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
 | Storage migrations | 12 |
@@ -297,7 +297,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 169:
 | Backlog | 170 items recorded, 75 done; every finding is fixed or recorded |
 
 note:
-- Wording rule from the owner: the NestJS/Next.js code under `modules/Forge MES` is "the interim MES bridge"; forge-mes is the Go module that replaces it. Never "TypeScript forge-mes".
+- Wording rule from the owner: the NestJS/Next.js code under `forge-modules/forge-mes/bridge` is "the interim MES bridge"; forge-mes is the Go module that replaces it. Never "TypeScript forge-mes".
 - The numbers move with every push; `docs/WHERE-WE-ARE.md` §2 is current before each one, and a test fails if this deck's date and that document's disagree.
 
 ---
@@ -359,7 +359,7 @@ note:
 | `forge-core/src/python/forge_core` | **forge-core**, the shared foundation, its own package `forge_core` since 2026-11-22 (D-17): the models and the clock, `fxts` (the frameworks), `sdk`, `adapter` (the base class and the generic adapters), `link` (a module's end of the link to a hub), `proto_gen`. Its language-neutral part is `forge-core/contract`: the proto files, every framework's schema with its released versions, and the governed lists (`forge_core.contract` says where it is; a built package and the image carry it). It imports nothing of the hub or of a module, and a test holds that (`tests/test_layer_imports.py`). The hub is its own package too, `forge_hub` in `forge-hub/src/python`; the modules are still in `src/forge` |
 | `src/forge/adapters` | the Python adapters of eight modules (`forge_wms`, `forge_mes`, `forge_cmms`, `forge_nms`, `forge_ims`, `forge_historian`, `forge_scanner`, `forge_integ_erp_netsuite`), each with its manifest and config, and four empty generic packages (FB-148) |
 | `forge-core/src/go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
-| `modules/Forge MES` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
+| `forge-modules/forge-mes/bridge` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
 | `tests/` | The modules' tests and the tests that span layers; `tests/governance/` holds the framework gates that use the hub or a module's spec. forge-core's own tests are in `forge-core/tests` and the hub's in `forge-hub/tests` |
 | `docs/` | the key documents, `decisions/` (the signed records), `tutorial.md` (this deck's source). forge-core's and the hub's own documents are in `forge-core/docs` and `forge-hub/docs` |
 | `deploy/docker` | the development compose stack and the hub image |
@@ -1392,7 +1392,7 @@ note:
 
 | Capability | State |
 |---|---|
-| NestJS backend + Next.js frontend as the bridge (`modules/Forge MES`); it speaks the contract (push, pull, Collect, token, TLS) and exchanges time with the hub | ✅ |
+| NestJS backend + Next.js frontend as the bridge (`forge-modules/forge-mes/bridge`); it speaks the contract (push, pull, Collect, token, TLS) and exchanges time with the hub | ✅ |
 | FACTS spec `forge-mes`, approved | ✅ |
 | FMTS spec | 🟡 not approved: the kit cannot drive a TypeScript process (FB-155); five requirements are waived, among them its own database, its own UI and its time sources (FB-145) |
 | Go rewrite from the module SDK | ⬜ FB-076: decided (A-2) and designed (D-3) |
@@ -1401,7 +1401,7 @@ note:
 
 - The bridge's frontend type check is clean and blocks in CI (FB-028). Its backend test step is advisory: five suites need a database and test settings the job does not have (FB-036).
 - Do not build new product surface on the bridge's frontend. It is the MES user interface only until forge-display exists.
-- The bridge has its own instruction file, `modules/Forge MES/CLAUDE.md`.
+- The bridge has its own instruction file, `forge-modules/forge-mes/bridge/CLAUDE.md`.
 
 note:
 - Wording rule: "the interim MES bridge", never "TypeScript forge-mes".
@@ -2050,7 +2050,7 @@ flowchart LR
 
 note:
 - CI runs on every push to every branch so checks attach to the commits behind auto-opened PRs; same-repo PRs do not run twice.
-- All four jobs are required checks on `main`, so all four always report. Two of them do their work only when it is relevant: `hub-go` when the branch touches `forge-core/src/go/` or `forge-core/contract/proto/`, `mes-module` when it touches `modules/Forge MES/`, the proto files or the forge-mes manifest. Otherwise the job passes in seconds and says "nothing to check" in its log and summary. The whole branch is compared with `main`, not only the last push, and when the comparison cannot be made the job runs in full (`.github/scripts/changed-paths.sh`).
+- All four jobs are required checks on `main`, so all four always report. Two of them do their work only when it is relevant: `hub-go` when the branch touches `forge-core/src/go/` or `forge-core/contract/proto/`, `mes-module` when it touches `forge-modules/forge-mes/bridge/`, the proto files or the forge-mes manifest. Otherwise the job passes in seconds and says "nothing to check" in its log and summary. The whole branch is compared with `main`, not only the last push, and when the comparison cannot be made the job runs in full (`.github/scripts/changed-paths.sh`).
 
 ---
 
@@ -2162,7 +2162,7 @@ note:
 - The repository runs its own MDEMG instance (a local, graph-backed project memory) with Jiminy as the governance layer; it recalls constraints, corrections and outcomes from a graph built by ingesting the codebase, documentation included.
 - **The repository's documents are the authority (A-12, owner 2026-11-17).** Where Jiminy guidance disagrees with them, follow the documents; the disagreement is a defect in MDEMG and is reported to the mdemg agent, not worked around here (FB-126).
 - The J17 handshake: identify by session, request the constraints for the task at hand, acknowledge them, act under enforcement, report the outcome.
-- The repository's own `CLAUDE.md` is what every coding agent reads first: what Forge is, why it is built, its goal, the documents to read, the architecture rules and the workflow. The interim MES bridge has one of its own under `modules/Forge MES/`.
+- The repository's own `CLAUDE.md` is what every coding agent reads first: what Forge is, why it is built, its goal, the documents to read, the architecture rules and the workflow. The interim MES bridge has one of its own under `forge-modules/forge-mes/bridge/`.
 - The **PreToolUse hook** enforces constraints deterministically at each tool call, whether or not the agent has read anything; a blocked action is the protocol working.
 - Models: the local llama-server model `mdemg-llm-v1`; no cloud model, ever (A-10).
 - This is problem P-7 applied to the engineering platform itself: the more AI assistance, the more the contracts and the workflow must be machine-enforced.

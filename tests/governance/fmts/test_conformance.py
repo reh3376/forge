@@ -134,7 +134,7 @@ class TestTheKitsOwnParts:
             ("src/forge/adapters/forge_wms", "forge.adapters.forge_wms.adapter"),
             ("src/forge/modules/ot/", "forge.modules.ot.adapter"),
             ("src/wms", None),
-            ("modules/Forge MES/backend/src", None),
+            ("forge-modules/forge-mes/bridge/backend/src", None),
             ("src/forge/adapters/not-a-package", None),
             ("../outside", None),
         ],

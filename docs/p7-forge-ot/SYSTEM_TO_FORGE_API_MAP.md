@@ -1,6 +1,6 @@
 # system.* → forge.* API Mapping Reference
 
-> **Rename notice (2026-10-15):** `whk-mes` was renamed `forge-mes` and the application was migrated into this repo as `modules/Forge MES` (backend + frontend). References to whk-mes below are historical and left unchanged.
+> **Rename notice (2026-10-15):** `whk-mes` was renamed `forge-mes` and the application was migrated into this repo as `forge-modules/forge-mes/bridge` (backend + frontend). References to whk-mes below are historical and left unchanged.
 
 **Version**: 1.0.0
 **Phase**: P7 OT Module — Phase 6 (Script Migration)
