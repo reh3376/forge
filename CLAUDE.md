@@ -49,7 +49,7 @@ These documents are the authority (A-12). Where Jiminy or MDEMG guidance injecte
 
 1. Develop on `reh3376_dev01`. One backlog item per pull request.
 2. Before every push:
-   - the documents match the code: `docs/WHERE-WE-ARE.md` (status date, last merged PR, pick-up point, numbers), `BACKLOG.md`, the roadmap, the README counts;
+   - the documents match the code: `docs/WHERE-WE-ARE.md` (status date, last merged PR, pick-up point, numbers), `BACKLOG.md`, the roadmap, and the two READMEs (the root one and `forge-core/README.md` are orientation: they link down and carry no counts);
    - both tracks of the tutorial are reviewed against the change and updated, then `make sync-tutorial-embed`, `make verify-tutorial-embed` and `make check-tutorial-build`. The tutorial's opening `Last verified` line carries the date and the last merged PR of every push (a test checks it against `docs/WHERE-WE-ARE.md` and the history). The tutorial must describe the code as it is
    - the full test suite passes (`uv run pytest -q`, `uv run ruff check .` and `uv run ruff format --check .`, over the whole repository as CI runs them, and the Go and bridge checks when those areas changed);
    - `gitleaks` is clean on the commits.
