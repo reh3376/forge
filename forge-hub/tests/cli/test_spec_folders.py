@@ -55,7 +55,7 @@ def test_the_listing_names_the_framework_and_sees_every_spec() -> None:
     for row in rows:
         by_framework[row["framework"]] = by_framework.get(row["framework"], 0) + 1
     assert by_framework == {
-        "facts": 9, "fats": 28, "fmts": 9, "ftts": 1, "futs": 17, "fvts": 2, "lists": 6,
+        "facts": 9, "fats": 28, "fmts": 9, "ftts": 1, "futs": 16, "fvts": 1, "lists": 6,
     }  # fmt: skip
     hub_file = hub_fxts.specs_dir("fats") / "healthz.json"
     assert governance.framework_dir_of(hub_file).name == "fats"

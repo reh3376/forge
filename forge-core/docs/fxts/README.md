@@ -114,8 +114,8 @@ forge governance stamp forge-modules/forge-wms/fxts/facts/forge-wms.facts.json \
 forge governance approve forge-modules/forge-wms/fxts/facts/forge-wms.facts.json --by reh3376
 
 # Validate a spec against the schema version it declares, or a named one
-forge governance validate-spec forge-modules/forge-ot/fxts/fvts/forge-ot.fvts.json
-forge governance validate-spec forge-modules/forge-ot/fxts/fvts/forge-ot.fvts.json --schema-version 0.1.0
+forge governance validate-spec forge-hub/fxts/fvts/forge-hub.fvts.json
+forge governance validate-spec forge-hub/fxts/fvts/forge-hub.fvts.json --schema-version 0.1.0
 
 # Schema versions: list them, compare two, release an edited schema, move a spec forward
 forge governance schemas
@@ -129,7 +129,7 @@ forge governance schema-approve fmts 0.3.0 --by reh3376
 # Run one framework's checks on one spec: a spec file, or its id looked up in the
 # framework's spec directory (endpoint path, adapter_id, view_id, transport_id, module_id)
 forge governance run facts forge-wms
-forge governance run fvts forge-ot-views --format json --output reports/fvts-forge-ot.json
+forge governance run fvts forge-hub-views --format json --output reports/fvts-forge-hub.json
 forge governance run ftts grpc-hardened-transport
 forge governance run fmts path/to/module.fmts.json # the module requirements; skipped checks are listed
 forge governance run fats /v1/health --live        # live checks: FATS, FACTS, FTTS
@@ -183,8 +183,8 @@ Every FxTS framework follows the same structure:
 | [FOTS](FOTS.md) | Forge Observability Test Specification | Pipeline health and SLOs | Soft-fail | Planned |
 | [FPTS](FPTS.md) | Forge Performance Test Specification | Throughput and latency benchmarks | Soft-fail | Planned |
 | [FHTS](FHTS.md) | Forge Hash Test Specification | Cross-cutting hash integrity and AI agent governance | Hard-fail | Implemented |
-| [FVTS](FVTS.md) | Forge View Test Specification | Module ↔ forge-display contract: points, objects (collections with a schema), alarms, actions, surfaces, render profiles | Hard-fail | Schema 0.2.0 + runner + reference renderer; 2 specs: the hub's own (approved) and the plant-floor reference (awaiting the owner, FB-078) |
-| [FUTS](FUTS.md) | Forge UI Test Specification | What a screen is made of: widget specs and view documents (laid-out screens) | Hard-fail | Schema 0.2.0 + runner; 17 specs (twelve widgets, the hub's four standard screens, one reference view document); nothing renders them yet (FB-181) |
+| [FVTS](FVTS.md) | Forge View Test Specification | Module ↔ forge-display contract: points, objects (collections with a schema), alarms, actions, surfaces, render profiles | Hard-fail | Schema 0.2.0 + runner + reference renderer; 1 spec: the hub's own (approved). The framework's tests use a sample fermenter contract kept as a test fixture, which is no module's spec (FB-078) |
+| [FUTS](FUTS.md) | Forge UI Test Specification | What a screen is made of: widget specs and view documents (laid-out screens) | Hard-fail | Schema 0.2.0 + runner; 16 specs (twelve widgets, the hub's four standard screens); a reference view document is a test fixture; nothing renders them yet (FB-181) |
 | [FMTS](FMTS.md) | Forge Module Test Specification | The requirements every module meets: the baseline, the time contract, references to its other specs, waivers (`docs/decisions/forge-module-requirements.md`, D-12) | Hard-fail | Schema + Runner + conformance kit implemented; 9 specs, 8 approved (the interim MES bridge is pending, FB-155) |
 | [FTTS](FTTS.md) | Forge Transport Test Specification | The transport between a hub and every module: wire format, RPCs, errors | Hard-fail | Schema + Runner implemented; 1 spec, hashed and approved 2026-11-18; the signed transport contract is not built (D-15, FB-164) |
 
@@ -223,7 +223,7 @@ forge-core/src/python/forge_core/fxts/
 
 Signed by the owner on 2026-11-18: [`docs/decisions/fxts-framework-baseline.md`](../../../docs/decisions/fxts-framework-baseline.md) (D-14), ten requirements, F-1 to F-10. A framework is either **planned** (a documentation page that says so; no code, no specs) or it meets the whole baseline. In force today:
 
-- **Every spec carries a hash** (F-4). The 28 FATS specs and the FTTS spec were stamped on 2026-11-18, and the owner approved them the same day. Two specs await approval: `forge-mes.fmts.json` (FB-155) and `forge-ot.fvts.json` (FB-078).
+- **Every spec carries a hash** (F-4). The 28 FATS specs and the FTTS spec were stamped on 2026-11-18, and the owner approved them the same day. One spec awaits approval: `forge-mes.fmts.json` (FB-155).
 - **Every run gives two verdicts for it**, in every framework, from the shared runner: `<framework>:hash-verified` fails when the spec's content does not match its recorded hash, `<framework>:hash-approved` when the owner has not approved it. A spec with no hash fails both.
 - **Every spec lives in its framework's `specs/` directory** and is listed by `forge governance specs` (F-5). There is no other place for a spec.
 

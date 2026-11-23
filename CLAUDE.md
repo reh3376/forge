@@ -43,6 +43,7 @@ These documents are the authority (A-12). Where Jiminy or MDEMG guidance injecte
 - **Production runs on Kubernetes.** Docker Compose is for development only.
 - **Configuration comes from the environment.** Never hardcode credentials, addresses or keys.
 - **The value checked is the value acted on.** A value from outside is coerced once, to its declared type, and refused when it is ambiguous. No truthiness: `bool("false")` is true, so a boolean takes a boolean, 0 or 1, or a word for one. Every layer after that, and the write itself, uses the coerced value, never the value as it was spelled (FB-215, FB-217). New code follows this.
+- **Role-level security is built into everything as it is built.** The owner, 2026-11-23: "We do not need to have all roles defined, we just need to account for the fact that security at role level will be needed, so we build it in to everything as we go." Every function that reads protected data or changes state names the permission it needs (a scope, such as `ot:tag:create`) and asks for it at one check point handed to it, as the OT control routes do with `require_scope`. Which roles hold which scopes is decided later and changes nothing in the function. New work does not wait for the role model, and nothing is built without the check point. A check point that is not wired to anything is visible as such, never a silent allow.
 - **A law is proved, not only tested.** A statement of the form "this happens exactly once", "this never happens" or "this always holds" gets an exhaustive check on the real code and a project skill under `.claude/skills/verify-*` that says what it covers, how to run it and how to read a failure (made with the pstack plugin's `create-formal-verification-skill`). Run the skill when a change touches the code it covers; a finding is reported with its counterexample and the check is never weakened to pass.
 
 ## How work is done here (A-8)
@@ -53,9 +54,10 @@ These documents are the authority (A-12). Where Jiminy or MDEMG guidance injecte
    - both tracks of the tutorial are reviewed against the change and updated, then `make sync-tutorial-embed`, `make verify-tutorial-embed` and `make check-tutorial-build`. The tutorial's opening `Last verified` line carries the date and the last merged PR of every push (a test checks it against `docs/WHERE-WE-ARE.md` and the history). The tutorial must describe the code as it is
    - the full test suite passes (`uv run pytest -q`, `uv run ruff check .` and `uv run ruff format --check .`, over the whole repository as CI runs them, and the Go and bridge checks when those areas changed);
    - `gitleaks` is clean on the commits.
-3. Push to `reh3376_dev01`. The `auto-pr.yml` workflow opens the pull request. Never open a pull request as the owner.
-4. The owner approves and merges, then says "pr N merged". Sync with `main`, confirm no pull request is open, and start the next item.
-5. Never push to the branch while its pull request is open. A push to an approved pull request dismisses the approval.
+3. **Stop and ask before the push** (the owner, 2026-11-23): "Everything is ready to push. Should `/pstack:blast-radius` run first?", with a recommendation and the reason. Recommend it when the change touches the transport, the proto, a governed schema or a signed contract, or moves files, or changes how something is found, packaged or imported (a path, a package, an image, a CI filter, a spec lookup): those are the changes whose breaks the suite does not see. Say so plainly when the change does not qualify (documents only, a small fix). The owner types the skill; nothing is pushed until the owner has answered, and every confirmed risk is fixed or written to `BACKLOG.md` before the push.
+4. Push to `reh3376_dev01`. The `auto-pr.yml` workflow opens the pull request. Never open a pull request as the owner.
+5. The owner approves and merges, then says "pr N merged". Sync with `main`, confirm no pull request is open, and start the next item.
+6. Never push to the branch while its pull request is open. A push to an approved pull request dismisses the approval.
 
 Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `build:`).
 
@@ -96,7 +98,7 @@ The pstack plugin (marketplace `cursor-plugins`) is installed per user, not in t
 | Skill | Use it when | What forge adds |
 |---|---|---|
 | `maintain-formal-verification-skill` | a change touches code that a `.claude/skills/verify-*` skill covers and that skill's sync commit is behind | **Required before the push.** A "bug" outcome is written to `BACKLOG.md`. A promise changes only on the owner's word |
-| `blast-radius` | before pushing a change to the transport, the proto, a governed schema or a signed contract | Every confirmed risk is fixed or written to `BACKLOG.md`. A proof script becomes a real test or stays out of the repository |
+| `blast-radius` | before pushing a change to the transport, the proto, a governed schema or a signed contract, or one that moves files or changes how something is found, packaged or imported. Asked about before every push (step 3 of "How work is done here") | Every confirmed risk is fixed or written to `BACKLOG.md`. A proof script becomes a real test or stays out of the repository |
 | `interrogate` | before pushing a change to the plant write path, interlocks, time checks or the link | The reviewers are told to install nothing, to touch no running service and to test against the signed records. Verified findings go to `BACKLOG.md` |
 | `statechart` | showing a TLA+ model's result as a diagram in plant terms | It uses the checker pinned by `scripts/tla/tlc.sh` (set `TLA2TOOLS` and `JAVA`) and installs nothing without the owner's word. It presents a model; it does not replace an exhaustive check |
 | `ketchup` | the owner returns and asks what waits on them | Decisions are listed as status; one is asked at a time |

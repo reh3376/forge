@@ -111,15 +111,13 @@ def test_this_change_is_replaced_once_the_change_is_merged() -> None:
     assert after is not None
     if int(after) == 0:
         return  # the merge commit itself: the text inside it was written before the merge
-    stale = []
-    for item in pending:
-        number = int(item.split("-")[1])
-        named = _git(
-            "log", latest, "--no-merges", "-E", f"--grep=FB-0*{number}([^0-9]|$)", "--format=%h"
-        )
-        if named and named.strip():
-            stale.append(item)
+    # An entry is overdue when it was already merged saying so: the closed log inside the
+    # latest merge has the same row. An item named by older commits is not overdue for that
+    # (FB-078 was named for weeks before it was closed).
+    merged_log = _git("show", f"{latest}:BACKLOG-DONE.md") or ""
+    merged_pending = {item for item, cells in _cells(merged_log).items() if cells[3] == PENDING}
+    stale = sorted(set(pending) & merged_pending)
     assert not stale, (
-        f"{stale} still say '{PENDING}', and a commit that names them is already merged: "
-        "write the commit and the pull request in the By column"
+        f"{stale} were merged saying '{PENDING}': write the commit and the pull request in the "
+        "By column"
     )

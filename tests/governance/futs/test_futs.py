@@ -10,7 +10,8 @@ from __future__ import annotations
 import copy
 import json
 import shutil
-from typing import TYPE_CHECKING, Any
+from pathlib import Path
+from typing import Any
 
 import pytest
 from jsonschema import Draft202012Validator
@@ -24,10 +25,8 @@ from forge_core.fxts.shared.runner import (
     add_spec_hash,
     approve_spec_hash,
     check_schema_runner_parity,
+    verify_spec_hash,
 )
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 PASS, FAIL, SKIP = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.SKIP
 SCHEMA = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
@@ -37,7 +36,7 @@ SPEC_FILES = locations.spec_files("futs", "*.futs.json")
 WIDGETS = sorted(
     p.name.removesuffix(".widget.futs.json") for p in SPEC_FILES if ".widget." in p.name
 )
-VIEW = "forge-ot-ferm-overview"
+VIEW = "reference-ferm-overview"
 
 #: The twelve the owner chose on 2026-11-20.
 FIRST_WIDGETS = [
@@ -58,8 +57,14 @@ ALLOWED_FAILURES: dict[str, frozenset[str]] = {}
 NOT_RUN: dict[str, frozenset[str]] = {VIEW: frozenset({"futs:expressions"})}
 
 
+#: The reference view document: a sample for these tests, not a governed file (FB-078).
+FIXTURES = Path(__file__).parent / "fixtures"
+
+
 def _load(name: str) -> dict[str, Any]:
-    return json.loads(locations.spec_path("futs", name).read_text(encoding="utf-8"))
+    fixture = FIXTURES / name
+    path = fixture if fixture.is_file() else locations.spec_path("futs", name)
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def _copy_specs(target: Path) -> None:
@@ -87,7 +92,8 @@ def runner() -> FUTSRunner:
 
 @pytest.fixture
 def view() -> dict[str, Any]:
-    return _load(f"{VIEW}.view.futs.json")
+    # The fixture carries no approval; a test signs it as the owner would a real one
+    return sign(_load(f"{VIEW}.view.futs.json"))
 
 
 @pytest.fixture
@@ -136,7 +142,7 @@ class TestSchemaAndParity:
 class TestTheSpecs:
     def test_the_first_widgets_are_the_owners_twelve(self) -> None:
         assert WIDGETS == FIRST_WIDGETS
-        assert len(SPEC_FILES) == len(FIRST_WIDGETS) + 1 + len(HUB_SCREENS)
+        assert len(SPEC_FILES) == len(FIRST_WIDGETS) + len(HUB_SCREENS)
 
     @pytest.mark.parametrize("path", SPEC_FILES, ids=lambda p: p.name.split(".")[0])
     async def test_every_spec_meets_the_runner(self, runner: FUTSRunner, path: Path) -> None:
@@ -414,3 +420,17 @@ class TestBindingACollection:
 def test_the_reference_view_is_inside_the_repository() -> None:
     view = _load(f"{VIEW}.view.futs.json")["view"]
     assert (REPO_ROOT / view["fvts_spec"]).is_file()
+
+
+def test_the_reference_fixture_is_a_sample_nobody_approved() -> None:
+    """The reference view document is a test fixture (FB-078). Its stored hash covers its
+    content, so the file cannot rot unnoticed, and it never claims the owner's approval."""
+    document = json.loads((FIXTURES / f"{VIEW}.view.futs.json").read_text(encoding="utf-8"))
+    verified, message = verify_spec_hash(document)
+    assert verified is True, message
+    assert document["integrity"]["hash_state"] == "pending_review"
+    assert not document["integrity"]["approved_by"]
+    assert (REPO_ROOT / document["view"]["fvts_spec"]).is_file()
+    assert VIEW not in {path.name.split(".")[0] for path in SPEC_FILES}, (
+        "it is a governed file again"
+    )

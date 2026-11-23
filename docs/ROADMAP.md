@@ -148,7 +148,7 @@ FVTS v0.1.0 is in `main`: schema, runner (19 checks, schema-runner parity), rend
 |---|---|---|
 | Resolve the FVTS open decisions (D-4) | Decision needed | Name, roles (FB-075), write authority per profile, mobile acknowledgement, rate ceilings, wire encoding/browser transport, configured-layout format. Server-side enforcement is done (FB-074). |
 | FB-077 `fvts_runner.py` with the 12 planned checks; golden-message conformance tests under `tests/governance/fvts` | **Done 2026-10-16** | 19 checks, parity asserted by test; gate on via `test_ot_module_views.py`. |
-| FB-078 replace the invented fermenter points with real OT tags; owner approves the hash | Not started — **decided 2026-10-16** (OT stays the reference spec) | After FB-077 and FB-075. |
+| FB-078 the invented fermenter points | **Done 2026-11-23, another way** (the owner: no tags are defined in the repository) | The sample is a test fixture of the framework and no module's governed spec; this sets aside the decision of 2026-10-16 that OT stays the reference spec. |
 | Design-token set (`forge://design/tokens/v1`) with reserved `alarm.*` namespace (ISA-101) | Not started | |
 | Renderer spike: one slice rendered in two renderers (candidates per the Rust research: Slint or egui for operator HMI, Dioxus for desktop apps) + Slint licence check | Not started | |
 | forge-display module scaffold (Go-hosted contract services, renderer packaging) | Not started | After the spike. |
