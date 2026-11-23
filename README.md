@@ -122,6 +122,7 @@ FxTS is specification-first governance. A spec says what must exist, and the cod
 uv run forge governance specs             # every governed file: its state, its hash, who approved it
 uv run forge governance specs --pending   # what awaits the owner
 uv run forge governance schemas           # every schema version and how many specs are written against it
+uv run forge governance index             # regenerate forge-core's index of its governed files
 uv run forge governance run facts <id>    # run one framework's checks on one spec
 ```
 
