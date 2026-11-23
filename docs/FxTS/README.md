@@ -241,6 +241,19 @@ Signed by the owner on 2026-11-18: [`docs/decisions/fxts-framework-baseline.md`]
 6. Add to CI: include in the framework's test suite
 7. Stamp it (`forge governance stamp <path> --by <you> --reason <why>`); the owner approves it with `forge governance approve <path> --by <owner>`
 
+## Designing a spec, a schema or a framework: the checklist
+
+The steps above are how a spec is filed. These four are how one is designed (the owner, 2026-11-22). They apply to a new spec, a change to a schema, and a new framework. They are held in order.
+
+1. **Shape first.** Decide the data before any rule or runner: the entities, their fields, and how each will be read and by whom. Trace every way the spec is used (the runner, the CLI listing, the generated index, the module that carries it). Ask what another actor may change at the same time; where the answer is not "nothing", give each actor its own part.
+2. **Make the wrong thing impossible to write.** Put the domain in the structure, so that an invalid spec does not validate: a closed list over a free string, one field over two that must agree, a state with its allowed moves over a set of flags. A rule the schema can state is in the schema; the runner holds only what a schema cannot say. Do not force it: a plain field stays plain when its meaning is clear and local.
+3. **Check once, at the edge.** A spec is validated where it enters: against the schema version it declares, by the framework's runner. A value from outside is coerced once to its declared type and refused when it is ambiguous, and the coerced value is what is acted on. Code behind that edge trusts what it was handed.
+   - *The exception:* on the path of a write to a process controller, validation, the review gate, the interlocks and authorization are separate layers on purpose. None of them is a repeat of another, and none is removed as one.
+4. **When a requirement changes, revise the shape.** Ask what the spec would be had the requirement been there from the start, and compare it with what exists. Do not add a field, a flag or a special case beside a shape that no longer fits.
+   - *What follows is a proposal, not an edit:* a schema changes by release (`forge governance schema-release`), a signed record by the owner's amendment, the proto by addition within a major version. Name what the new shape contradicts, and the owner decides.
+
+A new framework also meets the baseline of [What every framework provides](#what-every-framework-provides).
+
 ## Relationship to UxTS (MDEMG)
 
 | UxTS Framework | FxTS Adaptation | Key Differences |
