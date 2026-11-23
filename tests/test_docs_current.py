@@ -8,10 +8,13 @@ checked against each other and against the repository's history here.
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 from datetime import date, timedelta
 from pathlib import Path
+
+import pytest
 
 REPO = Path(__file__).resolve().parents[1]
 TUTORIAL = (REPO / "docs" / "tutorial.md").read_text(encoding="utf-8")
@@ -69,8 +72,35 @@ def allowed_numbers(merged: list[tuple[int, str]], work_after_newest: int) -> se
     return {newest} | ({merged[1][0]} if len(merged) > 1 else set())
 
 
+# The branch the state documents are kept on (CLAUDE.md, "How work is done here").
+DEVELOPMENT_BRANCH = "reh3376_dev01"
+
+
+def foreign_branch(environment: dict[str, str]) -> str | None:
+    """The head branch of the pull request under test, when it is not the development branch.
+
+    GitHub sets ``GITHUB_HEAD_REF`` on a pull request run only. A branch made by someone
+    else (the dependency bot) carries the documents of the ``main`` it was cut from or
+    last merged, and nobody maintains them there, so it cannot name the newest pull
+    request and is not asked to (BACKLOG FB-214: PR 140 failed on exactly this once the
+    job had the full history). ``main`` and the development branch are always checked.
+    """
+    head = environment.get("GITHUB_HEAD_REF", "").strip()
+    return head if head and head != DEVELOPMENT_BRANCH else None
+
+
+def _skip_on_a_foreign_branch() -> None:
+    other = foreign_branch(dict(os.environ))
+    if other is not None:
+        pytest.skip(
+            f"pull request from '{other}', not from '{DEVELOPMENT_BRANCH}': the state documents "
+            "are not maintained on that branch; the check runs on main after the merge"
+        )
+
+
 def test_the_last_merged_pull_request_is_the_one_in_history() -> None:
     """The number in both documents is the newest pull request merged into this history."""
+    _skip_on_a_foreign_branch()
     merged = _merged()
     if not merged:
         return
@@ -84,6 +114,13 @@ def test_the_last_merged_pull_request_is_the_one_in_history() -> None:
     )
 
 
+def test_which_branches_are_asked() -> None:
+    assert foreign_branch({}) is None  # a local run, or a push to main
+    assert foreign_branch({"GITHUB_HEAD_REF": ""}) is None
+    assert foreign_branch({"GITHUB_HEAD_REF": DEVELOPMENT_BRANCH}) is None
+    assert foreign_branch({"GITHUB_HEAD_REF": "dependabot/npm/next-15"}) == "dependabot/npm/next-15"
+
+
 def test_what_the_documents_may_name() -> None:
     history = [(122, "b" * 40), (121, "a" * 40)]
     assert allowed_numbers(history, work_after_newest=1) == {122}  # a push: must be current
@@ -93,6 +130,7 @@ def test_what_the_documents_may_name() -> None:
 
 
 def test_the_status_date_is_not_older_than_the_newest_commit() -> None:
+    _skip_on_a_foreign_branch()
     newest = _git("log", "-n", "1", "--format=%cs").strip()
     if not newest:
         return
