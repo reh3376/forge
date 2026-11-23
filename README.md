@@ -199,7 +199,7 @@ make check-tutorial-build               # its verification contracts and every l
 | [`docs/WHERE-WE-ARE-GOING.md`](docs/WHERE-WE-ARE-GOING.md) | The direction and the order of work |
 | [`docs/VISION.md`](docs/VISION.md) | The finished product and the problems it solves |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | The decisions in force, and the plan by workstream |
-| [`BACKLOG.md`](BACKLOG.md) | Every known problem, by a stable id (FB-nnn) |
+| [`BACKLOG.md`](BACKLOG.md) | Every known open problem, by a stable id (FB-nnn). Finished entries are in [`BACKLOG-DONE.md`](BACKLOG-DONE.md), each with the commit that fixed it |
 | [`docs/decisions/`](docs/decisions) | The signed decision records. A signed record is changed only by the owner |
 | [`docs/PRINCIPLES.md`](docs/PRINCIPLES.md) | Design principles and technology decisions |
 | [`forge-core/docs/fxts/`](forge-core/docs/fxts) | A page per framework, and the summary |

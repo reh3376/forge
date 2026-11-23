@@ -178,19 +178,27 @@ _THIRD_PARTY = frozenset(
 
 
 def load_backlog(repo_root: Path) -> dict[str, bool]:
-    """Read ``BACKLOG.md`` into ``{item id: is open}``.
+    """Read the backlog into ``{item id: is open}``.
 
-    An item is closed when its description starts with ``**Done`` or ``**Fixed``.
-    A missing file gives an empty mapping, so every waiver then fails as unknown.
+    Open work is in ``BACKLOG.md``; a finished entry is moved to ``BACKLOG-DONE.md``
+    (BACKLOG FB-247). Every row of the closed log is closed. A row of ``BACKLOG.md`` whose
+    description starts with ``**Done`` or ``**Fixed`` is closed too: it should have been
+    moved, and it is still not open. Missing files give an empty mapping, so every waiver
+    then fails as unknown.
     """
-    path = repo_root / "BACKLOG.md"
-    if not path.is_file():
-        return {}
     items: dict[str, bool] = {}
-    for line in path.read_text(encoding="utf-8").splitlines():
-        match = BACKLOG_ROW.match(line)
-        if match:
-            items[match.group(1)] = not match.group(2).startswith(BACKLOG_CLOSED)
+    closed_log = repo_root / "BACKLOG-DONE.md"
+    if closed_log.is_file():
+        for line in closed_log.read_text(encoding="utf-8").splitlines():
+            match = BACKLOG_ROW.match(line)
+            if match:
+                items[match.group(1)] = False
+    path = repo_root / "BACKLOG.md"
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            match = BACKLOG_ROW.match(line)
+            if match:
+                items[match.group(1)] = not match.group(2).startswith(BACKLOG_CLOSED)
     return items
 
 
