@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 166 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 167 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -21,7 +21,7 @@ note:
 
 <!-- .slide: id="landing-fork" -->
 
-## Choose Your Path
+## The Two Paths
 
 Two walkthroughs branch from here.
 
@@ -29,12 +29,12 @@ Two walkthroughs branch from here.
 |---|---|---|
 | **For** | Engineers and technical PMs who will build on or inside Forge | Operators, supervisors and managers who will run a Forge site or decide from it |
 | **Depth** | ~100 min, engineering-dense, code pointers throughout | ~50 min, plain language, no code required |
-| **Covers** | contract, storage, governance, OT module and the three layers of process control, modules and SDK, context and curation, security, one clock across the platform, the contributor workflow, where we are | what Forge is for, how data flows, the hub you run, your systems as spokes, the plant floor and the layers of control above it, context and decisions, governance, screens, roles, one clock, operations |
+| **Covers** | contract, storage, governance, OT module and the three layers of process control, modules and SDK, context and curation, security, one clock across the platform, the contributor workflow, the current state | what Forge is for, how data flows, the hub in operation, a site's systems as modules, the plant floor and the layers of control above it, context and decisions, governance, screens, roles, one clock, operations |
 | **Next** | Continue below ↓ (Contents → F1 Opening) | [Jump to the End User path →](#end-user-path) |
 
 note:
 - The dev path is the default: keep scrolling. The end-user path is complete on its own and never sends an operator into the dev path for a topic.
-- The left-margin sidebar lists every section and every diagram; clicking an acronym jumps to the glossary at the end, and a "Return to Previous" button brings you back.
+- The left-margin sidebar lists every section and every diagram; clicking an acronym jumps to the glossary at the end, and a "Return to Previous" button returns to the place left.
 
 ---
 
@@ -44,19 +44,19 @@ note:
 
 **Software Dev Path**: **[F1 Opening](#f1--opening)** → **[F2 The Hub ↔ Spoke Contract](#f2--the-hub-spoke-contract)** → **[F3 Storage](#f3--storage-and-the-hubs-databases)** → **[F4 Spec-First Governance](#f4--governance-fxts)** → **[F5 The Plant-Floor Module](#f5--the-forge-ot)** → **[F6 Modules, Module Builder, forge-display](#f6--modules-the-sdk-and-forge-display)** → **[F7 Context, Curation, Decisions](#f7--context-curation-and-decisions)** → **[F8 Security, Identity, Federation](#f8--security-identity-and-federation)** → **[F9 One Clock](#f9--one-clock)** → **[F10 Contributing](#f10--contributing)** → **[F11 Conclusion](#f11--conclusion)**
 
-**End User Path**: **[U1 Start Here](#end-user-path)** → **[U2 How Data Flows](#u2--how-data-flows)** → **[U3 The Hub You Run](#u3--the-hub-you-run)** → **[U4 Your Systems as Modules](#u4--your-systems-as-spokes)** → **[U5 The Plant Floor](#u5--the-plant-floor)** → **[U6 Context, Products, Decisions](#u6--context-products-and-decisions)** → **[U7 Governance for Users](#u7--governance-for-users)** → **[U8 Screens](#u8--screens)** → **[U9 Identity, Roles, Credentials](#u9--identity-roles-and-credentials)** → **[U10 One Clock](#u10--one-clock)** → **[U11 Operations](#u11--operations)** → **[U12 Where to Go Next](#u12--where-to-go-next)**
+**End User Path**: **[U1 Start Here](#end-user-path)** → **[U2 How Data Flows](#u2--how-data-flows)** → **[U3 The Hub in Operation](#u3--the-hub-you-run)** → **[U4 A Site's Systems as Modules](#u4--your-systems-as-spokes)** → **[U5 The Plant Floor](#u5--the-plant-floor)** → **[U6 Context, Products, Decisions](#u6--context-products-and-decisions)** → **[U7 Governance for Users](#u7--governance-for-users)** → **[U8 Screens](#u8--screens)** → **[U9 Identity, Roles, Credentials](#u9--identity-roles-and-credentials)** → **[U10 One Clock](#u10--one-clock)** → **[U11 Operations](#u11--operations)** → **[U12 Where to Go Next](#u12--where-to-go-next)**
 
-| § | Section | Target | What you leave with |
+| § | Section | Target | What the reader leaves with |
 |---|---|---:|---|
 | [F1](#f1--opening) | Opening: definition, thesis, the twelve problems, the vocabulary, the finished system, one value end to end, honest state, the key docs | ~15 min | the shape of the platform and how to read its documents |
 | [F2](#f2--the-hub-spoke-contract) | The hub ↔ module contract: `AdapterService`, `ContextualRecord`, transport, ingest, and the signed transport contract | ~14 min | what crosses the hub boundary, how, and what it must guarantee |
 | [F3](#f3--storage-and-the-hubs-databases) | Storage: hub-owned databases, routing, migrations, Forge-issued credentials | ~8 min | where data lands and who may touch it |
-| [F4](#f4--governance-fxts) | **Spec-first governance** (headline): the four layers, the FxTS family, what every framework provides, hashing and the owner's approval, what every module must do, governed lists | ~20 min | why nothing changes silently, and what your module will be held to |
+| [F4](#f4--governance-fxts) | **Spec-first governance** (headline): the four layers, the FxTS family, what every framework provides, hashing and the owner's approval, what every module must do, governed lists | ~20 min | why nothing changes silently, and what every module is held to |
 | [F5](#f5--the-forge-ot) | The plant-floor module (forge-ot): tags, alarms, the write defense chain, changeover, one clock, the three-layer process control framework | ~15 min | how the plant floor is reached safely, and what will sit above the PLC |
 | [F6](#f6--modules-the-sdk-and-forge-display) | Modules: kinds and names, what a module is made of, the order of building, the template, forge-display and its designer, integration modules built on site | ~14 min | how capability is built, shown, and extended at an installation |
 | [F7](#f7--context-curation-and-decisions) | Context, curation and decisions | ~8 min | how a value becomes decision-quality |
 | [F8](#f8--security-identity-and-federation) | Security, identity and federation | ~8 min | roles per hub, credentials, the hub hierarchy, repo posture |
-| [F9](#f9--one-clock) | One clock: why every timestamp must agree, the time authority at every level, what a record carries, measuring, declaring, the time contract with every counterpart, and failing closed | ~10 min | how time is kept the same from the top hub to a PLC, and how to hold your code to it |
+| [F9](#f9--one-clock) | One clock: why every timestamp must agree, the time authority at every level, what a record carries, measuring, declaring, the time contract with every counterpart, and failing closed | ~10 min | how time is kept the same from the top hub to a PLC, and how code is held to it |
 | [F10](#f10--contributing) | Contributing: setup, the workflow, the rules that bind, where things go, adding a module, deciding with the owner | ~12 min | how to land a change, and when to ask |
 | [F11](#f11--conclusion) | Conclusion: honest state, milestones, the decision queue, next | ~6 min | where to go from here |
 
@@ -91,7 +91,7 @@ note:
 - It curates that into **decision-quality data products** with lineage and quality objectives.
 - It renders every operator and management interface **from declarative specifications**.
 
-**Why it is built, in the owner's words (2026-11-17):** "Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business."
+**Why it was built:** the Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business.
 
 **Forge is a dynamic framework, not a fixed product (A-19).** Manufacturing differs from plant to plant even within one sector, so Forge is instantiated for a facility, a site or an enterprise by customization. That build-out is done in the **forge designer**, where users build with tools and widgets that are each governed by a specification. A user builds only within what the specifications allow.
 
@@ -99,7 +99,7 @@ Forge is also a **governed engineering platform**: every contract between compon
 
 note:
 - `docs/VISION.md` §1; decision A-19 in `docs/ROADMAP.md` §1.
-- The vision is written in the present tense about a system that does not fully exist yet. The gap is the work, and "Where We Are Today" says exactly where it is.
+- The vision is written in the present tense about a system that does not fully exist yet. The gap is the work, and "Where Forge Is Today" says exactly where it is.
 
 ---
 
@@ -145,7 +145,7 @@ note:
 
 ---
 
-## The Vocabulary You Need First
+## The Vocabulary First
 
 | Term | What it means in Forge |
 |---|---|
@@ -244,9 +244,9 @@ note:
 
 ---
 
-## Where We Are Today · Honest
+## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 166:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 167:
 
 **Working**
 
@@ -515,7 +515,7 @@ note:
 
 ## The Transport Contract · Signed, Not Built (D-15)
 
-The transport above works, but it was silent on what happens when things go wrong. On 2026-11-18 the owner settled that in sixteen answers (`docs/decisions/transport-contract.md`). Read it before you touch `forge-core/contract/proto` or `forge-hub/src/python/forge_hub/link`.
+The transport above works, but it was silent on what happens when things go wrong. On 2026-11-18 the owner settled that in sixteen answers (`docs/decisions/transport-contract.md`). It is to be read before any change to `forge-core/contract/proto` or `forge-hub/src/python/forge_hub/link`.
 
 | Records going up (the IT half) | Commands going down (the OT half) |
 |---|---|
@@ -526,7 +526,7 @@ The transport above works, but it was silent on what happens when things go wron
 
 **What a command is** (owner, 2026-11-19): only a write to a tag in a process controller (PLC or HMI) that directly affects a process. A message down to a business system is not one. A **business write-back** (a transaction posted to an ERP, an order updated in the MES) follows the IT rule in the other direction: it carries an id, the hub keeps it while the link is down, and it is delivered and confirmed **once and only once**; a minor delay is acceptable and it does not expire as a command does. Lifecycle calls (Configure, Start, Stop, a request to collect) are neither: they are answered or failed within a deadline.
 
-| Rule | What it means for your code |
+| Rule | What it means for the code |
 |---|---|
 | Change | Within `forge.v1` only **add** (optional fields, RPCs, enum values). Never remove, rename or reuse a field number. A breaking change is `forge.v2`, served beside v1; a hub serves two majors. |
 | Agreement | At Register both sides state their contract version, optional features and the limits in force. Use only what both named. |
@@ -789,7 +789,7 @@ note:
 
 Governance is declarative by invariant: quality, lineage, normalization and security rules are specifications, not code paths.
 
-**Every highly repeatable process has an FxTS spec and is built to it** (A-13). If you are about to build something that will be done more than once and no framework fits, that is a finding for `BACKLOG.md`, not a reason to invent an informal format.
+**Every highly repeatable process has an FxTS spec and is built to it** (A-13). When something that will be done more than once is about to be built and no framework fits, that is a finding for `BACKLOG.md`, not a reason to invent an informal format.
 
 note:
 - `forge-core/docs/fxts/README.md` is the summary of this table with a page per framework; a test keeps it true to the code.
@@ -819,7 +819,7 @@ A framework is either **planned** (a page that says so; no code, no specs) or it
 **Changing a schema** is a release, never an edit in place: edit `<framework>.schema.json`, raise the version in its `$id`, run `forge governance schema-release <framework> --summary "..."`, and the owner approves the new version's hash. `forge governance schemas` lists every version; `schema-diff` shows what changed and the step each change needs; `migrate-spec` moves a spec forward. A schema edited without a release fails the suite.
 
 note:
-- Why it exists, in the owner's words: "we need to ensure we are not generating excessive technical debt when building FxTS specs by ensuring these core purposes are met with each new instantiation of a FxTS spec."
+- Why it exists: so that building FxTS specs does not generate excessive technical debt, by ensuring these core purposes are met with each new instantiation of an FxTS spec.
 - Schema rules decided with it: within a major version a schema only gains; patch is wording, minor adds something optional, major adds a required field or removes or narrows anything and marks every spec for review. The owner approves each schema hash. The code is `forge-core/contract/fxts/shared/schemas.py`; the page is `forge-core/docs/fxts/FHTS.md`, "Schema Versions".
 - Every run now gives three verdicts for a spec's standing: `hash-verified`, `hash-approved` and `schema-current`.
 
@@ -972,8 +972,8 @@ forge governance approve <spec.json> --by reh3376   # the owner, on their own wo
 - The FVTS runner has a render-profile baseline and golden messages; a module can only tighten the baseline, never loosen it.
 
 note:
-- When you add a hub route you add a FATS spec; when you add a module you add its FACTS and FMTS specs; when a module exposes a screen it adds an FVTS spec; a new widget gets a FUTS widget spec and a standard screen is a FUTS view document. The gate is where you find out you forgot.
-- After any edit to a spec, `stamp` it. It then awaits the owner. Never write an approval yourself.
+- A new hub route comes with a FATS spec; a new module comes with its FACTS and FMTS specs; when a module exposes a screen it adds an FVTS spec; a new widget gets a FUTS widget spec and a standard screen is a FUTS view document. The gate is where a forgotten one is found.
+- After any edit a spec is stamped (`stamp`). It then awaits the owner. Nobody else writes an approval.
 
 ---
 
@@ -1280,7 +1280,7 @@ Everything that registers with a hub is a module, and every module meets the sam
 - **No existing company is named in this repository** (A-16). A third-party product that an integration module integrates may be named, because the module has to name it.
 
 note:
-- The names changed on 2026-11-18 and 19 during the owner's review of the module specs. If you meet an older name in history or in a document's record of a past decision, it is the same module.
+- The names changed on 2026-11-18 and 19 during the owner's review of the module specs. An older name met in history or in a document's record of a past decision is the same module.
 
 ---
 
@@ -1326,7 +1326,7 @@ Set by the owner on 2026-11-20 (the forge-display design record, D-16). The spec
 | 7 | **The designer** |
 | 8 | **The management modules in Go**, forge-mes first; then the integration builder |
 
-In the owner's words: "the first fully functioning forge module that we must build is the forge-display module. It will be used to build the frontend of the entire forge platform to include the hub UI, therefore it must exist before any other module can be completed."
+The first fully functioning Forge module that must be built is forge-display. It is used to build the frontend of the entire Forge platform, the hub UI included, so it must exist before any other module can be completed.
 
 note:
 - This replaces the older sequence that put the Go SDK and forge-mes before forge-display. `docs/ROADMAP.md` §4 has the backlog item of every step.
@@ -1933,9 +1933,9 @@ note:
 
 ---
 
-## Holding Your Code to It
+## Holding Code to It
 
-| When you … | Do this |
+| When a developer … | What is done |
 |---|---|
 | stamp anything with Forge's own time | `forge_core.clock.utc_now()`; never a naive `datetime.now()` or `utcnow()` |
 | define a model with a datetime field | derive from `OneClockModel` (manufacturing entities already do, through their base) |
@@ -1948,7 +1948,7 @@ note:
 - The tests that hold this are `tests/core/test_clock_gate.py`, `test_clock_offsets.py`, `test_clock_sample.py` and `test_time_governance.py`, and `tests/modules/ot/control/test_connections.py` for the plant floor.
 
 note:
-- A refusal is a first-class outcome, not an exception to swallow: count it, name its cause, show it. That is what `refuse` and the gate do for you.
+- A refusal is a first-class outcome, not an exception to swallow: count it, name its cause, show it. That is what `refuse` and the gate do.
 
 ---
 
@@ -2085,9 +2085,9 @@ note:
 
 ## Where Each Kind of Change Goes
 
-| You want to… | Do this |
+| The aim | What is done |
 |---|---|
-| fix something you found while doing something else | finish the item; add a `BACKLOG.md` row (ID, severity, problem, where, suggested fix) if you did not fix it |
+| fix something found while doing something else | finish the item; add a `BACKLOG.md` row (ID, severity, problem, where, suggested fix) if it was not fixed |
 | add or change a hub route | add or update the FATS spec; the hub test holds both directions |
 | add a module | scaffold with the module builder; write its FACTS spec and its FMTS spec; run `forge governance run facts <module>` and `forge governance run fmts <module>`; the module registers only when its manifest matches the approved FACTS spec |
 | change what crosses the wire | read `docs/decisions/transport-contract.md` first; within `forge.v1` only add; a wire change re-stamps the specs it touches. A proto file lives in three places (`forge-core/contract/proto`, `forge-core/src/go/proto/forge/v1`, the interim MES bridge's `backend/forge-core/contract/proto`): change all three in the same change, keep the Go copy's own `go_package` line, and regenerate. `tests/test_proto_copies.py` fails otherwise. |
@@ -2126,7 +2126,7 @@ note:
 
 ## How a Decision Is Made With the Owner
 
-Some things are not yours to decide: a design that pins the platform in, a name, an approval, a waiver. The pattern, used for every signed record:
+Some things are not a contributor's to decide: a design that pins the platform in, a name, an approval, a waiver. The pattern, used for every signed record:
 
 1. **Survey first.** Write what the code does today as facts, with paths. Most open questions shrink once the facts are on the page.
 2. **Draft a record** in `docs/decisions/`: a status line that says "draft, not approved", statements tagged **[OWNER]**, **[FACT]** or **[PROPOSED]**, and a numbered list of questions.
@@ -2138,7 +2138,7 @@ A signed record is changed only by the owner. When the owner says something afte
 
 note:
 - Five records were made this way between 2026-11-17 and 19: the module requirements, the integration builder, the framework baseline and the transport contract, and the amendments to them.
-- If you find yourself assuming what the owner would want on something that is theirs, stop and ask.
+- A contributor who is assuming what the owner would want, on something that is the owner's, stops and asks.
 
 ---
 
@@ -2177,7 +2177,7 @@ note:
 - Findings fixed or recorded; only the owner approves and signs; passwords never stored; local models only; the hook's denials are final.
 - Routes get FATS specs, modules get FACTS and FMTS specs, screens get FVTS specs, stored shapes get migrations, owner decisions get design records.
 
-**Next**: where we are and where to go.
+**Next**: the current state and where to go.
 
 ---
 
@@ -2280,7 +2280,7 @@ note:
 
 ## Where to Go Next
 
-| If you want to… | Open |
+| To find… | Document |
 |---|---|
 | see the destination in full | `docs/VISION.md` |
 | see what gates the route | `docs/WHERE-WE-ARE-GOING.md` §5 |
@@ -2292,7 +2292,7 @@ note:
 | read a signed decision | `docs/decisions/` |
 | understand why things are the way they are | `docs/PRINCIPLES.md` |
 
-Thank you. **[Return to the landing fork ↑](#landing-fork)** · **[Continue to the End User path ↓](#end-user-path)**
+End of the path. **[Return to the landing fork ↑](#landing-fork)** · **[Continue to the End User path ↓](#end-user-path)**
 
 note:
 - Natural final Q&A anchor. The end-user path follows for anyone who wants the operator's view of the same system.
@@ -2307,18 +2307,18 @@ note:
 
 This track is for the people who will run a Forge site or decide from it: operators, supervisors, planners, maintenance and quality staff, and the managers above them. No code. Plain language. It is complete on its own.
 
-| Section | What you get |
+| Section | What it gives |
 |---|---|
-| [U1 Start Here](#end-user-path) | what Forge is for, the problems it solves for you, what it is not |
+| [U1 Start Here](#end-user-path) | what Forge is for, the problems it solves for a plant, what it is not |
 | [U2 How Data Flows](#u2--how-data-flows) | from a plant system to a screen, in six steps; what happens when a link goes down |
-| [U3 The Hub You Run](#u3--the-hub-you-run) | what is running, how to tell it is healthy, the command line |
-| [U4 Your Systems as Modules](#u4--your-systems-as-spokes) | the kinds of module, the ones that exist, and what their contracts mean to you |
+| [U3 The Hub in Operation](#u3--the-hub-you-run) | what is running, how to tell it is healthy, the command line |
+| [U4 A Site's Systems as Modules](#u4--your-systems-as-spokes) | the kinds of module, the ones that exist, and what their contracts mean to a site |
 | [U5 The Plant Floor](#u5--the-plant-floor) | tags, alarms, writes, changeover, the three layers of control above the PLC |
 | [U6 Context, Products, Decisions](#u6--context-products-and-decisions) | why "area" means one thing, where figures come from, recording a decision |
 | [U7 Governance for Users](#u7--governance-for-users) | what "approved" means and why nothing changes silently |
-| [U8 Screens](#u8--screens) | what you will look at, how your site builds its own screens and integrations, and what you look at today |
+| [U8 Screens](#u8--screens) | what operators will look at, how a site builds its own screens and integrations, and what exists today |
 | [U9 Identity, Roles, Credentials](#u9--identity-roles-and-credentials) | who may do what |
-| [U10 One Clock](#u10--one-clock) | why every timestamp must agree, how Forge keeps it so, what you see and do when a clock is wrong |
+| [U10 One Clock](#u10--one-clock) | why every timestamp must agree, how Forge keeps it so, what an operator sees and does when a clock is wrong |
 | [U11 Operations](#u11--operations) | how a site is run, backed up and upgraded |
 | [U12 Where to Go Next](#u12--where-to-go-next) | documents, asking for a change, returning to the fork |
 
@@ -2329,18 +2329,18 @@ note:
 
 ## What Forge Is, in One Paragraph
 
-Forge sits between everything a plant runs on and the people who need to decide from its data. Every part of it is a **module** attached to one **hub**. Some modules are Forge's own software for a business function: manufacturing execution, the warehouse, maintenance, the network, the historian. Some are **integration modules**, each connecting one outside product you keep, such as your ERP. One talks to the plant floor. Every value that crosses into the hub is checked, stamped with the hub's clock, and tagged with the **context** it belongs to: which site, area and equipment, which lot and work order, which shift and operator, which operating mode. From those records the hub builds **data products** whose figures carry their sources and a stated quality, renders the screens people use from declared contracts, and records the decisions taken on them. A site can keep its existing software and connect it through an integration module, or replace it with a Forge module, one at a time.
+Forge sits between everything a plant runs on and the people who need to decide from its data. Every part of it is a **module** attached to one **hub**. Some modules are Forge's own software for a business function: manufacturing execution, the warehouse, maintenance, the network, the historian. Some are **integration modules**, each connecting one outside product the site keeps, such as its ERP. One talks to the plant floor. Every value that crosses into the hub is checked, stamped with the hub's clock, and tagged with the **context** it belongs to: which site, area and equipment, which lot and work order, which shift and operator, which operating mode. From those records the hub builds **data products** whose figures carry their sources and a stated quality, renders the screens people use from declared contracts, and records the decisions taken on them. A site can keep its existing software and connect it through an integration module, or replace it with a Forge module, one at a time.
 
-The goal, in the owner's words: "Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business."
+The goal: Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business.
 
 note:
 - `docs/VISION.md` §1 in plain words. "Hub" is the Forge server for a site or an area; a "module" is anything attached to it. Older pages say "spoke" or "adapter" for the same thing.
 
 ---
 
-## The Problems It Solves for You
+## The Problems It Solves
 
-| What you live with today | What Forge does about it |
+| What a plant lives with today | What Forge does about it |
 |---|---|
 | A dozen systems, each with its own identifiers, units and clocks; four screens open to answer one question | every system speaks one contract to the hub; every record is one shape with context attached, so the answer is one query |
 | A number on a dashboard that nobody can trace or trust | every figure carries where it came from, what was done to it and the quality it is held to |
@@ -2350,7 +2350,7 @@ note:
 | A site that stops when the link to headquarters drops | each site hub keeps working on its own; audit flows up when the link returns |
 | A contract between two systems changed quietly in a commit nobody read | every contract is hashed; only the owner approves a change; an unapproved change fails before it ships |
 | Data lost whenever a network link drops | every module keeps what it could not send and delivers it, in order, when the link returns |
-| Software that fits the vendor's idea of a plant, not yours | each installation is built out for its own plant in the Forge designer, inside rules that keep it safe and consistent |
+| Software that fits the vendor's idea of a plant, not the plant's own | each installation is built out for its own plant in the Forge designer, inside rules that keep it safe and consistent |
 
 note:
 - `docs/VISION.md` §2 (P-1 to P-12) in the end-user's terms.
@@ -2378,7 +2378,7 @@ note:
 
 ```mermaid
 flowchart LR
-  P["The plant<br/>PLCs and devices · outside products you keep (ERP …)"] --> S["Modules<br/>Forge's own (MES, warehouse, maintenance …) · integration · plant floor"]
+  P["The plant<br/>PLCs and devices · outside products the site keeps (ERP …)"] --> S["Modules<br/>Forge's own (MES, warehouse, maintenance …) · integration · plant floor"]
   S -- "one contract<br/>kept and re-sent if the link drops" --> H["Hub"]
   H --> C["Context attached<br/>site · area · equipment · lot · shift · operator · mode"]
   C --> ST["Stored<br/>time series · records · lineage"]
@@ -2405,12 +2405,12 @@ Plant networks drop. Forge is designed so that a dropped link loses nothing and,
 | What travels | Rule | Why |
 |---|---|---|
 | **Records** going up (readings, events, transactions) | never lost: the module keeps what it could not send and delivers it in order when the link returns; the hub ignores anything it already has | history must be complete |
-| **Commands** going down: writes to a PLC or HMI tag that act on a running process (a setpoint, a start, a recipe write) | never kept: a command that cannot be delivered now is dropped and you are told; it also carries a time limit | a setpoint from two minutes ago must not arrive on a process that has moved on |
-| **Business write-backs** going down (a transaction posted to your ERP, an order updated) | delivered and confirmed once and only once: kept while the link is down, never applied twice, no short time limit | a posting must not be lost or doubled, and a minor delay does no harm |
+| **Commands** going down: writes to a PLC or HMI tag that act on a running process (a setpoint, a start, a recipe write) | never kept: a command that cannot be delivered now is dropped and the sender is told; it also carries a time limit | a setpoint from two minutes ago must not arrive on a process that has moved on |
+| **Business write-backs** going down (a transaction posted to the ERP, an order updated) | delivered and confirmed once and only once: kept while the link is down, never applied twice, no short time limit | a posting must not be lost or doubled, and a minor delay does no harm |
 
 - After an outage, live data flows first and the backlog follows. Every record is placed by the time it happened, so late arrival does not scramble the picture. That is one reason Forge is strict about clocks (U10).
 - A module that shuts down properly says goodbye; one that vanishes is noticed by the hub and reported as lost, with the message and alarm priority that module declared in advance. A module that restarts is recorded as a restart.
-- If an outage lasts longer than a module can hold data for, your hub administrator has chosen beforehand what goes first: the oldest data, or the least important kind of data. Either way the loss is counted and shown, and audit records are never dropped.
+- If an outage lasts longer than a module can hold data for, the hub administrator has chosen beforehand what goes first: the oldest data, or the least important kind of data. Either way the loss is counted and shown, and audit records are never dropped.
 - Links between hubs (area to site, site to headquarters) carry reports and history. They may be down for a while without affecting control: each hub and its modules keep running by themselves.
 
 Where it stands: these rules were decided and signed by the owner on 2026-11-18. Today only the plant-floor module keeps unsent data; the rest is to be built.
@@ -2451,13 +2451,13 @@ Forge exists so that people at every level decide from the same picture, and rec
 Where it stands: timestamps are UTC and receipt is stamped; offsets are measured and warned on; on the plant floor a tag's time is corrected to the master clock by the server's measured offset (OPC UA, since 2026-11-13), no time is ever invented, and every connected system declares how it keeps time in its contract. A plant-floor connection with a bad clock is refused since 2026-11-15 (three checks in, three out, and it says so); the hub gives its time to every connected system and checks each one both ways (2026-11-15); a whole connected system is refused on the same rule since 2026-11-17.
 
 note:
-- The owner's principle of 2026-10-18; `docs/PRINCIPLES.md` §2. U10 explains why this matters to you and what you see and do when a clock is wrong.
+- The owner's principle of 2026-10-18; `docs/PRINCIPLES.md` §2. U10 explains why this matters to a plant and what an operator sees and does when a clock is wrong.
 
 ---
 
 <!-- .slide: id="u3--the-hub-you-run" -->
 
-# U3 · The Hub You Run
+# U3 · The Hub in Operation
 
 **Nav**: [← U2](#u2--how-data-flows) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [U4 →](#u4--your-systems-as-spokes)
 
@@ -2522,7 +2522,7 @@ note:
 
 <!-- .slide: id="u4--your-systems-as-spokes" -->
 
-# U4 · Your Systems as Modules
+# U4 · A Site's Systems as Modules
 
 **Nav**: [← U3](#u3--the-hub-you-run) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [U5 →](#u5--the-plant-floor)
 
@@ -2535,7 +2535,7 @@ The kinds of module, which ones exist, and what the contracts behind each one me
 | Kind | What it is | Named |
 |---|---|---|
 | **Management** | Forge's own software for a business function | `forge-<service>` |
-| **Integration** | connects one outside product you keep; the only place that product is talked to | `forge-integ-<function>-<product>` |
+| **Integration** | connects one outside product the site keeps; the only place that product is talked to | `forge-integ-<function>-<product>` |
 | **Plant floor** | talks to PLCs and devices | `forge-ot` |
 | **Display** | draws every screen | `forge-display` |
 
@@ -2546,7 +2546,7 @@ The kinds of module, which ones exist, and what the contracts behind each one me
 | forge-cmms | management | maintenance: equipment, work orders, maintenance events |
 | forge-nms | management | the plant network's topology and health |
 | forge-ims | management | inventory management |
-| forge-historian | management | process history: one time-series store, trends you build and save, export |
+| forge-historian | management | process history: one time-series store, trends users build and save, export |
 | forge-scanner | management | barcode scans as events |
 | forge-integ-erp-netsuite | integration | an ERP product: master data, orders, finance |
 | forge-ot | plant floor | tags, alarms, control writes, scripting |
@@ -2556,16 +2556,16 @@ The kinds of module, which ones exist, and what the contracts behind each one me
 - A site that keeps a vendor's control-room software can run it in parallel behind a bridge while the plant-floor module proves it gives the same answers.
 
 note:
-- `forge-core/docs/fxts/FMTS.md` lists every module with its state. Integration modules for other products are built at your site, in the designer (U8).
+- `forge-core/docs/fxts/FMTS.md` lists every module with its state. Integration modules for other products are built at the site, in the designer (U8).
 
 ---
 
-## What a Contract Means to You
+## What a Contract Means to a Site
 
 Each module has two contracts. Its **data contract** (FACTS) says what it is, what it is allowed to do (read, be written to, backfill, subscribe), what data it provides, how each field maps to Forge context, how it keeps time, and what happens on errors. Its **module contract** (FMTS) says what every module must do before a hub lets it in: speak to the hub in the one agreed way, keep time with the hub and stop when its clock is wrong, hold no passwords or databases of its own, ship no screens of its own, declare its roles.
 
 - **The spec is the contract.** If the module does not match its data contract, it cannot connect.
-- **A module is tested before it reaches you**: it is run against a test hub with its clock set wrong, to prove that it stops and says why.
+- **A module is tested before it reaches a site**: it is run against a test hub with its clock set wrong, to prove that it stops and says why.
 - **An exception is written down.** Where a module cannot yet meet a requirement, the gap is named in its contract with the reason, approved by the owner, and reported on every check.
 - **Approval state** is visible: `forge governance specs` shows whether each contract is approved by the owner, pending review after a change, or modified without review.
 - **A change on either side fails the gate before it fails production.** If a vendor upgrade changes the data a system sends, the contract check catches it in the hub, not on the floor.
@@ -2608,11 +2608,11 @@ note:
 ```mermaid
 stateDiagram-v2
   Normal --> Active_unacknowledged: condition becomes true
-  Active_unacknowledged --> Active_acknowledged: you acknowledge
+  Active_unacknowledged --> Active_acknowledged: an operator acknowledges
   Active_acknowledged --> Normal: condition clears
   Active_unacknowledged --> Cleared_unacknowledged: condition clears first
-  Cleared_unacknowledged --> Normal: you acknowledge
-  Normal --> Shelved: you shelve it for a time
+  Cleared_unacknowledged --> Normal: an operator acknowledges
+  Normal --> Shelved: an operator shelves it for a time
   Shelved --> Normal: the shelf expires
 ```
 
@@ -2644,10 +2644,10 @@ sequenceDiagram
 ```
 
 - **A screen asks; the core decides.** No path exists from any interface to a PLC that does not pass validation, review, interlocks, authorization, write with read-back, and audit.
-- Some tags require **two-step review**: the core shows you the current value and gives you a one-time token; the commit must present the token and a reason from the site's own list.
+- Some tags require **two-step review**: the core shows the operator the current value and issues a one-time token; the commit must present the token and a reason from the site's own list.
 - **Interlocks** block writes when a condition is unsafe; only an administrator can bypass one, with a reason that is recorded.
 - Every write is **reconstructible from the audit log**: who, what, when, which interlocks were evaluated, what the equipment read back.
-- **Whether you may write depends on your role, not on the device.** An operator with the right role can act from the control room, a laptop or a tablet carried onto the floor. Every write, from anywhere, goes through the same checks and is recorded with who made it and from what kind of screen. A site can switch writes off for a kind of screen if it chooses to.
+- **Whether a person may write depends on their role, not on the device.** An operator with the right role can act from the control room, a laptop or a tablet carried onto the floor. Every write, from anywhere, goes through the same checks and is recorded with who made it and from what kind of screen. A site can switch writes off for a kind of screen if it chooses to.
 
 note:
 - Multi-party approval (two people) for certain writes is designed; the role model it needs is signed (D-1, 2026-11-03) and FB-075 builds it.
@@ -2669,16 +2669,16 @@ note:
 
 | Layer | What it does | Who or what acts |
 |---|---|---|
-| **PC-L1** | the PID control your PLC runs today; it stays in the PLC | the controls engineer; the PLC |
-| **PC-L2** | model-predictive control for the complex loops: holds them steady and acts on a disturbance before it shows in the process; improves its own model and tuning under rules you set | the MPC Supervisor, a Forge module, writing through the same defense chain as every other write |
-| **PC-L3** | expert agents that learn all the processes of an area and work on the whole toward goals you state (for example, 130,000 barrels a year into the warehouses); every number they use comes from a deterministic tool, so it can be checked | the agents, acting only through PC-L2 |
+| **PC-L1** | the PID control the PLC runs today; it stays in the PLC | the controls engineer; the PLC |
+| **PC-L2** | model-predictive control for the complex loops: holds them steady and acts on a disturbance before it shows in the process; improves its own model and tuning under rules the site sets | the MPC Supervisor, a Forge module, writing through the same defense chain as every other write |
+| **PC-L3** | expert agents that learn all the processes of an area and work on the whole toward stated goals (for example, 130,000 barrels a year into the warehouses); every number they use comes from a deterministic tool, so it can be checked | the agents, acting only through PC-L2 |
 
 What never changes, whatever is switched on:
 
-- **You can always take over.** A loop leaves MPC mode from the plant's own HMI, immediately, with Forge up or down.
+- **An operator can always take over.** A loop leaves MPC mode from the plant's own HMI, immediately, with Forge up or down.
 - **Nothing writes to a safety system, and nothing bypasses an interlock.** The PLC clamps every value the upper layers write.
 - **No layer writes PLC code.** It can recommend; an engineer decides.
-- **Everything starts Off.** Each kind of automatic change begins as a proposal a person approves; it earns autonomy only after it has proved itself for a period you define, against figures you enter, and it loses that autonomy by itself if its record slips. If PC-L2 goes offline, PC-L3 can only write recommendations.
+- **Everything starts Off.** Each kind of automatic change begins as a proposal a person approves; it earns autonomy only after it has proved itself for a period the site defines, against figures the site enters, and it loses that autonomy by itself if its record slips. If PC-L2 goes offline, PC-L3 can only write recommendations.
 
 Where it stands: the owner decided the framework on 2026-11-13; nothing of it is built yet, and nothing will be before its specifications are written.
 
@@ -2699,7 +2699,7 @@ Why "area" means one thing everywhere, where a figure comes from, and how a deci
 
 ## Context · Why Area Means One Thing
 
-- A value like `TIT_2010 = 61.2` is useless until you know it is Cooker 01's temperature, in the Granary area, during lot L-2026-0412, on the night shift, in Cooking mode. Historians store values; context used to live in people's heads.
+- A value like `TIT_2010 = 61.2` is useless until it is known to be Cooker 01's temperature, in the Granary area, during lot L-2026-0412, on the night shift, in Cooking mode. Historians store values; context used to live in people's heads.
 - In Forge, context is **declared per spoke** (which source field is the equipment, which is the lot) and **defined once** for the whole platform in a manufacturing entity catalogue following the ISA-95 hierarchy: enterprise, site, area, line, cell, equipment; material items, lots, production orders.
 - The hub **enriches** what the source cannot say: the shift from the timestamp, the area from the location, the lot from the active batch.
 - A record missing required context is not stored silently; what is required is declared per spoke and checked by its contract.
@@ -2768,17 +2768,17 @@ What "approved" means, why nothing changes silently, and the owner's role.
 | `reverted` | rolled back to a previous approved hash |
 
 - **Only the owner approves** the platform's own contracts. AI coding agents working on the platform can propose and stamp; they can never approve, and a contract whose hash does not match, or that is not approved, fails its check.
-- **At your site, approval belongs to a role on your hub.** What your people build in the designer is approved by whoever holds that role on that hub; a second hub may have a different approver.
+- **At a site, approval belongs to a role on its hub.** What the site's people build in the designer is approved by whoever holds that role on that hub; a second hub may have a different approver.
 
 note:
 - `forge-core/docs/fxts/README.md` and `docs/PRINCIPLES.md` §3; the command is `forge governance specs --pending`.
 
 ---
 
-## Why This Matters to You
+## Why This Matters to a Site
 
 - A module whose contract was relaxed without approval **cannot register**.
-- **What your site builds is safe by construction.** A person building a screen or an integration in the designer can only use what the specifications allow. Changing a specification itself takes a hub admin, a developer or the super admin; anything beyond is a request that Forge support reviews.
+- **What a site builds is safe by construction.** A person building a screen or an integration in the designer can only use what the specifications allow. Changing a specification itself takes a hub admin, a developer or the super admin; anything beyond is a request that Forge support reviews.
 - A route that stopped returning what its contract says **fails the build**.
 - A screen that tries to write from a profile that may not **fails the view contract**.
 - The platform's own engineering is governed the same way: one item per change, every finding recorded, documents current before every change ships, owner-only approvals, and a governed memory for the AI agents that work on the code.
@@ -2794,7 +2794,7 @@ note:
 
 **Nav**: [← U7](#u7--governance-for-users) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [U9 →](#u9--identity-roles-and-credentials)
 
-What you will look at, and what you look at today.
+What operators will look at, and what exists today.
 
 ---
 
@@ -2809,7 +2809,7 @@ In the finished system no module ships its own screens. A module **describes** w
 | web | 4 Hz | a browser |
 | mobile | 1 Hz | a phone or tablet |
 
-What a person may do on any of them, writing a value or shelving an alarm included, follows their role. Your site can switch writes or alarm operations off for one kind of screen, for example no writes from phones.
+What a person may do on any of them, writing a value or shelving an alarm included, follows their role. A site can switch writes or alarm operations off for one kind of screen, for example no writes from phones.
 
 - **Any number of people can watch and operate the same process at once**: three control rooms, a lab technician and a supervisor are five clients of the same screens. What each may do follows their own sign-in and role.
 - A module may make a screen stricter than the baseline, never looser.
@@ -2820,17 +2820,17 @@ note:
 
 ---
 
-## Built for Your Plant · The Designer
+## Built for Each Plant · The Designer
 
-No two plants are alike, so Forge does not ship one fixed set of screens and connections. forge-display has a **design mode**, the Forge designer, where your own people build what your site needs.
+No two plants are alike, so Forge does not ship one fixed set of screens and connections. forge-display has a **design mode**, the Forge designer, where a site's own people build what the site needs.
 
-| You build | How |
+| What is built | How |
 |---|---|
-| **Screens** | drag and drop components and bind them to your data; each component is governed by a specification, so a screen cannot do what its kind of screen may not |
-| **An integration module** for a product you run | wire ready-made blocks into a flow (read from the product, transform, map to Forge context, send to the hub), with small scripts where the blocks do not reach |
+| **Screens** | drag and drop components and bind them to the site's data; each component is governed by a specification, so a screen cannot do what its kind of screen may not |
+| **An integration module** for a product the site runs | wire ready-made blocks into a flow (read from the product, transform, map to Forge context, send to the hub), with small scripts where the blocks do not reach |
 
-- You **test** a build against sample data or the real product; nothing it produces reaches the hub's stores while it is a test.
-- It goes live only when it passes the same checks as every module and **an approver on your hub** promotes that exact version. Going back is promoting the previous version. All of it is recorded.
+- A build is **tested** against sample data or the real product; nothing it produces reaches the hub's stores while it is a test.
+- It goes live only when it passes the same checks as every module and **an approver on the site's hub** promotes that exact version. Going back is promoting the previous version. All of it is recorded.
 - Passwords for the outside product are entered once in a central place and never appear in a flow or a script.
 
 Where it stands: decided and signed by the owner on 2026-11-18; not built. It follows forge-display itself.
@@ -2840,9 +2840,9 @@ note:
 
 ---
 
-## What You Look at Today · Honest
+## What Exists Today · Honest
 
-- **forge-display does not exist yet, and it is the first module that will be built.** Its design was signed by the owner on 2026-11-20: one web client for the screens you operate, the designer your site builds with, and the hub's own configuration and administration screens (status, modules, governance, users and roles). What exists today is its contract with the modules and the checker for it.
+- **forge-display does not exist yet, and it is the first module that will be built.** Its design was signed by the owner on 2026-11-20: one web client for the screens operators use, the designer a site builds with, and the hub's own configuration and administration screens (status, modules, governance, users and roles). What exists today is its contract with the modules and the checker for it.
 - The manufacturing system's screens today are the **interim MES bridge's** own web frontend, imported with it; they will be retired when forge-display renders the MES surfaces.
 - Plant-floor screens today are the vendor's where a site keeps them; the plant-floor module serves the data behind them and its REST interfaces.
 
@@ -2863,9 +2863,9 @@ Who may do what, where, and how systems get their credentials.
 
 ## Identity and Roles
 
-- **Your installation chooses how people sign in** (single sign-on with OpenID Connect, local accounts, LDAP or Active Directory, SAML), and **Forge decides what a signed-in identity may do**.
-- **Roles are scoped**: a role says what you may do in which area, on which equipment, in which module. "Operators in the distillery may acknowledge alarms there and see nothing from the ERP" is a configuration, not a program.
-- Roles **constrain what you can read** as well as what you can do.
+- **Each installation chooses how people sign in** (single sign-on with OpenID Connect, local accounts, LDAP or Active Directory, SAML), and **Forge decides what a signed-in identity may do**.
+- **Roles are scoped**: a role says what a person may do in which area, on which equipment, in which module. "Operators in the distillery may acknowledge alarms there and see nothing from the ERP" is a configuration, not a program.
+- Roles **constrain what a person can read** as well as what they can do.
 - **Separation of duties** is evaluated by the hub: two-step review on a write, an interlock bypass with a recorded reason, approvals.
 - In a multi-site enterprise, roles are assigned at the managing hub and inherited by sites; a site keeps verifying sign-ins while the link to headquarters is down.
 - **Each hub is independent in who may do what on it.** The approver on one area hub may not be the approver on the next. One **super admin** has full access to every hub in the enterprise.
@@ -2895,18 +2895,18 @@ note:
 
 **Nav**: [← U9](#u9--identity-roles-and-credentials) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork) · [U11 →](#u11--operations)
 
-Why Forge insists that every clock in your plant agrees, what it does about it, and what you see and do when one does not.
+Why Forge insists that every clock in a plant agrees, what it does about it, and what an operator sees and does when one does not.
 
 ---
 
-## Why It Matters to You
+## Why It Matters
 
-Every question you ask of plant data has a "when" in it.
+Every question asked of plant data has a "when" in it.
 
 - **What happened first?** If the PLC's clock and the MES server's clock are two seconds apart, the record can show a valve opening before anyone commanded it.
 - **What was the reading at that moment?** A lab sample, a lot transfer and a temperature only line up if all three were stamped by clocks that agree.
 - **Is this figure current?** A system whose clock runs behind makes fresh data look old; one that runs ahead makes old data look fresh.
-- **Can we stand behind the record?** A batch record or an audit trail is evidence only if its order does not depend on which machine wrote each line.
+- **Does the record hold up?** A batch record or an audit trail is evidence only if its order does not depend on which machine wrote each line.
 
 Nothing breaks loudly when clocks drift apart. The screens keep working and the numbers are quietly wrong. That is why Forge treats time as a rule, not a setting.
 
@@ -2919,7 +2919,7 @@ note:
 
 ```mermaid
 flowchart TD
-  R["One time reference<br/>for the whole enterprise"] --> H["Your hub<br/>the master clock for everything attached to it"]
+  R["One time reference<br/>for the whole enterprise"] --> H["The hub<br/>the master clock for everything attached to it"]
   H --> S["Connected systems<br/>MES, warehouse, maintenance, the plant-floor module"]
   S --> D["Servers and PLCs<br/>clocks checked, times corrected"]
   D -. "a clock that cannot be trusted" .-> X["cut off until it is right"]
@@ -2927,7 +2927,7 @@ flowchart TD
 
 | Who | Does what |
 |---|---|
-| Your network (IT and controls) | keeps every server and PLC in step with one reference, using the standard time services (NTP, or PTP where the devices support it). Forge does not set clocks. |
+| The site's network (IT and controls) | keeps every server and PLC in step with one reference, using the standard time services (NTP, or PTP where the devices support it). Forge does not set clocks. |
 | The top hub | is the master clock for everything below it; each hub looks after the clocks of what is attached to it |
 | Every connected system | states in its contract how it keeps time and how close it must be: within 10 ms on the site network, 100 ms between sites |
 | The hub, with every connected system | exchanges time on every contact, so each system knows how far its clock is from the hub's, and the hub knows too |
@@ -2935,26 +2935,26 @@ flowchart TD
 | Forge, on the plant floor | checks each server's clock every 30 seconds, corrects each tag's time to master time, and keeps the original time and the correction on the record |
 | Forge, when a clock is wrong | cuts that plant-floor connection, or that whole connected system, off after three checks in a row, says why, and reconnects it after three good checks |
 
-- "Cut off" means nothing is collected from that connection, or accepted from that system, and nothing is written to it until its clock is right. A value with a time you cannot trust is worse than no value.
+- "Cut off" means nothing is collected from that connection, or accepted from that system, and nothing is written to it until its clock is right. A value with a time that cannot be trusted is worse than no value.
 
 note:
 - `docs/decisions/one-clock-ot-source-time.md` (signed 2026-11-03) in plain words; the site requirement and a checklist for a new site are `forge-hub/docs/clock-discipline.md`.
 
 ---
 
-## What You See and What You Do
+## What Is Seen and What Is Done
 
 When a plant-floor connection is cut off for its clock:
 
-- **You are told at once.** The connection shows `CLOCK_UNREADABLE` (its clock could not be read) or `CLOCK_OUT_OF_TOLERANCE` (it is too far off), with the measured difference, the limit and since when. The plant-floor module's health turns degraded and names the connection.
+- **The operator is told at once.** The connection shows `CLOCK_UNREADABLE` (its clock could not be read) or `CLOCK_OUT_OF_TOLERANCE` (it is too far off), with the measured difference, the limit and since when. The plant-floor module's health turns degraded and names the connection.
 - **Its values stop arriving and writes to it are refused.** Every other connection carries on.
 - **Fix the clock, not Forge.** Ask whoever looks after that server or PLC to restore its time service. Restarting the connection does not help and is refused, with the reason.
 - **It comes back by itself.** After three good checks in a row (90 seconds at the usual pace) the connection resumes and the health returns to normal.
 - An engineer can change how often a connection's clock is checked while it runs, from once a second upward. The check cannot be switched off.
 
-When a whole connected system (your MES, for example) is cut off for its clock, the same holds. The hub shows the system as degraded with `CLOCK_OUT_OF_TOLERANCE`, or `CLOCK_UNREADABLE` when the system stopped reporting its clock, and it accepts nothing from it. Restarting the system does not bring it back. Its server's clock has to be put right, and after three good checks the hub takes its data again.
+When a whole connected system (the MES, for example) is cut off for its clock, the same holds. The hub shows the system as degraded with `CLOCK_OUT_OF_TOLERANCE`, or `CLOCK_UNREADABLE` when the system stopped reporting its clock, and it accepts nothing from it. Restarting the system does not bring it back. Its server's clock has to be put right, and after three good checks the hub takes its data again.
 
-Where you see it today: the hub's status pages and command line (U3). On your screens when forge-display exists (U8).
+Where it is seen today: the hub's status pages and command line (U3). On the site's screens when forge-display exists (U8).
 
 note:
 - Honest: an alarm in the alarm list is raised only where the alarm service is running, which the hub does not yet do by itself (FB-115); the status, the health and the log always carry the refusal.
@@ -2982,7 +2982,7 @@ note:
 | Business systems having the clock of their own server checked | recorded (FB-120) |
 | PLCs reached without OPC UA (Logix, S7, Modbus) having their clocks read | with their drivers (FB-117) |
 | The chain of clocks between sites and headquarters | with multi-site hubs (FB-118) |
-| Clock state on your screens | with forge-display |
+| Clock state on the site's screens | with forge-display |
 
 note:
 - `docs/WHERE-WE-ARE.md` §3.1 and §5 carry the current state.
@@ -3025,7 +3025,7 @@ note:
 
 **Nav**: [← U11](#u11--operations) · [⇤ TOC](#table-of-contents) · [⇅ Landing fork](#landing-fork)
 
-| If you want to… | Open |
+| To find… | Document |
 |---|---|
 | read the full definition and the problems it solves | `docs/VISION.md` |
 | see what exists today, component by component | `docs/WHERE-WE-ARE.md` |
@@ -3035,7 +3035,7 @@ note:
 | ask for a change or report a problem | a row in `BACKLOG.md`: every finding is recorded, never skipped |
 | see the decisions the owner is weighing | `docs/ROADMAP.md` §5 and `docs/decisions/` |
 
-Thank you. **[Return to the landing fork ↑](#landing-fork)** · **[Start the Software Dev path ↑](#f1--opening)**
+End of the path. **[Return to the landing fork ↑](#landing-fork)** · **[Start the Software Dev path ↑](#f1--opening)**
 
 note:
-- The end-user path is complete for operators by design: nothing above sends you into the dev path for a topic.
+- The end-user path is complete for operators by design: nothing above sends the reader into the dev path for a topic.
