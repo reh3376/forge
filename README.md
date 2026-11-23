@@ -1,433 +1,209 @@
-# Forge Platform
+# Forge
 
-**General industrial / manufacturing decision matrix infrastructure.** Forge is a hub-and-spoke platform that transforms raw operational data from manufacturing systems into decision-quality information — structured, governed, and actionable.
+**Forge is the industrial data operations platform for a manufacturing enterprise.** It connects the operational systems a plant runs on (SCADA and PLCs, MES, WMS, CMMS, ERP, QMS, historians, network management, lab and scanner devices), turns their output into one governed record type with manufacturing context attached, curates that into decision-quality data products, and renders every operator and management interface from declarative specifications.
 
-**Start here:** [What Forge will be](docs/VISION.md) · [Where we are going](docs/WHERE-WE-ARE-GOING.md) · [Where we are](docs/WHERE-WE-ARE.md) · [Roadmap](docs/ROADMAP.md) · [Backlog](BACKLOG.md) · [Principles](docs/PRINCIPLES.md)
+The goal, in the owner's words: "Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business."
+
+**Start here:** [Where we are](docs/WHERE-WE-ARE.md) · [Where we are going](docs/WHERE-WE-ARE-GOING.md) · [What Forge will be](docs/VISION.md) · [Roadmap](docs/ROADMAP.md) · [Backlog](BACKLOG.md) · [Tutorial](https://reh3376.github.io/forge/)
+
+This page is orientation. It says what Forge is and where things are, and it links down for detail. Counts, versions and the state of each component live in [`docs/WHERE-WE-ARE.md`](docs/WHERE-WE-ARE.md), which is brought up to date before every push.
 
 ---
 
-## What Forge Does
+## Why Forge exists
 
-Forge solves Industry / Manufacturing dataOPS.  Organizations run on dozens of disconnected systems: WMS, MES, SCADA, CMMS, ERP, QMS, historians, ... . These systems are usually highly customized by use case. Each produces data in its own format with its own assumptions. Forge connects them through a common data model (ContextualRecords) and governance framework (FxTS) so decision-makers get trustworthy, correlated information rather than raw telemetry from siloed sources. Additionally, Forge Core curates datasets for various ML and AI use cases: human-in-the-loop semi-autonomous decision making, expertise-specific training, analytics, observability and monitoring.
+Bad decisions in manufacturing do not come from a lack of data. They come from a lack of data quality, context and correlation. Each plant system is an island with its own data shape. Values arrive without context, clocks disagree, integrations are one-off projects that rot, and contracts between components change silently.
 
-**The core thesis**: Bad decisions in manufacturing don't come from lack of data — they come from lack of data *quality*, *context*, and *correlation*. Forge addresses all three. Poor decisions are far more costly than generally realized, the cost is frequently spread across many units, and the root cause of a confidently wrong decision is rarely captured.
+Forge exists so that every value is validated, carries where, when, what and who it belongs to, and can be joined with every other value by that context. [`docs/VISION.md`](docs/VISION.md) lists the twelve problems and what "solved" means for each.
 
-## Architecture
+Forge is a framework, not a fixed product. Manufacturing differs from plant to plant, so every installation is a build-out for one facility, site or enterprise, made from tools and widgets that are each governed by a specification.
 
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                         FORGE HUB                                │
-│                                                                  │
-│  ┌──────────┐  ┌───────────┐  ┌──────────┐  ┌───────────────┐  │
-│  │ Core     │  │ Curation  │  │ Storage  │  │ Governance    │  │
-│  │ Models   │  │ Pipeline  │  │ Router   │  │ (FxTS Suite)  │  │
-│  └──────────┘  └───────────┘  └──────────┘  └───────────────┘  │
-│  ┌──────────┐  ┌───────────┐  ┌──────────┐  ┌───────────────┐  │
-│  │ gRPC     │  │ Observer  │  │ CLI      │  │ SDK           │  │
-│  │Transport │  │ System    │  │ (forge)  │  │ (Module Bldr) │  │
-│  └──────────┘  └───────────┘  └──────────┘  └───────────────┘  │
-└───────────────────────┬──────────────────────────────────────────┘
-                        │ gRPC + Protobuf (compiled binary)
-          ┌─────────────┼──────────────┐
-          ▼             ▼              ▼
-   ┌────────────┐ ┌──────────┐ ┌────────────┐
-   │ OT Module  │ │ forge-cmms │ │ forge-wms    │   ... (10 spokes)
-   │ (OPC-UA,   │ │ Adapter  │ │ Adapter    │
-   │  MQTT,     │ │          │ │            │
-   │  Alarms,   │ │          │ │            │
-   │  Control)  │ │          │ │            │
-   └────────────┘ └──────────┘ └────────────┘
-```
+## How a deployment is organised
 
-### Hub (this repo)
-
-The hub owns the primary security / auth, data models, governance layer, storage orchestration, and gRPC transport. Every spoke connects through the hub — spokes never talk directly to each other.  Although spokes can publish to a Forge broker for real-time / near-real-time data. 
-
-### Spokes (Modules/Adapters)
-
-Each spoke wraps one production system and produces ContextualRecords that conform to the Forge data contract. Spokes are validated by FACTS specs before connecting.
-
-## Tech Stack
-
-| Component | Technology |
-|-----------|-----------|
-| forge-core (`forge-core/src/python/forge_core`), hub and modules (`src/forge`) | Python 3.12+ · FastAPI · Pydantic v2 · Typer CLI · uv · ruff · pytest (5,140 tests) |
-| Management and integration modules (`go/`) | Go 1.26 · `go build`, `go vet`, `go test` in CI; module SDK scaffold (the Go forge-mes is FB-076) |
-| Interim MES bridge (`modules/Forge MES`) | The migrated whk-mes application, NestJS 10 + Next.js 14, kept running only until the Go forge-mes module (FB-076) replaces it |
-| User interfaces | forge-display renders every surface from FVTS specs (not built yet; the FVTS runner and reference renderer exist) |
-| Transport | gRPC + Protobuf (compiled binary, never JSON-over-gRPC); mTLS in both directions |
-| Databases | PostgreSQL 16 (hub), TimescaleDB (time series), Neo4j 5 (graph); hub-owned, modules get `mod_<name>` schemas |
-| Messaging | RabbitMQ (AMQP), MQTT 3.1.1 (embedded broker); Kafka in the compose stack for later |
-| OPC-UA | asyncua (asyncio client) behind a thin wrapper; i3X REST API over the tag engine |
-
-**Language policy.** The hub is Python. Formal `forge-<service>` management and integration modules are Go, generated from the module SDK (roadmap decisions A-2, A-5). Spokes are Python inside the hub or external processes in any language that speaks the proto. forge-mes runs as the migrated TypeScript application until its Go rewrite (FB-076). No module writes its own UI: forge-display renders them from FVTS specs (A-3). The status of each choice is in [`docs/PRINCIPLES.md`](docs/PRINCIPLES.md) §6.
-
-## Project Structure
+A deployment is run as a chain of command. Each level deals with what is attached to it and with the one level above it, and nothing else.
 
 ```
-src/forge/
-├── core/                          # Hub core — models, broker, registry
-│   ├── models/                    # ContextualRecord, Decision, Adapter, Manufacturing entities
-│   │   └── manufacturing/         # ISA-95 hierarchy: MaterialItem, Lot, ProductionOrder, etc.
-│   ├── broker/                    # Embedded MQTT 3.1.1 broker (topic engine, sessions)
-│   ├── registry/                  # Context field registry
-│   ├── schemas/                   # JSON Schema definitions
-│   └── interfaces/                # Abstract protocols
-│
-├── curation/                      # Data quality pipeline
-│   ├── pipeline.py                # Multi-stage normalization + enrichment
-│   ├── normalization.py           # Field normalization, unit conversion
-│   ├── aggregation.py             # Time-window aggregation
-│   ├── quality.py                 # Quality scoring and validation
-│   └── lineage.py                 # Data provenance tracking
-│
-├── transport/                     # Hub ↔ Spoke gRPC layer
-│   ├── grpc_server.py             # Hub gRPC server
-│   ├── grpc_channel.py            # Channel management with retry
-│   ├── spoke_client.py            # Spoke-side gRPC client
-│   ├── hub_server.py              # Hub-side connection handler
-│   ├── proto_bridge.py            # Protobuf ↔ Python model conversion
-│   ├── serialization.py           # Binary serialization
-│   └── transport_adapter.py       # Adapter base for transport
-│
-├── storage/                       # Database orchestration (Hub owns all DBs)
-│   ├── router.py                  # Query routing to appropriate engine
-│   ├── pool.py                    # Connection pooling
-│   ├── access.py                  # Permissioned access for modules
-│   ├── backfill.py                # Historical data backfill
-│   ├── shadow.py                  # Shadow writes for migration
-│   └── engines/                   # Database engine adapters
-│
-├── governance/                    # FxTS Governance Suite
-│   ├── facts/                     # Forge Adapter Compliance Test Suite
-│   │   ├── schema/facts.schema.json
-│   │   ├── specs/                 # Per-spoke compliance specs (9 spokes)
-│   │   │   ├── forge-ot.facts.json      (v0.5.0 — 21 data sources)
-│   │   │   ├── forge-wms.facts.json
-│   │   │   ├── forge-mes.facts.json
-│   │   │   ├── forge-cmms.facts.json
-│   │   │   ├── forge-ims.facts.json
-│   │   │   ├── forge-nms.facts.json
-│   │   │   ├── forge-integ-erp-netsuite.facts.json
-│   │   │   ├── forge-historian.facts.json
-│   │   │   └── forge-scanner.facts.json
-│   │   └── runners/facts_runner.py
-│   ├── ftts/                      # Forge Transport Test Suite
-│   ├── fats/                      # Forge Adapter Test Suite
-│   ├── fhts/                      # Forge Hub Test Suite
-│   ├── fqts/                      # Forge Quality Test Suite
-│   └── fsts/                      # Forge Storage Test Suite
-│
-├── observer/                      # Event observation system
-│
-├── context/                       # Request context management
-│
-├── proto_gen/                     # Generated Protobuf/gRPC Python code
-│   └── forge/v1/                  # adapter.proto, contextual_record.proto, enums.proto
-│
-├── cli/                           # CLI entry point
-│   └── main.py                    # `forge` command
-│
-├── sdk/                           # Developer SDK
-│   ├── module_builder/            # Module scaffolder + generators
-│   │   ├── scaffolder.py          # `forge new-module <name>` scaffolding
-│   │   ├── generators.py          # Code generators for adapters
-│   │   ├── manifest_builder.py    # manifest.json generator
-│   │   └── cli.py                 # Module Builder CLI
-│   │
-│   └── scripting/                 # Python 3.12+ Script Engine (replaces Ignition Jython)
-│       ├── engine.py              # ScriptEngine — discover, load, hot-reload
-│       ├── sandbox.py             # ScriptSandbox — PEP 302 import allowlist
-│       ├── triggers.py            # TriggerRegistry — @timer, @on_tag_change, @api.route
-│       ├── rbac.py                # Script RBAC — area + tag-pattern permissions
-│       ├── audit.py               # Script audit trail — append-only ring buffer
-│       └── modules/               # forge.* SDK namespace (11 modules)
-│           ├── tag.py             # forge.tag — read/write/browse/subscribe
-│           ├── db.py              # forge.db — query/named_query/transaction
-│           ├── net.py             # forge.net — HTTP client (async, typed)
-│           ├── log.py             # forge.log — structured JSON logging
-│           ├── alarm.py           # forge.alarm — ISA-18.2 alarm interface
-│           ├── date.py            # forge.date — date/time with Java→Python pattern conversion
-│           ├── dataset.py         # forge.dataset — tabular data (replaces BasicDataset)
-│           ├── perspective.py     # forge.perspective — HMI/UI interaction
-│           ├── file.py            # forge.file — sandboxed file I/O
-│           ├── util.py            # forge.util — JSON, globals, messaging
-│           └── security.py        # forge.security — user/role queries
-│
-├── adapters/                      # Spoke adapters (in-repo)
-│   ├── forge_mes/                 # Forge MES hub-side spoke adapter (manifest, context mapper, 11 mappers) — module itself lives in modules/Forge MES/
-│   └── forge_cmms/                  # CMMS adapter (first spoke, reference impl)
-│       ├── adapter.py
-│       ├── config.py
-│       ├── context.py
-│       ├── record_builder.py
-│       ├── topics.py
-│       └── mappers/               # Entity mappers (equipment, maintenance)
-│
-└── modules/                       # Full modules (in-repo)
-    └── ot/                        # OT/SCADA Module (Phases 1-6 complete)
-        ├── adapter.py             # OT Module adapter (AdapterBase + DiscoveryProvider)
-        ├── manifest.json          # Module manifest
-        ├── opcua_client/          # OPC-UA async client (asyncua wrapper)
-        │   ├── __init__.py        # OpcuaClient, converters, connection management
-        │   └── paths.py           # PathNormalizer (OPC-UA ↔ Ignition ↔ Forge)
-        ├── tag_engine/            # Tag management engine
-        │   ├── engine.py          # TagEngine — CRUD, subscriptions, quality tracking
-        │   ├── models.py          # TagDefinition, TagValue, QualityCode, DataType
-        │   ├── registry.py        # Tag registry with metadata
-        │   ├── templates.py       # UDT template system
-        │   ├── persistence.py     # Tag config persistence
-        │   └── providers/         # Tag value providers (8 types)
-        │       ├── opcua_provider.py      # Direct OPC-UA reads
-        │       ├── acquisition.py         # Scheduled polling
-        │       ├── memory_provider.py     # In-memory tags
-        │       ├── expression_provider.py # Calculated tags
-        │       ├── query_provider.py      # SQL-driven tags
-        │       ├── virtual_provider.py    # Virtual/derived tags
-        │       ├── event_provider.py      # Event-driven tags
-        │       └── base.py                # Provider protocol
-        ├── i3x/                   # CESMII i3X integration (Smart Manufacturing)
-        │   ├── models.py          # i3X type system models
-        │   └── router.py          # i3X API router
-        ├── alarming/              # ISA-18.2 Alarm Engine
-        │   ├── engine.py          # AlarmEngine — evaluation loop, event journal
-        │   ├── state_machine.py   # 7-state ISA-18.2 state machine
-        │   ├── detector.py        # 9 alarm types (HI/HIHI/LO/LOLO/digital/ROC/quality/comm/custom)
-        │   ├── models.py          # AlarmConfig, AlarmInstance, AlarmEvent, AlarmPriority
-        │   ├── integrations.py    # MQTT publish, RabbitMQ fanout, CMMS work orders
-        │   └── api.py             # REST API (/alarms/active, /history, /config, /ack, /shelve)
-        ├── mqtt/                  # MQTT subsystem
-        │   ├── publisher.py       # MQTT publish with QoS
-        │   ├── subscriber.py      # MQTT subscribe with wildcard
-        │   ├── tag_publisher.py   # Tag value → MQTT topic mapping
-        │   ├── topic_router.py    # Topic pattern routing
-        │   ├── sparkplug.py       # SparkplugB codec
-        │   └── rate_limiter.py    # Per-topic rate limiting
-        ├── control/               # Control Write Interface
-        │   ├── write_engine.py    # ControlWriteEngine — 5-layer defense chain
-        │   ├── validation.py      # WriteValidator — type/range checking
-        │   ├── review.py          # WriteReviewer — two-step review tokens, reason codes (FB-074)
-        │   ├── interlock.py       # InterlockEngine — safety conditions
-        │   ├── authorization.py   # WriteAuthorizer — RBAC (Operator/Engineer/Admin)
-        │   ├── audit.py           # WriteAuditLogger — pluggable sinks
-        │   ├── recipe_integration.py  # MES recipe → batched PLC writes
-        │   └── models.py          # WriteRequest, WriteResult, InterlockRule, WriteRole
-        ├── bridge/                # Ignition Bridge Adapter (parallel operation)
-        │   ├── adapter.py         # IgnitionBridgeAdapter — REST polling
-        │   ├── client.py          # IgnitionRestClient — batch reads, auth, retry
-        │   ├── tag_mapper.py      # TagMapper — Ignition↔Forge path conversion
-        │   ├── dual_write.py      # DualWriteValidator — consistency checking
-        │   ├── health.py          # BridgeHealthDashboard — operator acceptance
-        │   └── models.py          # Bridge-specific models
-        ├── context/               # ContextualRecord production
-        │   ├── record_builder.py  # OT-specific record builder
-        │   ├── resolvers.py       # Context field resolvers
-        │   └── store_forward.py   # Store-and-forward for disconnected ops
-        ├── acquisition/           # Data acquisition scheduling
-        └── scripts/               # OT Module user scripts
+                      forge-core
+        the foundation and the administrative manager
+                          │
+                 forge-hub (enterprise)
+                          │
+            ┌─────────────┴─────────────┐
+     forge-hub (site)             forge-hub (site)
+            │                           │
+     ┌──────┴──────┐                    │
+ forge-hub      forge-hub           forge-hub
+  (area)         (area)              (area)
+     │              │                   │
+  modules        modules             modules
+
+  Every hub also has its own modules and databases attached to it.
 ```
 
-### Module Directories (`modules/`)
+| Part | What it is |
+|---|---|
+| **forge-core** | The foundation every hub and module is built from (the contract, the FxTS frameworks, the SDK), and the administrative manager of a deployment. It administers; it does not operate. No record and no command passes through it, and a hub that cannot reach it keeps running. See [`forge-core/README.md`](forge-core/README.md). |
+| **forge-hub** | The hub: it takes in records, adds context, stores, curates, governs and serves the data of what is attached to it. There are enterprise, site and area hubs, and a deployment with one site has only a site hub. |
+| **Module** | Anything that registers with a hub. A module speaks `forge.v1.AdapterService` to its hub over gRPC and reaches it no other way. A *management module* is Forge's own application for a domain (forge-ot, forge-mes, forge-wms and others). An *integration module* is the middleware between a hub and one third-party system; third-party software never reaches a hub directly. |
+| **forge-display** | The module that renders every user interface, for every module and for the hub, from specifications each module carries. No module ships its own interface. |
 
-First-party modules that ship with both a backend and a frontend live under the repo-level `modules/` directory, alongside the spoke templates copied from external repos:
+State moves up the chain one level at a time, and administrative changes move down the same way. Records travel up at least once, with store and forward. A command to a process controller travels down at most once, is never stored, and expires.
 
-| Directory | Sections | Status |
-|-----------|----------|--------|
-| `modules/Forge MES/` | `backend/` (NestJS + Prisma, forge-core integration), `frontend/` (Next.js 15), `shared/` | Migrated from `WhiskeyHouse/whk-mes` 2026-10-15; forge-mes replaces whk-mes. Hub-side spoke contract: `src/forge/adapters/forge_mes/` |
-| `modules/Forge CMMS/`, `Forge ERPI/`, `Forge NMS/` | adapter template copies (`src/`, `specs/`, `docs/`, `tests/`) | Templates for the in-repo adapters |
-| `modules/Forge DB Orchestration/` | storage framework copy | Reference |
+## What is built, and what is not
 
-## Governance: FxTS (Forge Test Specifications)
+This is the short form. [`docs/WHERE-WE-ARE.md`](docs/WHERE-WE-ARE.md) has every component.
 
-FxTS is **spec-first governance** — the specs define what must exist and the code conforms to the specs, not the other way around. This is not a testing framework; it's a compliance framework. Every spec carries a hash, and a run fails when the hash does not verify or the owner has not approved it. What every framework must provide is `docs/decisions/fxts-framework-baseline.md`.
+| Built | Where |
+|---|---|
+| forge-core's foundation: the models, the one clock, the contract, the FxTS frameworks, the SDK | [`forge-core/`](forge-core) |
+| The hub: the gRPC transport, ingest, context, storage, schema registry, curation, the REST API, the `forge` command | [`src/forge/`](src/forge) |
+| forge-ot, the plant-floor module: OPC UA, the tag engine, ISA-18.2 alarms, governed writes to controllers, MQTT, scripting | [`src/forge/modules/ot/`](src/forge/modules/ot) |
+| Eight adapters for other systems, as Python reference implementations | [`src/forge/adapters/`](src/forge/adapters) |
+| Six FxTS frameworks with their specs, and the governed lists, each hashed and approved by the owner | [`forge-core/contract/`](forge-core/contract), [`forge-core/src/python/forge_core/fxts/`](forge-core/src/python/forge_core/fxts) |
+| Exhaustive checks of two laws of forge-ot, each with a project skill | [`.claude/skills/`](.claude/skills) |
+| The interim MES bridge, kept running until the Go forge-mes replaces it | [`modules/Forge MES/`](modules/Forge%20MES) |
+
+| Not built yet | Tracked as |
+|---|---|
+| forge-core's manager, and the authority model of the chain of command | FB-232, FB-233 |
+| Hub-to-hub links, and the transport contract's store and forward, expiring commands and write-backs | FB-164 |
+| forge-display and its designer | FB-181, FB-184 |
+| The role model in force on the hub | FB-075, FB-189 to FB-195 |
+| The management modules in Go, built from the module SDK | FB-017, FB-076 |
+| The low-code builder for integration modules | FB-154 |
+
+## Where things are
+
+The repository is being reorganised into three self-contained parts, forge-core, forge-hub and forge-modules, each with the same standard folders ([`docs/decisions/repository-structure.md`](docs/decisions/repository-structure.md)). forge-core has moved. The hub and the modules still share `src/forge` until their own moves.
+
+| Path | Holds |
+|---|---|
+| [`forge-core/`](forge-core) | The foundation: `contract/` (proto files, framework schemas, governed lists), `src/python/forge_core` (the package), `tests/`, and its own README |
+| [`src/forge/`](src/forge) | The hub and the modules, until they move: `api`, `gateway`, `ingest`, `storage`, `registry`, `context`, `curation`, `broker`, `transport`, `cli`; `adapters/`; `modules/ot` |
+| [`tests/`](tests) | Tests of the hub and the modules, and tests that span layers |
+| [`go/`](go) | The Go models, the generated bindings and the module scaffold |
+| [`modules/Forge MES/`](modules/Forge%20MES) | The interim MES bridge (NestJS and Next.js). It has its own [`CLAUDE.md`](modules/Forge%20MES/CLAUDE.md) |
+| [`docs/`](docs) | The state and direction documents, the signed decision records, the framework pages, the tutorial's source |
+| [`deploy/`](deploy) | The container image and the Compose stack. Compose is for development only; production runs on Kubernetes |
+| [`scripts/`](scripts) | The tutorial tools, the pinned TLA+ model checker, the restructuring scripts |
+| [`archive/`](archive) | An index of what was retired from the tree. The old content is not kept; `forge archive show <id>` reads it from history |
+| [`.claude/skills/`](.claude/skills) | Project skills for coding agents, including the `verify-*` skills that check laws |
+
+## The rules every change is held to
+
+These are the short forms. [`CLAUDE.md`](CLAUDE.md) states them in full and [`docs/ROADMAP.md`](docs/ROADMAP.md) §1 lists the decisions in force.
+
+- **Hub and spoke.** Every module speaks one contract to its hub over gRPC. Nothing reaches a hub any other way.
+- **The transport contract is signed.** Records up at least once; commands down at most once and never stored; a business write-back delivered once and only once. The proto only gains additions within a major version.
+- **One clock.** The top hub is the time authority. Every stored time is UTC, time checks fail closed, and a module that does not implement the time exchange is refused.
+- **No silent failure.** A refusal or a fail-closed state is visible with its cause. A skipped test states its reason, and a check that was not run is reported as not run.
+- **Specifications first.** Repeatable work is built to an FxTS spec. Every spec, schema version and governed list carries a hash that only the owner approves.
+- **The value checked is the value acted on.** A value from outside is coerced once to its declared type, refused when ambiguous, and the coerced value is what is used.
+- **A law is proved, not only tested.** A statement of the form "exactly once", "never" or "always" gets an exhaustive check on the real code.
+- **Configuration comes from the environment.** No credentials, addresses or keys in the code. The repository is public and names no existing company.
+
+## Governance: FxTS
+
+FxTS is specification-first governance. A spec says what must exist, and the code is built to it. Each framework has a schema with released versions, a runner, a gate in CI, and specs. A run fails when a spec's hash does not verify or the owner has not approved it. What every framework must provide is [`docs/decisions/fxts-framework-baseline.md`](docs/decisions/fxts-framework-baseline.md), and how to design a spec is in [`docs/FxTS/README.md`](docs/FxTS/README.md).
 
 | Framework | Governs | State |
-|-----------|---------|-------|
-| **FATS** | API contracts: routes, shapes, status codes | schema, runner, 28 specs (one per hub route) |
-| **FACTS** | Adapter conformance: identity, capabilities, lifecycle, connection, data contract, context mapping, error handling | schema, runner, 9 specs |
-| **FTTS** | Transport: TLS, tokens, streaming behaviour | schema, runner, 1 spec |
-| **FVTS** | Module ↔ display contract: points, alarms, actions, surfaces, profiles | schema, runner, reference renderer, 1 spec |
-| **FMTS** | Module requirements: the sixteen-item baseline, the time contract, waivers (`docs/decisions/forge-module-requirements.md`) | schema, runner, conformance kit, 9 specs (8 approved) |
-| **FHTS** | Hash integrity and owner approval of every spec above | hashing in the shared runner; `forge governance specs / stamp / approve` |
-| FQTS · FSTS · FDTS · FLTS · FNTS · FOTS · FPTS | Data quality · security controls · schema evolution · lineage · normalization · observability · performance | planned |
+|---|---|---|
+| **FACTS** | A module's adapter: identity, capabilities, connection, data contract, context mapping, time | built |
+| **FATS** | The hub's API: routes, shapes, status codes | built |
+| **FTTS** | The transport: TLS, tokens, streaming behaviour | built |
+| **FMTS** | What every module must meet: the sixteen requirements and the time contract | built |
+| **FVTS** | The contract between a module and the display: points, objects, alarms, actions, surfaces | built |
+| **FUTS** | Widgets and view documents | built |
+| **FHTS** | The hash and the owner's approval of every governed file | built, in the shared runner |
+| FSTS · FQTS · FDTS · FLTS · FNTS · FOTS · FPTS | Security · data quality · schema evolution · lineage · normalization · observability · performance | planned |
 
-### FACTS Specs (9 spokes)
-
-Each spoke has a FACTS spec that declares its identity, capabilities, connection parameters, data sources, context field mappings, enrichment rules, error handling policy, and sample records. The spec is the contract — if the spoke doesn't match its spec, it can't connect.
-
-| Spoke | System (data sources) | Spec |
-|-------|-----------------------|------|
-| `forge-wms` | Warehouse management (GraphQL, RabbitMQ, REST; 14 sources) | v0.1.0 — approved (reh3376) |
-| `forge-mes` | Manufacturing execution, `modules/Forge MES` (GraphQL, RabbitMQ, MQTT, REST, WebSocket, database; 18 sources) | v0.1.0 — approved 2026-10-15 (reh3376) |
-| `forge-ims` | Aerospace inventory (gRPC unary and stream; 8 sources) | v0.1.0 — approved (no approver recorded) |
-| `forge-cmms` | Maintenance management (GraphQL, REST, RabbitMQ; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
-| `forge-integ-erp-netsuite` | ERP integration, NetSuite (RabbitMQ, REST, GraphQL; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
-| `forge-nms` | Network management (REST, WebSocket; 11 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
-| `forge-historian` | Time-series historian (REST, WebSocket; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
-| `forge-scanner` | Barcode scanner gateway (gRPC server unary and stream; 5 sources) | v0.1.0 — pending review (FB-080 re-stamp) |
-| `forge-ot` | OPC-UA, MQTT, alarms, control writes, scripting (21 sources) | v0.5.0 — pending review; fails schema validation until FB-079 (D-8 decided 2026-11-03: extend the enums) |
-
-`forge governance specs --pending` lists what awaits the owner; `forge governance run facts <spoke>` runs one spec.
-
-## OT Module (Phases 1-6)
-
-The OT Module is the most mature spoke, implemented directly in this repo. It replaces Ignition SCADA as the OT/HMI/SCADA layer.
-
-### Phase Summary
-
-| Phase | Name | What It Does |
-|-------|------|-------------|
-| 1 | OPC-UA Client | asyncua wrapper, tag engine with 8 provider types, path normalization (OPC-UA ↔ Ignition ↔ Forge), i3X discovery |
-| 2 | Scripting Engine | Python 3.12+ script engine replacing Jython 2.7, ScriptSandbox (PEP 302), TriggerRegistry decorators, RBAC, audit trail, 11 forge.* SDK modules |
-| 3 | Alarm Engine | ISA-18.2 compliant: 7-state machine, 9 alarm types, event-sourced journal, cross-module integration (MQTT, RabbitMQ, CMMS auto-work-orders) |
-| 4 | Control Write | 5-layer defense chain (validation → review → interlocks → RBAC → write+read-back), audit trail with pluggable sinks, MES recipe integration |
-| 5 | Ignition Bridge | Parallel operation adapter: REST API polling, dual-write consistency validation (<1% threshold), operator acceptance checklist |
-| 6 | Script Migration | 6 new forge.* SDK modules, API mapping for all 52 system.* calls, Tier 1 conversion targets identified (42 scripts) |
-
-### forge.* SDK Modules
-
-The scripting SDK provides 11 modules that replace Ignition's `system.*` namespace:
-
-| Module | Replaces | Key Functions |
-|--------|----------|---------------|
-| `forge.tag` | `system.tag.*` | `read`, `write`, `browse`, `get_config`, `exists` |
-| `forge.db` | `system.db.*` | `query`, `named_query`, `transaction`, `scalar` |
-| `forge.net` | `system.net.*` | `http_get`, `http_post`, `http_put`, `http_delete` |
-| `forge.log` | `system.util.getLogger` | `get`, `info`, `warning`, `error`, `debug` |
-| `forge.alarm` | `system.alarm.*` | `get_active`, `ack`, `trigger`, `shelve`, `get_history` |
-| `forge.date` | `system.date.*` | `now`, `format`, `parse`, `add_hours`, `seconds_between` |
-| `forge.dataset` | `system.dataset.*` | `create`, `to_csv`, `from_csv`, `to_json`, `add_row` |
-| `forge.perspective` | `system.perspective.*` | `send_message`, `navigate`, `open_popup`, `download` |
-| `forge.file` | `system.file.*` | `read_text`, `write_text`, `exists`, `list_dir` (sandboxed) |
-| `forge.util` | `system.util.*` | `json_encode`, `json_decode`, `get_globals`, `send_message` |
-| `forge.security` | `system.security.*` | `get_username`, `get_user`, `has_role` |
-
-## Connected Spokes (External Repos)
-
-| Spoke | Repo | Tech | Role |
-|-------|------|------|------|
-| forge-wms | `WhiskeyHouse/forge-wms` | NestJS + Next.js | Warehouse Management |
-| Forge MES | `modules/Forge MES` (in-repo; migrated from `WhiskeyHouse/whk-mes` on 2026-10-15) | NestJS 10 + Next.js 14 | Manufacturing Execution — forge-mes replaces whk-mes |
-| forge-cmms | `reh3376/forge-cmms` | GraphQL + REST + RabbitMQ | Maintenance Management |
-| IMS-IMS | `reh3376/forge_ims` | Go + gRPC | Aerospace Inventory |
-| forge-nms | `WhiskeyHouse/net-topology` | FastAPI + Next.js | Network Management |
-| forge-integ-erp-netsuite | `reh3376/forge-integ-erp-netsuite` | RabbitMQ + REST + GraphQL | ERP Integration (NetSuite) |
-| Forge Historian | a reference application | Rust + Next.js | Time-Series Historian |
-| Forge Scanner | `WhiskeyHouse/forge-wms-android` | Kotlin | Android Barcode Scanner |
-| Ignition SCADA | `WhiskeyHouse/whk-ignition-scada` | Ignition 8.x | SCADA/HMI (being replaced) |
-| Ignition Global | `WhiskeyHouse/whk-distillery01-ignition-global` | Jython 2.7 | Middleware scripts (being migrated) |
+```bash
+uv run forge governance specs             # every governed file: its state, its hash, who approved it
+uv run forge governance specs --pending   # what awaits the owner
+uv run forge governance schemas           # every schema version and how many specs are written against it
+uv run forge governance run facts <id>    # run one framework's checks on one spec
+```
 
 ## Development
 
 ### Prerequisites
 
-- Python 3.12+
-- UV (package manager)
-- Ruff (linter)
-- Docker (for database services)
+- Python 3.12 or newer, and [uv](https://docs.astral.sh/uv/)
+- Go, for the tree under `go/`
+- Node, only for the interim MES bridge (20 or newer) and the tutorial build (22 or newer)
+- Docker, for the development stack and the image
+- Java 11 or newer, only to run the TLA+ model checker
 
-### Quick Start
+### Quick start
 
 ```bash
-# Clone
 git clone https://github.com/reh3376/forge.git
 cd forge
 
-# Install from the lock (dev + ot extras); the same command CI and the hub image run
+# Install from the lock file (dev and ot extras); the same command CI and the image run
 uv sync --locked --extra dev --extra ot
 
-# Run tests
-uv run pytest
+# The whole Python suite: tests/ and forge-core/tests, about a minute
+uv run pytest -q -rsx
 
-# Lint and format checks (both block CI; ruff is pinned exactly so local and CI agree)
+# Lint and format checks; both block CI
 uv run ruff check .
 uv run ruff format --check .
 
-# Run specific test suite
-uv run pytest tests/modules/ot/ -v           # OT Module tests
-uv run pytest forge-core/tests/sdk/scripting/ -v   # Scripting SDK tests
-uv run pytest forge-core/tests/core/ -v            # forge-core tests
+# The Go tree
+cd go && gofmt -l . && go vet ./... && go test ./...
+```
+
+Run one area:
+
+```bash
+uv run pytest tests/modules/ot -q                 # forge-ot
+uv run pytest forge-core/tests -q                 # forge-core
+uv run pytest tests/modules/ot/control/test_review_gate_exhaustive.py -q    # the write review gate, exhaustively
+uv run pytest tests/modules/ot/alarming/test_state_machine_exhaustive.py -q # the alarm state machine, exhaustively
+scripts/tla/tlc.sh <Model.tla>                    # the TLA+ model checker, pinned by checksum
 ```
 
 ### Dependencies
 
-`uv.lock` pins every Python dependency for every platform. CI, the hub image
-(`deploy/docker/Dockerfile.forge`) and the quick start all install from it with
-`uv sync --locked`, which fails when `pyproject.toml` and the lock disagree, so a dependency
-moves only through a committed re-lock:
+`uv.lock` pins every Python dependency for every platform. CI, the image (`deploy/docker/Dockerfile.forge`) and the quick start all install from it with `uv sync --locked`, which fails when `pyproject.toml` and the lock disagree. A dependency moves only through a committed re-lock, and a change to a manifest or lock file is confirmed with the owner first.
 
 ```bash
-uv lock --upgrade-package fastapi    # one package, within its pyproject range
-uv lock --upgrade                    # everything the ranges allow
-uv sync --locked --extra dev --extra ot && uv run pytest   # then commit uv.lock with the change
+uv lock --upgrade-package fastapi    # one package, within its range in pyproject.toml
+uv sync --locked --extra dev --extra ot && uv run pytest -q   # then commit uv.lock with the change
 ```
 
-### Test Coverage
+### How work is done
 
-```
-Total:  5,140 tests collected (full suite green on 2026-11-22)
-        292 test files
-        354 source files
-
-By area:
-  OT module:                       1,162  (alarming, bridge, control, mqtt, tag_engine, opcua)
-  Spokes (adapters):               1,011
-  Governance (FxTS):                 822  (FATS, FACTS, FTTS, FVTS, FMTS runners and schemas)
-  Scripting SDK, module builder:     356
-  Core models, registry, context:    547
-  Storage:                           317
-  Transport, ingest, API, gateway:   298
-  Curation:                          147
-  Broker, integration, verification: 119
-  CLI:                                23
-  Repository (dependency lock):        7
-```
-
-Counts come from `uv run pytest --collect-only -q | tail -1`; `docs/WHERE-WE-ARE.md` §2 carries them and is updated before every push.
+Work happens on the branch `reh3376_dev01`, one backlog item per pull request. A push opens the pull request through a workflow; the owner approves and merges. Before every push the documents match the code, the tutorial is rebuilt, the full suite passes and the commits are scanned for secrets. [`CLAUDE.md`](CLAUDE.md) has the full procedure.
 
 ### Tutorial
 
-Two guided paths through the platform, built from `docs/tutorial.md` by tutorial-forge (`scripts/tutorial-forge/`, config `tutorial.config.json`): software-dev / contributor onboarding (F1–F11) and an end-user overview (U1–U12), with 24 pre-rendered diagrams, a sidebar of sections and diagrams, acronyms expanded on first use and a glossary. The framework's reference is `scripts/tutorial-forge/FSD.md`; the model is the MDEMG tutorial at https://reh3376.github.io/mdemg/.
+The tutorial has two tracks, one for developers and one for users, built from [`docs/tutorial.md`](docs/tutorial.md). It is published at https://reh3376.github.io/forge/.
 
 ```bash
-(cd scripts/tutorial-forge && npm ci)   # once; Node 22+; downloads Chromium for the diagram render
-make sync-tutorial-embed                # renders build/tutorial-static/ (gitignored)
-make verify-tutorial-embed              # the drift gate: the build matches the sources
-make check-tutorial-build               # the FSD's verification contracts and every fragment link
-make serve-tutorial                     # http://localhost:8000/ at a viewport of 980px or wider
+(cd scripts/tutorial-forge && npm ci)   # once
+make sync-tutorial-embed                # build it
+make verify-tutorial-embed              # the build matches its sources
+make check-tutorial-build               # its verification contracts and every link
 ```
 
-The published tutorial is at https://reh3376.github.io/forge/. The `Deploy Tutorial` workflow builds the deck on every push that touches its sources and publishes it to GitHub Pages from `main` (Pages enabled for the repository on 2026-10-28 with `gh api -X POST repos/reh3376/forge/pages -f build_type=workflow`); on a fork where Pages is not enabled the deploy step is skipped with a notice.
+## Documentation
 
-### Project Documentation
-
-| Document | Location | Purpose |
-|----------|----------|---------|
-| What Forge will be | `docs/VISION.md` | The finished system, the problems it solves, the definition of complete |
-| Where we are going | `docs/WHERE-WE-ARE-GOING.md` | Direction: principles, milestones, what is next, what gates it |
-| Where we are | `docs/WHERE-WE-ARE.md` | Component-by-component state snapshot, updated before every push that changes it |
-| Roadmap | `docs/ROADMAP.md` | Decisions in force, workstreams, sequence and the owner decision queue (companion to `BACKLOG.md`) |
-| Principles | `docs/PRINCIPLES.md` | Design principles, technical invariants, the governance pattern, the decision frame, technology decisions, origins, spoke priorities, lessons |
-| Tutorial | `docs/tutorial.md` | The onboarding deck (contributor and end-user tracks) rendered by tutorial-forge; see "Tutorial" above |
-| Sprint Plan | `docs/p7-forge-ot/P7_SPRINT_PLAN.md` | P7 OT Module 24-sprint plan |
-| API Mapping | `docs/p7-forge-ot/SYSTEM_TO_FORGE_API_MAP.md` | All 52 system.* → forge.* conversions |
-| Conversion Targets | `docs/p7-forge-ot/TIER1_CONVERSION_TARGETS.md` | 82 scripts classified (42 convert, 18 replace, 14 defer, 8 drop) |
-| HMI Latency | `docs/p7-forge-ot/HMI_LATENCY_CONTRACT.md` | UI response time contracts |
-
-## Design Decisions
-
-1. **Hub owns all databases**: Modules get permissioned access through the storage router — they never own their own database connections.
-
-2. **gRPC + compiled Protobuf only**: Hub↔spoke communication uses compiled protobuf binary transport. JSON-over-gRPC is explicitly forbidden — it defeats the purpose of type-safe contracts.
-
-3. **Spec-first governance**: FxTS specs define what must exist. Code conforms to specs. Specs are the source of truth, not the implementation.
-
-4. **Thin wrapper over asyncua**: The OPC-UA client wraps asyncua with 6 converter functions at the boundary. asyncua owns the wire protocol; Forge owns the type system and operational concerns.
-
-5. **Python 3.12+ everywhere**: No Jython, no Java interop. Scripts that previously ran on Ignition's Jython 2.7 VM are rewritten as native Python 3.12+ with the forge.* SDK.
-
-6. **Every spoke needs approval**: Each new spoke compliance plan (FACTS spec) requires explicit review and approval before implementation begins.
+| Document | What it tells you |
+|---|---|
+| [`docs/WHERE-WE-ARE.md`](docs/WHERE-WE-ARE.md) | The current state of every component. The pick-up point at the top says what was done last and what comes next |
+| [`docs/WHERE-WE-ARE-GOING.md`](docs/WHERE-WE-ARE-GOING.md) | The direction and the order of work |
+| [`docs/VISION.md`](docs/VISION.md) | The finished product and the problems it solves |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | The decisions in force, and the plan by workstream |
+| [`BACKLOG.md`](BACKLOG.md) | Every known problem, by a stable id (FB-nnn) |
+| [`docs/decisions/`](docs/decisions) | The signed decision records. A signed record is changed only by the owner |
+| [`docs/PRINCIPLES.md`](docs/PRINCIPLES.md) | Design principles and technology decisions |
+| [`docs/FxTS/`](docs/FxTS) | A page per framework, and the summary |
+| [`forge-core/README.md`](forge-core/README.md) | What forge-core is, the chain of command, and how authority works |
+| [`CLAUDE.md`](CLAUDE.md) | The rules for anyone, person or agent, changing this repository |
+| [`SECURITY.md`](SECURITY.md) | How to report a security problem |
 
 ---
 
-*367 Python source files | 292 test files | 5,140 tests | 9 FACTS · 28 FATS · 9 FMTS · 2 FVTS · 1 FTTS · 17 FUTS specs · 6 governed lists | Python 3.12+ · Go 1.26 | Proprietary (licence model undecided, `docs/PRINCIPLES.md` §6)*
+Python 3.12+ · Go · gRPC and Protobuf · PostgreSQL, TimescaleDB, Neo4j, Redis · Proprietary; the licence model is undecided ([`docs/PRINCIPLES.md`](docs/PRINCIPLES.md) §6).
