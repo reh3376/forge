@@ -24,7 +24,7 @@ In the owner's words (2026-11-17): "Forge is first and foremost a manufacturing 
 | `docs/WHERE-WE-ARE-GOING.md` | The direction and the order of work. |
 | `docs/VISION.md` | The finished product and the problems it solves. |
 | `docs/ROADMAP.md` | §1 lists the decisions in force (A-1 to A-12); the rest is the plan by workstream. |
-| `BACKLOG.md` | Every known problem, by stable id (FB-nnn). |
+| `BACKLOG.md` | Every known open problem, by stable id (FB-nnn). Finished entries are in `BACKLOG-DONE.md`, each with the commit and pull request that fixed it. |
 | `docs/decisions/` | Signed decision records. A signed record is changed only by the owner. |
 | `docs/tutorial.md` | The developer and user tutorial, live at https://reh3376.github.io/forge/ |
 
@@ -61,7 +61,7 @@ Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `build:`)
 
 ## Standing rules
 
-- **Every finding is fixed or written to `BACKLOG.md`.** Nothing is skipped.
+- **Every finding is fixed or written to `BACKLOG.md`.** Nothing is skipped. An entry that is finished moves to `BACKLOG-DONE.md` in the change that finishes it, with the date and `this change`; after "pr N merged", `this change` becomes the commit and the pull request. A finished entry is never left in `BACKLOG.md` marked Done (the owner, 2026-11-23; `tests/test_backlog.py`).
 - **Only the owner approves a spec hash** (`forge governance approve <spec> --by reh3376`) **or signs a decision record**, on their explicit word. When a decision is the owner's, ask one question at a time.
 - **FxTS specs are the standard for repeatable work (A-13).** Every highly repeatable process has an FxTS spec, and the work is built to it. A repeatable process without one is a finding. Every framework meets the baseline of `docs/decisions/fxts-framework-baseline.md` (D-14): a framework is either planned or complete, and every spec carries a hash the owner approves. So does every schema version (a schema change is a release, `forge governance schema-release`, never an edit in place) and every governed list a spec chooses values from (`forge-core/contract/lists/`).
 - **Confirm with the owner before installing packages** or changing a manifest or lock file.
