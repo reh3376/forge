@@ -23,6 +23,17 @@
       "released_at": "2026-11-23T02:24:12Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-23T02:30:20Z"
+    },
+    {
+      "version": "0.2.0",
+      "file": "versions/facts.v0.2.0.schema.json",
+      "schema_hash": "3bd3ba948e644e3f93d394fcb21390cb25799a9bd25ba298347ab3416dc24bac",
+      "hash_state": "approved",
+      "step": "minor",
+      "summary": "FB-079 (D-8): words for what FACTS could not say about an OT adapter: the OPC UA client services as source types (browse, read, subscribe, history_read, write), the collection mode on_demand, the parameter types enum and object, the enrichment rule opcua_property_read. Additions only.",
+      "released_at": "2026-11-23T18:20:15Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-23T18:34:09Z"
     }
   ]
 }

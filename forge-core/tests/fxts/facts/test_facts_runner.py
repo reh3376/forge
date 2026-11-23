@@ -245,6 +245,12 @@ class TestCheckSpecVersion:
         assert v.status == verdict_status.PASS
         assert v.check_id == "facts:spec-version"
 
+    def test_every_released_version_is_accepted(self, runner, verdict_status):
+        """FB-079: the check knew one number; a spec written against 0.2.0 failed it."""
+        for version in ("0.1.0", "0.1.1", "0.2.0"):
+            verdict = runner._check_spec_version(_minimal_spec(spec_version=version))
+            assert verdict.status == verdict_status.PASS, version
+
     def test_wrong_version(self, runner, verdict_status):
         spec = _minimal_spec(spec_version="9.9.9")
         v = runner._check_spec_version(spec)

@@ -253,14 +253,23 @@ class TestCrossSpecConsistency:
             ids.append(spec["adapter_identity"]["adapter_id"])
         assert len(ids) == len(set(ids)), f"Duplicate adapter IDs: {ids}"
 
-    def test_all_specs_have_same_spec_version(self):
-        """All specs should use the same FACTS spec version."""
+    def test_every_spec_declares_a_released_version(self):
+        """A spec is written against one released version of the schema and says which.
+
+        The specs need not all be on the same one: a spec moves to a newer version when it
+        needs what that version adds (forge-ot is on 0.2.0 for the OT words, FB-079).
+        """
+        from forge_core import contract
+        from forge_core.fxts.shared import schemas
+
+        released = {row.version for row in schemas.versions(contract.schema_dir("facts"))}
         specs_dir = FXTS_ROOT / "facts" / "specs"
-        versions = set()
-        for spec_path in specs_dir.glob("*.facts.json"):
-            spec = json.loads(spec_path.read_text())
-            versions.add(spec["spec_version"])
-        assert len(versions) == 1, f"Mixed spec versions: {versions}"
+        declared = {
+            spec_path.name: json.loads(spec_path.read_text())["spec_version"]
+            for spec_path in specs_dir.glob("*.facts.json")
+        }
+        assert set(declared.values()) <= released, declared
+        assert declared["forge-ot.facts.json"] == "0.2.0"
 
     def test_all_specs_have_integrity_blocks(self):
         """Every spec must include an integrity block."""

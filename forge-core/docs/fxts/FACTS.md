@@ -3,7 +3,7 @@
 **Framework ID:** FACTS
 **Full Name:** Forge Adapter Conformance Test Specification
 **CI Gate:** Hard-fail (merge-blocking for production adapters)
-**Status:** Schema v0.1.1 (a patch step of 2026-11-22 that corrects one description, FB-226; the nine specs stay on 0.1.0, which they declare). Schema v0.1.0 (vocabulary extended 2026-10-17, backward compatible), runner (`facts:schema-valid` + 35 rule checks whose enums are read from the schema) and 9 adapter specs; 8 of 9 validate against the schema; 298 tests under `tests/governance/facts/`. Gap: FB-079 (OT spec vocabulary and identity, decision D-8)
+**Status:** Schema v0.2.0 (a minor step of 2026-11-23, FB-079 and D-8: words for what FACTS could not say about an OT adapter, and nothing that had a word already; approved by the owner the same day). forge-ot's spec declares 0.2.0; the other eight stay on 0.1.0, which they declare. Schema v0.1.1 (a patch step of 2026-11-22 that corrects one description, FB-226; the nine specs stay on 0.1.0, which they declare). Schema v0.1.0 (vocabulary extended 2026-10-17, backward compatible), runner (`facts:schema-valid` + 35 rule checks whose enums are read from the schema) and 9 adapter specs; all 9 validate against the version they declare; 298 tests under `tests/governance/facts/`. No open gap in the specs
 **Phase:** F12
 **MDEMG Analog:** UPTS
 
@@ -41,7 +41,7 @@ State on 2026-10-17 (`FACTSRunner` over `forge-core/src/python/forge_core/fxts/f
 | `forge-ims.facts.json` | MES_MOM | 8 (7 gRPC unary, 1 gRPC stream) | 12 + 2 enrichment | read, subscribe, backfill, discover | approved (no approver recorded) | pass |
 | `forge-mes.facts.json` | MES_MOM | 18 (10 GraphQL, 1 mutation, 1 RabbitMQ, 2 MQTT, 1 WS, 2 REST, 1 database) | 15 + 3 enrichment | read, **write**, subscribe, backfill, discover | approved (reh3376) | pass |
 | `forge-historian.facts.json` | HISTORIAN | 5 (4 REST, 1 WS) | 8 | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; was auto-approved, no approver) | pass |
-| `forge-ot.facts.json` | OT_SCADA (not a FACTS tier) | 21 (OPC-UA, alarm, control-write, Ignition bridge, scripting) | 9 + 10 enrichment | read, **write**, subscribe, backfill, discover | pending_review (FB-073) | 9 failures: `facts:schema-valid` (66 violations) + 8 vocabulary checks (FB-079) |
+| `forge-ot.facts.json` | OT | 8 (the five OPC UA client services, the alarm acknowledgement topic, two calls to the system it replaces) | 13 + 10 enrichment | read, **write**, subscribe, backfill, discover | approved (reh3376, 2026-11-23), on schema 0.2.0 | none: 38 of 38 checks pass (FB-079) |
 | `forge-scanner.facts.json` | OT | 5 (3 gRPC server unary, 2 gRPC server stream) | 9 | read, subscribe, discover | pending_review (FB-080 re-stamp; was auto-approved, no approver) | pass |
 | `forge-cmms.facts.json` | MES_MOM | 5 (3 GraphQL, 1 REST, 1 RabbitMQ) | 19 + 2 enrichment | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; previous hash approved by reh3376) | pass |
 | `forge-integ-erp-netsuite.facts.json` | ERP_BUSINESS | 5 (3 RabbitMQ, 1 REST, 1 GraphQL) | 12 + 2 enrichment | read, subscribe, backfill, discover | pending_review (FB-080 re-stamp; previous hash approved by forge-governance-audit) | pass |
@@ -114,7 +114,7 @@ facts.schema.json
 └── metadata              # object — Free-form; the only open section (adapter-specific material lives here); never inspected by the runner
 ```
 
-Every other section is closed (`additionalProperties: false`). The enums, as the schema carries them today and the runner reads them (`FactsVocabulary`): `source_type` graphql_query, graphql_mutation, graphql_subscription, rest_get, rest_post, rabbitmq, mqtt, websocket, file, database, grpc_unary, grpc_stream, grpc_server_unary, grpc_server_stream · `collection_mode` poll, subscribe, backfill, write, push · `auth_methods` none, bearer_token, api_key, basic, oauth2, certificate, azure_entra_id, mtls, device_token · `rule_type` timestamp_to_shift, location_to_area, lookup, computed, static, enum_normalize, composite · lifecycle states REGISTERED, CONNECTING, HEALTHY, DEGRADED, FAILED, STOPPED · `type` INGESTION, BIDIRECTIONAL, WRITE_ONLY, DISCOVERY_ONLY · `tier` OT, MES_MOM, ERP_BUSINESS, HISTORIAN, DOCUMENT. The gRPC, `push`, mTLS/device-token and the two enrichment rule types were added on 2026-10-17 (FB-080) because live spokes already used them; the OT vocabulary waits on D-8.
+Every other section is closed (`additionalProperties: false`). The enums, as the schema carries them today and the runner reads them (`FactsVocabulary`): `source_type` graphql_query, graphql_mutation, graphql_subscription, rest_get, rest_post, rabbitmq, mqtt, websocket, file, database, grpc_unary, grpc_stream, grpc_server_unary, grpc_server_stream, opcua_browse, opcua_read, opcua_subscribe, opcua_history_read, opcua_write · `collection_mode` poll, subscribe, backfill, write, push, on_demand · `auth_methods` none, bearer_token, api_key, basic, oauth2, certificate, azure_entra_id, mtls, device_token · `rule_type` timestamp_to_shift, location_to_area, lookup, computed, static, enum_normalize, composite, opcua_property_read · lifecycle states REGISTERED, CONNECTING, HEALTHY, DEGRADED, FAILED, STOPPED · `type` INGESTION, BIDIRECTIONAL, WRITE_ONLY, DISCOVERY_ONLY · `tier` OT, MES_MOM, ERP_BUSINESS, HISTORIAN, DOCUMENT. The gRPC, `push`, mTLS/device-token and the two enrichment rule types were added on 2026-10-17 (FB-080) because live spokes already used them. Schema 0.2.0 (2026-11-23, FB-079, D-8) added the OPC UA client services, `on_demand`, the parameter types `enum` and `object`, and `opcua_property_read`. The rule the owner set for it: the schema gains a word only for a meaning it could not express; where it has a word, a spec uses that word (`none` and not `anonymous`, the six module states and not a connection's states), and what is not a source of data is not listed as one.
 
 ### Time governance (one clock, FB-090)
 
@@ -138,7 +138,7 @@ The same section rides on the adapter manifest (`AdapterManifest.time_governance
 | Check ID | Category | What it validates |
 |----------|----------|-------------------|
 | `facts:schema-valid` | Schema | Spec validates against `facts.schema.json` (JSON Schema 2020-12); one violation per offending JSON path |
-| `facts:spec-version` | Identity | `spec_version` is `0.1.0` |
+| `facts:spec-version` | Identity | `spec_version` is a released version of the schema |
 | `facts:identity-id-format` | Identity | `adapter_id` is kebab-case, 3–64 chars |
 | `facts:identity-id-match` | Identity | `adapter_id` equals the run target |
 | `facts:identity-name` | Identity | `name` is 1–128 chars |
