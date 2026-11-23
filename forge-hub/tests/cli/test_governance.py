@@ -13,6 +13,7 @@ from typer.testing import CliRunner
 from forge_core.fxts import locations
 from forge_core.fxts.shared.runner import verify_spec_hash
 from forge_hub.cli import governance
+from forge_hub.cli import governance as governance_cli
 from forge_hub.cli.main import app
 
 if TYPE_CHECKING:
@@ -252,16 +253,23 @@ def test_validate_spec_knows_fvts_and_ftts() -> None:
 
 def test_run_facts_by_adapter_id_and_by_file(root: Path) -> None:
     specs = root / "facts" / "specs"
+    # Nothing failed, and the checks against the adapter's code did not run: the run is
+    # incomplete, exit 3, and says so (D-14 F-7, FB-265, FB-271).
     code, out = run("run", "facts", "forge-wms", "--specs", str(specs))
-    assert code == 0, out
-    assert "[PASS] FACTS — forge-wms" in out and "All checks passed." in out
+    assert code == governance_cli.EXIT_INCOMPLETE == 3, out
+    assert "[INCOMPLETE] FACTS — forge-wms" in out and "1 not run" in out
+    assert "[NOT_RUN] facts:live: NOT RUN" in out
+    assert "this run does not show that the spec is met" in out
+    assert "All checks" not in out and "Failed checks:" not in out
 
     code, out = run("run", "facts", str(specs / "forge-wms.facts.json"), "--format", "json")
-    assert code == 0, out
+    assert code == governance_cli.EXIT_INCOMPLETE, out
     report = json.loads(out)
+    assert report["outcome"] == "INCOMPLETE"
     assert report["framework"] == "FACTS" and report["target"] == "forge-wms"
     assert report["metadata"]["spec_file"] == str(specs / "forge-wms.facts.json")
-    assert {v["status"] for v in report["verdicts"]} <= {"PASS", "SKIP"}
+    not_passed = {v["check_id"]: v["status"] for v in report["verdicts"] if v["status"] != "PASS"}
+    assert not_passed == {"facts:live": "NOT_RUN"}
 
 
 def test_run_facts_reports_a_pending_stamp_as_the_one_failed_check(root: Path) -> None:
@@ -294,16 +302,20 @@ def test_run_fvts_reference_only_waits_on_the_owner(tmp_path: Path) -> None:
     report = json.loads(out)
     assert report == json.loads(out_file.read_text(encoding="utf-8"))
     assert report["framework"] == "FVTS" and len(report["verdicts"]) == 21
-    not_ok = {v["check_id"] for v in report["verdicts"] if v["status"] not in ("PASS", "SKIP")}
+    not_ok = {v["check_id"] for v in report["verdicts"] if v["status"] != "PASS"}
     assert not_ok <= {"fvts:hash-approved"}  # pending the owner's approval, nothing else
     assert code == (1 if not_ok else 0)
+    assert report["outcome"] == ("FAIL" if not_ok else "PASS")
 
 
 def test_run_ftts_and_fats_load_their_specs() -> None:
     # The FTTS spec is hashed since FB-160 and the owner approved it on 2026-11-18.
+    # All 41 static checks pass and the run is incomplete: nothing compared the spec with
+    # the proto or the servicer (FB-265, FB-270).
     code, out = run("run", "ftts", "grpc-hardened-transport")
-    assert code == 0, out
-    assert "[PASS] FTTS — grpc-hardened-transport: 41/41 checks passed" in out
+    assert code == governance_cli.EXIT_INCOMPLETE, out
+    assert "[INCOMPLETE] FTTS — grpc-hardened-transport: 41/42 checks passed, 1 not run" in out
+    assert "[NOT_RUN] ftts:live: NOT RUN" in out
 
     code, out = run("run", "fats", "/v1/health", "--format", "json")
     report = json.loads(out)
@@ -404,8 +416,8 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
     code, out = run("run", "fmts", str(path))
     assert code == 1, out
     assert "[FAIL] fmts:m10" in out and "names no roles file" in out
-    assert "Not checked:" in out
+    assert "Not run:" in out
     for requirement in ("m4", "m5", "m6", "m7"):
-        assert f"[SKIP] fmts:{requirement}: NOT CHECKED" in out
+        assert f"[NOT_RUN] fmts:{requirement}: NOT RUN" in out
     assert "[FAIL] fmts:m1:" not in out and "[FAIL] fmts:m2:" not in out
     assert "[FAIL] fmts:m3:" not in out and "[FAIL] fmts:m11:" in out

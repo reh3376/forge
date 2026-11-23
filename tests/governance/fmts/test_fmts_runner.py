@@ -21,7 +21,8 @@ if TYPE_CHECKING:
 
     from forge_core.fxts.shared.runner import FxTSReport, FxTSVerdict
 
-PASS, FAIL, SKIP = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.SKIP
+PASS, FAIL = VerdictStatus.PASS, VerdictStatus.FAIL
+UNRUN, WAIVED = VerdictStatus.NOT_RUN, VerdictStatus.WAIVED
 REASON = "The interim bridge keeps this until its replacement exists."
 
 
@@ -68,7 +69,10 @@ class TestAModuleThatMeetsTheBaseline:
     async def test_every_static_requirement_passes(self, runner, spec, repo) -> None:
         report = await _run(runner, spec, repo)
         verdicts = _by_id(report)
-        assert report.passed and report.hash_verified is True and report.framework == "FMTS"
+        # Nothing fails, and the run is not passed: the fixture module waives the transport
+        # requirements and the kit cannot drive it, and none of that counts as passed.
+        assert not report.failed and report.outcome == "INCOMPLETE"
+        assert report.hash_verified is True and report.framework == "FMTS"
         assert report.total == 29
         for requirement in ("m1", "m2", "m3", "m8", "m9", "m10", "m11"):
             assert verdicts[f"fmts:{requirement}"].status == PASS, verdicts[f"fmts:{requirement}"]
@@ -92,10 +96,33 @@ class TestAModuleThatMeetsTheBaseline:
         assert CONFORMANCE_KIT == ("M-4", "M-5", "M-6", "M-7")
         for requirement in ("m4", "m5", "m6", "m7"):
             verdict = verdicts[f"fmts:{requirement}"]
-            assert verdict.status == SKIP
-            assert "NOT CHECKED" in verdict.message and "FB-155" in verdict.message
+            assert verdict.status == UNRUN
+            assert "NOT RUN" in verdict.message and "FB-155" in verdict.message
             assert "not in the module's own package" in verdict.message
             assert verdict.evidence == {"waived": False, "unverified": True, "blocked_on": "FB-155"}
+
+    async def test_a_module_that_breaks_while_it_is_loaded_fails_the_run(self, spec, repo) -> None:
+        """Not "the kit cannot drive it": the module broke. Until FB-265 that was a skip,
+        and a skip was a pass, so a module that could not even be loaded passed."""
+
+        class BrokenKit:
+            HOOK_FILE = "conformance.py"
+
+            @staticmethod
+            def load_fixture(repo_root: Any, module_id: str) -> dict[str, Any]:
+                raise RuntimeError("the fixture is unreadable")
+
+        report = await _run(
+            FMTSRunner(schema_path=SCHEMA_PATH, conformance_kit=BrokenKit), spec, repo
+        )
+        verdicts = _by_id(report)
+        for requirement in ("m4", "m5", "m6", "m7"):
+            verdict = verdicts[f"fmts:{requirement}"]
+            assert verdict.status == VerdictStatus.ERROR
+            assert (
+                "could not be loaded (RuntimeError: the fixture is unreadable)" in verdict.message
+            )
+        assert report.failed
 
     async def test_a_runner_handed_no_kit_says_so(self, spec, repo) -> None:
         """The kit belongs to the hub and is handed in (D-17, S-1); without it nothing is
@@ -103,7 +130,7 @@ class TestAModuleThatMeetsTheBaseline:
         verdicts = _by_id(await _run(FMTSRunner(schema_path=SCHEMA_PATH), spec, repo))
         for requirement in ("m4", "m5", "m6", "m7"):
             verdict = verdicts[f"fmts:{requirement}"]
-            assert verdict.status == SKIP
+            assert verdict.status == UNRUN
             assert "no conformance kit was handed to this runner" in verdict.message
 
     async def test_a_module_off_the_python_template_is_reported_as_not_checked(
@@ -112,7 +139,7 @@ class TestAModuleThatMeetsTheBaseline:
         unsigned["scaffold"]["template"] = "none"
         _waive(unsigned, "M-11")
         verdict = await _one(runner, unsigned, repo, "m4")
-        assert verdict.status == SKIP and "not on the python-adapter template" in verdict.message
+        assert verdict.status == UNRUN and "not on the python-adapter template" in verdict.message
 
     async def test_one_verdict_per_requirement(self, runner, spec, repo) -> None:
         verdicts = _by_id(await _run(runner, spec, repo))
@@ -129,7 +156,7 @@ class TestTheTransportRequirements:
         verdicts = _by_id(await _run(runner, spec, repo))
         for check in ("m12", "m13", "m14"):
             verdict = verdicts[f"fmts:{check}"]
-            assert verdict.status == SKIP and verdict.message.startswith("NOT CHECKED")
+            assert verdict.status == UNRUN and verdict.message.startswith("NOT RUN")
             assert verdict.evidence["blocked_on"] == "FB-164"
 
     async def test_a_module_with_no_downward_writes_is_not_bound(self, runner, spec, repo) -> None:
@@ -291,9 +318,14 @@ class TestPlumbing:
             "fmts:hash-verified",
             "fmts:hash-approved",
             "fmts:enum-parity",
+            "fmts:requirements",
             "fmts:schema-current",
         ]
-        assert _by_id(report)["fmts:schema-valid"].status == FAIL and not report.passed
+        verdicts = _by_id(report)
+        assert verdicts["fmts:schema-valid"].status == FAIL and report.failed
+        # the checks that did not run are said to have not run, never left out (FB-265)
+        assert verdicts["fmts:requirements"].status == UNRUN
+        assert "16 requirement checks" in verdicts["fmts:requirements"].message
 
     async def test_an_edited_spec_fails_its_hash(self, runner, spec, repo) -> None:
         spec["module_identity"]["version"] = "9.0.0"
@@ -334,7 +366,7 @@ class TestWaivers:
         _waive(unsigned, "M-11")
         report = await _run(runner, sign(unsigned), repo)
         verdicts = _by_id(report)
-        assert report.passed
+        assert not report.failed and not report.passed  # a waiver is never a pass (FB-265)
         assert verdicts["fmts:waivers"].status == PASS
         assert verdicts["fmts:waivers"].evidence == {
             "waived": ["M-11"],
@@ -343,7 +375,7 @@ class TestWaivers:
             "approved_by": "reh3376",
         }
         waived = verdicts["fmts:m11"]
-        assert waived.status == SKIP and waived.message.startswith("WAIVED until FB-900")
+        assert waived.status == WAIVED and waived.message.startswith("WAIVED until FB-900")
         assert REASON in waived.message and waived.evidence["waived"] is True
 
     async def test_without_the_waiver_the_requirement_is_enforced(self, runner, unsigned, repo):
@@ -390,7 +422,7 @@ class TestWaivers:
             assert waivers.evidence["admin_waivers"] == [requirement]
             assert waivers.evidence["approved_by"] == "reh3376"
             skipped = verdicts[f"fmts:{requirement.lower().replace('-', '')}"]
-            assert skipped.status == SKIP and skipped.message.startswith("WAIVED until FB-900")
+            assert skipped.status == WAIVED and skipped.message.startswith("WAIVED until FB-900")
 
     async def test_an_ordinary_waiver_does_not_wait_for_approval(
         self, runner, unsigned, repo
@@ -406,7 +438,7 @@ class TestWaivers:
     async def test_a_running_requirement_can_be_waived(self, runner, unsigned, repo) -> None:
         _waive(unsigned, "M-7")
         verdict = await _one(runner, unsigned, repo, "m7")
-        assert verdict.status == SKIP and verdict.message.startswith("WAIVED")
+        assert verdict.status == WAIVED and verdict.message.startswith("WAIVED")
 
     async def test_claim_and_waiver_must_agree(self, runner, unsigned, repo) -> None:
         claimed = json.loads(json.dumps(unsigned))

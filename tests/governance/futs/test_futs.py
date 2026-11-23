@@ -28,7 +28,7 @@ from forge_core.fxts.shared.runner import (
     verify_spec_hash,
 )
 
-PASS, FAIL, SKIP = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.SKIP
+PASS, FAIL, UNRUN = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.NOT_RUN
 SCHEMA = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 #: Every FUTS spec, each in the folder of what it describes: the widgets are
 #: forge-display's, a view is its module's or the hub's.
@@ -156,7 +156,7 @@ class TestTheSpecs:
         assert by_status.get(VerdictStatus.NOT_IMPLEMENTED, set()) == set()
         assert by_status.get(VerdictStatus.ERROR, set()) == set()
         assert by_status.get(FAIL, set()) == ALLOWED_FAILURES.get(ident, frozenset())
-        assert by_status.get(SKIP, set()) == NOT_RUN.get(ident, frozenset())
+        assert by_status.get(UNRUN, set()) == NOT_RUN.get(ident, frozenset())
         assert report.hash_verified is True
 
     def test_every_widget_with_a_binding_shows_quality_and_staleness(self) -> None:
@@ -196,9 +196,9 @@ class TestAWidgetSpec:
 class TestAViewDocument:
     async def test_the_reference_passes_and_names_what_it_did_not_check(self, runner, view) -> None:
         report = await runner.run(target=VIEW, spec=view)
-        skipped = [v for v in report.verdicts if v.status == SKIP]
+        skipped = [v for v in report.verdicts if v.status == UNRUN]
         assert [v.check_id for v in skipped] == ["futs:expressions"]
-        assert skipped[0].message.startswith("NOT CHECKED") and "FB-181" in skipped[0].message
+        assert skipped[0].message.startswith("NOT RUN") and "FB-181" in skipped[0].message
 
     async def test_a_widget_without_a_spec(self, runner, view) -> None:
         _node(view, "temp")["widget"] = "gauge-dial"

@@ -143,6 +143,20 @@ class FTTSRunner(FxTSRunner):
         # Live checks (import and inspect actual modules)
         if live:
             verdicts.extend(self._live_checks(spec))
+        else:
+            verdicts.append(
+                FxTSVerdict(
+                    check_id="ftts:live",
+                    spec_ref="FTTS/live",
+                    status=VerdictStatus.NOT_RUN,
+                    message=(
+                        "NOT RUN: the checks of a spec against the transport code: the run "
+                        "was not asked for live checks. Nothing in this run compared the "
+                        "spec with the proto or the servicer (BACKLOG FB-270)."
+                    ),
+                    evidence={"unverified": True, "blocked_on": "FB-270"},
+                )
+            )
 
         return verdicts
 

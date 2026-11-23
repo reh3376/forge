@@ -47,7 +47,12 @@ class TestEveryFrameworkGetsThem:
         approve_spec_hash(spec, approved_by="owner")
         report = await BareRunner().run(target="x", spec=spec)
         assert _statuses(report, "fxts") == {"fxts:hash-verified": PASS, "fxts:hash-approved": PASS}
-        assert report.passed
+        # Nothing failed. The run is still not passed: this stand-in has no registered
+        # schema, so the spec's schema record could not be checked, and that is said.
+        assert not report.failed and not report.passed
+        assert [(v.check_id, v.status) for v in report.not_run] == [
+            ("fxts:schema-current", VerdictStatus.NOT_RUN)
+        ]
 
     async def test_a_spec_without_a_hash_fails_both(self) -> None:
         report = await BareRunner().run(target="x", spec={"name": "x"})

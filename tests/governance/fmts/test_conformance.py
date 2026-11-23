@@ -26,7 +26,7 @@ from forge_wms.adapter import ForgeWmsAdapter
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-PASS, FAIL, SKIP = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.SKIP
+PASS, FAIL, UNRUN = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.NOT_RUN
 MANIFEST = REPO_ROOT / "forge-modules/forge-wms/src/python/forge_wms/manifest.json"
 PARAMS = placeholder_params(json.loads(MANIFEST.read_text(encoding="utf-8")))
 EVENTS = [
@@ -90,7 +90,7 @@ class TestAModuleThatConforms:
 
     async def test_without_sample_events_m6_is_not_checked(self) -> None:
         results = await run_conformance(_driver(events=[]))
-        assert results["M-6"].status == SKIP and "NOT CHECKED" in results["M-6"].message
+        assert results["M-6"].status == UNRUN and "NOT RUN" in results["M-6"].message
         assert results["M-4"].status == PASS and results["M-5"].status == PASS
 
 

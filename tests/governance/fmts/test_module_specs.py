@@ -30,7 +30,7 @@ import pytest
 from forge_core.fxts import locations
 from forge_core.fxts.fmts import REPO_ROOT
 from forge_core.fxts.fmts.runners.fmts_runner import CONFORMANCE_KIT, FMTSRunner, load_backlog
-from forge_core.fxts.shared.runner import VerdictStatus
+from forge_core.fxts.shared.runner import RunOutcome, VerdictStatus
 
 PENDING_APPROVAL = frozenset({"fmts:hash-approved"})
 ALLOWED_FAILURES: dict[str, frozenset[str]] = {
@@ -78,6 +78,8 @@ NOT_RUN: dict[str, frozenset[str]] = {
     "forge-ims": frozenset(),
     "forge-mes": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # TypeScript, another process
     "forge-ot": frozenset(),  # off the template; driven through its own conformance.py hook
+    # no sample events for the kit, so its time check never ran (the audit, FB-272)
+    "forge-scanner": NO_SAMPLE_EVENTS,
 }
 
 SPEC_FILES = locations.spec_files("fmts", "*.fmts.json")
@@ -115,13 +117,19 @@ async def test_module_meets_its_spec(runner: FMTSRunner, module_id: str) -> None
     assert report.total == 29 and report.hash_verified is True
     assert by_status.get(VerdictStatus.NOT_IMPLEMENTED, set()) == set()  # schema-runner parity
     assert by_status.get(VerdictStatus.ERROR, set()) == set()
-    assert by_status.get(VerdictStatus.FAIL, set()) == ALLOWED_FAILURES.get(
-        module_id, PENDING_APPROVAL
-    )
+    # A module with no row here is a failure of this test, never an allowed gap (FB-266).
+    assert by_status.get(VerdictStatus.FAIL, set()) == ALLOWED_FAILURES[module_id]
 
     waived = WAIVED.get(module_id, ROLES_ONLY)
-    not_run = {_check(r) for r in NOT_RUN.get(module_id, NO_SAMPLE_EVENTS) if r not in waived}
-    assert by_status.get(VerdictStatus.SKIP, set()) == not_run | {_check(r) for r in waived}
+    not_run = {_check(r) for r in NOT_RUN[module_id] if r not in waived}
+    assert by_status.get(VerdictStatus.NOT_RUN, set()) == not_run
+    assert by_status.get(VerdictStatus.WAIVED, set()) == {_check(r) for r in waived}
+    # Every module waives something, so no module's run passes: it is incomplete, or it
+    # fails. That is the true state of the nine today (D-14 F-7, FB-265, FB-272).
+    assert report.outcome is (
+        RunOutcome.FAIL if ALLOWED_FAILURES[module_id] else RunOutcome.INCOMPLETE
+    )
+    assert not report.passed
     ran = {_check(r) for r in CONFORMANCE_KIT} - not_run - {_check(r) for r in waived}
     assert ran <= by_status.get(VerdictStatus.PASS, set())
     assert {w["requirement"]: w["backlog_item"] for w in spec["waivers"]} == waived

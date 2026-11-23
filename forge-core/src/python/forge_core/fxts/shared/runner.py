@@ -6,6 +6,8 @@ Design principles (from UxTS lineage):
      enforced by the runner. Silent ignore is prohibited.
   3. Runners produce structured verdicts with evidence, not bare pass/fail.
   4. A single unimplemented schema field causes HARD FAIL, not a skip.
+     A check that did not run is reported as not run and the run does not
+     pass (D-14, F-7): see ``VerdictStatus`` and ``outcome_of``.
   5. Hashing lock — every spec carries a self-contained integrity hash.
      Hash verification is independent from assertion execution: a spec can
      PASS assertions but have hash_verified=False (meaning it was modified).
@@ -17,13 +19,17 @@ from __future__ import annotations
 import abc
 import hashlib
 import json
+import traceback
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 # ---------------------------------------------------------------------------
 # Verdict model
@@ -31,13 +37,56 @@ from pydantic import BaseModel, Field
 
 
 class VerdictStatus(StrEnum):
-    """Outcome of a single spec check."""
+    """Outcome of a single spec check.
+
+    There is no status that means "skipped": a check either observed what it is for
+    (``PASS``, ``FAIL``), broke while trying (``ERROR``), has no implementation behind a
+    field the schema declares (``NOT_IMPLEMENTED``), did not run (``NOT_RUN``), or is
+    not enforced by a waiver in the spec (``WAIVED``). The last two are never counted
+    as passed (D-14, F-7; BACKLOG FB-265).
+    """
 
     PASS = "PASS"
     FAIL = "FAIL"
-    SKIP = "SKIP"
     ERROR = "ERROR"
     NOT_IMPLEMENTED = "NOT_IMPLEMENTED"
+    NOT_RUN = "NOT_RUN"
+    WAIVED = "WAIVED"
+
+
+class RunOutcome(StrEnum):
+    """What a whole run showed.
+
+    ``PASS``: every check ran and passed. ``FAIL``: a check failed or broke, or there
+    was no check at all. ``INCOMPLETE``: nothing failed, and at least one check did not
+    run or is waived, so the run does not show that the spec is met.
+    """
+
+    PASS = "PASS"
+    FAIL = "FAIL"
+    INCOMPLETE = "INCOMPLETE"
+
+
+#: A verdict with one of these fails the run.
+FAILING_STATUSES = frozenset(
+    {VerdictStatus.FAIL, VerdictStatus.ERROR, VerdictStatus.NOT_IMPLEMENTED}
+)
+#: A verdict with one of these observed nothing: the run cannot pass with it.
+UNOBSERVED_STATUSES = frozenset({VerdictStatus.NOT_RUN, VerdictStatus.WAIVED})
+
+
+def outcome_of(statuses: Iterable[VerdictStatus]) -> RunOutcome:
+    """The outcome of a run with these verdict statuses.
+
+    The one place the rule is written. A run with no verdicts fails: a run that checked
+    nothing has shown nothing.
+    """
+    seen = set(statuses)
+    if not seen or seen & FAILING_STATUSES:
+        return RunOutcome.FAIL
+    if seen & UNOBSERVED_STATUSES:
+        return RunOutcome.INCOMPLETE
+    return RunOutcome.PASS
 
 
 class SpecViolation(BaseModel):
@@ -502,10 +551,33 @@ class FxTSReport(BaseModel):
     integrity: IntegrityReport = Field(default_factory=IntegrityReport)
     metadata: dict[str, Any] = Field(default_factory=dict)
 
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def outcome(self) -> RunOutcome:
+        """PASS, FAIL or INCOMPLETE: see :func:`outcome_of`. Written into the JSON report."""
+        return outcome_of(v.status for v in self.verdicts)
+
     @property
     def passed(self) -> bool:
-        """True only if every verdict is PASS or SKIP."""
-        return all(v.status in (VerdictStatus.PASS, VerdictStatus.SKIP) for v in self.verdicts)
+        """True only when every check ran and passed. Not run and waived are not passed."""
+        return self.outcome is RunOutcome.PASS
+
+    @property
+    def failed(self) -> bool:
+        """True when a check failed or broke, or the run has no verdict at all."""
+        return self.outcome is RunOutcome.FAIL
+
+    @property
+    def failures(self) -> list[FxTSVerdict]:
+        return [v for v in self.verdicts if v.status in FAILING_STATUSES]
+
+    @property
+    def not_run(self) -> list[FxTSVerdict]:
+        return [v for v in self.verdicts if v.status == VerdictStatus.NOT_RUN]
+
+    @property
+    def waived(self) -> list[FxTSVerdict]:
+        return [v for v in self.verdicts if v.status == VerdictStatus.WAIVED]
 
     @property
     def total(self) -> int:
@@ -528,17 +600,24 @@ class FxTSReport(BaseModel):
         return sum(1 for v in self.verdicts if v.status == VerdictStatus.NOT_IMPLEMENTED)
 
     def summary(self) -> str:
-        """Human-readable one-line summary."""
-        status = "PASS" if self.passed else "FAIL"
+        """Human-readable one-line summary: the outcome, then every count that is not zero."""
         hash_flag = ""
         if self.hash_verified is False:
             hash_flag = " [HASH MISMATCH]"
         elif self.hash_verified is None:
             hash_flag = " [NO HASH]"
-        return (
-            f"[{status}] {self.framework} — {self.target}: "
-            f"{self.pass_count}/{self.total} checks passed{hash_flag}"
-        )
+        if not self.verdicts:
+            counts = "no check ran"
+        else:
+            counts = f"{self.pass_count}/{self.total} checks passed"
+            for count, word in (
+                (len(self.failures), "failed"),
+                (len(self.not_run), "not run"),
+                (len(self.waived), "waived"),
+            ):
+                if count:
+                    counts += f", {count} {word}"
+        return f"[{self.outcome}] {self.framework} — {self.target}: {counts}{hash_flag}"
 
     def to_json(self, indent: int = 2) -> str:
         """Serialize to JSON for CI artifacts."""
@@ -840,9 +919,28 @@ class FxTSRunner(abc.ABC):
             # Propagate governance warnings
             report.integrity.warnings.extend(integrity_result["warnings"])
 
-        # Framework-specific checks (always execute, regardless of hash result)
-        verdicts = await self._run_checks(target, **kwargs)
-        report.verdicts.extend(verdicts)
+        # Framework-specific checks (always execute, regardless of hash result).
+        # A check that raises is a failed run with its cause, never a traceback with no
+        # report and never a pass (FB-265).
+        try:
+            report.verdicts.extend(await self._run_checks(target, **kwargs))
+        except Exception as exc:
+            where = traceback.extract_tb(exc.__traceback__)[-1]
+            report.verdicts.append(
+                FxTSVerdict(
+                    check_id=f"{self.framework.lower()}:runner-error",
+                    spec_ref=f"{self.framework}/runner",
+                    status=VerdictStatus.ERROR,
+                    message=(
+                        f"The runner broke before it finished its checks: "
+                        f"{type(exc).__name__}: {exc}"
+                    ),
+                    evidence={
+                        "exception": type(exc).__name__,
+                        "at": f"{Path(where.filename).name}:{where.lineno} in {where.name}",
+                    },
+                )
+            )
 
         # Every framework fails a spec whose hash does not verify or is not approved
         # (D-14, F-4). A runner that placed the two verdicts itself is left as it is.
@@ -850,9 +948,18 @@ class FxTSRunner(abc.ABC):
         if spec is not None and f"{self.framework.lower()}:hash-verified" not in placed:
             report.verdicts.extend(self.integrity_verdicts(spec))
         if spec is not None and f"{self.framework.lower()}:schema-current" not in placed:
-            schema_verdict = self.schema_verdict(spec)
-            if schema_verdict is not None:
-                report.verdicts.append(schema_verdict)
+            report.verdicts.append(
+                self.schema_verdict(spec)
+                or FxTSVerdict(
+                    check_id=f"{self.framework.lower()}:schema-current",
+                    spec_ref=f"{self.framework}/integrity/schema_version",
+                    status=VerdictStatus.NOT_RUN,
+                    message=(
+                        "NOT RUN: this runner was given no registered framework schema, so "
+                        "the spec's record of its schema version could not be checked."
+                    ),
+                )
+            )
 
         report.finished_at = datetime.now(UTC)
         return report

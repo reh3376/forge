@@ -260,7 +260,11 @@ def governance_run(
         Path | None, typer.Option("--output", help="Also write the JSON report to this file")
     ] = None,
 ) -> None:
-    """Run one framework's conformance checks on one spec (exit 1 on any failure)."""
+    """Run one framework's conformance checks on one spec.
+
+    Exit 0 only when every check ran and passed; 1 when a check failed; 3 when nothing
+    failed but a check did not run or is waived (2 is the command line's own usage error).
+    """
     import asyncio
 
     name = framework.lower()
@@ -280,8 +284,10 @@ def governance_run(
         typer.echo(str(exc))
         raise typer.Exit(code=1) from None
     governance_cli.emit_report(report, fmt, output)
-    if not report.passed:
+    if report.failed:
         raise typer.Exit(code=1)
+    if not report.passed:
+        raise typer.Exit(code=governance_cli.EXIT_INCOMPLETE)
 
 
 # ---------------------------------------------------------------------------

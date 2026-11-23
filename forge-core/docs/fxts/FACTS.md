@@ -170,14 +170,13 @@ The same section rides on the adapter manifest (`AdapterManifest.time_governance
 | `facts:error-circuit-breaker` | Error Handling | `failure_threshold` ≥1, `half_open_after_ms` ≥1,000 |
 | `facts:time-governed` | Time Governance | section present; every enum in the schema; `sync_protocol` is not `none`; `fail_closed` is `true`; `clock_probe_interval_seconds` ≥1; `clock_read_method` is one the spoke's protocol can perform and is declared when the protocol offers one (opcua, cip/ethernet-ip/logix, s7, modbus, sparkplug); each `connections[]` entry names its connection and obeys the same rules. **Blocking** (one clock, FB-090; `docs/decisions/one-clock-ot-source-time.md` P-7) |
 | `facts:metadata` | Metadata | `metadata` is a dict (free-form, never inspected) |
-| `facts:integrity-present` | Integrity | integrity block present (SKIP when absent) |
 | `facts:integrity-hash-format` | Integrity | `spec_hash` is 64-char hex |
-| `facts:integrity-hash-state` | Integrity | `approved` passes; `modified`/`pending_review` fail with severity *warning* |
+| `facts:hash-verified`, `facts:hash-approved`, `facts:schema-current` | Integrity | the three verdicts every framework gets from the shared runner (D-14, F-4, F-10): the hash covers the content, the owner approved it, and the schema version it records stands. A spec with no integrity block fails the first two |
 | `facts:cross-write-sources` | Cross-field | `write: true` needs a write source (`collection_mode: write` or `graphql_mutation`) (*conditional*) |
 | `facts:cross-subscribe-sources` | Cross-field | `subscribe: true` needs a `subscribe` source (*conditional*) |
 | `facts:cross-ingestion-read` | Cross-field | `INGESTION` type requires `read` (*conditional*, on failure) |
 
-#### Live Checks (adapter instantiation, `live=True`) — planned; today the runner emits one `facts:live-not-implemented` SKIP
+#### Live Checks (adapter instantiation, `live=True`): not built. Every run gives one `facts:live` verdict, `NOT_RUN`, so no adapter spec's run passes: nothing compares a spec with the module's code (BACKLOG FB-271)
 
 | Check ID | What it validates |
 |----------|-------------------|

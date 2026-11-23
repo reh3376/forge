@@ -256,6 +256,8 @@ class FACTSRunner(FxTSRunner):
         if live:
             live_verdicts = await self._live_checks(spec, target)
             verdicts.extend(live_verdicts)
+        else:
+            verdicts.append(self._live_not_run("the run was not asked for live checks."))
 
         return verdicts
 
@@ -275,8 +277,8 @@ class FACTSRunner(FxTSRunner):
             return FxTSVerdict(
                 check_id="facts:schema-valid",
                 spec_ref="FACTS/schema",
-                status=VerdictStatus.SKIP,
-                message="No schema configured — schema validation skipped.",
+                status=VerdictStatus.NOT_RUN,
+                message="NOT RUN: no schema configured, so the spec was not validated.",
             )
         # A spec is held to the schema version it declares, not to the newest (D-14 Q-5, FB-188).
         from jsonschema import Draft202012Validator
@@ -1706,14 +1708,20 @@ class FACTSRunner(FxTSRunner):
     ) -> list[FxTSVerdict]:
         """Exercise a live adapter instance against its spec.
 
-        Not yet implemented — returns SKIP verdicts. Live checks require
-        actual adapter code (Path 3 of the roadmap).
+        Not implemented: nothing compares an adapter spec with the module's code
+        (BACKLOG FB-271). Reported as not run, so the run does not pass.
         """
-        return [
-            FxTSVerdict(
-                check_id="facts:live-not-implemented",
-                spec_ref="FACTS/live",
-                status=VerdictStatus.SKIP,
-                message="Live adapter checks not yet implemented (requires adapter code).",
+        return [self._live_not_run("they are not implemented.")]
+
+    @staticmethod
+    def _live_not_run(why: str) -> FxTSVerdict:
+        return FxTSVerdict(
+            check_id="facts:live",
+            spec_ref="FACTS/live",
+            status=VerdictStatus.NOT_RUN,
+            message=(
+                "NOT RUN: the checks of a spec against the adapter's code: " + why + " "
+                "Nothing in this run compared the spec with the module (BACKLOG FB-271)."
             ),
-        ]
+            evidence={"unverified": True, "blocked_on": "FB-271"},
+        )
