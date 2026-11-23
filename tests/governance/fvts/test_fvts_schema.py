@@ -2,15 +2,21 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import pytest
 from jsonschema import Draft202012Validator
 
+from forge_core.fxts.fvts import SCHEMA_PATH
+from forge_core.fxts.shared import schemas
+
 
 @pytest.fixture(scope="module")
-def validator(schema: dict[str, Any]) -> Draft202012Validator:
-    return Draft202012Validator(schema)
+def validator(reference_spec: dict[str, Any]) -> Draft202012Validator:
+    """The schema version the reference spec declares, not the newest (D-14 Q-5, FB-188)."""
+    path = schemas.schema_for_spec(SCHEMA_PATH.parent, reference_spec)
+    return Draft202012Validator(json.loads(path.read_text(encoding="utf-8")))
 
 
 def errors(validator: Draft202012Validator, spec: dict[str, Any]) -> list[str]:
@@ -19,7 +25,7 @@ def errors(validator: Draft202012Validator, spec: dict[str, Any]) -> list[str]:
 
 def test_schema_is_valid_draft_2020_12(schema: dict[str, Any]) -> None:
     Draft202012Validator.check_schema(schema)
-    assert schema["$id"] == "forge://fxts/fvts/v0.2.0"
+    assert schema["$id"] == "forge://fxts/fvts/v0.2.1"
     assert len(schema["required"]) == 13
     assert len(schema["properties"]) == 15  # 13 required + metadata + integrity
 

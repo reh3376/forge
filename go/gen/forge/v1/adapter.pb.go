@@ -1,5 +1,5 @@
 // Forge Platform — Adapter control plane messages
-// Maps to: forge.core.models.adapter (Pydantic v2)
+// Maps to: forge_core.models.adapter (Pydantic v2)
 //
 // These messages handle adapter registration, configuration, health
 // monitoring, and capability negotiation. They are NOT high-volume

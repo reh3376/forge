@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://fxts/fvts/v0.2.0",
+  "$id": "forge://fxts/fvts/v0.2.1",
   "title": "Forge View Test Specification (FVTS)",
   "description": "Governs the contract between Forge modules and forge-display. A module never renders UI; it declares what can be shown (data bindings, history, alarms), what can be done (actions, settings) and on which surfaces and render profiles. forge-display renderers (desktop HMI, desktop app, web, mobile) consume this contract. One FVTS spec per module.",
   "type": "object",
@@ -23,7 +23,7 @@
   "properties": {
     "spec_version": {
       "type": "string",
-      "const": "0.2.0",
+      "const": "0.2.1",
       "description": "FVTS schema version this spec conforms to. Must match exactly."
     },
     "view_identity": {
@@ -552,7 +552,7 @@
     },
     "contextField": {
       "type": "string",
-      "description": "Mirrors forge.core.models.contextual_record.RecordContext.",
+      "description": "Mirrors forge_core.models.contextual_record.RecordContext.",
       "enum": [
         "site",
         "area",
@@ -579,7 +579,7 @@
     },
     "qualityCode": {
       "type": "string",
-      "description": "Mirrors forge.core.models.contextual_record.QualityCode.",
+      "description": "Mirrors forge_core.models.contextual_record.QualityCode.",
       "enum": [
         "GOOD",
         "UNCERTAIN",

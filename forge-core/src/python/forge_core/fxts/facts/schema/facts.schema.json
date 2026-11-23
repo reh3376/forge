@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://fxts/facts/v0.1.0",
+  "$id": "forge://fxts/facts/v0.1.1",
   "title": "FACTS — Forge Adapter Conformance Test Specification",
   "description": "Spec-first governance schema for Forge adapters. Defines what every adapter MUST declare about its identity, capabilities, lifecycle, connection, data contract, context mapping, and error handling. The runner enforces conformance — silent ignore is prohibited.",
   "type": "object",
@@ -18,7 +18,7 @@
   "properties": {
     "spec_version": {
       "type": "string",
-      "const": "0.1.0",
+      "const": "0.1.1",
       "description": "FACTS schema version this spec conforms to."
     },
     "adapter_identity": {
@@ -316,7 +316,7 @@
         "schema_ref": {
           "type": "string",
           "pattern": "^forge://schemas/[A-Za-z0-9][A-Za-z0-9_.-]*(/(?!v[0-9])[A-Za-z][A-Za-z0-9_-]*)?/v[0-9]+(\\.[0-9]+){0,2}([-+][0-9A-Za-z.-]+)?$",
-          "description": "Contract ref of the adapter's output: forge://schemas/<spoke>/v<version> (e.g. 'forge://schemas/forge-wms/v0.1.0'); forge.core.schema_ref, FB-008."
+          "description": "Contract ref of the adapter's output: forge://schemas/<spoke>/v<version> (e.g. 'forge://schemas/forge-wms/v0.1.0'); forge_core.schema_ref, FB-008."
         },
         "output_format": {
           "type": "string",

@@ -1,6 +1,6 @@
 // Forge Platform — Domain Enumerations
-// Maps 1:1 to forge.core.models.manufacturing.enums (Python StrEnum)
-// and forge.core.models.contextual_record.QualityCode
+// Maps 1:1 to forge_core.models.manufacturing.enums (Python StrEnum)
+// and forge_core.models.contextual_record.QualityCode
 //
 // Convention: enum values prefixed with abbreviated enum name to avoid
 // proto3 global namespace collisions. UNSPECIFIED = 0 for every enum.

@@ -234,7 +234,6 @@ class FMTSRunner(FxTSRunner):
         self, schema_path: Path | str | None = None, *, conformance_kit: Any = None
     ) -> None:
         super().__init__(schema_path=schema_path)
-        self._validator: Any = None
         # The kit runs a module against a real hub, so it belongs to the hub and is handed in
         # (D-17, S-1). Without one, the requirements it proves are reported as not checked.
         self._kit: Any = conformance_kit
@@ -731,11 +730,13 @@ class FMTSRunner(FxTSRunner):
                 status=VerdictStatus.ERROR,
                 message="No schema configured; cannot validate the spec.",
             )
-        if self._validator is None:
-            from jsonschema import Draft202012Validator
+        # A spec is held to the schema version it declares, not to the newest (D-14 Q-5, FB-188).
+        from jsonschema import Draft202012Validator
 
-            self._validator = Draft202012Validator(self.schema)
-        errors = sorted(self._validator.iter_errors(spec), key=lambda e: list(e.absolute_path))
+        schema = self.schema_for(spec) or self.schema
+        errors = sorted(
+            Draft202012Validator(schema).iter_errors(spec), key=lambda e: list(e.absolute_path)
+        )
         violations = [
             SpecViolation(
                 field="/".join(str(p) for p in e.absolute_path) or "$",
@@ -747,7 +748,7 @@ class FMTSRunner(FxTSRunner):
             "schema-valid",
             "schema",
             violations,
-            f"Spec validates against {self.schema.get('$id')}.",
+            f"Spec validates against {schema.get('$id')}.",
         )
 
     def _check_identity(self, spec: dict[str, Any], target: str) -> FxTSVerdict:

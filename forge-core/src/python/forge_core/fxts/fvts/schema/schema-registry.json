@@ -23,6 +23,17 @@
       "released_at": "2026-11-21T16:05:31Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-21T16:15:33Z"
+    },
+    {
+      "version": "0.2.1",
+      "file": "versions/fvts.v0.2.1.schema.json",
+      "schema_hash": "df3d3f198168e7e1f92a752cbfb52a4dbb5437ab04f4af22677f8ee409e241a6",
+      "hash_state": "approved",
+      "step": "patch",
+      "summary": "FB-226: two descriptions name the models they mirror by the new package, forge_core.models.contextual_record; nothing a spec is checked against changed",
+      "released_at": "2026-11-23T02:24:12Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-23T02:30:20Z"
     }
   ]
 }

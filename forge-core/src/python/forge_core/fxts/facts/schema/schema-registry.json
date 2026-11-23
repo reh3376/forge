@@ -12,6 +12,17 @@
       "released_at": "2026-11-19T00:00:00Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-19T18:03:46Z"
+    },
+    {
+      "version": "0.1.1",
+      "file": "versions/facts.v0.1.1.schema.json",
+      "schema_hash": "c0c31a8e69bdd1300726ef223d259c59288122e8c103823570e784122d6cc41c",
+      "hash_state": "approved",
+      "step": "patch",
+      "summary": "FB-226: one description names the schema-ref module by its new package, forge_core.schema_ref; nothing a spec is checked against changed",
+      "released_at": "2026-11-23T02:24:12Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-23T02:30:20Z"
     }
   ]
 }

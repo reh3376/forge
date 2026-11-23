@@ -21,7 +21,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import Any, ClassVar
 
 from forge_core.fxts.shared.runner import (
     FxTSRunner,
@@ -31,10 +31,6 @@ from forge_core.fxts.shared.runner import (
     load_schema,
 )
 from forge_core.schema_ref import SchemaRefError, require_versioned_ref
-
-if TYPE_CHECKING:
-    from jsonschema import Draft202012Validator
-
 
 # ---------------------------------------------------------------------------
 # Vocabulary — read from facts.schema.json, never hand-copied (BACKLOG FB-080)
@@ -196,7 +192,6 @@ class FACTSRunner(FxTSRunner):
         # The packaged schema is the default, so ``FACTSRunner()`` validates too.
         super().__init__(schema_path=schema_path or PACKAGED_SCHEMA_PATH)
         self._vocabulary: FactsVocabulary | None = None
-        self._validator: Draft202012Validator | None = None
 
     @property
     def vocabulary(self) -> FactsVocabulary:
@@ -280,11 +275,11 @@ class FACTSRunner(FxTSRunner):
                 status=VerdictStatus.SKIP,
                 message="No schema configured — schema validation skipped.",
             )
-        if self._validator is None:
-            from jsonschema import Draft202012Validator
+        # A spec is held to the schema version it declares, not to the newest (D-14 Q-5, FB-188).
+        from jsonschema import Draft202012Validator
 
-            self._validator = Draft202012Validator(schema)
-        errors = sorted(self._validator.iter_errors(spec), key=lambda e: list(e.absolute_path))
+        validator = Draft202012Validator(self.schema_for(spec) or schema)
+        errors = sorted(validator.iter_errors(spec), key=lambda e: list(e.absolute_path))
         if not errors:
             return FxTSVerdict(
                 check_id="facts:schema-valid",
