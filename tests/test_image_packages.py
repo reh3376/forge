@@ -46,8 +46,12 @@ def covered(path: str, copied: list[str]) -> bool:
     return any(path == folder or path.startswith(folder + "/") for folder in copied)
 
 
-def test_the_manifest_lists_both_packages() -> None:
-    assert package_roots() == ["src/forge", "forge-core/src/python/forge_core"]
+def test_the_manifest_lists_the_three_packages() -> None:
+    assert package_roots() == [
+        "src/forge",
+        "forge-core/src/python/forge_core",
+        "forge-hub/src/python/forge_hub",
+    ]
 
 
 def test_every_package_is_copied_into_both_stages() -> None:

@@ -1,6 +1,6 @@
 """Tests for Forge Storage configuration."""
 
-from forge.storage.config import (
+from forge_hub.storage.config import (
     KafkaConfig,
     MinioConfig,
     Neo4jConfig,

@@ -1,4 +1,4 @@
-"""Tests for the Forge Hub API (forge.api.main).
+"""Tests for the Forge Hub API (forge_hub.api.main).
 
 Uses ASGI transport (no network) to test all REST endpoints.
 gRPC is disabled in tests to avoid port binding.
@@ -22,8 +22,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from forge.api.main import _AdapterRegistry, create_app
-from forge.storage.config import StorageConfig
 from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
@@ -31,6 +29,8 @@ from forge_core.models.adapter import (
     DataContract,
     TimeGovernance,
 )
+from forge_hub.api.main import _AdapterRegistry, create_app
+from forge_hub.storage.config import StorageConfig
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -406,13 +406,13 @@ class TestHubServedServices:
     @pytest.mark.asyncio
     async def test_the_factory_stores_back_the_served_registries(self):
         """With a storage factory, the hub persists through its stores (FB-005)."""
-        from forge.context.equipment import InMemoryEquipmentStore
-        from forge.context.models import Equipment
-        from forge.ingest import IngestPipeline
-        from forge.registry.models import SchemaMetadata, SchemaType
-        from forge.registry.store import InMemorySchemaStore
-        from forge.storage.adapter_registry import InMemoryAdapterRegistryStore
-        from forge.storage.factory import StorageFactory
+        from forge_hub.context.equipment import InMemoryEquipmentStore
+        from forge_hub.context.models import Equipment
+        from forge_hub.ingest import IngestPipeline
+        from forge_hub.registry.models import SchemaMetadata, SchemaType
+        from forge_hub.registry.store import InMemorySchemaStore
+        from forge_hub.storage.adapter_registry import InMemoryAdapterRegistryStore
+        from forge_hub.storage.factory import StorageFactory
 
         schemas = InMemorySchemaStore()
         seeded = SchemaMetadata(

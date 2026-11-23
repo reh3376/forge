@@ -10,12 +10,12 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from forge import conformance
 from forge_core.fxts import FXTS_ROOT
 from forge_core.fxts.fmts import REPO_ROOT, SCHEMA_PATH
 from forge_core.fxts.fmts.runners.fmts_runner import FMTSRunner
 from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import add_spec_hash, approve_spec_hash
+from forge_hub import conformance
 
 if TYPE_CHECKING:
     from pathlib import Path

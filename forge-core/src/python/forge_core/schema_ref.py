@@ -14,7 +14,7 @@ parts it carries:
   versions as integers.
 * **version ref** ``forge://schemas/<spoke>/<Entity>/v<version>`` names one
   version of that schema: an integer names a registry version, a semantic
-  version names a storage routing entry (``forge.storage.registry.SchemaEntry``).
+  version names a storage routing entry (``forge_hub.storage.registry.SchemaEntry``).
 
 A bare ``forge://schemas/<spoke>`` parses (it names the spoke's schemas) but
 plays no role on its own. ``<spoke>`` is the adapter or module id; ``<Entity>``

@@ -28,7 +28,7 @@ A distillery runs on a dozen systems bought at different times from different ve
 
 **Forge:** hub and spoke. Every system is a *spoke* that speaks one contract, `forge.v1.AdapterService` (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover), to the *hub* (forge-core). Every record that crosses that boundary is a `ContextualRecord`: value, quality code, timestamps, source identity and a `RecordContext` (site, area, equipment, lot, shift, operator, work order, operating mode, …). The hub validates, routes and persists it.
 
-**Component:** transport (`forge.transport`), ingest (`forge.ingest`), core models (`forge_core.models`), the adapter base classes (`forge_core.adapter`).
+**Component:** transport (`forge_hub.link`), ingest (`forge_hub.ingest`), core models (`forge_core.models`), the adapter base classes (`forge_core.adapter`).
 
 **Solved when:** every production system at a site has a spoke, and any two records from any two systems can be joined on context without a human mapping step.
 
@@ -38,7 +38,7 @@ A tag value `TIT_2010 = 61.2` is useless without knowing it is Cooker 01's tempe
 
 **Forge:** context is a first-class, declared part of every integration. A spoke's FACTS specification maps source fields to Forge context fields and declares enrichment rules; the hub's enrichment pipeline fills what the source cannot (shift from timestamp, area from location, lot from the active batch). The manufacturing entity catalog (`forge-core/docs/manufacturing-entity-catalog.md`) and the ISA-95 / ISA-88 typed hierarchy define what context *means*, so "area" is the same thing in every spoke.
 
-**Component:** FACTS context mapping, `forge.context` (Context Engine), `forge_core.models.manufacturing`, the OT module's context resolvers.
+**Component:** FACTS context mapping, `forge_hub.context` (Context Engine), `forge_core.models.manufacturing`, the OT module's context resolvers.
 
 **Solved when:** no record is persisted without its required context fields, and the required set is declared per spoke and checked by the FACTS gate.
 
@@ -48,7 +48,7 @@ Numbers from different systems disagree. Nobody can say which transformation pro
 
 **Forge:** curation with lineage. Raw records flow through a normalization engine (units, time bucketing, value alignment) into versioned *data products* with published quality objectives, and the lineage from raw record to transformation to product is recorded and queryable. The quality framework (FQTS) states what "good" means per product; the normalization framework (FNTS) checks that units and definitions agree across spokes; the lineage framework (FLTS) checks the chain is unbroken.
 
-**Component:** `forge.curation` (normalization, data product registry, pipeline, lineage, quality), Neo4j for lineage, TimescaleDB for time series; FQTS/FNTS/FLTS.
+**Component:** `forge_hub.curation` (normalization, data product registry, pipeline, lineage, quality), Neo4j for lineage, TimescaleDB for time series; FQTS/FNTS/FLTS.
 
 **Solved when:** every figure on a surface can be traced to its sources and transformations, and its quality objective is visible beside it.
 
@@ -88,7 +88,7 @@ Specifications are documents; anyone, or any coding agent, can relax a timeout, 
 
 **Forge:** hash governance (FHTS). Every governed specification carries a hash of its content, a state (`approved`, `modified`, `pending_review`, `reverted`, `unknown`), a change history naming who or what changed it, and an approver. Agents re-stamp as `pending_review`; only the owner approves. Runners verify the hash before trusting the spec; the hub's Register check verifies a spoke's FACTS hash before accepting the spoke. The engineering workflow itself is governed: one backlog item per PR, every finding fixed or recorded, documentation current before every push, and a local, graph-backed project memory (MDEMG/Jiminy) that records constraints and outcomes for the agents that work on the codebase.
 
-**Component:** `forge_core.fxts.shared.runner` (hashing, verification, approval), `forge_core.fxts.fhts`, `forge.ingest.facts_check`, the backlog/roadmap workflow, MDEMG.
+**Component:** `forge_core.fxts.shared.runner` (hashing, verification, approval), `forge_core.fxts.fhts`, `forge_hub.ingest.facts_check`, the backlog/roadmap workflow, MDEMG.
 
 **Solved when:** an unapproved change to any governed spec fails CI and is visible in the spec's own history.
 
@@ -108,7 +108,7 @@ A confidently wrong decision costs more than the data problem that caused it, th
 
 **Forge:** the decision is a record. Data products feed decision support (human-in-the-loop, semi-autonomous where a site allows it), the decision taken is stored with the products and lineage it was based on (`forge_core.models.decision`), and outcomes are observed against it. The same curated products are the training and evaluation sets for site-specific models, so expertise is captured where it is exercised.
 
-**Component:** `forge.curation`, `forge_core.models.decision`, `forge.observer`, data products for ML/AI use.
+**Component:** `forge_hub.curation`, `forge_core.models.decision`, `forge_hub.observer`, data products for ML/AI use.
 
 **Solved when:** a decision can be replayed: what was known, what was decided, what happened.
 
@@ -128,7 +128,7 @@ Every application holds its own database password, often in a config file; acces
 
 **Forge:** the hub owns the databases (A-6) and issues credentials: a module never carries a database password it created itself (`forge db access`). Identity is established by the installation's chosen method (OIDC and local accounts and service identities first, then LDAP/AD, then SAML — R-10), but **Forge** decides what an identity may do (R-2). Roles are scoped (R-7), shipped per module as data (R-12), chosen in shape by the installing administrator (R-3, R-4), and constrain reads as well as actions (R-11). Separation-of-duties rules (two-step review, interlock bypass with reason, approvals) are evaluated by the hub (R-6). Hub ↔ spoke traffic is TLS or mTLS in both directions with a per-spoke callback token.
 
-**Component:** `forge.gateway` (auth, RBAC, rate limiting), `forge.storage.access`, transport TLS, the role model from `docs/decisions/roles.md`.
+**Component:** `forge_hub.gateway` (auth, RBAC, rate limiting), `forge_hub.storage.access`, transport TLS, the role model from `docs/decisions/roles.md`.
 
 **Solved when:** the gateway enforces scoped roles on every route and RPC, modules hold only Forge-issued credentials, and a visibility rule such as "ERP hidden from distillery operators" is a configuration, not code.
 
@@ -138,7 +138,7 @@ Docker Compose on a laptop is not a plant. Backups, health, upgrades and multi-n
 
 **Forge:** each hub is a Kubernetes deployment (compose stays development-only), with the observer providing health, liveness and pipeline SLOs (FOTS), performance baselines (FPTS) and scheduled backups of every store. Modules are hosted by the hub (in-process today for forge-ot; as Go services for the management modules).
 
-**Component:** `deploy/`, `forge.observer`, FOTS/FPTS.
+**Component:** `deploy/`, `forge_hub.observer`, FOTS/FPTS.
 
 **Solved when:** a site hub can be stood up, upgraded and restored from backup by procedure, and its SLOs are visible.
 

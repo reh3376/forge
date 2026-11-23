@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from forge.storage.adapter_registry import (
+from forge_hub.storage.adapter_registry import (
     _INSERT_BATCH,
     _SELECT_ADAPTERS,
     _SELECT_BATCHES,

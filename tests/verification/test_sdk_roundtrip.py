@@ -18,14 +18,14 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from forge.storage.registry import (
+from forge_core.sdk.module_builder.manifest_builder import ManifestBuilder
+from forge_core.sdk.module_builder.scaffolder import ModuleScaffolder
+from forge_hub.storage.registry import (
     SchemaEntry,
     SchemaRegistry,
     SchemaStatus,
     StorageEngine,
 )
-from forge_core.sdk.module_builder.manifest_builder import ManifestBuilder
-from forge_core.sdk.module_builder.scaffolder import ModuleScaffolder
 
 if TYPE_CHECKING:
     from pathlib import Path

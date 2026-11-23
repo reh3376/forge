@@ -6,7 +6,7 @@ import pytest
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
-from forge.gateway.errors import install_error_handlers, problem_response
+from forge_hub.gateway.errors import install_error_handlers, problem_response
 
 
 @pytest.fixture

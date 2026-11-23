@@ -11,3 +11,7 @@ forge-core/*
 !forge-core/src/
 forge-core/src/**/__pycache__/
 !forge-core/contract/
+!forge-hub/
+forge-hub/*
+!forge-hub/src/
+forge-hub/src/**/__pycache__/

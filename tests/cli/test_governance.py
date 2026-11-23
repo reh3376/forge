@@ -10,9 +10,9 @@ from typing import TYPE_CHECKING
 import pytest
 from typer.testing import CliRunner
 
-from forge.cli import governance
-from forge.cli.main import app
 from forge_core.fxts.shared.runner import verify_spec_hash
+from forge_hub.cli import governance
+from forge_hub.cli.main import app
 
 if TYPE_CHECKING:
     from pathlib import Path

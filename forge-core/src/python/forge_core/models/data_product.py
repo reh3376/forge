@@ -58,8 +58,8 @@ class CurationSpec(BaseModel):
     """How the curation engine builds this product's pipeline (FB-009).
 
     ``time_window`` is one of the named windows of
-    ``forge.curation.normalization.TIME_WINDOWS``; ``functions`` are
-    ``forge.curation.aggregation.AggregationFunction`` names; the engine
+    ``forge_hub.curation.normalization.TIME_WINDOWS``; ``functions`` are
+    ``forge_hub.curation.aggregation.AggregationFunction`` names; the engine
     checks both. ``on_ingest`` runs the pipeline whenever a batch from one of
     the product's ``source_adapters`` is ingested, for a published product.
     """

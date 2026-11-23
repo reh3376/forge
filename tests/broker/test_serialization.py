@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from forge.broker.serialization import deserialize_record, serialize_record
+from forge_hub.broker.serialization import deserialize_record, serialize_record
 
 
 class TestSerializeRecord:

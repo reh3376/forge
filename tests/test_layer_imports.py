@@ -3,9 +3,9 @@
 forge-core imports nothing of the hub or of a module; forge-hub imports forge-core and no
 module; a module imports forge-core and nothing of the hub or of another module.
 
-forge-core is its own package, ``forge_core`` (FB-199). The hub and the modules still share
-``src/forge`` until FB-200 and FB-201 move them: there a file is sorted by where it lies,
-``adapters/<name>`` and ``modules/<name>`` being modules and everything else the hub. Each
+forge-core is its own package, ``forge_core`` (FB-199), and so is the hub, ``forge_hub``
+(FB-200). The modules are still in ``src/forge`` until FB-201 moves them: there
+``adapters/<name>`` and ``modules/<name>`` are modules, and nothing else may hold code. Each
 import is read from the syntax tree, so one inside a function counts and one inside a
 docstring does not.
 """
@@ -18,16 +18,19 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 ROOTS = {
     "forge_core": REPO / "forge-core" / "src" / "python" / "forge_core",
+    "forge_hub": REPO / "forge-hub" / "src" / "python" / "forge_hub",
     "forge": REPO / "src" / "forge",
 }
 
 CORE = "forge-core"
 HUB = "forge-hub"
+#: The package the modules still share: ``forge/__init__.py`` and the two folders' own.
+SHARED = "shared package"
 
 # Each import that breaks a rule and is allowed to stand, with the item that removes it.
 # An entry that no longer matches an import fails the test: the list only shrinks.
 KNOWN = {
-    ("forge/api/main.py", "forge.modules.ot.host"): (
+    ("forge_hub/api/main.py", "forge.modules.ot.host"): (
         "FB-204: the hub hosts forge-ot in its own process until the module runs on the link"
     ),
 }
@@ -37,10 +40,12 @@ def layer_of(package: str, relative: str) -> str:
     """The layer of a file, given its top package and its path inside it."""
     if package == "forge_core":
         return CORE
+    if package == "forge_hub":
+        return HUB
     parts = relative.split("/")
     if parts[0] in {"adapters", "modules"} and len(parts) > 2:
         return f"module {parts[1]}"
-    return HUB
+    return SHARED
 
 
 def layer_of_import(dotted: str) -> str | None:
@@ -60,7 +65,7 @@ def layer_of_import(dotted: str) -> str | None:
 
 
 def allowed(source: str, target: str) -> bool:
-    return target in {source, CORE}
+    return target in {source, CORE, SHARED}
 
 
 def imports_of(path: Path) -> list[str]:
@@ -100,6 +105,7 @@ def crossings() -> dict[tuple[str, str], str]:
 def test_the_sorting_covers_the_three_layers() -> None:
     layers = {layer_of(package, relative) for package, relative, _ in files()}
     assert {CORE, HUB} <= layers
+    assert sum(1 for package, _, _ in files() if package == "forge_hub") > 80
     assert sum(1 for name in layers if name.startswith("module ")) >= 9
     assert sum(1 for package, _, _ in files() if package == "forge_core") > 100
 
@@ -117,13 +123,17 @@ def test_every_named_exception_still_exists() -> None:
     assert not gone, f"no longer in the code, remove from KNOWN: {gone}"
 
 
-def test_nothing_of_core_is_left_in_the_shared_tree() -> None:
-    """What moved to forge-core is not importable from its old place."""
-    for name in ("core", "governance", "proto_gen", "sdk"):
-        assert not list((ROOTS["forge"] / name).rglob("*.py")), f"src/forge/{name} holds code"
-    assert not (ROOTS["forge"] / "adapters" / "base").exists() or not list(
-        (ROOTS["forge"] / "adapters" / "base").rglob("*.py")
+def test_only_modules_are_left_in_the_shared_tree() -> None:
+    """What moved to forge-core or forge-hub is not importable from its old place."""
+    shared = ROOTS["forge"]
+    left = sorted(
+        path.relative_to(shared).as_posix()
+        for path in shared.rglob("*.py")
+        if "__pycache__" not in path.parts
+        and path.relative_to(shared).parts[0] not in {"adapters", "modules"}
     )
+    assert left == ["__init__.py"], f"src/forge holds code that is no module's: {left}"
+    assert not list((shared / "adapters" / "base").rglob("*.py"))
 
 
 def test_the_rule_itself() -> None:
@@ -133,9 +143,10 @@ def test_the_rule_itself() -> None:
     assert not allowed("module ot", "module forge_wms")
     assert layer_of("forge_core", "link/spoke_client.py") == CORE
     assert layer_of("forge_core", "fxts/fmts/runners/fmts_runner.py") == CORE
-    assert layer_of("forge", "transport/hub_ingest.py") == HUB
-    assert layer_of("forge", "conformance.py") == HUB
+    assert layer_of("forge_hub", "link/hub_ingest.py") == HUB
+    assert layer_of("forge_hub", "conformance.py") == HUB
+    assert layer_of("forge", "__init__.py") == SHARED
     assert layer_of("forge", "adapters/forge_wms/adapter.py") == "module forge_wms"
     assert layer_of("forge", "modules/ot/host.py") == "module ot"
     assert layer_of_import("forge_core.models.alarm.AlarmState") == CORE
-    assert layer_of_import("forge.conformance") == HUB
+    assert layer_of_import("forge_hub.conformance") == HUB

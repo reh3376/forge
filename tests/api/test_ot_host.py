@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING
 import pytest
 from fastapi.testclient import TestClient
 
-from forge.api.main import create_app
 from forge.modules.ot.control import ConfigError
+from forge_hub.api.main import create_app
 
 if TYPE_CHECKING:
     from pathlib import Path

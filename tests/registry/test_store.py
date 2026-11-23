@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from forge.registry.models import SchemaMetadata, SchemaType
-from forge.registry.store import InMemorySchemaStore
+from forge_hub.registry.models import SchemaMetadata, SchemaType
+from forge_hub.registry.store import InMemorySchemaStore
 
 
 def _make_metadata(

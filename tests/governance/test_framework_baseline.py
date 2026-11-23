@@ -19,10 +19,10 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from forge.cli.governance import FRAMEWORKS, REPO_ROOT, SPEC_ROOT, spec_files
 from forge_core.fxts.fmts.runners.fmts_runner import load_backlog
 from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import check_schema_runner_parity, verify_spec_hash
+from forge_hub.cli.governance import FRAMEWORKS, REPO_ROOT, SPEC_ROOT, spec_files
 
 if TYPE_CHECKING:
     from pathlib import Path

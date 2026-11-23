@@ -58,7 +58,7 @@ This is the short form. [`docs/WHERE-WE-ARE.md`](docs/WHERE-WE-ARE.md) has every
 | Built | Where |
 |---|---|
 | forge-core's foundation: the models, the one clock, the contract, the FxTS frameworks, the SDK | [`forge-core/`](forge-core) |
-| The hub: the gRPC transport, ingest, context, storage, schema registry, curation, the REST API, the `forge` command | [`src/forge/`](src/forge) |
+| The hub: the gRPC transport, ingest, context, storage, schema registry, curation, the REST API, the `forge` command | [`forge-hub/`](forge-hub) |
 | forge-ot, the plant-floor module: OPC UA, the tag engine, ISA-18.2 alarms, governed writes to controllers, MQTT, scripting | [`src/forge/modules/ot/`](src/forge/modules/ot) |
 | Eight adapters for other systems, as Python reference implementations | [`src/forge/adapters/`](src/forge/adapters) |
 | Six FxTS frameworks with their specs, and the governed lists, each hashed and approved by the owner | [`forge-core/contract/`](forge-core/contract), [`forge-core/src/python/forge_core/fxts/`](forge-core/src/python/forge_core/fxts) |
@@ -76,13 +76,14 @@ This is the short form. [`docs/WHERE-WE-ARE.md`](docs/WHERE-WE-ARE.md) has every
 
 ## Where things are
 
-The repository is being reorganised into three self-contained parts, forge-core, forge-hub and forge-modules, each with the same standard folders ([`docs/decisions/repository-structure.md`](docs/decisions/repository-structure.md)). forge-core has moved. The hub and the modules still share `src/forge` until their own moves.
+The repository is being reorganised into three self-contained parts, forge-core, forge-hub and forge-modules, each with the same standard folders ([`docs/decisions/repository-structure.md`](docs/decisions/repository-structure.md)). forge-core has moved, and so has the hub's package. The hub's tests and specs follow; the modules are still in `src/forge` until their move.
 
 | Path | Holds |
 |---|---|
 | [`forge-core/`](forge-core) | The foundation: `contract/` (proto files, framework schemas, governed lists), `src/python/forge_core` (the Python package), `src/go` (the Go models, generated bindings and module scaffold), `tests/`, `docs/`, and its own README |
-| [`src/forge/`](src/forge) | The hub and the modules, until they move: `api`, `gateway`, `ingest`, `storage`, `registry`, `context`, `curation`, `broker`, `transport`, `cli`; `adapters/`; `modules/ot` |
-| [`tests/`](tests) | Tests of the hub and the modules, and tests that span layers |
+| [`forge-hub/`](forge-hub) | The hub: `src/python/forge_hub` (`link`, `ingest`, `context`, `storage`, `registry`, `curation`, `broker`, `api`, `gateway`, `observer`, `cli`), and its own README |
+| [`src/forge/`](src/forge) | The modules, until they move: `adapters/` and `modules/ot` |
+| [`tests/`](tests) | Tests of the hub and the modules (until they follow their code), and tests that span layers |
 | [`modules/Forge MES/`](modules/Forge%20MES) | The interim MES bridge (NestJS and Next.js). It has its own [`CLAUDE.md`](modules/Forge%20MES/CLAUDE.md) |
 | [`docs/`](docs) | The state and direction documents, the signed decision records, the framework pages, the tutorial's source |
 | [`deploy/`](deploy) | The container image and the Compose stack. Compose is for development only; production runs on Kubernetes |

@@ -16,10 +16,6 @@ _src = Path(__file__).resolve().parent.parent.parent / "src"
 if str(_src) not in sys.path:
     sys.path.insert(0, str(_src))
 
-from forge.curation.lineage import LineageTracker
-from forge.curation.normalization import UnitRegistry, build_whk_unit_registry
-from forge.curation.quality import QualityMonitor
-from forge.curation.registry import DataProductRegistry
 from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -29,6 +25,10 @@ from forge_core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge_hub.curation.lineage import LineageTracker
+from forge_hub.curation.normalization import UnitRegistry, build_whk_unit_registry
+from forge_hub.curation.quality import QualityMonitor
+from forge_hub.curation.registry import DataProductRegistry
 
 
 @pytest.fixture()

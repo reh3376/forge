@@ -9,8 +9,6 @@ from unittest.mock import patch
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from forge.api.main import create_app
-from forge.storage.config import StorageConfig
 from forge_core.link.spoke_callback import CALLBACK_PARAM, WriteDispatcher
 from forge_core.link.spoke_client import InMemoryChannel
 from forge_core.models.adapter import (
@@ -18,6 +16,8 @@ from forge_core.models.adapter import (
     AdapterManifest,
     DataContract,
 )
+from forge_hub.api.main import create_app
+from forge_hub.storage.config import StorageConfig
 
 
 def _manifest(adapter_id: str = "forge-mes", *, write: bool = True) -> dict:

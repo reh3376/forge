@@ -8,12 +8,12 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from forge.registry.models import (
+from forge_hub.registry.models import (
     CompatibilityMode,
     SchemaMetadata,
     SchemaType,
 )
-from forge.registry.postgres_store import PostgresSchemaStore
+from forge_hub.registry.postgres_store import PostgresSchemaStore
 
 
 @pytest.fixture

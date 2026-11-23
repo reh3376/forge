@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 160 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 162 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -150,7 +150,7 @@ note:
 | Term | What it means in Forge |
 |---|---|
 | **forge-core** | The foundation and the administrative manager of a deployment (D-17 §11): one per deployment, above the top hub. The foundation is what every hub and module is built from (the contract, the FxTS frameworks, the SDK), and it is built. The manager knows every hub and module, monitors and alerts on their state, and is the one place administrative changes are made and distributed; it is not built. It administers and does not operate: a hub that cannot reach it keeps running. |
-| **Hub** | forge-hub (Python, in `src/forge` until it gets its own folder): an enterprise hub, site hubs and area hubs, each the manager of the modules and databases attached to it. It owns the transport, the ingest pipeline, the databases, context, curation, governance and the time. Hubs form a hierarchy: area hubs under a site hub under an enterprise hub. |
+| **Hub** | forge-hub (Python, its own package `forge_hub` in `forge-hub/src/python` since 2026-11-23): an enterprise hub, site hubs and area hubs, each the manager of the modules and databases attached to it. It owns the transport, the ingest pipeline, the databases, context, curation, governance and the time. Hubs form a hierarchy: area hubs under a site hub under an enterprise hub. |
 | **Module** (also **spoke**) | Anything that registers with a hub. A module speaks `forge.v1.AdapterService` to its hub over gRPC and reaches it no other way (A-1). |
 | **Management module** | A module Forge builds for a business function: `forge-mes`, `forge-wms`, `forge-cmms`, `forge-nms`, `forge-ims`, `forge-historian`, `forge-scanner`. Named `forge-<service>`. |
 | **Integration module** | A module that connects Forge to one third-party product: `forge-integ-erp-netsuite`. Named `forge-integ-<function>-<product>`. Its hub side is gRPC only; its application side uses whatever the product offers (REST, GraphQL, MQTT, OPC UA, SQL, …). Installations build their own in the designer. |
@@ -246,7 +246,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 160:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 162:
 
 **Working**
 
@@ -281,7 +281,8 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 160:
 | Measure | Value (2026-11-19) |
 |---|---|
 | Python: forge-core (`forge-core/src/python/forge_core`) | 120 files, ~26,500 lines |
-| Python: hub and modules (`src/forge`) | 242 files, ~50,600 lines |
+| Python: forge-hub (`forge-hub/src/python/forge_hub`) | 89 files, ~17,200 lines |
+| Python: the modules (`src/forge`) | 154 files, ~33,400 lines |
 | Python tests | 284 files, 5,144 collected, full suite green on the locked dependency set |
 | Go (`forge-core/src/go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
@@ -344,20 +345,20 @@ note:
 | Path | What lives there |
 |---|---|
 | `forge-core/src/python/forge_core` | `ContextualRecord`, decisions, adapters, manufacturing entities (ISA-95 hierarchy), the embedded MQTT broker, the context field registry, the schema-reference grammar, the clock (`clock.py`: time exchange, offsets, the gates) |
-| `src/forge/transport` · `proto` · `proto_gen` | the gRPC hub and module sides, the proto set and the generated Python bindings |
-| `src/forge/ingest` | the ingest pipeline, the FACTS check at Register, receipt stamping |
-| `src/forge/storage` | router, factory, engines (PostgreSQL, TimescaleDB, Neo4j, Redis), access control, migrations |
-| `src/forge/context` · `registry` · `curation` | Context Engine, Schema Registry, curation (normalization, data products, pipeline, lineage, quality) |
+| `forge-hub/src/python/forge_hub/link` · `proto` · `proto_gen` | the gRPC hub and module sides, the proto set and the generated Python bindings |
+| `forge-hub/src/python/forge_hub/ingest` | the ingest pipeline, the FACTS check at Register, receipt stamping |
+| `forge-hub/src/python/forge_hub/storage` | router, factory, engines (PostgreSQL, TimescaleDB, Neo4j, Redis), access control, migrations |
+| `forge-hub/src/python/forge_hub/context` · `registry` · `curation` | Context Engine, Schema Registry, curation (normalization, data products, pipeline, lineage, quality) |
 | `forge-core/src/python/forge_core/fxts` | FxTS: one directory per built framework (`facts`, `fats`, `fmts`, `ftts`, `fvts`), each with `schema/`, `runners/`, `specs/`; `shared/` is the runner every framework is built on; `fhts/` is the hash framework; `fmts/conformance.py` is the conformance kit |
-| `src/forge/gateway` · `api` · `observer` · `cli` | auth and RBAC middleware, the hub FastAPI app, health, the `forge` CLI |
+| `forge-hub/src/python/forge_hub/gateway` · `api` · `observer` · `cli` | auth and RBAC middleware, the hub FastAPI app, health, the `forge` CLI |
 | `src/forge/modules/ot` | forge-ot: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
 | `forge-core/src/python/forge_core/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
-| `forge-core/src/python/forge_core` | **forge-core**, the shared foundation, its own package `forge_core` since 2026-11-22 (D-17): the models and the clock, `fxts` (the frameworks), `sdk`, `adapter` (the base class and the generic adapters), `link` (a module's end of the link to a hub), `proto_gen`. Its language-neutral part is `forge-core/contract`: the proto files, every framework's schema with its released versions, and the governed lists (`forge_core.contract` says where it is; a built package and the image carry it). It imports nothing of the hub or of a module, and a test holds that (`tests/test_layer_imports.py`). The hub and the modules still share `src/forge` |
+| `forge-core/src/python/forge_core` | **forge-core**, the shared foundation, its own package `forge_core` since 2026-11-22 (D-17): the models and the clock, `fxts` (the frameworks), `sdk`, `adapter` (the base class and the generic adapters), `link` (a module's end of the link to a hub), `proto_gen`. Its language-neutral part is `forge-core/contract`: the proto files, every framework's schema with its released versions, and the governed lists (`forge_core.contract` says where it is; a built package and the image carry it). It imports nothing of the hub or of a module, and a test holds that (`tests/test_layer_imports.py`). The hub is its own package too, `forge_hub` in `forge-hub/src/python`; the modules are still in `src/forge` |
 | `src/forge/adapters` | the Python adapters of eight modules (`forge_wms`, `forge_mes`, `forge_cmms`, `forge_nms`, `forge_ims`, `forge_historian`, `forge_scanner`, `forge_integ_erp_netsuite`), each with its manifest and config, and four empty generic packages (FB-148) |
 | `forge-core/src/go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
 | `tests/` | The hub's and the modules' tests, and tests that span layers; `tests/governance/` holds the framework gates that use the hub or a module's spec. forge-core's own tests are in `forge-core/tests` |
-| `docs/` | the key documents, `FxTS/` (the framework pages), `decisions/` (the signed records), `deployment/`, `governance/`, `tutorial.md` (this deck's source) |
+| `docs/` | the key documents, `decisions/` (the signed records), `deployment/`, `governance/`, `tutorial.md` (this deck's source) |
 | `deploy/docker` | the development compose stack and the hub image |
 
 note:
@@ -389,7 +390,7 @@ One contract, `forge.v1.AdapterService`, carries everything between a module and
 A word on names: the code and the older documents say **spoke** and **adapter**; the decisions say **module**. They are the same thing: whatever registers with a hub.
 
 note:
-- Source: `docs/VISION.md` P-1, `docs/WHERE-WE-ARE.md` §3.1, `forge-core/contract/proto`, `src/forge/transport`, `src/forge/ingest`.
+- Source: `docs/VISION.md` P-1, `docs/WHERE-WE-ARE.md` §3.1, `forge-core/contract/proto`, `forge-hub/src/python/forge_hub/link`, `forge-hub/src/python/forge_hub/ingest`.
 
 ---
 
@@ -457,7 +458,7 @@ note:
 | Hub time in the contract: the four-timestamp exchange on Register, Health and Ingest; a reporting spoke measured two-way | ✅ | FB-092 (2026-11-15) |
 | A spoke outside its tolerance, or one that reports no measurement, refused at Register and Ingest | ✅ | FB-093's hub half (2026-11-17; the plant-floor links fail closed since 2026-11-15) |
 
-Code: `src/forge/transport/grpc_server.py` (hub), `spoke_client.py` (spoke side), `grpc_channel.py` (retry), `proto_bridge.py` (proto ↔ model), `transport_adapter.py` (adapter base).
+Code: `forge-hub/src/python/forge_hub/link/grpc_server.py` (hub), `spoke_client.py` (spoke side), `grpc_channel.py` (retry), `proto_bridge.py` (proto ↔ model), `transport_adapter.py` (adapter base).
 
 note:
 - FTTS governs the transport; the schema and runner exist and one approved spec is in force (`forge-core/docs/fxts/FTTS.md`). That spec describes the Python implementation; the next slide but two is what the transport is to guarantee for every language.
@@ -487,7 +488,7 @@ sequenceDiagram
   C->>D: curated records beside the raw ones
 ```
 
-- `forge.ingest.facts_check` verifies the spec's hash before trusting it; a spoke whose manifest or hash does not match is refused.
+- `forge_hub.ingest.facts_check` verifies the spec's hash before trusting it; a spoke whose manifest or hash does not match is refused.
 - One hub-clock reading per batch (`IngestPipeline.ingest` → `stamp_receipt`).
 - Every link's clock offset is measured and exposed on `AdapterHealth.clock`, `GET /v1/ingest/stats`, the OT connection status and OpenTelemetry (`forge.clock.offset`, `forge.clock.out_of_tolerance`); a spoke that reports the time exchange is held to the class it declared (FB-089, FB-092). Enforcement is FB-093 (D-9 signed 2026-11-03: per-link tolerance classes, never silent): on the plant floor since 2026-11-15, and at the hub since 2026-11-17, where every Register, Health and Ingest request is a probe of the spoke's clock and three probes outside the class, or three with no measurement, refuse the spoke's Register and Ingest.
 - Curated records are persisted with the raw ones (FB-009).
@@ -514,7 +515,7 @@ note:
 
 ## The Transport Contract · Signed, Not Built (D-15)
 
-The transport above works, but it was silent on what happens when things go wrong. On 2026-11-18 the owner settled that in sixteen answers (`docs/decisions/transport-contract.md`). Read it before you touch `forge-core/contract/proto` or `src/forge/transport`.
+The transport above works, but it was silent on what happens when things go wrong. On 2026-11-18 the owner settled that in sixteen answers (`docs/decisions/transport-contract.md`). Read it before you touch `forge-core/contract/proto` or `forge-hub/src/python/forge_hub/link`.
 
 | Records going up (the IT half) | Commands going down (the OT half) |
 |---|---|
@@ -571,7 +572,7 @@ note:
 The hub owns the databases (decision A-6). This section covers the engines, routing, the twelve migrations, Forge-issued credentials, the "observe → shadow → own" path for module data, and the two schema registries.
 
 note:
-- Source: `docs/PRINCIPLES.md` §2 and §6, `docs/WHERE-WE-ARE.md` §3.3, `docs/DB_ORCHESTRATION_FRAMEWORK.md`, `src/forge/storage`.
+- Source: `docs/PRINCIPLES.md` §2 and §6, `docs/WHERE-WE-ARE.md` §3.3, `docs/DB_ORCHESTRATION_FRAMEWORK.md`, `forge-hub/src/python/forge_hub/storage`.
 
 ---
 
@@ -601,7 +602,7 @@ note:
 
 ```mermaid
 flowchart LR
-  R["ContextualRecord"] --> DR["DataRouter<br/>forge.storage.router"]
+  R["ContextualRecord"] --> DR["DataRouter<br/>forge_hub.storage.router"]
   DR -- "time series" --> TS["TimescaleDB<br/>forge_ts.contextual_records"]
   DR -- "relational" --> PG["PostgreSQL<br/>forge_core · forge_canonical · mod_*"]
   DR -- "lineage" --> N["Neo4j"]
@@ -609,11 +610,11 @@ flowchart LR
   DR -. "no entry" .-> DEF["default routes by data_type<br/>→ PostgreSQL fallback"]
 ```
 
-- `forge.storage.factory` builds the engines from configuration; the router picks the engine per record.
+- `forge_hub.storage.factory` builds the engines from configuration; the router picks the engine per record.
 - Today the routing registry is in memory and empty on every start, so routing falls through the default routes by `data_type`. That is the subject of the one-schema-registry design record (D-10, below).
 
 note:
-- `forge.storage.engines.timescale` writes every `RecordContext` slot (FB-013); the migration test holds the writer's column list equal to the table's.
+- `forge_hub.storage.engines.timescale` writes every `RecordContext` slot (FB-013); the migration test holds the writer's column list equal to the table's.
 
 ---
 
@@ -636,7 +637,7 @@ note:
 
 ```bash
 forge migrate up | status | down
-python -m forge.storage.migrations.run up --target postgres     # the runner behind the CLI
+python -m forge_hub.storage.migrations.run up --target postgres     # the runner behind the CLI
 ```
 
 - Online runs go through asyncpg on SQLAlchemy's async engine (FB-003).
@@ -682,7 +683,7 @@ stateDiagram-v2
 
 - The hybrid path from `docs/DB_ORCHESTRATION_FRAMEWORK.md`: adapters read spoke databases, a shadow writer mirrors into the hub, ownership transfers per module.
 - Step 1 (grants and issued credentials) is delivered; steps 2–5 (the MES data into `mod_mes`) follow the forge-mes Go design, signed 2026-11-03 (FB-057, D-3).
-- `forge.storage.shadow` and `forge.storage.backfill` are the shadow writer and the historical backfill.
+- `forge_hub.storage.shadow` and `forge_hub.storage.backfill` are the shadow writer and the historical backfill.
 
 note:
 - "Own" is the end state for every management module: the module's schema lives in the hub's PostgreSQL and the module never carries a password it created itself.
@@ -691,7 +692,7 @@ note:
 
 ## Two Schema Registries · D-10
 
-| | F20 Schema Registry (`forge.registry`) | Routing registry (`forge.storage.registry`) |
+| | F20 Schema Registry (`forge_hub.registry`) | Routing registry (`forge_hub.storage.registry`) |
 |---|---|---|
 | Served at | `/v1/schemas` (9 routes), Postgres tables from migration 009 | in-memory only; the `schema_entries` table from 001 is never written |
 | Models | `SchemaMetadata`, `SchemaVersion`, integer versions, compatibility mode | `SchemaEntry` with engine, namespace, retention, authoritative spoke, status |
@@ -895,7 +896,7 @@ FACTS says what a module's data looks like. FMTS says what a module must do befo
 | M-15 | Refuses a command that arrives after its expiry; only for a module that declares process-control writes | not yet (FB-164); the declaration is checked now |
 | M-16 | Applies each business write-back once by its id and confirms it; only for a module that declares it takes them | not yet (FB-164); the declaration is checked now |
 
-- **The conformance kit** (`src/forge/conformance.py`) runs the real hub on clocks it controls, puts the module's clock 5 s out, and checks that the hub refuses the module, that nothing is delivered, that the module's own health says why, and that it is readmitted when the clock is put right. The kit belongs to the hub and is handed to the runner; a runner handed none reports these checks as not run.
+- **The conformance kit** (`forge-hub/src/python/forge_hub/conformance.py`) runs the real hub on clocks it controls, puts the module's clock 5 s out, and checks that the hub refuses the module, that nothing is delivered, that the module's own health says why, and that it is readmitted when the clock is put right. The kit belongs to the hub and is handed to the runner; a runner handed none reports these checks as not run.
 - **A waiver** is a requirement a module cannot meet yet, written in its spec with the reason and the backlog item that removes it. The owner approves it through the spec's hash; every run names it; it expires when its backlog item is closed. Three requirements are waived only with admin privileges: the two for time keeping (M-3, M-4) and refusing a late command (M-15).
 - **A check that could not run is reported as `NOT CHECKED`**, never as passed.
 
@@ -1513,7 +1514,7 @@ note:
 From a raw value to a decision-quality figure and a recorded decision: the Context Engine, the manufacturing entities, the curation pipeline, data products with lineage, and the decision frame.
 
 note:
-- Source: `docs/VISION.md` P-2, P-3, P-9; `docs/PRINCIPLES.md` §4; `docs/WHERE-WE-ARE.md` §3.2–§3.3; `src/forge/context`, `src/forge/curation`, `forge-core/src/python/forge_core/models`.
+- Source: `docs/VISION.md` P-2, P-3, P-9; `docs/PRINCIPLES.md` §4; `docs/WHERE-WE-ARE.md` §3.2–§3.3; `forge-hub/src/python/forge_hub/context`, `forge-hub/src/python/forge_hub/curation`, `forge-core/src/python/forge_core/models`.
 
 ---
 
@@ -1550,7 +1551,7 @@ flowchart LR
 ```
 
 - One curation engine builds each data product's pipeline from its `CurationSpec` (migration 010) and runs it on ingest for the published products the adapter feeds; curated records are persisted with the raw ones (FB-009).
-- `forge.curation`: `pipeline.py` (multi-stage normalization and enrichment), `normalization.py` (field normalization, unit conversion), `aggregation.py` (time windows), `quality.py` (scoring and validation), `lineage.py` (provenance).
+- `forge_hub.curation`: `pipeline.py` (multi-stage normalization and enrichment), `normalization.py` (field normalization, unit conversion), `aggregation.py` (time windows), `quality.py` (scoring and validation), `lineage.py` (provenance).
 - The curation service is mounted at `/curation`; data products live in `forge_canonical.data_products`.
 
 note:
@@ -1590,7 +1591,7 @@ The research basis (`docs/PRINCIPLES.md` §4): decision quality degrades from in
 
 For significant decisions the 13-point minimum frame is recorded: scope, current hypothesis, supporting evidence, **challenging evidence (required)**, alternative hypotheses, key assumptions with confidence, missing information, risk if wrong, opportunity if right, existing controls, **evidence of effectiveness (required)**, reassessment trigger, a named owner.
 
-- `forge_core.models.decision` holds the decision with the products and lineage it relied on; outcomes are observed against it (`forge.observer`).
+- `forge_core.models.decision` holds the decision with the products and lineage it relied on; outcomes are observed against it (`forge_hub.observer`).
 - Every assumption is a tracked entity (active / validated / invalidated / superseded); new data that contradicts an active assumption alerts its owner.
 
 note:
@@ -1630,7 +1631,7 @@ note:
 
 | Capability | State |
 |---|---|
-| Auth, RBAC and rate-limiting middleware (`forge.gateway`) | 🟡 exists; **auth off by default** |
+| Auth, RBAC and rate-limiting middleware (`forge_hub.gateway`) | 🟡 exists; **auth off by default** |
 | Scopes on state-changing routes: `adapters:write`, `context:write`, `schemas:write` | ✅ |
 | Reads are open | 🟡 FB-007 |
 | Scoped roles enforced on every route and RPC | ⬜ FB-075 (two role enums today: gateway `Role`, OT `WriteRole`) |

@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from forge.storage.config import StorageConfig
+    from forge_hub.storage.config import StorageConfig
 
 logger = logging.getLogger(__name__)
 

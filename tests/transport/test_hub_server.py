@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from forge.transport.hub_server import InMemoryServicer
 from forge_core.link.serialization import pydantic_to_proto
 from forge_core.models.adapter import AdapterManifest, AdapterState, AdapterTier, DataContract
+from forge_hub.link.hub_server import InMemoryServicer
 
 
 @pytest.fixture()

@@ -10,7 +10,6 @@ import httpx
 import pytest
 from fastapi import FastAPI
 
-from forge.gateway.rbac import require_scope
 from forge.modules.ot.control import (
     ControlDependencies,
     ControlRuntime,
@@ -40,6 +39,7 @@ from forge_core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge_hub.gateway.rbac import require_scope
 
 SP = "WH/WHK01/Cooker01/TIT_2010/SP"
 RR = "WH/WHK01/Cooker01/TIT_2010/RampRate"
@@ -994,8 +994,8 @@ async def test_two_step_write_over_rest() -> None:
 
 
 async def test_write_endpoints_use_the_hub_identity() -> None:
-    from forge.gateway.auth import configure_auth
-    from forge.gateway.models import AuthConfig, ForgeUser, Role
+    from forge_hub.gateway.auth import configure_auth
+    from forge_hub.gateway.models import AuthConfig, ForgeUser, Role
 
     rt, _mes, plc, _sink = runtime(review_document())
     plc.values[SP] = 150.0
@@ -1084,8 +1084,8 @@ async def test_system_writes_are_not_held_to_the_operator_policy() -> None:
 async def test_operator_actions_use_the_hub_identity() -> None:
     """FB-082: the changeover actions and a connection restart need ``adapters:write``
     and record the hub user, not whatever the body names."""
-    from forge.gateway.auth import configure_auth
-    from forge.gateway.models import AuthConfig, ForgeUser, Role
+    from forge_hub.gateway.auth import configure_auth
+    from forge_hub.gateway.models import AuthConfig, ForgeUser, Role
 
     rt, mes, _plc, sink = runtime(document(mqtt={"mode": "none"}))
     assert rt.orchestrator is not None

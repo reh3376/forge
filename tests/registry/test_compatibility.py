@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from forge.registry.compatibility import (
+from forge_hub.registry.compatibility import (
     check_compatibility,
     compute_diff,
 )
-from forge.registry.models import CompatibilityMode
+from forge_hub.registry.models import CompatibilityMode
 
 # ---------------------------------------------------------------------------
 # compute_diff tests

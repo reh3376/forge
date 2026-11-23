@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from forge.context.mode import InMemoryModeStore, infer_mode
-from forge.context.models import ModeState, OperatingMode
+from forge_hub.context.mode import InMemoryModeStore, infer_mode
+from forge_hub.context.models import ModeState, OperatingMode
 
 
 class TestInMemoryModeStore:

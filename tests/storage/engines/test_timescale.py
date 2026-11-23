@@ -8,7 +8,6 @@ from uuid import uuid4
 
 import pytest
 
-from forge.storage.engines.timescale import TimescaleRecordReader, TimescaleRecordWriter
 from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -18,6 +17,7 @@ from forge_core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge_hub.storage.engines.timescale import TimescaleRecordReader, TimescaleRecordWriter
 
 
 @pytest.fixture

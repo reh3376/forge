@@ -13,8 +13,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from forge.context.equipment import PostgresEquipmentStore
-from forge.context.models import Equipment, EquipmentStatus
+from forge_hub.context.equipment import PostgresEquipmentStore
+from forge_hub.context.models import Equipment, EquipmentStatus
 
 
 @pytest.fixture

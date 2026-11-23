@@ -11,11 +11,11 @@ from unittest.mock import patch
 import pytest
 from fastapi.testclient import TestClient
 
-from forge.api.main import create_app
-from forge.storage.config import StorageConfig
 from forge_core.link.grpc_channel import GrpcChannel
 from forge_core.link.spoke_client import ChannelTls, SpokeClient
 from forge_core.models.adapter import AdapterManifest
+from forge_hub.api.main import create_app
+from forge_hub.storage.config import StorageConfig
 from tests.transport.test_callback_auth import self_signed
 
 MANIFEST_PATH = (

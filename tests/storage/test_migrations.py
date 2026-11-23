@@ -7,7 +7,9 @@ domain models — they do NOT require a running database.
 import importlib
 from pathlib import Path
 
-MIGRATIONS_DIR = Path(__file__).parent.parent.parent / "src" / "forge" / "storage" / "migrations"
+from forge_hub.storage import migrations
+
+MIGRATIONS_DIR = Path(migrations.__file__).resolve().parent  # wherever the hub package lies
 VERSIONS_DIR = MIGRATIONS_DIR / "versions"
 
 
@@ -38,7 +40,7 @@ class TestMigrationStructure:
         }
 
         for module_name, expected_down in chain.items():
-            mod = importlib.import_module(f"forge.storage.migrations.versions.{module_name}")
+            mod = importlib.import_module(f"forge_hub.storage.migrations.versions.{module_name}")
             assert mod.down_revision == expected_down, (
                 f"{module_name}: expected down_revision={expected_down}, got {mod.down_revision}"
             )
@@ -49,7 +51,7 @@ class TestMigrationStructure:
             if f.name == "__init__.py":
                 continue
             module_name = f.stem
-            mod = importlib.import_module(f"forge.storage.migrations.versions.{module_name}")
+            mod = importlib.import_module(f"forge_hub.storage.migrations.versions.{module_name}")
             assert hasattr(mod, "upgrade"), f"{module_name} missing upgrade()"
             assert hasattr(mod, "downgrade"), f"{module_name} missing downgrade()"
             assert callable(mod.upgrade)
@@ -61,7 +63,7 @@ class TestMigrationColumnAlignment:
 
     def test_001_adapters_columns(self):
         """forge_core.adapters should have key adapter columns."""
-        mod = importlib.import_module("forge.storage.migrations.versions.001_forge_core_schema")
+        mod = importlib.import_module("forge_hub.storage.migrations.versions.001_forge_core_schema")
         # Verify the migration defines expected tables by checking revision
         assert mod.revision == "001"
         assert mod.down_revision is None
@@ -79,7 +81,7 @@ class TestMigrationColumnAlignment:
         """lineage_entries should mirror LineageEntry dataclass."""
         import dataclasses
 
-        from forge.curation.lineage import LineageEntry
+        from forge_hub.curation.lineage import LineageEntry
 
         entry_fields = {f.name for f in dataclasses.fields(LineageEntry)}
         # Key fields that must be in the migration
@@ -139,7 +141,7 @@ class TestMigration006:
 
     def test_downgrade_removes_the_schema_after_the_table_without_cascade(self):
         mod = importlib.import_module(
-            "forge.storage.migrations.versions.006_forge_ts_contextual_records"
+            "forge_hub.storage.migrations.versions.006_forge_ts_contextual_records"
         )
         assert mod.revision == "006" and mod.down_revision == "005"
         upgrade, downgrade = _upgrade_and_downgrade("006_forge_ts_contextual_records.py")
@@ -156,7 +158,7 @@ class TestMigration008:
     def test_008_permission_columns_match_model(self):
         import dataclasses
 
-        from forge.storage.access import AccessAuditEntry, ModulePermission
+        from forge_hub.storage.access import AccessAuditEntry, ModulePermission
 
         upgrade, _ = _upgrade_and_downgrade("008_module_permissions.py")
         tables = _tables_in(upgrade)
@@ -184,7 +186,7 @@ class TestMigration008:
         assert restored == {name: _tables_in(original)[name] for name in restored}
 
     def test_upsert_conflicts_on_the_008_key(self):
-        from forge.storage.access import _UPSERT_PERMISSION
+        from forge_hub.storage.access import _UPSERT_PERMISSION
 
         assert "ON CONFLICT (module_id, schema_name)" in _UPSERT_PERMISSION
 
@@ -193,7 +195,7 @@ class TestOnlineRuns:
     """Online runs go through asyncpg, the one PostgreSQL driver the project declares (FB-003)."""
 
     def test_async_url_switches_the_driver(self):
-        from forge.storage.migrations.run import async_url
+        from forge_hub.storage.migrations.run import async_url
 
         assert async_url("postgresql://u:p@h:5432/db") == "postgresql+asyncpg://u:p@h:5432/db"
         assert async_url("postgresql+asyncpg://u:p@h/db") == "postgresql+asyncpg://u:p@h/db"
@@ -204,7 +206,7 @@ class TestOnlineRuns:
         assert "create_async_engine(async_url(" in env
         code = env.split('"""')[2]  # the docstring explains psycopg2; the code never names it
         assert "psycopg" not in code
-        pyproject = (MIGRATIONS_DIR.parents[3] / "pyproject.toml").read_text()
+        pyproject = (Path(__file__).resolve().parents[2] / "pyproject.toml").read_text()
         assert '"sqlalchemy[asyncio]>=' in pyproject  # greenlet, for run_sync
 
 
@@ -228,13 +230,13 @@ class TestMigration009:
 
     def test_chain(self):
         mod = importlib.import_module(
-            "forge.storage.migrations.versions.009_registry_and_equipment_tables"
+            "forge_hub.storage.migrations.versions.009_registry_and_equipment_tables"
         )
         assert mod.revision == "009" and mod.down_revision == "008"
 
     def test_tables_match_the_stores_sql_column_for_column(self):
-        from forge.context import equipment
-        from forge.registry import postgres_store
+        from forge_hub.context import equipment
+        from forge_hub.registry import postgres_store
 
         tables = _migration_tables("009_registry_and_equipment_tables.py")
         assert set(tables) == {"registry_schemas", "registry_versions", "equipment_registry"}
@@ -245,8 +247,8 @@ class TestMigration009:
     def test_tables_match_the_domain_models(self):
         import dataclasses
 
-        from forge.context.models import Equipment
-        from forge.registry.models import SchemaMetadata, SchemaVersion
+        from forge_hub.context.models import Equipment
+        from forge_hub.registry.models import SchemaMetadata, SchemaVersion
 
         tables = _migration_tables("009_registry_and_equipment_tables.py")
         metadata_fields = {f.name for f in dataclasses.fields(SchemaMetadata)} - {"versions"}
@@ -260,7 +262,9 @@ class TestMigration010:
     """010 adds the curation spec column to data products (FB-009)."""
 
     def test_chain_and_column(self):
-        mod = importlib.import_module("forge.storage.migrations.versions.010_data_product_curation")
+        mod = importlib.import_module(
+            "forge_hub.storage.migrations.versions.010_data_product_curation"
+        )
         assert mod.revision == "010" and mod.down_revision == "009"
         source = (VERSIONS_DIR / "010_data_product_curation.py").read_text()
         assert 'op.add_column("data_products", sa.Column("curation", sa.JSON)' in source
@@ -272,8 +276,10 @@ class TestMigration012:
     LOGIN PASSWORD 'changeme', unless Forge has issued the role a password (FB-099)."""
 
     def test_chain_and_roles(self):
-        mod = importlib.import_module("forge.storage.migrations.versions.012_spoke_roles_nologin")
-        two = importlib.import_module("forge.storage.migrations.versions.002_spoke_schemas")
+        mod = importlib.import_module(
+            "forge_hub.storage.migrations.versions.012_spoke_roles_nologin"
+        )
+        two = importlib.import_module("forge_hub.storage.migrations.versions.002_spoke_schemas")
         assert mod.revision == "012" and mod.down_revision == "011"
         assert tuple(f"forge_{schema}" for schema in two.SPOKE_SCHEMAS) == mod.SPOKE_ROLES
 
@@ -291,7 +297,7 @@ class TestMigration012:
     def test_the_audit_row_it_looks_for_is_the_one_record_issued_writes(self):
         """The match is on the exact reason text `record_issued` audits; a dry run
         (provisioned=no) must not count as an issue."""
-        from forge.storage.access import AccessController, AccessLevel
+        from forge_hub.storage.access import AccessController, AccessLevel
 
         upgrade, _ = _upgrade_and_downgrade("012_spoke_roles_nologin.py")
         controller = AccessController()
@@ -311,11 +317,11 @@ class TestMigration011:
     def test_chain_and_columns_match_the_writer(self):
         import re
 
-        from forge.storage.engines import timescale
         from forge_core.models.contextual_record import RecordContext
+        from forge_hub.storage.engines import timescale
 
         mod = importlib.import_module(
-            "forge.storage.migrations.versions.011_contextual_records_context_columns"
+            "forge_hub.storage.migrations.versions.011_contextual_records_context_columns"
         )
         assert mod.revision == "011" and mod.down_revision == "010"
         added = set(mod._TEXT_COLUMNS) | {"event_timestamp"}

@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from forge.storage.registry import SchemaRegistry, StorageEngine
+from forge_hub.storage.registry import SchemaRegistry, StorageEngine
 
 if TYPE_CHECKING:
     from forge_core.models.contextual_record import ContextualRecord

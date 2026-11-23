@@ -5,8 +5,8 @@ from __future__ import annotations
 from datetime import datetime, time
 from zoneinfo import ZoneInfo
 
-from forge.context.models import ShiftSchedule
-from forge.context.shift import build_louisville_schedule, resolve_shift
+from forge_hub.context.models import ShiftSchedule
+from forge_hub.context.shift import build_louisville_schedule, resolve_shift
 
 _LOU_TZ = ZoneInfo("America/Kentucky/Louisville")
 

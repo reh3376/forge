@@ -14,11 +14,6 @@ from uuid import uuid4
 
 import pytest
 
-from forge.broker.consumer import InMemoryConsumer
-from forge.broker.event_publisher import ForgeEventPublisher
-from forge.broker.exchanges import FORGE_EXCHANGES
-from forge.broker.producer import InMemoryProducer
-from forge.broker.serialization import deserialize_record, serialize_record
 from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -28,6 +23,11 @@ from forge_core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge_hub.broker.consumer import InMemoryConsumer
+from forge_hub.broker.event_publisher import ForgeEventPublisher
+from forge_hub.broker.exchanges import FORGE_EXCHANGES
+from forge_hub.broker.producer import InMemoryProducer
+from forge_hub.broker.serialization import deserialize_record, serialize_record
 
 
 class TestInMemoryRoundTrip:

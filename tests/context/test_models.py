@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import time
 
-from forge.context.models import (
+from forge_hub.context.models import (
     Batch,
     BatchStatus,
     Equipment,

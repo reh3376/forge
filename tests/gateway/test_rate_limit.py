@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from forge.gateway.rate_limit import EndpointLimit, InMemoryRateLimiter
+from forge_hub.gateway.rate_limit import EndpointLimit, InMemoryRateLimiter
 
 
 class TestInMemoryRateLimiter:

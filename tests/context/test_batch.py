@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from forge.context.batch import InMemoryBatchStore
-from forge.context.models import Batch, BatchStatus
+from forge_hub.context.batch import InMemoryBatchStore
+from forge_hub.context.models import Batch, BatchStatus
 
 
 def _batch(bid: str = "B001", **kw) -> Batch:

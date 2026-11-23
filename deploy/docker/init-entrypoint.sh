@@ -120,7 +120,7 @@ log "All infrastructure ready."
 
 # 2. Run Alembic migrations for PostgreSQL, TimescaleDB, and Neo4j
 log "Running database migrations (Alembic + Neo4j Cypher) ..."
-python3 -m forge.storage.migrations.run up --target all \
+python3 -m forge_hub.storage.migrations.run up --target all \
     || fail "Database migrations failed" 2
 log "All database schemas ready."
 

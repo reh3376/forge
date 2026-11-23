@@ -7,10 +7,11 @@ from datetime import timedelta
 
 import pytest
 
-from forge.curation.aggregation import AggregationFunction, AggregationSpec
-from forge.curation.lineage import LineageTracker
-from forge.curation.normalization import build_whk_unit_registry
-from forge.curation.pipeline import (
+from forge_core.models.contextual_record import ContextualRecord
+from forge_hub.curation.aggregation import AggregationFunction, AggregationSpec
+from forge_hub.curation.lineage import LineageTracker
+from forge_hub.curation.normalization import build_whk_unit_registry
+from forge_hub.curation.pipeline import (
     AggregationStep,
     CurationPipeline,
     EnrichmentStep,
@@ -18,12 +19,11 @@ from forge.curation.pipeline import (
     TimeBucketStep,
     ValidationStep,
 )
-from forge.curation.quality import (
+from forge_hub.curation.quality import (
     CompletenessRule,
     QualityMonitor,
     RangeRule,
 )
-from forge_core.models.contextual_record import ContextualRecord
 from tests.curation.conftest import make_record_batch
 
 

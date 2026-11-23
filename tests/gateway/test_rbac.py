@@ -6,10 +6,10 @@ import pytest
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
-from forge.gateway.auth import configure_auth
-from forge.gateway.errors import install_error_handlers
-from forge.gateway.models import AuthConfig, ForgeUser, Role
-from forge.gateway.rbac import _is_authorized, require_role, require_scope
+from forge_hub.gateway.auth import configure_auth
+from forge_hub.gateway.errors import install_error_handlers
+from forge_hub.gateway.models import AuthConfig, ForgeUser, Role
+from forge_hub.gateway.rbac import _is_authorized, require_role, require_scope
 
 
 @pytest.fixture

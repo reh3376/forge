@@ -15,7 +15,7 @@ checked without running the module:
 
 M-4 to M-7 (the time exchange, failing closed, UTC stamps, health with
 refusals by cause) need a running module. The conformance kit
-(``forge.conformance``, FB-137) runs them: for a module on
+(``forge_hub.conformance``, FB-137) runs them: for a module on
 the ``python-adapter`` template the runner finds the adapter class in the
 module's ``adapter.py``, drives it against a reference hub and reports what
 happened. A Python module off the template supplies a ``conformance.py`` hook

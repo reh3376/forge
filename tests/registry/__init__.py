@@ -1,1 +1,1 @@
-# Tests for forge.registry (F20 Schema Registry Service).
+# Tests for forge_hub.registry (F20 Schema Registry Service).

@@ -7,12 +7,12 @@ from pathlib import Path
 
 import pytest
 
-from forge.ingest.facts_check import (
+from forge_core.models.adapter import AdapterManifest
+from forge_hub.ingest.facts_check import (
     DEFAULT_SPECS_DIR,
     check_manifest_against_facts,
     load_facts_spec,
 )
-from forge_core.models.adapter import AdapterManifest
 
 MES_MANIFEST = Path(__file__).resolve().parents[2] / "src" / "forge" / "adapters"
 MES_MANIFEST = MES_MANIFEST / "forge_mes" / "manifest.json"

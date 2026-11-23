@@ -7,9 +7,6 @@ from datetime import UTC, datetime
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from forge.curation.quality import QualityMonitor
-from forge.curation.registry import DataProductRegistry
-from forge.curation.service import create_curation_app
 from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -19,6 +16,9 @@ from forge_core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge_hub.curation.quality import QualityMonitor
+from forge_hub.curation.registry import DataProductRegistry
+from forge_hub.curation.service import create_curation_app
 
 
 @pytest.fixture()

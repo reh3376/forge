@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typer.testing import CliRunner
 
-from forge.cli.main import app
+from forge_hub.cli.main import app
 
 HEALTH = {
     "state": "DEGRADED",

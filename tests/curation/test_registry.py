@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import pytest
 
-from forge.curation.registry import (
+from forge_core.models.data_product import DataProductStatus, QualitySLO
+from forge_hub.curation.registry import (
     DataProductField,
     DataProductRegistry,
     InMemoryProductStore,
 )
-from forge_core.models.data_product import DataProductStatus, QualitySLO
 
 # Schema references in the one grammar (forge_core.schema_ref, FB-008).
 _PRODUCT_REF = "forge://schemas/curation/Product/v1"

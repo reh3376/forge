@@ -1,0 +1,53 @@
+"""forge_hub.context — F21 Context Engine Service.
+
+Public API:
+    Equipment, Batch, ShiftSchedule, ModeState — domain models
+    EquipmentStore, BatchStore, ModeStore — storage ABCs
+    ContextEnricher — enrichment pipeline
+    create_context_app — FastAPI application factory
+"""
+
+from forge_hub.context.batch import BatchStore, InMemoryBatchStore
+from forge_hub.context.enrichment import ContextEnricher, EnrichmentResult
+from forge_hub.context.equipment import (
+    EquipmentStore,
+    InMemoryEquipmentStore,
+    PostgresEquipmentStore,
+)
+from forge_hub.context.mode import InMemoryModeStore, ModeStore
+from forge_hub.context.models import (
+    Batch,
+    BatchStatus,
+    Equipment,
+    EquipmentStatus,
+    ModeState,
+    OperatingMode,
+    ShiftDefinition,
+    ShiftSchedule,
+)
+from forge_hub.context.service import build_context_router, create_context_app
+from forge_hub.context.shift import build_louisville_schedule, resolve_shift
+
+__all__ = [
+    "Batch",
+    "BatchStatus",
+    "BatchStore",
+    "ContextEnricher",
+    "EnrichmentResult",
+    "Equipment",
+    "EquipmentStatus",
+    "EquipmentStore",
+    "InMemoryBatchStore",
+    "InMemoryEquipmentStore",
+    "InMemoryModeStore",
+    "ModeState",
+    "ModeStore",
+    "OperatingMode",
+    "PostgresEquipmentStore",
+    "ShiftDefinition",
+    "ShiftSchedule",
+    "build_context_router",
+    "build_louisville_schedule",
+    "create_context_app",
+    "resolve_shift",
+]

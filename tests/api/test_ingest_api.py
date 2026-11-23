@@ -10,15 +10,15 @@ from unittest.mock import patch
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from forge.api.main import create_app
-from forge.ingest.pipeline import IngestPipeline, InMemoryRecordSink
-from forge.storage.config import StorageConfig
 from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
     DataContract,
     TimeGovernance,
 )
+from forge_hub.api.main import create_app
+from forge_hub.ingest.pipeline import IngestPipeline, InMemoryRecordSink
+from forge_hub.storage.config import StorageConfig
 
 
 def _manifest(adapter_id: str = "forge-wms", *, declared: bool = True) -> dict:
@@ -98,7 +98,7 @@ async def test_reading_without_timestamp_is_refused_unless_the_adapter_declared_
 ) -> None:
     """One clock (FB-088): the hub never invents a source time, and the refusal is visible."""
     await client.post("/v1/adapters/register", json=_manifest(declared=False))
-    with caplog.at_level(logging.WARNING, logger="forge.api.main"):
+    with caplog.at_level(logging.WARNING, logger="forge_hub.api.main"):
         resp = await client.post(
             "/v1/records",
             json={
@@ -245,7 +245,7 @@ async def test_a_spoke_refused_for_its_clock_is_refused_on_rest_too(
         at = start + timedelta(seconds=30 * i)
         gates.probe("forge-wms", at, offset_seconds=-2.0, round_trip_seconds=0.002, measured_at=at)
 
-    with caplog.at_level(logging.WARNING, logger="forge.api.main"):
+    with caplog.at_level(logging.WARNING, logger="forge_hub.api.main"):
         resp = await client.post("/v1/records", json=body)
     assert resp.status_code == 409
     detail = resp.json()["detail"]

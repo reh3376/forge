@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from forge.curation.lineage import (
+from forge_hub.curation.lineage import (
     InMemoryLineageStore,
     LineageEntry,
     LineageTracker,

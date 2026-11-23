@@ -8,13 +8,13 @@ from unittest.mock import patch
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from forge.api.main import create_app
-from forge.gateway.auth import configure_auth
-from forge.gateway.models import AuthConfig
-from forge.storage.config import StorageConfig
 from forge_core.link.spoke_callback import CALLBACK_PARAM, WriteDispatcher
 from forge_core.link.spoke_client import InMemoryChannel
 from forge_core.models.adapter import AdapterCapabilities, AdapterManifest, DataContract
+from forge_hub.api.main import create_app
+from forge_hub.gateway.auth import configure_auth
+from forge_hub.gateway.models import AuthConfig
+from forge_hub.storage.config import StorageConfig
 
 OPS = {"X-API-Key": "ops-key"}
 VIEW = {"X-API-Key": "view-key"}

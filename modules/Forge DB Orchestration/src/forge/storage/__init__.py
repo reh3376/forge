@@ -13,13 +13,13 @@ Storage engines:
     - Kafka       (streaming: CDC events, adapter output, cross-module)
 """
 
-from forge.storage.access import AccessController
-from forge.storage.backfill import BackfillEngine
-from forge.storage.config import StorageConfig
-from forge.storage.pool import PoolManager
-from forge.storage.registry import SchemaRegistry
-from forge.storage.router import DataRouter
-from forge.storage.shadow import ShadowWriter
+from forge_hub.storage.access import AccessController
+from forge_hub.storage.backfill import BackfillEngine
+from forge_hub.storage.config import StorageConfig
+from forge_hub.storage.pool import PoolManager
+from forge_hub.storage.registry import SchemaRegistry
+from forge_hub.storage.router import DataRouter
+from forge_hub.storage.shadow import ShadowWriter
 
 __all__ = [
     "AccessController",
