@@ -63,7 +63,7 @@ packages = ["src/forge", "forge-core/src/python/forge_core"]
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-src = ["src", "forge-core/src/python", "tests"]
+src = ["src", "forge-core/src/python", "tests", "forge-core/tests"]
 # Applies the excludes even when paths are passed explicitly (pre-commit, `git ls-files | xargs`).
 force-exclude = true
 extend-exclude = [
@@ -99,7 +99,13 @@ runtime-evaluated-base-classes = [
 known-first-party = ["forge", "forge_core"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# Two trees: what spans layers, the hub and the modules in tests/, and forge-core's own in
+# forge-core/tests (D-17 §10.3). Two folders named tests cannot both be the package "tests",
+# so test files are imported by path (importlib mode) and the repository root is on the
+# import path for the helpers under tests/.
+testpaths = ["tests", "forge-core/tests"]
+addopts = "--import-mode=importlib"
+pythonpath = ["."]
 asyncio_mode = "auto"
 
 [tool.mypy]

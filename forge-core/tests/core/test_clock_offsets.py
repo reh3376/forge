@@ -6,6 +6,7 @@ import logging
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from tests.otel import metric_reader
 
 from forge_core import telemetry
 from forge_core.clock import (
@@ -18,7 +19,6 @@ from forge_core.clock import (
     clock_tolerance_seconds,
 )
 from forge_core.models.contextual_record import RecordTimestamp
-from tests.otel import metric_reader
 
 T0 = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
 

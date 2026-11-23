@@ -345,8 +345,8 @@ uv run ruff format --check .
 
 # Run specific test suite
 uv run pytest tests/modules/ot/ -v           # OT Module tests
-uv run pytest tests/sdk/scripting/ -v         # Scripting SDK tests
-uv run pytest tests/core/ -v                  # Core tests
+uv run pytest forge-core/tests/sdk/scripting/ -v   # Scripting SDK tests
+uv run pytest forge-core/tests/core/ -v            # forge-core tests
 ```
 
 ### Dependencies

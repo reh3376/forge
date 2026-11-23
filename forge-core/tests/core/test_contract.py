@@ -7,7 +7,7 @@ from pathlib import Path
 
 from forge_core import contract
 
-REPO = Path(__file__).resolve().parents[2]
+REPO = Path(__file__).resolve().parents[3]
 
 
 def test_in_a_checkout_the_contract_is_forge_cores_folder() -> None:

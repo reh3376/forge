@@ -43,7 +43,7 @@ jobs:
       - name: pytest
         # -rsx: every skipped and expected-failure test is listed with its reason on each run
         # (owner, 2026-11-18: a skipped test without a visible reason is a silent gap)
-        run: .venv/bin/pytest tests -q --no-header -p no:cacheprovider -rsx
+        run: .venv/bin/pytest -q --no-header -p no:cacheprovider -rsx
 
   hub-go:
     name: hub-go
