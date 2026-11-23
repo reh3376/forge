@@ -1,6 +1,6 @@
 """Tests for the Forge Scanner context builder."""
 
-from forge.adapters.forge_scanner.context import (
+from forge_scanner.context import (
     _normalize_scan_type,
     build_record_context,
 )

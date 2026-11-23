@@ -94,7 +94,7 @@ class TestAModuleThatMeetsTheBaseline:
             verdict = verdicts[f"fmts:{requirement}"]
             assert verdict.status == SKIP
             assert "NOT CHECKED" in verdict.message and "FB-155" in verdict.message
-            assert "not in an importable Forge package" in verdict.message
+            assert "not in the module's own package" in verdict.message
             assert verdict.evidence == {"waived": False, "unverified": True, "blocked_on": "FB-155"}
 
     async def test_a_runner_handed_no_kit_says_so(self, spec, repo) -> None:

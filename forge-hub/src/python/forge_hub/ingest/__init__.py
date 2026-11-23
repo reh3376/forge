@@ -7,7 +7,6 @@ regardless of how it reached the hub.
 """
 
 from forge_hub.ingest.facts_check import (
-    DEFAULT_SPECS_DIR,
     FactsCheckResult,
     check_manifest_against_facts,
     load_facts_spec,
@@ -22,7 +21,6 @@ from forge_hub.ingest.pipeline import (
 )
 
 __all__ = [
-    "DEFAULT_SPECS_DIR",
     "FactsCheckResult",
     "InMemoryRecordSink",
     "IngestOutcome",

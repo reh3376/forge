@@ -59,8 +59,8 @@ This is the short form. [`docs/WHERE-WE-ARE.md`](docs/WHERE-WE-ARE.md) has every
 |---|---|
 | forge-core's foundation: the models, the one clock, the contract, the FxTS frameworks, the SDK | [`forge-core/`](forge-core) |
 | The hub: the gRPC transport, ingest, context, storage, schema registry, curation, the REST API, the `forge` command | [`forge-hub/`](forge-hub) |
-| forge-ot, the plant-floor module: OPC UA, the tag engine, ISA-18.2 alarms, governed writes to controllers, MQTT, scripting | [`src/forge/modules/ot/`](src/forge/modules/ot) |
-| Eight adapters for other systems, as Python reference implementations | [`src/forge/adapters/`](src/forge/adapters) |
+| forge-ot, the plant-floor module: OPC UA, the tag engine, ISA-18.2 alarms, governed writes to controllers, MQTT, scripting | [`forge-modules/forge-ot/src/python/forge_ot/`](forge-modules/forge-ot/src/python/forge_ot) |
+| Eight adapters for other systems, as Python reference implementations, each in its module's folder | [`forge-modules/`](forge-modules) |
 | Six FxTS frameworks with their specs, and the governed lists, each hashed and approved by the owner | [`forge-core/contract/`](forge-core/contract), [`forge-core/src/python/forge_core/fxts/`](forge-core/src/python/forge_core/fxts) |
 | Exhaustive checks of two laws of forge-ot, each with a project skill | [`.claude/skills/`](.claude/skills) |
 | The interim MES bridge, kept running until the Go forge-mes replaces it | [`forge-modules/forge-mes/bridge/`](forge-modules/forge-mes/bridge) |
@@ -76,13 +76,13 @@ This is the short form. [`docs/WHERE-WE-ARE.md`](docs/WHERE-WE-ARE.md) has every
 
 ## Where things are
 
-The repository is being reorganised into three self-contained parts, forge-core, forge-hub and forge-modules, each with the same standard folders ([`docs/decisions/repository-structure.md`](docs/decisions/repository-structure.md)). forge-core and the hub have moved. The modules are still in `src/forge` until their move.
+The repository is being reorganised into three self-contained parts, forge-core, forge-hub and forge-modules, each with the same standard folders ([`docs/decisions/repository-structure.md`](docs/decisions/repository-structure.md)). forge-core, the hub and every module's code and specs have moved. The modules' tests and documents follow.
 
 | Path | Holds |
 |---|---|
 | [`forge-core/`](forge-core) | The foundation: `contract/` (proto files, framework schemas, governed lists), `src/python/forge_core` (the Python package), `src/go` (the Go models, generated bindings and module scaffold), `tests/`, `docs/`, and its own README |
 | [`forge-hub/`](forge-hub) | The hub: `src/python/forge_hub` (`link`, `ingest`, `context`, `storage`, `registry`, `curation`, `broker`, `api`, `gateway`, `observer`, `cli`), `fxts/` (its own specs), `tests/`, `docs/`, and its own README |
-| [`src/forge/`](src/forge) | The modules, until they move: `adapters/` and `modules/ot` |
+| [`forge-modules/`](forge-modules) | One folder per module: its Python package in `src/python/`, its specs in `fxts/`. forge-mes also holds the interim MES bridge in `bridge/`; forge-display holds the widget specs |
 | [`tests/`](tests) | Tests of the modules (until they follow their code), and tests that span layers |
 | [`forge-modules/forge-mes/bridge/`](forge-modules/forge-mes/bridge) | The interim MES bridge (NestJS and Next.js). It has its own [`CLAUDE.md`](forge-modules/forge-mes/bridge/CLAUDE.md) |
 | [`docs/`](docs) | The state and direction documents, the signed decision records, the tutorial's source |

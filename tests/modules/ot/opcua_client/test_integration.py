@@ -27,14 +27,14 @@ import pytest_asyncio
 from asyncua import Server as UaServer
 from asyncua import ua
 
-from forge.modules.ot.opcua_client import (
+from forge_ot.opcua_client import (
     ConnectionState,
     DataType,
     NodeClass,
     OpcUaClient,
     QualityCode,
 )
-from forge.modules.ot.opcua_client.exceptions import (
+from forge_ot.opcua_client.exceptions import (
     EndpointUnreachableError,
     WriteError,
 )

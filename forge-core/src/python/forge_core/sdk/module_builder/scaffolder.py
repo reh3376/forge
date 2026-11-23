@@ -52,7 +52,7 @@ Example
     )
 
     scaffolder = ModuleScaffolder(manifest)
-    result = scaffolder.generate("./src/forge/adapters/acme_plc/")
+    result = scaffolder.generate(scaffolder.package_dir("forge-modules"))
 
     # result.files_created lists all generated files
     # result.adapter_class is "AcmePlcAdapter"
@@ -140,6 +140,18 @@ class ModuleScaffolder:
         """The PascalCase adapter class name (e.g. 'AcmePlcAdapter')."""
         return f"{self._pascal}Adapter"
 
+    def package_dir(self, modules_root: str | Path) -> Path:
+        """The module's package folder under ``modules_root`` in the standard structure:
+        ``<modules_root>/<adapter-id>/src/python/<snake_name>``."""
+        return Path(modules_root) / self._adapter_id / "src" / "python" / self._snake
+
+    @staticmethod
+    def module_root(package_dir: Path) -> Path:
+        """The module's own folder, given its package folder."""
+        if (package_dir.parent.name, package_dir.parent.parent.name) == ("python", "src"):
+            return package_dir.parents[2]
+        return package_dir.parent
+
     def generate(
         self,
         target_dir: str | Path,
@@ -153,14 +165,16 @@ class ModuleScaffolder:
         Parameters
         ----------
         target_dir : str or Path
-            The directory where the adapter module files will be written.
-            Typically ``src/forge/adapters/<snake_name>/``.
+            The module's Python package folder. In the repository's standard structure
+            (D-17 §10.3) that is ``forge-modules/<module-id>/src/python/<snake_name>/``,
+            which ``package_dir`` builds; the module's folder is then three levels up and
+            takes the tests and the spec. Any other folder is taken as the package, with
+            ``tests/`` and ``fxts/`` beside it.
         include_tests : bool
-            If True (default), also generates a test file in a ``tests/``
-            sibling directory.
+            If True (default), also generates a test file in the module's ``tests/``.
         include_facts : bool
-            If True (default), also generates a FACTS governance spec
-            in a ``specs/`` sibling directory.
+            If True (default), also generates a FACTS governance spec in the module's
+            ``fxts/facts/``.
         overwrite : bool
             If True, overwrite existing files. Default is False (skip
             existing files with a warning).
@@ -200,9 +214,8 @@ class ModuleScaffolder:
 
         # ── Test scaffold ──────────────────────────────────────
         if include_tests:
-            # Place tests relative to the adapter directory
-            # Convention: tests/adapters/test_<snake>.py
-            tests_dir = target.parent.parent.parent.parent / "tests" / "adapters"
+            # A module keeps its own tests: <module>/tests/test_<snake>.py
+            tests_dir = self.module_root(target) / "tests"
             tests_dir.mkdir(parents=True, exist_ok=True)
 
             test_file = tests_dir / f"test_{self._snake}.py"
@@ -214,7 +227,7 @@ class ModuleScaffolder:
                 result.files_created.append(test_file)
                 logger.info("Created: %s", test_file)
 
-            # Ensure conftest.py exists in tests/adapters/
+            # Its conftest puts the module's own package on the import path
             conftest = tests_dir / "conftest.py"
             if not conftest.exists():
                 conftest.write_text(_adapter_conftest())
@@ -222,7 +235,8 @@ class ModuleScaffolder:
 
         # ── FACTS governance spec ──────────────────────────────
         if include_facts:
-            specs_dir = target.parent.parent / "governance" / "facts" / "specs"
+            # A spec lives with what it describes: <module>/fxts/facts (D-17 A-3)
+            specs_dir = self.module_root(target) / "fxts" / "facts"
             specs_dir.mkdir(parents=True, exist_ok=True)
 
             facts_file = specs_dir / f"{self._adapter_id}.facts.json"
@@ -258,8 +272,11 @@ if not hasattr(enum, "StrEnum"):
         pass
     enum.StrEnum = StrEnum
 
-# Ensure src/ is importable
-_src = Path(__file__).resolve().parent.parent.parent / "src"
+# The module's own package: <module>/src/python (the standard structure), else the folder
+# beside tests/
+_module = Path(__file__).resolve().parent.parent
+_package_root = _module / "src" / "python"
+_src = _package_root if _package_root.is_dir() else _module
 if str(_src) not in sys.path:
     sys.path.insert(0, str(_src))
 '''

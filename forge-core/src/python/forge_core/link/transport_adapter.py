@@ -7,7 +7,7 @@ adapter classes (ForgeWmsAdapter, ForgeMesAdapter) require ZERO code changes
 to work with gRPC — they just get wrapped in this adapter.
 
 Usage:
-    from forge.adapters.forge_wms.adapter import ForgeWmsAdapter
+    from forge_wms.adapter import ForgeWmsAdapter
     from forge_core.link.transport_adapter import GrpcTransportAdapter
 
     wms = ForgeWmsAdapter()

@@ -372,7 +372,7 @@ from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
 
 runner = FACTSRunner()  # the packaged facts.schema.json is the default
 
-with open("forge-core/src/python/forge_core/fxts/facts/specs/my-system.facts.json") as f:
+with open("forge-modules/my-system/fxts/facts/my-system.facts.json") as f:
     spec = json.load(f)
 
 report = asyncio.run(runner.run(target="my-system", spec=spec))

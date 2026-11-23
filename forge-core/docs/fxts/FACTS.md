@@ -34,7 +34,7 @@ Without FACTS, adapter development is ad hoc. Each adapter would make its own as
 
 ### Adapter Specs
 
-State on 2026-10-17 (`FACTSRunner` over `forge-core/src/python/forge_core/fxts/facts/specs/`; "Runner" counts the 36-verdict set, `facts:integrity-hash-state` excluded):
+State on 2026-10-17 (`FACTSRunner` over every module's `fxts/facts/`; "Runner" counts the 36-verdict set, `facts:integrity-hash-state` excluded):
 
 | Spec | Tier | Data sources | Context mappings | Capabilities | Hash state | Runner |
 |------|------|--------------|------------------|--------------|------------|--------|
@@ -192,7 +192,7 @@ The same section rides on the adapter manifest (`AdapterManifest.time_governance
 ### Usage
 
 ```bash
-# Static validation: by adapter_id (looked up in forge-core/src/python/forge_core/fxts/facts/specs) or by file
+# Static validation: by adapter_id (looked up in each module's fxts/facts) or by file
 forge governance run facts forge-wms
 forge governance run facts path/to/forge-wms.facts.json
 
@@ -211,7 +211,7 @@ Spec integrity is on the CLI already (FB-021): `forge governance specs --pending
 
 ### forge-wms (Forge Warehouse Management System)
 
-**Spec File:** `forge-core/src/python/forge_core/fxts/facts/specs/forge-wms.facts.json`
+**Spec File:** `forge-modules/forge-wms/fxts/facts/forge-wms.facts.json`
 **Tier:** MES_MOM
 **Protocol:** graphql+amqp
 **Capabilities:** read, subscribe, backfill, discover (no write)
@@ -225,7 +225,7 @@ Context fields: `manufacturing_unit_id` (barrel), `lot_id`, `physical_asset_id` 
 
 ### forge-mes (Forge Manufacturing Execution System)
 
-**Spec File:** `forge-core/src/python/forge_core/fxts/facts/specs/forge-mes.facts.json`
+**Spec File:** `forge-modules/forge-mes/fxts/facts/forge-mes.facts.json`
 **Tier:** MES_MOM
 **Protocol:** graphql+amqp+mqtt
 **Capabilities:** read, write, subscribe, backfill, discover

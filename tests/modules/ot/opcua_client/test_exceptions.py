@@ -5,7 +5,7 @@ Validates exception inheritance, attribute preservation, and repr formatting.
 
 from __future__ import annotations
 
-from forge.modules.ot.opcua_client.exceptions import (
+from forge_ot.opcua_client.exceptions import (
     BrowseError,
     CertificateError,
     ConfigurationError,

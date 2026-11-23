@@ -6,7 +6,7 @@ Use GitHub's private vulnerability reporting on this repository ("Security" tab 
 
 ## Scope
 
-- The Forge hub (`src/forge`, `forge-core/src/go/`), the Forge MES module (`forge-modules/forge-mes/bridge`) and the governance specs.
+- forge-core (`forge-core/`), the hub (`forge-hub/`), the modules (`forge-modules/`, the interim MES bridge under `forge-modules/forge-mes/bridge` included) and the governance specs.
 - Spoke adapters are integration code; vulnerabilities in the external systems they connect to should be reported to those systems' owners.
 
 ## Secrets

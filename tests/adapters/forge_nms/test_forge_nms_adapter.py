@@ -5,9 +5,9 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from forge.adapters.forge_nms import ForgeNmsAdapter
 from forge_core.clock import TimeGovernanceConflictError
 from forge_core.models.adapter import AdapterState
+from forge_nms import ForgeNmsAdapter
 
 # ── Test Fixtures ──────────────────────────────────────────────
 

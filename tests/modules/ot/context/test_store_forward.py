@@ -5,7 +5,6 @@ from datetime import UTC, datetime
 
 import pytest
 
-from forge.modules.ot.context.store_forward import StoreForwardBuffer
 from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -15,6 +14,7 @@ from forge_core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge_ot.context.store_forward import StoreForwardBuffer
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -9,25 +9,25 @@ from typing import Any
 
 import pytest
 
-from forge.modules.ot.control import PlcConnectionManager, PlcConnectionSpec, RegistryTagIO
-from forge.modules.ot.control.connections import (
+from forge_core.clock import ClockRefusedError, ClockSample
+from forge_core.models.adapter import ConnectionTimeGovernance, TimeGovernance
+from forge_ot.control import PlcConnectionManager, PlcConnectionSpec, RegistryTagIO
+from forge_ot.control.connections import (
     LIVENESS_NODE,
     default_client_factory,
     default_provider_factory,
 )
-from forge.modules.ot.opcua_client.types import (
+from forge_ot.opcua_client.types import (
     ConnectionHealth,
     ConnectionState,
     DataType,
     DataValue,
     QualityCode,
 )
-from forge.modules.ot.tag_engine.models import StandardTag
-from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
-from forge.modules.ot.tag_engine.providers.base import ProviderState
-from forge.modules.ot.tag_engine.registry import TagRegistry
-from forge_core.clock import ClockRefusedError, ClockSample
-from forge_core.models.adapter import ConnectionTimeGovernance, TimeGovernance
+from forge_ot.tag_engine.models import StandardTag
+from forge_ot.tag_engine.providers.acquisition import AcquisitionEngine
+from forge_ot.tag_engine.providers.base import ProviderState
+from forge_ot.tag_engine.registry import TagRegistry
 
 SP = "WH/WHK01/Cooker01/TIT_2010/SP"
 PV = "WH/WHK01/Cooker01/TIT_2010/PV"
@@ -314,7 +314,7 @@ async def test_operator_restart_and_unknown_names(caplog: pytest.LogCaptureFixtu
     status = await manager.restart("WHK01")
     assert status["restarts"] == 1 and status["connected"] and clients["WHK01"].connects == 2
     # the supervisor log says who asked (the hub user over REST, FB-082)
-    with caplog.at_level(logging.INFO, logger="forge.modules.ot.control.connections"):
+    with caplog.at_level(logging.INFO, logger="forge_ot.control.connections"):
         status = await manager.restart("WHK01", requested_by="alice")
     assert status["restarts"] == 2 and clients["WHK01"].connects == 3
     assert "WHK01: reconnected (requested by alice)" in caplog.text
@@ -689,7 +689,7 @@ async def test_a_listener_that_fails_does_not_hide_the_refusal(
     manager.add_clock_listener(awaited)  # a coroutine listener is awaited
     await manager.start()
     clients["WHK01"].values[LIVENESS_NODE] = None
-    with caplog.at_level(logging.ERROR, logger="forge.modules.ot.control.connections"):
+    with caplog.at_level(logging.ERROR, logger="forge_ot.control.connections"):
         for _ in range(3):
             await manager.check()
             clock.advance(10)

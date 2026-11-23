@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 
-from forge.modules.ot.bridge.dual_write import (
+from forge_ot.bridge.dual_write import (
     ComparisonResult,
     ConsistencyReport,
     DiscrepancyType,

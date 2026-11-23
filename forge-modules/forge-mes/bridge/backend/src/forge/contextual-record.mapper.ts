@@ -4,7 +4,7 @@
  * in proto-loader wire shape.
  *
  * The mapping mirrors the hub-side Python adapter
- * (`src/forge/adapters/forge_mes/{context,record_builder}.py`) so a record
+ * (`forge-modules/forge-mes/src/python/forge_mes/{context,record_builder}.py`) so a record
  * pushed from here and a record pulled by the hub describe the same event the
  * same way:
  *   - the 6 mandatory + 10 optional FACTS context fields

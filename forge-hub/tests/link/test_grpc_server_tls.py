@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import asyncio
 import json
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
+from tests.samples import module_manifest_path
 from tests.tls import self_signed
 
 from forge_core.link.grpc_channel import GrpcChannel
@@ -16,14 +17,10 @@ from forge_hub.ingest.pipeline import IngestPipeline, InMemoryRecordSink
 from forge_hub.link.grpc_server import GrpcServer, ServerTls
 from forge_hub.link.hub_ingest import HubIngestServicer
 
-MANIFEST_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "src"
-    / "forge"
-    / "adapters"
-    / "forge_mes"
-    / "manifest.json"
-)
+if TYPE_CHECKING:
+    from pathlib import Path
+
+MANIFEST_PATH = module_manifest_path("forge-mes")
 
 
 def mes_manifest() -> AdapterManifest:

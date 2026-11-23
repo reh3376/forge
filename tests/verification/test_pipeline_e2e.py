@@ -15,7 +15,6 @@ from typing import Any
 
 import pytest
 
-from forge.adapters.forge_wms.adapter import ForgeWmsAdapter
 from forge_core.models.adapter import AdapterState
 from forge_core.models.contextual_record import (
     ContextualRecord,
@@ -32,6 +31,7 @@ from forge_hub.storage.registry import (
     StorageEngine,
 )
 from forge_hub.storage.router import DataRouter, RoutingDecision
+from forge_wms.adapter import ForgeWmsAdapter
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. Adapter Lifecycle

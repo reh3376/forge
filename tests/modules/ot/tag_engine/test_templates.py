@@ -2,16 +2,16 @@
 
 import pytest
 
-from forge.modules.ot.opcua_client.types import DataType
-from forge.modules.ot.tag_engine.builtin_templates import (
+from forge_ot.opcua_client.types import DataType
+from forge_ot.tag_engine.builtin_templates import (
     create_builtin_registry,
 )
-from forge.modules.ot.tag_engine.models import (
+from forge_ot.tag_engine.models import (
     MemoryTag,
     ScanClass,
     StandardTag,
 )
-from forge.modules.ot.tag_engine.templates import (
+from forge_ot.tag_engine.templates import (
     TagTemplate,
     TemplateParam,
     TemplateRegistry,

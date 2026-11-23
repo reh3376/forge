@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from forge.adapters.forge_mes.record_builder import (
+from forge_core.models.contextual_record import QualityCode, RecordContext
+from forge_mes.record_builder import (
     _assess_quality,
     _derive_tag_path,
     _extract_server_time,
     _extract_source_time,
     build_contextual_record,
 )
-from forge_core.models.contextual_record import QualityCode, RecordContext
 
 
 class TestAssessQuality:

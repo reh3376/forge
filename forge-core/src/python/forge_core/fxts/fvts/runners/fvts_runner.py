@@ -27,7 +27,7 @@ import json
 import re
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from forge_core.fxts import FXTS_ROOT
+from forge_core.fxts import locations
 from forge_core.fxts.fvts import REPO_ROOT
 from forge_core.fxts.fvts.profiles import (
     ALARM_OPERATIONS,
@@ -48,7 +48,6 @@ from forge_core.models.alarm import SYSTEM_ALARM_ACTIONS as _SYSTEM_ALARM_ACTION
 if TYPE_CHECKING:
     from pathlib import Path
 
-FACTS_SPECS_DIR = FXTS_ROOT / "facts" / "specs"
 
 # AlarmAction members that are system-initiated and therefore never UI actions: the one
 # definition is forge_core.models.alarm (FB-220).
@@ -147,10 +146,16 @@ _OBJECT = frozenset(
 HUB_OWNER = "forge-hub"
 
 
-def load_facts_specs(directory: Path = FACTS_SPECS_DIR) -> dict[str, dict[str, Any]]:
-    """Every ``*.facts.json`` under ``directory`` keyed by its adapter_id."""
+def load_facts_specs(directory: Path | None = None) -> dict[str, dict[str, Any]]:
+    """Every FACTS spec keyed by its adapter_id: from ``directory``, or, without one, from
+    every module's ``fxts/facts`` folder (``locations``)."""
+    files = (
+        sorted(directory.glob("*.facts.json"))
+        if directory is not None
+        else locations.spec_files("facts", "*.facts.json")
+    )
     specs: dict[str, dict[str, Any]] = {}
-    for file in sorted(directory.glob("*.facts.json")):
+    for file in files:
         spec = json.loads(file.read_text(encoding="utf-8"))
         adapter_id = spec.get("adapter_identity", {}).get("adapter_id")
         if adapter_id:

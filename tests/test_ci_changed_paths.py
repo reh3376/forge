@@ -22,7 +22,7 @@ WORKFLOW = (REPO / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8
 MES = (
     "forge-modules/forge-mes/bridge/",
     "forge-core/contract/proto/",
-    "src/forge/adapters/forge_mes/manifest.json",
+    "forge-modules/forge-mes/src/python/forge_mes/manifest.json",
 )
 
 pytestmark = pytest.mark.skipif(
@@ -102,10 +102,12 @@ class TestABranch:
         )
 
     def test_an_exact_file_is_a_prefix_too(self, repo: Path) -> None:
-        _commit(repo, "src/forge/adapters/forge_mes/manifest.json")
+        _commit(repo, "forge-modules/forge-mes/src/python/forge_mes/manifest.json")
         assert decide(repo, *MES)[0] == "true"
-        _commit(repo, "src/forge/adapters/forge_mes/adapter.py")
-        assert decide(repo, "src/forge/adapters/forge_mes/manifest.json")[0] == "true"
+        _commit(repo, "forge-modules/forge-mes/src/python/forge_mes/adapter.py")
+        assert (
+            decide(repo, "forge-modules/forge-mes/src/python/forge_mes/manifest.json")[0] == "true"
+        )
 
     def test_a_neighbouring_path_does_not_match(self, repo: Path) -> None:
         _commit(repo, "gopher/notes.md")

@@ -6,8 +6,8 @@ from typing import Any
 
 import pytest
 
-from forge.modules.ot.bridge.client import IgnitionRestClient, _chunk, _parse_tag_response
-from forge.modules.ot.bridge.models import BridgeConfig, IgnitionQuality
+from forge_ot.bridge.client import IgnitionRestClient, _chunk, _parse_tag_response
+from forge_ot.bridge.models import BridgeConfig, IgnitionQuality
 
 # ---------------------------------------------------------------------------
 # Mock HTTP transport

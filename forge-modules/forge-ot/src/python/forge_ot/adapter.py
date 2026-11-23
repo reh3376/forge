@@ -1,0 +1,618 @@
+"""OT Module Adapter — the full adapter implementation for SCADA/PLC data.
+
+This is the most capable adapter in Forge: it implements all 5 capability
+mixins (read, write, subscribe, backfill, discover). It wires together:
+
+    Tag Engine       → 9-type tag system with providers
+    i3X Browse API   → CESMII-shaped tag hierarchy navigation
+    Enrichment       → Context resolvers (area, equipment, batch, mode)
+    Store-and-Forward → SQLite buffer for connectivity loss
+    OPC-UA Client    → Hardened PLC communication
+
+The adapter follows the standard Forge lifecycle:
+    configure(params) → start() → collect()/subscribe() → stop()
+
+Control path (FB-065): when ``configure`` receives ``control_config`` (a
+dict) or ``control_config_path`` (a JSON file) and the adapter was built
+with :class:`~forge_ot.control.runtime.ControlDependencies`, it
+composes a :class:`~forge_ot.control.runtime.ControlRuntime`
+(write engine, recipe adapter, PLC CIP runner, changeover orchestrator and
+MQTT ingress). ``start``/``stop`` drive it, and hub writes to Standard
+tags go through its write engine (validation, review, interlocks, authorisation, write with
+read-back).
+"""
+
+from __future__ import annotations
+
+import inspect
+import logging
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
+
+from forge_core.adapter.interface import (
+    AdapterBase,
+    BackfillProvider,
+    DiscoveryProvider,
+    SubscriptionProvider,
+    WritableAdapter,
+)
+from forge_core.clock import (
+    SOURCE_TIMESTAMP_ORIGINS,
+    ClockRefusedError,
+    SourceStampMissingError,
+)
+from forge_core.models.adapter import (
+    AdapterCapabilities,
+    AdapterHealth,
+    AdapterManifest,
+    AdapterState,
+    AdapterTier,
+    DataContract,
+    TimeGovernance,
+)
+from forge_ot.context.record_builder import build_ot_record
+from forge_ot.context.resolvers import AreaResolver, AreaRule, EnrichmentPipeline
+from forge_ot.context.store_forward import StoreForwardBuffer
+from forge_ot.control.config import load_control_config, parse_control_config
+from forge_ot.control.models import DataType, WriteRequest, WriteRole, WriteStatus
+from forge_ot.control.runtime import ControlDependencies, ControlRuntime
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator, Callable
+
+    from forge_core.clock import ClockEstimate, ClockGateTransition
+    from forge_core.models.contextual_record import ContextualRecord
+    from forge_ot.tag_engine.models import BaseTag
+    from forge_ot.tag_engine.registry import TagRegistry
+
+logger = logging.getLogger(__name__)
+
+
+def parse_source_timestamp_origins(declared: Any) -> dict[str, str]:
+    """``source_timestamp_origin`` from ``configure`` params: a string, or a dict by connection.
+
+    Every value must be one of the one-clock record's origins; anything else is a
+    configuration error and is refused at configure time.
+    """
+    mapping = {"*": declared} if isinstance(declared, str) else dict(declared)
+    for connection, origin in mapping.items():
+        if origin not in SOURCE_TIMESTAMP_ORIGINS:
+            msg = (
+                f"source_timestamp_origin for connection {connection!r} must be one of "
+                f"{SOURCE_TIMESTAMP_ORIGINS}; got {origin!r}"
+            )
+            raise ValueError(msg)
+    return mapping
+
+
+class OTModuleAdapter(
+    AdapterBase,
+    SubscriptionProvider,
+    WritableAdapter,
+    BackfillProvider,
+    DiscoveryProvider,
+):
+    """Full-capability OT adapter for SCADA/PLC integration.
+
+    This adapter is instantiated once per Forge deployment.  It owns:
+        - A TagRegistry (shared with the tag engine and providers)
+        - An EnrichmentPipeline (resolvers for context fields)
+        - A StoreForwardBuffer (SQLite-based reliability)
+        - Subscription management (callback dispatch)
+    """
+
+    manifest = AdapterManifest(
+        # one identity, the approved FACTS spec's (FB-144): the manifest file beside this
+        # module and the specs carry the same five values
+        adapter_id="forge-ot",
+        name="Forge OT/SCADA Module — OPC-UA Adapter",
+        version="0.5.0",
+        type="BIDIRECTIONAL",
+        protocol="opcua+mqtt+amqp",
+        tier=AdapterTier.OT,
+        capabilities=AdapterCapabilities(
+            read=True,
+            write=True,
+            subscribe=True,
+            backfill=True,
+            discover=True,
+        ),
+        data_contract=DataContract(
+            schema_ref="forge://schemas/forge-ot/v0.3.0",
+            output_format="contextual_record",
+            context_fields=["area", "equipment_id", "operating_mode"],
+        ),
+        health_check_interval_ms=5000,
+        # One clock (FB-090): the module's defaults; each PLC connection declares its own
+        # origin and cadence in the control config (PlcConnectionSpec), which must agree.
+        time_governance=TimeGovernance(
+            time_source="hub-ntp",
+            sync_protocol="ntp",
+            clock_read_method="opcua-current-time",
+            clock_probe_interval_seconds=30,
+            source_timestamp_origin="server",
+            tolerance_class="T0",
+        ),
+    )
+
+    def __init__(
+        self,
+        registry: TagRegistry,
+        enrichment: EnrichmentPipeline | None = None,
+        buffer: StoreForwardBuffer | None = None,
+        *,
+        control: ControlDependencies | None = None,
+    ) -> None:
+        super().__init__()
+        self._registry = registry
+        self._enrichment_injected = enrichment is not None
+        self._enrichment = enrichment or EnrichmentPipeline()
+        self._buffer = buffer
+        self._control_deps = control
+        self._control: ControlRuntime | None = None
+        self._subscriptions: dict[str, _Subscription] = {}
+        self._next_sub_id: int = 0
+        self._started_at: datetime | None = None
+        self._hub_connected: bool = True
+        # connection name -> declared source_timestamp_origin ("*" applies to every
+        # connection); the FACTS time_governance section takes this over with FB-090.
+        self._source_timestamp_origins: dict[str, str] = {}
+        # connection name -> the refusal standing on it for its clock (FB-093).
+        self._clock_refused: dict[str, str] = {}
+
+    @property
+    def control_runtime(self) -> ControlRuntime | None:
+        """The composed control path, once ``configure`` has built it."""
+        return self._control
+
+    # ------------------------------------------------------------------
+    # AdapterLifecycle
+    # ------------------------------------------------------------------
+
+    async def configure(self, params: dict[str, Any]) -> None:
+        """Receive connection parameters from the hub.
+
+        For the OT Module, params can include:
+            - buffer_db_path: SQLite buffer path
+            - max_buffer_age_hours: Retention period
+            - area_rules: List of AreaRule dicts (pattern, area, site)
+            - control_config: OTControlConfig document (dict)
+            - control_config_path: path to an OTControlConfig JSON file
+            - source_timestamp_origin: which clock stamps each connection's values
+              (one-clock record P-4: ``device``, ``server``, ``edge`` or ``forge``),
+              one string for every connection or a dict keyed by connection name
+              (``"*"`` as the default). A value that arrives without a source stamp
+              on a connection not declared ``forge`` is refused (FB-088).
+        """
+        self._state = AdapterState.CONNECTING
+
+        declared = params.get("source_timestamp_origin")
+        if declared is not None:
+            self._source_timestamp_origins = parse_source_timestamp_origins(declared)
+
+        if self._buffer is None and params.get("buffer_db_path"):
+            self._buffer = StoreForwardBuffer(
+                db_path=params["buffer_db_path"],
+                max_age_hours=params.get("max_buffer_age_hours", 72.0),
+            )
+
+        rules = params.get("area_rules")
+        if rules and not self._enrichment_injected:
+            self._enrichment = EnrichmentPipeline(
+                area_resolver=AreaResolver([AreaRule.model_validate(r) for r in rules]),
+                equipment_resolver=self._enrichment.equipment_resolver,
+                batch_resolver=self._enrichment.batch_resolver,
+                mode_resolver=self._enrichment.mode_resolver,
+            )
+
+        document = params.get("control_config")
+        path = params.get("control_config_path")
+        if document or path:
+            if self._control_deps is None:
+                msg = (
+                    "control_config given but the adapter was built without "
+                    "ControlDependencies (write_dispatcher)"
+                )
+                raise ValueError(msg)
+            if self._control is not None and self._control.started:
+                await self._control.stop()
+            config = parse_control_config(document) if document else load_control_config(path)
+            self._control = ControlRuntime(
+                config,
+                self._control_deps,
+                registry=self._registry,
+                time_governance=self.manifest.time_governance,
+            )
+            self._clock_refused.clear()
+            if self._control.connections is not None:
+                self._control.connections.add_clock_listener(self._on_clock_state)
+            logger.info("OT control runtime composed: %s", config.describe())
+
+    async def start(self) -> None:
+        """Begin active operation."""
+        if self._buffer:
+            self._buffer.open()
+
+        # Register for tag change notifications (TagRegistry.on_change is
+        # synchronous; test doubles may hand back an awaitable).
+        registration = self._registry.on_change(self._on_tag_change)
+        if inspect.isawaitable(registration):
+            await registration
+
+        if self._control is not None:
+            await self._control.start()
+
+        self._state = AdapterState.HEALTHY
+        self._started_at = datetime.now(UTC)
+        logger.info("OTModuleAdapter started")
+
+    async def stop(self) -> None:
+        """Graceful shutdown."""
+        self._state = AdapterState.STOPPED
+
+        if self._control is not None:
+            await self._control.stop()
+
+        # Flush remaining buffered records
+        if self._buffer and self._buffer.is_open:
+            self._buffer.prune()
+            self._buffer.close()
+
+        self._subscriptions.clear()
+        logger.info("OTModuleAdapter stopped")
+
+    async def health(self) -> AdapterHealth:
+        """Return current health status."""
+        uptime = 0.0
+        if self._started_at:
+            uptime = (datetime.now(UTC) - self._started_at).total_seconds()
+
+        return AdapterHealth(
+            adapter_id=self.manifest.adapter_id,
+            state=self._state,
+            last_check=datetime.now(UTC),
+            last_healthy=self._started_at if self._state == AdapterState.HEALTHY else None,
+            records_collected=self._records_collected,
+            records_failed=self._records_failed,
+            uptime_seconds=uptime,
+            **self.refusal_health(),
+        )
+
+    def _on_clock_state(self, name: str, transition: ClockGateTransition) -> None:
+        """A PLC connection's clock was refused or cleared (FB-093, one-clock record P-5).
+
+        A refusal is never silent: it is counted under its cause on ``refusals``, named
+        on ``last_refusal`` and ``error_message``, turns the adapter DEGRADED and counts
+        on the ``forge.ingest.refused`` metric (:meth:`refuse`). The probe-based recovery
+        is here: when the last refused connection clears and no other refusal stands,
+        the adapter is HEALTHY again.
+        """
+        if transition.refused:
+            message = f"connection '{name}': {transition.cause}"
+            self._clock_refused[name] = message
+            self.refuse(ClockRefusedError(message, cause=transition.refusal_cause))
+            return
+        cleared = self._clock_refused.pop(name, None)
+        if cleared is None or self._last_refusal != cleared:
+            return  # another refusal is the one the health names; it stands
+        if self._clock_refused:
+            self._last_refusal = next(reversed(self._clock_refused.values()))
+            return
+        self._last_refusal = None
+        if self._state == AdapterState.DEGRADED:
+            self._state = AdapterState.HEALTHY
+            logger.info("%s: clock refusal on '%s' cleared; healthy again", self.adapter_id, name)
+
+    def source_timestamp_origin_for(self, tag: BaseTag) -> str | None:
+        """The origin declared for the tag's connection, or None (FB-088).
+
+        The connection's spec in the control config declares it first (FB-094 step 2:
+        the same declaration names the clock the probe measures), then the ``configure``
+        params' map, then the FACTS ``time_governance`` declaration on the manifest
+        (FB-090): the connection's own entry, else the module's default.
+        """
+        connection = getattr(tag, "connection_name", None)
+        if not connection:
+            return None
+        if self._control is not None:
+            for spec in self._control.config.connections:
+                if spec.name == connection and spec.source_timestamp_origin:
+                    return spec.source_timestamp_origin
+        origins = self._source_timestamp_origins
+        declared = origins.get(connection) or origins.get("*")
+        if declared:
+            return declared
+        # the FACTS declaration (FB-090): the spoke's default, or the connection's own entry
+        governance = self.manifest.time_governance
+        return governance.origin_for(connection) if governance is not None else None
+
+    def clock_estimate_for(self, tag: BaseTag) -> ClockEstimate | None:
+        """The measured estimate of the clock the tag's connection declared (FB-094 step 3).
+
+        It comes from the control runtime's connection manager, whose probe and
+        response-header tap keep the series; None for a tag without a connection, a
+        connection the manager does not own, or a clock not read yet.
+        """
+        connection = getattr(tag, "connection_name", None)
+        if not connection or self._control is None or self._control.connections is None:
+            return None
+        return self._control.connections.clock_estimate(connection)
+
+    # ------------------------------------------------------------------
+    # AdapterBase.collect() — core read interface
+    # ------------------------------------------------------------------
+
+    async def collect(self) -> AsyncIterator[ContextualRecord]:
+        """Yield ContextualRecords for all tags with updated values.
+
+        Called periodically by the hub to collect current state.
+        """
+        all_paths = await self._registry.list_paths()
+
+        for path in all_paths:
+            tag = await self._registry.get_definition(path)
+            tag_value = await self._registry.get_value(path)
+            if tag is None or tag_value is None:
+                continue
+            if getattr(tag, "connection_name", None) in self._clock_refused:
+                # The connection is refused for its clock (FB-093): it delivers nothing,
+                # its last values included. The refusal itself is on the health.
+                continue
+
+            try:
+                enrichment = self._enrichment.enrich(tag.path)
+                record = build_ot_record(
+                    tag=tag,
+                    tag_value=tag_value,
+                    enrichment=enrichment,
+                    source_timestamp_origin=self.source_timestamp_origin_for(tag),
+                    clock=self.clock_estimate_for(tag),
+                )
+                self._records_collected += 1
+                yield record
+            except SourceStampMissingError as exc:
+                self.refuse(exc)
+            except Exception:
+                self._records_failed += 1
+                logger.exception("Failed to build record for %s", path)
+
+    # ------------------------------------------------------------------
+    # SubscriptionProvider
+    # ------------------------------------------------------------------
+
+    async def subscribe(
+        self,
+        tags: list[str],
+        callback: Any,
+    ) -> str:
+        """Subscribe to value changes on the listed tag paths.
+
+        The callback is invoked with each ContextualRecord when a
+        subscribed tag's value changes.
+        """
+        self._next_sub_id += 1
+        sub_id = f"ot-sub-{self._next_sub_id}"
+        self._subscriptions[sub_id] = _Subscription(
+            id=sub_id,
+            tags=set(tags),
+            callback=callback,
+        )
+        logger.debug("Subscription %s created for %d tags", sub_id, len(tags))
+        return sub_id
+
+    async def unsubscribe(self, subscription_id: str) -> None:
+        """Cancel an active subscription."""
+        removed = self._subscriptions.pop(subscription_id, None)
+        if removed:
+            logger.debug("Subscription %s cancelled", subscription_id)
+
+    # ------------------------------------------------------------------
+    # WritableAdapter
+    # ------------------------------------------------------------------
+
+    async def write(
+        self,
+        tag_path: str,
+        value: Any,
+        *,
+        confirm: bool = True,
+    ) -> bool:
+        """Write a value to a tag (Memory tag or PLC via OPC-UA).
+
+        Memory tags are written straight into the registry. Every other tag
+        goes through the control runtime's write engine (validation → review
+        → interlocks → authorisation → OPC-UA write + read-back), so a
+        hub-originated write is held to the same rules as a recipe download.
+        The hub's ``Write`` RPC carries no review token, so a tag configured
+        ``two_step_with_review`` refuses this path (``REJECTED_REVIEW``);
+        such writes go through the control API's stage/commit endpoints
+        (FB-074). Without a control runtime there is no PLC path.
+        """
+        tag = await self._registry.get_definition(tag_path)
+        if tag is None:
+            return False
+
+        # Memory tags: direct write
+        from forge_ot.opcua_client.types import QualityCode
+        from forge_ot.tag_engine.models import MemoryTag
+
+        if isinstance(tag, MemoryTag):
+            await self._registry.update_value(tag_path, value, QualityCode.GOOD)
+            return True
+
+        if self._control is None:
+            logger.warning(
+                "Write to '%s' refused: no control runtime (configure with control_config)",
+                tag_path,
+            )
+            return False
+
+        config = self._control.validator.get_config(tag_path)
+        request = WriteRequest(
+            tag_path=tag_path,
+            value=value,
+            data_type=config.data_type if config is not None else DataType.FLOAT,
+            requestor=self._control.config.requested_by,
+            role=WriteRole.ENGINEER,
+            reason="hub write",
+            area=getattr(tag, "area", "") or "",
+            equipment_id=getattr(tag, "equipment_id", "") or "",
+        )
+        result = await self._control.engine.execute(request)
+        if result.status == WriteStatus.CONFIRMED:
+            return True
+        if result.status == WriteStatus.UNCONFIRMED and not confirm:
+            return True
+        logger.warning(
+            "Write to '%s' %s: %s",
+            tag_path,
+            result.status.value,
+            result.validation_error
+            or result.interlock_error
+            or result.auth_error
+            or result.write_error
+            or result.readback_error
+            or "read-back mismatch",
+        )
+        return False
+
+    # ------------------------------------------------------------------
+    # BackfillProvider
+    # ------------------------------------------------------------------
+
+    async def backfill(
+        self,
+        tags: list[str],
+        start: datetime,
+        end: datetime,
+        *,
+        max_records: int | None = None,
+    ) -> AsyncIterator[ContextualRecord]:
+        """Backfill is delegated to Forge Historian historian.
+
+        The OT Module does not store history locally — it delegates
+        historical queries to the Forge Historian time-series historian
+        via its REST API.
+        """
+        # Stub — Forge Historian integration in Phase 2B
+        logger.info(
+            "Backfill requested for %d tags [%s → %s] — delegating to Forge Historian",
+            len(tags),
+            start,
+            end,
+        )
+        return
+        yield  # pragma: no cover — makes this an async generator
+
+    async def get_earliest_timestamp(self, tag: str) -> datetime | None:
+        """Earliest timestamp delegated to Forge Historian."""
+        return None
+
+    # ------------------------------------------------------------------
+    # DiscoveryProvider
+    # ------------------------------------------------------------------
+
+    async def discover(self) -> list[dict[str, Any]]:
+        """Enumerate all registered tags as discoverable points."""
+        paths = await self._registry.list_paths()
+        results = []
+        for path in paths:
+            tag = await self._registry.get_definition(path)
+            if tag:
+                results.append(
+                    {
+                        "tag_path": tag.path,
+                        "data_type": tag.data_type.value,
+                        "description": tag.description,
+                        "engineering_units": tag.engineering_units,
+                        "tag_type": tag.tag_type.value if hasattr(tag, "tag_type") else "unknown",
+                    }
+                )
+        return results
+
+    # ------------------------------------------------------------------
+    # Internal: tag change dispatch
+    # ------------------------------------------------------------------
+
+    async def _on_tag_change(self, path: str, value: Any = None, quality: Any = None) -> None:
+        """Called by TagRegistry when any tag value changes.
+
+        The registry calls ``callback(path, value)``; ``quality`` is optional because the
+        value carries it. It was required here, so every change raised inside the real
+        registry's notify loop and no subscription fired (found by the FMTS conformance
+        kit, FB-155). The definition and value are read from the registry either way.
+
+        Builds a ContextualRecord and dispatches to:
+            1. Active subscriptions
+            2. Store-and-forward buffer (if hub is disconnected)
+        """
+        tag = await self._registry.get_definition(path)
+        tag_value = await self._registry.get_value(path)
+        if tag is None or tag_value is None:
+            return
+
+        try:
+            enrichment = self._enrichment.enrich(tag.path)
+            record = build_ot_record(
+                tag=tag,
+                tag_value=tag_value,
+                enrichment=enrichment,
+                source_timestamp_origin=self.source_timestamp_origin_for(tag),
+                clock=self.clock_estimate_for(tag),
+            )
+        except SourceStampMissingError as exc:
+            self.refuse(exc)
+            return
+        except Exception:
+            self._records_failed += 1
+            return
+
+        self._records_collected += 1
+
+        # Dispatch to subscriptions
+        for sub in self._subscriptions.values():
+            if path in sub.tags:
+                try:
+                    await sub.callback(record)
+                except Exception:
+                    logger.warning("Subscription %s callback failed", sub.id)
+
+        # Store-and-forward if hub disconnected
+        if not self._hub_connected and self._buffer and self._buffer.is_open:
+            self._buffer.enqueue(record)
+
+    # ------------------------------------------------------------------
+    # Hub connectivity management
+    # ------------------------------------------------------------------
+
+    def set_hub_connected(self, connected: bool) -> None:
+        """Update hub connectivity state.
+
+        When transitioning from disconnected → connected, triggers
+        a buffer flush.
+        """
+        was_disconnected = not self._hub_connected
+        self._hub_connected = connected
+
+        if connected and was_disconnected:
+            logger.info("Hub connectivity restored — buffer flush scheduled")
+
+    async def flush_buffer(
+        self,
+        send_fn: Callable[[list[ContextualRecord]], Any],
+    ) -> int:
+        """Manually trigger a buffer flush."""
+        if self._buffer and self._buffer.is_open:
+            return await self._buffer.flush(send_fn)
+        return 0
+
+
+class _Subscription:
+    """Internal subscription tracking."""
+
+    __slots__ = ("callback", "id", "tags")
+
+    def __init__(self, id: str, tags: set[str], callback: Any) -> None:
+        self.id = id
+        self.tags = tags
+        self.callback = callback

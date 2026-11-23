@@ -254,7 +254,7 @@ class TestGenerateInit:
 
     def test_import_from_adapter_module(self, basic_manifest):
         code = generate_init(basic_manifest)
-        assert "from forge.adapters.test_basic.adapter import" in code
+        assert "from test_basic.adapter import" in code
 
 
 # ---------------------------------------------------------------------------

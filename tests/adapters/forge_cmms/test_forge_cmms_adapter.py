@@ -10,7 +10,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from forge.adapters.forge_cmms import ForgeCmmsAdapter
+from forge_cmms import ForgeCmmsAdapter
 from forge_core.models.adapter import AdapterState
 
 # ── Test Fixtures ──────────────────────────────────────────────

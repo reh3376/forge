@@ -36,7 +36,7 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from forge.modules.ot.control import (
+from forge_ot.control import (
     ConfirmationMode,
     ControlWriteEngine,
     DataType,
@@ -51,7 +51,7 @@ from forge.modules.ot.control import (
     WriteRole,
     WriteValidator,
 )
-from forge.modules.ot.control import review as review_module
+from forge_ot.control import review as review_module
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine, Iterator

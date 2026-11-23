@@ -12,7 +12,7 @@ from asyncua import ua
 from asyncua.common.utils import Buffer
 from asyncua.ua.ua_binary import struct_to_binary
 
-from forge.modules.ot.opcua_client.clock_tap import (
+from forge_ot.opcua_client.clock_tap import (
     ResponseHeaderTap,
     install_response_header_tap,
 )
@@ -77,7 +77,7 @@ async def test_an_unreadable_header_is_counted_and_never_breaks_the_request(
     low = _LowLevel(Buffer(b"\x01\x00\x02"))  # not a response
     samples: list[ClockSample] = []
     tap = ResponseHeaderTap(low, samples.append, now=lambda: T4).install()
-    with caplog.at_level(logging.DEBUG, logger="forge.modules.ot.opcua_client.clock_tap"):
+    with caplog.at_level(logging.DEBUG, logger="forge_ot.opcua_client.clock_tap"):
         data = await low._send_request(_request())
     assert data.read(3) == b"\x01\x00\x02" and samples == []
     assert tap.unreadable == 1 and tap.samples == 0
@@ -94,7 +94,7 @@ async def test_a_failing_sink_is_logged_and_the_request_still_succeeds(
         raise RuntimeError("sink down")
 
     tap = ResponseHeaderTap(low, explode, now=lambda: T4).install()
-    with caplog.at_level(logging.ERROR, logger="forge.modules.ot.opcua_client.clock_tap"):
+    with caplog.at_level(logging.ERROR, logger="forge_ot.opcua_client.clock_tap"):
         assert isinstance(await low._send_request(_request()), Buffer)
     assert tap.samples == 1 and "clock sink failed" in caplog.text
 

@@ -18,11 +18,11 @@ from typing import Any
 import pytest
 
 from forge_core import contract
-from forge_core.fxts import FXTS_ROOT
+from forge_core.fxts import locations
 
 SCHEMA_PATH = contract.schema_path("facts")
-WMS_SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
-MES_SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-mes.facts.json"
+WMS_SPEC_PATH = locations.spec_path("facts", "forge-wms.facts.json")
+MES_SPEC_PATH = locations.spec_path("facts", "forge-mes.facts.json")
 
 
 # ---------------------------------------------------------------------------

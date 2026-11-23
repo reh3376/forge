@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from forge.modules.ot.mqtt.publisher import (
+from forge_ot.mqtt.publisher import (
     MqttConfig,
     OTMqttPublisher,
     _StubMqttClient,
@@ -296,7 +296,7 @@ class TestExternalMode:
         import sys
         import types
 
-        from forge.modules.ot.mqtt.publisher import _AiomqttClient, _create_mqtt_client
+        from forge_ot.mqtt.publisher import _AiomqttClient, _create_mqtt_client
 
         calls: dict = {}
 
@@ -359,7 +359,7 @@ class TestExternalMode:
     async def test_missing_aiomqtt_is_a_visible_error(self, monkeypatch):
         import sys
 
-        from forge.modules.ot.mqtt.publisher import _AiomqttClient
+        from forge_ot.mqtt.publisher import _AiomqttClient
 
         monkeypatch.setitem(sys.modules, "aiomqtt", None)  # import raises ImportError
         client = _AiomqttClient(MqttConfig(broker_mode="external"))

@@ -22,7 +22,7 @@ Create with full options::
         --param "security_policy:Security policy:optional:Basic256Sha256" \\
         --context-field equipment_id \\
         --context-field area \\
-        --output ./src/forge/adapters/
+        --output ./forge-modules/
 
 List all adapters in the project::
 
@@ -30,7 +30,7 @@ List all adapters in the project::
 
 Validate a module's structure::
 
-    forge module validate src/forge/adapters/acme_plc/
+    forge module validate forge-modules/acme-plc/src/python/acme_plc/
 """
 
 from __future__ import annotations
@@ -104,8 +104,8 @@ def module_init(
     ] = None,
     output: Annotated[
         Path,
-        typer.Option("--output", "-o", help="Parent directory for the adapter module"),
-    ] = Path("src/forge/adapters"),
+        typer.Option("--output", "-o", help="The folder that holds the modules"),
+    ] = Path("forge-modules"),
     no_tests: Annotated[
         bool,
         typer.Option("--no-tests", help="Skip test scaffold generation"),
@@ -205,7 +205,7 @@ def module_init(
 
     # Metadata
     builder.metadata("spoke", adapter_id)
-    builder.metadata("hub_module", f"forge.adapters.{adapter_id.replace('-', '_')}")
+    builder.metadata("hub_module", adapter_id.replace("-", "_"))
 
     # Build and scaffold
     try:
@@ -214,10 +214,10 @@ def module_init(
         typer.echo(f"[ERROR] {e}")
         raise typer.Exit(code=1) from e
 
-    snake = adapter_id.replace("-", "_")
-    target_dir = Path(output).resolve() / snake
-
+    # The standard structure: <output>/<adapter-id>/src/python/<package>, with the module's
+    # tests and spec in its own folder (D-17 §10.3)
     scaffolder = ModuleScaffolder(manifest)
+    target_dir = scaffolder.package_dir(Path(output).resolve())
     result = scaffolder.generate(
         target_dir,
         include_tests=not no_tests,
@@ -251,8 +251,8 @@ def module_init(
 def module_list(
     adapters_dir: Annotated[
         Path,
-        typer.Option("--dir", help="Adapters directory to scan"),
-    ] = Path("src/forge/adapters"),
+        typer.Option("--dir", help="The folder that holds the modules"),
+    ] = Path("forge-modules"),
 ) -> None:
     """List all adapter modules in the project.
 
@@ -265,7 +265,9 @@ def module_list(
         raise typer.Exit(code=1)
 
     found = 0
-    for manifest_file in sorted(adapters_path.rglob("manifest.json")):
+    # A module's manifest is in its package: <module>/src/python/<package>/manifest.json.
+    # Looking only there keeps the interim MES bridge and its dependencies out of the scan.
+    for manifest_file in sorted(adapters_path.glob("*/src/python/*/manifest.json")):
         try:
             with manifest_file.open() as f:
                 manifest = json.load(f)
@@ -312,7 +314,7 @@ def module_validate(
 
     Example:
 
-        forge module validate src/forge/adapters/acme_plc/
+        forge module validate forge-modules/acme-plc/src/python/acme_plc/
     """
     module_path = Path(module_dir).resolve()
 
@@ -377,7 +379,9 @@ def module_validate(
             errors.append(f"manifest.json is not valid JSON: {e}")
 
     # Check for FACTS spec
-    specs_dir = module_path.parent.parent / "governance" / "facts" / "specs"
+    from forge_core.sdk.module_builder.scaffolder import ModuleScaffolder
+
+    specs_dir = ModuleScaffolder.module_root(module_path) / "fxts" / "facts"
     adapter_id = manifest.get("adapter_id", "") if manifest_path.exists() else ""
     if adapter_id:
         facts_file = specs_dir / f"{adapter_id}.facts.json"

@@ -1,8 +1,8 @@
 """Hub-level RabbitMQ exchange definitions.
 
 Follows the UNS (Unified Namespace) naming pattern established in
-``src/forge/adapters/forge_integ_erp_netsuite/topics.py``. Hub exchanges use the
-``forge.`` prefix to distinguish from spoke-level exchanges.
+``forge_integ_erp_netsuite/topics.py`` (in ``forge-modules/forge-integ-erp-netsuite``). Hub
+exchanges use the ``forge.`` prefix to distinguish from spoke-level exchanges.
 
 Exchange architecture:
     - ``fanout`` exchanges broadcast to all bound queues

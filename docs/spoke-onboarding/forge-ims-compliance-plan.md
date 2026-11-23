@@ -112,7 +112,7 @@ Go Core → TransactionEvent → Adapter subscribes → gRPC AdapterService.Subs
 
 ### 4.1 Adapter Location
 ```
-forge-platform/src/forge/adapters/forge_ims/
+forge-platform/forge-modules/forge-ims/src/python/forge_ims/
 ├── __init__.py
 ├── adapter.py           # ForgeAdapter subclass
 ├── proto_mappings.py    # ContextualRecord ↔ ims.v1 message translation
@@ -148,7 +148,7 @@ The adapter inherits FTTS compliance from the Forge transport layer. The `grpc-h
 ### Phase 1: Adapter Scaffold (Forge Platform Side Only)
 **Effort:** 1-2 days | **Risk:** Low | **Requires spoke changes:** No
 
-- Create adapter directory under `forge-platform/src/forge/adapters/forge_ims/`
+- Create adapter directory under `forge-platform/forge-modules/forge-ims/src/python/forge_ims/`
 - Generate Python gRPC stubs from `ims.v1` protos (using `grpcio-tools`)
 - Implement `DiscoverRequest` → static tag manifest from IMS's proto contract
 - Write FACTS spec (`forge-ims-adapter.facts.json`)

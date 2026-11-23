@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from forge.modules.ot.control import (
+from forge_ot.control import (
     AreaChangeoverConfig,
     CipPolicy,
     ControlWriteEngine,
@@ -22,7 +22,7 @@ from forge.modules.ot.control import (
     WriteStatus,
     WriteValidator,
 )
-from forge.modules.ot.control.cip_runner import _matches
+from forge_ot.control.cip_runner import _matches
 
 START = "WH/WHK01/Cooker01/CIP/Start"
 STATE = "WH/WHK01/Cooker01/CIP/State"

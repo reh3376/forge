@@ -22,7 +22,9 @@ HUB = REPO / "forge-core" / "contract" / "proto"
 GO = REPO / "forge-core" / "src" / "go" / "proto" / "forge" / "v1"
 BRIDGE = REPO / "forge-modules" / "forge-mes" / "bridge" / "backend" / "src" / "forge"
 BRIDGE_PROTO = BRIDGE / "proto" / "forge" / "v1"
-HUB_MANIFEST = REPO / "src" / "forge" / "adapters" / "forge_mes" / "manifest.json"
+HUB_MANIFEST = (
+    REPO / "forge-modules" / "forge-mes" / "src" / "python" / "forge_mes" / "manifest.json"
+)
 BRIDGE_MANIFEST = BRIDGE / "forge-mes.manifest.json"
 
 #: The one line a Go copy may differ in: where its generated code is imported from.

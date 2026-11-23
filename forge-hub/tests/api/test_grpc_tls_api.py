@@ -5,11 +5,12 @@ from __future__ import annotations
 import asyncio
 import json
 import os
-from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
+from tests.samples import module_manifest_path
 from tests.tls import self_signed
 
 from forge_core.link.grpc_channel import GrpcChannel
@@ -18,14 +19,10 @@ from forge_core.models.adapter import AdapterManifest
 from forge_hub.api.main import create_app
 from forge_hub.storage.config import StorageConfig
 
-MANIFEST_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "src"
-    / "forge"
-    / "adapters"
-    / "forge_mes"
-    / "manifest.json"
-)
+if TYPE_CHECKING:
+    from pathlib import Path
+
+MANIFEST_PATH = module_manifest_path("forge-mes")
 
 
 def _register_over_tls(port: int, ca_path: Path) -> str:

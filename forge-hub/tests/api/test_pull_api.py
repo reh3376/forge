@@ -6,12 +6,12 @@ import asyncio
 import json
 import os
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from tests.samples import module_manifest_path
 
 from forge_core.link.serialization import pydantic_to_proto
 from forge_core.link.spoke_callback import CALLBACK_PARAM, WriteDispatcher
@@ -29,14 +29,7 @@ from forge_core.models.contextual_record import (
 from forge_hub.api.main import create_app
 from forge_hub.storage.config import StorageConfig
 
-MANIFEST_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "src"
-    / "forge"
-    / "adapters"
-    / "forge_mes"
-    / "manifest.json"
-)
+MANIFEST_PATH = module_manifest_path("forge-mes")
 MANIFEST = json.loads(MANIFEST_PATH.read_text())
 SCHEMA_REF = MANIFEST["data_contract"]["schema_ref"]
 T0 = datetime(2026, 6, 1, 12, tzinfo=UTC)

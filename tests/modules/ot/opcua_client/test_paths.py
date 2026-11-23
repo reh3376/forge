@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import pytest
 
-from forge.modules.ot.opcua_client.paths import NormalizedPath, PathNormalizer
+from forge_ot.opcua_client.paths import NormalizedPath, PathNormalizer
 
 # ---------------------------------------------------------------------------
 # Fixtures

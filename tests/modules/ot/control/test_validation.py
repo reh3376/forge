@@ -12,14 +12,14 @@ Covers:
 
 import pytest
 
-from forge.modules.ot.control.models import (
+from forge_ot.control.models import (
     DataType,
     TagWriteConfig,
     WriteRequest,
     WriteResult,
     WriteStatus,
 )
-from forge.modules.ot.control.validation import WriteValidator
+from forge_ot.control.validation import WriteValidator
 
 
 @pytest.fixture

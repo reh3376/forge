@@ -18,7 +18,8 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 import jsonschema
 
-from forge_core.fxts.futs import REPO_ROOT, SPECS_DIR
+from forge_core.fxts import locations
+from forge_core.fxts.futs import REPO_ROOT
 from forge_core.fxts.shared import lists
 from forge_core.fxts.shared.runner import (
     FxTSRunner,
@@ -127,7 +128,7 @@ class FUTSRunner(FxTSRunner):
             *self._view_checks(
                 spec["view"],
                 repo_root=kwargs.get("repo_root") or REPO_ROOT,
-                specs_dir=kwargs.get("specs_dir") or SPECS_DIR,
+                specs_dir=kwargs.get("specs_dir"),
                 lists_dir=kwargs.get("lists_dir"),
             ),
         ]
@@ -328,12 +329,20 @@ class FUTSRunner(FxTSRunner):
         ]
 
     def _load_widgets(
-        self, ids: set[str], specs_dir: Path
+        self, ids: set[str], specs_dir: Path | None
     ) -> dict[str, tuple[dict[str, Any] | None, str]]:
-        """Each widget spec a view document uses, or why it cannot be used."""
+        """Each widget spec a view document uses, or why it cannot be used.
+
+        A widget spec is looked for in ``specs_dir`` when one is given, and otherwise in
+        every ``fxts/futs`` folder: the widgets are forge-display's, a view is its module's.
+        """
         out: dict[str, tuple[dict[str, Any] | None, str]] = {}
         for widget_id in sorted(ids):
-            spec, error = _load(specs_dir / f"{widget_id}.widget.futs.json")
+            name = f"{widget_id}.widget.futs.json"
+            file = specs_dir / name if specs_dir is not None else locations.find_spec("futs", name)
+            spec, error = (
+                _load(file) if file is not None else (None, f"{name} is in no fxts folder")
+            )
             if spec is None:
                 out[widget_id] = (None, f"no widget spec ({error})")
                 continue

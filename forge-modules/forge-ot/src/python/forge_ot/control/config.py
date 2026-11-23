@@ -1,0 +1,377 @@
+"""Declarative configuration for the OT control runtime (FB-065).
+
+One JSON document describes everything the changeover sequence needs on
+the OT side: writable PLC tags with their ranges, safety interlocks, write
+permissions, per-equipment recipe parameter mappings, the MES changeover
+areas this module serves (with their CIP policy and PLC CIP sequence) and
+how MES topics reach the module (embedded broker or external MQTT).
+
+Cross-references are checked when the document is parsed, so a tag that a
+recipe or CIP sequence writes but the validator does not know fails at
+start-up rather than in the middle of a changeover::
+
+    {
+      "site": "whk01",
+      "write_tags": [{"tag_path": "WH/WHK01/Cooker01/TIT_2010/SP", "data_type": "FLOAT",
+                      "min_value": 0, "max_value": 212, "engineering_units": "degF",
+                      "confirmation": "two_step_with_review", "reason_code_required": true}],
+      "review_timeout_seconds": 120,
+      "reason_codes": ["setpoint_tune", "quality_hold"],
+      "permissions": [{"area_pattern": "*", "tag_pattern": "WH/WHK01/**", "min_role": "ENGINEER"}],
+      "recipes": [{"equipment_id": "Cooker01", "area": "cooker",
+                   "mappings": [{"parameter_name": "target_temp",
+                                 "tag_path": "WH/WHK01/Cooker01/TIT_2010/SP"}]}],
+      "changeover_areas": [{"area": "cooker", "equipment_id": "Cooker01", "cooker_number": "1",
+                            "cip_policy": "runner",
+                            "cip": {"start_tag": "...", "state_tag": "..."}}]
+    }
+
+The dataclasses from ``forge_ot.control.models`` and
+``recipe_integration`` are validated directly by pydantic (field types and
+enums are coerced from JSON); unknown keys are rejected explicitly.
+"""
+
+from __future__ import annotations
+
+import dataclasses
+import json
+from pathlib import Path
+from typing import Any, Literal
+
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from forge_core.models.adapter import ToleranceClass
+from forge_ot.control.changeover_orchestrator import (
+    OT_ADAPTER_ID,
+    AreaChangeoverConfig,
+    CipPolicy,
+)
+from forge_ot.control.cip_runner import PlcCipSpec
+from forge_ot.control.models import (
+    ConfirmationMode,
+    InterlockRule,
+    TagWriteConfig,
+    WritePermission,
+)
+from forge_ot.control.recipe_integration import (
+    RecipeParameterMapping,
+    RecipeWriteConfig,
+)
+
+DEFAULT_CONFIG_ENV = "FORGE_OT_CONTROL_CONFIG"
+
+
+class ConfigError(ValueError):
+    """The control configuration document is inconsistent."""
+
+
+class MqttIngressSettings(BaseModel):
+    """How MES topics reach the module."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    #: ``local`` = the embedded Forge broker (started by the runtime unless one is
+    #: injected); ``external`` = an aiomqtt client to a broker; ``none`` = messages
+    #: are fed programmatically (tests, custom transports).
+    mode: Literal["local", "external", "none"] = "local"
+    host: str = "127.0.0.1"
+    port: int = Field(default=1883, ge=0, le=65535)
+    username: str = ""
+    password: str = ""
+    client_id: str = "forge-ot-control"
+    use_tls: bool = False
+    ca_certs: str = ""
+    certfile: str = ""
+    keyfile: str = ""
+    reconnect_min_delay: float = Field(default=1.0, gt=0)
+    reconnect_max_delay: float = Field(default=60.0, gt=0)
+    #: Publish ``<root>/<site>/<area>/equipment/cipState`` (retained) while CIP runs.
+    publish_cip_state: bool = True
+    #: Publish every control write result on ``<root>/<site>/<area>/ot/control/audit/<id>``.
+    publish_audit: bool = True
+
+
+class PlcConnectionSpec(BaseModel):
+    """One OPC-UA server (PLC) the module connects to (FB-069).
+
+    ``name`` is what Standard tags carry in ``connection_name``; the
+    provider built for this spec subscribes to those tags and serves
+    their reads and writes.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(min_length=1)
+    #: ``opc.tcp://host:4840``
+    endpoint: str
+    #: OPC-UA namespace index of the PLC's tag tree (``PathNormalizer``).
+    namespace_index: int = Field(default=2, ge=0)
+    security_policy: Literal["None", "Basic256Sha256"] = "None"
+    certificate_path: str | None = None
+    private_key_path: str | None = None
+    trust_dir: str | None = None
+    server_certificate_path: str | None = None
+    session_timeout_ms: int = Field(default=60_000, ge=1_000)
+    request_timeout_ms: int = Field(default=10_000, ge=100)
+    #: Initial restart back-off (doubles up to a minute) when the PLC is unreachable.
+    reconnect_interval_ms: int = Field(default=1_000, ge=100)
+    max_reconnect_attempts: int = Field(default=0, ge=0)
+    #: Clock probe cadence (one-clock record P-2): the supervisor reads the server's clock
+    #: this often; the FB-070 liveness check and the FB-089 offset measurement ride on the
+    #: same read. 30 s default; the operator adjusts the value in force at runtime, without
+    #: a restart (``PlcConnectionManager.set_clock_probe_interval``, minimum 1 s). The
+    #: probe cannot be switched off (FB-093): a clock that is not read cannot be trusted,
+    #: so a value under 1 s, 0 included, is refused when the configuration is loaded.
+    #: ``liveness_interval_seconds`` is the field's older name and still accepted.
+    clock_probe_interval_seconds: float = Field(
+        default=30.0,
+        ge=1,
+        validation_alias=AliasChoices("clock_probe_interval_seconds", "liveness_interval_seconds"),
+    )
+    #: The tolerance class this link is held to (one-clock record P-8): the probe's offset
+    #: against it decides ``CLOCK_OUT_OF_TOLERANCE`` (FB-093). None takes the class the
+    #: module's FACTS ``time_governance`` section declares for the connection, else its
+    #: default (T0: polled values from NTP-synced devices and servers).
+    tolerance_class: ToleranceClass | None = None
+    #: Which clock stamps this connection's values (one-clock record P-4): ``device`` for
+    #: a PLC-embedded server, ``server`` for a host that stamps at poll (Kepware, Ignition,
+    #: Linx). None is undeclared: a value without a source stamp is refused (FB-088). The
+    #: clock the probe measures is named from it (``clock_id``, FB-094 step 2); FB-090
+    #: moves the declaration into FACTS ``time_governance``.
+    source_timestamp_origin: Literal["device", "server"] | None = None
+    enabled: bool = True
+
+    @model_validator(mode="after")
+    def _check(self) -> PlcConnectionSpec:
+        if not self.endpoint.startswith("opc.tcp://"):
+            msg = (
+                f"connection '{self.name}': endpoint must start with opc.tcp://, "
+                f"got {self.endpoint!r}"
+            )
+            raise ValueError(msg)
+        if self.security_policy != "None" and not (self.certificate_path and self.private_key_path):
+            msg = (
+                f"connection '{self.name}': security_policy {self.security_policy} needs "
+                "certificate_path and private_key_path"
+            )
+            raise ValueError(msg)
+        return self
+
+
+class ChangeoverAreaSpec(BaseModel):
+    """One MES changeover area and the PLC CIP sequence behind it."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    area: str
+    equipment_id: str
+    cooker_number: str
+    cip_policy: CipPolicy = CipPolicy.EXTERNAL
+    auto_start: bool = False
+    cip: PlcCipSpec | None = None
+
+    @model_validator(mode="after")
+    def _check(self) -> ChangeoverAreaSpec:
+        # Validates the area name and the policy value.
+        self.to_area_config()
+        if self.cip_policy is CipPolicy.RUNNER and self.cip is None:
+            msg = f"area '{self.area}': cip_policy 'runner' needs a 'cip' block"
+            raise ValueError(msg)
+        return self
+
+    def to_area_config(self) -> AreaChangeoverConfig:
+        return AreaChangeoverConfig(
+            area=self.area,
+            equipment_id=self.equipment_id,
+            cooker_number=self.cooker_number,
+            cip_policy=self.cip_policy,
+            auto_start=self.auto_start,
+        )
+
+
+class OTControlConfig(BaseModel):
+    """The control runtime document."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    site: str = "whk01"
+    topic_root: str = "whk"
+    #: First segment of Forge tag paths (``WH/WHK01/...``), for the path normaliser.
+    site_prefix: str = "WH"
+    #: Identity recorded on MES writes, PLC writes and audit records.
+    requested_by: str = OT_ADAPTER_ID
+    #: Adapter id of the MES spoke the changeover commands are written to.
+    mes_adapter_id: str = "forge-mes"
+    act_on_retained: bool = False
+    audit_log: bool = True
+    readback_tolerance: float = Field(default=0.001, ge=0)
+    #: How long a staged two-step write may wait for its commit (FB-074).
+    review_timeout_seconds: float = Field(default=120.0, gt=0)
+    #: Site vocabulary for ``WriteRequest.reason_code``; empty accepts any non-blank code.
+    reason_codes: list[str] = Field(default_factory=list)
+    mqtt: MqttIngressSettings = Field(default_factory=MqttIngressSettings)
+    #: PLC connections (FB-069); empty means Standard tags have no live path.
+    connections: list[PlcConnectionSpec] = Field(default_factory=list)
+    #: Supervisor period for restarting dropped PLC connections; 0 disables it.
+    connection_poll_seconds: float = Field(default=5.0, ge=0)
+    write_tags: list[TagWriteConfig] = Field(default_factory=list)
+    interlocks: list[InterlockRule] = Field(default_factory=list)
+    permissions: list[WritePermission] = Field(default_factory=list)
+    recipes: list[RecipeWriteConfig] = Field(default_factory=list)
+    changeover_areas: list[ChangeoverAreaSpec] = Field(default_factory=list)
+
+    @field_validator("write_tags", "interlocks", "permissions", "recipes", mode="before")
+    @classmethod
+    def _reject_unknown_keys(cls, items: Any, info: Any) -> Any:
+        """pydantic ignores extra keys on stdlib dataclasses; a typo must not pass."""
+        allowed = _ALLOWED_KEYS[info.field_name]
+        if isinstance(items, list):
+            for index, item in enumerate(items):
+                if isinstance(item, dict):
+                    _check_keys(f"{info.field_name}[{index}]", item, allowed)
+                    if info.field_name == "recipes":
+                        for j, mapping in enumerate(item.get("mappings") or []):
+                            if isinstance(mapping, dict):
+                                _check_keys(
+                                    f"recipes[{index}].mappings[{j}]",
+                                    mapping,
+                                    _ALLOWED_KEYS["mappings"],
+                                )
+        return items
+
+    @model_validator(mode="after")
+    def _cross_check(self) -> OTControlConfig:
+        problems: list[str] = []
+        tag_paths = [t.tag_path for t in self.write_tags]
+        problems += _duplicates("write_tags.tag_path", tag_paths)
+        problems += _duplicates("interlocks.rule_id", [r.rule_id for r in self.interlocks])
+        problems += _duplicates(
+            "permissions.permission_id", [p.permission_id for p in self.permissions]
+        )
+        problems += _duplicates("recipes.equipment_id", [r.equipment_id for r in self.recipes])
+        problems += _duplicates("changeover_areas.area", [a.area for a in self.changeover_areas])
+        problems += _duplicates("connections.name", [c.name for c in self.connections])
+        problems += _duplicates("reason_codes", self.reason_codes)
+        if any(not code.strip() for code in self.reason_codes):
+            problems.append("reason_codes: blank entries are not allowed")
+
+        known = set(tag_paths)
+        for recipe in self.recipes:
+            for mapping in recipe.mappings:
+                if mapping.tag_path not in known:
+                    problems.append(
+                        f"recipes[{recipe.equipment_id}].{mapping.parameter_name}: tag "
+                        f"'{mapping.tag_path}' is not in write_tags"
+                    )
+        equipment = {r.equipment_id for r in self.recipes}
+        for spec in self.changeover_areas:
+            if spec.equipment_id not in equipment:
+                problems.append(
+                    f"changeover_areas[{spec.area}]: equipment '{spec.equipment_id}' has no "
+                    "recipes entry, so no recipe could ever be downloaded"
+                )
+            if spec.cip is not None and spec.cip.start_tag not in known:
+                problems.append(
+                    f"changeover_areas[{spec.area}].cip.start_tag '{spec.cip.start_tag}' "
+                    "is not in write_tags"
+                )
+        if problems:
+            raise ValueError("; ".join(problems))
+        return self
+
+    # -- derived views --------------------------------------------------------
+
+    def area_configs(self) -> list[AreaChangeoverConfig]:
+        return [spec.to_area_config() for spec in self.changeover_areas]
+
+    def cip_specs(self) -> dict[str, PlcCipSpec]:
+        return {spec.area: spec.cip for spec in self.changeover_areas if spec.cip is not None}
+
+    def topic(self, area: str, *leaf: str) -> str:
+        return "/".join((self.topic_root, self.site, area, *leaf))
+
+    def describe(self) -> dict[str, Any]:
+        return {
+            "site": self.site,
+            "topic_root": self.topic_root,
+            "mes_adapter_id": self.mes_adapter_id,
+            "mqtt_mode": self.mqtt.mode,
+            "connections": {c.name: c.endpoint for c in self.connections if c.enabled},
+            "write_tags": len(self.write_tags),
+            "review": {
+                "two_step_tags": sum(
+                    t.confirmation is ConfirmationMode.TWO_STEP_WITH_REVIEW for t in self.write_tags
+                ),
+                "reason_code_tags": sum(t.reason_code_required for t in self.write_tags),
+                "timeout_seconds": self.review_timeout_seconds,
+                "reason_codes": len(self.reason_codes),
+            },
+            "interlocks": len(self.interlocks),
+            "permissions": len(self.permissions),
+            "recipes": {r.equipment_id: len(r.mappings) for r in self.recipes},
+            "changeover_areas": {
+                a.area: {
+                    "equipment_id": a.equipment_id,
+                    "cip_policy": a.cip_policy.value,
+                    "auto_start": a.auto_start,
+                }
+                for a in self.changeover_areas
+            },
+        }
+
+
+_ALLOWED_KEYS: dict[str, frozenset[str]] = {
+    "write_tags": frozenset(f.name for f in dataclasses.fields(TagWriteConfig)),
+    "interlocks": frozenset(f.name for f in dataclasses.fields(InterlockRule)),
+    "permissions": frozenset(f.name for f in dataclasses.fields(WritePermission)),
+    "recipes": frozenset(f.name for f in dataclasses.fields(RecipeWriteConfig)),
+    "mappings": frozenset(f.name for f in dataclasses.fields(RecipeParameterMapping)),
+}
+
+
+def _check_keys(where: str, item: dict[str, Any], allowed: frozenset[str]) -> None:
+    unknown = sorted(set(item) - allowed)
+    if unknown:
+        msg = f"{where}: unknown key(s) {unknown}; allowed: {sorted(allowed)}"
+        raise ValueError(msg)
+
+
+def _duplicates(what: str, values: list[str]) -> list[str]:
+    seen: set[str] = set()
+    dupes: list[str] = []
+    for value in values:
+        if value in seen and value not in dupes:
+            dupes.append(value)
+        seen.add(value)
+    return [f"duplicate {what}: {d!r}" for d in dupes]
+
+
+def parse_control_config(data: dict[str, Any] | OTControlConfig) -> OTControlConfig:
+    """Validate a parsed document (or pass a model through)."""
+    if isinstance(data, OTControlConfig):
+        return data
+    try:
+        return OTControlConfig.model_validate(data)
+    except ValueError as exc:
+        raise ConfigError(str(exc)) from exc
+
+
+def load_control_config(path: str | Path) -> OTControlConfig:
+    """Read and validate a JSON control configuration file."""
+    file = Path(path)
+    try:
+        data = json.loads(file.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        msg = f"control config not found: {file}"
+        raise ConfigError(msg) from None
+    except json.JSONDecodeError as exc:
+        msg = f"{file}: invalid JSON at line {exc.lineno}: {exc.msg}"
+        raise ConfigError(msg) from exc
+    if not isinstance(data, dict):
+        msg = f"{file}: expected a JSON object at the top level"
+        raise ConfigError(msg)
+    try:
+        return parse_control_config(data)
+    except ConfigError as exc:
+        msg = f"{file}: {exc}"
+        raise ConfigError(msg) from None

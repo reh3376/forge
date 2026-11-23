@@ -8,14 +8,14 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from forge.modules.ot.i3x.router import create_i3x_router
-from forge.modules.ot.opcua_client.types import DataType, QualityCode
-from forge.modules.ot.tag_engine.builtin_templates import create_builtin_registry
-from forge.modules.ot.tag_engine.models import (
+from forge_ot.i3x.router import create_i3x_router
+from forge_ot.opcua_client.types import DataType, QualityCode
+from forge_ot.tag_engine.builtin_templates import create_builtin_registry
+from forge_ot.tag_engine.models import (
     MemoryTag,
     StandardTag,
 )
-from forge.modules.ot.tag_engine.registry import TagRegistry
+from forge_ot.tag_engine.registry import TagRegistry
 
 
 @pytest.fixture

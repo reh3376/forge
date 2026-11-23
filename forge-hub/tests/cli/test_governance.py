@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 import pytest
 from typer.testing import CliRunner
 
+from forge_core.fxts import locations
 from forge_core.fxts.shared.runner import verify_spec_hash
 from forge_hub.cli import governance
 from forge_hub.cli.main import app
@@ -20,10 +21,10 @@ if TYPE_CHECKING:
 runner = CliRunner()
 
 SPECS = governance.SPEC_ROOT
-FACTS_OT = SPECS / "facts" / "specs" / "forge-ot.facts.json"  # non-ASCII, hand-wrapped
-FACTS_NMS = SPECS / "facts" / "specs" / "forge-nms.facts.json"  # ASCII-escaped
-FACTS_WMS = SPECS / "facts" / "specs" / "forge-wms.facts.json"  # approved in the fixture
-FVTS_OT = SPECS / "fvts" / "specs" / "forge-ot.fvts.json"
+FACTS_OT = locations.spec_path("facts", "forge-ot.facts.json")  # non-ASCII, hand-wrapped
+FACTS_NMS = locations.spec_path("facts", "forge-nms.facts.json")  # ASCII-escaped
+FACTS_WMS = locations.spec_path("facts", "forge-wms.facts.json")  # approved in the fixture
+FVTS_OT = locations.spec_path("fvts", "forge-ot.fvts.json")
 STAMP_RE = re.compile(r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
 
 
@@ -44,7 +45,7 @@ def root(tmp_path: Path) -> Path:
     other three awaiting approval.
     """
     for src in (FACTS_OT, FACTS_NMS, FACTS_WMS, FVTS_OT):
-        dest = tmp_path / src.parent.parent.name / "specs" / src.name
+        dest = tmp_path / src.parent.name / "specs" / src.name  # <framework>/specs/<file>
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(src, dest)
         text, spec = governance.load_spec(dest)
@@ -340,7 +341,7 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
             "kind": "integration",
             "function": "wms",
             "language": "python",
-            "source_paths": ["src/forge/adapters/forge_wms"],
+            "source_paths": ["forge-modules/forge-wms/src/python/forge_wms"],
         },
         "hub_link": {"protocol": "grpc", "service": "forge.v1.AdapterService"},
         "transport": {
@@ -364,10 +365,10 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
         },
         "references": {
             "facts": {
-                "path": "forge-core/src/python/forge_core/fxts/facts/specs/forge-wms.facts.json",
+                "path": "forge-modules/forge-wms/fxts/facts/forge-wms.facts.json",
                 "adapter_id": "forge-wms",
             },
-            "manifest": "src/forge/adapters/forge_wms/manifest.json",
+            "manifest": "forge-modules/forge-wms/src/python/forge_wms/manifest.json",
         },
         "baseline": {
             **{f"M-{n}": "met" for n in range(1, 15)},

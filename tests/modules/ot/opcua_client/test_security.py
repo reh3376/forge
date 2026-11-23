@@ -10,11 +10,11 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from forge.modules.ot.opcua_client.exceptions import (
+from forge_ot.opcua_client.exceptions import (
     CertificateError,
     ConfigurationError,
 )
-from forge.modules.ot.opcua_client.security import (
+from forge_ot.opcua_client.security import (
     MessageSecurityMode,
     SecurityConfig,
     SecurityPolicy,

@@ -52,7 +52,19 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/forge", "forge-core/src/python/forge_core", "forge-hub/src/python/forge_hub"]
+packages = [
+    "forge-core/src/python/forge_core",
+    "forge-hub/src/python/forge_hub",
+    "forge-modules/forge-cmms/src/python/forge_cmms",
+    "forge-modules/forge-historian/src/python/forge_historian",
+    "forge-modules/forge-ims/src/python/forge_ims",
+    "forge-modules/forge-integ-erp-netsuite/src/python/forge_integ_erp_netsuite",
+    "forge-modules/forge-mes/src/python/forge_mes",
+    "forge-modules/forge-nms/src/python/forge_nms",
+    "forge-modules/forge-ot/src/python/forge_ot",
+    "forge-modules/forge-scanner/src/python/forge_scanner",
+    "forge-modules/forge-wms/src/python/forge_wms",
+]
 
 # forge-core's contract (proto files, framework schemas, governed lists) is language-neutral and
 # lives outside the Python package; a built package carries it as forge_core/_contract
@@ -65,7 +77,22 @@ packages = ["src/forge", "forge-core/src/python/forge_core", "forge-hub/src/pyth
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-src = ["src", "forge-core/src/python", "forge-hub/src/python", "tests", "forge-core/tests", "forge-hub/tests"]
+src = [
+    "forge-core/src/python",
+    "forge-hub/src/python",
+    "forge-modules/forge-cmms/src/python",
+    "forge-modules/forge-historian/src/python",
+    "forge-modules/forge-ims/src/python",
+    "forge-modules/forge-integ-erp-netsuite/src/python",
+    "forge-modules/forge-mes/src/python",
+    "forge-modules/forge-nms/src/python",
+    "forge-modules/forge-ot/src/python",
+    "forge-modules/forge-scanner/src/python",
+    "forge-modules/forge-wms/src/python",
+    "tests",
+    "forge-core/tests",
+    "forge-hub/tests",
+]
 # Applies the excludes even when paths are passed explicitly (pre-commit, `git ls-files | xargs`).
 force-exclude = true
 extend-exclude = [
@@ -98,7 +125,19 @@ runtime-evaluated-base-classes = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["forge", "forge_core", "forge_hub"]
+known-first-party = [
+    "forge_core",
+    "forge_hub",
+    "forge_cmms",
+    "forge_historian",
+    "forge_ims",
+    "forge_integ_erp_netsuite",
+    "forge_mes",
+    "forge_nms",
+    "forge_ot",
+    "forge_scanner",
+    "forge_wms",
+]
 
 [tool.pytest.ini_options]
 # Three trees: what spans layers and the modules' tests in tests/, forge-core's own in

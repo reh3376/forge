@@ -14,8 +14,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from forge.modules.ot.control.interlock import InterlockEngine
-from forge.modules.ot.control.models import (
+from forge_ot.control.interlock import InterlockEngine
+from forge_ot.control.models import (
     InterlockCondition,
     InterlockRule,
     WriteRequest,
@@ -447,7 +447,7 @@ class TestUnreadableCheckTag:
 
     @pytest.mark.asyncio
     async def test_reader_exception_rejects_the_write(self):
-        from forge.modules.ot.control.models import (
+        from forge_ot.control.models import (
             InterlockCondition,
             InterlockRule,
             WriteRequest,

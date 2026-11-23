@@ -59,16 +59,15 @@ class TestScaffoldImport:
         )
 
         # Create project structure
-        src_dir = tmp_path / "src" / "forge" / "adapters"
-        src_dir.mkdir(parents=True)
-
-        target = src_dir / "test_roundtrip"
         scaffolder = ModuleScaffolder(manifest)
+        target = scaffolder.package_dir(tmp_path / "forge-modules")
         scaffolder.generate(target, include_tests=True, include_facts=True)
         return tmp_path
 
     def test_all_core_files_exist(self, scaffold_dir: Path):
-        mod_dir = scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip"
+        mod_dir = (
+            scaffold_dir / "forge-modules" / "test-roundtrip" / "src" / "python" / "test_roundtrip"
+        )
         for f in (
             "__init__.py",
             "manifest.json",
@@ -80,7 +79,9 @@ class TestScaffoldImport:
             assert (mod_dir / f).exists(), f"Missing: {f}"
 
     def test_manifest_json_valid(self, scaffold_dir: Path):
-        mod_dir = scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip"
+        mod_dir = (
+            scaffold_dir / "forge-modules" / "test-roundtrip" / "src" / "python" / "test_roundtrip"
+        )
         manifest = json.loads((mod_dir / "manifest.json").read_text())
         assert manifest["adapter_id"] == "test-roundtrip"
         assert manifest["capabilities"]["subscribe"] is True
@@ -88,7 +89,15 @@ class TestScaffoldImport:
 
     def test_adapter_module_importable(self, scaffold_dir: Path):
         """The scaffolded adapter.py should be importable as a Python module."""
-        adapter_py = scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "adapter.py"
+        adapter_py = (
+            scaffold_dir
+            / "forge-modules"
+            / "test-roundtrip"
+            / "src"
+            / "python"
+            / "test_roundtrip"
+            / "adapter.py"
+        )
         spec = importlib.util.spec_from_file_location(
             "test_roundtrip_adapter",
             adapter_py,
@@ -99,7 +108,15 @@ class TestScaffoldImport:
         compile(source, str(adapter_py), "exec")
 
     def test_config_module_importable(self, scaffold_dir: Path):
-        config_py = scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "config.py"
+        config_py = (
+            scaffold_dir
+            / "forge-modules"
+            / "test-roundtrip"
+            / "src"
+            / "python"
+            / "test_roundtrip"
+            / "config.py"
+        )
         source = config_py.read_text()
         compile(source, str(config_py), "exec")
         # Should have Pydantic BaseModel
@@ -108,14 +125,30 @@ class TestScaffoldImport:
         assert "api_key" in source
 
     def test_context_module_has_builder(self, scaffold_dir: Path):
-        context_py = scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "context.py"
+        context_py = (
+            scaffold_dir
+            / "forge-modules"
+            / "test-roundtrip"
+            / "src"
+            / "python"
+            / "test_roundtrip"
+            / "context.py"
+        )
         source = context_py.read_text()
         compile(source, str(context_py), "exec")
         assert "build_record_context" in source
         assert "equipment_id" in source
 
     def test_record_builder_has_assembler(self, scaffold_dir: Path):
-        rb_py = scaffold_dir / "src" / "forge" / "adapters" / "test_roundtrip" / "record_builder.py"
+        rb_py = (
+            scaffold_dir
+            / "forge-modules"
+            / "test-roundtrip"
+            / "src"
+            / "python"
+            / "test_roundtrip"
+            / "record_builder.py"
+        )
         source = rb_py.read_text()
         compile(source, str(rb_py), "exec")
         assert "build_contextual_record" in source
@@ -327,3 +360,40 @@ class TestSDKPipelineIntegration:
         assert result.adapter_class == "TestResultAdapter"
         assert result.module_dir == target
         assert len(result.files_created) == 6
+
+
+class TestTheGeneratedModuleRuns:
+    """The module the builder writes is a module that works, not only files that exist.
+
+    Found on 2026-11-23 (FB-201): the generated code imported ``forge.adapters.<name>``,
+    a package that no longer existed, and one generated test could never pass. Neither
+    showed, because nothing ran what the builder wrote.
+    """
+
+    def test_its_own_tests_pass(self, tmp_path: Path) -> None:
+        import subprocess
+        import sys
+
+        from forge_core.sdk.module_builder.manifest_builder import ManifestBuilder
+
+        manifest = (
+            ManifestBuilder("built-module")
+            .name("Built Module")
+            .protocol("rest")
+            .tier("MES_MOM")
+            .capability("read")
+            .capability("subscribe")
+            .connection_param("api_url", description="The API", required=True)
+            .context_field("equipment_id")
+            .build()
+        )
+        scaffolder = ModuleScaffolder(manifest)
+        result = scaffolder.generate(scaffolder.package_dir(tmp_path / "forge-modules"))
+        module = tmp_path / "forge-modules" / "built-module"
+        assert result.test_file == module / "tests" / "test_built_module.py"
+        command = [sys.executable, "-m", "pytest", "tests", "-q", "-p", "no:cacheprovider"]
+        done = subprocess.run(
+            [*command, "-o", "addopts="], cwd=module, capture_output=True, text=True, check=False
+        )
+        assert done.returncode == 0, done.stdout[-2000:] + done.stderr[-1000:]
+        assert " passed" in done.stdout and "failed" not in done.stdout

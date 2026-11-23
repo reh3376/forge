@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING
 import pytest
 from jsonschema import Draft202012Validator
 
-from forge_core.fxts import FXTS_ROOT
+from forge_core.fxts import locations
 from forge_core.fxts.facts import SCHEMA_PATH
 from forge_core.fxts.facts.runners.facts_runner import (
     PACKAGED_SCHEMA_PATH,
@@ -29,8 +29,7 @@ from forge_core.fxts.shared.runner import VerdictStatus, verify_spec_hash
 if TYPE_CHECKING:
     from pathlib import Path
 
-SPECS_DIR = FXTS_ROOT / "facts" / "specs"
-SPEC_PATHS = sorted(SPECS_DIR.glob("*.facts.json"))
+SPEC_PATHS = locations.spec_files("facts", "*.facts.json")  # each in its module's folder
 
 #: adapter_id → why the spec does not validate yet (and which item fixes it).
 VOCABULARY_GAPS: dict[str, str] = {}
@@ -147,7 +146,7 @@ class TestVocabularyParity:
 class TestSchemaValidCheck:
     @pytest.mark.asyncio()
     async def test_one_violation_per_offending_path(self, runner: FACTSRunner) -> None:
-        spec = _load(SPECS_DIR / "forge-wms.facts.json")
+        spec = _load(locations.spec_path("facts", "forge-wms.facts.json"))
         spec["data_contract"]["data_sources"][0]["source_type"] = "telepathy"
         spec["lifecycle"]["magic_timeout_ms"] = 1
         report = await runner.run(target="forge-wms", spec=spec)
@@ -161,13 +160,13 @@ class TestSchemaValidCheck:
 
     @pytest.mark.asyncio()
     async def test_is_the_first_verdict(self, runner: FACTSRunner) -> None:
-        spec = _load(SPECS_DIR / "forge-wms.facts.json")
+        spec = _load(locations.spec_path("facts", "forge-wms.facts.json"))
         report = await runner.run(target="forge-wms", spec=spec)
         assert report.verdicts[0].check_id == "facts:schema-valid"
 
     @pytest.mark.asyncio()
     async def test_large_offending_values_are_summarised(self, runner: FACTSRunner) -> None:
-        spec = _load(SPECS_DIR / "forge-wms.facts.json")
+        spec = _load(locations.spec_path("facts", "forge-wms.facts.json"))
         spec["surprise"] = {"deep": list(range(50))}
         report = await runner.run(target="forge-wms", spec=spec)
         verdict = next(v for v in report.verdicts if v.check_id == "facts:schema-valid")

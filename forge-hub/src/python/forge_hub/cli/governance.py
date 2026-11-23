@@ -40,6 +40,7 @@ import typer
 
 import forge_core.fxts as _fxts
 from forge_core import contract
+from forge_core.fxts import locations
 from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import (
     add_spec_hash,
@@ -54,9 +55,10 @@ if TYPE_CHECKING:
 
     from forge_core.fxts.shared.runner import FxTSReport, FxTSRunner
 
-#: ``forge-core/src/python/forge_core/fxts``: every ``<framework>/specs/*.json`` under it is a spec.
-#: These are the specs of the modules, until each moves to its module's folder (FB-201).
-SPEC_ROOT = Path(_fxts.__file__).resolve().parent  # the frameworks, in forge-core
+#: The frameworks, in forge-core. As a root handed to ``spec_files`` it means the real tree:
+#: every ``fxts`` folder of the hub and the modules. Any other root is a self-contained tree
+#: of ``<framework>/specs/*.json`` with its own ``lists``.
+SPEC_ROOT = Path(_fxts.__file__).resolve().parent
 #: ``forge-hub/fxts``: every ``<framework>/*.json`` under it is a spec of the hub's own (A-3).
 HUB_FXTS = hub_fxts.FXTS_DIR
 #: The governed lists have a schema of their own, released like a framework's (FB-234).
@@ -105,8 +107,8 @@ def write_integrity(path: Path, text: str, integrity: dict[str, Any]) -> None:
 
 
 def spec_dirs(framework: str) -> tuple[Path, ...]:
-    """Every folder that holds specs of one framework: the modules' and the hub's own."""
-    return (SPEC_ROOT / framework / "specs", HUB_FXTS / framework)
+    """Every folder that holds specs of one framework: the hub's own and each module's."""
+    return tuple(locations.spec_dirs(framework))
 
 
 def spec_files(root: Path) -> list[Path]:
@@ -114,9 +116,10 @@ def spec_files(root: Path) -> list[Path]:
     in_frameworks = sorted(root.glob("*/specs/*.json"))
     if root != SPEC_ROOT:  # any other root is self-contained
         return in_frameworks + sorted((root / "lists").glob("*.list.json"))
-    # The real tree: the hub's own specs lie in its fxts folder, the lists in the contract.
+    # The real tree: a spec lies in the fxts folder of what it describes, the lists in the
+    # contract.
     specs = sorted(
-        [*in_frameworks, *HUB_FXTS.glob("*/*.json")],
+        [file for folder in locations.fxts_folders() for file in folder.glob("*/*.json")],
         key=lambda path: (framework_dir_of(path).name, path.name),
     )
     return specs + sorted(contract.LISTS_DIR.glob("*.list.json"))

@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from forge.modules.ot.opcua_client.types import (
+from forge_ot.opcua_client.types import (
     AccessLevel,
     BrowseResult,
     ConnectionHealth,

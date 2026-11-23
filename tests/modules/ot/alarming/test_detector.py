@@ -13,9 +13,9 @@ import time
 
 import pytest
 
-from forge.modules.ot.alarming.detector import AlarmDetector
-from forge.modules.ot.alarming.engine import AlarmEngine
-from forge.modules.ot.alarming.models import (
+from forge_ot.alarming.detector import AlarmDetector
+from forge_ot.alarming.engine import AlarmEngine
+from forge_ot.alarming.models import (
     AlarmConfig,
     AlarmPriority,
     AlarmType,

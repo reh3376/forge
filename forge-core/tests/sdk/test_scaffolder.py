@@ -45,22 +45,21 @@ def manifest() -> dict:
 @pytest.fixture()
 def temp_project(tmp_path) -> Path:
     """Create a minimal project structure for scaffolding into."""
-    src_dir = tmp_path / "src" / "forge" / "adapters"
-    src_dir.mkdir(parents=True)
+    (tmp_path / "forge-modules").mkdir()
     return tmp_path
 
 
 class TestModuleScaffolder:
     def test_generate_creates_module_dir(self, manifest, temp_project):
         scaffolder = ModuleScaffolder(manifest)
-        target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
+        target = scaffolder.package_dir(temp_project / "forge-modules")
         result = scaffolder.generate(target)
         assert result.module_dir == target
         assert target.is_dir()
 
     def test_all_required_files_created(self, manifest, temp_project):
         scaffolder = ModuleScaffolder(manifest)
-        target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
+        target = scaffolder.package_dir(temp_project / "forge-modules")
         scaffolder.generate(target, include_tests=False, include_facts=False)
 
         required = [
@@ -76,7 +75,7 @@ class TestModuleScaffolder:
 
     def test_manifest_json_valid(self, manifest, temp_project):
         scaffolder = ModuleScaffolder(manifest)
-        target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
+        target = scaffolder.package_dir(temp_project / "forge-modules")
         scaffolder.generate(target, include_tests=False, include_facts=False)
 
         with (target / "manifest.json").open() as f:
@@ -87,7 +86,7 @@ class TestModuleScaffolder:
     def test_generated_python_compiles(self, manifest, temp_project):
         """All generated .py files must be syntactically valid."""
         scaffolder = ModuleScaffolder(manifest)
-        target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
+        target = scaffolder.package_dir(temp_project / "forge-modules")
         scaffolder.generate(target, include_tests=False, include_facts=False)
 
         for py_file in target.glob("*.py"):
@@ -99,20 +98,20 @@ class TestModuleScaffolder:
 
     def test_result_adapter_class(self, manifest, temp_project):
         scaffolder = ModuleScaffolder(manifest)
-        target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
+        target = scaffolder.package_dir(temp_project / "forge-modules")
         result = scaffolder.generate(target, include_tests=False, include_facts=False)
         assert result.adapter_class == "TestScaffoldAdapter"
         assert result.adapter_id == "test-scaffold"
 
     def test_result_files_created_count(self, manifest, temp_project):
         scaffolder = ModuleScaffolder(manifest)
-        target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
+        target = scaffolder.package_dir(temp_project / "forge-modules")
         result = scaffolder.generate(target, include_tests=False, include_facts=False)
         assert len(result.files_created) == 6  # 6 core files
 
     def test_test_file_generated(self, manifest, temp_project):
         scaffolder = ModuleScaffolder(manifest)
-        target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
+        target = scaffolder.package_dir(temp_project / "forge-modules")
         result = scaffolder.generate(target, include_tests=True, include_facts=False)
         assert result.test_file is not None
         assert result.test_file.exists()
@@ -120,7 +119,7 @@ class TestModuleScaffolder:
 
     def test_facts_spec_generated(self, manifest, temp_project):
         scaffolder = ModuleScaffolder(manifest)
-        target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
+        target = scaffolder.package_dir(temp_project / "forge-modules")
         result = scaffolder.generate(target, include_tests=False, include_facts=True)
         assert result.facts_file is not None
         assert result.facts_file.exists()
@@ -130,7 +129,7 @@ class TestModuleScaffolder:
     def test_no_overwrite_by_default(self, manifest, temp_project):
         """Existing files should not be overwritten without --overwrite."""
         scaffolder = ModuleScaffolder(manifest)
-        target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
+        target = scaffolder.package_dir(temp_project / "forge-modules")
 
         # First generation
         scaffolder.generate(target, include_tests=False, include_facts=False)
@@ -147,7 +146,7 @@ class TestModuleScaffolder:
 
     def test_overwrite_when_enabled(self, manifest, temp_project):
         scaffolder = ModuleScaffolder(manifest)
-        target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
+        target = scaffolder.package_dir(temp_project / "forge-modules")
 
         scaffolder.generate(target, include_tests=False, include_facts=False)
         (target / "config.py").write_text("# CUSTOM")
@@ -160,11 +159,33 @@ class TestModuleScaffolder:
 
     def test_conftest_created_for_tests(self, manifest, temp_project):
         scaffolder = ModuleScaffolder(manifest)
-        target = temp_project / "src" / "forge" / "adapters" / "test_scaffold"
+        target = scaffolder.package_dir(temp_project / "forge-modules")
         scaffolder.generate(target, include_tests=True, include_facts=False)
 
-        tests_dir = temp_project / "tests" / "adapters"
-        assert (tests_dir / "conftest.py").exists()
+        module = temp_project / "forge-modules" / "test-scaffold"
+        assert (module / "tests" / "conftest.py").exists()
+        assert (module / "tests" / "test_test_scaffold.py").exists()
+
+    def test_the_module_is_laid_out_in_the_standard_structure(self, manifest, temp_project):
+        """Its package, its tests and its spec are in the module's own folder (FB-201)."""
+        scaffolder = ModuleScaffolder(manifest)
+        target = scaffolder.package_dir(temp_project / "forge-modules")
+        result = scaffolder.generate(target)
+        module = temp_project / "forge-modules" / "test-scaffold"
+        assert target == module / "src" / "python" / "test_scaffold"
+        assert ModuleScaffolder.module_root(target) == module
+        assert result.facts_file == module / "fxts" / "facts" / "test-scaffold.facts.json"
+        assert result.test_file == module / "tests" / "test_test_scaffold.py"
+        produced = {path.relative_to(module).parts[0] for path in result.files_created}
+        assert produced == {"src", "tests", "fxts"}
+
+    def test_the_generated_code_imports_the_modules_own_package(self, manifest, temp_project):
+        """There is no package ``forge``: a generated module imports itself by its name."""
+        scaffolder = ModuleScaffolder(manifest)
+        result = scaffolder.generate(scaffolder.package_dir(temp_project / "forge-modules"))
+        text = "".join(path.read_text() for path in result.files_created if path.suffix == ".py")
+        assert "from test_scaffold.config import" in text
+        assert "forge.adapters" not in text and "from forge." not in text
 
 
 class TestModuleScaffolderProperties:

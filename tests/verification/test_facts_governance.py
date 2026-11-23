@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from forge_core.fxts import FXTS_ROOT
+from forge_core.fxts import locations
 from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
 from forge_core.fxts.shared.runner import (
     VerdictStatus,
@@ -71,8 +71,7 @@ class TestSpecLoading:
 
     def test_all_specs_loadable(self):
         """Every FACTS spec file in the specs dir should be valid JSON."""
-        specs_dir = FXTS_ROOT / "facts" / "specs"
-        for spec_path in specs_dir.glob("*.facts.json"):
+        for spec_path in locations.spec_files("facts", "*.facts.json"):
             data = json.loads(spec_path.read_text())
             assert "adapter_identity" in data, f"{spec_path.name} missing identity"
             assert "spec_version" in data, f"{spec_path.name} missing version"
@@ -156,8 +155,7 @@ class TestFACTSRunnerValidation:
     @pytest.mark.asyncio()
     async def test_every_production_spec_passes(self, runner: FACTSRunner):
         """All existing FACTS specs should pass static validation."""
-        specs_dir = FXTS_ROOT / "facts" / "specs"
-        for spec_path in specs_dir.glob("*.facts.json"):
+        for spec_path in locations.spec_files("facts", "*.facts.json"):
             spec = json.loads(spec_path.read_text())
             adapter_id = spec.get("adapter_identity", {}).get("adapter_id", spec_path.stem)
             report = await runner.run(target=adapter_id, spec=spec)
@@ -246,9 +244,8 @@ class TestCrossSpecConsistency:
 
     def test_all_specs_have_unique_adapter_ids(self):
         """No two specs should declare the same adapter_id."""
-        specs_dir = FXTS_ROOT / "facts" / "specs"
         ids = []
-        for spec_path in specs_dir.glob("*.facts.json"):
+        for spec_path in locations.spec_files("facts", "*.facts.json"):
             spec = json.loads(spec_path.read_text())
             ids.append(spec["adapter_identity"]["adapter_id"])
         assert len(ids) == len(set(ids)), f"Duplicate adapter IDs: {ids}"
@@ -263,17 +260,15 @@ class TestCrossSpecConsistency:
         from forge_core.fxts.shared import schemas
 
         released = {row.version for row in schemas.versions(contract.schema_dir("facts"))}
-        specs_dir = FXTS_ROOT / "facts" / "specs"
         declared = {
             spec_path.name: json.loads(spec_path.read_text())["spec_version"]
-            for spec_path in specs_dir.glob("*.facts.json")
+            for spec_path in locations.spec_files("facts", "*.facts.json")
         }
         assert set(declared.values()) <= released, declared
         assert declared["forge-ot.facts.json"] == "0.2.0"
 
     def test_all_specs_have_integrity_blocks(self):
         """Every spec must include an integrity block."""
-        specs_dir = FXTS_ROOT / "facts" / "specs"
-        for spec_path in specs_dir.glob("*.facts.json"):
+        for spec_path in locations.spec_files("facts", "*.facts.json"):
             spec = json.loads(spec_path.read_text())
             assert "integrity" in spec, f"{spec_path.name} missing integrity block"

@@ -25,11 +25,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # Application source and the project itself (editable, into the same /app/.venv)
 COPY README.md ./
-COPY src/ ./src/
 COPY forge-core/src/ ./forge-core/src/
 COPY forge-core/contract/ ./forge-core/contract/
 COPY forge-hub/src/ ./forge-hub/src/
 COPY forge-hub/fxts/ ./forge-hub/fxts/
+# Every module's package and specs; the build context leaves the interim MES bridge out
+COPY forge-modules/ ./forge-modules/
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --extra ot
 
@@ -48,16 +49,16 @@ WORKDIR /app
 
 # Copy the virtual environment from builder
 COPY --from=builder /app/.venv /app/.venv
-COPY --from=builder /app/src /app/src
 COPY --from=builder /app/forge-core/src /app/forge-core/src
 COPY --from=builder /app/forge-core/contract /app/forge-core/contract
 COPY --from=builder /app/forge-hub/src /app/forge-hub/src
 COPY --from=builder /app/forge-hub/fxts /app/forge-hub/fxts
+COPY --from=builder /app/forge-modules /app/forge-modules
 COPY --from=builder /app/pyproject.toml /app/pyproject.toml
 
 # Ensure venv python is on PATH
 ENV PATH="/app/.venv/bin:$PATH"
-ENV PYTHONPATH="/app/src:/app/forge-core/src/python:/app/forge-hub/src/python:$PYTHONPATH"
+ENV PYTHONPATH="/app/forge-core/src/python:/app/forge-hub/src/python:/app/forge-modules/forge-cmms/src/python:/app/forge-modules/forge-historian/src/python:/app/forge-modules/forge-ims/src/python:/app/forge-modules/forge-integ-erp-netsuite/src/python:/app/forge-modules/forge-mes/src/python:/app/forge-modules/forge-nms/src/python:/app/forge-modules/forge-ot/src/python:/app/forge-modules/forge-scanner/src/python:/app/forge-modules/forge-wms/src/python:$PYTHONPATH"
 ENV PYTHONUNBUFFERED=1
 
 # Default ports

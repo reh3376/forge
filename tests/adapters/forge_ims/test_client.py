@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.adapters.forge_ims.client import MockForgeImsClient
+from forge_ims.client import MockForgeImsClient
 
 # ── Mock Client Lifecycle ────────────────────────────────────────
 

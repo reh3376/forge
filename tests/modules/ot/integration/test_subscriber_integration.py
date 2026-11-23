@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from forge.modules.ot.mqtt.subscriber import IncomingMessage, MqttSubscriber
+from forge_ot.mqtt.subscriber import IncomingMessage, MqttSubscriber
 
 
 class TestSubscriberCommandIngestion:

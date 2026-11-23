@@ -3,19 +3,21 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
+from tests.samples import module_manifest_path
 
 from forge_core.models.adapter import AdapterManifest
 from forge_hub.ingest.facts_check import (
-    DEFAULT_SPECS_DIR,
     check_manifest_against_facts,
     load_facts_spec,
 )
 
-MES_MANIFEST = Path(__file__).resolve().parents[3] / "src" / "forge" / "adapters"
-MES_MANIFEST = MES_MANIFEST / "forge_mes" / "manifest.json"
+if TYPE_CHECKING:
+    from pathlib import Path
+
+MES_MANIFEST = module_manifest_path("forge-mes")
 
 
 @pytest.fixture()
@@ -28,7 +30,7 @@ def test_load_spec_found_and_missing() -> None:
     assert spec is not None and path is not None
     assert spec["adapter_identity"]["adapter_id"] == "forge-mes"
     assert load_facts_spec("no-such-adapter") == (None, None)
-    assert DEFAULT_SPECS_DIR.is_dir()
+    assert path.parent.name == "facts" and path.parent.parent.name == "fxts"  # the module's own
 
 
 def test_real_mes_manifest_conforms(mes_manifest: AdapterManifest) -> None:

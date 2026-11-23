@@ -144,7 +144,7 @@ To add an entry: edit the list, `forge governance stamp <list> --by <you> --reas
 
 ## The module specs
 
-`forge-core/src/python/forge_core/fxts/fmts/specs/` holds one spec for each module that has a FACTS spec. `tests/governance/fmts/test_module_specs.py` runs all of them in CI and names every failure it allows.
+Each module that has a FACTS spec keeps its module spec in its own folder, `forge-modules/<module>/fxts/fmts/`. `tests/governance/fmts/test_module_specs.py` runs all of them in CI and names every failure it allows.
 
 | Module | Kind | Waived | State |
 |---|---|---|---|
@@ -165,7 +165,7 @@ Module names (A-17): a module Forge builds is `forge-<service>`; a module that i
 ## Running it
 
 ```bash
-forge governance run fmts <module_id>             # looked up in forge-core/src/python/forge_core/fxts/fmts/specs
+forge governance run fmts <module_id>             # looked up in each module's fxts/fmts
 forge governance run fmts path/to/x.fmts.json     # or a spec file
 forge governance stamp path/to/x.fmts.json        # after an edit
 forge governance approve path/to/x.fmts.json --by reh3376    # the owner only

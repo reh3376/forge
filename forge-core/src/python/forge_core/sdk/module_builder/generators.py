@@ -215,9 +215,9 @@ def generate_adapter(manifest: dict[str, Any]) -> str:
         "from forge_core.adapter.interface import (",
         f"    {imports_str},",
         ")",
-        f"from forge.adapters.{snake}.config import {pascal}Config",
-        f"from forge.adapters.{snake}.context import build_record_context",
-        f"from forge.adapters.{snake}.record_builder import build_contextual_record",
+        f"from {snake}.config import {pascal}Config",
+        f"from {snake}.context import build_record_context",
+        f"from {snake}.record_builder import build_contextual_record",
         "from forge_core.models.adapter import (",
         "    AdapterCapabilities,",
         "    AdapterHealth,",
@@ -725,7 +725,7 @@ def generate_init(manifest: dict[str, Any]) -> str:
 
     return (
         f'"""{manifest["name"]}."""\n\n'
-        f"from forge.adapters.{snake}.adapter import {pascal}Adapter\n\n"
+        f"from {snake}.adapter import {pascal}Adapter\n\n"
         f'__all__ = ["{pascal}Adapter"]\n'
     )
 
@@ -873,11 +873,12 @@ def generate_tests(manifest: dict[str, Any]) -> str:
         "from __future__ import annotations",
         "",
         "import pytest",
+        "from pydantic import ValidationError",
         "",
-        f"from forge.adapters.{snake}.adapter import {pascal}Adapter",
-        f"from forge.adapters.{snake}.config import {pascal}Config",
-        f"from forge.adapters.{snake}.context import build_record_context",
-        f"from forge.adapters.{snake}.record_builder import build_contextual_record",
+        f"from {snake}.adapter import {pascal}Adapter",
+        f"from {snake}.config import {pascal}Config",
+        f"from {snake}.context import build_record_context",
+        f"from {snake}.record_builder import build_contextual_record",
         "from forge_core.models.adapter import AdapterState",
         "",
         "",
@@ -918,8 +919,9 @@ def generate_tests(manifest: dict[str, Any]) -> str:
         "",
         "    def test_config_is_frozen(self):",
         f"        config = {pascal}Config(**_TEST_CONFIG)",
-        "        with pytest.raises(Exception):",
-        '            config.__dict__["_frozen"] = False  # type: ignore[attr-defined]',
+        "        field = next(iter(type(config).model_fields))",
+        "        with pytest.raises(ValidationError):",
+        "            setattr(config, field, getattr(config, field))",
         "",
         "",
         "# ---------------------------------------------------------------------------",

@@ -1,0 +1,170 @@
+{
+  "spec_version": "2.0.0",
+  "module_identity": {
+    "module_id": "forge-integ-erp-netsuite",
+    "name": "Forge NetSuite ERP Integration Adapter",
+    "alias": "netsuite",
+    "version": "0.1.0",
+    "kind": "integration",
+    "function": "erp",
+    "language": "python",
+    "source_paths": [
+      "forge-modules/forge-integ-erp-netsuite/src/python/forge_integ_erp_netsuite"
+    ]
+  },
+  "hub_link": {
+    "protocol": "grpc",
+    "service": "forge.v1.AdapterService"
+  },
+  "transport": {
+    "process_control_writes": false,
+    "business_write_backs": false,
+    "data_classes": [
+      "raw",
+      "historical",
+      "status",
+      "config"
+    ]
+  },
+  "integration": {
+    "product": "NetSuite",
+    "supported_versions": [
+      "set at the installation"
+    ],
+    "interfaces": [
+      "amqp",
+      "graphql",
+      "rest"
+    ],
+    "direction": "read",
+    "site_owner": "set at the installation",
+    "credential": "netsuite-api"
+  },
+  "references": {
+    "facts": {
+      "path": "forge-modules/forge-integ-erp-netsuite/fxts/facts/forge-integ-erp-netsuite.facts.json",
+      "adapter_id": "forge-integ-erp-netsuite"
+    },
+    "manifest": "forge-modules/forge-integ-erp-netsuite/src/python/forge_integ_erp_netsuite/manifest.json"
+  },
+  "baseline": {
+    "M-1": "met",
+    "M-2": "met",
+    "M-3": "met",
+    "M-4": "met",
+    "M-5": "met",
+    "M-6": "met",
+    "M-7": "met",
+    "M-8": "met",
+    "M-9": "met",
+    "M-10": "waived",
+    "M-11": "met",
+    "M-12": "waived",
+    "M-13": "waived",
+    "M-14": "waived",
+    "M-15": "not_applicable",
+    "M-16": "not_applicable"
+  },
+  "waivers": [
+    {
+      "requirement": "M-10",
+      "reason": "No module ships a roles file yet: the roles file has no FxTS spec to be written against, and the hub still uses its own flat roles.",
+      "backlog_item": "FB-141"
+    },
+    {
+      "requirement": "M-12",
+      "reason": "The record id rule of the transport contract (T-5) is not built: records carry an id the adapter makes, and the hub does not yet keep each id once.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-13",
+      "reason": "Store and forward is not part of the module SDK yet (T-6): the module does not buffer what it cannot deliver.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-14",
+      "reason": "The goodbye and the last will of the transport contract (T-8) are not built: the hub learns of a shutdown only when calls stop.",
+      "backlog_item": "FB-164"
+    }
+  ],
+  "time_contract": {
+    "hub": {
+      "exchange": "four-timestamp",
+      "fail_closed": true
+    },
+    "plant_floor_devices": "none",
+    "databases": [
+      {
+        "name": "mod_erpi",
+        "owner": "hub",
+        "engine": "PostgreSQL",
+        "access": "read-write",
+        "credential": "forge-issued",
+        "written_time_source": "module-clock",
+        "fail_closed": true
+      }
+    ],
+    "third_party_systems": [
+      {
+        "name": "netsuite",
+        "interface": "amqp+rest+graphql",
+        "clock_read_method": "http-date-header",
+        "tolerance_class": "it-lan",
+        "clock_probe_interval_seconds": 30,
+        "offset_reported": true,
+        "fail_closed": true
+      }
+    ]
+  },
+  "user_interface": {
+    "ships_ui_code": false,
+    "screens": false
+  },
+  "scaffold": {
+    "template": "python-adapter"
+  },
+  "metadata": {
+    "hosting": "hub-hosted Python adapter today",
+    "state": "An integration module for one named product: it connects Forge to a NetSuite ERP (owner, 2026-11-18). Named forge-integ-<function>-<product> (A-17). It is the hand-written forerunner of what the integration builder will let an installation build (D-13).",
+    "time_contract_state": "Nothing reads the ERP's clock yet: the third-party entry is the contract the module is to be built to (FB-139). The hub database mod_erpi holds the ERP-side data; every time the module writes there comes from its own governed clock. M-4 to M-7 are run by the conformance kit through the Python transport, against a reference hub."
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": "64a390ca7097d2098f05f6697a8bfef0c705d76c4f4c22ec00fd16065521bdf3",
+    "change_history": [
+      {
+        "previous_hash": "64a390ca7097d2098f05f6697a8bfef0c705d76c4f4c22ec00fd16065521bdf3",
+        "new_hash": "ed6213c04ea01e1516b54690f4da1732853ecb1d0b7ec1a63fdcee73bbe4e40e",
+        "changed_at": "2026-11-23T19:24:59Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "every module has a folder of its own (D-17 step 5, FB-201): the paths of the module's code, its manifest and its sibling specs follow it; nothing else changed"
+      },
+      {
+        "previous_hash": "6db8a6af11d55b695b37492e79875c75bf7fa2933f689692ea6a14cacbed9294",
+        "new_hash": "64a390ca7097d2098f05f6697a8bfef0c705d76c4f4c22ec00fd16065521bdf3",
+        "changed_at": "2026-11-23T02:07:48Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "paths follow the move of forge-core to its own folder (D-17 step 3, FB-199); nothing else changed"
+      },
+      {
+        "previous_hash": "3b2e57b269a003b1533e9bbcaf0c7257eb36cd9c916e7f665fc0945a43de35a4",
+        "new_hash": "6db8a6af11d55b695b37492e79875c75bf7fa2933f689692ea6a14cacbed9294",
+        "changed_at": "2026-11-19T21:46:24Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-153: FMTS 2.0.0, the module's function and the data classes it carries (owner, 2026-11-19)"
+      }
+    ],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "ed6213c04ea01e1516b54690f4da1732853ecb1d0b7ec1a63fdcee73bbe4e40e",
+    "schema_version": "2.0.0",
+    "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-23T19:47:52Z"
+  }
+}

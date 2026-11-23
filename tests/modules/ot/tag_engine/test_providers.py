@@ -13,30 +13,30 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 import pytest_asyncio
 
-from forge.modules.ot.opcua_client.types import (
+from forge_ot.opcua_client.types import (
     ConnectionHealth,
     ConnectionState,
     DataType,
     DataValue,
     QualityCode,
 )
-from forge.modules.ot.tag_engine.engine import TagEngine
-from forge.modules.ot.tag_engine.models import (
+from forge_ot.tag_engine.engine import TagEngine
+from forge_ot.tag_engine.models import (
     EventTag,
     ExpressionTag,
     MemoryTag,
     StandardTag,
     VirtualTag,
 )
-from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
-from forge.modules.ot.tag_engine.providers.base import BaseProvider, ProviderState
-from forge.modules.ot.tag_engine.providers.event_provider import EventProvider
-from forge.modules.ot.tag_engine.providers.expression_provider import ExpressionProvider
-from forge.modules.ot.tag_engine.providers.memory_provider import MemoryProvider
-from forge.modules.ot.tag_engine.providers.opcua_provider import OpcUaProvider
-from forge.modules.ot.tag_engine.providers.query_provider import QueryProvider
-from forge.modules.ot.tag_engine.providers.virtual_provider import VirtualProvider
-from forge.modules.ot.tag_engine.registry import TagRegistry
+from forge_ot.tag_engine.providers.acquisition import AcquisitionEngine
+from forge_ot.tag_engine.providers.base import BaseProvider, ProviderState
+from forge_ot.tag_engine.providers.event_provider import EventProvider
+from forge_ot.tag_engine.providers.expression_provider import ExpressionProvider
+from forge_ot.tag_engine.providers.memory_provider import MemoryProvider
+from forge_ot.tag_engine.providers.opcua_provider import OpcUaProvider
+from forge_ot.tag_engine.providers.query_provider import QueryProvider
+from forge_ot.tag_engine.providers.virtual_provider import VirtualProvider
+from forge_ot.tag_engine.registry import TagRegistry
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -698,7 +698,7 @@ class TestQueryProvider:
 
     @pytest.mark.asyncio
     async def test_discovers_query_tags(self, registry):
-        from forge.modules.ot.tag_engine.models import QueryTag
+        from forge_ot.tag_engine.models import QueryTag
 
         qt = QueryTag(
             path="query/test",

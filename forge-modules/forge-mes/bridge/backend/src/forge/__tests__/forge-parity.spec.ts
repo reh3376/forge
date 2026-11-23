@@ -1,7 +1,7 @@
 /**
  * Guards the vendored copies against drift from the hub:
  *   - src/forge/proto/forge/v1/*.proto  == <repo>/forge-core/contract/proto/*.proto
- *   - src/forge/forge-mes.manifest.json == <repo>/src/forge/adapters/forge_mes/manifest.json
+ *   - src/forge/forge-mes.manifest.json == <repo>/forge-modules/forge-mes/src/python/forge_mes/manifest.json
  *
  * Skipped when the backend is built outside the forge monorepo (no hub tree).
  */
@@ -11,7 +11,15 @@ import { FORGE_MES_MANIFEST, toProtoManifest } from "../forge-manifest";
 import { ADAPTER_SERVICE_PROTO, PROTO_DIR, getAdapterService, loadForgeV1 } from "../proto";
 
 const REPO_ROOT = path.resolve(__dirname, "../../../../../../..");
-const HUB_ROOT = path.join(REPO_ROOT, "src", "forge");
+// The Python reference adapter of forge-mes, in the module's own folder (D-17, FB-201).
+const MODULE_PACKAGE = path.join(
+  REPO_ROOT,
+  "forge-modules",
+  "forge-mes",
+  "src",
+  "python",
+  "forge_mes"
+);
 // The proto files are part of forge-core's contract (D-17, FB-227).
 const CONTRACT_PROTO = path.join(REPO_ROOT, "forge-core", "contract", "proto");
 const hubPresent = fs.existsSync(path.join(CONTRACT_PROTO, "adapter_service.proto"));
@@ -32,7 +40,7 @@ describeIfHub("vendored hub contract parity", () => {
 
   it("forge-mes.manifest.json matches the hub adapter manifest", () => {
     const hub = JSON.parse(
-      fs.readFileSync(path.join(HUB_ROOT, "adapters", "forge_mes", "manifest.json"), "utf8")
+      fs.readFileSync(path.join(MODULE_PACKAGE, "manifest.json"), "utf8")
     );
     expect(FORGE_MES_MANIFEST).toEqual(hub);
   });

@@ -46,12 +46,30 @@ def covered(path: str, copied: list[str]) -> bool:
     return any(path == folder or path.startswith(folder + "/") for folder in copied)
 
 
-def test_the_manifest_lists_the_three_packages() -> None:
+def test_the_manifest_lists_forge_core_the_hub_and_every_module() -> None:
+    """One package root per layer, and one per module: its own folder (FB-201)."""
+    modules = sorted(
+        str(package.relative_to(REPO))
+        for package in (REPO / "forge-modules").glob("*/src/python/*")
+        if (package / "__init__.py").is_file()
+    )
+    assert len(modules) == 9
     assert package_roots() == [
-        "src/forge",
         "forge-core/src/python/forge_core",
         "forge-hub/src/python/forge_hub",
+        *modules,
     ]
+
+
+def test_the_interim_bridge_stays_out_of_the_image() -> None:
+    """``forge-modules`` is copied whole; the bridge under it is a NestJS and Next.js
+    application with its dependencies, and is kept out of the build context."""
+    assert "forge-modules/forge-mes/bridge/" in DOCKERIGNORE
+    assert DOCKERIGNORE.index("forge-modules/forge-mes/bridge/") > DOCKERIGNORE.index(
+        "!forge-modules/"
+    )
+    assert covered("forge-modules/forge-ot/fxts", copied_into_builder())
+    assert covered("forge-modules/forge-ot/fxts", copied_into_runtime())
 
 
 def test_every_package_is_copied_into_both_stages() -> None:

@@ -9,28 +9,28 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 import pytest
 from pydantic import ValidationError
 
-from forge.adapters.forge_historian.adapter import ForgeHistorianAdapter
-from forge.adapters.forge_historian.config import ForgeHistorianConfig
-from forge.adapters.forge_historian.context import (
+from forge_core.fxts import locations
+from forge_core.models.adapter import AdapterState, AdapterTier
+from forge_core.models.contextual_record import QualityCode
+from forge_historian.adapter import ForgeHistorianAdapter
+from forge_historian.config import ForgeHistorianConfig
+from forge_historian.context import (
     _quality_label,
     build_record_context,
 )
-from forge.adapters.forge_historian.record_builder import (
+from forge_historian.record_builder import (
     _assess_quality,
     _historian_tag_path,
     _normalize_value,
     _parse_timestamp,
     build_contextual_record,
 )
-from forge_core.fxts import FXTS_ROOT
-from forge_core.models.adapter import AdapterState, AdapterTier
-from forge_core.models.contextual_record import QualityCode
+from tests.samples import module_manifest_path
 
 # ── Fixtures ──────────────────────────────────────────────────────
 
@@ -138,14 +138,7 @@ class TestManifest:
         assert "Axum" in ForgeHistorianAdapter.manifest.metadata["source_framework"]
 
     def test_manifest_json_exists(self):
-        manifest_path = (
-            Path(__file__).parent.parent.parent.parent
-            / "src"
-            / "forge"
-            / "adapters"
-            / "forge_historian"
-            / "manifest.json"
-        )
+        manifest_path = module_manifest_path("forge-historian")
         assert manifest_path.exists()
 
 
@@ -570,7 +563,7 @@ class TestFACTSSpec:
 
     @pytest.fixture()
     def spec(self) -> dict[str, Any]:
-        spec_path = FXTS_ROOT / "facts" / "specs" / "forge-historian.facts.json"
+        spec_path = locations.spec_path("facts", "forge-historian.facts.json")
         return json.loads(spec_path.read_text())
 
     def test_spec_loads(self, spec):

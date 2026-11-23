@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from forge_core.fxts import FXTS_ROOT
+from forge_core.fxts import locations
 from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA
 from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
 from forge_core.fxts.shared.runner import (
@@ -17,7 +17,7 @@ from forge_core.fxts.shared.runner import (
 )
 
 PASS, FAIL = VerdictStatus.PASS, VerdictStatus.FAIL
-FACTS_SPEC = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
+FACTS_SPEC = locations.spec_path("facts", "forge-wms.facts.json")
 
 
 class BareRunner(FxTSRunner):

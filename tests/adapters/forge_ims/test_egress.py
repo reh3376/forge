@@ -1,6 +1,6 @@
 """Tests for the Forge IMS egress translation."""
 
-from forge.adapters.forge_ims.egress import (
+from forge_ims.egress import (
     ALLOWED_EGRESS_TAGS,
     ALLOWED_EGRESS_TYPES,
     INTELLIGENCE_TYPES,

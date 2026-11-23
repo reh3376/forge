@@ -89,7 +89,7 @@ class TestEveryInstallerReadsTheLock:
         assert f"{SYNC} --extra ot" in dockerfile  # then the project, same extras
         assert "uv pip install" not in dockerfile
         ignored = (ROOT / ".dockerignore").read_text(encoding="utf-8").splitlines()
-        assert ignored[2:7] == ["*", "!pyproject.toml", "!uv.lock", "!README.md", "!src/"]
+        assert ignored[2:7] == ["*", "!pyproject.toml", "!uv.lock", "!README.md", "!forge-core/"]
 
     def test_the_quick_start(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")

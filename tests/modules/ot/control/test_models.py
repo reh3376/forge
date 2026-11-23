@@ -11,7 +11,7 @@ Covers:
 
 import pytest
 
-from forge.modules.ot.control.models import (
+from forge_ot.control.models import (
     ConfirmationMode,
     DataType,
     InterlockCondition,

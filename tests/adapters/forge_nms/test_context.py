@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from forge.adapters.forge_nms.context import build_record_context
+from forge_nms.context import build_record_context
 
 
 class TestDeviceContext:

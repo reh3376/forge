@@ -136,7 +136,7 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 
 | # | Task | Details |
 |---|------|---------|
-| 1.1.1 | Create module structure | `src/forge/modules/ot/opcua_client/` with `__init__.py`, `client.py`, `types.py`, `security.py`, `exceptions.py` |
+| 1.1.1 | Create module structure | `forge-modules/forge-ot/src/python/forge_ot/opcua_client/` with `__init__.py`, `client.py`, `types.py`, `security.py`, `exceptions.py` |
 | 1.1.2 | Implement OPC-UA session management | Async context manager: `async with OpcUaClient(endpoint, security) as client:` |
 | 1.1.3 | Implement Browse service | `client.browse(node_id) → list[BrowseResult]` — recursive namespace discovery |
 | 1.1.4 | Implement Read service | `client.read(node_ids) → list[DataValue]` — single and batch reads |

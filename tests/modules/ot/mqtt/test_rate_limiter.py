@@ -2,7 +2,7 @@
 
 import time
 
-from forge.modules.ot.mqtt.rate_limiter import (
+from forge_ot.mqtt.rate_limiter import (
     MqttRateLimiter,
     RateLimiterConfig,
     TokenBucket,

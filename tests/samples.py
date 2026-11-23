@@ -8,7 +8,9 @@ as fixtures of the same names.
 from __future__ import annotations
 
 import datetime as _dt_mod
+import json
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from uuid import UUID, uuid4
 
 from forge_core.models.adapter import (
@@ -177,3 +179,23 @@ def make_record_batch(
             )
         )
     return records
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def module_package_dir(module: str) -> Path:
+    """The Python package folder of a module, in the standard structure (D-17 §10.3)."""
+    return REPO_ROOT / "forge-modules" / module / "src" / "python" / module.replace("-", "_")
+
+
+def module_manifest_path(module: str) -> Path:
+    return module_package_dir(module) / "manifest.json"
+
+
+def module_manifest(module: str) -> AdapterManifest:
+    """A real module's manifest. The hub's tests register with one until they have a sample
+    module of their own (BACKLOG FB-239)."""
+    return AdapterManifest.model_validate(
+        json.loads(module_manifest_path(module).read_text(encoding="utf-8"))
+    )

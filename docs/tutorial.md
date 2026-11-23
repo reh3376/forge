@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 171 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 172 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 171:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 172:
 
 **Working**
 
@@ -283,10 +283,10 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 171:
 
 | Measure | Value (2026-11-19) |
 |---|---|
-| Python: forge-core (`forge-core/src/python/forge_core`) | 118 files, ~26,500 lines |
+| Python: forge-core (`forge-core/src/python/forge_core`) | 116 files, ~26,600 lines |
 | Python: forge-hub (`forge-hub/src/python/forge_hub`) | 90 files, ~17,300 lines |
-| Python: the modules (`src/forge`) | 154 files, ~33,400 lines |
-| Python tests | 281 files, 5,165 collected, full suite green on the locked dependency set |
+| Python: the modules (nine packages under `forge-modules`) | 144 files, ~31,400 lines |
+| Python tests | 281 files, 5,173 collected, full suite green on the locked dependency set |
 | Go (`forge-core/src/go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`forge-modules/forge-mes/bridge`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -354,10 +354,10 @@ note:
 | `forge-hub/src/python/forge_hub/context` · `registry` · `curation` | Context Engine, Schema Registry, curation (normalization, data products, pipeline, lineage, quality) |
 | `forge-core/src/python/forge_core/fxts` | FxTS: one directory per built framework (`facts`, `fats`, `fmts`, `ftts`, `fvts`), each with `schema/`, `runners/`, `specs/`; `shared/` is the runner every framework is built on; `fhts/` is the hash framework; `fmts/conformance.py` is the conformance kit |
 | `forge-hub/src/python/forge_hub/gateway` · `api` · `observer` · `cli` | auth and RBAC middleware, the hub FastAPI app, health, the `forge` CLI |
-| `src/forge/modules/ot` | forge-ot: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
+| `forge-modules/forge-ot/src/python/forge_ot` | forge-ot: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
 | `forge-core/src/python/forge_core/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
 | `forge-core/src/python/forge_core` | **forge-core**, the shared foundation, its own package `forge_core` since 2026-11-22 (D-17): the models and the clock, `fxts` (the frameworks), `sdk`, `adapter` (the base class and the generic adapters), `link` (a module's end of the link to a hub), `proto_gen`. Its language-neutral part is `forge-core/contract`: the proto files, every framework's schema with its released versions, and the governed lists (`forge_core.contract` says where it is; a built package and the image carry it). It imports nothing of the hub or of a module, and a test holds that (`tests/test_layer_imports.py`). The hub is its own package too, `forge_hub` in `forge-hub/src/python`; the modules are still in `src/forge` |
-| `src/forge/adapters` | the Python adapters of eight modules (`forge_wms`, `forge_mes`, `forge_cmms`, `forge_nms`, `forge_ims`, `forge_historian`, `forge_scanner`, `forge_integ_erp_netsuite`), each with its manifest and config, and four empty generic packages (FB-148) |
+| `forge-modules/forge-<name>` | one folder per module: its Python package in `src/python/forge_<name>` (with its manifest and config) and its specs in `fxts/<framework>`. Eight adapters (`forge-wms`, `forge-mes`, `forge-cmms`, `forge-nms`, `forge-ims`, `forge-historian`, `forge-scanner`, `forge-integ-erp-netsuite`) and forge-ot; `forge-display` holds the widget specs; `forge-mes/bridge` is the interim MES bridge |
 | `forge-core/src/go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `forge-modules/forge-mes/bridge` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
 | `tests/` | The modules' tests and the tests that span layers; `tests/governance/` holds the framework gates that use the hub or a module's spec. forge-core's own tests are in `forge-core/tests` and the hub's in `forge-hub/tests` |
@@ -1007,15 +1007,15 @@ note:
 forge-ot is the most mature module: the one that talks to PLCs and OPC UA servers. Its module id is `forge-ot` everywhere since 2026-11-18 (it had carried three different ids). This section covers the tag engine, ISA-18.2 alarming, the control-write defense chain, the MES changeover, the scripting SDK, the Ignition bridge, the one-clock principle, and the three-layer process control framework the owner decided on 2026-11-13 (D-11).
 
 note:
-- Source: `docs/VISION.md` P-4 and P-6, `docs/WHERE-WE-ARE.md` §3.5, `README.md` "OT Module", `src/forge/modules/ot`, `docs/PRINCIPLES.md` §2 (one clock), `docs/decisions/process-control-framework.md` (D-11).
+- Source: `docs/VISION.md` P-4 and P-6, `docs/WHERE-WE-ARE.md` §3.5, `README.md` "OT Module", `forge-modules/forge-ot/src/python/forge_ot`, `docs/PRINCIPLES.md` §2 (one clock), `docs/decisions/process-control-framework.md` (D-11).
 
 ---
 
 ## What It Is
 
 - A **thin, open wrapper over OPC-UA**: asyncua owns the wire protocol (pinned `==2.1.0`, FB-085); Forge owns tags, alarms, writes, scripting and history.
-- Hosted **inside the hub** with PLC connections, supervision and liveness (`forge.modules.ot.host`, FB-069, FB-070).
-- It is held to the module requirements like any module: its FMTS spec is approved, and the conformance kit drives it on a real tag registry through `src/forge/modules/ot/conformance.py`.
+- Hosted **inside the hub** with PLC connections, supervision and liveness (`forge_ot.host`, FB-069, FB-070).
+- It is held to the module requirements like any module: its FMTS spec is approved, and the conformance kit drives it on a real tag registry through `forge-modules/forge-ot/src/python/forge_ot/conformance.py`.
 - Replaces the vendor SCADA/HMI layer (Ignition) problem by problem: tag engine, alarming, scripting SDK, i3X-shaped REST, MQTT; where a site keeps its vendor product, the **Ignition bridge** runs a read-only parallel validation.
 - HMI/SCADA itself is an optional module activated per site (decision A-4); forge-display renders the surfaces (A-3).
 
@@ -1134,7 +1134,7 @@ note:
 - The migration map covers all 52 `system.*` calls; 42 Tier 1 scripts are identified for conversion (`docs/p7-forge-ot/`).
 
 note:
-- The SDK lives in `forge-core/src/python/forge_core/sdk/scripting`; the OT module's user scripts in `src/forge/modules/ot/scripts`.
+- The SDK lives in `forge-core/src/python/forge_core/sdk/scripting`; the OT module's user scripts in `forge-modules/forge-ot/src/python/forge_ot/scripts`.
 
 ---
 
@@ -1364,7 +1364,7 @@ flowchart LR
 
 - `forge module init` generates this layout (`forge-core/src/python/forge_core/sdk/module_builder`); `forge-core/docs/module-builder.md` is the from-first-principles guide.
 - FMTS requirement M-11 checks the layout. The conformance kit finds the one `AdapterBase` subclass in `adapter.py` and drives it; a Python module off the template (forge-ot) supplies a small `conformance.py` hook beside its adapter.
-- Read `src/forge/adapters/forge_wms` as the reference: adapter, config, context, record builder, entity mappers.
+- Read `forge-modules/forge-wms/src/python/forge_wms` as the reference: adapter, config, context, record builder, entity mappers.
 
 note:
 - Honest: the template is Python and backend-only (FB-017), duplicate SDK copies drift (FB-019), and the scaffold does not yet generate a module's FMTS spec (FB-140). The Go template is the real target.
@@ -2006,7 +2006,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest -q -rsx                          # 5,165 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
+uv run pytest -q -rsx                          # 5,173 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2147,7 +2147,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/`, `forge-core/tests` and `forge-hub/tests`: 281 files, 5,165 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/`, `forge-core/tests` and `forge-hub/tests`: 281 files, 5,173 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -2624,7 +2624,7 @@ stateDiagram-v2
 - How alarms look (colours, sounds, priority) is the screen layer's job from a declared contract, the same on every screen.
 
 note:
-- `src/forge/modules/ot/alarming`; presentation follows ISA-101 in forge-display when it exists.
+- `forge-modules/forge-ot/src/python/forge_ot/alarming`; presentation follows ISA-101 in forge-display when it exists.
 
 ---
 

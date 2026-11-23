@@ -16,7 +16,6 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from forge.modules.ot.adapter import OTModuleAdapter
 from forge_core.fxts.facts import SCHEMA_PATH
 from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
 from forge_core.fxts.shared.runner import (
@@ -26,12 +25,13 @@ from forge_core.fxts.shared.runner import (
     verify_spec_integrity,
 )
 from forge_hub.ingest.facts_check import check_manifest_against_facts
+from forge_ot.adapter import OTModuleAdapter
+from tests.samples import module_package_dir
 
 SPEC_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "forge-core/src/python/forge_core/fxts/facts/specs/forge-ot.facts.json"
+    Path(__file__).resolve().parents[3] / "forge-modules/forge-ot/fxts/facts/forge-ot.facts.json"
 )
-MODULE_DIR = Path(__file__).resolve().parents[3] / "src" / "forge" / "modules" / "ot"
+MODULE_DIR = module_package_dir("forge-ot")
 FHTS_STATES = frozenset({"approved", "modified", "pending_review", "reverted", "unknown"})
 
 #: Checks the OT spec is allowed to fail. Empty since FACTS 0.2.0 (FB-079): the spec speaks

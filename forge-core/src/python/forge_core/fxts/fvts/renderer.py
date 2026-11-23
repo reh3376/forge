@@ -47,7 +47,7 @@ from forge_core.fxts.fvts.profiles import (
 QUALITY_CODES = frozenset({"GOOD", "UNCERTAIN", "BAD", "NOT_AVAILABLE"})
 BAD_QUALITIES = frozenset({"BAD", "NOT_AVAILABLE"})
 NUMERIC_TYPES = frozenset({"INT", "FLOAT", "DOUBLE"})
-# Mirrors $defs.writeStatus (and forge.modules.ot.control.models.WriteStatus, see fvts:enum-parity).
+# Mirrors $defs.writeStatus (and forge_ot.control.models.WriteStatus, see fvts:enum-parity).
 WRITE_STATUSES = frozenset(
     {
         "CONFIRMED",

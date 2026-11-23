@@ -4,9 +4,9 @@ import asyncio
 
 import pytest_asyncio
 
-from forge.modules.ot.opcua_client.types import QualityCode
-from forge.modules.ot.tag_engine.engine import TagEngine, _quality_rank
-from forge.modules.ot.tag_engine.models import (
+from forge_ot.opcua_client.types import QualityCode
+from forge_ot.tag_engine.engine import TagEngine, _quality_rank
+from forge_ot.tag_engine.models import (
     ComputedTag,
     DerivedSource,
     DerivedTag,
@@ -15,7 +15,7 @@ from forge.modules.ot.tag_engine.models import (
     ReferenceTag,
     StandardTag,
 )
-from forge.modules.ot.tag_engine.registry import TagRegistry
+from forge_ot.tag_engine.registry import TagRegistry
 
 
 @pytest_asyncio.fixture
