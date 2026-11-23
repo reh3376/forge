@@ -54,6 +54,8 @@ So a hub that is cut off does not wait for permission to keep its plant running,
 | The foundation: the SDK (module builder, scripting) | built | [`src/python/forge_core/sdk`](src/python/forge_core/sdk) |
 | The foundation: the adapter base class and the generic adapters; a module's end of the link to a hub | built | [`src/python/forge_core/adapter`](src/python/forge_core/adapter), [`src/python/forge_core/link`](src/python/forge_core/link) |
 | The foundation in Go (models, generated bindings, the module scaffold) | built | [`src/go`](src/go) |
+| The index of forge-core's governed files, generated | built | [`fxts/README.md`](fxts/README.md), by `forge governance index` |
+| The foundation's documents: a page per framework, the FACTS developer guide, the module builder guide | built | [`docs/`](docs) |
 | The foundation's own tests | built | [`tests/`](tests); some framework tests are still under [`../tests/governance`](../tests/governance) |
 | **The manager** | **not built** | no inventory, no deployment-wide state, no distribution of changes, no behavioral contract, no review of interim decisions |
 

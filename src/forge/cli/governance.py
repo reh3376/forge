@@ -614,6 +614,24 @@ def schema_diff(
     )
 
 
+def index_command(
+    check: Annotated[
+        bool, typer.Option("--check", help="Exit 1 when the page is stale; write nothing")
+    ] = False,
+) -> None:
+    """Rewrite forge-core's index of its governed files from the files themselves."""
+    from forge_core.fxts import index
+
+    path = index.INDEX_PATH.relative_to(REPO_ROOT)
+    if check:
+        if not index.is_current():
+            typer.echo(f"{path} is stale: run `forge governance index`")
+            raise typer.Exit(code=1)
+        typer.echo(f"{path}: current")
+        return
+    typer.echo(f"{path}: {'written' if index.write() else 'current'}")
+
+
 def schema_release(
     framework: Annotated[str, typer.Argument(help="fats | facts | fvts | ftts | fmts | futs")],
     summary: Annotated[str, typer.Option("--summary", help="What changed and why (FB-nnn: ...)")],
