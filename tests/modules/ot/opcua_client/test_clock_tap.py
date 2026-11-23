@@ -18,7 +18,7 @@ from forge.modules.ot.opcua_client.clock_tap import (
 )
 
 if TYPE_CHECKING:
-    from forge.core.clock import ClockSample
+    from forge_core.clock import ClockSample
 
 T1 = datetime(2026, 6, 1, 12, 0, 0, tzinfo=UTC)
 T3 = T1 + timedelta(seconds=2, milliseconds=5)

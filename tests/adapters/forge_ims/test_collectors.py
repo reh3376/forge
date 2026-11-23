@@ -14,7 +14,7 @@ from forge.adapters.forge_ims.collectors import (
 )
 
 if TYPE_CHECKING:
-    from forge.core.clock import SourceStampMissingError
+    from forge_core.clock import SourceStampMissingError
 
 _ADAPTER_ID = "forge-ims"
 _ADAPTER_VERSION = "0.1.0"

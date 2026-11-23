@@ -140,7 +140,7 @@ class TestSchemaIdGrammar:
     """A registry entry is keyed by a schema id, never by a versioned ref (FB-008)."""
 
     def test_rejects_a_versioned_or_entity_less_id(self):
-        from forge.core.schema_ref import SchemaRefError
+        from forge_core.schema_ref import SchemaRefError
 
         bad_ids = (
             "forge://schemas/forge-wms/Barrel/v1",

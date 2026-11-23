@@ -2,7 +2,7 @@
 
 import struct
 
-from forge.core.broker.protocol import (
+from forge_core.broker.protocol import (
     ConnectReturnCode,
     PacketType,
     decode_connect,

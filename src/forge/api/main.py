@@ -44,10 +44,6 @@ from forge.api.health import (
 )
 from forge.api.registry import AdapterRegistry
 from forge.context.service import build_context_router
-from forge.core import telemetry
-from forge.core.models.adapter import (
-    AdapterManifest,  # noqa: TC001 — FastAPI resolves these at runtime
-)
 from forge.curation.engine import CurationEngine
 from forge.curation.lineage import LineageTracker
 from forge.curation.registry import DataProductRegistry
@@ -60,12 +56,16 @@ from forge.storage.adapter_registry import AdapterRegistryStore  # noqa: TC001
 from forge.storage.config import StorageConfig
 from forge.storage.factory import StorageFactory  # noqa: TC001
 from forge.transport.grpc_server import ServerTls
-from forge.transport.spoke_callback import WriteDispatcher, WriteDispatchError
-from forge.transport.spoke_client import ChannelTls
 from forge.transport.spoke_pull import (
     SubscriptionManager,
     backfill_into_pipeline,
     collect_into_pipeline,
+)
+from forge_core import telemetry
+from forge_core.link.spoke_callback import WriteDispatcher, WriteDispatchError
+from forge_core.link.spoke_client import ChannelTls
+from forge_core.models.adapter import (
+    AdapterManifest,  # noqa: TC001 — FastAPI resolves these at runtime
 )
 
 if TYPE_CHECKING:

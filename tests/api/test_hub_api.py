@@ -23,14 +23,14 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from forge.api.main import _AdapterRegistry, create_app
-from forge.core.models.adapter import (
+from forge.storage.config import StorageConfig
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
     AdapterState,
     DataContract,
     TimeGovernance,
 )
-from forge.storage.config import StorageConfig
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -325,7 +325,7 @@ class TestCurationOnIngest:
 # Context Engine and Schema Registry served by the hub (FB-001)
 # ---------------------------------------------------------------------------
 
-FATS_SPECS = sorted(Path("src/forge/governance/fats/specs").glob("*.json"))
+FATS_SPECS = sorted(Path("forge-core/src/python/forge_core/fxts/fats/specs").glob("*.json"))
 
 
 def _served(app) -> set[tuple[str, str]]:

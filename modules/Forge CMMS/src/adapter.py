@@ -22,12 +22,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from forge.adapters.base.interface import (
-    AdapterBase,
-    BackfillProvider,
-    DiscoveryProvider,
-    SubscriptionProvider,
-)
 from forge.adapters.forge_cmms.config import ForgeCmmsConfig
 from forge.adapters.forge_cmms.context import build_record_context
 from forge.adapters.forge_cmms.record_builder import build_contextual_record
@@ -35,7 +29,13 @@ from forge.adapters.forge_cmms.topics import (
     CMMS_GRAPHQL_ENTITIES,
     CMMS_RABBITMQ_TOPICS,
 )
-from forge.core.models.adapter import (
+from forge_core.adapter.interface import (
+    AdapterBase,
+    BackfillProvider,
+    DiscoveryProvider,
+    SubscriptionProvider,
+)
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
     AdapterManifest,
@@ -48,7 +48,7 @@ from forge.core.models.adapter import (
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-    from forge.core.models.contextual_record import ContextualRecord
+    from forge_core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 

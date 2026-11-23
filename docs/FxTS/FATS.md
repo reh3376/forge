@@ -26,11 +26,11 @@ FATS governs API contracts. When a FATS spec declares an endpoint, that endpoint
 
 ## Specs
 
-**Location:** `src/forge/governance/fats/specs/` — 28 specs, one per route the hub app serves on its own (platform, Context Engine under `/v1/context`, Schema Registry under `/v1/schemas`). `tests/api/test_hub_api.py` holds the inventory in both directions: every spec's endpoint is served by the hub, and every served Context Engine and Schema Registry route has a spec (FB-001, 2026-10-22).
+**Location:** `forge-core/src/python/forge_core/fxts/fats/specs/` — 28 specs, one per route the hub app serves on its own (platform, Context Engine under `/v1/context`, Schema Registry under `/v1/schemas`). `tests/api/test_hub_api.py` holds the inventory in both directions: every spec's endpoint is served by the hub, and every served Context Engine and Schema Registry route has a spec (FB-001, 2026-10-22).
 
 ## Schema
 
-**Location:** `src/forge/governance/fats/schema/fats.schema.json`
+**Location:** `forge-core/src/python/forge_core/fxts/fats/schema/fats.schema.json`
 
 Top-level fields:
 
@@ -46,7 +46,7 @@ Top-level fields:
 
 ## Runner
 
-**Location:** `src/forge/governance/fats/runners/fats_runner.py`
+**Location:** `forge-core/src/python/forge_core/fxts/fats/runners/fats_runner.py`
 **Class:** `FATSRunner(FxTSRunner)`
 **Version:** 0.1.0
 
@@ -84,7 +84,7 @@ forge governance run fats --spec path/to/spec.fats.json --live --base-url http:/
 ### Programmatic Usage
 
 ```python
-from forge.governance.fats.runners.fats_runner import FATSRunner
+from forge_core.fxts.fats.runners.fats_runner import FATSRunner
 
 runner = FATSRunner(
     schema_path="governance/fats/schema/fats.schema.json",

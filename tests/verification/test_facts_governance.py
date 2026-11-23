@@ -11,17 +11,21 @@ data contract, context mapping, error handling, metadata, integrity.
 from __future__ import annotations
 
 import json
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
-from forge.governance.facts.runners.facts_runner import FACTSRunner
-from forge.governance.shared.runner import (
+from forge_core.fxts import FXTS_ROOT
+from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
+from forge_core.fxts.shared.runner import (
     VerdictStatus,
     compute_spec_hash,
     verify_spec_hash,
     verify_spec_integrity,
 )
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. Spec Loading & Structure
@@ -67,9 +71,7 @@ class TestSpecLoading:
 
     def test_all_specs_loadable(self):
         """Every FACTS spec file in the specs dir should be valid JSON."""
-        specs_dir = (
-            Path(__file__).resolve().parents[2] / "src" / "forge" / "governance" / "facts" / "specs"
-        )
+        specs_dir = FXTS_ROOT / "facts" / "specs"
         for spec_path in specs_dir.glob("*.facts.json"):
             data = json.loads(spec_path.read_text())
             assert "adapter_identity" in data, f"{spec_path.name} missing identity"
@@ -154,9 +156,7 @@ class TestFACTSRunnerValidation:
     @pytest.mark.asyncio()
     async def test_every_production_spec_passes(self, runner: FACTSRunner):
         """All existing FACTS specs should pass static validation."""
-        specs_dir = (
-            Path(__file__).resolve().parents[2] / "src" / "forge" / "governance" / "facts" / "specs"
-        )
+        specs_dir = FXTS_ROOT / "facts" / "specs"
         for spec_path in specs_dir.glob("*.facts.json"):
             spec = json.loads(spec_path.read_text())
             adapter_id = spec.get("adapter_identity", {}).get("adapter_id", spec_path.stem)
@@ -246,9 +246,7 @@ class TestCrossSpecConsistency:
 
     def test_all_specs_have_unique_adapter_ids(self):
         """No two specs should declare the same adapter_id."""
-        specs_dir = (
-            Path(__file__).resolve().parents[2] / "src" / "forge" / "governance" / "facts" / "specs"
-        )
+        specs_dir = FXTS_ROOT / "facts" / "specs"
         ids = []
         for spec_path in specs_dir.glob("*.facts.json"):
             spec = json.loads(spec_path.read_text())
@@ -257,9 +255,7 @@ class TestCrossSpecConsistency:
 
     def test_all_specs_have_same_spec_version(self):
         """All specs should use the same FACTS spec version."""
-        specs_dir = (
-            Path(__file__).resolve().parents[2] / "src" / "forge" / "governance" / "facts" / "specs"
-        )
+        specs_dir = FXTS_ROOT / "facts" / "specs"
         versions = set()
         for spec_path in specs_dir.glob("*.facts.json"):
             spec = json.loads(spec_path.read_text())
@@ -268,9 +264,7 @@ class TestCrossSpecConsistency:
 
     def test_all_specs_have_integrity_blocks(self):
         """Every spec must include an integrity block."""
-        specs_dir = (
-            Path(__file__).resolve().parents[2] / "src" / "forge" / "governance" / "facts" / "specs"
-        )
+        specs_dir = FXTS_ROOT / "facts" / "specs"
         for spec_path in specs_dir.glob("*.facts.json"):
             spec = json.loads(spec_path.read_text())
             assert "integrity" in spec, f"{spec_path.name} missing integrity block"

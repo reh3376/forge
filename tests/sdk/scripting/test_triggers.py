@@ -5,7 +5,7 @@ from types import ModuleType
 
 import pytest
 
-from forge.sdk.scripting.triggers import (
+from forge_core.sdk.scripting.triggers import (
     _HANDLER_ATTR,
     AlarmEvent,
     LifecycleEvent,

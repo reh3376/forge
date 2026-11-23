@@ -4,21 +4,21 @@ from __future__ import annotations
 
 import pytest
 
-from forge.core.models.data_product import DataProductStatus, QualitySLO
 from forge.curation.registry import (
     DataProductField,
     DataProductRegistry,
     InMemoryProductStore,
 )
+from forge_core.models.data_product import DataProductStatus, QualitySLO
 
-# Schema references in the one grammar (forge.core.schema_ref, FB-008).
+# Schema references in the one grammar (forge_core.schema_ref, FB-008).
 _PRODUCT_REF = "forge://schemas/curation/Product/v1"
 _SPOKE_REF = "forge://schemas/test"
 
 
 class TestInMemoryProductStore:
     def test_save_and_get(self) -> None:
-        from forge.core.models.data_product import DataProduct, DataProductSchema
+        from forge_core.models.data_product import DataProduct, DataProductSchema
 
         store = InMemoryProductStore()
         product = DataProduct(
@@ -33,7 +33,7 @@ class TestInMemoryProductStore:
         assert store.get("dp-test").name == "Test"
 
     def test_list_all(self) -> None:
-        from forge.core.models.data_product import DataProduct, DataProductSchema
+        from forge_core.models.data_product import DataProduct, DataProductSchema
 
         store = InMemoryProductStore()
         for i in range(3):
@@ -49,7 +49,7 @@ class TestInMemoryProductStore:
         assert len(store.list_all()) == 3
 
     def test_list_by_status(self) -> None:
-        from forge.core.models.data_product import DataProduct, DataProductSchema
+        from forge_core.models.data_product import DataProduct, DataProductSchema
 
         store = InMemoryProductStore()
         store.save(
@@ -76,7 +76,7 @@ class TestInMemoryProductStore:
         assert len(store.list_all(DataProductStatus.PUBLISHED)) == 1
 
     def test_delete(self) -> None:
-        from forge.core.models.data_product import DataProduct, DataProductSchema
+        from forge_core.models.data_product import DataProduct, DataProductSchema
 
         store = InMemoryProductStore()
         store.save(

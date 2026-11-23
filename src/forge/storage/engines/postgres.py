@@ -19,16 +19,16 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
-from forge.core.models.data_product import (
+from forge.curation.lineage import LineageEntry, LineageStore, TransformationStep
+from forge.curation.registry import ProductStore
+from forge.storage.access import PersistentAccessController, PostgresPermissionStore
+from forge_core.models.data_product import (
     CurationSpec,
     DataProduct,
     DataProductSchema,
     DataProductStatus,
     QualitySLO,
 )
-from forge.curation.lineage import LineageEntry, LineageStore, TransformationStep
-from forge.curation.registry import ProductStore
-from forge.storage.access import PersistentAccessController, PostgresPermissionStore
 
 logger = logging.getLogger(__name__)
 

@@ -26,7 +26,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from forge.transport.spoke_callback import WriteDispatcher, WriteOutcome
+    from forge_core.link.spoke_callback import WriteDispatcher, WriteOutcome
 
 CHANGEOVER_AREAS = ("cooker", "fermentation", "barreling")
 CHANGEOVER_COMMANDS = (

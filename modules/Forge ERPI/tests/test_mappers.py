@@ -34,7 +34,7 @@ from forge.adapters.forge_integ_erp_netsuite.mappers.production import (
     map_production_order_unit_procedure,
     map_unit_procedure,
 )
-from forge.core.models.manufacturing.enums import EntityType
+from forge_core.models.manufacturing.enums import EntityType
 
 # ── Business Entity Mappers ────────────────────────────────────
 

@@ -28,8 +28,6 @@ import logging
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from forge.core.broker.broker import BrokerConfig, ForgeMqttBroker
-from forge.core.clock import ClockRefusedError
 from forge.modules.ot.control.audit import (
     ContextualRecordAuditSink,
     LogAuditSink,
@@ -52,15 +50,17 @@ from forge.modules.ot.mqtt.publisher import MqttConfig, OTMqttPublisher
 from forge.modules.ot.mqtt.subscriber import MqttSubscriber
 from forge.modules.ot.opcua_client.types import QualityCode
 from forge.modules.ot.tag_engine.models import MemoryTag, StandardTag
+from forge_core.broker.broker import BrokerConfig, ForgeMqttBroker
+from forge_core.clock import ClockRefusedError
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Mapping
     from datetime import datetime
 
-    from forge.core.clock import ClockGateTransition
-    from forge.core.models.adapter import TimeGovernance
     from forge.modules.ot.control.config import OTControlConfig
     from forge.modules.ot.tag_engine.registry import TagRegistry
+    from forge_core.clock import ClockGateTransition
+    from forge_core.models.adapter import TimeGovernance
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ class RegistryTagIO:
             for its clock, or None (``PlcConnectionManager.clock_refusal_cause``). A
             refused connection is neither read nor written (FB-093): its last value
             is stale and its clock cannot be trusted, so both raise
-            :class:`~forge.core.clock.ClockRefusedError` with the cause.
+            :class:`~forge_core.clock.ClockRefusedError` with the cause.
     """
 
     def __init__(

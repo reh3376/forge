@@ -1,0 +1,254 @@
+{
+  "spec_version": "0.2.0",
+  "view_identity": {
+    "view_id": "forge-core-views",
+    "name": "Forge hub — configuration and administration",
+    "version": "0.1.0",
+    "owner_module": "forge-core",
+    "description": "The hub's own screens, the first thing forge-display renders (D-16, Q-15): status and health, modules, governance, users and roles. The hub is not a module and has no FACTS spec; it describes its screens here like any module."
+  },
+  "scope": {
+    "isa95_levels": [
+      "enterprise",
+      "site",
+      "area"
+    ],
+    "required_context_fields": [
+      "site"
+    ],
+    "multi_site": false
+  },
+  "data_bindings": {
+    "points": [],
+    "objects": [
+      {
+        "object_id": "hub.component",
+        "object_label": "Hub component",
+        "schema_ref": "forge://schemas/forge-core/HealthComponent/v1",
+        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/HealthComponent.v1.schema.json",
+        "schema_hash": "a70324992b6ff9d30d02c597a002488d54dcad5560c94af244480de106bfb171",
+        "key_field": "name",
+        "delivery": "push"
+      },
+      {
+        "object_id": "hub.module",
+        "object_label": "Module",
+        "schema_ref": "forge://schemas/forge-core/Module/v1",
+        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/Module.v1.schema.json",
+        "schema_hash": "5467f211177d52254662b15554f0256279fc632452fac8a6c110f5f252c975fa",
+        "key_field": "module_id",
+        "delivery": "push"
+      },
+      {
+        "object_id": "hub.governed_file",
+        "object_label": "Spec or governed list",
+        "schema_ref": "forge://schemas/forge-core/GovernedFile/v1",
+        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/GovernedFile.v1.schema.json",
+        "schema_hash": "82ed48af9ec9047f87e63fe2ed024befcebc71c0c263316d24ec60c69de32d45",
+        "key_field": "file",
+        "delivery": "request"
+      },
+      {
+        "object_id": "hub.schema_version",
+        "object_label": "Schema version",
+        "schema_ref": "forge://schemas/forge-core/SchemaVersion/v1",
+        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/SchemaVersion.v1.schema.json",
+        "schema_hash": "4394e5b2617cfcb52dd8cbcbcdaffb098db54b3871d426d7fb0876bc8ec5c667",
+        "key_field": "id",
+        "delivery": "request"
+      },
+      {
+        "object_id": "hub.user",
+        "object_label": "User",
+        "schema_ref": "forge://schemas/forge-core/User/v1",
+        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/User.v1.schema.json",
+        "schema_hash": "1356e63d5a47df1bab9f7b3bafa0fc4cdf4f2b29436587bcc6a2ede3e1b98e83",
+        "key_field": "user_id",
+        "delivery": "request"
+      },
+      {
+        "object_id": "hub.role",
+        "object_label": "Role",
+        "schema_ref": "forge://schemas/forge-core/Role/v1",
+        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/Role.v1.schema.json",
+        "schema_hash": "97c941ca2cbd78c83520f68e22c0af5221a20fd605428d4157b17d61f2d1a9cf",
+        "key_field": "role_id",
+        "delivery": "request"
+      },
+      {
+        "object_id": "hub.assignment",
+        "object_label": "Role assignment",
+        "schema_ref": "forge://schemas/forge-core/RoleAssignment/v1",
+        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/RoleAssignment.v1.schema.json",
+        "schema_hash": "e3d0aabcbc5ad9d754b2a4f01245eb35ccb83973765a8197cfbb67cf73346e72",
+        "key_field": "assignment_id",
+        "delivery": "request"
+      }
+    ]
+  },
+  "live_updates": {
+    "transport": "grpc_stream",
+    "max_update_rate_hz": 1,
+    "coalescing": "latest_wins",
+    "heartbeat_ms": 5000,
+    "on_disconnect": "mark_all_stale",
+    "reconnect": {
+      "initial_backoff_ms": 500,
+      "max_backoff_ms": 15000
+    }
+  },
+  "history": {
+    "enabled": false
+  },
+  "alarms": {
+    "enabled": false
+  },
+  "actions": [
+    {
+      "action_id": "governance.run_checks",
+      "label": "Run a spec's checks",
+      "kind": "module_command",
+      "command": "governance.run",
+      "target_object": "hub.governed_file",
+      "required_role": "VIEWER",
+      "confirmation": "none",
+      "timeout_ms": 60000,
+      "audit": true,
+      "allowed_profiles": [
+        "desktop_hmi",
+        "desktop_app",
+        "web",
+        "mobile"
+      ]
+    }
+  ],
+  "settings": {
+    "exposed": false
+  },
+  "render_profiles": {
+    "supported": [
+      "desktop_hmi",
+      "desktop_app",
+      "web",
+      "mobile"
+    ],
+    "overrides": {}
+  },
+  "surfaces": [
+    {
+      "surface_id": "hub.status",
+      "title": "Status and health",
+      "kind": "app_view",
+      "authoring": "configured",
+      "scope_level": "site",
+      "allowed_profiles": [
+        "desktop_hmi",
+        "desktop_app",
+        "web",
+        "mobile"
+      ],
+      "points": [],
+      "objects": [
+        "hub.component"
+      ],
+      "actions": []
+    },
+    {
+      "surface_id": "hub.modules",
+      "title": "Modules",
+      "kind": "app_view",
+      "authoring": "configured",
+      "scope_level": "site",
+      "allowed_profiles": [
+        "desktop_hmi",
+        "desktop_app",
+        "web",
+        "mobile"
+      ],
+      "points": [],
+      "objects": [
+        "hub.module"
+      ],
+      "actions": []
+    },
+    {
+      "surface_id": "hub.governance",
+      "title": "Governance",
+      "kind": "app_view",
+      "authoring": "configured",
+      "scope_level": "site",
+      "allowed_profiles": [
+        "desktop_hmi",
+        "desktop_app",
+        "web",
+        "mobile"
+      ],
+      "points": [],
+      "objects": [
+        "hub.governed_file",
+        "hub.schema_version"
+      ],
+      "actions": [
+        "governance.run_checks"
+      ]
+    },
+    {
+      "surface_id": "hub.access",
+      "title": "Users and roles",
+      "kind": "app_view",
+      "authoring": "configured",
+      "scope_level": "site",
+      "allowed_profiles": [
+        "desktop_hmi",
+        "desktop_app",
+        "web",
+        "mobile"
+      ],
+      "points": [],
+      "objects": [
+        "hub.user",
+        "hub.role",
+        "hub.assignment"
+      ],
+      "actions": []
+    }
+  ],
+  "design_system": {
+    "tokens_ref": "forge://design/tokens/v1",
+    "isa101_high_performance": false
+  },
+  "conformance_tests": {
+    "suite_path": "tests/governance/fvts/test_hub_views.py",
+    "golden_messages_path": "tests/governance/fvts/golden/forge-core/",
+    "renderers_under_test": [
+      "desktop_app",
+      "web",
+      "mobile"
+    ]
+  },
+  "metadata": {
+    "status": "draft",
+    "notes": "Read-only except for running a spec's checks. Approving a spec stays a command-line action until roles are enforced; assigning a role comes with the role model (FB-075), and the users-and-roles objects follow docs/decisions/roles.md. What the hub serves for each object today: components and modules from its health and registry; governed files and schema versions from the governance commands (no served route yet); users, roles and assignments from nothing until FB-075."
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": "aa68b466c210c0ba758e9d29fccf7f2673c0071af0e7efa5b1be855a8eca437f",
+    "change_history": [
+      {
+        "previous_hash": "aa68b466c210c0ba758e9d29fccf7f2673c0071af0e7efa5b1be855a8eca437f",
+        "new_hash": "9642291fff157f153470b75b466b9bb536563a889d921a98baf055299a39475d",
+        "changed_at": "2026-11-23T02:07:50Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "paths follow the move of forge-core to its own folder (D-17 step 3, FB-199); nothing else changed"
+      }
+    ],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "9642291fff157f153470b75b466b9bb536563a889d921a98baf055299a39475d",
+    "schema_version": "0.2.0",
+    "schema_hash": "1a9785248467232def2fe2f01959988cfaffad20c1098382510a7c3d125b1ec7",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-23T02:14:30Z"
+  }
+}

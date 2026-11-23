@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from forge.core.models.adapter import ConnectionTimeGovernance, TimeGovernance
+from forge_core.models.adapter import ConnectionTimeGovernance, TimeGovernance
 
 
 def _governance(**overrides: object) -> TimeGovernance:

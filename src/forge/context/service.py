@@ -42,7 +42,7 @@ from forge.context.models import (
     ShiftSchedule,
 )
 from forge.context.shift import build_louisville_schedule, resolve_shift
-from forge.core.models.contextual_record import RecordContext
+from forge_core.models.contextual_record import RecordContext
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

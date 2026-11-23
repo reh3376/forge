@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from forge.core.models.contextual_record import RecordContext
+from forge_core.models.contextual_record import RecordContext
 
 T0 = datetime(2026, 4, 5, 14, 30, tzinfo=UTC)
 NAIVE = datetime(2026, 4, 5, 14, 30)  # noqa: DTZ001

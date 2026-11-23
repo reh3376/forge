@@ -8,13 +8,13 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from forge.core.models.data_product import (
+from forge.curation.lineage import LineageEntry, TransformationStep
+from forge.storage.engines.postgres import PostgresLineageStore, PostgresProductStore
+from forge_core.models.data_product import (
     DataProduct,
     DataProductSchema,
     DataProductStatus,
 )
-from forge.curation.lineage import LineageEntry, TransformationStep
-from forge.storage.engines.postgres import PostgresLineageStore, PostgresProductStore
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -331,7 +331,7 @@ class TestProductCurationColumn:
 
     @pytest.mark.asyncio
     async def test_row_with_spec(self, mock_pool):
-        from forge.core.models.data_product import CurationSpec
+        from forge_core.models.data_product import CurationSpec
 
         pool, conn = mock_pool
         row = _product_row("dp-c1")
@@ -347,7 +347,7 @@ class TestProductCurationColumn:
 
     @pytest.mark.asyncio
     async def test_row_without_the_column_gets_the_default_spec(self, mock_pool):
-        from forge.core.models.data_product import CurationSpec
+        from forge_core.models.data_product import CurationSpec
 
         pool, conn = mock_pool
         conn.fetchrow.return_value = _product_row("dp-c2")

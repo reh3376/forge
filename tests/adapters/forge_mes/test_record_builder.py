@@ -11,7 +11,7 @@ from forge.adapters.forge_mes.record_builder import (
     _extract_source_time,
     build_contextual_record,
 )
-from forge.core.models.contextual_record import QualityCode, RecordContext
+from forge_core.models.contextual_record import QualityCode, RecordContext
 
 
 class TestAssessQuality:

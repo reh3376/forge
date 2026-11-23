@@ -28,18 +28,18 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from forge.adapters.base.interface import (
+from forge.adapters.forge_nms.config import ForgeNmsConfig
+from forge.adapters.forge_nms.context import build_record_context
+from forge.adapters.forge_nms.endpoints import NMS_REST_ENDPOINTS, NMS_WEBSOCKET_ENDPOINTS
+from forge.adapters.forge_nms.record_builder import build_contextual_record
+from forge_core.adapter.interface import (
     AdapterBase,
     BackfillProvider,
     DiscoveryProvider,
     SubscriptionProvider,
 )
-from forge.adapters.forge_nms.config import ForgeNmsConfig
-from forge.adapters.forge_nms.context import build_record_context
-from forge.adapters.forge_nms.endpoints import NMS_REST_ENDPOINTS, NMS_WEBSOCKET_ENDPOINTS
-from forge.adapters.forge_nms.record_builder import build_contextual_record
-from forge.core.clock import SourceStampMissingError
-from forge.core.models.adapter import (
+from forge_core.clock import SourceStampMissingError
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
     AdapterManifest,
@@ -53,7 +53,7 @@ from forge.core.models.adapter import (
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-    from forge.core.models.contextual_record import ContextualRecord
+    from forge_core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 

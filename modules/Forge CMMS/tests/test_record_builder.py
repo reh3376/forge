@@ -7,7 +7,7 @@ from datetime import datetime
 
 from forge.adapters.forge_cmms.context import build_record_context
 from forge.adapters.forge_cmms.record_builder import build_contextual_record
-from forge.core.models.contextual_record import QualityCode
+from forge_core.models.contextual_record import QualityCode
 
 
 class TestRecordBuilder:

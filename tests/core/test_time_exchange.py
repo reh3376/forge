@@ -6,11 +6,11 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from forge.core.clock import SERVER_LINK, SPOKE_LINK, ClockOffsetTracker, TimeExchange
-from forge.core.models.adapter import AdapterHealth, AdapterState, HubTime, SpokeTime
-from forge.core.models.contextual_record import RecordTimestamp
-from forge.proto_gen.forge.v1 import adapter_pb2
-from forge.transport import proto_bridge, serialization
+from forge_core.clock import SERVER_LINK, SPOKE_LINK, ClockOffsetTracker, TimeExchange
+from forge_core.link import proto_bridge, serialization
+from forge_core.models.adapter import AdapterHealth, AdapterState, HubTime, SpokeTime
+from forge_core.models.contextual_record import RecordTimestamp
+from forge_core.proto_gen.forge.v1 import adapter_pb2
 
 HUB = datetime(2026, 6, 1, 12, tzinfo=UTC)
 

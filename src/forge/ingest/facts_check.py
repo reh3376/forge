@@ -20,16 +20,19 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from forge_core.fxts import FXTS_ROOT
+
 if TYPE_CHECKING:
-    from forge.core.models.adapter import AdapterManifest
+    from pathlib import Path
+
+    from forge_core.models.adapter import AdapterManifest
 
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_SPECS_DIR = Path(__file__).resolve().parent.parent / "governance" / "facts" / "specs"
+DEFAULT_SPECS_DIR = FXTS_ROOT / "facts" / "specs"
 
 _CAPABILITY_NAMES = ("read", "write", "subscribe", "backfill", "discover")
 
@@ -87,7 +90,7 @@ def load_facts_spec(
 def _verify_integrity(spec: dict[str, Any]) -> tuple[bool | None, str]:
     """Delegate to the governance hash verifier when available."""
     try:
-        from forge.governance.shared.runner import verify_spec_hash
+        from forge_core.fxts.shared.runner import verify_spec_hash
     except Exception:  # pragma: no cover - governance package optional at runtime
         return None, "integrity verifier unavailable"
     try:

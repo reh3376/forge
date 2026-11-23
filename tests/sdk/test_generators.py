@@ -16,7 +16,7 @@ import json
 
 import pytest
 
-from forge.sdk.module_builder.generators import (
+from forge_core.sdk.module_builder.generators import (
     generate_adapter,
     generate_config,
     generate_context,
@@ -25,7 +25,7 @@ from forge.sdk.module_builder.generators import (
     generate_record_builder,
     generate_tests,
 )
-from forge.sdk.module_builder.manifest_builder import ManifestBuilder
+from forge_core.sdk.module_builder.manifest_builder import ManifestBuilder
 
 # ---------------------------------------------------------------------------
 # Fixtures

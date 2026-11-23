@@ -21,12 +21,12 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
 
-from forge.core.models.adapter import AdapterHealth, AdapterManifest, AdapterState
 from forge.storage.adapter_registry import (
     AdapterRow,
     IngestBatchRow,
     InMemoryAdapterRegistryStore,
 )
+from forge_core.models.adapter import AdapterHealth, AdapterManifest, AdapterState
 
 if TYPE_CHECKING:
     from collections.abc import Callable

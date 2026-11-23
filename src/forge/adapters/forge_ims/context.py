@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from forge.core.models.contextual_record import RecordContext
+from forge_core.models.contextual_record import RecordContext
 
 # ── Transaction type mapping ──────────────────────────────────────
 # Maps IMS's TransactionType enum names to Forge-normalized event types.

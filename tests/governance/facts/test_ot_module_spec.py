@@ -16,19 +16,20 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from forge.governance.facts import SCHEMA_PATH
-from forge.governance.facts.runners.facts_runner import FACTSRunner
-from forge.governance.shared.runner import (
+from forge.ingest.facts_check import check_manifest_against_facts
+from forge.modules.ot.adapter import OTModuleAdapter
+from forge_core.fxts.facts import SCHEMA_PATH
+from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
+from forge_core.fxts.shared.runner import (
     VerdictStatus,
     compute_spec_hash,
     verify_spec_hash,
     verify_spec_integrity,
 )
-from forge.ingest.facts_check import check_manifest_against_facts
-from forge.modules.ot.adapter import OTModuleAdapter
 
 SPEC_PATH = (
-    Path(__file__).resolve().parents[3] / "src/forge/governance/facts/specs/forge-ot.facts.json"
+    Path(__file__).resolve().parents[3]
+    / "forge-core/src/python/forge_core/fxts/facts/specs/forge-ot.facts.json"
 )
 FHTS_STATES = frozenset({"approved", "modified", "pending_review", "reverted", "unknown"})
 

@@ -8,21 +8,23 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from pydantic import ValidationError
 
-from forge.core.clock import (
+from forge.ingest.pipeline import IngestPipeline, IngestStats, InMemoryRecordSink
+from forge.storage.registry import StorageEngine
+from forge_core.clock import (
     SERVER_LINK,
     SOURCE_LINK,
     SPOKE_LINK,
     ClockOffsetTracker,
     SourceStampMissingError,
 )
-from forge.core.models.adapter import (
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
     AdapterTier,
     DataContract,
     TimeGovernance,
 )
-from forge.core.models.contextual_record import (
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,
@@ -31,8 +33,6 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.ingest.pipeline import IngestPipeline, IngestStats, InMemoryRecordSink
-from forge.storage.registry import StorageEngine
 
 SCHEMA_REF = "forge://schemas/forge-mes/v0.1.0"
 
@@ -319,7 +319,7 @@ async def test_ingest_measures_clock_offsets_per_link(caplog: pytest.LogCaptureF
         server_time=HUB_NOW - timedelta(seconds=1),
         ingestion_time=SPOKE_NOW,  # the spoke's clock: 3 s behind the hub at send
     )
-    with caplog.at_level(logging.WARNING, logger="forge.core.clock"):
+    with caplog.at_level(logging.WARNING, logger="forge_core.clock"):
         await pipeline.ingest([record], adapter_id="forge-mes", manifest=make_manifest())
     stats = pipeline.offsets.stats("forge-mes")
     assert stats[SPOKE_LINK].last_seconds == -3.0 and not stats[SPOKE_LINK].within_tolerance
@@ -344,8 +344,8 @@ class TestCurationOnIngest:
 
     @staticmethod
     def _engine(**spec):
-        from forge.core.models.data_product import CurationSpec
         from forge.curation.engine import CurationEngine
+        from forge_core.models.data_product import CurationSpec
 
         engine = CurationEngine()
         product = engine.registry.create(

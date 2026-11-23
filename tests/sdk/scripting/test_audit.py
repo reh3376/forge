@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.sdk.scripting.audit import (
+from forge_core.sdk.scripting.audit import (
     AuditEntry,
     ScriptAuditTrail,
     ScriptExecutionContext,

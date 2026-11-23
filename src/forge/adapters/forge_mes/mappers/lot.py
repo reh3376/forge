@@ -26,7 +26,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from forge.core.models.manufacturing.lot import Lot
+from forge_core.models.manufacturing.lot import Lot
 
 logger = logging.getLogger(__name__)
 

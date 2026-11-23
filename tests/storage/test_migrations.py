@@ -68,7 +68,7 @@ class TestMigrationColumnAlignment:
 
     def test_003_data_products_columns(self):
         """forge_canonical.data_products should mirror DataProduct model."""
-        from forge.core.models.data_product import DataProduct
+        from forge_core.models.data_product import DataProduct
 
         model_fields = set(DataProduct.model_fields.keys())
         # Key fields that must be in the migration
@@ -311,8 +311,8 @@ class TestMigration011:
     def test_chain_and_columns_match_the_writer(self):
         import re
 
-        from forge.core.models.contextual_record import RecordContext
         from forge.storage.engines import timescale
+        from forge_core.models.contextual_record import RecordContext
 
         mod = importlib.import_module(
             "forge.storage.migrations.versions.011_contextual_records_context_columns"

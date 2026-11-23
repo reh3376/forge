@@ -26,7 +26,8 @@ import logging
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
-from forge.core.models.contextual_record import (
+from forge.modules.ot.control.models import WriteOrigin, WriteResult, WriteStatus
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,
@@ -35,7 +36,6 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.modules.ot.control.models import WriteOrigin, WriteResult, WriteStatus
 
 if TYPE_CHECKING:
     from collections.abc import Callable

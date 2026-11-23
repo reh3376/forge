@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.sdk.scripting.rbac import (
+from forge_core.sdk.scripting.rbac import (
     PermissionCheckResult,
     ScriptPermission,
     ScriptRBAC,

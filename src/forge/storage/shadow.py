@@ -18,13 +18,13 @@ import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from forge.core.models.contextual_record import ContextualRecord  # noqa: TC001
 from forge.storage.engines.neo4j_engine import Neo4jGraphWriter
 from forge.storage.engines.redis_engine import RedisStateCache
 from forge.storage.engines.timescale import TimescaleRecordWriter
 from forge.storage.pool import PoolManager  # noqa: TC001
 from forge.storage.registry import StorageEngine
 from forge.storage.router import DataRouter, RoutingDecision  # noqa: TC001
+from forge_core.models.contextual_record import ContextualRecord  # noqa: TC001
 
 logger = logging.getLogger(__name__)
 

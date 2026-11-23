@@ -8,8 +8,8 @@ import pytest
 
 from forge.adapters.forge_integ_erp_netsuite.context import build_record_context
 from forge.adapters.forge_integ_erp_netsuite.record_builder import build_contextual_record
-from forge.core.clock import SourceStampMissingError
-from forge.core.models.contextual_record import QualityCode
+from forge_core.clock import SourceStampMissingError
+from forge_core.models.contextual_record import QualityCode
 
 _SAMPLE_EVENT = {
     "data": {

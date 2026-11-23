@@ -19,13 +19,15 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Protocol
 
-from forge.core.clock import (
+from forge.storage.registry import SchemaRegistry, StorageEngine
+from forge.storage.router import DataRouter
+from forge_core.clock import (
     ClockOffsetTracker,
     SpokeClockGates,
     resolve_source_stamp,
     utc_now,
 )
-from forge.core.models.contextual_record import (
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordLineage,
@@ -33,14 +35,12 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.storage.registry import SchemaRegistry, StorageEngine
-from forge.storage.router import DataRouter
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Mapping
 
-    from forge.core.models.adapter import AdapterManifest
     from forge.curation.engine import CurationEngine
+    from forge_core.models.adapter import AdapterManifest
 
 logger = logging.getLogger(__name__)
 
@@ -188,7 +188,7 @@ class IngestPipeline:
     The pipeline is the hub's receipt point for every path (gRPC push, pull,
     REST): each record is stamped with the hub clock on entry, see
     :func:`stamp_receipt`, and its timestamps feed the clock-offset
-    measurement, see :class:`~forge.core.clock.ClockOffsetTracker` (FB-089).
+    measurement, see :class:`~forge_core.clock.ClockOffsetTracker` (FB-089).
     ``clock`` is the hub clock, ``utc_now`` unless a test or a hub-of-hubs link
     (FB-092) injects another; ``offsets`` is the tracker and ``gates`` the hub's
     gate on each spoke's clock (FB-093), one of each per pipeline by default.
@@ -381,7 +381,7 @@ class IngestPipeline:
             try:
                 return ContextualRecord.model_validate(raw)
             except Exception:
-                from forge.transport.serialization import proto_to_pydantic
+                from forge_core.link.serialization import proto_to_pydantic
 
                 return proto_to_pydantic(raw, "ContextualRecord")
 

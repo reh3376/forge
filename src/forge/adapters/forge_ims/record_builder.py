@@ -18,8 +18,8 @@ from datetime import UTC, datetime
 from typing import Any
 
 from forge.adapters.forge_ims.context import build_record_context
-from forge.core.clock import FORGE_CLOCK, resolve_source_stamp
-from forge.core.models.contextual_record import (
+from forge_core.clock import FORGE_CLOCK, resolve_source_stamp
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,

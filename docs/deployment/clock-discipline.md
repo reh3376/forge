@@ -16,7 +16,7 @@ Records from different sources only reconcile if their timestamps come from one 
 | Every PLC and OPC-UA server | NTP from the plant chain (`T0`, 10 ms) or PTP where the device supports it (`T1`, 1 ms; CIP Sync, IEEE 802.1AS); a device whose clock cannot be read is not a valid source | FACTS `clock_read_method` and `tolerance_class`; FB-094's probe and tap; FB-093's `CLOCK_UNREADABLE` and `CLOCK_OUT_OF_TOLERANCE`, enforced since 2026-11-15 |
 | Sparkplug edge nodes | declared `edge`, measured one-way at `edge-mqtt` (500 ms) until the exchange reaches them | FACTS `source_timestamp_origin: edge` |
 | Every connection's probe cadence | 30 s default, 1 s minimum, adjusted per connection at runtime; the probe cannot be switched off (a value under 1 s is refused when the configuration is loaded); three consecutive bad probes refuse the connection, three good ones resume it | `PlcConnectionSpec.clock_probe_interval_seconds`, `POST /control/connections/{name}/clock-probe-interval` |
-| Stamps | UTC and timezone-aware everywhere; a naive stamp is rejected at the model (FB-014); OPC UA `DateTime` is UTC by definition | `forge.core.clock` |
+| Stamps | UTC and timezone-aware everywhere; a naive stamp is rejected at the model (FB-014); OPC UA `DateTime` is UTC by definition | `forge_core.clock` |
 
 ## What fails closed
 

@@ -9,8 +9,8 @@ from forge.adapters.forge_scanner.record_builder import (
     _scan_tag_path,
     build_contextual_record,
 )
-from forge.core.clock import SourceStampMissingError
-from forge.core.models.contextual_record import QualityCode, RecordContext
+from forge_core.clock import SourceStampMissingError
+from forge_core.models.contextual_record import QualityCode, RecordContext
 
 # ── Parse Timestamp ──────────────────────────────────────────────
 

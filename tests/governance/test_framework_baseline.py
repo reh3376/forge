@@ -2,8 +2,8 @@
 
 ``docs/decisions/fxts-framework-baseline.md``, signed by the owner on 2026-11-18. A
 framework is either planned (a documentation page that says so; no code, no specs) or
-it meets the whole baseline. This walks ``src/forge/governance`` and the documentation
-on every run, so a framework cannot be added half-finished and the summary document
+it meets the whole baseline. This walks ``forge-core/src/python/forge_core/fxts`` and the
+documentation on every run, so a framework cannot be added half-finished and the summary document
 cannot fall behind the code (BACKLOG FB-149, FB-152).
 
 A requirement that is not met yet is named in ``KNOWN_GAPS`` with the backlog item that
@@ -20,9 +20,9 @@ from typing import TYPE_CHECKING, Any
 import pytest
 
 from forge.cli.governance import FRAMEWORKS, REPO_ROOT, SPEC_ROOT, spec_files
-from forge.governance.fmts.runners.fmts_runner import load_backlog
-from forge.governance.shared import schemas
-from forge.governance.shared.runner import check_schema_runner_parity, verify_spec_hash
+from forge_core.fxts.fmts.runners.fmts_runner import load_backlog
+from forge_core.fxts.shared import schemas
+from forge_core.fxts.shared.runner import check_schema_runner_parity, verify_spec_hash
 
 if TYPE_CHECKING:
     from pathlib import Path

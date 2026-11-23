@@ -12,7 +12,7 @@ The module builder generates the boilerplate that every Forge adapter needs:
 
 Usage (programmatic)::
 
-    from forge.sdk.module_builder import ManifestBuilder, ModuleScaffolder
+    from forge_core.sdk.module_builder import ManifestBuilder, ModuleScaffolder
 
     manifest = (
         ManifestBuilder("acme-plc")
@@ -35,7 +35,7 @@ Usage (CLI)::
 
 """
 
-from forge.sdk.module_builder.manifest_builder import ManifestBuilder
-from forge.sdk.module_builder.scaffolder import ModuleScaffolder
+from forge_core.sdk.module_builder.manifest_builder import ManifestBuilder
+from forge_core.sdk.module_builder.scaffolder import ModuleScaffolder
 
 __all__ = ["ManifestBuilder", "ModuleScaffolder"]

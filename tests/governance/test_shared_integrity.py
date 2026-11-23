@@ -7,10 +7,10 @@ from typing import Any
 
 import pytest
 
-from forge.governance.facts import SCHEMA_PATH as FACTS_SCHEMA
-from forge.governance.facts.runners.facts_runner import FACTSRunner
-from forge.governance.fats.runners.fats_runner import FATSRunner
-from forge.governance.shared.runner import (
+from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA
+from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
+from forge_core.fxts.fats.runners.fats_runner import FATSRunner
+from forge_core.fxts.shared.runner import (
     FxTSRunner,
     FxTSVerdict,
     VerdictStatus,

@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any
 import pytest
 
 from forge.cli.governance import FRAMEWORKS
-from forge.governance.shared import schemas
+from forge_core.fxts.shared import schemas
 
 if TYPE_CHECKING:
     from pathlib import Path

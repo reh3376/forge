@@ -39,7 +39,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from forge.core.models.manufacturing.work_order import WorkOrder
+from forge_core.models.manufacturing.work_order import WorkOrder
 
 logger = logging.getLogger(__name__)
 

@@ -19,7 +19,7 @@ from uuid import UUID
 import pytest
 from pydantic import ValidationError
 
-from forge.core.models.manufacturing import (
+from forge_core.models.manufacturing import (
     BusinessEntity,
     Lot,
     ManufacturingUnit,
@@ -34,7 +34,7 @@ from forge.core.models.manufacturing import (
     WorkOrder,
     WorkOrderDependency,
 )
-from forge.core.models.manufacturing.enums import (
+from forge_core.models.manufacturing.enums import (
     AssetOperationalState,
     AssetType,
     EntityType,
@@ -815,7 +815,7 @@ class TestPackageExports:
         import inspect
         import pkgutil
 
-        import forge.core.models.manufacturing as package
+        import forge_core.models.manufacturing as package
 
         exported = set(package.__all__)
         missing: dict[str, list[str]] = {}

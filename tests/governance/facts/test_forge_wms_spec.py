@@ -15,13 +15,15 @@ from pathlib import Path
 
 import pytest
 
+from forge_core.fxts import FXTS_ROOT
+
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
 
 _base = Path(__file__).resolve().parents[3]
-SCHEMA_PATH = _base / "src" / "forge" / "governance" / "facts" / "schema" / "facts.schema.json"
-SPEC_PATH = _base / "src" / "forge" / "governance" / "facts" / "specs" / "forge-wms.facts.json"
+SCHEMA_PATH = FXTS_ROOT / "facts" / "schema" / "facts.schema.json"
+SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
 
 
 @pytest.fixture(scope="module")

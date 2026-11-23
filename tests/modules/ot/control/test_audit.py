@@ -186,8 +186,8 @@ class TestContextualRecordAuditSink:
 
     @pytest.mark.asyncio
     async def test_quality_follows_the_outcome(self):
-        from forge.core.models.contextual_record import QualityCode as CoreQuality
         from forge.modules.ot.control.audit import write_result_to_record
+        from forge_core.models.contextual_record import QualityCode as CoreQuality
 
         base = _make_result().to_dict()
         confirmed = write_result_to_record({**base, "status": "CONFIRMED"})

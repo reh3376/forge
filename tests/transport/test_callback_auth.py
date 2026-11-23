@@ -14,17 +14,17 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
-from forge.proto_gen.forge.v1 import adapter_service_pb2 as service_msg
-from forge.proto_gen.forge.v1 import adapter_service_pb2_grpc as service_grpc
-from forge.transport.grpc_channel import GrpcChannel
-from forge.transport.spoke_callback import (
+from forge_core.link.grpc_channel import GrpcChannel
+from forge_core.link.spoke_callback import (
     CALLBACK_PARAM,
     CALLBACK_TOKEN_HEADER,
     CALLBACK_TOKEN_PARAM,
     WriteDispatcher,
     WriteDispatchError,
 )
-from forge.transport.spoke_client import ChannelTls, InMemoryChannel
+from forge_core.link.spoke_client import ChannelTls, InMemoryChannel
+from forge_core.proto_gen.forge.v1 import adapter_service_pb2 as service_msg
+from forge_core.proto_gen.forge.v1 import adapter_service_pb2_grpc as service_grpc
 
 
 class FakeSpoke:

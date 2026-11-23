@@ -134,8 +134,8 @@ def module_init(
             -p "endpoint_url:OPC-UA server:required" \\
             -f equipment_id -f area
     """
-    from forge.sdk.module_builder.manifest_builder import ManifestBuilder
-    from forge.sdk.module_builder.scaffolder import ModuleScaffolder
+    from forge_core.sdk.module_builder.manifest_builder import ManifestBuilder
+    from forge_core.sdk.module_builder.scaffolder import ModuleScaffolder
 
     # Build manifest from CLI args
     builder = ManifestBuilder(adapter_id)

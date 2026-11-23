@@ -7,7 +7,6 @@ from datetime import timedelta
 
 import pytest
 
-from forge.core.models.contextual_record import ContextualRecord
 from forge.curation.aggregation import AggregationFunction, AggregationSpec
 from forge.curation.lineage import LineageTracker
 from forge.curation.normalization import build_whk_unit_registry
@@ -24,6 +23,7 @@ from forge.curation.quality import (
     QualityMonitor,
     RangeRule,
 )
+from forge_core.models.contextual_record import ContextualRecord
 from tests.curation.conftest import make_record_batch
 
 

@@ -11,7 +11,7 @@ from typing import get_args
 
 import pytest
 
-from forge.core.clock import (
+from forge_core.clock import (
     CLOCK_OK,
     CLOCK_OUT_OF_TOLERANCE,
     CLOCK_UNREADABLE,
@@ -30,13 +30,13 @@ from forge.core.clock import (
     spoke_clock_id,
     tolerance_for_class,
 )
-from forge.core.models.adapter import (
+from forge_core.link.serialization import headers_to_spoke_time, spoke_time_to_headers
+from forge_core.models.adapter import (
     ConnectionTimeGovernance,
     SpokeTime,
     TimeGovernance,
     ToleranceClass,
 )
-from forge.transport.serialization import headers_to_spoke_time, spoke_time_to_headers
 
 T = datetime(2026, 6, 1, 8, tzinfo=UTC)
 
@@ -314,7 +314,7 @@ def test_a_malformed_measurement_header_is_read_as_no_measurement(
         SPOKE_OFFSET_HEADER: "about right",
         SPOKE_ROUND_TRIP_HEADER: "0.004",
     }
-    with caplog.at_level("WARNING", logger="forge.transport.serialization"):
+    with caplog.at_level("WARNING", logger="forge_core.link.serialization"):
         read = headers_to_spoke_time(headers)
     assert read == SpokeTime(transmit_time=T)
     assert "x-forge-spoke-offset-seconds='about right'" in caplog.text

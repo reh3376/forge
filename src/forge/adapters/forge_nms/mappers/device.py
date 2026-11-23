@@ -7,8 +7,8 @@ location_id for topology correlation.
 
 from __future__ import annotations
 
-from forge.core.models.manufacturing.enums import LifecycleState, UnitStatus
-from forge.core.models.manufacturing.manufacturing_unit import ManufacturingUnit
+from forge_core.models.manufacturing.enums import LifecycleState, UnitStatus
+from forge_core.models.manufacturing.manufacturing_unit import ManufacturingUnit
 
 
 def map_device(raw_device: dict) -> ManufacturingUnit | None:

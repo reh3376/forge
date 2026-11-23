@@ -20,8 +20,8 @@ import json
 import logging
 from typing import Any
 
-from forge.core.models.manufacturing.business_entity import BusinessEntity
-from forge.core.models.manufacturing.enums import EntityType
+from forge_core.models.manufacturing.business_entity import BusinessEntity
+from forge_core.models.manufacturing.enums import EntityType
 
 logger = logging.getLogger(__name__)
 

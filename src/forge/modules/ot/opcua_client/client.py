@@ -65,7 +65,7 @@ from forge.modules.ot.opcua_client.types import (
 )
 
 if TYPE_CHECKING:
-    from forge.core.clock import ClockSample, ClockSink
+    from forge_core.clock import ClockSample, ClockSink
 
 logger = logging.getLogger(__name__)
 

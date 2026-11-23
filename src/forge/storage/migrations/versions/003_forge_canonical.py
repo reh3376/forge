@@ -1,7 +1,7 @@
 """003 — Forge Canonical schema for curated data products.
 
 Mirrors the DataProduct Pydantic model from
-src/forge/core/models/data_product.py.
+forge-core/src/python/forge_core/models/data_product.py.
 
 Revision ID: 003
 Create Date: 2026-04-12

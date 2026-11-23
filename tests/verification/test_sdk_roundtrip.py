@@ -18,14 +18,14 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from forge.sdk.module_builder.manifest_builder import ManifestBuilder
-from forge.sdk.module_builder.scaffolder import ModuleScaffolder
 from forge.storage.registry import (
     SchemaEntry,
     SchemaRegistry,
     SchemaStatus,
     StorageEngine,
 )
+from forge_core.sdk.module_builder.manifest_builder import ManifestBuilder
+from forge_core.sdk.module_builder.scaffolder import ModuleScaffolder
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -184,8 +184,8 @@ class TestScaffoldedFactsSpec:
         facts_schema_path: Path,
     ):
         """The SDK-generated spec should survive FACTSRunner validation."""
-        from forge.governance.facts.runners.facts_runner import FACTSRunner
-        from forge.governance.shared.runner import VerdictStatus
+        from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
+        from forge_core.fxts.shared.runner import VerdictStatus
 
         runner = FACTSRunner(schema_path=facts_schema_path)
         report = await runner.run(target="test-facts-rt", spec=scaffolded_spec)
@@ -211,7 +211,7 @@ class TestManifestCompatibility:
 
     def test_builder_output_creates_valid_adapter_manifest(self):
         """ManifestBuilder dict should deserialize into AdapterManifest."""
-        from forge.core.models.adapter import AdapterManifest
+        from forge_core.models.adapter import AdapterManifest
 
         built = (
             ManifestBuilder("test-compat")
@@ -230,7 +230,7 @@ class TestManifestCompatibility:
         assert len(manifest.connection_params) == 1
 
     def test_builder_capabilities_match_core_model(self):
-        from forge.core.models.adapter import AdapterManifest
+        from forge_core.models.adapter import AdapterManifest
 
         built = (
             ManifestBuilder("test-caps")
@@ -246,7 +246,7 @@ class TestManifestCompatibility:
 
     def test_all_tiers_roundtrip(self):
         """Every valid tier should roundtrip through builder → manifest."""
-        from forge.core.models.adapter import AdapterManifest, AdapterTier
+        from forge_core.models.adapter import AdapterManifest, AdapterTier
 
         for tier in ("OT", "MES_MOM", "ERP_BUSINESS", "HISTORIAN", "DOCUMENT"):
             built = ManifestBuilder("test").tier(tier).build()
@@ -264,7 +264,7 @@ class TestSDKPipelineIntegration:
 
     def test_scaffolded_schema_routes_correctly(self, tmp_path: Path):
         """A schema registered from scaffolded manifest should route."""
-        from forge.core.models.adapter import AdapterManifest
+        from forge_core.models.adapter import AdapterManifest
 
         # 1. Build manifest via SDK
         built = (

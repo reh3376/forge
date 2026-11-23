@@ -16,7 +16,7 @@ from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
 
-from forge.core.models.data_product import (
+from forge_core.models.data_product import (
     CurationSpec,
     DataProduct,
     DataProductSchema,

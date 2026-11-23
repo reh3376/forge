@@ -7,7 +7,7 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from pydantic import ValidationError
 
-from forge.core.clock import (
+from forge_core.clock import (
     FORGE_CLOCK,
     SERVER_LINK,
     SOURCE_TIMESTAMP_ORIGINS,
@@ -18,7 +18,7 @@ from forge.core.clock import (
     resolve_source_stamp,
     source_clock_name,
 )
-from forge.core.models.contextual_record import RecordTimestamp
+from forge_core.models.contextual_record import RecordTimestamp
 
 STAMP = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
 READ_AT = datetime(2026, 6, 1, 12, 0, 3, tzinfo=UTC)

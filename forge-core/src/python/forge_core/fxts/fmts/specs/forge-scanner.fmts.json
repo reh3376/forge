@@ -1,0 +1,141 @@
+{
+  "spec_version": "2.0.0",
+  "module_identity": {
+    "module_id": "forge-scanner",
+    "name": "Forge Scanner Adapter",
+    "alias": "scanner",
+    "version": "0.1.0",
+    "kind": "management",
+    "function": "scanner",
+    "language": "python",
+    "source_paths": [
+      "src/forge/adapters/forge_scanner"
+    ]
+  },
+  "hub_link": {
+    "protocol": "grpc",
+    "service": "forge.v1.AdapterService"
+  },
+  "transport": {
+    "process_control_writes": false,
+    "business_write_backs": false,
+    "data_classes": [
+      "raw",
+      "status",
+      "config"
+    ]
+  },
+  "references": {
+    "facts": {
+      "path": "forge-core/src/python/forge_core/fxts/facts/specs/forge-scanner.facts.json",
+      "adapter_id": "forge-scanner"
+    },
+    "manifest": "src/forge/adapters/forge_scanner/manifest.json"
+  },
+  "baseline": {
+    "M-1": "met",
+    "M-2": "met",
+    "M-3": "waived",
+    "M-4": "met",
+    "M-5": "met",
+    "M-6": "met",
+    "M-7": "met",
+    "M-8": "met",
+    "M-9": "met",
+    "M-10": "waived",
+    "M-11": "met",
+    "M-12": "waived",
+    "M-13": "waived",
+    "M-14": "waived",
+    "M-15": "not_applicable",
+    "M-16": "not_applicable"
+  },
+  "waivers": [
+    {
+      "requirement": "M-3",
+      "reason": "The handheld scanners are plant-floor devices that push scan events over gRPC, and no clock reader exists for a device of that kind: the module cannot declare how their clocks are read. Waived with admin privileges until a reader exists.",
+      "backlog_item": "FB-117"
+    },
+    {
+      "requirement": "M-10",
+      "reason": "No module ships a roles file yet: the roles file has no FxTS spec to be written against, and the hub still uses its own flat roles.",
+      "backlog_item": "FB-141"
+    },
+    {
+      "requirement": "M-12",
+      "reason": "The record id rule of the transport contract (T-5) is not built: records carry an id the adapter makes, and the hub does not yet keep each id once.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-13",
+      "reason": "Store and forward is not part of the module SDK yet (T-6): the module does not buffer what it cannot deliver.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-14",
+      "reason": "The goodbye and the last will of the transport contract (T-8) are not built: the hub learns of a shutdown only when calls stop.",
+      "backlog_item": "FB-164"
+    }
+  ],
+  "time_contract": {
+    "hub": {
+      "exchange": "four-timestamp",
+      "fail_closed": true
+    },
+    "plant_floor_devices": "declared-in-facts",
+    "databases": [],
+    "third_party_systems": []
+  },
+  "user_interface": {
+    "ships_ui_code": false,
+    "screens": false
+  },
+  "scaffold": {
+    "template": "python-adapter"
+  },
+  "metadata": {
+    "hosting": "hub-hosted Python adapter today",
+    "state": "Forge's own module for handheld scanning: it runs the gRPC server the scanner devices connect to, turns scan events into records and routes them to the warehouse and inventory modules by scan type. The devices are plant-floor equipment, not third-party software.",
+    "target": "A Go module built from the module SDK, with Python scripting for customization (owner, 2026-11-18). Its source path, language and template change in this spec when that code exists.",
+    "time_contract_state": "The scanners' clocks are not read: the FACTS spec names no clock-read method for them, because none exists for a device that pushes over gRPC (FB-117). M-3 is waived for that, which counts only once the owner approves this spec. M-4, M-5 and M-7 are run by the conformance kit; M-6 has no sample events."
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": "113665becc921a95e4b272069ede434d67488bb6197885aa3b68f29708d64136",
+    "change_history": [
+      {
+        "previous_hash": "113665becc921a95e4b272069ede434d67488bb6197885aa3b68f29708d64136",
+        "new_hash": "cb2f3fedb2fa06ee495bfdf4126cb0fed0b5d263daba85d394e04aa47378da6b",
+        "changed_at": "2026-11-23T02:07:49Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "paths follow the move of forge-core to its own folder (D-17 step 3, FB-199); nothing else changed"
+      },
+      {
+        "previous_hash": "1a30102c85f766ff7ac925a66b7a7bc65b32bd95bf1daf4b549f5de6f7f9dc0f",
+        "new_hash": "113665becc921a95e4b272069ede434d67488bb6197885aa3b68f29708d64136",
+        "changed_at": "2026-11-19T21:46:25Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-153: FMTS 2.0.0, the module's function and the data classes it carries (owner, 2026-11-19)"
+      },
+      {
+        "previous_hash": "06afa74ab9961f7b85a1f11e1718c7a26f6c835fecc89947e6dac102310dfb5f",
+        "new_hash": "1a30102c85f766ff7ac925a66b7a7bc65b32bd95bf1daf4b549f5de6f7f9dc0f",
+        "changed_at": "2026-11-19T18:38:18Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-165: FMTS 1.0.0, the transport contract's requirements M-12 to M-16 (D-12 amendment, owner 2026-11-19); each one that binds the module waived until FB-164"
+      }
+    ],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "cb2f3fedb2fa06ee495bfdf4126cb0fed0b5d263daba85d394e04aa47378da6b",
+    "schema_version": "2.0.0",
+    "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-23T02:14:29Z"
+  }
+}

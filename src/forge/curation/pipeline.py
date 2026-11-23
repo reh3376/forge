@@ -21,11 +21,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any
 
-from forge.core.models.contextual_record import ContextualRecord
 from forge.curation.aggregation import AggregationSpec, aggregate_records
 from forge.curation.lineage import LineageEntry, LineageTracker
 from forge.curation.normalization import TimeBucketer, UnitRegistry, ValueNormalizer
 from forge.curation.quality import QualityMonitor, QualityReport, QualityRule
+from forge_core.models.contextual_record import ContextualRecord
 
 # ---------------------------------------------------------------------------
 # CurationResult — the output of a pipeline run

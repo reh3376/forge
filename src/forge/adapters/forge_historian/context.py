@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from forge.core.models.contextual_record import RecordContext
+from forge_core.models.contextual_record import RecordContext
 
 # ── Quality code mapping ─────────────────────────────────────────
 # Forge Historian uses OPC UA quality codes (u8):

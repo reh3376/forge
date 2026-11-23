@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from forge.adapters.forge_mes.adapter import ForgeMesAdapter
-from forge.core.models.adapter import AdapterState, AdapterTier
+from forge_core.models.adapter import AdapterState, AdapterTier
 
 # ---------------------------------------------------------------------------
 # Fixtures

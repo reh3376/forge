@@ -507,7 +507,7 @@ def _create_mqtt_client(config: MqttConfig) -> Any:
         "stub"     — uses in-memory stub for testing
     """
     if config.broker_mode == "local" and config._broker is not None:
-        from forge.core.broker.local_client import LocalMqttClient
+        from forge_core.broker.local_client import LocalMqttClient
 
         logger.info("Using embedded broker (local mode)")
         return LocalMqttClient(config._broker, client_id=config.client_id)

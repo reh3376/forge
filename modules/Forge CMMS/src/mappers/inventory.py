@@ -20,9 +20,9 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from forge.core.models.manufacturing.business_entity import BusinessEntity
-from forge.core.models.manufacturing.enums import EntityType
-from forge.core.models.manufacturing.operational_event import OperationalEvent
+from forge_core.models.manufacturing.business_entity import BusinessEntity
+from forge_core.models.manufacturing.enums import EntityType
+from forge_core.models.manufacturing.operational_event import OperationalEvent
 
 logger = logging.getLogger(__name__)
 

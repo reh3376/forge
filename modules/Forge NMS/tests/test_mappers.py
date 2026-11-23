@@ -12,7 +12,7 @@ from forge.adapters.forge_nms.mappers import (
     map_spof_detection,
     map_trap_event,
 )
-from forge.core.models.manufacturing.enums import EventSeverity, UnitStatus
+from forge_core.models.manufacturing.enums import EventSeverity, UnitStatus
 
 
 class TestMapDevice:

@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from forge.core.clock import ClockReader, ClockSample
+from forge_core.clock import ClockReader, ClockSample
 
 T1 = datetime(2026, 6, 1, 12, 0, 0, tzinfo=UTC)
 

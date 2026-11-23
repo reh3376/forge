@@ -29,7 +29,7 @@ from datetime import UTC, datetime
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from forge.core.models.contextual_record import RecordContext
+from forge_core.models.contextual_record import RecordContext
 
 logger = logging.getLogger(__name__)
 

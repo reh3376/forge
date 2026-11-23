@@ -24,7 +24,7 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from forge.core.models.contextual_record import ContextualRecord
+from forge_core.models.contextual_record import ContextualRecord
 
 if TYPE_CHECKING:
     from collections.abc import Callable

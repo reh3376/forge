@@ -9,16 +9,16 @@ from typing import Any
 
 import pytest
 
-from forge.governance.fvts import SCHEMA_PATH
-from forge.governance.fvts.renderer import GoldenMessage
-from forge.governance.fvts.runners.fvts_runner import FVTSRunner, tag_pattern, write_tags
-from forge.governance.shared.runner import (
+from forge.modules.ot.control.config import load_control_config
+from forge_core.fxts.fvts import SCHEMA_PATH
+from forge_core.fxts.fvts.renderer import GoldenMessage
+from forge_core.fxts.fvts.runners.fvts_runner import FVTSRunner, tag_pattern, write_tags
+from forge_core.fxts.shared.runner import (
     VerdictStatus,
     add_spec_hash,
     approve_spec_hash,
     check_schema_runner_parity,
 )
-from forge.modules.ot.control.config import load_control_config
 
 PASS, FAIL = VerdictStatus.PASS, VerdictStatus.FAIL
 WRITE_CONFIG_PATH = (

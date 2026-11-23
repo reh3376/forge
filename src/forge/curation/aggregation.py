@@ -19,8 +19,9 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
-from forge.core.clock import utc_now
-from forge.core.models.contextual_record import (
+from forge.curation.normalization import TimeBucketer
+from forge_core.clock import utc_now
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,
@@ -29,7 +30,6 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.curation.normalization import TimeBucketer
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -187,7 +187,7 @@ def aggregate_records(
                 context=RecordContext(**context_dict),
                 lineage=RecordLineage(
                     # Version ref of the product's schema under the curation spoke
-                    # (forge.core.schema_ref, FB-008).
+                    # (forge_core.schema_ref, FB-008).
                     schema_ref=f"forge://schemas/curation/{spec.product_id or 'default'}/v0.1.0",
                     adapter_id="forge-curation",
                     adapter_version="0.1.0",

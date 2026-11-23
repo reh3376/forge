@@ -22,7 +22,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from forge.core.models.manufacturing.manufacturing_unit import ManufacturingUnit
+from forge_core.models.manufacturing.manufacturing_unit import ManufacturingUnit
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from forge.core.registry.context_fields import (
+from forge_core.registry.context_fields import (
     ContextField,
     ContextFieldRegistry,
     build_default_registry,
@@ -300,14 +300,14 @@ class TestRegistryMatchesRecordContext:
     """FB-013: the registry's fields are RecordContext's slots, one for one."""
 
     def test_same_names(self) -> None:
-        from forge.core.models.contextual_record import RecordContext
+        from forge_core.models.contextual_record import RecordContext
 
         registry = build_default_registry()
         slots = set(RecordContext.model_fields) - {"extra"}
         assert set(registry.list_field_names()) == slots
 
     def test_types_agree(self) -> None:
-        from forge.core.models.contextual_record import RecordContext
+        from forge_core.models.contextual_record import RecordContext
 
         for ctx_field in build_default_registry().list_fields():
             annotation = str(RecordContext.model_fields[ctx_field.name].annotation)

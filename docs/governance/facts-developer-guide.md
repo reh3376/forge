@@ -303,7 +303,7 @@ The same from Python (`add_spec_hash` leaves `hash_state: modified`, so set it y
 
 ```python
 import json
-from forge.governance.shared.runner import add_spec_hash
+from forge_core.fxts.shared.runner import add_spec_hash
 
 with open("my-system.facts.json") as f:
     spec = json.load(f)
@@ -368,11 +368,11 @@ The resulting block looks like:
 
 ```python
 import asyncio, json
-from forge.governance.facts.runners.facts_runner import FACTSRunner
+from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
 
 runner = FACTSRunner()  # the packaged facts.schema.json is the default
 
-with open("src/forge/governance/facts/specs/my-system.facts.json") as f:
+with open("forge-core/src/python/forge_core/fxts/facts/specs/my-system.facts.json") as f:
     spec = json.load(f)
 
 report = asyncio.run(runner.run(target="my-system", spec=spec))

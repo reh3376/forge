@@ -5,7 +5,7 @@
     forge governance approve SPEC --by WHO               the owner's approval
     forge governance run FRAMEWORK TARGET                one framework's checks on one spec
 
-``stamp`` wraps :func:`forge.governance.shared.runner.add_spec_hash`: it
+``stamp`` wraps :func:`forge_core.fxts.shared.runner.add_spec_hash`: it
 recomputes the content hash, pushes the old one into ``change_history``
 and leaves the spec ``pending_review`` with no approver.  ``approve`` wraps
 :func:`approve_spec_hash` and refuses when the stored hash no longer covers
@@ -38,8 +38,9 @@ from typing import TYPE_CHECKING, Annotated, Any
 
 import typer
 
-from forge.governance.shared import schemas
-from forge.governance.shared.runner import (
+import forge_core.fxts as _fxts
+from forge_core.fxts.shared import schemas
+from forge_core.fxts.shared.runner import (
     add_spec_hash,
     approve_spec_hash,
     compute_spec_hash,
@@ -49,10 +50,10 @@ from forge.governance.shared.runner import (
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from forge.governance.shared.runner import FxTSReport, FxTSRunner
+    from forge_core.fxts.shared.runner import FxTSReport, FxTSRunner
 
-#: ``src/forge/governance``: every ``<framework>/specs/*.json`` under it is a spec.
-SPEC_ROOT = Path(__file__).resolve().parent.parent / "governance"
+#: ``forge-core/src/python/forge_core/fxts``: every ``<framework>/specs/*.json`` under it is a spec.
+SPEC_ROOT = Path(_fxts.__file__).resolve().parent  # the frameworks, in forge-core
 #: The checkout; the FTTS spec lives in its top-level ``specs/``.
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
@@ -291,38 +292,38 @@ def approve(
 
 
 def _fats_runner(schema: Path) -> FxTSRunner:
-    from forge.governance.fats.runners.fats_runner import FATSRunner
+    from forge_core.fxts.fats.runners.fats_runner import FATSRunner
 
     return FATSRunner(schema_path=schema)
 
 
 def _facts_runner(schema: Path) -> FxTSRunner:
-    from forge.governance.facts.runners.facts_runner import FACTSRunner
+    from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
 
     return FACTSRunner(schema_path=schema)
 
 
 def _fvts_runner(schema: Path) -> FxTSRunner:
-    from forge.governance.fvts.runners.fvts_runner import FVTSRunner
+    from forge_core.fxts.fvts.runners.fvts_runner import FVTSRunner
 
     return FVTSRunner(schema_path=schema)
 
 
 def _ftts_runner(schema: Path) -> FxTSRunner:
-    from forge.governance.ftts.runners.ftts_runner import FTTSRunner
+    from forge_core.fxts.ftts.runners.ftts_runner import FTTSRunner
 
     return FTTSRunner(schema_path=schema)
 
 
 def _futs_runner(schema: Path) -> FxTSRunner:
-    from forge.governance.futs.runners.futs_runner import FUTSRunner
+    from forge_core.fxts.futs.runners.futs_runner import FUTSRunner
 
     return FUTSRunner(schema_path=schema)
 
 
 def _fmts_runner(schema: Path) -> FxTSRunner:
-    from forge.governance.fmts import conformance
-    from forge.governance.fmts.runners.fmts_runner import FMTSRunner
+    from forge import conformance
+    from forge_core.fxts.fmts.runners.fmts_runner import FMTSRunner
 
     return FMTSRunner(schema_path=schema, conformance_kit=conformance)
 

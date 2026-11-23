@@ -27,7 +27,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from forge.core.models.contextual_record import RecordContext
+from forge_core.models.contextual_record import RecordContext
 
 logger = logging.getLogger(__name__)
 

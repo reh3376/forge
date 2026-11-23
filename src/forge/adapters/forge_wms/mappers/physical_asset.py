@@ -17,11 +17,11 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from forge.core.models.manufacturing.enums import (
+from forge_core.models.manufacturing.enums import (
     AssetOperationalState,
     AssetType,
 )
-from forge.core.models.manufacturing.physical_asset import PhysicalAsset
+from forge_core.models.manufacturing.physical_asset import PhysicalAsset
 
 logger = logging.getLogger(__name__)
 

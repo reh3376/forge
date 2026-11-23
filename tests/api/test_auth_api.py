@@ -9,12 +9,12 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from forge.api.main import create_app
-from forge.core.models.adapter import AdapterCapabilities, AdapterManifest, DataContract
 from forge.gateway.auth import configure_auth
 from forge.gateway.models import AuthConfig
 from forge.storage.config import StorageConfig
-from forge.transport.spoke_callback import CALLBACK_PARAM, WriteDispatcher
-from forge.transport.spoke_client import InMemoryChannel
+from forge_core.link.spoke_callback import CALLBACK_PARAM, WriteDispatcher
+from forge_core.link.spoke_client import InMemoryChannel
+from forge_core.models.adapter import AdapterCapabilities, AdapterManifest, DataContract
 
 OPS = {"X-API-Key": "ops-key"}
 VIEW = {"X-API-Key": "view-key"}

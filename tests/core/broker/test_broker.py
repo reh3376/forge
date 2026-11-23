@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.core.broker.broker import BrokerConfig, ForgeMqttBroker
+from forge_core.broker.broker import BrokerConfig, ForgeMqttBroker
 
 # ---------------------------------------------------------------------------
 # Lifecycle
@@ -327,7 +327,7 @@ class TestLocalRetainSemantics:
 
     @pytest.mark.asyncio
     async def test_local_client_subscribe_replays_like_a_tcp_subscribe(self):
-        from forge.core.broker.local_client import LocalMqttClient
+        from forge_core.broker.local_client import LocalMqttClient
 
         broker = ForgeMqttBroker(BrokerConfig(port=0, sys_interval=0))
         await broker.start()

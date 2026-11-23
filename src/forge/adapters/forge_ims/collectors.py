@@ -26,8 +26,8 @@ from forge.adapters.forge_ims.record_builder import (
     build_asset_record,
     build_contextual_record,
 )
-from forge.core.clock import FORGE_CLOCK, SourceStampMissingError
-from forge.core.models.contextual_record import (
+from forge_core.clock import FORGE_CLOCK, SourceStampMissingError
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,

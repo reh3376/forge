@@ -46,13 +46,13 @@ FVTS does not invent parallel vocabularies. Its enums mirror the models already 
 
 | FVTS `$def` | Mirrors |
 |-------------|---------|
-| `qualityCode` | `forge.core.models.contextual_record.QualityCode` |
-| `contextField` | `forge.core.models.contextual_record.RecordContext` fields |
+| `qualityCode` | `forge_core.models.contextual_record.QualityCode` |
+| `contextField` | `forge_core.models.contextual_record.RecordContext` fields |
 | `timestampBasis` | `RecordTimestamp.TIME_BASES` (`source_time`, `server_time`, `ingestion_time`); `spoke_time` (the spoke's own send time; `sent_time` and hub-local until FB-092) is a clock-offset input (FB-087/FB-089), not a basis |
-| `alarmState`, `alarmPriority` | `forge.core.models.alarm.AlarmState` / `AlarmPriority` |
+| `alarmState`, `alarmPriority` | `forge_core.models.alarm.AlarmState` / `AlarmPriority` |
 | `alarmOperation` | Operator-initiated subset of `AlarmAction` (system actions are never UI actions) |
-| `role` | `forge.core.models.control.WriteRole` **plus `VIEWER`** (read-only; see open decisions) |
-| `writeStatus` | `forge.core.models.control.WriteStatus` |
+| `role` | `forge_core.models.control.WriteRole` **plus `VIEWER`** (read-only; see open decisions) |
+| `writeStatus` | `forge_core.models.control.WriteStatus` |
 
 Live updates with `transport: grpc_stream` ride the FTTS-governed gRPC transport.
 
@@ -79,7 +79,7 @@ Runner check `fvts:objects`: each schema is a file in the repository, a valid JS
 
 ## Render profiles — normative baseline
 
-A profile carries one platform limit, the update rate. **Who may act is decided by the user's role, on every profile** (owner, 2026-11-19 and 21; `docs/decisions/forge-display.md`, Q-7 and Q-8): a tag write and every alarm operation are open on all four, so an operator can monitor and control a process from a carried tablet or laptop, and the activity record names the profile each action came from. Two things can narrow a profile and neither can widen it: a spec may **tighten** it (via `render_profiles.overrides`, and by the profiles an action lists), and a site may switch tag writes or alarm operations off for a profile (`SitePolicy`). Runner check `fvts:profile-baseline`. The table is code: `src/forge/governance/fvts/profiles.py` (`PROFILE_BASELINE`).
+A profile carries one platform limit, the update rate. **Who may act is decided by the user's role, on every profile** (owner, 2026-11-19 and 21; `docs/decisions/forge-display.md`, Q-7 and Q-8): a tag write and every alarm operation are open on all four, so an operator can monitor and control a process from a carried tablet or laptop, and the activity record names the profile each action came from. Two things can narrow a profile and neither can widen it: a spec may **tighten** it (via `render_profiles.overrides`, and by the profiles an action lists), and a site may switch tag writes or alarm operations off for a profile (`SitePolicy`). Runner check `fvts:profile-baseline`. The table is code: `forge-core/src/python/forge_core/fxts/fvts/profiles.py` (`PROFILE_BASELINE`).
 
 | Profile | Intended renderer | Max update rate | Tag writes | Alarm operations | Kiosk / fullscreen | Notes |
 |---------|-------------------|-----------------|------------|------------------|--------------------|-------|
@@ -95,7 +95,7 @@ Consequences enforced by the runner:
 
 ## Schema
 
-**Location:** `src/forge/governance/fvts/schema/fvts.schema.json`
+**Location:** `forge-core/src/python/forge_core/fxts/fvts/schema/fvts.schema.json`
 **`$id`:** `forge://governance/fvts/v0.1.0`
 
 ### Top-Level Structure
@@ -142,7 +142,7 @@ fvts.schema.json
 - `hmi_screen` surfaces are `configured` (versioned layout data), never hand-coded.
 - Alarm priority tokens must live in the reserved `alarm.*` token namespace.
 
-### Runner checks — `src/forge/governance/fvts/runners/fvts_runner.py`
+### Runner checks — `forge-core/src/python/forge_core/fxts/fvts/runners/fvts_runner.py`
 
 `FVTSRunner(FxTSRunner)` produces one verdict per check (19 for the reference spec). `fvts:schema-valid` applies the schema itself, so every schema-encoded rule above is enforced; the other checks add what JSON Schema cannot express.
 
@@ -172,7 +172,7 @@ Schema-runner parity holds: `implemented_fields()` lists every top-level propert
 
 ### Golden messages and the reference renderer
 
-`src/forge/governance/fvts/renderer.py` is the smallest faithful model of what any forge-display renderer must do with the contract; it is not a UI. `ReferenceRenderer(spec, profile)` renders six message types and raises `GoldenRenderError` on any contract breach:
+`forge-core/src/python/forge_core/fxts/fvts/renderer.py` is the smallest faithful model of what any forge-display renderer must do with the contract; it is not a UI. `ReferenceRenderer(spec, profile)` renders six message types and raises `GoldenRenderError` on any contract breach:
 
 | Message | What the renderer enforces |
 |---------|----------------------------|
@@ -193,7 +193,7 @@ A golden message may carry `"profiles": [...]` to apply to some renderers only (
 
 | Spec | Status | Notes |
 |------|--------|-------|
-| `forge-core.fvts.json` | approved by the owner 2026-11-21 | The hub's own screens, the first thing forge-display renders (D-16, Q-15): status and health, modules, governance, users and roles. No points; seven objects, each with a schema under `src/forge/governance/fvts/objects/forge-core/`. Read-only except for running a spec's checks: approving a spec and assigning a role stay off the screens until roles are enforced (FB-075). The hub is not a module and has no FACTS spec. Suite: `tests/governance/fvts/test_hub_views.py`. |
+| `forge-core.fvts.json` | approved by the owner 2026-11-21 | The hub's own screens, the first thing forge-display renders (D-16, Q-15): status and health, modules, governance, users and roles. No points; seven objects, each with a schema under `forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/`. Read-only except for running a spec's checks: approving a spec and assigning a role stay off the screens until roles are enforced (FB-075). The hub is not a module and has no FACTS spec. Suite: `tests/governance/fvts/test_hub_views.py`. |
 | `forge-ot.fvts.json` | `hash_state: pending_review` (FB-078) | Reference contract: fermenter HMI screen, trend, alarm summary, settings; setpoint write via two-step review. Passes every runner check except `fvts:hash-approved`; with the OT write config (`deploy/ot/ot-control.example.json`) `fvts:action-target` fails because the fermenter points are invented — FB-078 replaces them. |
 
 ## Relationship to other FxTS frameworks

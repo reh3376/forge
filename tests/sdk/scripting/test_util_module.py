@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.sdk.scripting.modules.util import UtilModule
+from forge_core.sdk.scripting.modules.util import UtilModule
 
 # ---------------------------------------------------------------------------
 # JSON

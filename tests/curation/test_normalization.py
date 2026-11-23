@@ -7,16 +7,16 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from forge.core.models.contextual_record import (
-    ContextualRecord,
-    QualityCode,
-    RecordValue,
-)
 from forge.curation.normalization import (
     TimeBucketer,
     UnitConversion,
     UnitRegistry,
     ValueNormalizer,
+)
+from forge_core.models.contextual_record import (
+    ContextualRecord,
+    QualityCode,
+    RecordValue,
 )
 
 # ---------------------------------------------------------------------------

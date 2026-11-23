@@ -1,0 +1,153 @@
+{
+  "spec_version": "2.0.0",
+  "module_identity": {
+    "module_id": "forge-ot",
+    "name": "Forge OT/SCADA Module — OPC-UA Adapter",
+    "alias": "ot",
+    "version": "0.5.0",
+    "kind": "ot",
+    "function": "ot",
+    "language": "python",
+    "source_paths": [
+      "src/forge/modules/ot"
+    ]
+  },
+  "hub_link": {
+    "protocol": "grpc",
+    "service": "forge.v1.AdapterService"
+  },
+  "transport": {
+    "process_control_writes": true,
+    "business_write_backs": false,
+    "data_classes": [
+      "raw",
+      "historical",
+      "alarm",
+      "audit",
+      "control",
+      "status",
+      "config"
+    ]
+  },
+  "references": {
+    "facts": {
+      "path": "forge-core/src/python/forge_core/fxts/facts/specs/forge-ot.facts.json",
+      "adapter_id": "forge-ot"
+    },
+    "manifest": "src/forge/modules/ot/manifest.json",
+    "fvts": [
+      "forge-core/src/python/forge_core/fxts/fvts/specs/forge-ot.fvts.json"
+    ]
+  },
+  "baseline": {
+    "M-1": "met",
+    "M-2": "met",
+    "M-3": "met",
+    "M-4": "met",
+    "M-5": "met",
+    "M-6": "met",
+    "M-7": "met",
+    "M-8": "met",
+    "M-9": "met",
+    "M-10": "waived",
+    "M-11": "waived",
+    "M-12": "waived",
+    "M-13": "waived",
+    "M-14": "waived",
+    "M-15": "waived",
+    "M-16": "not_applicable"
+  },
+  "waivers": [
+    {
+      "requirement": "M-10",
+      "reason": "No module ships a roles file yet: the roles file has no FxTS spec to be written against, and the hub still uses its own flat roles.",
+      "backlog_item": "FB-141"
+    },
+    {
+      "requirement": "M-11",
+      "reason": "The OT module is hub-hosted Python with its own layout; no module SDK template exists for a hub-hosted module.",
+      "backlog_item": "FB-146"
+    },
+    {
+      "requirement": "M-12",
+      "reason": "The record id rule of the transport contract (T-5) is not built: records carry an id the adapter makes, and the hub does not yet keep each id once.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-13",
+      "reason": "The module has a store-and-forward buffer of its own for acquisition, but not the transport contract's (T-6): no declared capacity on the hub link, no replay at a separate rate, and buffering is not on its health.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-14",
+      "reason": "The goodbye and the last will of the transport contract (T-8) are not built: the hub learns of a shutdown only when calls stop.",
+      "backlog_item": "FB-164"
+    },
+    {
+      "requirement": "M-15",
+      "reason": "Command expiry (T-11) is not built: a process-control write carries no expiry for the module to refuse it by.",
+      "backlog_item": "FB-164"
+    }
+  ],
+  "time_contract": {
+    "hub": {
+      "exchange": "four-timestamp",
+      "fail_closed": true
+    },
+    "plant_floor_devices": "declared-in-facts",
+    "databases": [],
+    "third_party_systems": []
+  },
+  "user_interface": {
+    "ships_ui_code": false,
+    "screens": true
+  },
+  "scaffold": {
+    "template": "none"
+  },
+  "metadata": {
+    "hosting": "hub-hosted Python module",
+    "state": "Forge's own OT module: PLC and OPC UA connections, the tag engine, alarms and control writes. It carries one identity since 2026-11-18, the approved FACTS spec's, in its manifest file and in the manifest its code registers with (FB-144).",
+    "time_contract_state": "Its plant-floor connections are declared in the FACTS spec's time_governance (OPC UA current time, class T0). M-4 to M-7 are run by the conformance kit through the module's own hook (src/forge/modules/ot/conformance.py): the adapter on a real tag registry with two stamped tags, against a reference hub. No PLC or OPC UA server is connected, so a connection's clock gate is not exercised by the kit; its own tests cover it.",
+    "note": "The local SQLite store-and-forward buffer is not declared as a database; whether M-8 covers it is the owner's to decide (FB-147)."
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": "b4a9586c6262948c86cca0814068e7adf6fb1cea6bb2d0c61d163ac791ad9cb0",
+    "change_history": [
+      {
+        "previous_hash": "b4a9586c6262948c86cca0814068e7adf6fb1cea6bb2d0c61d163ac791ad9cb0",
+        "new_hash": "9be3e745131f6f8d541f4315e31f906acef14dc5b1b90de62f2612e2202a095e",
+        "changed_at": "2026-11-23T02:07:49Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "paths follow the move of forge-core to its own folder (D-17 step 3, FB-199); nothing else changed"
+      },
+      {
+        "previous_hash": "6f2ccc1a528fe4d646c0bbcd0c499ca55b79b28e8d003410f6f584681e096aa2",
+        "new_hash": "b4a9586c6262948c86cca0814068e7adf6fb1cea6bb2d0c61d163ac791ad9cb0",
+        "changed_at": "2026-11-19T21:46:25Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "FB-153: FMTS 2.0.0, the module's function and the data classes it carries (owner, 2026-11-19)"
+      },
+      {
+        "previous_hash": "8dd87c2729105c1af0b702ab990e8d55a37fc887091c4fa1b4b702e0d4913d51",
+        "new_hash": "6f2ccc1a528fe4d646c0bbcd0c499ca55b79b28e8d003410f6f584681e096aa2",
+        "changed_at": "2026-11-19T18:38:28Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-165: the M-13 waiver states what forge-ot's own buffer lacks"
+      }
+    ],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "9be3e745131f6f8d541f4315e31f906acef14dc5b1b90de62f2612e2202a095e",
+    "schema_version": "2.0.0",
+    "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-23T02:14:29Z"
+  }
+}

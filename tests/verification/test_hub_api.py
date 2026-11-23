@@ -15,7 +15,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from forge.api.main import create_app
-from forge.core.models.adapter import (
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
     AdapterTier,

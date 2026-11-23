@@ -12,8 +12,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from forge.core.models.manufacturing.enums import EventCategory, EventSeverity
-from forge.core.models.manufacturing.operational_event import OperationalEvent
+from forge_core.models.manufacturing.enums import EventCategory, EventSeverity
+from forge_core.models.manufacturing.operational_event import OperationalEvent
 
 
 def map_trap_event(raw_trap: dict) -> OperationalEvent | None:

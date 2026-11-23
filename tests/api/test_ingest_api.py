@@ -11,14 +11,14 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from forge.api.main import create_app
-from forge.core.models.adapter import (
+from forge.ingest.pipeline import IngestPipeline, InMemoryRecordSink
+from forge.storage.config import StorageConfig
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
     DataContract,
     TimeGovernance,
 )
-from forge.ingest.pipeline import IngestPipeline, InMemoryRecordSink
-from forge.storage.config import StorageConfig
 
 
 def _manifest(adapter_id: str = "forge-wms", *, declared: bool = True) -> dict:

@@ -1,0 +1,294 @@
+"""ContextualRecord — the fundamental data unit in Forge.
+
+A contextual record is a value with its operational context attached.
+This is the core innovation that makes decision-quality possible.
+The value 78.4°F means something very different depending on whether
+the fermenter is in production, CIP, startup, or idle mode.
+"""
+
+from __future__ import annotations
+
+from datetime import datetime
+from enum import StrEnum
+from typing import Any, ClassVar
+from uuid import UUID, uuid4
+
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from forge_core.clock import SOURCE_CLOCK_PATTERN, OneClockModel, TimeQuality, utc_now
+from forge_core.schema_ref import require_versioned_ref
+
+
+class QualityCode(StrEnum):
+    """OPC UA-inspired data quality codes."""
+
+    GOOD = "GOOD"
+    UNCERTAIN = "UNCERTAIN"
+    BAD = "BAD"
+    NOT_AVAILABLE = "NOT_AVAILABLE"
+
+
+class RecordTimestamp(OneClockModel):
+    """Triple-timestamp for full temporal context.
+
+    source_time: when the value was generated at the source system
+    server_time: when the source system's server processed it
+    ingestion_time: when the hub received it, by the hub's clock
+    spoke_time: the spoke's own clock when it sent the record
+
+    The hub stamps ``ingestion_time`` on receipt (one clock, FB-087) and never
+    takes a spoke's stamp for arrival. ``spoke_time`` is on the wire since FB-092
+    (proto field 10); a record from a spoke that still puts its send time in
+    ``ingestion_time`` has it moved there on receipt. Every field is UTC and
+    timezone-aware (FB-014): a naive value, or an ISO string without an offset, is
+    rejected rather than read as UTC. ``source_time`` is never invented (FB-088): a value the source
+    did not stamp is refused unless its connection declared ``origin: forge``,
+    and then ``source_clock`` says so and ``source_uncertainty_seconds`` carries
+    the poll bound. Once the stamping clock is measured (FB-094), ``source_time``
+    is the stamp corrected to master time on entry at the spoke, and the record
+    keeps what was done: ``source_time_as_sent``, ``source_offset_seconds``,
+    ``source_uncertainty_seconds`` and ``time_quality`` (the one-clock record's
+    P-3).
+    """
+
+    # The timestamps a view or a quality rule may take as its time axis: the source's
+    # two and the hub's receipt. The FVTS ``timestampBasis`` enum mirrors this tuple.
+    # ``spoke_time`` is a measurement input for the clock-offset check, never a basis.
+    TIME_BASES: ClassVar[tuple[str, ...]] = ("source_time", "server_time", "ingestion_time")
+
+    source_time: datetime
+    server_time: datetime | None = None
+    ingestion_time: datetime = Field(default_factory=utc_now)
+    spoke_time: datetime | None = Field(
+        default=None,
+        description=(
+            "The spoke's own clock when it sent the record (one-clock record P-3, the name "
+            "the owner approved in Q-2; ``sent_time`` until FB-092). Set by the spoke; the "
+            "hub keeps it for the one-way offset measurement of a spoke that does not yet "
+            "report the time exchange. Proto field 10."
+        ),
+    )
+    source_clock: str | None = Field(
+        default=None,
+        pattern=SOURCE_CLOCK_PATTERN,
+        description=(
+            "Which clock stamped source_time (one-clock record, P-3/P-4): device:<name>, "
+            "server:<name>, edge:<name>, or forge when Forge's own read time stands in for a "
+            "stamp the protocol does not carry (FB-088). None until the connection declares "
+            "its origin; FB-094 names it on every record. Proto field 6."
+        ),
+    )
+    source_uncertainty_seconds: float | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "How far source_time may sit from the instant the value occurred, in seconds: "
+            "the poll bound when source_clock is forge (FB-088); half the probe round trip "
+            "plus the sampling bound once the stamping clock is measured (FB-094). Proto "
+            "field 8."
+        ),
+    )
+    source_time_as_sent: datetime | None = Field(
+        default=None,
+        description=(
+            "The stamp exactly as the stamping clock sent it (one-clock record P-3); "
+            "source_time is this minus source_offset_seconds once the clock is measured, "
+            "and equal to it until then. None when Forge's own read time stood in. Proto "
+            "field 5."
+        ),
+    )
+    source_offset_seconds: float | None = Field(
+        default=None,
+        description=(
+            "The offset subtracted from the stamp on entry (stamping clock minus master, "
+            "FB-089's sign); None when no measured clock was applied. Proto field 7."
+        ),
+    )
+    time_quality: TimeQuality | None = Field(
+        default=None,
+        description=(
+            "IEC 61850 TimeQuality in Forge's words, set when the stamping clock is "
+            "measured: synchronized, clock_failure, leap_seconds_known, accuracy_class. "
+            "Proto field 9."
+        ),
+    )
+
+
+class RecordValue(BaseModel):
+    """The actual value with its engineering context."""
+
+    raw: Any
+    engineering_units: str | None = None
+    quality: QualityCode = QualityCode.GOOD
+    data_type: str = "string"
+
+
+def _aware_datetime(value: Any) -> datetime | None:
+    """``value`` as a timezone-aware datetime, or None if it is not one (naive included)."""
+    if isinstance(value, datetime):
+        return value if value.tzinfo is not None else None
+    if isinstance(value, str) and value:
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        return parsed if parsed.tzinfo is not None else None
+    return None
+
+
+class RecordContext(OneClockModel):
+    """Operational context that travels with every data record.
+
+    This is what makes Forge different from a raw data pipeline.
+    Every record carries enough context for correct interpretation.
+
+    The named slots are the context field registry
+    (``forge_core.registry.context_fields``), one attribute per registered
+    field; ``extra`` holds what a spoke adds beyond them (FB-013). A producer
+    that still sends a registered field inside ``extra`` (``shift``,
+    ``shift_id``, ``event_type``, ``work_order_id``, ``event_timestamp``)
+    finds it lifted into its slot when the slot is empty; an
+    ``event_timestamp`` that is not an aware datetime stays in ``extra``, since
+    a naive value is rejected at the slot (one clock, FB-014). ``shift`` is
+    accepted as an alias of ``shift_id`` on input and as an attribute, for
+    the spokes that still use the name the slot had until FB-013.
+    """
+
+    #: The registry fields a producer may still send inside ``extra``.
+    LIFTED_FROM_EXTRA: ClassVar[tuple[str, ...]] = (
+        "shift_id",
+        "event_type",
+        "work_order_id",
+        "event_timestamp",
+    )
+
+    equipment_id: str | None = None
+    area: str | None = None
+    site: str | None = None
+    batch_id: str | None = None
+    lot_id: str | None = None
+    recipe_id: str | None = None
+    operating_mode: str | None = None
+    shift_id: str | None = Field(default=None, validation_alias=AliasChoices("shift_id", "shift"))
+    operator_id: str | None = None
+    event_type: str | None = None
+    event_timestamp: datetime | None = None
+    work_order_id: str | None = None
+    extra: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _lift_registry_fields(cls, data: Any) -> Any:
+        """Move the registry's fields out of ``extra`` into their slots (FB-013)."""
+        if not isinstance(data, dict):
+            return data
+        extra = data.get("extra")
+        if not isinstance(extra, dict) or not extra:
+            return data
+        out = dict(data)
+        remaining = dict(extra)
+        for key in ("shift", *cls.LIFTED_FROM_EXTRA):
+            if key not in remaining:
+                continue
+            slot = "shift_id" if key == "shift" else key
+            if out.get(slot) is not None or (slot == "shift_id" and out.get("shift") is not None):
+                continue
+            value = remaining[key]
+            if slot == "event_timestamp":
+                value = _aware_datetime(value)
+            if value is None or value == "":
+                continue
+            out[slot] = value
+            del remaining[key]
+        out["extra"] = remaining
+        return out
+
+    @property
+    def shift(self) -> str | None:
+        """``shift_id`` under the name the slot had until FB-013."""
+        return self.shift_id
+
+    @shift.setter
+    def shift(self, value: str | None) -> None:
+        self.shift_id = value
+
+
+class RecordLineage(BaseModel):
+    """Provenance chain — where this record came from and how it was transformed."""
+
+    schema_ref: str = Field(
+        description=(
+            "Contract ref of the producing adapter, forge://schemas/<spoke>/v<version>,"
+            " or a version ref of one of its schemas (forge_core.schema_ref, FB-008)."
+        )
+    )
+    adapter_id: str
+    adapter_version: str
+    transformation_chain: list[str] = Field(default_factory=list)
+
+    @field_validator("schema_ref")
+    @classmethod
+    def _schema_ref_is_versioned(cls, value: str) -> str:
+        return require_versioned_ref(value, field="lineage.schema_ref")
+
+
+class RecordSource(BaseModel):
+    """Source identification — which adapter and system produced this record."""
+
+    adapter_id: str
+    system: str
+    tag_path: str | None = None
+    connection_id: str | None = None
+
+
+class ContextualRecord(BaseModel):
+    """The fundamental data unit in Forge.
+
+    Every piece of data that enters the platform is wrapped in a
+    ContextualRecord that preserves its operational context, source,
+    timestamps, and lineage. This ensures that when an analyst,
+    dashboard, AI model, or automated workflow later reads this value,
+    the context required for correct interpretation is present.
+    """
+
+    record_id: UUID = Field(default_factory=uuid4)
+    source: RecordSource
+    timestamp: RecordTimestamp
+    value: RecordValue
+    context: RecordContext = Field(default_factory=RecordContext)
+    lineage: RecordLineage
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "record_id": "01234567-89ab-cdef-0123-456789abcdef",
+                "source": {
+                    "adapter_id": "opcua-generic",
+                    "system": "ignition-prod",
+                    "tag_path": "Area1/Fermenter3/Temperature",
+                },
+                "timestamp": {
+                    "source_time": "2026-04-05T14:30:00.123Z",
+                    "ingestion_time": "2026-04-05T14:30:00.200Z",
+                },
+                "value": {
+                    "raw": 78.4,
+                    "engineering_units": "°F",
+                    "quality": "GOOD",
+                    "data_type": "float64",
+                },
+                "context": {
+                    "equipment_id": "FERM-003",
+                    "batch_id": "B2026-0405-003",
+                    "operating_mode": "PRODUCTION",
+                    "shift_id": "B",
+                    "event_type": "process.value",
+                },
+                "lineage": {
+                    "schema_ref": "forge://schemas/opcua-generic/v1",
+                    "adapter_id": "opcua-generic",
+                    "adapter_version": "0.1.0",
+                },
+            }
+        }
+    )

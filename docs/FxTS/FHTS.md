@@ -147,7 +147,7 @@ The FHTS registry (`fhts/specs/fhts-registry.json`) maintains a central record a
 
 ## Runner
 
-**Location:** `src/forge/governance/fhts/runners/fhts_runner.py`
+**Location:** `forge-core/src/python/forge_core/fxts/fhts/runners/fhts_runner.py`
 **Class:** `FHTSRunner(FxTSRunner)`
 
 ### Check Catalog
@@ -183,7 +183,7 @@ forge governance run fhts --verify-all --format json --output reports/fhts.json
 
 ## Registry
 
-**Location:** `src/forge/governance/fhts/registry.py`
+**Location:** `forge-core/src/python/forge_core/fxts/fhts/registry.py`
 **Class:** `FHTSRegistry`
 **Persistence:** `governance/fhts/specs/fhts-registry.json`
 
@@ -204,7 +204,7 @@ forge governance run fhts --verify-all --format json --output reports/fhts.json
 
 A spec's hash covers the spec. The schema a spec is written against is hashed and approved the same way, so that a schema cannot change under an approved spec (D-14, F-2 and F-10; owner, 2026-11-18: "when a FxTS schema changes so must the hash, this functionality should be built directly into the FxTS framework").
 
-**Layout**, per framework, under `src/forge/governance/<framework>/schema/`:
+**Layout**, per framework, under `forge-core/src/python/forge_core/fxts/<framework>/schema/`:
 
 | File | What it is |
 |---|---|
@@ -212,7 +212,7 @@ A spec's hash covers the spec. The schema a spec is written against is hashed an
 | `versions/<framework>.v<version>.schema.json` | one frozen copy per released version; never edited |
 | `schema-registry.json` | every version: its file, hash, step, summary, and the owner's approval |
 
-**Rules** (`src/forge/governance/shared/schemas.py`):
+**Rules** (`forge-core/src/python/forge_core/fxts/shared/schemas.py`):
 
 | Rule | How it is held |
 |---|---|

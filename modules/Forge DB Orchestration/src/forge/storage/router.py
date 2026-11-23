@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 from forge.storage.registry import SchemaRegistry, StorageEngine
 
 if TYPE_CHECKING:
-    from forge.core.models.contextual_record import ContextualRecord
+    from forge_core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 

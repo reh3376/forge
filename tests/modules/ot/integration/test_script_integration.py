@@ -8,13 +8,13 @@ from pathlib import Path
 
 import pytest
 
-from forge.sdk.scripting.audit import (
+from forge_core.sdk.scripting.audit import (
     ScriptAuditTrail,
     clear_execution_context,
     get_execution_context,
 )
-from forge.sdk.scripting.engine import ScriptEngine
-from forge.sdk.scripting.rbac import ScriptPermission, ScriptRBAC
+from forge_core.sdk.scripting.engine import ScriptEngine
+from forge_core.sdk.scripting.rbac import ScriptPermission, ScriptRBAC
 
 
 def _write_script(scripts_dir: Path, name: str, content: str) -> Path:
@@ -26,14 +26,14 @@ def _write_script(scripts_dir: Path, name: str, content: str) -> Path:
 OWNER_SCRIPT = """\
 __forge_owner__ = "commissioning"
 
-from forge.sdk.scripting.triggers import on_tag_change
+from forge_core.sdk.scripting.triggers import on_tag_change
 
 received_contexts = []
 
 @on_tag_change("WH/WHK01/Distillery01/*/Out_PV")
 async def on_temp_change(event):
     # Record the context that was set before handler invocation
-    from forge.sdk.scripting.audit import get_execution_context
+    from forge_core.sdk.scripting.audit import get_execution_context
     ctx = get_execution_context()
     received_contexts.append({
         "script_name": ctx.script_name,
@@ -45,7 +45,7 @@ async def on_temp_change(event):
 """
 
 DEFAULT_OWNER_SCRIPT = """\
-from forge.sdk.scripting.triggers import on_event
+from forge_core.sdk.scripting.triggers import on_event
 
 received = []
 
@@ -160,8 +160,8 @@ class TestScriptExecutionContext:
         scripts.mkdir()
 
         script = """\
-from forge.sdk.scripting.triggers import on_event
-from forge.sdk.scripting.audit import get_execution_context
+from forge_core.sdk.scripting.triggers import on_event
+from forge_core.sdk.scripting.audit import get_execution_context
 
 captured = []
 
@@ -188,8 +188,8 @@ async def on_startup(event):
         scripts.mkdir()
 
         script = """\
-from forge.sdk.scripting.triggers import on_alarm
-from forge.sdk.scripting.audit import get_execution_context
+from forge_core.sdk.scripting.triggers import on_alarm
+from forge_core.sdk.scripting.audit import get_execution_context
 
 captured = []
 
@@ -235,12 +235,12 @@ class TestScriptWithAuditTrail:
 
         script = """\
 __forge_owner__ = "commissioning"
-from forge.sdk.scripting.triggers import on_tag_change
+from forge_core.sdk.scripting.triggers import on_tag_change
 
 @on_tag_change("WH/**")
 async def handler(event):
     # Simulate a tag write that would be audited
-    from forge.sdk.scripting.audit import get_execution_context
+    from forge_core.sdk.scripting.audit import get_execution_context
     ctx = get_execution_context()
     # Store for test verification
     import sys
@@ -270,7 +270,7 @@ async def handler(event):
         ctx = mod._last_ctx
 
         # Record an audit entry as if forge.tag.write() was called
-        from forge.sdk.scripting.audit import set_execution_context
+        from forge_core.sdk.scripting.audit import set_execution_context
 
         set_execution_context(ctx)
         entry = audit.record_tag_write(

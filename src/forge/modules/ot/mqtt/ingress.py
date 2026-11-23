@@ -4,7 +4,7 @@
 from a broker and call ``process_message``. Two transports:
 
 * :class:`LocalBrokerIngress` — in-process subscription on the embedded
-  :class:`~forge.core.broker.ForgeMqttBroker` (the MES backend publishes
+  :class:`~forge_core.broker.ForgeMqttBroker` (the MES backend publishes
   to the hub's broker port). Retained messages matching the subscriber's
   filters are replayed on start, flagged ``retain=True`` so handlers can
   treat them as state synchronisation.
@@ -29,8 +29,8 @@ from forge.modules.ot.mqtt.subscriber import IncomingMessage
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from forge.core.broker.broker import ForgeMqttBroker
     from forge.modules.ot.mqtt.subscriber import MqttSubscriber
+    from forge_core.broker.broker import ForgeMqttBroker
 
 logger = logging.getLogger(__name__)
 

@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from forge.sdk.scripting.engine import ScriptEngine
-from forge.sdk.scripting.triggers import TriggerType
+from forge_core.sdk.scripting.engine import ScriptEngine
+from forge_core.sdk.scripting.triggers import TriggerType
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -21,7 +21,7 @@ def _write_script(scripts_dir: Path, name: str, content: str) -> Path:
 
 
 BASIC_SCRIPT = """\
-from forge.sdk.scripting.triggers import on_tag_change, timer, on_event
+from forge_core.sdk.scripting.triggers import on_tag_change, timer, on_event
 
 @on_tag_change("WH/WHK01/Distillery01/*/Out_PV")
 async def on_temp_change(event):
@@ -37,7 +37,7 @@ async def on_startup(event):
 """
 
 ALARM_SCRIPT = """\
-from forge.sdk.scripting.triggers import on_alarm
+from forge_core.sdk.scripting.triggers import on_alarm
 
 @on_alarm(priorities=["CRITICAL", "HIGH"])
 async def on_critical(event):
@@ -160,7 +160,7 @@ class TestReload:
 
         # Modify: remove one handler, add alarm handler
         updated = """\
-from forge.sdk.scripting.triggers import on_tag_change
+from forge_core.sdk.scripting.triggers import on_tag_change
 
 @on_tag_change("WH/**")
 async def simplified(event):
@@ -188,7 +188,7 @@ class TestDispatch:
 
         # Script that records calls
         script = """\
-from forge.sdk.scripting.triggers import on_tag_change
+from forge_core.sdk.scripting.triggers import on_tag_change
 
 received = []
 
@@ -242,7 +242,7 @@ async def handler(event):
         scripts.mkdir()
 
         script = """\
-from forge.sdk.scripting.triggers import on_event
+from forge_core.sdk.scripting.triggers import on_event
 
 started = False
 
@@ -269,7 +269,7 @@ async def handler(event):
         scripts.mkdir()
 
         script = """\
-from forge.sdk.scripting.triggers import on_alarm
+from forge_core.sdk.scripting.triggers import on_alarm
 
 received = []
 

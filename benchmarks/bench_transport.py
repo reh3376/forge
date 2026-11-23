@@ -21,7 +21,8 @@ _src = Path(__file__).resolve().parent.parent / "src"
 if str(_src) not in sys.path:
     sys.path.insert(0, str(_src))
 
-from forge.core.models.contextual_record import (
+from forge_core.link.serialization import proto_to_pydantic, pydantic_to_proto
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,
@@ -30,7 +31,6 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.transport.serialization import proto_to_pydantic, pydantic_to_proto
 
 
 def make_record() -> ContextualRecord:

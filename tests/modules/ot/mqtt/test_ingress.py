@@ -8,9 +8,9 @@ from typing import Any, ClassVar
 
 import pytest
 
-from forge.core.broker.broker import BrokerConfig, ForgeMqttBroker
 from forge.modules.ot.mqtt.ingress import ExternalBrokerIngress, LocalBrokerIngress
 from forge.modules.ot.mqtt.subscriber import IncomingMessage, MqttSubscriber
+from forge_core.broker.broker import BrokerConfig, ForgeMqttBroker
 
 STATE_T = "whk/whk01/cooker/changeover/state"
 RECIPE_T = "whk/whk01/cooker/recipe/next"

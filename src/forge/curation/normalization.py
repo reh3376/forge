@@ -13,8 +13,8 @@ import math
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
-from forge.core.clock import require_utc
-from forge.core.models.contextual_record import ContextualRecord, RecordValue
+from forge_core.clock import require_utc
+from forge_core.models.contextual_record import ContextualRecord, RecordValue
 
 # ---------------------------------------------------------------------------
 # Unit Conversion

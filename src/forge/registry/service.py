@@ -32,7 +32,6 @@ from typing import TYPE_CHECKING, Any
 from fastapi import APIRouter, FastAPI, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from forge.core.schema_ref import require_schema_id
 from forge.registry.compatibility import (
     CompatibilityResult,
     check_compatibility,
@@ -40,6 +39,7 @@ from forge.registry.compatibility import (
 )
 from forge.registry.models import CompatibilityMode, SchemaMetadata, SchemaType
 from forge.registry.store import InMemorySchemaStore, SchemaStore
+from forge_core.schema_ref import require_schema_id
 
 if TYPE_CHECKING:
     from collections.abc import Sequence

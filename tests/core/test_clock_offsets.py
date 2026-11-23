@@ -7,8 +7,8 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from forge.core import telemetry
-from forge.core.clock import (
+from forge_core import telemetry
+from forge_core.clock import (
     CLOCK_TOLERANCE_ENV,
     DEFAULT_CLOCK_TOLERANCE_SECONDS,
     SERVER_LINK,
@@ -17,7 +17,7 @@ from forge.core.clock import (
     ClockOffsetTracker,
     clock_tolerance_seconds,
 )
-from forge.core.models.contextual_record import RecordTimestamp
+from forge_core.models.contextual_record import RecordTimestamp
 from tests.otel import metric_reader
 
 T0 = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
@@ -119,7 +119,7 @@ class TestToleranceAlert:
         tracker = ClockOffsetTracker(
             tolerance_seconds=0.5, on_breach=lambda aid, s: breaches.append((aid, s.link))
         )
-        with caplog.at_level(logging.INFO, logger="forge.core.clock"):
+        with caplog.at_level(logging.INFO, logger="forge_core.clock"):
             assert tracker.observe("a", SPOKE_LINK, 0.1, T0).within_tolerance
             out = tracker.observe("a", SPOKE_LINK, 2.0, T0)
             assert not out.within_tolerance and out.breaches == 1

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from forge.core.models.identity import ROLE_RANK, ForgeUser, Role
+from forge_core.models.identity import ROLE_RANK, ForgeUser, Role
 
 
 @dataclass

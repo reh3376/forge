@@ -35,7 +35,7 @@ Example
 -------
 ::
 
-    from forge.sdk.module_builder import ManifestBuilder, ModuleScaffolder
+    from forge_core.sdk.module_builder import ManifestBuilder, ModuleScaffolder
 
     manifest = (
         ManifestBuilder("acme-plc")
@@ -67,7 +67,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from forge.sdk.module_builder.generators import (
+from forge_core.sdk.module_builder.generators import (
     generate_adapter,
     generate_config,
     generate_context,

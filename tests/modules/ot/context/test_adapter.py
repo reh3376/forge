@@ -5,15 +5,6 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from forge.core.clock import (
-    CLOCK_OK,
-    CLOCK_OUT_OF_TOLERANCE,
-    CLOCK_UNREADABLE,
-    ClockGateTransition,
-    SourceStampMissingError,
-)
-from forge.core.models.adapter import AdapterState
-from forge.core.models.contextual_record import ContextualRecord
 from forge.modules.ot.adapter import OTModuleAdapter
 from forge.modules.ot.context.store_forward import StoreForwardBuffer
 from forge.modules.ot.opcua_client.types import DataType, QualityCode
@@ -22,6 +13,15 @@ from forge.modules.ot.tag_engine.models import (
     StandardTag,
     TagValue,
 )
+from forge_core.clock import (
+    CLOCK_OK,
+    CLOCK_OUT_OF_TOLERANCE,
+    CLOCK_UNREADABLE,
+    ClockGateTransition,
+    SourceStampMissingError,
+)
+from forge_core.models.adapter import AdapterState
+from forge_core.models.contextual_record import ContextualRecord
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -548,7 +548,7 @@ class TestControlComposition:
         assert adapter.source_timestamp_origin_for(tag("WHK03")) == "forge"
 
         # the clock estimate for the correction on entry comes from the manager (FB-094 step 3)
-        from forge.core.clock import SERVER_LINK
+        from forge_core.clock import SERVER_LINK
 
         assert adapter.clock_estimate_for(tag("WHK01")) is None
         manager = adapter.control_runtime.connections

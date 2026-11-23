@@ -30,13 +30,13 @@ from itertools import product
 
 import pytest
 
-from forge.core.models.alarm import OPERATOR_ALARM_ACTIONS, SYSTEM_ALARM_ACTIONS
 from forge.modules.ot.alarming.models import AlarmAction, AlarmInstance, AlarmState
 from forge.modules.ot.alarming.state_machine import (
     AlarmStateMachine,
     InvalidTransitionError,
     TransitionResult,
 )
+from forge_core.models.alarm import OPERATOR_ALARM_ACTIONS, SYSTEM_ALARM_ACTIONS
 
 MACHINE = AlarmStateMachine()
 STATES = tuple(AlarmState)

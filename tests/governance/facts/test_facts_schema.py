@@ -17,6 +17,8 @@ from pathlib import Path
 
 import pytest
 
+from forge_core.fxts import FXTS_ROOT
+
 # ---------------------------------------------------------------------------
 # The jsonschema ≥4.18 is a project dependency (Python 3.12+ target).
 # In this sandbox (3.10), the test runner must find it on sys.path —
@@ -35,15 +37,7 @@ except ImportError:
 # Fixtures
 # ---------------------------------------------------------------------------
 
-SCHEMA_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "src"
-    / "forge"
-    / "governance"
-    / "facts"
-    / "schema"
-    / "facts.schema.json"
-)
+SCHEMA_PATH = FXTS_ROOT / "facts" / "schema" / "facts.schema.json"
 
 
 @pytest.fixture(scope="module")
@@ -439,7 +433,7 @@ class TestPatternValidation:
         minimal_spec: dict,
         ref: str,
     ):
-        """forge.core.schema_ref: forge://schemas/<spoke>[/<Entity>]/v<version> (FB-008)."""
+        """forge_core.schema_ref: forge://schemas/<spoke>[/<Entity>]/v<version> (FB-008)."""
         minimal_spec["data_contract"]["schema_ref"] = ref
         with pytest.raises(ValidationError):
             validator.validate(minimal_spec)

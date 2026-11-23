@@ -11,8 +11,8 @@ from forge.adapters.forge_wms.record_builder import (
     _extract_source_time,
     build_contextual_record,
 )
-from forge.core.clock import SourceStampMissingError
-from forge.core.models.contextual_record import (
+from forge_core.clock import SourceStampMissingError
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,

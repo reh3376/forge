@@ -21,27 +21,6 @@ import logging
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
-from forge.adapters.base.interface import AdapterBase, DiscoveryProvider
-from forge.core.clock import SourceStampMissingError, resolve_source_stamp
-from forge.core.models.adapter import (
-    AdapterCapabilities,
-    AdapterHealth,
-    AdapterManifest,
-    AdapterState,
-    AdapterTier,
-    DataContract,
-)
-from forge.core.models.contextual_record import (
-    ContextualRecord,
-    RecordContext,
-    RecordLineage,
-    RecordSource,
-    RecordTimestamp,
-    RecordValue,
-)
-from forge.core.models.contextual_record import (
-    QualityCode as CoreQualityCode,
-)
 from forge.modules.ot.bridge.models import (
     BridgeConfig,
     BridgeHealth,
@@ -50,6 +29,27 @@ from forge.modules.ot.bridge.models import (
     IgnitionTagValue,
 )
 from forge.modules.ot.context.resolvers import EnrichmentPipeline
+from forge_core.adapter.interface import AdapterBase, DiscoveryProvider
+from forge_core.clock import SourceStampMissingError, resolve_source_stamp
+from forge_core.models.adapter import (
+    AdapterCapabilities,
+    AdapterHealth,
+    AdapterManifest,
+    AdapterState,
+    AdapterTier,
+    DataContract,
+)
+from forge_core.models.contextual_record import (
+    ContextualRecord,
+    RecordContext,
+    RecordLineage,
+    RecordSource,
+    RecordTimestamp,
+    RecordValue,
+)
+from forge_core.models.contextual_record import (
+    QualityCode as CoreQualityCode,
+)
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -60,7 +60,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 # Schema ref for bridge-sourced records (distinct from OT Module direct)
-# Version ref of the module's bridge schema (forge.core.schema_ref, FB-008).
+# Version ref of the module's bridge schema (forge_core.schema_ref, FB-008).
 _BRIDGE_SCHEMA_REF = "forge://schemas/forge-ot/bridge/v0.3.0"
 _BRIDGE_ADAPTER_ID = "ignition-bridge"
 _BRIDGE_ADAPTER_VERSION = "0.1.0"
