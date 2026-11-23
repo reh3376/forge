@@ -3,9 +3,6 @@
 
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 import pytest
 
 from forge_core.link.spoke_client import InMemoryChannel
@@ -15,9 +12,6 @@ from forge_hub.link.hub_server import InMemoryServicer
 
 # ── Import WMS and MES adapters if available ──────────────────────────────
 
-_src = Path(__file__).resolve().parent.parent.parent / "src"
-if str(_src) not in sys.path:
-    sys.path.insert(0, str(_src))
 
 try:
     from forge.adapters.forge_wms.adapter import ForgeWmsAdapter

@@ -6,7 +6,7 @@
 ``forge_core.equipment_registry`` since F20/F21, but no migration created the
 tables, and since FB-001 the hub serves both registries from memory. This
 migration creates the three tables the stores' SQL expects, column for
-column (``tests/storage/test_migrations.py`` holds the alignment), and the
+column (``forge-hub/tests/storage/test_migrations.py`` holds the alignment), and the
 storage factory hands the Postgres stores to the hub.
 
 * ``registry_schemas`` — one row per schema: identity, type, compatibility
