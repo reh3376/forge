@@ -354,9 +354,9 @@ One test: every major directory has the required entries of §10.3, no governed 
 
 Each is the owner's, asked one at a time. Until one is answered, the signed record it touches stands as written.
 
-| # | Question | The record it touches |
+| # | Question | The record it touches, or the answer |
 |---|---|---|
-| C-1 | How a hub reaches forge-core: up the chain of command, each hub to the one above it, with forge-core as the parent of the enterprise hub; or every hub to forge-core directly. | The transport contract, T-13 ("a hub is a module to its parent") |
+| C-1 | How a hub reaches forge-core. | **Answered 2026-11-22: up the chain of command.** The owner's words: "We long ago established how hubs interact with each other. Each hub only worries about the modules / spokes attached to it and the hub one layer up attached to it." So forge-core is the layer above the enterprise hub; state rolls up one layer at a time and changes roll down the same way. No hub below the enterprise hub connects to forge-core. This is the transport contract's T-13 ("a hub is a module to its parent") applied once more at the top; nothing signed changes. |
 | C-2 | Where roles are mastered: today at the "managing hub", the top hub. | `roles.md`, R-16 and R-18 |
 | C-3 | Whether the time authority stays with the top hub, time being operational. | `one-clock-ot-source-time.md` |
 | C-4 | Where forge-core runs: its own process beside the enterprise hub, or inside it. | A-1; the image and deployment |
