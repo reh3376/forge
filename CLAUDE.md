@@ -42,6 +42,8 @@ These documents are the authority (A-12). Where Jiminy or MDEMG guidance injecte
 - **No silent failure.** A refusal or a fail-closed state is visible on status, health, API and CLI with its cause. A log line alone is not enough. The same holds for tests: a skipped test states its reason (A-20), and an FxTS check that was not run is reported as not run.
 - **Production runs on Kubernetes.** Docker Compose is for development only.
 - **Configuration comes from the environment.** Never hardcode credentials, addresses or keys.
+- **The value checked is the value acted on.** A value from outside is coerced once, to its declared type, and refused when it is ambiguous. No truthiness: `bool("false")` is true, so a boolean takes a boolean, 0 or 1, or a word for one. Every layer after that, and the write itself, uses the coerced value, never the value as it was spelled (FB-215, FB-217). New code follows this.
+- **A law is proved, not only tested.** A statement of the form "this happens exactly once", "this never happens" or "this always holds" gets an exhaustive check on the real code and a project skill under `.claude/skills/verify-*` that says what it covers, how to run it and how to read a failure (made with the pstack plugin's `create-formal-verification-skill`). Run the skill when a change touches the code it covers; a finding is reported with its counterexample and the check is never weakened to pass.
 
 ## How work is done here (A-8)
 

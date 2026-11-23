@@ -49,27 +49,33 @@ def test_the_tutorial_and_the_state_document_agree() -> None:
 
 
 def _merged() -> list[tuple[int, str]]:
-    """``(number, commit)`` of every pull request merge in the recent history, newest first."""
+    """``(number, commit)`` of every pull request merge in the recent history.
+
+    In the order of the history, the most recently merged first. That is not the order of
+    the numbers: a pull request opened earlier can be merged later (BACKLOG FB-218: PR 140
+    was merged after PR 141).
+    """
     log = _git("log", "-n", "200", "--format=%H %s")
     found = re.findall(r"^([0-9a-f]{40}) Merge pull request #(\d+) ", log, re.MULTILINE)
-    return sorted(((int(number), commit) for commit, number in found), reverse=True)
+    return [(int(number), commit) for commit, number in found]
 
 
-def allowed_numbers(merged: list[tuple[int, str]], work_after_newest: int) -> set[int]:
+def allowed_numbers(merged: list[tuple[int, str]], work_after_latest: int) -> set[int]:
     """The pull request numbers the documents may name, given the history.
 
-    Once any work follows the newest merge, the documents must name that merge: this is
-    the state of every push. The merge commit itself is the one exception. It is made
-    by the merge, so the documents inside it were written before its number existed
-    and name the pull request before it. Without this the check fails on ``main``
-    after every merge (BACKLOG FB-172: it did, on PR 121 and PR 122).
+    Once any work follows the latest merge, the documents must name the highest number
+    merged: this is the state of every push. A merge commit itself is the exception. It
+    is made by the merge, so the documents inside it were written before, on a branch
+    that could not know which merges would land around it; they may name any of the last
+    three merges. Without this the check fails on ``main`` after a merge (BACKLOG FB-172:
+    PR 121 and PR 122), and after one merged out of the order of its number (FB-218).
     """
     if not merged:  # a shallow checkout without merge commits: nothing to compare against
         return set()
-    newest = merged[0][0]
-    if work_after_newest > 0:
-        return {newest}
-    return {newest} | ({merged[1][0]} if len(merged) > 1 else set())
+    highest = max(number for number, _ in merged)
+    if work_after_latest > 0:
+        return {highest}
+    return {highest} | {number for number, _ in merged[:3]}
 
 
 # The branch the state documents are kept on (CLAUDE.md, "How work is done here").
@@ -133,10 +139,17 @@ def test_which_branches_are_asked() -> None:
 
 def test_what_the_documents_may_name() -> None:
     history = [(122, "b" * 40), (121, "a" * 40)]
-    assert allowed_numbers(history, work_after_newest=1) == {122}  # a push: must be current
-    assert allowed_numbers(history, work_after_newest=0) == {122, 121}  # the merge commit
-    assert allowed_numbers(history[:1], work_after_newest=0) == {122}
-    assert allowed_numbers([], work_after_newest=3) == set()
+    assert allowed_numbers(history, work_after_latest=1) == {122}  # a push: must be current
+    assert allowed_numbers(history, work_after_latest=0) == {122, 121}  # the merge commit
+    assert allowed_numbers(history[:1], work_after_latest=0) == {122}
+    assert allowed_numbers([], work_after_latest=3) == set()
+    # merged out of the order of the numbers: 140 after 141, then 142 (FB-218)
+    out_of_order = [(140, "c" * 40), (141, "b" * 40), (139, "a" * 40)]
+    assert allowed_numbers(out_of_order, work_after_latest=0) == {141, 140, 139}
+    assert allowed_numbers(out_of_order, work_after_latest=2) == {141}
+    later = [(142, "d" * 40), *out_of_order]
+    assert allowed_numbers(later, work_after_latest=0) == {142, 140, 141}
+    assert allowed_numbers(later, work_after_latest=1) == {142}
 
 
 def test_the_status_date_is_not_older_than_the_newest_commit() -> None:
