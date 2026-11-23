@@ -46,7 +46,10 @@ When this skill is invoked with no keyword, print the two tables and the chainin
 | `+blast` | pstack `blast-radius`: what the change breaks elsewhere, with the one fact it is safe because of proven by running code | medium |
 | `+verify` | pstack `maintain-formal-verification-skill`: the formal proofs brought back in line with the code | medium |
 | `+attack` | pstack `interrogate` on the finished change | high (several agents) |
-| `+ship` | `+blast +verify` | medium |
+| `+prove` | pstack `principle-prove-it-works`, as a script: the check on the real artifact is written down, rerun at the gate and its output shown; a check worth keeping becomes a test | low |
+| `+ship` | `+blast +verify +prove` | medium |
+
+**What gate 2 always says, whatever the answer** (working principle 1): what was run on the real thing and what it showed, or plainly that it was not proved and why. `go` never means "push without proving"; `+prove` adds the script and its output.
 
 ## At either gate
 
