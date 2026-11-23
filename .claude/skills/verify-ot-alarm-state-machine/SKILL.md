@@ -21,10 +21,10 @@ description: "Check a change to the forge-ot alarm state machine (ISA-18.2 state
 
 Paths are as of the sync commit; the code moves to `forge-modules/forge-ot/` with BACKLOG FB-201.
 
-**Sync commit:** `e1a50afd` (2026-11-22). See what changed since:
+**Sync commit:** `88cc1c20` (2026-11-22). See what changed since:
 
 ```bash
-git log --oneline e1a50afd..HEAD -- src/forge/modules/ot/alarming/state_machine.py src/forge/modules/ot/alarming/models.py src/forge/core/models/alarm.py
+git log --oneline 88cc1c20..HEAD -- src/forge/modules/ot/alarming/state_machine.py src/forge/modules/ot/alarming/models.py src/forge/core/models/alarm.py
 ```
 
 If that prints commits you did not check, look before you trust a pass. Move the sync commit forward only after you have confirmed the check still describes the code.
