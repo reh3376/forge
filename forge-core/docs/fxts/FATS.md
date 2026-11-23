@@ -26,7 +26,7 @@ FATS governs API contracts. When a FATS spec declares an endpoint, that endpoint
 
 ## Specs
 
-**Location:** `forge-core/src/python/forge_core/fxts/fats/specs/` — 28 specs, one per route the hub app serves on its own (platform, Context Engine under `/v1/context`, Schema Registry under `/v1/schemas`). `forge-hub/tests/api/test_hub_api.py` holds the inventory in both directions: every spec's endpoint is served by the hub, and every served Context Engine and Schema Registry route has a spec (FB-001, 2026-10-22).
+**Location:** `forge-hub/fxts/fats/` — 28 specs, one per route the hub app serves on its own (platform, Context Engine under `/v1/context`, Schema Registry under `/v1/schemas`). `forge-hub/tests/api/test_hub_api.py` holds the inventory in both directions: every spec's endpoint is served by the hub, and every served Context Engine and Schema Registry route has a spec (FB-001, 2026-10-22).
 
 ## Schema
 

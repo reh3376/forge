@@ -47,6 +47,7 @@ from forge_core.fxts.shared.runner import (
     compute_spec_hash,
     verify_spec_hash,
 )
+from forge_hub import fxts as hub_fxts
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -54,7 +55,10 @@ if TYPE_CHECKING:
     from forge_core.fxts.shared.runner import FxTSReport, FxTSRunner
 
 #: ``forge-core/src/python/forge_core/fxts``: every ``<framework>/specs/*.json`` under it is a spec.
+#: These are the specs of the modules, until each moves to its module's folder (FB-201).
 SPEC_ROOT = Path(_fxts.__file__).resolve().parent  # the frameworks, in forge-core
+#: ``forge-hub/fxts``: every ``<framework>/*.json`` under it is a spec of the hub's own (A-3).
+HUB_FXTS = hub_fxts.FXTS_DIR
 #: The governed lists have a schema of their own, released like a framework's (FB-234).
 LISTS = "lists"
 #: The checkout; the FTTS spec lives in its top-level ``specs/``.
@@ -100,16 +104,34 @@ def write_integrity(path: Path, text: str, integrity: dict[str, Any]) -> None:
     path.write_text(render_integrity(text, integrity), encoding="utf-8")
 
 
+def spec_dirs(framework: str) -> tuple[Path, ...]:
+    """Every folder that holds specs of one framework: the modules' and the hub's own."""
+    return (SPEC_ROOT / framework / "specs", HUB_FXTS / framework)
+
+
 def spec_files(root: Path) -> list[Path]:
     """Every governed file: each framework's specs, and the governed lists (FB-153)."""
-    # The real tree keeps the governed lists in the contract; any other root is self-contained.
-    lists = contract.LISTS_DIR if root == SPEC_ROOT else root / "lists"
-    return sorted(root.glob("*/specs/*.json")) + sorted(lists.glob("*.list.json"))
+    in_frameworks = sorted(root.glob("*/specs/*.json"))
+    if root != SPEC_ROOT:  # any other root is self-contained
+        return in_frameworks + sorted((root / "lists").glob("*.list.json"))
+    # The real tree: the hub's own specs lie in its fxts folder, the lists in the contract.
+    specs = sorted(
+        [*in_frameworks, *HUB_FXTS.glob("*/*.json")],
+        key=lambda path: (framework_dir_of(path).name, path.name),
+    )
+    return specs + sorted(contract.LISTS_DIR.glob("*.list.json"))
+
+
+def framework_dir_of(spec_file: Path) -> Path:
+    """The folder named after the framework a spec file lies in, in either layout:
+    ``<framework>/specs/<file>`` (forge-core) or ``fxts/<framework>/<file>`` (A-3)."""
+    folder = spec_file.resolve().parent
+    return folder.parent if folder.name == "specs" else folder
 
 
 def schema_dir_of(spec_file: Path) -> Path | None:
     """The schema directory of the framework a spec file belongs to, when it has a registry."""
-    framework = spec_file.resolve().parent.parent
+    framework = framework_dir_of(spec_file)
     own = spec_file.resolve().parent / "schema"  # a governed list: the schema is beside it
     for candidate in (own, framework / "schema", contract.schema_dir(framework.name)):
         if (candidate / schemas.REGISTRY_NAME).is_file():
@@ -149,7 +171,7 @@ def describe(path: Path) -> dict[str, Any] | None:
         return None
     verified, _ = verify_spec_hash(spec)
     return {
-        "framework": "lists" if path.parent.name == "lists" else path.parent.parent.name,
+        "framework": "lists" if path.parent.name == "lists" else framework_dir_of(path).name,
         "spec": path.name,
         "hash_state": integrity.get("hash_state") or "unknown",
         "approved_by": integrity.get("approved_by") or "",
@@ -342,7 +364,7 @@ class Framework:
     """How the CLI finds, identifies and runs one framework's specs."""
 
     label: str
-    specs_dir: Path
+    specs_dirs: tuple[Path, ...]  # every folder that holds its specs (``spec_dirs``)
     pattern: str
     schema: Path
     identity: tuple[str, ...]  # path of the id the runner checks the target against
@@ -353,7 +375,7 @@ class Framework:
 FRAMEWORKS: dict[str, Framework] = {
     "fats": Framework(
         "FATS",
-        SPEC_ROOT / "fats" / "specs",
+        spec_dirs("fats"),
         "*.json",
         contract.schema_path("fats"),
         ("endpoint",),
@@ -362,7 +384,7 @@ FRAMEWORKS: dict[str, Framework] = {
     ),
     "facts": Framework(
         "FACTS",
-        SPEC_ROOT / "facts" / "specs",
+        spec_dirs("facts"),
         "*.facts.json",
         contract.schema_path("facts"),
         ("adapter_identity", "adapter_id"),
@@ -371,7 +393,7 @@ FRAMEWORKS: dict[str, Framework] = {
     ),
     "fvts": Framework(
         "FVTS",
-        SPEC_ROOT / "fvts" / "specs",
+        spec_dirs("fvts"),
         "*.fvts.json",
         contract.schema_path("fvts"),
         ("view_identity", "view_id"),
@@ -380,7 +402,7 @@ FRAMEWORKS: dict[str, Framework] = {
     ),
     "ftts": Framework(
         "FTTS",
-        SPEC_ROOT / "ftts" / "specs",
+        spec_dirs("ftts"),
         "*.ftts.json",
         contract.schema_path("ftts"),
         ("transport_identity", "transport_id"),
@@ -389,7 +411,7 @@ FRAMEWORKS: dict[str, Framework] = {
     ),
     "futs": Framework(
         "FUTS",
-        SPEC_ROOT / "futs" / "specs",
+        spec_dirs("futs"),
         "*.futs.json",
         contract.schema_path("futs"),
         ("identity", "id"),
@@ -398,7 +420,7 @@ FRAMEWORKS: dict[str, Framework] = {
     ),
     "fmts": Framework(
         "FMTS",
-        SPEC_ROOT / "fmts" / "specs",
+        spec_dirs("fmts"),
         "*.fmts.json",
         contract.schema_path("fmts"),
         ("module_identity", "module_id"),
@@ -406,6 +428,18 @@ FRAMEWORKS: dict[str, Framework] = {
         live=False,
     ),
 }
+
+
+def framework_specs(
+    framework: Framework, directories: tuple[Path, ...] | None = None
+) -> list[Path]:
+    """The spec files of one framework, from every folder that holds them, by file name."""
+    found = [
+        file
+        for directory in (directories or framework.specs_dirs)
+        for file in directory.glob(framework.pattern)
+    ]
+    return sorted(found, key=lambda path: path.name)
 
 
 def identity_of(spec: dict[str, Any], path: tuple[str, ...]) -> str:
@@ -427,15 +461,16 @@ def resolve_spec(
     if path.is_file():
         spec = json.loads(path.read_text(encoding="utf-8"))
         return path, spec, identity_of(spec, framework.identity) or path.stem
-    directory = specs_dir or framework.specs_dir
-    for file in sorted(directory.glob(framework.pattern)):
+    directories = (specs_dir,) if specs_dir else framework.specs_dirs
+    for file in framework_specs(framework, directories):
         try:
             spec = json.loads(file.read_text(encoding="utf-8"))
         except ValueError:
             continue
         if identity_of(spec, framework.identity) == target:
             return file, spec, target
-    msg = f"no {framework.label} spec for '{target}' in {directory} (pass a spec file instead)"
+    where = ", ".join(str(directory) for directory in directories)
+    msg = f"no {framework.label} spec for '{target}' in {where} (pass a spec file instead)"
     raise FileNotFoundError(msg)
 
 
@@ -506,7 +541,7 @@ def schema_rows(names: list[str] | None = None) -> list[dict[str, Any]]:
         if name == LISTS:
             written = sorted(contract.LISTS_DIR.glob("*.list.json"))
         else:
-            written = sorted(FRAMEWORKS[name].specs_dir.glob(FRAMEWORKS[name].pattern))
+            written = framework_specs(FRAMEWORKS[name])
         for file in written:
             declared = json.loads(file.read_text(encoding="utf-8")).get("spec_version", "")
             counts[declared] = counts.get(declared, 0) + 1
@@ -614,22 +649,74 @@ def schema_diff(
     )
 
 
-def index_command(
-    check: Annotated[
-        bool, typer.Option("--check", help="Exit 1 when the page is stale; write nothing")
-    ] = False,
-) -> None:
-    """Rewrite forge-core's index of its governed files from the files themselves."""
+HUB_INDEX_PATH = HUB_FXTS / "README.md"
+
+
+def render_hub_index() -> str:
+    """The hub's index of its own governed files, from the files themselves (D-17 A-2, A-3)."""
+    lines = [
+        "# forge-hub: governed files",
+        "",
+        "Generated by `forge governance index` from the files it lists. Do not edit.",
+        "",
+        "The hub's own specs, one folder per framework. Each carries a hash, and only the",
+        "owner approves one. The frameworks, their schemas and the governed lists are",
+        "forge-core's: [`../../forge-core/fxts/README.md`](../../forge-core/fxts/README.md).",
+    ]
+    for name in sorted(FRAMEWORKS):
+        framework = FRAMEWORKS[name]
+        files = sorted((HUB_FXTS / name).glob(framework.pattern))
+        if not files:
+            continue
+        lines += [
+            "",
+            f"## {framework.label}",
+            "",
+            "| Spec | Id | Format | State | Hash | Approved by |",
+            "|---|---|---|---|---|---|",
+        ]
+        for file in files:
+            _, spec = load_spec(file)
+            integrity = spec.get("integrity", {})
+            lines.append(
+                f"| [`{file.name}`]({name}/{file.name}) "
+                f"| `{identity_of(spec, framework.identity) or file.stem}` "
+                f"| {spec.get('spec_version', '')} | {integrity.get('hash_state', '')} "
+                f"| `{_short(integrity.get('spec_hash') or '')}` "
+                f"| {integrity.get('approved_by') or ''} |"
+            )
+    return "\n".join(lines) + "\n"
+
+
+def index_pages() -> list[tuple[Path, str]]:
+    """Every generated index and the text it must have: forge-core's, then the hub's."""
     from forge_core.fxts import index
 
-    path = index.INDEX_PATH.relative_to(REPO_ROOT)
-    if check:
-        if not index.is_current():
-            typer.echo(f"{path} is stale: run `forge governance index`")
-            raise typer.Exit(code=1)
-        typer.echo(f"{path}: current")
-        return
-    typer.echo(f"{path}: {'written' if index.write() else 'current'}")
+    return [(index.INDEX_PATH, index.render()), (HUB_INDEX_PATH, render_hub_index())]
+
+
+def index_command(
+    check: Annotated[
+        bool, typer.Option("--check", help="Exit 1 when a page is stale; write nothing")
+    ] = False,
+) -> None:
+    """Rewrite the generated indexes of governed files from the files themselves."""
+    stale = 0
+    for page, text in index_pages():
+        shown = page.relative_to(REPO_ROOT) if page.is_relative_to(REPO_ROOT) else page
+        current = page.is_file() and page.read_text(encoding="utf-8") == text
+        if check:
+            typer.echo(
+                f"{shown}: {'current' if current else 'stale: run `forge governance index`'}"
+            )
+            stale += not current
+            continue
+        if not current:
+            page.parent.mkdir(parents=True, exist_ok=True)
+            page.write_text(text, encoding="utf-8")
+        typer.echo(f"{shown}: {'current' if current else 'written'}")
+    if stale:
+        raise typer.Exit(code=1)
 
 
 def schema_release(
@@ -678,7 +765,7 @@ def framework_of(spec_file: Path) -> str | None:
     """The framework a spec file belongs to: by its directory, then by its name."""
     resolved = spec_file.resolve()
     for name, framework in FRAMEWORKS.items():
-        if resolved.parent == framework.specs_dir.resolve():
+        if resolved.parent in {directory.resolve() for directory in framework.specs_dirs}:
             return name
     stem = spec_file.name.lower()
     return next((name for name in FRAMEWORKS if f".{name}." in stem or name in stem), None)

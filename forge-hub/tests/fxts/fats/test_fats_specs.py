@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
+from pathlib import Path  # noqa: TC003 (pytest reads the annotation of a parametrized test)
 
 import pytest
 
 from forge_core import contract
+from forge_core.fxts.fats.runners.fats_runner import FATSRunner
+from forge_core.fxts.shared.runner import VerdictStatus
+from forge_hub import fxts as hub_fxts
 
-SPECS_DIR = Path("forge-core/src/python/forge_core/fxts/fats/specs")
+SPECS_DIR = hub_fxts.specs_dir("fats")  # the hub's own specs of its API
 SCHEMA_PATH = contract.schema_path("fats")
 
 # Discover all spec files
@@ -113,3 +116,28 @@ class TestFatsSpecValidation:
         """All specs must declare a rate limit."""
         data = json.loads(spec_file.read_text())
         assert "requests_per_minute" in data["rate_limit"]
+
+
+@pytest.mark.parametrize("path", sorted(SPECS_DIR.glob("*.json")), ids=lambda p: p.stem)
+async def test_every_fats_spec_carries_a_hash_that_verifies(path: Path) -> None:
+    """28 FATS specs had no hash before FB-160; the owner approved them on 2026-11-18."""
+    spec = json.loads(path.read_text(encoding="utf-8"))
+    integrity = spec["integrity"]
+    assert integrity["spec_hash"] and integrity["hash_state"] == "approved"
+    assert integrity["approved_by"] == "reh3376"
+    runner = FATSRunner(schema_path=contract.schema_path("fats"))
+    report = await runner.run(target=spec["endpoint"], spec=spec)
+    statuses = {
+        verdict.check_id: verdict.status
+        for verdict in report.verdicts
+        if verdict.check_id.startswith("fats:hash-")
+    }
+    assert statuses == {
+        "fats:hash-verified": VerdictStatus.PASS,
+        "fats:hash-approved": VerdictStatus.PASS,
+    }
+    assert report.hash_verified is True
+
+
+def test_there_are_the_28_specs_of_the_api() -> None:
+    assert len(SPEC_FILES) == 28

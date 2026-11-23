@@ -5,13 +5,9 @@ from __future__ import annotations
 import json
 from typing import Any
 
-import pytest
-
-from forge_core import contract
 from forge_core.fxts import FXTS_ROOT
 from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA
 from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
-from forge_core.fxts.fats.runners.fats_runner import FATSRunner
 from forge_core.fxts.shared.runner import (
     FxTSRunner,
     FxTSVerdict,
@@ -22,7 +18,6 @@ from forge_core.fxts.shared.runner import (
 
 PASS, FAIL = VerdictStatus.PASS, VerdictStatus.FAIL
 FACTS_SPEC = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
-FATS_DIR = FXTS_ROOT / "fats"
 
 
 class BareRunner(FxTSRunner):
@@ -92,17 +87,3 @@ class TestTheFrameworksThatDidNotFail:
         spec["adapter_identity"]["name"] += " (edited)"
         edited = await runner.run(target="forge-wms", spec=spec)
         assert _statuses(edited, "facts")["facts:hash-verified"] == FAIL and not edited.passed
-
-    @pytest.mark.parametrize(
-        "path", sorted((FATS_DIR / "specs").glob("*.json")), ids=lambda p: p.stem
-    )
-    async def test_every_fats_spec_carries_a_hash_that_verifies(self, path: Any) -> None:
-        """28 FATS specs had no hash before FB-160; the owner approved them on 2026-11-18."""
-        spec = json.loads(path.read_text(encoding="utf-8"))
-        integrity = spec["integrity"]
-        assert integrity["spec_hash"] and integrity["hash_state"] == "approved"
-        assert integrity["approved_by"] == "reh3376"
-        runner = FATSRunner(schema_path=contract.schema_path("fats"))
-        report = await runner.run(target=spec["endpoint"], spec=spec)
-        assert _statuses(report, "fats") == {"fats:hash-verified": PASS, "fats:hash-approved": PASS}
-        assert report.hash_verified is True
