@@ -72,6 +72,24 @@ Commit messages follow Conventional Commits (`feat:`, `fix:`, `docs:`, `build:`)
 - **Question the owner's proposals too.** The owner, 2026-11-19: "I am open to discussion and I encourage you to question my choices." Say where a proposal conflicts with a signed record or carries a risk, and say where it is better than what is signed.
 - **A signed decision is the current best answer, not a fence.** The owner, 2026-11-22: "we cannot get overly caught up in old decisions." When new information favours a better decision, say which signed record and rule it contradicts, review how it affects the whole system, and recommend on the merits. On the owner's word the older record is amended with a dated note and everything that depended on it is brought along.
 
+## Skills from the pstack plugin
+
+The pstack plugin (marketplace `cursor-plugins`) is installed per user, not in the repository. Seven of its skills are adopted here (the owner, 2026-11-22). Each is typed as `/pstack:<name>`; none runs by itself.
+
+| Skill | Use it when | What forge adds |
+|---|---|---|
+| `maintain-formal-verification-skill` | a change touches code that a `.claude/skills/verify-*` skill covers and that skill's sync commit is behind | **Required before the push.** A "bug" outcome is written to `BACKLOG.md`. A promise changes only on the owner's word |
+| `blast-radius` | before pushing a change to the transport, the proto, a governed schema or a signed contract | Every confirmed risk is fixed or written to `BACKLOG.md`. A proof script becomes a real test or stays out of the repository |
+| `interrogate` | before pushing a change to the plant write path, interlocks, time checks or the link | The reviewers are told to install nothing, to touch no running service and to test against the signed records. Verified findings go to `BACKLOG.md` |
+| `statechart` | showing a TLA+ model's result as a diagram in plant terms | It uses the checker pinned by `scripts/tla/tlc.sh` (set `TLA2TOOLS` and `JAVA`) and installs nothing without the owner's word. It presents a model; it does not replace an exhaustive check |
+| `ketchup` | the owner returns and asks what waits on them | Decisions are listed as status; one is asked at a time |
+| `tdd` | a bug has a cheap local test: the failing test first, then the fix | A skipped test states its reason (A-20) |
+| `technical-writing` | writing or reviewing a document, the tutorial or a commit message | It never rewords a signed record and never restructures the state documents or the tutorial's two tracks |
+
+**Forge's rules win over any pstack text.** In particular, these pstack rules do not apply here: "never call a tool that shows a person a question", "add no check, gate, sign-off or review round" above a brief, "external actions proceed without asking", and every step that runs `gh pr create`, pushes to an open pull request or merges. pstack decides by whether an action can be undone; forge decides by whose decision it is. The owner's word is always needed for: a spec hash, a schema release or a governed list; a decision record or its amendment; a package, manifest or lock file; a pull request, a merge or a message to anyone outside; and any change to the plant write path, an interlock, a time check or the transport. A subagent started for one of these skills is given these rules in its brief.
+
+Not adopted: `poteto-mode` and its delivery playbooks, `poteto-agent`, `figure-it-out`, `automate-me`, `no-comments` and `comment-sicko`, `make-bot-ui`, `ketchup-video`. `create-verification-skill` waits until forge-display exists.
+
 ## Commands
 
 ```bash

@@ -1,5 +1,5 @@
 // Forge Platform — ContextualRecord and component messages
-// Maps 1:1 to forge.core.models.contextual_record (Pydantic v2)
+// Maps 1:1 to forge_core.models.contextual_record (Pydantic v2)
 //
 // This is the PRIMARY streaming unit — every piece of data that enters
 // Forge is wrapped in a ContextualRecord. These messages are the payload
@@ -477,7 +477,7 @@ type RecordContext struct {
 	ShiftId       string                 `protobuf:"bytes,8,opt,name=shift_id,json=shiftId,proto3" json:"shift_id,omitempty"` // named `shift` until FB-013; same field number, wire-compatible
 	OperatorId    string                 `protobuf:"bytes,9,opt,name=operator_id,json=operatorId,proto3" json:"operator_id,omitempty"`
 	// The context field registry's remaining fields
-	// (forge.core.registry.context_fields, FB-013)
+	// (forge_core.registry.context_fields, FB-013)
 	EventType      string                 `protobuf:"bytes,10,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`
 	EventTimestamp *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=event_timestamp,json=eventTimestamp,proto3" json:"event_timestamp,omitempty"`
 	WorkOrderId    string                 `protobuf:"bytes,12,opt,name=work_order_id,json=workOrderId,proto3" json:"work_order_id,omitempty"`

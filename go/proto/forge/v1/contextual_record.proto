@@ -1,5 +1,5 @@
 // Forge Platform — ContextualRecord and component messages
-// Maps 1:1 to forge.core.models.contextual_record (Pydantic v2)
+// Maps 1:1 to forge_core.models.contextual_record (Pydantic v2)
 //
 // This is the PRIMARY streaming unit — every piece of data that enters
 // Forge is wrapped in a ContextualRecord. These messages are the payload
@@ -16,7 +16,7 @@ option go_package = "github.com/reh3376/forge/gen/forge/v1;forgev1";
 
 // ---------------------------------------------------------------------------
 // RecordSource — which adapter and system produced this record
-// Maps to: forge.core.models.contextual_record.RecordSource
+// Maps to: forge_core.models.contextual_record.RecordSource
 // ---------------------------------------------------------------------------
 
 message RecordSource {
@@ -28,7 +28,7 @@ message RecordSource {
 
 // ---------------------------------------------------------------------------
 // RecordTimestamp — triple-timestamp for full temporal context
-// Maps to: forge.core.models.contextual_record.RecordTimestamp
+// Maps to: forge_core.models.contextual_record.RecordTimestamp
 // ---------------------------------------------------------------------------
 
 message RecordTimestamp {
@@ -84,7 +84,7 @@ message TimeQuality {
 
 // ---------------------------------------------------------------------------
 // RecordValue — the actual value with engineering context
-// Maps to: forge.core.models.contextual_record.RecordValue
+// Maps to: forge_core.models.contextual_record.RecordValue
 //
 // Design note: Pydantic uses `raw: Any`. Protobuf has no direct equivalent.
 // We use `oneof typed_value` with explicit variants to preserve type fidelity
@@ -114,7 +114,7 @@ message RecordValue {
 
 // ---------------------------------------------------------------------------
 // RecordContext — operational context that travels with every record
-// Maps to: forge.core.models.contextual_record.RecordContext
+// Maps to: forge_core.models.contextual_record.RecordContext
 //
 // This is what makes Forge different from a raw data pipeline. Every
 // record carries enough context for correct interpretation.
@@ -132,7 +132,7 @@ message RecordContext {
   string operator_id = 9;
 
   // The context field registry's remaining fields
-  // (forge.core.registry.context_fields, FB-013)
+  // (forge_core.registry.context_fields, FB-013)
   string event_type = 10;
   google.protobuf.Timestamp event_timestamp = 11;
   string work_order_id = 12;
@@ -146,7 +146,7 @@ message RecordContext {
 
 // ---------------------------------------------------------------------------
 // RecordLineage — provenance chain
-// Maps to: forge.core.models.contextual_record.RecordLineage
+// Maps to: forge_core.models.contextual_record.RecordLineage
 // ---------------------------------------------------------------------------
 
 message RecordLineage {
@@ -158,7 +158,7 @@ message RecordLineage {
 
 // ---------------------------------------------------------------------------
 // ContextualRecord — the fundamental data unit in Forge
-// Maps to: forge.core.models.contextual_record.ContextualRecord
+// Maps to: forge_core.models.contextual_record.ContextualRecord
 //
 // This is the PRIMARY message type in the Collect() and Subscribe()
 // gRPC streams. Every piece of data that enters Forge is one of these.

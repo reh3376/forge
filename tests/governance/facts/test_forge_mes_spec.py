@@ -17,6 +17,7 @@ from pathlib import Path
 import pytest
 
 from forge_core.fxts import FXTS_ROOT
+from forge_core.fxts.shared import schemas
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -29,8 +30,9 @@ WMS_SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
 
 
 @pytest.fixture(scope="module")
-def schema():
-    with open(SCHEMA_PATH) as f:
+def schema(spec):
+    """The schema version the spec declares, not the newest (D-14 Q-5, FB-188)."""
+    with open(schemas.schema_for_spec(SCHEMA_PATH.parent, spec)) as f:
         return json.load(f)
 
 

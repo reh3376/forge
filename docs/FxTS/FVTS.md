@@ -3,7 +3,7 @@
 **Framework ID:** FVTS
 **Full Name:** Forge View Test Specification
 **CI Gate:** Hard-fail (merge-blocking) — `tests/governance/fvts/` runs in the `hub-python` job
-**Status:** v0.2.0 (2026-11-21, FB-177: objects beside points, a minor step released and approved under the schema version rules). Schema, runner (`fvts_runner.py`, 21 checks), reference renderer, two golden sets and two specs: the hub's own (`forge-core.fvts.json`, approved by the owner) and the plant-floor reference (`forge-ot.fvts.json`, `pending_review` until FB-078). forge-display itself has no code (FB-181).
+**Status:** v0.2.1 (a patch step of 2026-11-22 that corrects two descriptions, FB-226; the two specs stay on 0.2.0, which they declare). v0.2.0 (2026-11-21, FB-177: objects beside points, a minor step released and approved under the schema version rules). Schema, runner (`fvts_runner.py`, 21 checks), reference renderer, two golden sets and two specs: the hub's own (`forge-core.fvts.json`, approved by the owner) and the plant-floor reference (`forge-ot.fvts.json`, `pending_review` until FB-078). forge-display itself has no code (FB-181).
 **Phase:** TBD (forge-display)
 **MDEMG Analog:** None — new for forge-display
 

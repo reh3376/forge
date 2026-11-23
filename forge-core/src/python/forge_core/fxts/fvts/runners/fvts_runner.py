@@ -210,7 +210,6 @@ class FVTSRunner(FxTSRunner):
 
     def __init__(self, schema_path: Path | str | None = None) -> None:
         super().__init__(schema_path=schema_path)
-        self._validator: Any = None
 
     def implemented_fields(self) -> set[str]:
         return set(self._ENFORCED_FIELDS)
@@ -312,11 +311,13 @@ class FVTSRunner(FxTSRunner):
                 status=VerdictStatus.ERROR,
                 message="No schema configured; cannot validate the spec.",
             )
-        if self._validator is None:
-            from jsonschema import Draft202012Validator
+        # A spec is held to the schema version it declares, not to the newest (D-14 Q-5, FB-188).
+        from jsonschema import Draft202012Validator
 
-            self._validator = Draft202012Validator(self.schema)
-        errors = sorted(self._validator.iter_errors(spec), key=lambda e: list(e.absolute_path))
+        schema = self.schema_for(spec) or self.schema
+        errors = sorted(
+            Draft202012Validator(schema).iter_errors(spec), key=lambda e: list(e.absolute_path)
+        )
         violations = [
             SpecViolation(
                 field="/".join(str(p) for p in e.absolute_path) or "$",
@@ -328,7 +329,7 @@ class FVTSRunner(FxTSRunner):
             "schema-valid",
             "schema",
             violations,
-            f"Spec validates against {self.schema.get('$id')}.",
+            f"Spec validates against {schema.get('$id')}.",
         )
 
     # ------------------------------------------------------------------

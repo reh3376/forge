@@ -23,6 +23,7 @@ from forge_core.fxts.facts.runners.facts_runner import (
     FactsVocabulary,
     schema_enum,
 )
+from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import VerdictStatus, verify_spec_hash
 
 if TYPE_CHECKING:
@@ -78,8 +79,12 @@ class TestEverySpec:
         assert {_spec_id(p) for p in SPEC_PATHS} >= {"forge-mes", "forge-wms", "forge-ot"}
 
     @pytest.mark.parametrize("path", CONFORMING)
-    def test_validates_against_schema(self, validator: Draft202012Validator, path: Path) -> None:
-        errors = sorted(validator.iter_errors(_load(path)), key=lambda e: list(e.absolute_path))
+    def test_validates_against_schema(self, path: Path) -> None:
+        """Against the schema version the spec declares (D-14 Q-5, FB-188)."""
+        spec = _load(path)
+        declared = _load(schemas.schema_for_spec(SCHEMA_PATH.parent, spec))
+        validator = Draft202012Validator(declared)
+        errors = sorted(validator.iter_errors(spec), key=lambda e: list(e.absolute_path))
         assert not errors, "\n".join(
             f"/{'/'.join(str(s) for s in e.absolute_path)}: {e.message[:120]}" for e in errors
         )

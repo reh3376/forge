@@ -52,10 +52,16 @@ def validator(schema: dict) -> Draft202012Validator:
     return Draft202012Validator(schema)
 
 
+# The version the current schema pins; a spec written today declares it.
+CURRENT_VERSION = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))["properties"]["spec_version"][
+    "const"
+]
+
+
 def _minimal_valid_spec() -> dict:
     """Return the smallest spec that passes validation."""
     return {
-        "spec_version": "0.1.0",
+        "spec_version": CURRENT_VERSION,
         "adapter_identity": {
             "adapter_id": "test-adapter",
             "name": "Test Adapter",
@@ -143,7 +149,7 @@ class TestMetaSchemaValidation:
         Draft202012Validator.check_schema(schema)
 
     def test_schema_has_id(self, schema: dict):
-        assert schema["$id"] == "forge://fxts/facts/v0.1.0"
+        assert schema["$id"] == f"forge://fxts/facts/v{CURRENT_VERSION}"
 
     def test_schema_has_title(self, schema: dict):
         assert "FACTS" in schema["title"]

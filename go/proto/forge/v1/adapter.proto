@@ -1,5 +1,5 @@
 // Forge Platform — Adapter control plane messages
-// Maps to: forge.core.models.adapter (Pydantic v2)
+// Maps to: forge_core.models.adapter (Pydantic v2)
 //
 // These messages handle adapter registration, configuration, health
 // monitoring, and capability negotiation. They are NOT high-volume
@@ -17,7 +17,7 @@ option go_package = "github.com/reh3376/forge/gen/forge/v1;forgev1";
 
 // ---------------------------------------------------------------------------
 // AdapterCapabilities — what this adapter can do
-// Maps to: forge.core.models.adapter.AdapterCapabilities
+// Maps to: forge_core.models.adapter.AdapterCapabilities
 // ---------------------------------------------------------------------------
 
 message AdapterCapabilities {
@@ -30,7 +30,7 @@ message AdapterCapabilities {
 
 // ---------------------------------------------------------------------------
 // ConnectionParam — a parameter required to connect to the source system
-// Maps to: forge.core.models.adapter.ConnectionParam
+// Maps to: forge_core.models.adapter.ConnectionParam
 // ---------------------------------------------------------------------------
 
 message ConnectionParam {
@@ -43,7 +43,7 @@ message ConnectionParam {
 
 // ---------------------------------------------------------------------------
 // DataContract — what this adapter produces
-// Maps to: forge.core.models.adapter.DataContract
+// Maps to: forge_core.models.adapter.DataContract
 // ---------------------------------------------------------------------------
 
 message DataContract {
@@ -54,7 +54,7 @@ message DataContract {
 
 // ---------------------------------------------------------------------------
 // AdapterManifest — adapter self-description
-// Maps to: forge.core.models.adapter.AdapterManifest
+// Maps to: forge_core.models.adapter.AdapterManifest
 //
 // The manifest is the adapter's registration document. It declares what
 // the adapter is, what it can do, what it produces, and what it needs.
@@ -109,7 +109,7 @@ message ConnectionTimeGovernance {
 // with its request, the hub answers with T2 and T3, the spoke takes T4 on receipt and
 // computes the offset and the round trip by RFC 5905, and reports them with its next
 // Health so the hub keeps the series. No new RPC.
-// Maps to: forge.core.models.adapter.SpokeTime / HubTime
+// Maps to: forge_core.models.adapter.SpokeTime / HubTime
 // ---------------------------------------------------------------------------
 
 // What a spoke sends with a request.
@@ -135,7 +135,7 @@ message HubTime {
 
 // ---------------------------------------------------------------------------
 // AdapterHealth — current health status of an adapter instance
-// Maps to: forge.core.models.adapter.AdapterHealth
+// Maps to: forge_core.models.adapter.AdapterHealth
 // ---------------------------------------------------------------------------
 
 message AdapterHealth {

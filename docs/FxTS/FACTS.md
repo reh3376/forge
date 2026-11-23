@@ -3,7 +3,7 @@
 **Framework ID:** FACTS
 **Full Name:** Forge Adapter Conformance Test Specification
 **CI Gate:** Hard-fail (merge-blocking for production adapters)
-**Status:** Schema v0.1.0 (vocabulary extended 2026-10-17, backward compatible), runner (`facts:schema-valid` + 35 rule checks whose enums are read from the schema) and 9 adapter specs; 8 of 9 validate against the schema; 298 tests under `tests/governance/facts/`. Gap: FB-079 (OT spec vocabulary and identity, decision D-8)
+**Status:** Schema v0.1.1 (a patch step of 2026-11-22 that corrects one description, FB-226; the nine specs stay on 0.1.0, which they declare). Schema v0.1.0 (vocabulary extended 2026-10-17, backward compatible), runner (`facts:schema-valid` + 35 rule checks whose enums are read from the schema) and 9 adapter specs; 8 of 9 validate against the schema; 298 tests under `tests/governance/facts/`. Gap: FB-079 (OT spec vocabulary and identity, decision D-8)
 **Phase:** F12
 **MDEMG Analog:** UPTS
 
