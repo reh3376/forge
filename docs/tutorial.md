@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 150 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 151 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -149,7 +149,8 @@ note:
 
 | Term | What it means in Forge |
 |---|---|
-| **Hub** | forge-hub (Python, in `src/forge` until it gets its own folder). It owns the transport, the ingest pipeline, the databases, context, curation, governance and the time. Hubs form a hierarchy: area hubs under a site hub under an enterprise hub. |
+| **forge-core** | The foundation and the administrative manager of a deployment (D-17 §11): one per deployment, above the top hub. The foundation is what every hub and module is built from (the contract, the FxTS frameworks, the SDK), and it is built. The manager knows every hub and module, monitors and alerts on their state, and is the one place administrative changes are made and distributed; it is not built. It administers and does not operate: a hub that cannot reach it keeps running. |
+| **Hub** | forge-hub (Python, in `src/forge` until it gets its own folder): an enterprise hub, site hubs and area hubs, each the manager of the modules and databases attached to it. It owns the transport, the ingest pipeline, the databases, context, curation, governance and the time. Hubs form a hierarchy: area hubs under a site hub under an enterprise hub. |
 | **Module** (also **spoke**) | Anything that registers with a hub. A module speaks `forge.v1.AdapterService` to its hub over gRPC and reaches it no other way (A-1). |
 | **Management module** | A module Forge builds for a business function: `forge-mes`, `forge-wms`, `forge-cmms`, `forge-nms`, `forge-ims`, `forge-historian`, `forge-scanner`. Named `forge-<service>`. |
 | **Integration module** | A module that connects Forge to one third-party product: `forge-integ-erp-netsuite`. Named `forge-integ-<function>-<product>`. Its hub side is gRPC only; its application side uses whatever the product offers (REST, GraphQL, MQTT, OPC UA, SQL, …). Installations build their own in the designer. |
@@ -245,7 +246,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 150:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 151:
 
 **Working**
 
