@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 # Ensure src/ is importable
-_src = Path(__file__).resolve().parents[3] / "src"
+_src = Path(__file__).resolve().parents[4] / "src"
 if str(_src) not in sys.path:
     sys.path.insert(0, str(_src))
 
@@ -32,7 +32,7 @@ from forge_core.fxts.shared.runner import VerdictStatus
 # ---------------------------------------------------------------------------
 
 SPEC_PATH = (
-    Path(__file__).resolve().parents[3]
+    Path(__file__).resolve().parents[4]
     / "forge-core/src/python/forge_core/fxts/ftts/specs/grpc-hardened-transport.ftts.json"
 )
 SCHEMA_PATH = contract.schema_path("ftts")

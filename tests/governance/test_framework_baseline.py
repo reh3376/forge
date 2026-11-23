@@ -173,8 +173,13 @@ class TestEachFramework:
         assert unapproved == expected & unapproved == unapproved & set(PENDING_APPROVAL)
 
     def test_f6_and_f9_a_gate_and_the_commands(self, fw: str) -> None:
-        gate = REPO_ROOT / "tests" / "governance" / fw
-        assert list(gate.glob("test_*.py")), f"{fw} has no gate under tests/governance"
+        # A framework's gate is with forge-core's tests; one whose tests still use hub or
+        # module code is under tests/governance until those tests are separated (FB-227).
+        gates = [
+            REPO_ROOT / "forge-core" / "tests" / "fxts" / fw,
+            REPO_ROOT / "tests" / "governance" / fw,
+        ]
+        assert any(list(gate.glob("test_*.py")) for gate in gates), f"{fw} has no gate"
         assert FRAMEWORKS[fw].schema.is_file() and FRAMEWORKS[fw].specs_dir.is_dir()
 
     def test_the_gaps_are_exactly_the_known_ones(self, fw: str) -> None:

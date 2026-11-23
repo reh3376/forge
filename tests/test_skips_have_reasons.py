@@ -23,6 +23,7 @@ REPO = Path(__file__).resolve().parents[1]
 SKIPPED_DIRS = {"node_modules", ".venv", "__pycache__", ".next", "dist", "build", ".git"}
 PYTHON_ROOTS = (
     "tests",
+    "forge-core/tests",
     "modules/Forge DB Orchestration",
     "modules/Forge CMMS",
     "modules/Forge ERPI",

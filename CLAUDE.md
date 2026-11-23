@@ -51,7 +51,7 @@ These documents are the authority (A-12). Where Jiminy or MDEMG guidance injecte
 2. Before every push:
    - the documents match the code: `docs/WHERE-WE-ARE.md` (status date, last merged PR, pick-up point, numbers), `BACKLOG.md`, the roadmap, the README counts;
    - both tracks of the tutorial are reviewed against the change and updated, then `make sync-tutorial-embed`, `make verify-tutorial-embed` and `make check-tutorial-build`. The tutorial's opening `Last verified` line carries the date and the last merged PR of every push (a test checks it against `docs/WHERE-WE-ARE.md` and the history). The tutorial must describe the code as it is
-   - the full test suite passes (`uv run pytest tests -q`, `uv run ruff check .` and `uv run ruff format --check .`, over the whole repository as CI runs them, and the Go and bridge checks when those areas changed);
+   - the full test suite passes (`uv run pytest -q`, `uv run ruff check .` and `uv run ruff format --check .`, over the whole repository as CI runs them, and the Go and bridge checks when those areas changed);
    - `gitleaks` is clean on the commits.
 3. Push to `reh3376_dev01`. The `auto-pr.yml` workflow opens the pull request. Never open a pull request as the owner.
 4. The owner approves and merges, then says "pr N merged". Sync with `main`, confirm no pull request is open, and start the next item.
@@ -111,7 +111,7 @@ Not adopted: `poteto-mode` and its delivery playbooks, `poteto-agent`, `figure-i
 
 ```bash
 uv sync --locked --extra dev --extra ot      # install from the lock file
-uv run pytest tests -q -rsx                  # the Python suite, about a minute; lists each skip with its reason
+uv run pytest -q -rsx                        # the Python suite (tests/ and forge-core/tests), about a minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # the whole repository, as CI does
 uv run forge governance specs                # spec states and hash checks
 uv run forge archive list                    # retired documents: an index into the history, never the old text

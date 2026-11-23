@@ -56,7 +56,7 @@ from forge_core.models.manufacturing.enums import (
 )
 
 FIXTURE = (
-    Path(__file__).resolve().parents[3]
+    Path(__file__).resolve().parents[4]
     / "go"
     / "internal"
     / "models"
