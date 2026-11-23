@@ -36,12 +36,6 @@ const nextConfig = {
   // Disable source maps in production to hide debug info (temporarily for demo)
   productionBrowserSourceMaps: false,
 
-  // Skip prerendering for problematic pages during static export
-  experimental: {
-    missingSuspenseWithCSRBailout: false,
-    instrumentationHook: true,
-  },
-
   // Configure which routes to skip during export
   // This prevents build errors from API routes that can't be statically generated
   async headers() {
