@@ -1,4 +1,5 @@
 {
+  "spec_version": "0.1.0",
   "list": "application-protocols",
   "title": "Application-side protocols",
   "description": "How an integration module reaches the third-party application it connects. Its hub side is gRPC only (M-1); its application side uses one or more of these (owner, 2026-11-18 and 2026-11-19). Adding a protocol is one approved change to this list.",
@@ -34,11 +35,23 @@
   ],
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": null,
-    "change_history": [],
+    "previous_hash": "3ae21a0711b2883096552f0e0d44585857c3b233af625fa9ee2d3f9317197e41",
+    "change_history": [
+      {
+        "previous_hash": "3ae21a0711b2883096552f0e0d44585857c3b233af625fa9ee2d3f9317197e41",
+        "new_hash": "96841a27fa04d62c21612c7f311e09876502fd6ab611ef66ffce29592854f8bf",
+        "changed_at": "2026-11-23T05:34:43Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "the list declares the format it is written in (spec_version, the governed-list schema 0.1.0; FB-234); its entries are unchanged"
+      }
+    ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "3ae21a0711b2883096552f0e0d44585857c3b233af625fa9ee2d3f9317197e41",
+    "spec_hash": "96841a27fa04d62c21612c7f311e09876502fd6ab611ef66ffce29592854f8bf",
+    "schema_version": "0.1.0",
+    "schema_hash": "c9cb17e17a24bba4afcd76f6d87fbe0719064b6a853e91eedc4240ab129e668b",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-19T22:06:45Z"
+    "approved_at": "2026-11-23T05:38:09Z"
   }
 }

@@ -194,7 +194,14 @@ class TestHardLimits:
     """What a level may not decide for itself (D-17 §11.5; owner, 2026-11-23)."""
 
     def _load(self, tmp_path: Path, entries: list[dict]) -> list[str]:
-        document = {"list": lists.HARD_LIMITS, "title": "t", "description": "d", "entries": entries}
+        document = {
+            "spec_version": "0.1.0",
+            "list": lists.HARD_LIMITS,
+            "title": "t",
+            "description": "d",
+            "entries": entries,
+            "integrity": {},
+        }
         (tmp_path / f"{lists.HARD_LIMITS}{lists.SUFFIX}").write_text(
             json.dumps(document), encoding="utf-8"
         )
@@ -235,20 +242,21 @@ class TestHardLimits:
     @pytest.mark.parametrize(
         ("changes", "expected"),
         [
-            ({"reason": ""}, "does not say its reason"),
-            ({"held_how": ...}, "does not say its held_how"),
-            ({"kind": "wish"}, "has kind 'wish'"),
-            ({"applies": "sometimes"}, "has applies 'sometimes'"),
-            ({"held_by": "anyone"}, "has held_by 'anyone'"),
-            ({"scopes": []}, "lists no scopes"),
-            ({"scopes": ["interlock bypass"]}, "not <domain>:<object>:<action>"),
-            ({"relation": "grantor-is-grantee"}, "also names a relation"),
-            ({"kind": "relation", "scopes": ..., "relation": "is-tired"}, "unknown relation"),
-            ({"kind": "relation", "relation": "grantor-is-grantee"}, "also lists scopes"),
-            ({"added": "last week"}, "no date it was added"),
-            ({"status": "retired"}, "retired and has no date"),
-            ({"retired": "2026-12-01"}, "active and carries a retired date"),
-            ({"enforced_by": ...}, "does not list what enforces it"),
+            ({"reason": ""}, "/entries/0/reason"),
+            ({"held_how": ...}, "'held_how' is a required property"),
+            ({"kind": "wish"}, "/entries/0/kind"),
+            ({"applies": "sometimes"}, "/entries/0/applies"),
+            ({"held_by": "anyone"}, "/entries/0/held_by"),
+            ({"scopes": []}, "/entries/0/scopes"),
+            ({"scopes": ["interlock bypass"]}, "/entries/0/scopes/0"),
+            ({"relation": "grantor-is-grantee"}, "/entries/0"),
+            ({"kind": "relation", "scopes": ..., "relation": "is-tired"}, "/entries/0/relation"),
+            ({"kind": "relation", "relation": "grantor-is-grantee"}, "/entries/0"),
+            ({"added": "last week"}, "/entries/0/added"),
+            ({"status": "retired"}, "'retired' is a required property"),
+            ({"retired": "2026-12-01"}, "/entries/0"),
+            ({"enforced_by": ...}, "'enforced_by' is a required property"),
+            ({"surprise": 1}, "Additional properties are not allowed"),
         ],
     )
     def test_a_malformed_limit_is_named(self, tmp_path: Path, changes: dict, expected: str) -> None:
@@ -271,3 +279,55 @@ class TestHardLimits:
         assert sorted(lists.unenforced_hard_limits()) == sorted(
             e["id"] for e in lists.active_hard_limits()
         )
+
+
+class TestTheFormatOfAList:
+    """A list says which construction it is, and a receiver refuses one it does not know
+    (BACKLOG FB-234; the receiver's questions of the design checklist)."""
+
+    def test_every_list_declares_the_current_format(self) -> None:
+        from forge_core.fxts.shared import schemas
+
+        current = schemas.latest(lists.SCHEMA_DIR)
+        assert current is not None
+        for name in lists.ALL_NAMES:
+            document = lists.load(name).document
+            assert document["spec_version"] == current.version, name
+            assert document["integrity"]["schema_version"] == current.version, name
+            assert document["integrity"]["schema_hash"] == current.schema_hash, name
+
+    def test_a_list_in_an_unknown_format_is_refused_and_said_to_be(self, tmp_path: Path) -> None:
+        document = json.loads(lists.list_path(lists.PRUNING_STRATEGIES).read_text("utf-8"))
+        document["spec_version"] = "9.0.0"
+        (tmp_path / f"{lists.PRUNING_STRATEGIES}{lists.SUFFIX}").write_text(
+            json.dumps(document), encoding="utf-8"
+        )
+        loaded = lists.load(lists.PRUNING_STRATEGIES, tmp_path)
+        assert not loaded.usable
+        assert any("list format '9.0.0'" in p and "it is refused" in p for p in loaded.problems)
+
+    def test_a_list_that_names_no_format_is_refused(self, tmp_path: Path) -> None:
+        document = json.loads(lists.list_path(lists.PRUNING_STRATEGIES).read_text("utf-8"))
+        del document["spec_version"]
+        (tmp_path / f"{lists.PRUNING_STRATEGIES}{lists.SUFFIX}").write_text(
+            json.dumps(document), encoding="utf-8"
+        )
+        problems = lists.load(lists.PRUNING_STRATEGIES, tmp_path).problems
+        assert any("list format None" in p for p in problems)
+
+    def test_only_data_classes_carries_the_three_vocabularies(self, tmp_path: Path) -> None:
+        document = json.loads(lists.list_path(lists.PRUNING_STRATEGIES).read_text("utf-8"))
+        document["links"] = ["hub-to-hub"]
+        (tmp_path / f"{lists.PRUNING_STRATEGIES}{lists.SUFFIX}").write_text(
+            json.dumps(document), encoding="utf-8"
+        )
+        problems = lists.load(lists.PRUNING_STRATEGIES, tmp_path).problems
+        assert any(p.startswith("pruning-strategies: /:") for p in problems), problems
+
+    def test_the_schema_is_listed_with_the_frameworks(self) -> None:
+        from forge.cli import governance
+
+        rows = [row for row in governance.schema_rows() if row["framework"] == "lists"]
+        assert [row["version"] for row in rows] == ["0.1.0"]
+        assert rows[0]["specs"] == len(lists.ALL_NAMES)
+        assert governance.schema_problems() == []

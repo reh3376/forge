@@ -55,6 +55,8 @@ if TYPE_CHECKING:
 
 #: ``forge-core/src/python/forge_core/fxts``: every ``<framework>/specs/*.json`` under it is a spec.
 SPEC_ROOT = Path(_fxts.__file__).resolve().parent  # the frameworks, in forge-core
+#: The governed lists have a schema of their own, released like a framework's (FB-234).
+LISTS = "lists"
 #: The checkout; the FTTS spec lives in its top-level ``specs/``.
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
@@ -108,7 +110,8 @@ def spec_files(root: Path) -> list[Path]:
 def schema_dir_of(spec_file: Path) -> Path | None:
     """The schema directory of the framework a spec file belongs to, when it has a registry."""
     framework = spec_file.resolve().parent.parent
-    for candidate in (framework / "schema", contract.schema_dir(framework.name)):
+    own = spec_file.resolve().parent / "schema"  # a governed list: the schema is beside it
+    for candidate in (own, framework / "schema", contract.schema_dir(framework.name)):
         if (candidate / schemas.REGISTRY_NAME).is_file():
             return candidate
     return None
@@ -485,20 +488,26 @@ def emit_report(report: FxTSReport, fmt: str, output: Path | None) -> None:
 
 def _framework_schema_dir(name: str) -> Path:
     key = name.lower()
+    if key == LISTS:
+        return contract.LISTS_DIR / "schema"
     if key not in FRAMEWORKS:
-        raise typer.BadParameter(f"unknown framework '{name}' (known: {', '.join(FRAMEWORKS)})")
+        known = ", ".join([*FRAMEWORKS, LISTS])
+        raise typer.BadParameter(f"unknown framework '{name}' (known: {known})")
     return FRAMEWORKS[key].schema.parent
 
 
 def schema_rows(names: list[str] | None = None) -> list[dict[str, Any]]:
     """One row per registered schema version, with how many specs are written against it."""
     rows: list[dict[str, Any]] = []
-    for name in names or sorted(FRAMEWORKS):
-        framework = FRAMEWORKS[name]
-        schema_dir = framework.schema.parent
+    for name in names or [*sorted(FRAMEWORKS), LISTS]:
+        schema_dir = _framework_schema_dir(name)
         head = schemas.latest(schema_dir)
         counts: dict[str, int] = {}
-        for file in framework.specs_dir.glob(framework.pattern):
+        if name == LISTS:
+            written = sorted(contract.LISTS_DIR.glob("*.list.json"))
+        else:
+            written = sorted(FRAMEWORKS[name].specs_dir.glob(FRAMEWORKS[name].pattern))
+        for file in written:
             declared = json.loads(file.read_text(encoding="utf-8")).get("spec_version", "")
             counts[declared] = counts.get(declared, 0) + 1
         rows.extend(
@@ -522,8 +531,8 @@ def schema_rows(names: list[str] | None = None) -> list[dict[str, Any]]:
 def schema_problems(names: list[str] | None = None) -> list[str]:
     return [
         problem
-        for name in names or sorted(FRAMEWORKS)
-        for problem in schemas.registry_problems(FRAMEWORKS[name].schema.parent)
+        for name in names or [*sorted(FRAMEWORKS), LISTS]
+        for problem in schemas.registry_problems(_framework_schema_dir(name))
     ]
 
 

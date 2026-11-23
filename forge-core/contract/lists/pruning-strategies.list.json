@@ -1,4 +1,5 @@
 {
+  "spec_version": "0.1.0",
   "list": "pruning-strategies",
   "title": "Store-and-forward pruning strategies",
   "description": "What a module does when its store-and-forward buffer is full. A module spec declares the strategies it supports; the hub admin chooses one. Whatever the strategy, every loss is counted and shown, and the audit class is never pruned (owner, 2026-11-19, FB-153; amends T-6).",
@@ -16,11 +17,23 @@
   ],
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": null,
-    "change_history": [],
+    "previous_hash": "59d005c98cb691aa361e80c3ca54b97b717ab5b1e4aa30e2a87bb364ddd17db7",
+    "change_history": [
+      {
+        "previous_hash": "59d005c98cb691aa361e80c3ca54b97b717ab5b1e4aa30e2a87bb364ddd17db7",
+        "new_hash": "097f801702943e47e9ab958902aa08b4463aaabf4113de5ddf69be31fab4fdd2",
+        "changed_at": "2026-11-23T05:34:43Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "structural",
+        "reason": "the list declares the format it is written in (spec_version, the governed-list schema 0.1.0; FB-234); its entries are unchanged"
+      }
+    ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "59d005c98cb691aa361e80c3ca54b97b717ab5b1e4aa30e2a87bb364ddd17db7",
+    "spec_hash": "097f801702943e47e9ab958902aa08b4463aaabf4113de5ddf69be31fab4fdd2",
+    "schema_version": "0.1.0",
+    "schema_hash": "c9cb17e17a24bba4afcd76f6d87fbe0719064b6a853e91eedc4240ab129e668b",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-19T22:06:45Z"
+    "approved_at": "2026-11-23T05:38:10Z"
   }
 }
