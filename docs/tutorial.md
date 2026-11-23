@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 173 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 174 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 173:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 174:
 
 **Working**
 
@@ -286,7 +286,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 173:
 | Python: forge-core (`forge-core/src/python/forge_core`) | 116 files, ~26,600 lines |
 | Python: forge-hub (`forge-hub/src/python/forge_hub`) | 90 files, ~17,300 lines |
 | Python: the modules (nine packages under `forge-modules`) | 144 files, ~31,400 lines |
-| Python tests | 281 files, 5,173 collected, full suite green on the locked dependency set |
+| Python tests | 282 files, 5,180 collected, full suite green on the locked dependency set |
 | Go (`forge-core/src/go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`forge-modules/forge-mes/bridge`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -2006,7 +2006,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest -q -rsx                          # 5,173 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
+uv run pytest -q -rsx                          # 5,180 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2059,7 +2059,10 @@ note:
 | Rule | Since |
 |---|---|
 | **Every finding is fixed or recorded** in `BACKLOG.md`; nothing is skipped | 2026-10-15 |
-| **Documentation is current before every push**: `docs/WHERE-WE-ARE.md` rows, numbers and status date, `README.md` counts, the roadmap and backlog | 2026-10-16 |
+| **Every decision is front-loaded**: the problem is stated and the design is taken through the cases it would fail on later, before anything is built or put to the owner. Speed is never a reason | 2026-11-23 |
+| **Two gates, and the owner is the gate**: before building and before pushing the work stops, states what is recommended, prints the keywords (`/gates`) and waits for `go` or keywords such as `+design+arena` or `+blast` | 2026-11-23 |
+| **Role-level security is built into everything as it is built**: every function that reads protected data or changes state names the permission it needs and asks at a check point handed to it; the roles themselves come later | 2026-11-23 |
+| **Documentation is current before every push**: `docs/WHERE-WE-ARE.md` rows, numbers and status date, the roadmap and the backlog; the two READMEs are orientation and carry no counts | 2026-10-16 |
 | **The developer and user tutorial is current before every push**: `docs/tutorial.md` reviewed against the change, updated, rebuilt (`make sync-tutorial-embed`) and checked | 2026-11-17 (owner) |
 | **The repository's documents are the authority**: where Jiminy guidance disagrees, the documents win and the disagreement is reported to the mdemg agent as a defect | A-12, 2026-11-17 |
 | **Every module speaks to the hub over gRPC**; third-party software is reached by an integration module, never by the hub; every module meets the forge module requirements (`docs/decisions/forge-module-requirements.md`, signed 2026-11-17; their framework is FMTS) | A-11, D-12 |
@@ -2147,7 +2150,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/`, `forge-core/tests` and `forge-hub/tests`: 281 files, 5,173 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/`, `forge-core/tests` and `forge-hub/tests`: 282 files, 5,180 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
