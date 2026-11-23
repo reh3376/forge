@@ -7,7 +7,6 @@ description = "Test fixtures and placeholders that are not credentials"
 regexTarget = "line"
 paths = [
   '''tests/adapters/forge_cmms/test_forge_cmms_adapter\.py''',
-  '''modules/Forge CMMS/tests/test_forge_cmms_adapter\.py''',
 ]
 regexes = [
   '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.test''',

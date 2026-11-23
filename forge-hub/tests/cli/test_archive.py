@@ -24,7 +24,7 @@ def test_the_root_has_an_archive_with_the_first_rows() -> None:
     assert "." in found
     ids = {entry["id"] for entry in found["."].entries}
     assert {"fvts-0-1-0-review-package", "mes-bridge-sidecar", "top-level-cli-copy"} <= ids
-    assert sum(len(entry["paths"]) for entry in found["."].entries) == 29
+    assert sum(len(entry["paths"]) for entry in found["."].entries) == 102
 
 
 def test_every_index_is_well_formed() -> None:

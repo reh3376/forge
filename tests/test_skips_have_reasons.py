@@ -25,10 +25,6 @@ PYTHON_ROOTS = (
     "tests",
     "forge-core/tests",
     "forge-hub/tests",
-    "modules/Forge DB Orchestration",
-    "modules/Forge CMMS",
-    "modules/Forge ERPI",
-    "modules/Forge NMS",
 )
 TS_ROOTS = (
     "modules/Forge MES/backend/src",
