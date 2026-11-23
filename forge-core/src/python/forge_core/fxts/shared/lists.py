@@ -6,7 +6,7 @@ approved like a spec. A schema says only that a field takes an entry of a list; 
 checks it. Adding an entry is one approved change to the list: no schema version, no spec
 touched.
 
-A list is ``forge-core/src/python/forge_core/fxts/lists/<name>.list.json`` with ``list``, ``title``,
+A list is ``forge-core/contract/lists/<name>.list.json`` with ``list``, ``title``,
 ``description``, ``entries`` (each with an ``id`` and a ``description``) and the same
 ``integrity`` block a spec carries. ``forge governance stamp`` and ``approve`` work on it.
 """
@@ -16,10 +16,14 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-LISTS_DIR = Path(__file__).resolve().parent.parent / "lists"
+from forge_core import contract
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+LISTS_DIR = contract.LISTS_DIR
 SUFFIX = ".list.json"
 ENTRY_ID = re.compile(r"^[a-z][a-z0-9-]*$")
 

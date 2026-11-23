@@ -15,6 +15,7 @@ from uuid import uuid4
 
 import pytest
 
+from forge_core import contract
 from forge_core.fxts import FXTS_ROOT
 
 # ── Path setup ────────────────────────────────────────────────────
@@ -83,4 +84,4 @@ def forge_wms_spec() -> dict[str, Any]:
 @pytest.fixture()
 def facts_schema_path() -> Path:
     """Path to the FACTS JSON Schema."""
-    return FXTS_ROOT / "facts" / "schema" / "facts.schema.json"
+    return contract.schema_path("facts")

@@ -1,6 +1,6 @@
 /**
  * Guards the vendored copies against drift from the hub:
- *   - src/forge/proto/forge/v1/*.proto  == <repo>/src/forge/proto/*.proto
+ *   - src/forge/proto/forge/v1/*.proto  == <repo>/forge-core/contract/proto/*.proto
  *   - src/forge/forge-mes.manifest.json == <repo>/src/forge/adapters/forge_mes/manifest.json
  *
  * Skipped when the backend is built outside the forge monorepo (no hub tree).
@@ -10,8 +10,11 @@ import * as path from "path";
 import { FORGE_MES_MANIFEST, toProtoManifest } from "../forge-manifest";
 import { ADAPTER_SERVICE_PROTO, PROTO_DIR, getAdapterService, loadForgeV1 } from "../proto";
 
-const HUB_ROOT = path.resolve(__dirname, "../../../../../../src/forge");
-const hubPresent = fs.existsSync(path.join(HUB_ROOT, "proto", "adapter_service.proto"));
+const REPO_ROOT = path.resolve(__dirname, "../../../../../..");
+const HUB_ROOT = path.join(REPO_ROOT, "src", "forge");
+// The proto files are part of forge-core's contract (D-17, FB-227).
+const CONTRACT_PROTO = path.join(REPO_ROOT, "forge-core", "contract", "proto");
+const hubPresent = fs.existsSync(path.join(CONTRACT_PROTO, "adapter_service.proto"));
 const describeIfHub = hubPresent ? describe : describe.skip;
 
 describeIfHub("vendored hub contract parity", () => {
@@ -22,7 +25,7 @@ describeIfHub("vendored hub contract parity", () => {
         path.join(PROTO_DIR, "forge", "v1", `${name}.proto`),
         "utf8"
       );
-      const hub = fs.readFileSync(path.join(HUB_ROOT, "proto", `${name}.proto`), "utf8");
+      const hub = fs.readFileSync(path.join(CONTRACT_PROTO, `${name}.proto`), "utf8");
       expect(local).toBe(hub);
     }
   );

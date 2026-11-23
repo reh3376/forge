@@ -35,8 +35,8 @@ SUMMARY = (DOCS / "README.md").read_text(encoding="utf-8")
 INFRASTRUCTURE = {
     "shared": "the shared runner",
     "fhts": "the hash framework",
-    "lists": "the governed lists specs choose from (FB-153)",
 }
+#: The governed lists and every schema live in the contract, not among the runners (FB-227).
 #: A documentation page that says "Planned", and nothing in the code.
 PLANNED = ("fdts", "flts", "fnts", "fots", "fpts", "fqts", "fsts")
 BUILT = tuple(sorted(FRAMEWORKS))

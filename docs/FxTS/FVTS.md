@@ -95,7 +95,7 @@ Consequences enforced by the runner:
 
 ## Schema
 
-**Location:** `forge-core/src/python/forge_core/fxts/fvts/schema/fvts.schema.json`
+**Location:** `forge-core/contract/fxts/fvts/schema/fvts.schema.json`
 **`$id`:** `forge://governance/fvts/v0.1.0`
 
 ### Top-Level Structure

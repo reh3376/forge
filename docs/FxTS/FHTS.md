@@ -212,7 +212,7 @@ A spec's hash covers the spec. The schema a spec is written against is hashed an
 | `versions/<framework>.v<version>.schema.json` | one frozen copy per released version; never edited |
 | `schema-registry.json` | every version: its file, hash, step, summary, and the owner's approval |
 
-**Rules** (`forge-core/src/python/forge_core/fxts/shared/schemas.py`):
+**Rules** (`forge-core/contract/fxts/shared/schemas.py`):
 
 | Rule | How it is held |
 |---|---|

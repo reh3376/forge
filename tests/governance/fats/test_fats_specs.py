@@ -7,8 +7,10 @@ from pathlib import Path
 
 import pytest
 
+from forge_core import contract
+
 SPECS_DIR = Path("forge-core/src/python/forge_core/fxts/fats/specs")
-SCHEMA_PATH = Path("forge-core/src/python/forge_core/fxts/fats/schema/fats.schema.json")
+SCHEMA_PATH = contract.schema_path("fats")
 
 # Discover all spec files
 SPEC_FILES = sorted(SPECS_DIR.glob("*.json"))

@@ -18,6 +18,7 @@ from typing import Any
 
 import pytest
 
+from forge_core import contract
 from forge_core.fxts import FXTS_ROOT
 
 # ---------------------------------------------------------------------------
@@ -25,7 +26,7 @@ from forge_core.fxts import FXTS_ROOT
 # ---------------------------------------------------------------------------
 
 SRC_ROOT = Path(__file__).resolve().parents[3] / "src"
-SCHEMA_PATH = FXTS_ROOT / "facts" / "schema" / "facts.schema.json"
+SCHEMA_PATH = contract.schema_path("facts")
 WMS_SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
 MES_SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-mes.facts.json"
 

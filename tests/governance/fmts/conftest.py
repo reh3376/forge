@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any
 import pytest
 
 from forge import conformance
-from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
+from forge_core.fxts import FXTS_ROOT
 from forge_core.fxts.fmts import REPO_ROOT, SCHEMA_PATH
 from forge_core.fxts.fmts.runners.fmts_runner import FMTSRunner
 from forge_core.fxts.shared import schemas
@@ -20,7 +20,7 @@ from forge_core.fxts.shared.runner import add_spec_hash, approve_spec_hash
 if TYPE_CHECKING:
     from pathlib import Path
 
-FACTS_SPEC = FACTS_SCHEMA_PATH.parent.parent / "specs" / "forge-wms.facts.json"
+FACTS_SPEC = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
 ADAPTER_DIR = REPO_ROOT / "src" / "forge" / "adapters" / "forge_wms"
 
 BACKLOG = """# Backlog

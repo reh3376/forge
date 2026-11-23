@@ -17,6 +17,8 @@ Runner:  ``futs/runners/futs_runner.py`` (BACKLOG FB-176)
 
 from pathlib import Path
 
-SCHEMA_PATH = Path(__file__).parent / "schema" / "futs.schema.json"
+from forge_core import contract
+
+SCHEMA_PATH = contract.schema_path("futs")
 SPECS_DIR = Path(__file__).parent / "specs"
 REPO_ROOT = Path(__file__).resolve().parents[6]

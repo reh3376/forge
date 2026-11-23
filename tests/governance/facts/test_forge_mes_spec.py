@@ -16,6 +16,7 @@ from pathlib import Path
 
 import pytest
 
+from forge_core import contract
 from forge_core.fxts import FXTS_ROOT
 from forge_core.fxts.shared import schemas
 
@@ -24,7 +25,7 @@ from forge_core.fxts.shared import schemas
 # ---------------------------------------------------------------------------
 
 _base = Path(__file__).resolve().parents[3]
-SCHEMA_PATH = FXTS_ROOT / "facts" / "schema" / "facts.schema.json"
+SCHEMA_PATH = contract.schema_path("facts")
 MES_SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-mes.facts.json"
 WMS_SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
 

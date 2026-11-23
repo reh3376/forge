@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from forge_core.fxts import FXTS_ROOT
+from forge_core import contract
 
 # ---------------------------------------------------------------------------
 # The jsonschema ≥4.18 is a project dependency (Python 3.12+ target).
@@ -37,7 +37,7 @@ except ImportError:
 # Fixtures
 # ---------------------------------------------------------------------------
 
-SCHEMA_PATH = FXTS_ROOT / "facts" / "schema" / "facts.schema.json"
+SCHEMA_PATH = contract.schema_path("facts")
 
 
 @pytest.fixture(scope="module")

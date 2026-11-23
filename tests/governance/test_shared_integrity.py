@@ -7,6 +7,8 @@ from typing import Any
 
 import pytest
 
+from forge_core import contract
+from forge_core.fxts import FXTS_ROOT
 from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA
 from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
 from forge_core.fxts.fats.runners.fats_runner import FATSRunner
@@ -19,8 +21,8 @@ from forge_core.fxts.shared.runner import (
 )
 
 PASS, FAIL = VerdictStatus.PASS, VerdictStatus.FAIL
-FACTS_SPEC = FACTS_SCHEMA.parent.parent / "specs" / "forge-wms.facts.json"
-FATS_DIR = FACTS_SCHEMA.parent.parent.parent / "fats"
+FACTS_SPEC = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
+FATS_DIR = FXTS_ROOT / "fats"
 
 
 class BareRunner(FxTSRunner):
@@ -100,7 +102,7 @@ class TestTheFrameworksThatDidNotFail:
         integrity = spec["integrity"]
         assert integrity["spec_hash"] and integrity["hash_state"] == "approved"
         assert integrity["approved_by"] == "reh3376"
-        runner = FATSRunner(schema_path=FATS_DIR / "schema" / "fats.schema.json")
+        runner = FATSRunner(schema_path=contract.schema_path("fats"))
         report = await runner.run(target=spec["endpoint"], spec=spec)
         assert _statuses(report, "fats") == {"fats:hash-verified": PASS, "fats:hash-approved": PASS}
         assert report.hash_verified is True
