@@ -22,6 +22,7 @@ import typer
 
 import forge
 from forge.cli import governance as governance_cli
+from forge.cli.archive import archive_app
 from forge.cli.db_access import access_app
 
 # ---------------------------------------------------------------------------
@@ -224,6 +225,7 @@ governance_app = typer.Typer(
     no_args_is_help=True,
 )
 app.add_typer(governance_app, name="governance")
+app.add_typer(archive_app, name="archive")
 
 # Spec integrity: hash state listing, re-stamp after edits, owner approval (FB-021).
 governance_app.command("specs")(governance_cli.specs)

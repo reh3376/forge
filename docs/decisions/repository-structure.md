@@ -198,6 +198,8 @@ This contradicts §5, which keeps `docs/`, `deploy/`, `scripts/` and `tests/` on
 | A-2 | **[OWNER]** A document that exists at more than one level is **written once, at the bottom, and generated above, held by a test.** The lowest level carries the full detail; each level above is a summary built from it by a command; a stale generated file fails the suite. Hand-written text at an upper level is orientation only: it links down and carries no counts, versions or lists. |
 | A-3 | **[OWNER]** The folder of governed files in each major directory is named `fxts/` (not `specs/`). It holds that directory's specs and its generated index. The root `fxts/` holds the overview of every framework and every spec, generated from the levels below. |
 
+| A-4 | **[OWNER]** 2026-11-22, after the signature: each major directory has an **`archive/`**, and it is an **index only**. A retired document is removed from the tree and gets a row: a name by its original intent, what it was for, when and why it was retired, what replaced it, and the commit and paths that still hold it. `forge archive show <id>` reads it from the history; a test fails when a row points at nothing, when a retired path is back in the tree, or when the generated page is stale. The owner had proposed keeping the old versions in the folder; the index was chosen because content kept in the tree is read as current by search, agents and memory tools, and old text breaks current rules (names). Superseded versions of governed things stay as files, as before (schema versions; signed records amended in place). The 23 files removed by FB-207 are the first rows of the root archive (FB-210). |
+
 ### 10.3 The standard structure
 
 **[OWNER]** Signed 2026-11-22. A major directory is the root, `forge-core`, `forge-hub` and each folder under `forge-modules/`.
@@ -210,6 +212,7 @@ This contradicts §5, which keeps `docs/`, `deploy/`, `scripts/` and `tests/` on
 | `src/` | required below the root | its code; one folder per language where there are two (`src/python`, `src/go`) |
 | `tests/` | required | its tests; at the root, only tests that span layers |
 | `deploy/`, `scripts/` | where needed | deployment files and tools of this scope |
+| `archive/` | when the first document is retired there | `archive.json`, the index of what was retired from this directory, and its generated `README.md`; never the old content (A-4) |
 | `contract/` | forge-core only | proto files, framework schemas, governed lists |
 | `bridge/` | forge-mes only | the interim MES bridge, until it is retired |
 
