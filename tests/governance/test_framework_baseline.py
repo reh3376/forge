@@ -27,7 +27,7 @@ from forge_core.fxts.shared.runner import check_schema_runner_parity, verify_spe
 if TYPE_CHECKING:
     from pathlib import Path
 
-DOCS = REPO_ROOT / "docs" / "FxTS"
+DOCS = REPO_ROOT / "forge-core" / "docs" / "fxts"
 SUMMARY = (DOCS / "README.md").read_text(encoding="utf-8")
 
 #: Not frameworks with specs of their own: the engine every runner is built on, and the
@@ -142,7 +142,7 @@ class TestEachFramework:
         page = _page(fw)
         assert "\n## Purpose\n" in page
         row = _summary_row(fw)
-        assert row is not None, f"{fw.upper()} has no row in docs/FxTS/README.md"
+        assert row is not None, f"{fw.upper()} has no row in forge-core/docs/fxts/README.md"
         assert "Planned" not in row and "Stub" not in row
         assert f"{len(_specs(fw))} spec" in row, f"the row does not state the spec count: {row}"
 

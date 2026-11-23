@@ -112,7 +112,7 @@ SKIPPED_DIRS = frozenset(
     {"node_modules", "__pycache__", ".git", ".next", "dist", "build", "coverage", ".turbo"}
 )
 
-# The six-file layout ``forge module init`` generates (docs/MODULE_BUILDER.md §2).
+# The six-file layout ``forge module init`` generates (forge-core/docs/module-builder.md §2).
 PYTHON_ADAPTER_FILES = (
     "__init__.py",
     "manifest.json",

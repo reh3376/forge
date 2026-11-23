@@ -79,7 +79,7 @@ A ✅ marks a decision taken on 2026-11-03: its gate is lifted and the listed it
 |---|---|---|
 | ✅ 2026-11-03 · D-1 role model (Q21 derived copy of assignments at the site hub; Q22 ladder preset) | FB-075, FB-078, the multi-party approval step above FB-074, the gateway work in M5 | `docs/decisions/roles.md` §13 |
 | ✅ 2026-11-03 · D-3 forge-mes Go design | all of M3 | `ROADMAP.md` §5 |
-| ✅ 2026-11-03 · D-4 FVTS open items | M4 | `docs/FxTS/FVTS.md`, `ROADMAP.md` §5 |
+| ✅ 2026-11-03 · D-4 FVTS open items | M4 | `forge-core/docs/fxts/FVTS.md`, `ROADMAP.md` §5 |
 | ✅ 2026-11-03 · D-8 FACTS vocabulary for OT adapters | approval of the OT FACTS spec; the OT module's identity | `ROADMAP.md` §5 |
 | ✅ 2026-11-03 · D-9 one clock: which established standards to adopt (NTP/chrony strata, PTP/IEEE 1588, NTP four-timestamp measurement in-band, IEC 61850-5 tolerances, IEC 61850 `TimeQuality` + OPC UA `DataValue` fields); FB-094 recommends, the owner approves | FB-092, FB-093, FB-094's fields, the representation half of FB-088, the final name of `sent_time` (FB-087's provisional field), the per-link tolerances that replace FB-089's provisional `FORGE_CLOCK_TOLERANCE_SECONDS`, FB-089/FB-091 tolerances | `ROADMAP.md` §5; the record `decisions/one-clock-ot-source-time.md` |
 | ✅ 2026-11-03 · D-10 one schema registry (the F20 registry with a placement facet; routing from the hub's store; manifest registration under the compatibility gate; Q-1 … Q-8) | FB-097 and its eight steps; the Go module's schema registration (M3); the FDTS gate | `docs/decisions/one-schema-registry.md` |

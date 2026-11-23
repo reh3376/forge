@@ -106,7 +106,7 @@ These are the short forms. [`CLAUDE.md`](CLAUDE.md) states them in full and [`do
 
 ## Governance: FxTS
 
-FxTS is specification-first governance. A spec says what must exist, and the code is built to it. Each framework has a schema with released versions, a runner, a gate in CI, and specs. A run fails when a spec's hash does not verify or the owner has not approved it. What every framework must provide is [`docs/decisions/fxts-framework-baseline.md`](docs/decisions/fxts-framework-baseline.md), and how to design a spec is in [`docs/FxTS/README.md`](docs/FxTS/README.md).
+FxTS is specification-first governance. A spec says what must exist, and the code is built to it. Each framework has a schema with released versions, a runner, a gate in CI, and specs. A run fails when a spec's hash does not verify or the owner has not approved it. What every framework must provide is [`docs/decisions/fxts-framework-baseline.md`](docs/decisions/fxts-framework-baseline.md), and how to design a spec is in [`forge-core/docs/fxts/README.md`](forge-core/docs/fxts/README.md).
 
 | Framework | Governs | State |
 |---|---|---|
@@ -201,7 +201,7 @@ make check-tutorial-build               # its verification contracts and every l
 | [`BACKLOG.md`](BACKLOG.md) | Every known problem, by a stable id (FB-nnn) |
 | [`docs/decisions/`](docs/decisions) | The signed decision records. A signed record is changed only by the owner |
 | [`docs/PRINCIPLES.md`](docs/PRINCIPLES.md) | Design principles and technology decisions |
-| [`docs/FxTS/`](docs/FxTS) | A page per framework, and the summary |
+| [`forge-core/docs/fxts/`](forge-core/docs/fxts) | A page per framework, and the summary |
 | [`forge-core/README.md`](forge-core/README.md) | What forge-core is, the chain of command, and how authority works |
 | [`CLAUDE.md`](CLAUDE.md) | The rules for anyone, person or agent, changing this repository |
 | [`SECURITY.md`](SECURITY.md) | How to report a security problem |

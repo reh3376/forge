@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 157 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 159 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -246,7 +246,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 157:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 159:
 
 **Working**
 
@@ -309,7 +309,7 @@ flowchart LR
   DR["docs/decisions/<br/>the nine signed design records"] --> R
   B["BACKLOG.md<br/>every known problem, FB-nnn"] --> W
   P["PRINCIPLES.md<br/>what does not change with the code"] --> V
-  F["docs/FxTS/README.md<br/>every FxTS framework: what it governs,<br/>its state, its specs · one page per framework"] --> W
+  F["forge-core/docs/fxts/README.md<br/>every FxTS framework: what it governs,<br/>its state, its specs · one page per framework"] --> W
   DR --> F
 ```
 
@@ -317,7 +317,7 @@ flowchart LR
 - **`WHERE-WE-ARE.md`** is the current state. Its "Pick-up point" paragraph says what was done last and what comes next. It changes **before every push**.
 - **`ROADMAP.md`** §1 holds the decisions in force (A-1 to A-20). §5 lists the signed records (D-1 to D-15).
 - **`docs/decisions/`** holds the signed design records. Each was decided by the owner one question at a time; a signed record is changed only by the owner.
-- **`docs/FxTS/README.md`** is the summary of the specification frameworks: which exist, what each governs, its real state and its spec count, with a page per framework (`FACTS.md`, `FATS.md`, `FMTS.md`, `FTTS.md`, `FVTS.md`, `FHTS.md`, and the planned ones). A test keeps it true to the code.
+- **`forge-core/docs/fxts/README.md`** is the summary of the specification frameworks: which exist, what each governs, its real state and its spec count, with a page per framework (`FACTS.md`, `FATS.md`, `FMTS.md`, `FTTS.md`, `FVTS.md`, `FHTS.md`, and the planned ones). A test keeps it true to the code.
 - **`BACKLOG.md`** is the unit of work: one item per pull request; a finding is fixed or recorded, never skipped.
 - **`VISION.md`** and **`PRINCIPLES.md`** change rarely: the finished product, and what does not change with the code.
 
@@ -439,7 +439,7 @@ flowchart TD
 - Every schema reference uses one grammar, `forge://schemas/<spoke>[/<Entity>][/v<version>]`, held at every boundary (FB-008).
 
 note:
-- The context field registry (`forge-core/src/python/forge_core/registry`) and the manufacturing entity catalog (`docs/core/manufacturing-entity-catalog.md`) define what each slot means, so "area" is the same thing in every spoke.
+- The context field registry (`forge-core/src/python/forge_core/registry`) and the manufacturing entity catalog (`forge-core/docs/manufacturing-entity-catalog.md`) define what each slot means, so "area" is the same thing in every spoke.
 - `spoke_time` is on the wire (proto field 10) since the hub-to-spoke time exchange landed (FB-092, 2026-11-15); until then it was the hub-local `sent_time`.
 
 ---
@@ -452,7 +452,7 @@ note:
 | Per-spoke callback token, scoped hub endpoints | ✅ | FB-063 |
 | Hub → spoke write-back over a session-bound callback | ✅ | FB-054 |
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
-| FTTS transport spec and runner | ✅ | `forge-core/src/python/forge_core/fxts/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18; page `docs/FxTS/FTTS.md`. The transport contract it should become is decided and signed (D-15, `docs/decisions/transport-contract.md`): versioning, delivery, store and forward, command expiry, time-outs, security. None of that is built (FB-164) |
+| FTTS transport spec and runner | ✅ | `forge-core/src/python/forge_core/fxts/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18; page `forge-core/docs/fxts/FTTS.md`. The transport contract it should become is decided and signed (D-15, `docs/decisions/transport-contract.md`): versioning, delivery, store and forward, command expiry, time-outs, security. None of that is built (FB-164) |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
 | Hub time in the contract: the four-timestamp exchange on Register, Health and Ingest; a reporting spoke measured two-way | ✅ | FB-092 (2026-11-15) |
 | A spoke outside its tolerance, or one that reports no measurement, refused at Register and Ingest | ✅ | FB-093's hub half (2026-11-17; the plant-floor links fail closed since 2026-11-15) |
@@ -460,7 +460,7 @@ note:
 Code: `src/forge/transport/grpc_server.py` (hub), `spoke_client.py` (spoke side), `grpc_channel.py` (retry), `proto_bridge.py` (proto ↔ model), `transport_adapter.py` (adapter base).
 
 note:
-- FTTS governs the transport; the schema and runner exist and one approved spec is in force (`docs/FxTS/FTTS.md`). That spec describes the Python implementation; the next slide but two is what the transport is to guarantee for every language.
+- FTTS governs the transport; the schema and runner exist and one approved spec is in force (`forge-core/docs/fxts/FTTS.md`). That spec describes the Python implementation; the next slide but two is what the transport is to guarantee for every language.
 
 ---
 
@@ -728,7 +728,7 @@ note:
 The spec is the contract. This section is the headline for contributors: spec-first governance, the four layers every framework shares, the family of frameworks and their state, what every framework must provide, hashing and the owner's approval, the anatomy of a FACTS spec, what every module must do (FMTS), and how to run the gates.
 
 note:
-- Source: `docs/PRINCIPLES.md` §3, `docs/FxTS/README.md`, `docs/governance/facts-developer-guide.md`, `docs/WHERE-WE-ARE.md` §3.9, `forge-core/src/python/forge_core/fxts`.
+- Source: `docs/PRINCIPLES.md` §3, `forge-core/docs/fxts/README.md`, `forge-core/docs/facts-developer-guide.md`, `docs/WHERE-WE-ARE.md` §3.9, `forge-core/src/python/forge_core/fxts`.
 
 ---
 
@@ -791,7 +791,7 @@ Governance is declarative by invariant: quality, lineage, normalization and secu
 **Every highly repeatable process has an FxTS spec and is built to it** (A-13). If you are about to build something that will be done more than once and no framework fits, that is a finding for `BACKLOG.md`, not a reason to invent an informal format.
 
 note:
-- `docs/FxTS/README.md` is the summary of this table with a page per framework; a test keeps it true to the code.
+- `forge-core/docs/fxts/README.md` is the summary of this table with a page per framework; a test keeps it true to the code.
 - The OT FACTS spec fails schema validation until FB-079 extends the vocabulary (D-8, decided 2026-11-03).
 
 ---
@@ -819,7 +819,7 @@ A framework is either **planned** (a page that says so; no code, no specs) or it
 
 note:
 - Why it exists, in the owner's words: "we need to ensure we are not generating excessive technical debt when building FxTS specs by ensuring these core purposes are met with each new instantiation of a FxTS spec."
-- Schema rules decided with it: within a major version a schema only gains; patch is wording, minor adds something optional, major adds a required field or removes or narrows anything and marks every spec for review. The owner approves each schema hash. The code is `forge-core/contract/fxts/shared/schemas.py`; the page is `docs/FxTS/FHTS.md`, "Schema Versions".
+- Schema rules decided with it: within a major version a schema only gains; patch is wording, minor adds something optional, major adds a required field or removes or narrows anything and marks every spec for review. The owner approves each schema hash. The code is `forge-core/contract/fxts/shared/schemas.py`; the page is `forge-core/docs/fxts/FHTS.md`, "Schema Versions".
 - Every run now gives three verdicts for a spec's standing: `hash-verified`, `hash-approved` and `schema-current`.
 
 ---
@@ -865,7 +865,7 @@ note:
 
 - Nine specs today, one per module: forge-wms (the reference), forge-mes, forge-ims, forge-cmms, forge-nms, forge-historian, forge-scanner, forge-integ-erp-netsuite, forge-ot.
 - The runner validates every spec against the JSON schema first (`facts:schema-valid`) and reads its enums from the schema (FB-080).
-- The developer guide, `docs/governance/facts-developer-guide.md`, walks the schema, how to write a spec, running the runner, common failures and cross-spoke consistency.
+- The developer guide, `forge-core/docs/facts-developer-guide.md`, walks the schema, how to write a spec, running the runner, common failures and cross-spoke consistency.
 
 note:
 - Adapter tiers and what they mean: `docs/PRINCIPLES.md` §5. The OT tier's vocabulary gap in FACTS v0.1.0 is decision D-8 (decided 2026-11-03: extend the enums, FB-079).
@@ -1255,7 +1255,7 @@ note:
 How capability enters Forge: the kinds of module and their names, what a module is made of, the order in which they are built, the Python adapter template that exists today, what exists in Go, the interim MES bridge, forge-display and its designer, and the integration modules an installation builds for itself.
 
 note:
-- Source: `docs/ROADMAP.md` §1 (A-2, A-3, A-5, A-14, A-17, A-18, A-19), `docs/decisions/forge-module-requirements.md` (D-12), `docs/decisions/integration-module-builder.md` (D-13), `docs/MODULE_BUILDER.md`, `docs/FxTS/FVTS.md`, `docs/FxTS/FMTS.md`.
+- Source: `docs/ROADMAP.md` §1 (A-2, A-3, A-5, A-14, A-17, A-18, A-19), `docs/decisions/forge-module-requirements.md` (D-12), `docs/decisions/integration-module-builder.md` (D-13), `forge-core/docs/module-builder.md`, `forge-core/docs/fxts/FVTS.md`, `forge-core/docs/fxts/FMTS.md`.
 
 ---
 
@@ -1358,7 +1358,7 @@ flowchart LR
   SP --> T["tests/<br/>spec, runner and adapter tests"]
 ```
 
-- `forge module init` generates this layout (`forge-core/src/python/forge_core/sdk/module_builder`); `docs/MODULE_BUILDER.md` is the from-first-principles guide.
+- `forge module init` generates this layout (`forge-core/src/python/forge_core/sdk/module_builder`); `forge-core/docs/module-builder.md` is the from-first-principles guide.
 - FMTS requirement M-11 checks the layout. The conformance kit finds the one `AdapterBase` subclass in `adapter.py` and drives it; a Python module off the template (forge-ot) supplies a small `conformance.py` hook beside its adapter.
 - Read `src/forge/adapters/forge_wms` as the reference: adapter, config, context, record builder, entity mappers.
 
@@ -1426,7 +1426,7 @@ Signed by the owner on 2026-11-20: `docs/decisions/forge-display.md` (D-16). Not
 - **Those four screens are laid out** (2026-11-22) as FUTS view documents, Forge's first standard screens: one reflowing column each, a title, a line of guidance, and a table per object whose columns are fields of that object's schema. A binding names a point or an object; a table takes an object.
 - **What an installation builds is data.** A screen is a view document (a tree of containers and widget instances with their properties, bindings, actions and event handlers) in a new framework, **FUTS**, which also holds the widget specs. Forge's standard screens are files in the repository; an installation's are in its hub's database, versioned, hashed and approved on that hub.
 - **A screen adapts to its device through its containers.** Each container has a kind, mixed freely on one screen: `fixed` (exact positions, for a process graphic), `reflow` (rows and columns that wrap and stack, for forms and tables) and `switch` (one of several arrangements, chosen by the width of the display).
-- **FUTS exists** (2026-11-20): the schema, a runner, the first twelve widget specs and one reference view document, all approved. A view document may use only the points and actions of the surface it lays out, and only widgets whose spec the owner approved. `docs/FxTS/FUTS.md`.
+- **FUTS exists** (2026-11-20): the schema, a runner, the first twelve widget specs and one reference view document, all approved. A view document may use only the points and actions of the surface it lays out, and only widgets whose spec the owner approved. `forge-core/docs/fxts/FUTS.md`.
 - **The core decides.** A browser reaches only forge-display; forge-display reaches data only through its hub session and never decides a permission itself.
 - **Any number of clients, and any of them may act.** Whoever has the role may write, from a control room, a laptop or a tablet; there is no station-in-control. The activity chain records who did what, and from which profile. This replaces the earlier rule that only the control-room profile writes.
 - **Design mode is the forge designer** (D-13): the same renderer plus selection, a property editor and a palette. An installation builds its screens there with widgets that are each governed by a spec; a user builds only within what the specs allow, and Forge alone writes the widgets.
@@ -1522,7 +1522,7 @@ note:
 - Context is what makes two records joinable; **time** is what makes them comparable. A record is ordered by its source time, never by when it arrived, which is why a replay after an outage does not corrupt a data product (F2, F9).
 - The **Context Engine** (F21) is served by the hub under `/v1/context` (12 routes; state changes behind `context:write`) with Postgres stores through the factory (FB-001, FB-005).
 - The **context field registry** (`forge-core/src/python/forge_core/registry`) is the vocabulary; `RecordContext` carries it slot for slot (FB-013).
-- The **manufacturing entity catalog** (`docs/core/manufacturing-entity-catalog.md`) and the ISA-95 / ISA-88 hierarchy in `forge_core.models.manufacturing` define what context *means*: `MaterialItem`, `Lot` (with `item_id`, FB-010), `ProductionOrder`, equipment and areas.
+- The **manufacturing entity catalog** (`forge-core/docs/manufacturing-entity-catalog.md`) and the ISA-95 / ISA-88 hierarchy in `forge_core.models.manufacturing` define what context *means*: `MaterialItem`, `Lot` (with `item_id`, FB-010), `ProductionOrder`, equipment and areas.
 - Context is never silently dropped (invariant).
 
 | Open | Backlog |
@@ -1554,7 +1554,7 @@ flowchart LR
 
 note:
 - The governance frameworks that make this declarative (FQTS quality, FNTS normalization, FLTS lineage) are planned; the engine runs on the product's spec today.
-- When FQTS is built it starts from rules of four kinds already sketched for three data products: completeness, freshness, range and consistency (`docs/FxTS/FQTS.md`).
+- When FQTS is built it starts from rules of four kinds already sketched for three data products: completeness, freshness, range and consistency (`forge-core/docs/fxts/FQTS.md`).
 
 ---
 
@@ -1898,7 +1898,7 @@ FACTS `time_governance` covers a module's own clock and the devices it pulls fro
 - A time-keeping requirement can be waived only with admin privileges, and the waiver is named on every run of the module's spec.
 
 note:
-- `docs/decisions/forge-module-requirements.md` §5 and the answers Q-5 and Q-6; `docs/FxTS/FMTS.md` "The time contract".
+- `docs/decisions/forge-module-requirements.md` §5 and the answers Q-5 and Q-6; `forge-core/docs/fxts/FMTS.md` "The time contract".
 - Two modules carry such a waiver today: forge-scanner (no clock reader exists for handheld devices) and the interim MES bridge (its database stamps rows with its own clock).
 
 ---
@@ -2106,7 +2106,7 @@ note:
 ## Adding a Module (P-5)
 
 1. **Name it**: `forge-<service>` if Forge builds the function, `forge-integ-<function>-<product>` if it connects a third-party product; give it an alias.
-2. **Scaffold**: the module builder generates manifest, config, adapter, context mapper, record builder and a FACTS spec skeleton (`docs/MODULE_BUILDER.md` §3–§4).
+2. **Scaffold**: the module builder generates manifest, config, adapter, context mapper, record builder and a FACTS spec skeleton (`forge-core/docs/module-builder.md` §3–§4).
 3. **Declare its data** in the FACTS spec: identity and tier, capabilities, connection, data sources with schema references, context mapping and enrichment, error handling, `time_governance`, sample records.
 4. **Declare what it must do** in the FMTS spec: its kind and function, the data classes it carries, whether it takes process-control writes or business write-backs, the sixteen claims, its time contract with every counterpart, and a waiver, with a reason and an open backlog item, for anything it cannot meet yet.
 5. **Validate**: `forge governance run facts <module>` and `run fmts <module>`; fix every violation; `stamp` both specs.
@@ -2284,8 +2284,8 @@ note:
 | see what gates the route | `docs/WHERE-WE-ARE-GOING.md` §5 |
 | see what exists today, component by component | `docs/WHERE-WE-ARE.md` §3 |
 | pick up an item | `BACKLOG.md` and `docs/ROADMAP.md` §6 (open backlog by workstream) |
-| write a module | `docs/MODULE_BUILDER.md`, `docs/governance/facts-developer-guide.md`, `docs/FxTS/FMTS.md` |
-| see every specification framework and its state | `docs/FxTS/README.md`, then `docs/FxTS/<FRAMEWORK>.md` |
+| write a module | `forge-core/docs/module-builder.md`, `forge-core/docs/facts-developer-guide.md`, `forge-core/docs/fxts/FMTS.md` |
+| see every specification framework and its state | `forge-core/docs/fxts/README.md`, then `forge-core/docs/fxts/<FRAMEWORK>.md` |
 | change the transport or the proto | `docs/decisions/transport-contract.md` |
 | read a signed decision | `docs/decisions/` |
 | understand why things are the way they are | `docs/PRINCIPLES.md` |
@@ -2554,7 +2554,7 @@ The kinds of module, which ones exist, and what the contracts behind each one me
 - A site that keeps a vendor's control-room software can run it in parallel behind a bridge while the plant-floor module proves it gives the same answers.
 
 note:
-- `docs/FxTS/FMTS.md` lists every module with its state. Integration modules for other products are built at your site, in the designer (U8).
+- `forge-core/docs/fxts/FMTS.md` lists every module with its state. Integration modules for other products are built at your site, in the designer (U8).
 
 ---
 
@@ -2703,7 +2703,7 @@ Why "area" means one thing everywhere, where a figure comes from, and how a deci
 - A record missing required context is not stored silently; what is required is declared per spoke and checked by its contract.
 
 note:
-- `docs/core/manufacturing-entity-catalog.md`; the Context Engine serves the vocabulary under `/v1/context`.
+- `forge-core/docs/manufacturing-entity-catalog.md`; the Context Engine serves the vocabulary under `/v1/context`.
 
 ---
 
@@ -2769,7 +2769,7 @@ What "approved" means, why nothing changes silently, and the owner's role.
 - **At your site, approval belongs to a role on your hub.** What your people build in the designer is approved by whoever holds that role on that hub; a second hub may have a different approver.
 
 note:
-- `docs/FxTS/README.md` and `docs/PRINCIPLES.md` §3; the command is `forge governance specs --pending`.
+- `forge-core/docs/fxts/README.md` and `docs/PRINCIPLES.md` §3; the command is `forge governance specs --pending`.
 
 ---
 
@@ -3028,7 +3028,7 @@ note:
 | read the full definition and the problems it solves | `docs/VISION.md` |
 | see what exists today, component by component | `docs/WHERE-WE-ARE.md` |
 | see the route and what gates it | `docs/WHERE-WE-ARE-GOING.md` |
-| see every contract family and its state | `docs/FxTS/README.md`, then `docs/FxTS/<FRAMEWORK>.md` |
+| see every contract family and its state | `forge-core/docs/fxts/README.md`, then `forge-core/docs/fxts/<FRAMEWORK>.md` |
 | see which contracts await approval | `forge governance specs --pending` |
 | ask for a change or report a problem | a row in `BACKLOG.md`: every finding is recorded, never skipped |
 | see the decisions the owner is weighing | `docs/ROADMAP.md` §5 and `docs/decisions/` |

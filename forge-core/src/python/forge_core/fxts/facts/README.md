@@ -30,4 +30,4 @@ print(f"{'PASS' if report.passed else 'FAIL'}: {report.pass_count}/{report.total
 
 ## Status
 
-244/244 tests passing. See `docs/governance/facts-developer-guide.md` for the full developer guide.
+244/244 tests passing. See `forge-core/docs/facts-developer-guide.md` for the full developer guide.
