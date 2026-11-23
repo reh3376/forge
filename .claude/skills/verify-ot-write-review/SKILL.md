@@ -23,10 +23,10 @@ Run the check when a change touches any of these. Paths are as of the sync commi
 | `src/forge/modules/ot/control/interlock.py` | `InterlockEngine.check` as a layer that can refuse after the token is used |
 | `src/forge/modules/ot/control/models.py`, `forge-core/src/python/forge_core/models/control.py` | `WriteRequest`, `TagWriteConfig.coerce`, `ConfirmationMode`, `WriteOrigin` |
 
-**Sync commit:** `63f94a55` (2026-11-22). The check was confirmed to describe the code at this commit. See what changed since:
+**Sync commit:** `b508bb05` (2026-11-23). The check was confirmed to describe the code at this commit. See what changed since:
 
 ```bash
-git log --oneline 63f94a55..HEAD -- src/forge/modules/ot/control/review.py src/forge/modules/ot/control/write_engine.py src/forge/modules/ot/control/validation.py src/forge/modules/ot/control/interlock.py src/forge/modules/ot/control/models.py forge-core/src/python/forge_core/models/control.py
+git log --oneline b508bb05..HEAD -- src/forge/modules/ot/control/review.py src/forge/modules/ot/control/write_engine.py src/forge/modules/ot/control/validation.py src/forge/modules/ot/control/interlock.py src/forge/modules/ot/control/models.py forge-core/src/python/forge_core/models/control.py
 ```
 
 If that prints commits you did not check, the verification needs a look before you trust a pass: read "When the code changes on purpose". Move the sync commit forward only after you have confirmed that the check still describes the code at the new commit.
