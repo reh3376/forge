@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://schemas/forge-core/HealthComponent/v1",
+  "$id": "forge://schemas/forge-hub/HealthComponent/v1",
   "title": "Hub component",
   "description": "One part of a hub: the hub itself or one of its stores.",
   "type": "object",

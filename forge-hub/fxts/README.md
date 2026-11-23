@@ -38,3 +38,24 @@ forge-core's: [`../../forge-core/fxts/README.md`](../../forge-core/fxts/README.m
 | [`v1_registry_list.json`](fats/v1_registry_list.json) | `/v1/schemas` | 0.1.0 | approved | `66e5cab2e064` | reh3376 |
 | [`v1_registry_register.json`](fats/v1_registry_register.json) | `/v1/schemas` | 0.1.0 | approved | `aa5bcb02b1ed` | reh3376 |
 | [`v1_registry_versions.json`](fats/v1_registry_versions.json) | `/v1/schemas/{schema_id}/versions` | 0.1.0 | approved | `14cb350a9414` | reh3376 |
+
+## FTTS
+
+| Spec | Id | Format | State | Hash | Approved by |
+|---|---|---|---|---|---|
+| [`grpc-hardened-transport.ftts.json`](ftts/grpc-hardened-transport.ftts.json) | `grpc-hardened-transport` | 0.1.0 | approved | `9d68fe9a1843` | reh3376 |
+
+## FUTS
+
+| Spec | Id | Format | State | Hash | Approved by |
+|---|---|---|---|---|---|
+| [`forge-hub-access.view.futs.json`](futs/forge-hub-access.view.futs.json) | `forge-hub-access` | 0.2.0 | approved | `be401ccec96e` | reh3376 |
+| [`forge-hub-governance.view.futs.json`](futs/forge-hub-governance.view.futs.json) | `forge-hub-governance` | 0.2.0 | approved | `128b87e6ef81` | reh3376 |
+| [`forge-hub-modules.view.futs.json`](futs/forge-hub-modules.view.futs.json) | `forge-hub-modules` | 0.2.0 | approved | `a5dc5779d75f` | reh3376 |
+| [`forge-hub-status.view.futs.json`](futs/forge-hub-status.view.futs.json) | `forge-hub-status` | 0.2.0 | approved | `53b770f5caf0` | reh3376 |
+
+## FVTS
+
+| Spec | Id | Format | State | Hash | Approved by |
+|---|---|---|---|---|---|
+| [`forge-hub.fvts.json`](fvts/forge-hub.fvts.json) | `forge-hub-views` | 0.2.0 | approved | `f49ed4009279` | reh3376 |

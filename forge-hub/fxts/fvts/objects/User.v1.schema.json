@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://schemas/forge-core/User/v1",
+  "$id": "forge://schemas/forge-hub/User/v1",
   "title": "User",
   "description": "One identity known to this hub: a person or a service.",
   "type": "object",

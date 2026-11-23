@@ -24,6 +24,7 @@ from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import check_schema_runner_parity, verify_spec_hash
 from forge_hub.cli.governance import (
     FRAMEWORKS,
+    HUB_FXTS,
     REPO_ROOT,
     SPEC_ROOT,
     framework_specs,
@@ -125,16 +126,26 @@ class TestTheSetOfFrameworks:
         assert pages == set(BUILT) | set(PLANNED) | {"fhts"}
 
     def test_no_spec_lives_outside_its_framework(self) -> None:
-        """F-5. A spec file anywhere else is not listed, hashed or run by anything."""
+        """F-5, as D-17 words it: a spec lives in the folder of what it describes. That is a
+        framework's ``specs`` folder in forge-core (the modules', until FB-201) or the hub's
+        ``fxts`` folder. A spec file anywhere else is not listed, hashed or run by anything."""
         skipped = {"node_modules", ".venv", ".git", "__pycache__"}
         strays = [
             str(path.relative_to(REPO_ROOT))
             for path in REPO_ROOT.rglob("*.f?ts.json")
             if not skipped & set(path.parts)
             and SPEC_ROOT not in path.parents
+            and HUB_FXTS not in path.parents
             and "tests" not in path.relative_to(REPO_ROOT).parts
         ]
         assert strays == []
+        listed = set(spec_files(SPEC_ROOT))
+        unlisted = [
+            str(path.relative_to(REPO_ROOT))
+            for path in HUB_FXTS.glob("*/*.json")
+            if path not in listed
+        ]
+        assert unlisted == [], "a file in the hub's fxts folder that the listing does not see"
 
     def test_the_spec_listing_sees_every_spec(self) -> None:
         listed = {path.name for path in spec_files(SPEC_ROOT)}

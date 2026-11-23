@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://schemas/forge-core/GovernedFile/v1",
+  "$id": "forge://schemas/forge-hub/GovernedFile/v1",
   "title": "Spec or governed list",
   "description": "One governed file: a spec of a framework, or a governed list.",
   "type": "object",

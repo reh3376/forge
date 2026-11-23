@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://schemas/forge-core/SchemaVersion/v1",
+  "$id": "forge://schemas/forge-hub/SchemaVersion/v1",
   "title": "Schema version",
   "description": "One released version of a framework's schema.",
   "type": "object",

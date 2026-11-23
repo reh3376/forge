@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://schemas/forge-core/RoleAssignment/v1",
+  "$id": "forge://schemas/forge-hub/RoleAssignment/v1",
   "title": "Role assignment",
   "description": "One role given to one user, with where it applies.",
   "type": "object",

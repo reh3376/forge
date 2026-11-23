@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 164 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 165 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -246,7 +246,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 164:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 165:
 
 **Working**
 
@@ -280,7 +280,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 164:
 
 | Measure | Value (2026-11-19) |
 |---|---|
-| Python: forge-core (`forge-core/src/python/forge_core`) | 119 files, ~26,500 lines |
+| Python: forge-core (`forge-core/src/python/forge_core`) | 118 files, ~26,500 lines |
 | Python: forge-hub (`forge-hub/src/python/forge_hub`) | 90 files, ~17,300 lines |
 | Python: the modules (`src/forge`) | 154 files, ~33,400 lines |
 | Python tests | 280 files, 5,154 collected, full suite green on the locked dependency set |
@@ -453,7 +453,7 @@ note:
 | Per-spoke callback token, scoped hub endpoints | ✅ | FB-063 |
 | Hub → spoke write-back over a session-bound callback | ✅ | FB-054 |
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
-| FTTS transport spec and runner | ✅ | `forge-core/src/python/forge_core/fxts/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18; page `forge-core/docs/fxts/FTTS.md`. The transport contract it should become is decided and signed (D-15, `docs/decisions/transport-contract.md`): versioning, delivery, store and forward, command expiry, time-outs, security. None of that is built (FB-164) |
+| FTTS transport spec and runner | ✅ | `forge-hub/fxts/ftts/grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18; page `forge-core/docs/fxts/FTTS.md`. The transport contract it should become is decided and signed (D-15, `docs/decisions/transport-contract.md`): versioning, delivery, store and forward, command expiry, time-outs, security. None of that is built (FB-164) |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
 | Hub time in the contract: the four-timestamp exchange on Register, Health and Ingest; a reporting spoke measured two-way | ✅ | FB-092 (2026-11-15) |
 | A spoke outside its tolerance, or one that reports no measurement, refused at Register and Ingest | ✅ | FB-093's hub half (2026-11-17; the plant-floor links fail closed since 2026-11-15) |

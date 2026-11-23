@@ -30,7 +30,12 @@ if TYPE_CHECKING:
 
 PASS, FAIL, SKIP = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.SKIP
 SCHEMA = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
-SPEC_FILES = sorted(SPECS_DIR.glob("*.futs.json"))
+#: The hub's own screens are in its folder of governed files; the widgets and the module's
+#: view are still in forge-core's framework folder (FB-201).
+HUB_SPECS_DIR = REPO_ROOT / "forge-hub" / "fxts" / "futs"
+SPEC_FILES = sorted(
+    [*SPECS_DIR.glob("*.futs.json"), *HUB_SPECS_DIR.glob("*.futs.json")], key=lambda p: p.name
+)
 WIDGETS = sorted(p.name.removesuffix(".widget.futs.json") for p in SPECS_DIR.glob("*.widget.*"))
 VIEW = "forge-ot-ferm-overview"
 
@@ -42,10 +47,10 @@ FIRST_WIDGETS = [
 ]  # fmt: skip
 #: The hub's four standard screens (D-16, Q-15; FB-187), by view id and the surface each lays out.
 HUB_SCREENS = {
-    "forge-core-status": "hub.status",
-    "forge-core-modules": "hub.modules",
-    "forge-core-governance": "hub.governance",
-    "forge-core-access": "hub.access",
+    "forge-hub-status": "hub.status",
+    "forge-hub-modules": "hub.modules",
+    "forge-hub-governance": "hub.governance",
+    "forge-hub-access": "hub.access",
 }
 #: Failures the gate allows, by spec id. A spec the owner approved is allowed none.
 ALLOWED_FAILURES: dict[str, frozenset[str]] = {}
@@ -54,7 +59,8 @@ NOT_RUN: dict[str, frozenset[str]] = {VIEW: frozenset({"futs:expressions"})}
 
 
 def _load(name: str) -> dict[str, Any]:
-    return json.loads((SPECS_DIR / name).read_text(encoding="utf-8"))
+    folder = HUB_SPECS_DIR if (HUB_SPECS_DIR / name).is_file() else SPECS_DIR
+    return json.loads((folder / name).read_text(encoding="utf-8"))
 
 
 def sign(spec: dict[str, Any]) -> dict[str, Any]:
@@ -321,22 +327,20 @@ class TestBindingACollection:
 
     @pytest.fixture
     def screen(self) -> dict[str, Any]:
-        return _load("forge-core-governance.view.futs.json")
+        return _load("forge-hub-governance.view.futs.json")
 
     def test_the_four_hub_screens_lay_out_the_four_surfaces(self) -> None:
         found = {}
         for view_id in HUB_SCREENS:
             view = _load(f"{view_id}.view.futs.json")
-            assert view["view"]["owner_module"] == "forge-core"
+            assert view["view"]["owner_module"] == "forge-hub"
             assert view["view"]["root"]["container"] == "reflow"  # works on a phone
             found[view_id] = view["view"]["surface_id"]
         assert found == HUB_SCREENS
 
     def test_every_object_of_a_surface_is_on_its_screen(self) -> None:
         fvts = json.loads(
-            (
-                REPO_ROOT / "forge-core/src/python/forge_core/fxts/fvts/specs/forge-core.fvts.json"
-            ).read_text(encoding="utf-8")
+            (REPO_ROOT / "forge-hub/fxts/fvts/forge-hub.fvts.json").read_text(encoding="utf-8")
         )
         surfaces = {s["surface_id"]: set(s["objects"]) for s in fvts["surfaces"]}
         for view_id, surface_id in HUB_SCREENS.items():

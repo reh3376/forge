@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://schemas/forge-core/Role/v1",
+  "$id": "forge://schemas/forge-hub/Role/v1",
   "title": "Role",
   "description": "One role: a named set of scopes, shipped by a module as data.",
   "type": "object",

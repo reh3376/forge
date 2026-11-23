@@ -2,14 +2,14 @@
   "spec_version": "0.2.0",
   "spec_kind": "view",
   "identity": {
-    "id": "forge-core-governance",
+    "id": "forge-hub-governance",
     "name": "Governance",
     "version": "0.1.0",
     "description": "Every spec, governed list and schema version with its state and hash, and what awaits approval. One of the hub's four standard screens."
   },
   "view": {
-    "owner_module": "forge-core",
-    "fvts_spec": "forge-core/src/python/forge_core/fxts/fvts/specs/forge-core.fvts.json",
+    "owner_module": "forge-hub",
+    "fvts_spec": "forge-hub/fxts/fvts/forge-hub.fvts.json",
     "surface_id": "hub.governance",
     "root": {
       "node_id": "screen",
@@ -80,8 +80,17 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "c2c33d04f7701acf19d8f0d746fc2a7ce5c5d94df220b1f8b58e0dc0bd711fe5",
+    "previous_hash": "ae3b15c4c3ab8e5673ef2150eb029740ca2033d9c2965a0da64823413e0754ad",
     "change_history": [
+      {
+        "previous_hash": "ae3b15c4c3ab8e5673ef2150eb029740ca2033d9c2965a0da64823413e0754ad",
+        "new_hash": "128b87e6ef81eaebe9e9e10414c0bae02dcb04b6e44d1b1b9d04371d0e64fe52",
+        "changed_at": "2026-11-23T17:37:15Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "the hub's id is forge-hub (D-17 \u00a76, FB-200): the view's id, its owner and the path of the hub's view spec"
+      },
       {
         "previous_hash": "c2c33d04f7701acf19d8f0d746fc2a7ce5c5d94df220b1f8b58e0dc0bd711fe5",
         "new_hash": "ae3b15c4c3ab8e5673ef2150eb029740ca2033d9c2965a0da64823413e0754ad",
@@ -93,10 +102,10 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "ae3b15c4c3ab8e5673ef2150eb029740ca2033d9c2965a0da64823413e0754ad",
+    "spec_hash": "128b87e6ef81eaebe9e9e10414c0bae02dcb04b6e44d1b1b9d04371d0e64fe52",
     "schema_version": "0.2.0",
     "schema_hash": "05fa4883f7f52ce66c03e0025d923b46a0a4721f947283dae329a43c45368b51",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T02:14:29Z"
+    "approved_at": "2026-11-23T17:43:48Z"
   }
 }

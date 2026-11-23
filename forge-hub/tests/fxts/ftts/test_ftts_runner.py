@@ -1,4 +1,3 @@
-# ruff: noqa: E402
 """Tests for the FTTS runner — validates transport governance enforcement.
 
 Covers:
@@ -13,28 +12,19 @@ Covers:
 from __future__ import annotations
 
 import json
-import sys
-from pathlib import Path
-
-# Ensure src/ is importable
-_src = Path(__file__).resolve().parents[4] / "src"
-if str(_src) not in sys.path:
-    sys.path.insert(0, str(_src))
 
 import pytest
 
 from forge_core import contract
 from forge_core.fxts.ftts.runners.ftts_runner import FTTSRunner
 from forge_core.fxts.shared.runner import VerdictStatus
+from forge_hub import fxts as hub_fxts
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
 
-SPEC_PATH = (
-    Path(__file__).resolve().parents[4]
-    / "forge-core/src/python/forge_core/fxts/ftts/specs/grpc-hardened-transport.ftts.json"
-)
+SPEC_PATH = hub_fxts.specs_dir("ftts") / "grpc-hardened-transport.ftts.json"  # the hub's own
 SCHEMA_PATH = contract.schema_path("ftts")
 
 

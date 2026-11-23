@@ -144,7 +144,7 @@ _OBJECT = frozenset(
     }
 )
 #: The hub's id as the owner of a view spec. It is not a module and has no FACTS spec.
-HUB_OWNER = "forge-core"
+HUB_OWNER = "forge-hub"
 
 
 def load_facts_specs(directory: Path = FACTS_SPECS_DIR) -> dict[str, dict[str, Any]]:

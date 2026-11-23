@@ -104,7 +104,7 @@
   },
 
   "serialization_bridge": {
-    "bridge_module": "forge.transport.proto_bridge",
+    "bridge_module": "forge_core.link.proto_bridge",
     "round_trip_lossless": true,
     "type_mappings": [
       {
@@ -203,7 +203,7 @@
   },
 
   "server_requirements": {
-    "server_module": "forge.transport.grpc_server",
+    "server_module": "forge_hub.link.grpc_server",
     "servicer_class": "ForgeAdapterServiceServicer",
     "uses_compiled_registration": true,
     "uses_compiled_servicer_base": true,
@@ -212,7 +212,7 @@
   },
 
   "client_requirements": {
-    "channel_module": "forge.transport.grpc_channel",
+    "channel_module": "forge_core.link.grpc_channel",
     "channel_class": "GrpcChannel",
     "uses_compiled_stub": true,
     "transport_channel_compatible": true,
@@ -404,10 +404,19 @@
 
   "integrity": {
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "62df74ee59fc37f3e6d66580837e2cde80366384b7d0cc4e3d7f88692bb6ec0e",
+    "spec_hash": "9d68fe9a18437bab5326d18bb2337fcbdb725b03833c6b34ca986c48a9013bed",
     "hash_state": "approved",
-    "previous_hash": "bf89cb3699f5748413c10cc766bf5a628b68261c15f9a358501ea33715fd6c8a",
+    "previous_hash": "62df74ee59fc37f3e6d66580837e2cde80366384b7d0cc4e3d7f88692bb6ec0e",
     "change_history": [
+      {
+        "previous_hash": "62df74ee59fc37f3e6d66580837e2cde80366384b7d0cc4e3d7f88692bb6ec0e",
+        "new_hash": "9d68fe9a18437bab5326d18bb2337fcbdb725b03833c6b34ca986c48a9013bed",
+        "changed_at": "2026-11-23T17:37:15Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "moved to the hub's folder of governed files (D-17 A-3, FB-200); the three module names follow the code: the bridge and the channel are forge_core.link (FB-199), the server is forge_hub.link (FB-238)"
+      },
       {
         "previous_hash": "bf89cb3699f5748413c10cc766bf5a628b68261c15f9a358501ea33715fd6c8a",
         "new_hash": "62df74ee59fc37f3e6d66580837e2cde80366384b7d0cc4e3d7f88692bb6ec0e",
@@ -430,7 +439,7 @@
     "schema_version": "0.1.0",
     "schema_hash": "121616f19462d1dbc5bf8d671dd2c26289ac3787adbb90ddfd24e47c461a906a",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T02:14:29Z"
+    "approved_at": "2026-11-23T17:43:48Z"
   },
 
   "metadata": {
