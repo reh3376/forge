@@ -1,6 +1,6 @@
 # The structure of the repository: forge-core, forge-hub, forge-modules — design record
 
-**Status:** approved by reh3376 on 2026-11-22 as D-17, amended the same day by §10 (one standard structure in every major directory), which replaces §5 where they differ. Signed as D-17 (the owner answered Q-1 to Q-6 one at a time and signed the record as written, Q-7). Nothing is moved yet: §9 is the plan, and the code is still laid out as §2 describes. · **Backlog:** FB-196 (with FB-197 to FB-203) · **Roadmap:** decision A-1
+**Status:** approved by reh3376 on 2026-11-22 as D-17, amended the same day by §10 (one standard structure in every major directory), which replaces §5 where they differ, and by §11 (what forge-core is), which replaces the answer to Q-1. Signed as D-17 (the owner answered Q-1 to Q-6 one at a time and signed the record as written, Q-7). Nothing is moved yet: §9 is the plan, and the code is still laid out as §2 describes. · **Backlog:** FB-196 (with FB-197 to FB-203) · **Roadmap:** decision A-1
 **Participants:** reh3376 (owner, decides and signs), Claude (surveys, asks, records, proposes)
 
 Every statement is tagged **[OWNER]** (decided by the owner, with the date), **[FACT]** (what the code says today, with where) or **[PROPOSED]** (Claude's recommendation, not approved).
@@ -48,7 +48,7 @@ Every statement is tagged **[OWNER]** (decided by the owner, with the date), **[
 
 | # | Question | Answer |
 |---|---|---|
-| Q-1 | What forge-core is. | **Answered 2026-11-22: the shared foundation, not a running thing.** forge-core is what hubs and modules are built from: the contract (proto files, schemas, the FxTS frameworks, governed lists) and shared libraries in Python and Go. It has a version and is never deployed. The hub is forge-hub. An installation is one or more hubs, each with its modules. Debt check: the name changes meaning, so the hub's id and the wording of signed records change once, now, before more is built on the old name. |
+| Q-1 | What forge-core is. | **Amended 2026-11-22 by §11: forge-core is the foundation and the administrative manager of a deployment, one per deployment above the top hub.** As first recorded: **the shared foundation, not a running thing.** forge-core is what hubs and modules are built from: the contract (proto files, schemas, the FxTS frameworks, governed lists) and shared libraries in Python and Go. It has a version and is never deployed. The hub is forge-hub. An installation is one or more hubs, each with its modules. Debt check: the name changes meaning, so the hub's id and the wording of signed records change once, now, before more is built on the old name. |
 | Q-2 | How deep the reorganisation goes. | **Answered 2026-11-22: three top-level folders, each self-contained.** `forge-core/`, `forge-hub/` and `forge-modules/`, each holding its own code, tests and specs; one folder per module. Debt check: a module's folder holds the whole module, which is what "each module carries its own specs and schemas" (D-16) asks; a module can later be lifted out whole. |
 | Q-3 | How the Python code is packaged. | **Answered 2026-11-22: one project, three package roots.** One manifest and one lock file at the top; the manifest lists the three places code is found. Imports become `forge_core`, `forge_hub` and one package per module. This is the owner's confirmation for the manifest change this record needs. Debt check: installing, testing and CI stay one command; a module gets a manifest of its own when one is shipped on its own. |
 | Q-4 | What happens to the top-level `modules` folder. | **Answered 2026-11-22: remove the four copies; move the bridge under its module.** The four template copies are deleted (history keeps them; FB-019 closes). The interim MES bridge moves to `forge-modules/forge-mes/bridge`. |
@@ -307,3 +307,64 @@ One command builds them and one test fails when any is stale. A spec whose conte
 ### 10.8 What holds the structure
 
 One test: every major directory has the required entries of §10.3, no governed file lies outside an `fxts/` or `contract/` folder, and no tracked path lies outside what §10.3 to §10.5 allow. A new top-level folder fails the suite until this record names it.
+
+---
+
+## 11. Amendment 2: what forge-core is
+
+**Status of this section:** the definition of §11.2 and the chain of command of §11.3 are the owner's, accepted on 2026-11-22. They replace the answer to Q-1 in §3 ("the shared foundation, not a running thing"). §11.4 lists what is not yet decided; nothing in it is settled. Backlog: FB-232.
+
+### 11.1 What the owner said (2026-11-22)
+
+**[OWNER]** "forge-core is the administrative manager for a forge deployment, what exactly that means and how it will manifest is to be determined as we work through it. For example: a given forge deployment has 2 sites and a corporate headquarters all in geographically different areas. forge-core manages, tracks, monitors, and alerts on the state of [each site hub, each area hub, and their spokes and modules]. The highest hub in the hierarchy houses forge-core, we must also build in a manner that will allow any individual hub to run autonomously if needed in the event of comms loss."
+
+**[OWNER]** "Forge-core must be the administrative manager and sits above the top level hub running service. Think of it as similar to the EAM module in Ignition. How else would we manage an enterprise deployment? Each site level instantiation of forge-hub must have a centralized location to perform administrative functions. If not we would have to build it all in every hub deployed."
+
+**[FACT]** Q-1 of this record had offered "Core is also a running service" and recorded the other answer, with the words "never a running thing". The owner's first description of the layers (§1) had already said "1 or more hubs for every forge-core deployment". The wording of Q-1's answer was Claude's; this amendment corrects it.
+
+### 11.2 The definition
+
+**[OWNER]** Accepted as written, 2026-11-22.
+
+> **forge-core** is the foundation and the administrative manager of a Forge deployment. There is one per deployment, above the top hub.
+>
+> As the foundation, it holds what every hub and module is built from: the contract, the FxTS frameworks, and the SDK.
+>
+> As the manager, it knows every hub and module in the deployment, tracks and monitors their state, raises alerts, and is the one place administrative changes are made and distributed.
+>
+> It administers; it does not operate. No record and no command passes through it, and a hub that cannot reach it keeps running.
+
+**[OWNER]** The line between the two kinds of work, accepted with the definition:
+
+- **Operations stay in every hub:** ingest, context, storage, alarms, writes to process controllers, and knowing the health of its own modules. A hub that is cut off loses none of this.
+- **Administration is forge-core's:** the inventory of every hub and module, deployment-wide state and alerting, and making and distributing changes (specs, schemas, lists, roles, configuration). A hub that is cut off keeps running on what it last received; changes wait until the link returns.
+
+### 11.3 The chain of command
+
+**[OWNER]** "Each hub is the manager of the spokes / modules and DBs attached to it. From a chain of command perspective forge-core is the CEO, forge-hub-enterprise is the VP, forge-hub-site is the director, and forge-hub-area is the plant manager."
+
+| Level | Is | Manages |
+|---|---|---|
+| forge-core | the administrative manager of the deployment | the whole deployment, through the hubs |
+| forge-hub-enterprise | the top hub | the site hubs, and the modules and databases attached to it |
+| forge-hub-site | a site's hub | its area hubs, and the modules and databases attached to it |
+| forge-hub-area | an area's hub | the modules and databases attached to it |
+
+### 11.4 Not yet decided
+
+Each is the owner's, asked one at a time. Until one is answered, the signed record it touches stands as written.
+
+| # | Question | The record it touches |
+|---|---|---|
+| C-1 | How a hub reaches forge-core: up the chain of command, each hub to the one above it, with forge-core as the parent of the enterprise hub; or every hub to forge-core directly. | The transport contract, T-13 ("a hub is a module to its parent") |
+| C-2 | Where roles are mastered: today at the "managing hub", the top hub. | `roles.md`, R-16 and R-18 |
+| C-3 | Whether the time authority stays with the top hub, time being operational. | `one-clock-ot-source-time.md` |
+| C-4 | Where forge-core runs: its own process beside the enterprise hub, or inside it. | A-1; the image and deployment |
+| C-5 | What a site that is cut off may administer for itself, and how that is reconciled afterwards. | R-18 (the derived copy) |
+| C-6 | The structure rules: the manager is a layer above the hub. It imports the foundation and reaches hubs over the link, never by importing them; the foundation imports nothing of the manager. | §4, S-1 to S-3, and the import-direction test |
+| C-7 | A deployment with one site and no enterprise hub: which hub is under forge-core. | R-16 |
+
+### 11.5 What exists today
+
+**[FACT]** The foundation is built and is the package `forge_core` (FB-199) with `forge-core/contract` (FB-227). Nothing of the manager is built: no inventory, no deployment-wide state, no distribution of changes. Hub-to-hub links have no transport yet (the transport contract, T-13; FB-164).
+
