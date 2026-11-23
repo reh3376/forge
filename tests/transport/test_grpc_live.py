@@ -30,8 +30,6 @@ if str(_src) not in sys.path:
 # prepended to sys.path: doing so shadows the real `forge` package whenever this
 # conftest loads before any other test module has imported forge (BACKLOG FB-058).
 
-from forge.transport.grpc_server import GrpcServer
-from forge.transport.hub_server import InMemoryServicer
 from forge_core.link.grpc_channel import GrpcChannel
 from forge_core.link.spoke_client import SpokeClient
 from forge_core.models.adapter import (
@@ -51,6 +49,8 @@ from forge_core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge_hub.link.grpc_server import GrpcServer
+from forge_hub.link.hub_server import InMemoryServicer
 
 # ---------------------------------------------------------------------------
 # Fixtures

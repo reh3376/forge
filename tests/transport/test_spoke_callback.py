@@ -11,8 +11,6 @@ import grpc
 import grpc.aio
 import pytest
 
-from forge.transport.grpc_server import GrpcServer
-from forge.transport.hub_ingest import HubIngestServicer
 from forge_core.link.grpc_channel import GrpcChannel
 from forge_core.link.proto_bridge import contextual_record_to_proto, get_typed_value
 from forge_core.link.serialization import pydantic_to_proto
@@ -35,6 +33,8 @@ from forge_core.models.contextual_record import (
 )
 from forge_core.proto_gen.forge.v1 import adapter_service_pb2 as service_msg
 from forge_core.proto_gen.forge.v1 import adapter_service_pb2_grpc as service_grpc
+from forge_hub.link.grpc_server import GrpcServer
+from forge_hub.link.hub_ingest import HubIngestServicer
 
 MES_MANIFEST = Path(__file__).resolve().parents[2] / "src" / "forge" / "adapters"
 MES_MANIFEST = MES_MANIFEST / "forge_mes" / "manifest.json"

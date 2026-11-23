@@ -1,0 +1,730 @@
+"""Forge Hub API — unified REST entry point for the platform.
+
+This is the main application that ``docker compose`` runs.  It provides:
+
+    /v1/health          — Aggregated infrastructure health
+    /v1/adapters        — Adapter registry and lifecycle (durable, FB-060)
+    /v1/ingest/log      — Ingest log (one row per batch, forge_core.records_log)
+    /v1/records         — Record ingestion (REST passthrough)
+    /v1/adapters/{id}/write — Hub → spoke write-back (FB-054)
+    /v1/adapters/{id}/backfill, /subscriptions — pull from the spoke (FB-061)
+    /v1/writes          — Write-back targets and counters
+    /api/v1/ot/...      — OT module control + i3X browse (FORGE_OT_CONTROL_CONFIG, FB-065)
+    /v1/context/...     — Context Engine (F21): enrich, equipment, batches, modes, shifts (FB-001)
+    /v1/schemas/...     — Schema Registry (F20): schemas, versions, compatibility, diff (FB-001)
+    /curation/...       — Curation sub-app (products, lineage, quality)
+
+The gRPC server for spoke communication runs on a separate port
+(default 50051) but is started/stopped by the same lifecycle.
+"""
+
+from __future__ import annotations
+
+import logging
+import os
+import time
+from contextlib import asynccontextmanager
+from datetime import datetime
+from functools import partial
+from typing import TYPE_CHECKING, Any
+
+from fastapi import Depends, FastAPI, HTTPException, Query
+from pydantic import BaseModel, Field
+
+from forge_core import telemetry
+from forge_core.link.spoke_callback import WriteDispatcher, WriteDispatchError
+from forge_core.link.spoke_client import ChannelTls
+from forge_core.models.adapter import (
+    AdapterManifest,  # noqa: TC001 — FastAPI resolves these at runtime
+)
+from forge_hub.api.health import (
+    HealthOrchestrator,
+    PlatformHealth,
+    check_kafka,
+    check_minio,
+    check_neo4j,
+    check_postgres,
+    check_rabbitmq,
+    check_redis,
+    check_timescaledb,
+)
+from forge_hub.api.registry import AdapterRegistry
+from forge_hub.context.service import build_context_router
+from forge_hub.curation.engine import CurationEngine
+from forge_hub.curation.lineage import LineageTracker
+from forge_hub.curation.registry import DataProductRegistry
+from forge_hub.gateway.auth import auth_config_from_env, configure_auth
+from forge_hub.gateway.models import ForgeUser  # noqa: TC001 — FastAPI dependency type
+from forge_hub.gateway.rbac import require_scope
+from forge_hub.ingest import IngestPipeline, build_pipeline_from_storage
+from forge_hub.link.grpc_server import ServerTls
+from forge_hub.link.spoke_pull import (
+    SubscriptionManager,
+    backfill_into_pipeline,
+    collect_into_pipeline,
+)
+from forge_hub.registry.service import build_registry_router
+from forge_hub.storage.adapter_registry import AdapterRegistryStore  # noqa: TC001
+from forge_hub.storage.config import StorageConfig
+from forge_hub.storage.factory import StorageFactory  # noqa: TC001
+
+if TYPE_CHECKING:
+    from forge_hub.context.equipment import EquipmentStore
+    from forge_hub.registry.store import SchemaStore
+
+logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Request / Response models
+# ---------------------------------------------------------------------------
+
+
+class IngestRequest(BaseModel):
+    """Batch of raw records to ingest via REST."""
+
+    adapter_id: str
+    records: list[dict[str, Any]]
+
+
+class IngestResponse(BaseModel):
+    """Result of an ingestion request."""
+
+    accepted: int
+    rejected: int = 0
+    persisted: int = 0
+    errors: list[str] = Field(default_factory=list)
+    # Curation on ingest (FB-009): curated records per data product, and failed runs.
+    curated: dict[str, int] = Field(default_factory=dict)
+    curation_errors: list[str] = Field(default_factory=list)
+
+
+class WriteRequestModel(BaseModel):
+    """One hub → spoke write: a tag path and the value to put there."""
+
+    tag_path: str
+    value: Any = None
+    confirm: bool = False
+
+
+class WriteResponseModel(BaseModel):
+    adapter_id: str
+    tag_path: str
+    success: bool
+    message: str = ""
+    readback: dict[str, Any] | None = None
+
+
+class BackfillRequestModel(BaseModel):
+    """Replay a time range from a spoke into the ingest pipeline (FB-061)."""
+
+    start_time: datetime
+    end_time: datetime
+    tags: list[str] = Field(default_factory=list)
+    max_records: int = Field(default=0, ge=0)
+    batch_size: int = Field(default=100, ge=1, le=10_000)
+
+
+class CollectRequestModel(BaseModel):
+    """Pull what a spoke has queued for push into the ingest pipeline (FB-071)."""
+
+    max_records: int = Field(default=0, ge=0)
+    batch_size: int = Field(default=100, ge=1, le=10_000)
+
+
+class SubscribeRequestModel(BaseModel):
+    """Open a spoke subscription that streams into the ingest pipeline (FB-061)."""
+
+    tags: list[str] = Field(default_factory=list)
+
+
+# HTTP status per WriteDispatchError code.
+_WRITE_HTTP_STATUS = {
+    "unknown_adapter": 404,
+    "no_callback": 409,
+    "not_writable": 403,
+    "transport": 502,
+}
+
+
+# Backwards-compatible name for the registry (now durable, FB-060).
+_AdapterRegistry = AdapterRegistry
+
+
+# ---------------------------------------------------------------------------
+# Application factory
+# ---------------------------------------------------------------------------
+
+
+def create_app(
+    storage_config: StorageConfig | None = None,
+    storage_factory: StorageFactory | None = None,
+    ingest_pipeline: IngestPipeline | None = None,
+    write_dispatcher: WriteDispatcher | None = None,
+    adapter_registry_store: AdapterRegistryStore | None = None,
+    schema_store: SchemaStore | None = None,
+    equipment_store: EquipmentStore | None = None,
+) -> FastAPI:
+    """Create the Forge Hub API application.
+
+    Args:
+        storage_config: Override for storage configuration.
+            Defaults to ``StorageConfig.from_env()``.
+        storage_factory: Optional StorageFactory for real backends.
+            When provided, the curation sub-app uses real stores.
+        ingest_pipeline: Override for the record ingest pipeline. Defaults to
+            one built from ``storage_factory`` (or in-memory sinks).
+        write_dispatcher: Override for the hub → spoke write dispatcher.
+            Defaults to one that dials each spoke's ``grpc_callback_url``
+            and consults the registry for ``capabilities.write``.
+        adapter_registry_store: Where registrations, heartbeats and the
+            ingest log are persisted (FB-060). Defaults to the storage
+            factory's PostgreSQL store, or in-memory without one.
+        schema_store: Backing store of the Schema Registry served under
+            ``/v1/schemas`` (FB-001). Defaults to the storage factory's
+            PostgreSQL store (migration 009, FB-005), or in-memory without
+            one.
+        equipment_store: Backing store of the Context Engine's equipment
+            registry served under ``/v1/context`` (FB-001). Defaults to the
+            storage factory's PostgreSQL store (migration 009, FB-005), or
+            in-memory without one.
+    """
+    config = storage_config or StorageConfig.from_env()
+    store = adapter_registry_store
+    if store is None and storage_factory is not None:
+        store = storage_factory.adapter_registry_store()
+    registry = AdapterRegistry(store=store)
+    # The hub-served registries (FB-001) persist through the factory (FB-005).
+    if schema_store is None and storage_factory is not None:
+        schema_store = storage_factory.schema_store()
+    if equipment_store is None and storage_factory is not None:
+        equipment_store = storage_factory.equipment_store()
+    # One curation engine (FB-009) serves the ingest trigger and the curation sub-app;
+    # its registry and lineage persist through the factory.
+    if storage_factory is not None:
+        curation = CurationEngine(
+            DataProductRegistry(store=storage_factory.product_store()),
+            lineage_tracker=LineageTracker(store=storage_factory.lineage_store()),
+        )
+    else:
+        curation = CurationEngine()
+    # One ingest pipeline serves both transports (gRPC Ingest and REST /v1/records).
+    if ingest_pipeline is not None:
+        pipeline = ingest_pipeline
+        if pipeline.curation is None:
+            pipeline.curation = curation
+        else:
+            curation = pipeline.curation
+    elif storage_factory is not None:
+        pipeline = build_pipeline_from_storage(storage_factory, curation=curation)
+    else:
+        pipeline = IngestPipeline(curation=curation)
+    # Curated records land in the same stores as the raw ones.
+    if curation.persist is None:
+        curation.persist = pipeline.persist
+
+    def _can_write(adapter_id: str) -> bool | None:
+        manifest = registry.get_manifest(adapter_id)
+        return None if manifest is None else bool(manifest.capabilities.write)
+
+    # Hub → spoke callbacks: TLS material from FORGE_SPOKE_TLS_CA/_CERT/_KEY (FB-063).
+    dispatcher = (
+        write_dispatcher
+        if write_dispatcher is not None
+        else WriteDispatcher(can_write=_can_write, tls=ChannelTls.from_env())
+    )
+    # Auth kill-switch and credentials from FORGE_AUTH_ENABLED / FORGE_API_KEYS / JWT env;
+    # the endpoints that drive a spoke require the adapters:write scope (FB-063).
+    configure_auth(auth_config_from_env())
+    runtime: dict[str, Any] = {}
+    start_time = time.monotonic()
+    # Spoke subscriptions streaming into the pipeline (FB-061).
+    subscriptions = SubscriptionManager(
+        dispatcher, pipeline, manifest_for=registry.get_manifest, on_batch=registry.log_batch
+    )
+
+    # OT module hosted in-process (FB-065) when a control config is named.
+    ot_host = None
+    ot_config_path = os.getenv("FORGE_OT_CONTROL_CONFIG", "").strip()
+    if ot_config_path:
+        from forge.modules.ot.host import OTModuleHost
+
+        ot_host = OTModuleHost(
+            config_path=ot_config_path,
+            tags_dir=os.getenv("FORGE_OT_TAGS_DIR", "").strip() or None,
+            write_dispatcher=dispatcher,
+            record_sink=pipeline,
+        )
+        registry.register(ot_host.adapter.manifest)
+
+    # Build health orchestrator with all infrastructure checks
+    health_orch = HealthOrchestrator(start_time=start_time)
+    health_orch.register("postgres", partial(check_postgres, config.postgres.dsn))
+    health_orch.register("timescaledb", partial(check_timescaledb, config.timescale.dsn))
+    health_orch.register(
+        "neo4j",
+        partial(check_neo4j, config.neo4j.uri, config.neo4j.user, config.neo4j.password),
+    )
+    health_orch.register("redis", partial(check_redis, config.redis.url))
+    health_orch.register("kafka", partial(check_kafka, config.kafka.bootstrap_servers))
+    # The two remaining compose-stack components (FB-006); every registered
+    # check feeds both /v1/health and the /readyz verdict.
+    health_orch.register("rabbitmq", partial(check_rabbitmq, config.rabbitmq.url))
+    health_orch.register(
+        "minio",
+        partial(
+            check_minio,
+            config.minio.endpoint,
+            config.minio.access_key,
+            config.minio.secret_key,
+            config.minio.secure,
+        ),
+    )
+
+    # gRPC server (lazy start — only if spoke transport is enabled). TLS for the
+    # spoke → hub direction comes from FORGE_GRPC_TLS_CERT/_KEY (+ _CA for mTLS);
+    # FORGE_GRPC_REQUIRE_TLS refuses plaintext (FB-072).
+    grpc_server = None
+    grpc_port = int(os.getenv("FORGE_GRPC_PORT", "50051"))
+    grpc_tls = ServerTls.from_env()
+    grpc_require_tls = os.getenv("FORGE_GRPC_REQUIRE_TLS", "false").lower() == "true"
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        """Startup / shutdown lifecycle."""
+        nonlocal grpc_server
+
+        logger.info("Forge Hub API starting ...")
+
+        # Durable registry (FB-060): restore spokes seen before, persist what
+        # was registered while building the app (hosted OT module).
+        restored = await registry.load()
+        await registry.flush()
+        logger.info(
+            "Adapter registry: %d restored, store=%s", restored, registry.describe()["store"]
+        )
+
+        # Start gRPC server for spoke communication
+        grpc_enabled = os.getenv("FORGE_GRPC_ENABLED", "true").lower() == "true"
+        if grpc_enabled:
+            try:
+                from forge_hub.link.grpc_server import GrpcServer
+                from forge_hub.link.hub_ingest import HubIngestServicer
+
+                servicer = HubIngestServicer(
+                    pipeline,
+                    on_registered=registry.registered,
+                    on_health=registry.health_reported,
+                    write_dispatcher=dispatcher,
+                    ingest_log=registry.log_batch,
+                )
+                runtime["servicer"] = servicer
+                grpc_server = GrpcServer(
+                    servicer, port=grpc_port, tls=grpc_tls, require_tls=grpc_require_tls
+                )
+                actual_port = await grpc_server.start()
+                app.state.grpc_server = grpc_server
+                logger.info("gRPC server started on port %d", actual_port)
+            except RuntimeError:
+                # A TLS requirement that cannot be met is a configuration error:
+                # fail the start-up instead of silently running without spokes.
+                raise
+            except Exception:
+                logger.exception("Failed to start gRPC server — spoke transport disabled")
+                grpc_server = None
+
+        if ot_host is not None:
+            await ot_host.start()
+            logger.info("OT module hosted in-process (config %s)", ot_host.config_path)
+
+        logger.info(
+            "Forge Hub API ready (REST port %s, gRPC port %s)",
+            os.getenv("FORGE_API_PORT", "8000"),
+            grpc_port,
+        )
+
+        yield
+
+        # Shutdown
+        if ot_host is not None:
+            await ot_host.stop()
+        if grpc_server is not None:
+            servicer = runtime.get("servicer")
+            if servicer is not None:
+                flushed = await servicer.flush_all()
+                logger.info("Flushed %d buffered records before shutdown", flushed)
+            await grpc_server.stop()
+            logger.info("gRPC server stopped")
+        await subscriptions.close()
+        await dispatcher.close()
+        await registry.flush()
+
+        logger.info("Forge Hub API shut down")
+
+    app = FastAPI(
+        title="Forge Hub API",
+        description="Manufacturing Decision Infrastructure — Hub API",
+        version="0.1.0",
+        lifespan=lifespan,
+    )
+    app.state.ingest_pipeline = pipeline
+    app.state.curation_engine = curation
+    app.state.adapter_registry = registry
+    app.state.write_dispatcher = dispatcher
+    app.state.subscriptions = subscriptions
+    app.state.grpc_server = None
+    app.state.ot_module = None
+    if ot_host is not None:
+        ot_host.mount(app, require_scope=require_scope)
+    # Where each hub-served service answers; ``/v1/info`` reports it.
+    services: dict[str, str | None] = {
+        "context": "/v1/context",
+        "schemas": "/v1/schemas",
+        "curation": None,
+    }
+
+    # ------------------------------------------------------------------
+    # Health endpoints
+    # ------------------------------------------------------------------
+
+    @app.get("/v1/health")
+    async def platform_health() -> dict[str, Any]:
+        """Aggregated health across all Forge infrastructure components."""
+        result: PlatformHealth = await health_orch.check_all()
+        return result.to_dict()
+
+    @app.get("/healthz")
+    async def healthz() -> dict[str, str]:
+        """Liveness probe for container orchestrators."""
+        return {"status": "alive", "service": "forge-hub-api"}
+
+    @app.get("/readyz")
+    async def readyz() -> dict[str, Any]:
+        """Readiness probe — checks if infrastructure is reachable."""
+        result = await health_orch.check_all()
+        if result.status == "unhealthy":
+            raise HTTPException(status_code=503, detail=result.to_dict())
+        return {"status": "ready", "platform": result.status}
+
+    # ------------------------------------------------------------------
+    # Adapter registry endpoints
+    # ------------------------------------------------------------------
+
+    @app.get("/v1/adapters")
+    async def list_adapters() -> list[dict[str, Any]]:
+        """List all registered adapters."""
+        return [item.model_dump() for item in registry.list_all()]
+
+    @app.post("/v1/adapters/register")
+    async def register_adapter(manifest: AdapterManifest) -> dict[str, str]:
+        """Register a new adapter (persisted, FB-060)."""
+        await registry.registered(manifest)
+        logger.info("Adapter registered: %s", manifest.adapter_id)
+        return {"status": "registered", "adapter_id": manifest.adapter_id}
+
+    @app.get("/v1/adapters/{adapter_id}/health")
+    async def adapter_health(adapter_id: str) -> dict[str, Any]:
+        """Get health status of a specific adapter."""
+        health = registry.get_health(adapter_id)
+        if health is None:
+            raise HTTPException(404, f"Adapter '{adapter_id}' not found")
+        return health.model_dump(mode="json")
+
+    @app.get("/v1/adapters/{adapter_id}/ingest-log")
+    async def adapter_ingest_log(
+        adapter_id: str, limit: int = Query(default=100, ge=1, le=1000)
+    ) -> list[dict[str, Any]]:
+        """Batches ingested from one adapter, newest first (``forge_core.records_log``)."""
+        if registry.get_manifest(adapter_id) is None:
+            raise HTTPException(404, f"Adapter '{adapter_id}' not found")
+        return await registry.ingest_log(adapter_id, limit=limit)
+
+    @app.get("/v1/ingest/log")
+    async def ingest_log(
+        adapter_id: str | None = None, limit: int = Query(default=100, ge=1, le=1000)
+    ) -> list[dict[str, Any]]:
+        """The ingest log across adapters, newest first."""
+        return await registry.ingest_log(adapter_id, limit=limit)
+
+    # ------------------------------------------------------------------
+    # Record ingestion (REST passthrough)
+    # ------------------------------------------------------------------
+
+    @app.post("/v1/records", response_model=IngestResponse)
+    async def ingest_records(request: IngestRequest) -> IngestResponse:
+        """Ingest a batch of ContextualRecords via REST.
+
+        This is the REST fallback for systems that cannot use gRPC.
+        Records are validated and forwarded to the same pipeline as
+        gRPC-ingested records.
+        """
+        manifest = registry.get_manifest(request.adapter_id)
+        if manifest is None:
+            raise HTTPException(404, f"Adapter '{request.adapter_id}' not registered")
+        refusal = pipeline.gates.refusal(request.adapter_id)
+        if refusal is not None:
+            # The hub refuses this spoke for its clock (FB-093). This endpoint carries no
+            # time exchange and is to be retired (FB-123: every module speaks to the hub
+            # over gRPC); until then it honours the state the gRPC exchange established,
+            # so there is no path around the refusal.
+            pipeline.gates.note_refused(request.adapter_id, refusal.cause)
+            telemetry.record_refusal(request.adapter_id, refusal.cause)
+            logger.warning("REST ingest from adapter '%s' refused: %s", request.adapter_id, refusal)
+            raise HTTPException(409, f"Ingest refused: {refusal}")
+
+        records = []
+        parse_errors: list[str] = []
+        for index, raw in enumerate(request.records):
+            try:
+                records.append(
+                    IngestPipeline.coerce(raw, adapter_id=request.adapter_id, manifest=manifest)
+                )
+            except Exception as exc:
+                parse_errors.append(f"record {index}: {exc}")
+                cause = getattr(exc, "cause", None)
+                if isinstance(cause, str):
+                    # A refusal (no source stamp, FB-088) is never silent: counted on the
+                    # metric, named in the response and the ingest log, logged with cause.
+                    telemetry.record_refusal(request.adapter_id, cause)
+        if parse_errors:
+            logger.warning(
+                "REST ingest from adapter '%s': %d of %d records refused before ingest; first: %s",
+                request.adapter_id,
+                len(parse_errors),
+                len(request.records),
+                parse_errors[0],
+            )
+        outcome = await pipeline.ingest(records, adapter_id=request.adapter_id, manifest=manifest)
+        pipeline.note_refused(outcome, parse_errors)
+        if outcome.received:
+            await registry.log_batch(request.adapter_id, "rest", outcome)
+        logger.info("REST ingest from adapter '%s': %s", request.adapter_id, outcome.summary())
+        return IngestResponse(
+            accepted=outcome.accepted,
+            rejected=outcome.rejected,
+            curated=outcome.curated,
+            curation_errors=outcome.curation_errors,
+            persisted=outcome.persisted,
+            errors=outcome.errors,
+        )
+
+    @app.get("/v1/ingest/stats")
+    async def ingest_stats() -> dict[str, Any]:
+        """Pipeline counters plus, when the gRPC server runs, per-session state."""
+        servicer = runtime.get("servicer")
+        return {
+            "pipeline": pipeline.describe(),
+            "grpc": servicer.snapshot() if servicer is not None else None,
+        }
+
+    # ------------------------------------------------------------------
+    # Write-back (hub → spoke, FB-054)
+    # ------------------------------------------------------------------
+
+    @app.post("/v1/adapters/{adapter_id}/write", response_model=WriteResponseModel)
+    async def write_to_adapter(
+        adapter_id: str,
+        request: WriteRequestModel,
+        _user: ForgeUser = Depends(require_scope("adapters:write")),  # noqa: B008
+    ) -> WriteResponseModel:
+        """Push a value into a spoke's source system through its ``Write`` RPC.
+
+        The spoke must have registered with ``capabilities.write`` and
+        advertised ``grpc_callback_url`` on Configure. With ``confirm`` the
+        spoke's read-back record is returned.
+        """
+        try:
+            outcome = await dispatcher.write(
+                adapter_id, request.tag_path, request.value, confirm=request.confirm
+            )
+        except WriteDispatchError as exc:
+            raise HTTPException(_WRITE_HTTP_STATUS.get(exc.code, 500), exc.message) from exc
+        return WriteResponseModel(
+            adapter_id=adapter_id,
+            tag_path=request.tag_path,
+            success=outcome.success,
+            message=outcome.message,
+            readback=outcome.readback.model_dump(mode="json") if outcome.readback else None,
+        )
+
+    @app.get("/v1/adapters/{adapter_id}/tags")
+    async def discover_adapter_tags(adapter_id: str) -> dict[str, Any]:
+        """Tags the spoke exposes to the hub (its ``Discover`` RPC)."""
+        try:
+            tags = await dispatcher.discover(adapter_id)
+        except WriteDispatchError as exc:
+            raise HTTPException(_WRITE_HTTP_STATUS.get(exc.code, 500), exc.message) from exc
+        return {"adapter_id": adapter_id, "tags": tags}
+
+    @app.get("/v1/writes")
+    async def write_stats() -> dict[str, Any]:
+        """Write-back callbacks known to the hub, with per-adapter counters."""
+        return dispatcher.snapshot()
+
+    # ------------------------------------------------------------------
+    # Pull RPCs on the spoke: backfill + subscriptions (FB-061)
+    # ------------------------------------------------------------------
+
+    @app.post("/v1/adapters/{adapter_id}/backfill")
+    async def backfill_adapter(
+        adapter_id: str,
+        request: BackfillRequestModel,
+        _user: ForgeUser = Depends(require_scope("adapters:write")),  # noqa: B008
+    ) -> dict[str, Any]:
+        """Replay ``[start_time, end_time]`` from the spoke into the pipeline.
+
+        Each batch is ingested like a pushed one and logged under session
+        ``backfill``. Returns the totals; records already ingested stay
+        ingested when the stream fails part-way.
+        """
+        manifest = registry.get_manifest(adapter_id)
+        if manifest is None:
+            raise HTTPException(404, f"Adapter '{adapter_id}' not registered")
+        if request.end_time < request.start_time:
+            raise HTTPException(422, "end_time must not be before start_time")
+        try:
+            outcome = await backfill_into_pipeline(
+                dispatcher,
+                pipeline,
+                adapter_id=adapter_id,
+                start=request.start_time,
+                end=request.end_time,
+                tags=request.tags,
+                max_records=request.max_records,
+                manifest=manifest,
+                batch_size=request.batch_size,
+                on_batch=registry.log_batch,
+            )
+        except WriteDispatchError as exc:
+            raise HTTPException(_WRITE_HTTP_STATUS.get(exc.code, 500), exc.message) from exc
+        return outcome.to_dict()
+
+    @app.post("/v1/adapters/{adapter_id}/collect")
+    async def collect_adapter(
+        adapter_id: str,
+        request: CollectRequestModel | None = None,
+        _user: ForgeUser = Depends(require_scope("adapters:write")),  # noqa: B008
+    ) -> dict[str, Any]:
+        """Pull the records the spoke has queued for push (``Collect``, FB-071).
+
+        The spoke hands each record over once; batches are ingested like
+        pushed ones and logged under session ``collect``.
+        """
+        manifest = registry.get_manifest(adapter_id)
+        if manifest is None:
+            raise HTTPException(404, f"Adapter '{adapter_id}' not registered")
+        options = request or CollectRequestModel()
+        try:
+            outcome = await collect_into_pipeline(
+                dispatcher,
+                pipeline,
+                adapter_id=adapter_id,
+                max_records=options.max_records,
+                manifest=manifest,
+                batch_size=options.batch_size,
+                on_batch=registry.log_batch,
+            )
+        except WriteDispatchError as exc:
+            raise HTTPException(_WRITE_HTTP_STATUS.get(exc.code, 500), exc.message) from exc
+        return outcome.to_dict()
+
+    @app.post("/v1/adapters/{adapter_id}/subscriptions")
+    async def open_subscription(
+        adapter_id: str,
+        request: SubscribeRequestModel,
+        _user: ForgeUser = Depends(require_scope("adapters:write")),  # noqa: B008
+    ) -> dict[str, Any]:
+        """Subscribe to the spoke's record stream; records flow into the pipeline."""
+        if registry.get_manifest(adapter_id) is None:
+            raise HTTPException(404, f"Adapter '{adapter_id}' not registered")
+        try:
+            handle = await subscriptions.start(adapter_id, request.tags)
+        except WriteDispatchError as exc:
+            raise HTTPException(_WRITE_HTTP_STATUS.get(exc.code, 500), exc.message) from exc
+        return handle.to_dict()
+
+    @app.get("/v1/adapters/{adapter_id}/subscriptions")
+    async def list_subscriptions(adapter_id: str) -> list[dict[str, Any]]:
+        return [h.to_dict() for h in subscriptions.list(adapter_id)]
+
+    @app.delete("/v1/adapters/{adapter_id}/subscriptions/{subscription_id}")
+    async def close_subscription(
+        adapter_id: str,
+        subscription_id: str,
+        _user: ForgeUser = Depends(require_scope("adapters:write")),  # noqa: B008
+    ) -> dict[str, Any]:
+        """Unsubscribe at the spoke and stop ingesting; flushes what is buffered."""
+        try:
+            handle = await subscriptions.stop(adapter_id, subscription_id)
+        except KeyError as exc:
+            raise HTTPException(404, str(exc.args[0] if exc.args else exc)) from None
+        return handle.to_dict()
+
+    @app.get("/v1/subscriptions")
+    async def all_subscriptions() -> dict[str, Any]:
+        return subscriptions.snapshot()
+
+    # ------------------------------------------------------------------
+    # Platform info
+    # ------------------------------------------------------------------
+
+    @app.get("/v1/info")
+    async def platform_info() -> dict[str, Any]:
+        """Platform metadata."""
+        return {
+            "platform": "forge",
+            "version": "0.1.0",
+            "grpc_port": grpc_port,
+            "grpc_enabled": os.getenv("FORGE_GRPC_ENABLED", "true").lower() == "true",
+            "grpc_tls": {
+                **(grpc_tls.describe() if grpc_tls is not None else {"enabled": False}),
+                "required": grpc_require_tls,
+            },
+            "adapters_registered": len(registry.list_all()),
+            "adapter_registry": registry.describe(),
+            "ot_module": ot_host.status() if ot_host is not None else None,
+            "services": dict(services),
+        }
+
+    # ------------------------------------------------------------------
+    # Context Engine (F21) and Schema Registry (F20), served by the hub
+    # (FB-001). The routes that change state require the matching write
+    # scope; reads, enrichment, shift resolution, compatibility checks and
+    # diffs are open to any authenticated caller.
+    # ------------------------------------------------------------------
+
+    app.include_router(
+        build_context_router(
+            equipment_store=equipment_store,
+            write_dependencies=[Depends(require_scope("context:write"))],
+        )
+    )
+    app.include_router(
+        build_registry_router(
+            schema_store,
+            write_dependencies=[Depends(require_scope("schemas:write"))],
+        )
+    )
+
+    # ------------------------------------------------------------------
+    # Mount curation sub-application
+    # ------------------------------------------------------------------
+
+    try:
+        from forge_hub.curation.service import create_curation_app
+
+        curation_app = create_curation_app(engine=curation)
+        app.mount("/curation", curation_app)
+        services["curation"] = "/curation"
+        logger.info("Curation sub-application mounted at /curation")
+    except Exception:
+        logger.warning("Curation service not available — skipping mount")
+
+    return app
+
+
+# ---------------------------------------------------------------------------
+# Default app instance (for uvicorn)
+# ---------------------------------------------------------------------------
+
+app = create_app()

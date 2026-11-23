@@ -6,7 +6,7 @@ from datetime import timedelta
 
 import pytest
 
-from forge.curation.aggregation import (
+from forge_hub.curation.aggregation import (
     AggregationFunction,
     AggregationSpec,
     aggregate_records,

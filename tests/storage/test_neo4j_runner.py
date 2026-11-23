@@ -8,9 +8,9 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-MIGRATIONS_DIR = (
-    Path(__file__).parent.parent.parent / "src" / "forge" / "storage" / "migrations" / "neo4j"
-)
+from forge_hub.storage import migrations
+
+MIGRATIONS_DIR = Path(migrations.__file__).resolve().parent / "neo4j"
 
 _MIGRATION_PATTERN = re.compile(r"^(\d{3})_(.+)\.cypher$")
 

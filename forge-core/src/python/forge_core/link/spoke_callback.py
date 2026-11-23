@@ -9,7 +9,7 @@ params as ``grpc_callback_url``.
 This module is the hub side of that second half:
 
 * :class:`WriteDispatcher` remembers the callback address per session
-  (fed by :class:`~forge.transport.hub_ingest.HubIngestServicer`), dials
+  (fed by :class:`~forge_hub.link.hub_ingest.HubIngestServicer`), dials
   the spoke on demand, enforces the manifest's ``capabilities.write`` and
   keeps per-adapter counters for ``GET /v1/writes``.
 * :class:`SpokeCallbackClient` is the typed wrapper over a

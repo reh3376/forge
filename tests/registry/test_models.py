@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from forge.registry.models import (
+from forge_hub.registry.models import (
     CompatibilityMode,
     SchemaMetadata,
     SchemaType,

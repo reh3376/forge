@@ -219,7 +219,7 @@ Beside it, waiting for none of it: process control (WS-12, D-11: the framework F
 
 | Model | Values | Used by |
 |---|---|---|
-| `forge.gateway.models.Role` | `admin`, `operator`, `viewer` | Hub REST auth: API keys and JWTs carry a role, roles expand to scopes such as `adapters:write` (enforced on write/backfill/subscription endpoints since FB-063). |
+| `forge_hub.gateway.models.Role` | `admin`, `operator`, `viewer` | Hub REST auth: API keys and JWTs carry a role, roles expand to scopes such as `adapters:write` (enforced on write/backfill/subscription endpoints since FB-063). |
 | `forge.modules.ot.control.models.WriteRole` | `OPERATOR`, `ENGINEER`, `ADMIN` | PLC writes: permissions per area/tag pattern, interlock bypass (`ADMIN`), recipe downloads (`ENGINEER`). |
 
 FVTS binds UI actions to the union (`VIEWER`, `OPERATOR`, `ENGINEER`, `ADMIN`). The question is whether Forge has one security role model for people (hub API, UI actions, PLC writes) with `ENGINEER` added to the gateway and `WriteRole` mapped onto it, or keeps the OT write roles separate from platform access roles. Recommendation: one model (`viewer < operator < engineer < admin`), scopes derived from it, OT keeps its per-tag permissions but reads the role from the platform identity.

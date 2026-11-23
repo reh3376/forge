@@ -2,8 +2,8 @@
 
 import pytest
 
-from forge.broker.consumer import InMemoryConsumer
-from forge.broker.exchanges import ExchangeSpec
+from forge_hub.broker.consumer import InMemoryConsumer
+from forge_hub.broker.exchanges import ExchangeSpec
 
 
 class TestInMemoryConsumer:

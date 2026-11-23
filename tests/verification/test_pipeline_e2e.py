@@ -16,22 +16,22 @@ from typing import Any
 import pytest
 
 from forge.adapters.forge_wms.adapter import ForgeWmsAdapter
-from forge.curation.lineage import LineageTracker
-from forge.curation.normalization import UnitRegistry
-from forge.curation.quality import QualityMonitor
-from forge.curation.registry import DataProductRegistry
-from forge.storage.registry import (
-    SchemaEntry,
-    SchemaRegistry,
-    SchemaStatus,
-    StorageEngine,
-)
-from forge.storage.router import DataRouter, RoutingDecision
 from forge_core.models.adapter import AdapterState
 from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
 )
+from forge_hub.curation.lineage import LineageTracker
+from forge_hub.curation.normalization import UnitRegistry
+from forge_hub.curation.quality import QualityMonitor
+from forge_hub.curation.registry import DataProductRegistry
+from forge_hub.storage.registry import (
+    SchemaEntry,
+    SchemaRegistry,
+    SchemaStatus,
+    StorageEngine,
+)
+from forge_hub.storage.router import DataRouter, RoutingDecision
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. Adapter Lifecycle
@@ -327,7 +327,7 @@ class TestCurationPipeline:
         quality_monitor: QualityMonitor,
     ):
         """The curation FastAPI app should be instantiable with all deps."""
-        from forge.curation.service import create_curation_app
+        from forge_hub.curation.service import create_curation_app
 
         app = create_curation_app(
             unit_registry=unit_registry,

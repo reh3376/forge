@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from forge.context.equipment import InMemoryEquipmentStore
-from forge.context.models import Equipment
+from forge_hub.context.equipment import InMemoryEquipmentStore
+from forge_hub.context.models import Equipment
 
 
 def _eq(eid: str = "FERM-001", **kw) -> Equipment:

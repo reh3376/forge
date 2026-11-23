@@ -5,9 +5,9 @@ from __future__ import annotations
 import pytest
 from typer.testing import CliRunner
 
-from forge.cli import db_access
-from forge.cli.main import app
-from forge.storage.access import InMemoryPermissionStore
+from forge_hub.cli import db_access
+from forge_hub.cli.main import app
+from forge_hub.storage.access import InMemoryPermissionStore
 
 runner = CliRunner()
 

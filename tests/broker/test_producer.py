@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from forge.broker.exchanges import ExchangeSpec, ExchangeType
-from forge.broker.producer import InMemoryProducer
+from forge_hub.broker.exchanges import ExchangeSpec, ExchangeType
+from forge_hub.broker.producer import InMemoryProducer
 
 
 class TestInMemoryProducer:

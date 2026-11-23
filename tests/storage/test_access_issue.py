@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from forge.storage.access import (
+from forge_hub.storage.access import (
     _DEACTIVATE_PERMISSION,
     _INSERT_AUDIT,
     _SELECT_PERMISSIONS,
@@ -42,7 +42,7 @@ def test_naming_matches_migration_002() -> None:
     with pytest.raises(ValueError, match="unsafe"):
         schema_role("mod_mes; DROP ROLE forge")
 
-    migration = importlib.import_module("forge.storage.migrations.versions.002_spoke_schemas")
+    migration = importlib.import_module("forge_hub.storage.migrations.versions.002_spoke_schemas")
     defaults = AccessController().setup_default_grants()
     own = {p.schema_name for p in defaults if p.access_level == AccessLevel.WRITE}
     assert own == set(migration.SPOKE_SCHEMAS)  # access, router defaults and DDL agree (FB-004)
@@ -285,7 +285,7 @@ async def test_persistent_controller_issues_through_an_awaited_provisioner() -> 
 def test_postgres_access_controller_is_the_persistent_controller_over_forge_core(
     mock_pool,
 ) -> None:
-    from forge.storage.engines import PostgresAccessController
+    from forge_hub.storage.engines import PostgresAccessController
 
     pool, _ = mock_pool
     controller = PostgresAccessController(pool)

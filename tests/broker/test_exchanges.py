@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.broker.exchanges import (
+from forge_hub.broker.exchanges import (
     FORGE_EXCHANGES,
     ExchangeSpec,
     ExchangeType,

@@ -63,7 +63,7 @@ The fields the offset and the uncertainty travel in already exist on the record 
 
 ## The conformance kit
 
-`src/forge/conformance.py`. M-4 to M-7 can only be checked on a running module, so the kit runs one. The kit runs a real hub, so it belongs to the hub and is handed to the runner (`FMTSRunner(conformance_kit=...)`; the `forge governance` command does this); a runner handed none reports the four as not checked, with that reason (D-17):
+`forge-hub/src/python/forge_hub/conformance.py`. M-4 to M-7 can only be checked on a running module, so the kit runs one. The kit runs a real hub, so it belongs to the hub and is handed to the runner (`FMTSRunner(conformance_kit=...)`; the `forge governance` command does this); a runner handed none reports the four as not checked, with that reason (D-17):
 
 - **The reference hub** is the real hub servicer on clocks the kit controls. A refusal that takes three probes a second apart on a plant network takes no time here, and the hub that judges the module is the one in production.
 - **A driver** is how the kit reaches a module, and is the only part written per kind of module. `PythonAdapterDriver` drives any `AdapterBase` through the transport Python modules ship with.
@@ -158,7 +158,7 @@ The owner reviewed all nine on 2026-11-18, the first line by line, and approves 
 
 The six management modules that are approved are Forge's own (owner, 2026-11-18). An existing application was the example each is built from; today each is a Python adapter that holds the data contract taken from that example, and its own logic, storage and screens are not built. The target is a Go module with Python scripting for customization. Each declares its hub database as the rule it is built to: `mod_wms`, `mod_cmms`, `mod_nms`, `mod_ims`, and for forge-historian the hub's time-series store (what forge-historian is to become: FB-157). forge-scanner has no database; its counterparts are the handheld scanners, plant-floor devices whose clocks nothing can read yet (FB-117).
 
-forge-integ-erp-netsuite is an integration module for one named product. It keeps the hub schema `mod_erpi` through an explicit mapping in `forge.storage.access`, because its id no longer derives that name. Nothing reads the product's clock yet (FB-139).
+forge-integ-erp-netsuite is an integration module for one named product. It keeps the hub schema `mod_erpi` through an explicit mapping in `forge_hub.storage.access`, because its id no longer derives that name. Nothing reads the product's clock yet (FB-139).
 
 Module names (A-17): a module Forge builds is `forge-<service>`; a module that integrates an existing system is `forge-integ-<function>-<product>`.
 

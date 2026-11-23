@@ -4,26 +4,26 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, PropertyMock
 
-from forge.context.equipment import InMemoryEquipmentStore, PostgresEquipmentStore
-from forge.curation.lineage import InMemoryLineageStore
-from forge.curation.registry import InMemoryProductStore
-from forge.registry.postgres_store import PostgresSchemaStore
-from forge.registry.store import InMemorySchemaStore
-from forge.storage.access import (
+from forge_hub.context.equipment import InMemoryEquipmentStore, PostgresEquipmentStore
+from forge_hub.curation.lineage import InMemoryLineageStore
+from forge_hub.curation.registry import InMemoryProductStore
+from forge_hub.registry.postgres_store import PostgresSchemaStore
+from forge_hub.registry.store import InMemorySchemaStore
+from forge_hub.storage.access import (
     InMemoryPermissionStore,
     PersistentAccessController,
     PostgresPermissionStore,
 )
-from forge.storage.engines.neo4j_engine import Neo4jGraphWriter, Neo4jLineageWriter
-from forge.storage.engines.postgres import (
+from forge_hub.storage.engines.neo4j_engine import Neo4jGraphWriter, Neo4jLineageWriter
+from forge_hub.storage.engines.postgres import (
     PostgresAccessController,
     PostgresLineageStore,
     PostgresProductStore,
 )
-from forge.storage.engines.redis_engine import RedisSchemaCache, RedisStateCache
-from forge.storage.engines.timescale import TimescaleRecordReader, TimescaleRecordWriter
-from forge.storage.factory import StorageFactory
-from forge.storage.pool import PoolManager
+from forge_hub.storage.engines.redis_engine import RedisSchemaCache, RedisStateCache
+from forge_hub.storage.engines.timescale import TimescaleRecordReader, TimescaleRecordWriter
+from forge_hub.storage.factory import StorageFactory
+from forge_hub.storage.pool import PoolManager
 
 
 def _make_pool_manager(

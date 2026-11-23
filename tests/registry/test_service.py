@@ -8,7 +8,7 @@ import sys
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from forge.registry.service import (
+from forge_hub.registry.service import (
     AddVersionRequest,
     CompatibilityCheckRequest,
     RegisterSchemaRequest,
@@ -388,7 +388,7 @@ class TestSchemaJsonIsTheWireName:
 
     def test_import_emits_no_warning(self):
         run = subprocess.run(
-            [sys.executable, "-W", "error", "-c", "import forge.registry.service"],
+            [sys.executable, "-W", "error", "-c", "import forge_hub.registry.service"],
             capture_output=True,
             text=True,
             check=False,

@@ -13,9 +13,9 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from forge.cli.governance import SPEC_ROOT, spec_files
 from forge_core.fxts.shared import lists
 from forge_core.fxts.shared.runner import add_spec_hash, approve_spec_hash
+from forge_hub.cli.governance import SPEC_ROOT, spec_files
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -325,7 +325,7 @@ class TestTheFormatOfAList:
         assert any(p.startswith("pruning-strategies: /:") for p in problems), problems
 
     def test_the_schema_is_listed_with_the_frameworks(self) -> None:
-        from forge.cli import governance
+        from forge_hub.cli import governance
 
         rows = [row for row in governance.schema_rows() if row["framework"] == "lists"]
         assert [row["version"] for row in rows] == ["0.1.0"]

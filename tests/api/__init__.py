@@ -1,1 +1,1 @@
-"""Tests for forge.api — Hub API service."""
+"""Tests for forge_hub.api — Hub API service."""

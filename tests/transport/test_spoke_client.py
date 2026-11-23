@@ -7,7 +7,6 @@ from collections.abc import AsyncIterator
 
 import pytest
 
-from forge.transport.hub_server import InMemoryServicer
 from forge_core.link.spoke_client import InMemoryChannel, SpokeClient
 from forge_core.models.adapter import (
     AdapterManifest,
@@ -15,6 +14,7 @@ from forge_core.models.adapter import (
     DataContract,
 )
 from forge_core.models.contextual_record import ContextualRecord
+from forge_hub.link.hub_server import InMemoryServicer
 
 
 @pytest.fixture()

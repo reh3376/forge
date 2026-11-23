@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from forge.broker.event_publisher import ForgeEventPublisher
-from forge.broker.producer import InMemoryProducer
+from forge_hub.broker.event_publisher import ForgeEventPublisher
+from forge_hub.broker.producer import InMemoryProducer
 
 
 @pytest.fixture

@@ -250,7 +250,7 @@ When a module requests database access, the Access Controller:
 
 ### 4.6 Persistence (FB-003)
 
-Grants and the audit trail live in `forge_core.module_permissions` and `forge_core.access_audit` (migration 008). `PersistentAccessController` (`forge.storage.access`) is the in-memory `AccessController` with every grant, revoke, issued connection and refusal (`access_denied`) written to the store the moment it is made; `PostgresAccessController` is it over the hub's PostgreSQL, the storage factory hands it out (`access_controller()`) and `forge db access` runs on it, so a grant made at the CLI is what the hub loads. A password never reaches either table: the connection string exists only in the `ConnectionGrant` returned to the caller.
+Grants and the audit trail live in `forge_core.module_permissions` and `forge_core.access_audit` (migration 008). `PersistentAccessController` (`forge_hub.storage.access`) is the in-memory `AccessController` with every grant, revoke, issued connection and refusal (`access_denied`) written to the store the moment it is made; `PostgresAccessController` is it over the hub's PostgreSQL, the storage factory hands it out (`access_controller()`) and `forge db access` runs on it, so a grant made at the CLI is what the hub loads. A password never reaches either table: the connection string exists only in the `ConnectionGrant` returned to the caller.
 
 ---
 

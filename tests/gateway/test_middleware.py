@@ -5,9 +5,9 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from forge.gateway.auth import configure_auth
-from forge.gateway.middleware import _get_limit_for_path, create_gateway_app
-from forge.gateway.models import AuthConfig
+from forge_hub.gateway.auth import configure_auth
+from forge_hub.gateway.middleware import _get_limit_for_path, create_gateway_app
+from forge_hub.gateway.models import AuthConfig
 
 
 @pytest.fixture(autouse=True)

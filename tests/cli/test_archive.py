@@ -8,8 +8,8 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from forge.cli import archive
-from forge.cli.main import app
+from forge_hub.cli import archive
+from forge_hub.cli.main import app
 
 REPO = Path(__file__).resolve().parents[2]
 runner = CliRunner()

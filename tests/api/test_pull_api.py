@@ -13,8 +13,6 @@ from unittest.mock import patch
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from forge.api.main import create_app
-from forge.storage.config import StorageConfig
 from forge_core.link.serialization import pydantic_to_proto
 from forge_core.link.spoke_callback import CALLBACK_PARAM, WriteDispatcher
 from forge_core.link.spoke_client import InMemoryChannel
@@ -28,6 +26,8 @@ from forge_core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge_hub.api.main import create_app
+from forge_hub.storage.config import StorageConfig
 
 MANIFEST_PATH = (
     Path(__file__).resolve().parents[2]

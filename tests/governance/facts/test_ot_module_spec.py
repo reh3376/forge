@@ -16,7 +16,6 @@ from pathlib import Path
 import pytest
 from jsonschema import Draft202012Validator
 
-from forge.ingest.facts_check import check_manifest_against_facts
 from forge.modules.ot.adapter import OTModuleAdapter
 from forge_core.fxts.facts import SCHEMA_PATH
 from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
@@ -26,6 +25,7 @@ from forge_core.fxts.shared.runner import (
     verify_spec_hash,
     verify_spec_integrity,
 )
+from forge_hub.ingest.facts_check import check_manifest_against_facts
 
 SPEC_PATH = (
     Path(__file__).resolve().parents[3]
@@ -144,7 +144,7 @@ class TestRunnerVerdicts:
 
 
 class TestHubRegistrationCheck:
-    """`forge.ingest.facts_check` is what the hub runs at Register."""
+    """`forge_hub.ingest.facts_check` is what the hub runs at Register."""
 
     def test_spec_hash_verifies_for_the_hub(self) -> None:
         # The adapter class still identifies as 'forge-ot' (BACKLOG FB-079);

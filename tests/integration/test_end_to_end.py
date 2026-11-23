@@ -11,11 +11,6 @@ from uuid import uuid4
 
 import pytest
 
-from forge.storage.config import StorageConfig
-from forge.storage.factory import StorageFactory
-from forge.storage.pool import PoolManager
-from forge.storage.registry import SchemaRegistry, StorageEngine
-from forge.storage.router import DataRouter
 from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
@@ -25,6 +20,11 @@ from forge_core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge_hub.storage.config import StorageConfig
+from forge_hub.storage.factory import StorageFactory
+from forge_hub.storage.pool import PoolManager
+from forge_hub.storage.registry import SchemaRegistry, StorageEngine
+from forge_hub.storage.router import DataRouter
 
 
 @pytest.mark.integration
@@ -141,7 +141,7 @@ class TestEndToEnd:
     @pytest.mark.asyncio
     async def test_in_memory_lineage_store_crud(self):
         """InMemory lineage store CRUD via factory."""
-        from forge.curation.lineage import LineageEntry, TransformationStep
+        from forge_hub.curation.lineage import LineageEntry, TransformationStep
 
         config = StorageConfig()
         pools = PoolManager(config)

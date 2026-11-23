@@ -8,12 +8,12 @@ from pathlib import Path
 
 import pytest
 
-from forge.ingest.pipeline import IngestPipeline, InMemoryRecordSink
-from forge.transport.grpc_server import GrpcServer, ServerTls
-from forge.transport.hub_ingest import HubIngestServicer
 from forge_core.link.grpc_channel import GrpcChannel
 from forge_core.link.spoke_client import ChannelTls, SpokeClient
 from forge_core.models.adapter import AdapterManifest
+from forge_hub.ingest.pipeline import IngestPipeline, InMemoryRecordSink
+from forge_hub.link.grpc_server import GrpcServer, ServerTls
+from forge_hub.link.hub_ingest import HubIngestServicer
 from tests.transport.test_callback_auth import self_signed
 
 MANIFEST_PATH = (

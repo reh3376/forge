@@ -9,11 +9,6 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-from forge.api.main import create_app
-from forge.api.registry import AdapterRegistry
-from forge.ingest.pipeline import IngestOutcome
-from forge.storage.adapter_registry import AdapterRow, InMemoryAdapterRegistryStore
-from forge.storage.config import StorageConfig
 from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
@@ -21,6 +16,11 @@ from forge_core.models.adapter import (
     AdapterState,
     DataContract,
 )
+from forge_hub.api.main import create_app
+from forge_hub.api.registry import AdapterRegistry
+from forge_hub.ingest.pipeline import IngestOutcome
+from forge_hub.storage.adapter_registry import AdapterRow, InMemoryAdapterRegistryStore
+from forge_hub.storage.config import StorageConfig
 
 
 def manifest(adapter_id: str = "forge-mes") -> AdapterManifest:

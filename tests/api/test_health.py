@@ -16,7 +16,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from forge.api.health import (
+from forge_hub.api.health import (
     _CHECK_TIMEOUT,
     ComponentHealth,
     ComponentStatus,

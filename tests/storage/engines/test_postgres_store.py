@@ -8,13 +8,13 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from forge.curation.lineage import LineageEntry, TransformationStep
-from forge.storage.engines.postgres import PostgresLineageStore, PostgresProductStore
 from forge_core.models.data_product import (
     DataProduct,
     DataProductSchema,
     DataProductStatus,
 )
+from forge_hub.curation.lineage import LineageEntry, TransformationStep
+from forge_hub.storage.engines.postgres import PostgresLineageStore, PostgresProductStore
 
 # ---------------------------------------------------------------------------
 # Fixtures

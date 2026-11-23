@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from forge.context.service import create_context_app
+from forge_hub.context.service import create_context_app
 
 
 @pytest.fixture

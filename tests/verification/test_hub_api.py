@@ -14,7 +14,6 @@ from typing import Any
 import pytest
 from fastapi.testclient import TestClient
 
-from forge.api.main import create_app
 from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
@@ -22,6 +21,7 @@ from forge_core.models.adapter import (
     DataContract,
     TimeGovernance,
 )
+from forge_hub.api.main import create_app
 
 # ── Fixtures ─────────────────────────────────────────────────────
 

@@ -8,8 +8,6 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from pydantic import ValidationError
 
-from forge.ingest.pipeline import IngestPipeline, IngestStats, InMemoryRecordSink
-from forge.storage.registry import StorageEngine
 from forge_core.clock import (
     SERVER_LINK,
     SOURCE_LINK,
@@ -33,6 +31,8 @@ from forge_core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
+from forge_hub.ingest.pipeline import IngestPipeline, IngestStats, InMemoryRecordSink
+from forge_hub.storage.registry import StorageEngine
 
 SCHEMA_REF = "forge://schemas/forge-mes/v0.1.0"
 
@@ -344,8 +344,8 @@ class TestCurationOnIngest:
 
     @staticmethod
     def _engine(**spec):
-        from forge.curation.engine import CurationEngine
         from forge_core.models.data_product import CurationSpec
+        from forge_hub.curation.engine import CurationEngine
 
         engine = CurationEngine()
         product = engine.registry.create(

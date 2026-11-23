@@ -28,6 +28,7 @@ COPY README.md ./
 COPY src/ ./src/
 COPY forge-core/src/ ./forge-core/src/
 COPY forge-core/contract/ ./forge-core/contract/
+COPY forge-hub/src/ ./forge-hub/src/
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --extra ot
 
@@ -49,11 +50,12 @@ COPY --from=builder /app/.venv /app/.venv
 COPY --from=builder /app/src /app/src
 COPY --from=builder /app/forge-core/src /app/forge-core/src
 COPY --from=builder /app/forge-core/contract /app/forge-core/contract
+COPY --from=builder /app/forge-hub/src /app/forge-hub/src
 COPY --from=builder /app/pyproject.toml /app/pyproject.toml
 
 # Ensure venv python is on PATH
 ENV PATH="/app/.venv/bin:$PATH"
-ENV PYTHONPATH="/app/src:/app/forge-core/src/python:$PYTHONPATH"
+ENV PYTHONPATH="/app/src:/app/forge-core/src/python:/app/forge-hub/src/python:$PYTHONPATH"
 ENV PYTHONUNBUFFERED=1
 
 # Default ports
@@ -64,7 +66,7 @@ HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
     CMD curl -fs http://localhost:8000/healthz || exit 1
 
 # Default command: run the Hub API
-CMD ["uvicorn", "forge.api.main:app", \
+CMD ["uvicorn", "forge_hub.api.main:app", \
      "--host", "0.0.0.0", \
      "--port", "8000", \
      "--log-level", "info"]
