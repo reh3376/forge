@@ -1,8 +1,9 @@
 """FVTS gate for the OT module's view contract.
 
-This is the ``conformance_tests.suite_path`` of ``forge-ot.fvts.json``. It runs the full
+This is the ``conformance_tests.suite_path`` of the reference fixture
+(``fixtures/reference.fvts.json``). It runs the full
 FVTSRunner over the reference spec with the real FACTS specs and the golden set under
-``tests/governance/fvts/golden/forge-ot/``. Every check must pass except
+``tests/governance/fvts/golden/reference/``. Every check must pass except
 ``fvts:hash-approved``: the reference spec stays ``pending_review`` until the owner approves it
 under BACKLOG FB-078 (after the invented fermenter points are replaced by real OT tags). Nobody
 writes that approval on the owner's behalf. Empty ``ALLOWED_FAILURES`` when it lands.
@@ -25,7 +26,7 @@ ALLOWED_FAILURES = frozenset({"fvts:hash-approved"})
 async def test_reference_contract_passes_every_check(
     runner: FVTSRunner, reference_spec: dict[str, Any]
 ) -> None:
-    report = await runner.run(target="forge-ot-views", spec=reference_spec)
+    report = await runner.run(target="reference-views", spec=reference_spec)
     by_status: dict[VerdictStatus, list[str]] = {}
     for verdict in report.verdicts:
         by_status.setdefault(verdict.status, []).append(verdict.check_id)

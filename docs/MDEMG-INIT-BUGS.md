@@ -384,3 +384,17 @@ serves every probe; a test that counts the connections an `httptest.Server` acce
 several probes holds it. Raising `LLM_PROBE_INTERVAL_SEC` only lowers the rate. Neither
 protects against the host defect of Bug 9; a reboot before day 49 of uptime does.
 
+
+## Bug 13: Jiminy guidance states a past observation as a rule, and contradicts the owner
+
+**Seen on 2026-11-23, in one long session in the forge repository.** Three injected guidance blocks, each worded as "You MUST":
+
+1. *"all user roles must be defined clearly"*, minutes after the owner said the opposite in the same session: "We do not need to have all roles defined, we just need to account for the fact that security at role level will be needed, so we build it in to everything as we go." The guidance took the topic of the owner's sentence and returned an older pattern about role hierarchies as a requirement.
+2. *"the line `DOCS = REPO_ROOT / "docs" / "FxTS"` … must remain intact"*, about a test file. That line was a fact of the code at the time of an earlier observation (a `grep` that printed it). The work in hand was moving that very folder, so the line had to change.
+3. *"You MUST address the bash error in the command …"*, several times, for commands that had not failed. An observation of a command's text was stored as an error to fix.
+
+**Effect:** none on the work, because forge's rule is that its documents and the owner win over injected guidance (A-12). But each block is worded as an instruction and costs attention, and a session that followed block 2 would have refused a signed restructuring.
+
+**Cause (inferred from the guidance text, not from the mdemg code):** observations of what was true or what was run are retrieved by similarity and rendered through one template that turns any retrieved node into a "MUST" rule. Nothing separates a rule the owner gave (which should be quoted with its date) from a fact about the code at one moment (which goes stale) or a command that was merely seen. Recency is not weighed against an older, similar node.
+
+**Suggested fix (upstream, in mdemg):** store the kind of each node (owner rule, code fact, command seen, error seen) and render only owner rules as constraints, quoted with their date; render code facts as "was true at <commit>" and never as "must remain"; drop command text that carries no failure; and when two nodes on one topic disagree, give the newer owner statement and say that it replaces the older.

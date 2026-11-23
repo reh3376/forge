@@ -56,7 +56,7 @@ ANY_VERSIONED_ID = re.compile(r"^forge://[a-z]+/[a-z]+/v\d+\.\d+\.\d+$")
 #: Empty since FB-151 (2026-11-19): every framework meets all ten.
 KNOWN_GAPS: dict[str, dict[str, str]] = {}
 #: Specs whose hash the owner has not approved, each with the item that leads to it.
-PENDING_APPROVAL = {"forge-mes.fmts.json": "FB-155", "forge-ot.fvts.json": "FB-078"}
+PENDING_APPROVAL = {"forge-mes.fmts.json": "FB-155"}
 
 
 def _schema(fw: str) -> dict[str, Any]:
@@ -151,7 +151,7 @@ class TestTheSetOfFrameworks:
     def test_the_spec_listing_sees_every_spec(self) -> None:
         listed = {path.name for path in spec_files(SPEC_ROOT)}
         expected = {path.name for fw in BUILT for path in _specs(fw)}
-        assert expected <= listed and len(expected) == 66
+        assert expected <= listed and len(expected) == 64
 
 
 @pytest.mark.parametrize("fw", BUILT)

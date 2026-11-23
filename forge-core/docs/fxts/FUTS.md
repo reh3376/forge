@@ -107,7 +107,7 @@ A view document also gets:
 | `text-label`, `value-display`, `status-indicator`, `data-table`, `action-button`, `input-field`, `view-link` | widget, general | the seven for any screen |
 | `level-bar`, `two-state-symbol`, `trend-chart`, `alarm-list`, `alarm-banner` | widget, plant-floor | the five for control-room screens |
 | `forge-hub-status`, `forge-hub-modules`, `forge-hub-governance`, `forge-hub-access` | view | the hub's four standard screens (D-16, Q-15): one reflowing column each, a title, a line of guidance and a table per object. Forge's first standard screens |
-| `forge-ot-ferm-overview` | view | the reference view document: the fermenter overview surface of forge-ot's view spec, laid out with every container kind. Not a screen for a plant; the example the runner and the tests are held to |
+| `reference-ferm-overview` (`tests/governance/futs/fixtures/`) | view, a test fixture | the reference view document: the fermenter overview surface of the reference view spec, laid out with every container kind. Not a screen for a plant and not a governed file; the example the runner and the tests are held to |
 
 The twelve widgets are the first set the owner chose on 2026-11-20. More are added as new widget specs.
 
@@ -115,7 +115,7 @@ The twelve widgets are the first set the owner chose on 2026-11-20. More are add
 
 ```bash
 forge governance run futs value-display
-forge governance run futs forge-ot-ferm-overview
+forge governance run futs forge-hub-status
 forge governance validate-spec forge-modules/forge-display/fxts/futs/level-bar.widget.futs.json
 ```
 

@@ -1,12 +1,12 @@
 {
   "spec_version": "0.2.0",
   "view_identity": {
-    "view_id": "forge-ot-views",
-    "name": "Forge OT/SCADA Module — Operator Views",
+    "view_id": "reference-views",
+    "name": "Reference views (a test fixture)",
     "version": "0.1.0",
     "owner_module": "forge-ot",
     "facts_spec_ref": "forge-modules/forge-ot/fxts/facts/forge-ot.facts.json",
-    "description": "Reference FVTS contract: operator HMI, trending and alarm summary for the OT module. Exercises every FVTS section, including the write path through the OT module's write engine (validation, two-step review, interlocks, authorization, write with read-back)."
+    "description": "A sample for the framework's tests (BACKLOG FB-078): a made-up fermenter screen that exercises every FVTS section. It is not forge-ot's contract and not a governed file: a plant's tags are bound on site. Reference FVTS contract: operator HMI, trending and alarm summary for the OT module. Exercises every FVTS section, including the write path through the OT module's write engine (validation, two-step review, interlocks, authorization, write with read-back)."
   },
   "scope": {
     "isa95_levels": [
@@ -312,8 +312,8 @@
     "isa101_high_performance": true
   },
   "conformance_tests": {
-    "suite_path": "tests/governance/fvts/test_ot_module_views.py",
-    "golden_messages_path": "tests/governance/fvts/golden/forge-ot/",
+    "suite_path": "tests/governance/fvts/test_reference_views.py",
+    "golden_messages_path": "tests/governance/fvts/golden/reference/",
     "renderers_under_test": [
       "desktop_hmi",
       "web"
@@ -325,39 +325,12 @@
   },
   "integrity": {
     "hash_state": "pending_review",
-    "previous_hash": "d2d3165cade802868a55a0a23b2dd8311fd7557b64d8ca13165fc51513b84910",
-    "change_history": [
-      {
-        "previous_hash": "d2d3165cade802868a55a0a23b2dd8311fd7557b64d8ca13165fc51513b84910",
-        "new_hash": "2e166e690183704101aba391ca78a8751ac05c99b151b6982ba3006d0fc09577",
-        "changed_at": "2026-11-23T19:25:00Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "content",
-        "reason": "every module has a folder of its own (D-17 step 5, FB-201): the paths of the module's code, its manifest and its sibling specs follow it; nothing else changed"
-      },
-      {
-        "previous_hash": "52c24d95c2fc918dfb22b25529e136e6b4589522faf812a413f577d33cc60c19",
-        "new_hash": "d2d3165cade802868a55a0a23b2dd8311fd7557b64d8ca13165fc51513b84910",
-        "changed_at": "2026-11-23T02:07:50Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "content",
-        "reason": "paths follow the move of forge-core to its own folder (D-17 step 3, FB-199); nothing else changed"
-      },
-      {
-        "previous_hash": "6f46a3c215b2aa71b3657adc02aad18a205cbc278e369fe8d3ea98163b34d118",
-        "new_hash": "52c24d95c2fc918dfb22b25529e136e6b4589522faf812a413f577d33cc60c19",
-        "changed_at": "2026-11-21T16:05:32Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "structural",
-        "reason": "schema fvts 0.1.0 -> 0.2.0"
-      }
-    ],
+    "previous_hash": null,
+    "change_history": [],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "2e166e690183704101aba391ca78a8751ac05c99b151b6982ba3006d0fc09577",
+    "spec_hash": "75e898965c81882b7fb44bbbbba164cfdd0c2a7b92e3c2580480f4a770097d80",
     "schema_version": "0.2.0",
-    "schema_hash": "1a9785248467232def2fe2f01959988cfaffad20c1098382510a7c3d125b1ec7"
+    "schema_hash": "1a9785248467232def2fe2f01959988cfaffad20c1098382510a7c3d125b1ec7",
+    "approved_by": ""
   }
 }

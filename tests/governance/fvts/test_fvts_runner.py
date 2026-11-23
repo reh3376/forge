@@ -47,7 +47,7 @@ class TestParity:
         assert check_schema_runner_parity(schema, runner.implemented_fields()) == []
 
     async def test_reference_run_has_no_parity_or_error_verdicts(self, runner, spec) -> None:
-        report = await runner.run(target="forge-ot-views", spec=spec)
+        report = await runner.run(target="reference-views", spec=spec)
         statuses = {v.status for v in report.verdicts}
         assert VerdictStatus.NOT_IMPLEMENTED not in statuses
         assert VerdictStatus.ERROR not in statuses
@@ -61,7 +61,7 @@ class TestParity:
         ]
 
     async def test_runner_without_schema_reports_errors_not_passes(self, spec: dict) -> None:
-        report = await FVTSRunner().run(target="forge-ot-views", spec=spec)
+        report = await FVTSRunner().run(target="reference-views", spec=spec)
         errored = {v.check_id for v in report.verdicts if v.status is VerdictStatus.ERROR}
         assert errored == {"fvts:schema-valid", "fvts:enum-parity"}
 
@@ -140,7 +140,7 @@ class TestEnumParity:
         path = tmp_path / "fvts.schema.json"
         path.write_text(json.dumps(drifted), encoding="utf-8")
         report = await FVTSRunner(schema_path=path).run(
-            target="forge-ot-views", spec=spec, facts_specs=facts_specs
+            target="reference-views", spec=spec, facts_specs=facts_specs
         )
         verdict = next(v for v in report.verdicts if v.check_id == "fvts:enum-parity")
         assert verdict.status is FAIL

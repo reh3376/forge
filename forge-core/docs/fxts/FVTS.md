@@ -3,7 +3,7 @@
 **Framework ID:** FVTS
 **Full Name:** Forge View Test Specification
 **CI Gate:** Hard-fail (merge-blocking) — `tests/governance/fvts/` runs in the `hub-python` job
-**Status:** v0.2.1 (a patch step of 2026-11-22 that corrects two descriptions, FB-226; the two specs stay on 0.2.0, which they declare). v0.2.0 (2026-11-21, FB-177: objects beside points, a minor step released and approved under the schema version rules). Schema, runner (`fvts_runner.py`, 21 checks), reference renderer, two golden sets and two specs: the hub's own (`forge-hub.fvts.json`, approved by the owner) and the plant-floor reference (`forge-ot.fvts.json`, `pending_review` until FB-078). forge-display itself has no code (FB-181).
+**Status:** v0.2.1 (a patch step of 2026-11-22 that corrects two descriptions, FB-226; the hub's spec and the reference fixture stay on 0.2.0, which they declare). v0.2.0 (2026-11-21, FB-177: objects beside points, a minor step released and approved under the schema version rules). Schema, runner (`fvts_runner.py`, 21 checks), reference renderer, two golden sets and two specs: the hub's own (`forge-hub.fvts.json`, approved by the owner) and the plant-floor reference (`forge-ot.fvts.json`, `pending_review` until FB-078). forge-display itself has no code (FB-181).
 **Phase:** TBD (forge-display)
 **MDEMG Analog:** None — new for forge-display
 
@@ -183,18 +183,18 @@ Schema-runner parity holds: `implemented_fields()` lists every top-level propert
 | `action_result` | Action declared and permitted on this profile; status is a `writeStatus`, handled by `tag_write` actions; `REJECTED_INTERLOCK` carries the blocking rule and message |
 | `surface_render` | Surface offered on the profile; points declared; actions split into visible/hidden per `fvts:profile-action-filter` |
 
-A golden message may carry `"profiles": [...]` to apply to some renderers only (the setpoint write results apply to `desktop_hmi`). The OT reference set lives in `tests/governance/fvts/golden/forge-ot/` (twelve messages in eight files, rendered in name order; the renderer keeps the last good value per point across files).
+A golden message may carry `"profiles": [...]` to apply to some renderers only (the setpoint write results apply to `desktop_hmi`). The reference set lives in `tests/governance/fvts/golden/reference/` (twelve messages in eight files, rendered in name order; the renderer keeps the last good value per point across files).
 
 ### CI gate
 
-`forge governance run fvts forge-ot-views` runs the 20 checks from the CLI (exit 1 while `fvts:hash-approved` fails). `tests/governance/fvts/test_ot_module_views.py` is the suite the reference spec declares in `conformance_tests.suite_path`. It runs the full runner and allows exactly one failure, `fvts:hash-approved`, until the owner approves the hash under FB-078. Every other FAIL, ERROR or NOT_IMPLEMENTED verdict blocks the merge.
+`forge governance run fvts forge-hub-views` runs the checks on the hub's spec from the CLI; a file path runs any spec, the reference fixture included. `tests/governance/fvts/test_reference_views.py` is the suite the reference fixture declares in `conformance_tests.suite_path`. It runs the full runner and allows exactly one failure, `fvts:hash-approved`: the fixture is a sample and is approved by nobody. Every other FAIL, ERROR or NOT_IMPLEMENTED verdict blocks the merge.
 
 ## Specs
 
 | Spec | Status | Notes |
 |------|--------|-------|
 | `forge-hub.fvts.json` (in `forge-hub/fxts/fvts`) | approved by the owner 2026-11-21; again 2026-11-23 with the hub's id (FB-200) | The hub's own screens, the first thing forge-display renders (D-16, Q-15): status and health, modules, governance, users and roles. No points; seven objects, each with a schema under `forge-hub/fxts/fvts/objects/`. Read-only except for running a spec's checks: approving a spec and assigning a role stay off the screens until roles are enforced (FB-075). The hub is not a module and has no FACTS spec. Suite: `forge-hub/tests/fxts/fvts/test_hub_views.py`. |
-| `forge-ot.fvts.json` | `hash_state: pending_review` (FB-078) | Reference contract: fermenter HMI screen, trend, alarm summary, settings; setpoint write via two-step review. Passes every runner check except `fvts:hash-approved`; with the OT write config (`deploy/ot/ot-control.example.json`) `fvts:action-target` fails because the fermenter points are invented — FB-078 replaces them. |
+| `tests/governance/fvts/fixtures/reference.fvts.json` | a test fixture, not a governed file (FB-078, the owner 2026-11-23) | A sample contract for the framework's tests: a made-up fermenter screen, trend, alarm summary and settings, with a setpoint write via two-step review, so that every FVTS section is exercised. It was kept as forge-ot's view spec until 2026-11-23 and waited for approval the whole time, because its tags are invented: a plant's tags are bound on site and are no part of the repository. forge-ot has no view spec of its own yet. |
 
 ## Relationship to other FxTS frameworks
 

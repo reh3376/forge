@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 172 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 173 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 172:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 173:
 
 **Working**
 
@@ -784,7 +784,7 @@ note:
 | **FACTS** · Forge Adapter Conformance Test Specification | a module's data contract: identity, capabilities, lifecycle, connection, data sources, context mapping, error handling, time governance | schema + runner + 9 specs, all approved |
 | **FATS** · Forge API Test Specification | the hub's REST routes: route, method, authentication, status, errors, rate limit | schema + runner + 28 specs, one per served route, all approved; thin (FB-162) |
 | **FTTS** · Forge Transport Test Specification | the hub-to-module transport | schema + runner + 1 spec, approved; the signed transport contract is not built (FB-164) |
-| **FVTS** · Forge View Test Specification | module ↔ forge-display: points, objects (collections with a schema), alarms, actions, surfaces, profiles | schema 0.2.0 + runner + reference renderer + golden messages + 2 specs: the hub's own (approved) and the plant-floor reference (awaiting approval, FB-078) |
+| **FVTS** · Forge View Test Specification | module ↔ forge-display: points, objects (collections with a schema), alarms, actions, surfaces, profiles | schema 0.2.0 + runner + reference renderer + golden messages + 1 spec: the hub's own (approved); a sample fermenter contract is a test fixture of the framework, no module's spec (FB-078) |
 | **FMTS** · Forge Module Test Specification | what every module must do: sixteen requirements, the time contract, waivers | schema + runner + conformance kit + 9 specs, 8 approved |
 | **FUTS** · Forge UI Test Specification | what a screen is made of: widget specs and view documents (laid-out screens) | schema 0.2.0 + runner + 17 specs (twelve widgets, the hub's four standard screens, one reference view), all approved; nothing renders them yet (FB-181) |
 | **FHTS** · Forge Hash Test Specification | the hash and owner approval of every spec above | hashing, verification, approval, revert, registry |
@@ -990,7 +990,7 @@ note:
 | The hub does not demand an approved FMTS spec at Register; the scaffold does not generate one | FB-140 |
 | No module ships a roles file, and the roles file has no FxTS spec of its own | FB-141 |
 | The conformance kit cannot drive a module in another process or language | FB-155 |
-| Two specs await the owner's approval: `forge-mes.fmts.json`, `forge-ot.fvts.json` | FB-155, FB-078 |
+| One spec awaits the owner's approval: `forge-mes.fmts.json` | FB-155 |
 | The OT reference FVTS spec uses invented points and is `pending_review` | FB-078 |
 
 **Next**: the module that reaches the plant floor.

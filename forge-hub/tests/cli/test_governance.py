@@ -24,7 +24,8 @@ SPECS = governance.SPEC_ROOT
 FACTS_OT = locations.spec_path("facts", "forge-ot.facts.json")  # non-ASCII, hand-wrapped
 FACTS_NMS = locations.spec_path("facts", "forge-nms.facts.json")  # ASCII-escaped
 FACTS_WMS = locations.spec_path("facts", "forge-wms.facts.json")  # approved in the fixture
-FVTS_OT = locations.spec_path("fvts", "forge-ot.fvts.json")
+# A sample view spec that no owner approved: the framework's reference fixture (FB-078)
+FVTS_OT = locations.REPO_ROOT / "tests" / "governance" / "fvts" / "fixtures" / "reference.fvts.json"
 STAMP_RE = re.compile(r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
 
 
@@ -45,7 +46,8 @@ def root(tmp_path: Path) -> Path:
     other three awaiting approval.
     """
     for src in (FACTS_OT, FACTS_NMS, FACTS_WMS, FVTS_OT):
-        dest = tmp_path / src.parent.name / "specs" / src.name  # <framework>/specs/<file>
+        framework = src.name.split(".")[-2]  # forge-wms.facts.json -> facts
+        dest = tmp_path / framework / "specs" / src.name  # <framework>/specs/<file>
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(src, dest)
         text, spec = governance.load_spec(dest)
@@ -74,7 +76,7 @@ def test_specs_lists_state_approver_and_verification(root: Path) -> None:
     code, out = run("specs", "--root", str(root))
     assert code == 0, out
     assert "forge-wms.facts.json" in out and "approved" in out and "test-owner" in out
-    assert "forge-ot.fvts.json" in out and "pending_review" in out
+    assert "reference.fvts.json" in out and "pending_review" in out
     assert "4 spec(s): 3 awaiting approval, 0 with a hash mismatch." in out
 
     code, out = run("specs", "--root", str(root), "--pending")
@@ -133,7 +135,7 @@ def test_approve_is_idempotent_for_the_same_approver(root: Path) -> None:
 
 
 def test_approve_refuses_when_the_hash_does_not_cover_the_content(root: Path) -> None:
-    path = root / "fvts" / "specs" / "forge-ot.fvts.json"
+    path = root / "fvts" / "specs" / "reference.fvts.json"
     spec = json.loads(path.read_text(encoding="utf-8"))
     spec["scope"]["description"] = "edited after the stamp"
     path.write_text(json.dumps(spec, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -288,7 +290,7 @@ def test_run_lists_the_failed_checks_and_exits_1(tmp_path: Path) -> None:
 
 def test_run_fvts_reference_only_waits_on_the_owner(tmp_path: Path) -> None:
     out_file = tmp_path / "fvts.json"
-    code, out = run("run", "fvts", "forge-ot-views", "--format", "json", "--output", str(out_file))
+    code, out = run("run", "fvts", str(FVTS_OT), "--format", "json", "--output", str(out_file))
     report = json.loads(out)
     assert report == json.loads(out_file.read_text(encoding="utf-8"))
     assert report["framework"] == "FVTS" and len(report["verdicts"]) == 21

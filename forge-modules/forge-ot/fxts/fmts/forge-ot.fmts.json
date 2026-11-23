@@ -34,10 +34,7 @@
       "path": "forge-modules/forge-ot/fxts/facts/forge-ot.facts.json",
       "adapter_id": "forge-ot"
     },
-    "manifest": "forge-modules/forge-ot/src/python/forge_ot/manifest.json",
-    "fvts": [
-      "forge-modules/forge-ot/fxts/fvts/forge-ot.fvts.json"
-    ]
+    "manifest": "forge-modules/forge-ot/src/python/forge_ot/manifest.json"
   },
   "baseline": {
     "M-1": "met",
@@ -100,7 +97,7 @@
   },
   "user_interface": {
     "ships_ui_code": false,
-    "screens": true
+    "screens": false
   },
   "scaffold": {
     "template": "none"
@@ -113,8 +110,17 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "9be3e745131f6f8d541f4315e31f906acef14dc5b1b90de62f2612e2202a095e",
+    "previous_hash": "4b41afd6fe7a50f06ee0df127e2efbed8a520b866b154b4ee1ca820d242b2125",
     "change_history": [
+      {
+        "previous_hash": "4b41afd6fe7a50f06ee0df127e2efbed8a520b866b154b4ee1ca820d242b2125",
+        "new_hash": "ab63328972421d2c97cd81785ce0ab3b0c05a6fe816288ea55b8b1321abe3927",
+        "changed_at": "2026-11-23T20:11:52Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "FB-078 (the owner, 2026-11-23): the fermenter view spec was a sample for the framework's tests, not forge-ot's contract, and is now a test fixture; forge-ot carries no view spec with tags, so references.fvts is gone and screens is false until its real view contract is written"
+      },
       {
         "previous_hash": "9be3e745131f6f8d541f4315e31f906acef14dc5b1b90de62f2612e2202a095e",
         "new_hash": "4b41afd6fe7a50f06ee0df127e2efbed8a520b866b154b4ee1ca820d242b2125",
@@ -132,22 +138,13 @@
         "changed_by": "claude-mythos-5-2",
         "change_type": "content",
         "reason": "paths follow the move of forge-core to its own folder (D-17 step 3, FB-199); nothing else changed"
-      },
-      {
-        "previous_hash": "6f2ccc1a528fe4d646c0bbcd0c499ca55b79b28e8d003410f6f584681e096aa2",
-        "new_hash": "b4a9586c6262948c86cca0814068e7adf6fb1cea6bb2d0c61d163ac791ad9cb0",
-        "changed_at": "2026-11-19T21:46:25Z",
-        "source": "agent",
-        "changed_by": "claude-mythos-5-2",
-        "change_type": "structural",
-        "reason": "FB-153: FMTS 2.0.0, the module's function and the data classes it carries (owner, 2026-11-19)"
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "4b41afd6fe7a50f06ee0df127e2efbed8a520b866b154b4ee1ca820d242b2125",
+    "spec_hash": "ab63328972421d2c97cd81785ce0ab3b0c05a6fe816288ea55b8b1321abe3927",
     "schema_version": "2.0.0",
     "schema_hash": "2789bb323f90761fb82b1cbfabb357fe9d24f5788f252165e8125420837e1f1e",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T19:47:52Z"
+    "approved_at": "2026-11-23T20:21:42Z"
   }
 }
