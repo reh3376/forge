@@ -80,10 +80,9 @@ The repository is being reorganised into three self-contained parts, forge-core,
 
 | Path | Holds |
 |---|---|
-| [`forge-core/`](forge-core) | The foundation: `contract/` (proto files, framework schemas, governed lists), `src/python/forge_core` (the package), `tests/`, and its own README |
+| [`forge-core/`](forge-core) | The foundation: `contract/` (proto files, framework schemas, governed lists), `src/python/forge_core` (the Python package), `src/go` (the Go models, generated bindings and module scaffold), `tests/`, `docs/`, and its own README |
 | [`src/forge/`](src/forge) | The hub and the modules, until they move: `api`, `gateway`, `ingest`, `storage`, `registry`, `context`, `curation`, `broker`, `transport`, `cli`; `adapters/`; `modules/ot` |
 | [`tests/`](tests) | Tests of the hub and the modules, and tests that span layers |
-| [`go/`](go) | The Go models, the generated bindings and the module scaffold |
 | [`modules/Forge MES/`](modules/Forge%20MES) | The interim MES bridge (NestJS and Next.js). It has its own [`CLAUDE.md`](modules/Forge%20MES/CLAUDE.md) |
 | [`docs/`](docs) | The state and direction documents, the signed decision records, the framework pages, the tutorial's source |
 | [`deploy/`](deploy) | The container image and the Compose stack. Compose is for development only; production runs on Kubernetes |
@@ -123,6 +122,7 @@ FxTS is specification-first governance. A spec says what must exist, and the cod
 uv run forge governance specs             # every governed file: its state, its hash, who approved it
 uv run forge governance specs --pending   # what awaits the owner
 uv run forge governance schemas           # every schema version and how many specs are written against it
+uv run forge governance index             # regenerate forge-core's index of its governed files
 uv run forge governance run facts <id>    # run one framework's checks on one spec
 ```
 
@@ -131,7 +131,7 @@ uv run forge governance run facts <id>    # run one framework's checks on one sp
 ### Prerequisites
 
 - Python 3.12 or newer, and [uv](https://docs.astral.sh/uv/)
-- Go, for the tree under `go/`
+- Go, for the tree under `forge-core/src/go/`
 - Node, only for the interim MES bridge (20 or newer) and the tutorial build (22 or newer)
 - Docker, for the development stack and the image
 - Java 11 or newer, only to run the TLA+ model checker
@@ -153,7 +153,7 @@ uv run ruff check .
 uv run ruff format --check .
 
 # The Go tree
-cd go && gofmt -l . && go vet ./... && go test ./...
+cd forge-core/src/go && gofmt -l . && go vet ./... && go test ./...
 ```
 
 Run one area:

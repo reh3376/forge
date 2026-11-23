@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: go
+        working-directory: forge-core/src/go
     steps:
       - uses: actions/checkout@v7
         with:
@@ -63,7 +63,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: >
           .github/scripts/changed-paths.sh hub-go
-          go/ forge-core/contract/proto/ .github/workflows/ci.yml .github/scripts/
+          forge-core/src/go/ forge-core/contract/proto/ .github/workflows/ci.yml .github/scripts/
         env:
           EVENT_NAME: ${{ github.event_name }}
           REF_NAME: ${{ github.ref_name }}
@@ -72,8 +72,8 @@ jobs:
       - uses: actions/setup-go@v7
         if: steps.changes.outputs.run == 'true'
         with:
-          go-version-file: go/go.mod
-          cache-dependency-path: go/go.sum
+          go-version-file: forge-core/src/go/go.mod
+          cache-dependency-path: forge-core/src/go/go.sum
       - run: go build ./...
         if: steps.changes.outputs.run == 'true'
       - name: gofmt

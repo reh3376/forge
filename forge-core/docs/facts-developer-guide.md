@@ -395,10 +395,10 @@ The first verdict is always `facts:schema-valid`. The enums the other checks use
 
 ```bash
 # All FACTS tests
-pytest tests/governance/facts/ -v
+pytest forge-core/tests/fxts/facts tests/governance/facts -v
 
 # Just runner tests
-pytest tests/governance/facts/test_facts_runner.py -v
+pytest forge-core/tests/fxts/facts/test_facts_runner.py -v
 
 # Just spec tests for a specific adapter
 pytest tests/governance/facts/test_forge_wms_spec.py -v

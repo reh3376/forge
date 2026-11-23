@@ -2,7 +2,7 @@
 
 **Framework ID:** FTTS
 **Full Name:** Forge Transport Test Specification
-**CI Gate:** Hard-fail (merge-blocking): `tests/governance/ftts/` runs in the `hub-python` job
+**CI Gate:** Hard-fail (merge-blocking): `forge-core/tests/fxts/ftts/` runs in the `hub-python` job
 **Status:** v0.1.0. Schema, runner (`ftts_runner.py`) and one spec, `grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18. The contract this framework is to govern is decided and signed, and not built: [`docs/decisions/transport-contract.md`](../../../docs/decisions/transport-contract.md) (D-15, FB-164)
 **MDEMG Analog:** None
 

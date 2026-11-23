@@ -119,7 +119,7 @@ forge governance run futs forge-ot-ferm-overview
 forge governance validate-spec forge-core/src/python/forge_core/fxts/futs/specs/level-bar.widget.futs.json
 ```
 
-`tests/governance/futs/test_futs.py` runs every spec in CI and names each failure it allows.
+`forge-core/tests/fxts/futs/test_futs.py` runs every spec in CI and names each failure it allows.
 
 A spec is held to the schema version it declares: the eleven widget specs written against 0.1.0 are validated against 0.1.0 and stay approved, and an object binding in a document that declares 0.1.0 is refused.
 

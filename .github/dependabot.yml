@@ -15,7 +15,7 @@ updates:
       python-minor-patch:
         update-types: ["minor", "patch"]
   - package-ecosystem: "gomod"
-    directory: "/go"
+    directory: "/forge-core/src/go"
     schedule: { interval: "weekly" }
     groups:
       go-minor-patch:

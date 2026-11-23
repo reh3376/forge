@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 159 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 160 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -246,7 +246,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 159:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 160:
 
 **Working**
 
@@ -280,10 +280,10 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 159:
 
 | Measure | Value (2026-11-19) |
 |---|---|
-| Python: forge-core (`forge-core/src/python/forge_core`) | 125 files, ~26,300 lines |
+| Python: forge-core (`forge-core/src/python/forge_core`) | 120 files, ~26,500 lines |
 | Python: hub and modules (`src/forge`) | 242 files, ~50,600 lines |
-| Python tests | 292 files, 5,140 collected, full suite green on the locked dependency set |
-| Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
+| Python tests | 284 files, 5,144 collected, full suite green on the locked dependency set |
+| Go (`forge-core/src/go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
 | Hub REST routes | 41 on the hub app, plus OT i3X (8) and OT control (16), plus the curation app |
@@ -354,9 +354,9 @@ note:
 | `forge-core/src/python/forge_core/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
 | `forge-core/src/python/forge_core` | **forge-core**, the shared foundation, its own package `forge_core` since 2026-11-22 (D-17): the models and the clock, `fxts` (the frameworks), `sdk`, `adapter` (the base class and the generic adapters), `link` (a module's end of the link to a hub), `proto_gen`. Its language-neutral part is `forge-core/contract`: the proto files, every framework's schema with its released versions, and the governed lists (`forge_core.contract` says where it is; a built package and the image carry it). It imports nothing of the hub or of a module, and a test holds that (`tests/test_layer_imports.py`). The hub and the modules still share `src/forge` |
 | `src/forge/adapters` | the Python adapters of eight modules (`forge_wms`, `forge_mes`, `forge_cmms`, `forge_nms`, `forge_ims`, `forge_historian`, `forge_scanner`, `forge_integ_erp_netsuite`), each with its manifest and config, and four empty generic packages (FB-148) |
-| `go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
+| `forge-core/src/go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
-| `tests/` | 292 files mirroring `src/`; `tests/governance/` holds the gates of every framework |
+| `tests/` | The hub's and the modules' tests, and tests that span layers; `tests/governance/` holds the framework gates that use the hub or a module's spec. forge-core's own tests are in `forge-core/tests` |
 | `docs/` | the key documents, `FxTS/` (the framework pages), `decisions/` (the signed records), `deployment/`, `governance/`, `tutorial.md` (this deck's source) |
 | `deploy/docker` | the development compose stack and the hub image |
 
@@ -406,7 +406,7 @@ note:
 | Discovery | `Discover` | hub → spoke | enumerate what the source exposes |
 
 - Compiled protobuf over gRPC; JSON over gRPC is forbidden (decision A-1).
-- Go and Python bindings generated from one proto set (`forge-core/contract/proto`, `forge-core/src/python/forge_core/proto_gen`, `go/gen/forge`).
+- Go and Python bindings generated from one proto set (`forge-core/contract/proto`, `forge-core/src/python/forge_core/proto_gen`, `forge-core/src/go/gen/forge`).
 - A module is either hosted in the hub's process (forge-ot and the Python adapters today) or its own process in any language that speaks the proto (the interim MES bridge today; Go modules and the integration host later). Either way it reaches the hub through this service and nothing else: the hub's REST ingest route is being retired (FB-123).
 - **Who starts a call matters.** Register, Health and Ingest are started by the module. Configure, Start, Stop, Collect, Backfill, Subscribe, Write and Discover are started by the hub, through a callback address the module gave at Register.
 
@@ -959,6 +959,7 @@ uv run pytest tests/modules/ot/control/test_review_gate_exhaustive.py -q    # th
 uv run pytest tests/modules/ot/alarming/test_state_machine_exhaustive.py -q # the alarm state machine: every configuration, no bound
 forge governance validate-spec <spec.json>   # against the schema version it declares
 forge governance schemas                     # every schema version, its step, hash and approval
+forge governance index                       # rewrite forge-core/fxts/README.md from the lists and schemas; --check fails when stale
 forge governance run facts forge-wms           # one framework, one spec; exit 1 on any failure
 forge governance stamp <spec.json>           # after an edit: history entry, pending_review, no approver
 forge governance approve <spec.json> --by reh3376   # the owner, on their own word, never on their behalf
@@ -1371,11 +1372,11 @@ note:
 
 | Piece | State |
 |---|---|
-| `go/internal/models` | ✅ the core models mirrored, 2,078 lines with 1,665 of tests; every manufacturing entity has a `New*` constructor with the Python defaults and a `Validate()`, held equal to the Python models by one fixture both suites read (FB-016) |
-| `go/gen/forge` | ✅ generated bindings from the one proto set (Buf) |
-| `go/internal/scaffold` | 🟡 112 lines; not a module template yet |
+| `forge-core/src/go/internal/models` | ✅ the core models mirrored, 2,078 lines with 1,665 of tests; every manufacturing entity has a `New*` constructor with the Python defaults and a `Validate()`, held equal to the Python models by one fixture both suites read (FB-016) |
+| `forge-core/src/go/gen/forge` | ✅ generated bindings from the one proto set (Buf) |
+| `forge-core/src/go/internal/scaffold` | 🟡 112 lines; not a module template yet |
 | `forged` daemon, `forgectl` | ⬜ placeholders |
-| CI | `go build`, `gofmt -l`, `go vet`, `go test` in the `hub-go` job, which runs them only when a push touches `go/` or the proto files |
+| CI | `go build`, `gofmt -l`, `go vet`, `go test` in the `hub-go` job, which runs them only when a push touches `forge-core/src/go/` or the proto files |
 
 What the Go SDK has to give every module, so that no module writes it itself: the session with the hub, the time exchange, store and forward with its buffer, the goodbye and last will, the health report with refusals by cause, and authorization. A Go module is written to the **transport contract spec** (F2), not to the Python code.
 
@@ -2002,13 +2003,13 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest -q -rsx                          # 5,140 tests in tests/ and forge-core/tests, ~1 minute; lists each skip with its reason
+uv run pytest -q -rsx                          # 5,144 tests in tests/ and forge-core/tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
 ```
 
-- Python 3.12+, uv, ruff, Docker for the services; Go 1.26 for `go/`; Node 20 for the interim MES bridge's CI job and Node 22 for the tutorial build.
+- Python 3.12+, uv, ruff, Docker for the services; Go 1.26 for `forge-core/src/go/`; Node 20 for the interim MES bridge's CI job and Node 22 for the tutorial build.
 - Every Python dependency is locked in `uv.lock`; `--locked` fails on a stale lock, so a dependency moves only through a committed re-lock (FB-096):
 
 ```bash
@@ -2046,7 +2047,7 @@ flowchart LR
 
 note:
 - CI runs on every push to every branch so checks attach to the commits behind auto-opened PRs; same-repo PRs do not run twice.
-- All four jobs are required checks on `main`, so all four always report. Two of them do their work only when it is relevant: `hub-go` when the branch touches `go/` or `forge-core/contract/proto/`, `mes-module` when it touches `modules/Forge MES/`, the proto files or the forge-mes manifest. Otherwise the job passes in seconds and says "nothing to check" in its log and summary. The whole branch is compared with `main`, not only the last push, and when the comparison cannot be made the job runs in full (`.github/scripts/changed-paths.sh`).
+- All four jobs are required checks on `main`, so all four always report. Two of them do their work only when it is relevant: `hub-go` when the branch touches `forge-core/src/go/` or `forge-core/contract/proto/`, `mes-module` when it touches `modules/Forge MES/`, the proto files or the forge-mes manifest. Otherwise the job passes in seconds and says "nothing to check" in its log and summary. The whole branch is compared with `main`, not only the last push, and when the comparison cannot be made the job runs in full (`.github/scripts/changed-paths.sh`).
 
 ---
 
@@ -2088,7 +2089,7 @@ note:
 | fix something you found while doing something else | finish the item; add a `BACKLOG.md` row (ID, severity, problem, where, suggested fix) if you did not fix it |
 | add or change a hub route | add or update the FATS spec; the hub test holds both directions |
 | add a module | scaffold with the module builder; write its FACTS spec and its FMTS spec; run `forge governance run facts <module>` and `forge governance run fmts <module>`; the module registers only when its manifest matches the approved FACTS spec |
-| change what crosses the wire | read `docs/decisions/transport-contract.md` first; within `forge.v1` only add; a wire change re-stamps the specs it touches. A proto file lives in three places (`forge-core/contract/proto`, `go/proto/forge/v1`, the interim MES bridge's `backend/forge-core/contract/proto`): change all three in the same change, keep the Go copy's own `go_package` line, and regenerate. `tests/test_proto_copies.py` fails otherwise. |
+| change what crosses the wire | read `docs/decisions/transport-contract.md` first; within `forge.v1` only add; a wire change re-stamps the specs it touches. A proto file lives in three places (`forge-core/contract/proto`, `forge-core/src/go/proto/forge/v1`, the interim MES bridge's `backend/forge-core/contract/proto`): change all three in the same change, keep the Go copy's own `go_package` line, and regenerate. `tests/test_proto_copies.py` fails otherwise. |
 | build something that will be done more than once | find its FxTS framework and build to the spec; if none fits, record that in `BACKLOG.md` |
 | add a module function, a protocol, a data class or a pruning strategy | edit the governed list in `forge-core/contract/lists/`, `forge governance stamp` it; the owner approves it. Not a schema change. |
 | skip a test | give the reason (`reason=`, a `// skip reason:` comment, a message to `t.Skip`); if the reason is "needs work", add a backlog item |
@@ -2142,7 +2143,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 292 files, 5,140 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/` and `forge-core/tests`: 284 files, 5,144 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.

@@ -135,7 +135,7 @@ The NestJS backend and Next.js frontend stay as the bridge that keeps the hub �
 
 | Item | Status | Notes |
 |---|---|---|
-| FB-076 rewrite forge-mes in Go; UI through forge-display | Design record signed 2026-11-03 (`docs/decisions/forge-mes-go.md`, D-3): ten steps, one PR each, the Go SDK scaffold (FB-017) first | Suggested order: design doc → SDK scaffold under `go/` → hub link (Register/Configure/Ingest, write-back server, pull RPCs) against `go/gen/forge/v1` → changeover state machine + MQTT publishing → `mod_mes` (FB-057) → parity tests (FB-055) → cut-over → retire NestJS. |
+| FB-076 rewrite forge-mes in Go; UI through forge-display | Design record signed 2026-11-03 (`docs/decisions/forge-mes-go.md`, D-3): ten steps, one PR each, the Go SDK scaffold (FB-017) first | Suggested order: design doc → SDK scaffold under `forge-core/src/go/` → hub link (Register/Configure/Ingest, write-back server, pull RPCs) against `forge-core/src/go/gen/forge/v1` → changeover state machine + MQTT publishing → `mod_mes` (FB-057) → parity tests (FB-055) → cut-over → retire NestJS. |
 | FB-057 `mod_mes` schema in the hub (data ownership per A-6) | Step 1 done 2026-10-16: Forge-issued credentials (`forge db access`, migration 008) | Steps 2–5 once, for the Go module (D-3). |
 | Bridge debt that still matters while the bridge runs: FB-050 Dependabot alerts (High), FB-036 jest failures in CI, FB-052 CI exit hang, FB-031 inert nested workflows, FB-045 committed env vaults, FB-043 privacy hygiene | Not started | Triage against the bridge's remaining life; do not invest beyond safety. |
 | Bridge debt that the rewrite retires: FB-030 stale admin-app refs, FB-032 cloud resource names, FB-033 submodule, FB-035 nested tooling configs, FB-064 eslint resolution. FB-028, the frontend's strict-mode errors, was needed sooner and is done (2026-11-17: clean, and blocking in CI) | Not started | Close with FB-076 unless needed sooner. |
@@ -161,7 +161,7 @@ Needed before FB-076, forge-ignition and forge-hmi-scada can start the same way.
 
 | Item | Status | Notes |
 |---|---|---|
-| Go module scaffold (`go/internal/scaffold` exists; `forge module init` is Python/adapter-only — FB-017) | Not started | Template must produce backend (hub link) + FVTS spec stub, not a UI. |
+| Go module scaffold (`forge-core/src/go/internal/scaffold` exists; `forge module init` is Python/adapter-only — FB-017) | Not started | Template must produce backend (hub link) + FVTS spec stub, not a UI. |
 | FB-019 duplicate SDK copies and template modules drift | Not started | |
 | FB-021 FACTS approval CLI | Done 2026-10-18 | `forge governance specs / stamp / approve`; serves FVTS and FTTS too. FB-083 (done the same day) put the four runners on `forge governance run`. |
 
@@ -285,6 +285,6 @@ Three numbering series appear in the repository's history. None is renumbered; t
 |---|---|---|---|
 | **F** (F01 … F2x) | `PLAN.md`, `PHASES.md` (retired by FB-081, 2026-10-18) | Feature numbers of the original Python plan (F03 broker, F04 serialization, F05 storage config, F20 Schema Registry, F21 Context Engine …). The hub's code still names a few (`F20`, `F21` in docstrings). | Retired with the planning records; the durable content is in `PRINCIPLES.md`. |
 | **P** (P1 … P8 …) | `PLAN.md` sprint plan, commit messages | Sprint numbers of that plan. **Collision:** commit `2fe26a28` (2026-04-13) is titled "Sprint P8 — Hub Infrastructure Foundation (F03 + F04 + F05)" while `PLAN.md`'s P8 was the QMS build ("replaces Intellect"); the sprint that built the hub infrastructure reused the number. The commit message stands as written. | Retired with the planning records. |
-| **G** (G0 … G15) | PR #5 (G0, project scaffold and proto generation, merged 2026-04-15) and PR #6 (G1, core models and proto converters, merged 2026-04-16) | Sprints of a "Go hub migration". Only G0 and G1 were written down in full; PR #6 named G2 (storage config and pool manager) as the next step; G3 to G15 were never written anywhere in the repository or the PR bodies, only the range. | Superseded by A-2 (2026-10-16): Go is the language of the formal modules, the hub stays Python (D-5 parked). G0/G1's output (`go/internal/models`, the scaffold, the generated bindings) carries into WS-7 (module SDK) and FB-076; new Go work is tracked by FB ids, not G phases. |
+| **G** (G0 … G15) | PR #5 (G0, project scaffold and proto generation, merged 2026-04-15) and PR #6 (G1, core models and proto converters, merged 2026-04-16) | Sprints of a "Go hub migration". Only G0 and G1 were written down in full; PR #6 named G2 (storage config and pool manager) as the next step; G3 to G15 were never written anywhere in the repository or the PR bodies, only the range. | Superseded by A-2 (2026-10-16): Go is the language of the formal modules, the hub stays Python (D-5 parked). G0/G1's output (`forge-core/src/go/internal/models`, the scaffold, the generated bindings) carries into WS-7 (module SDK) and FB-076; new Go work is tracked by FB ids, not G phases. |
 
 Since 2026-10-15 work is tracked by backlog ids (`BACKLOG.md`), decisions by A-/D- ids (sections 1 and 5) and workstreams by WS- ids (section 3).

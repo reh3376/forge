@@ -127,7 +127,7 @@ The same section rides on the adapter manifest (`AdapterManifest.time_governance
 **Location:** `forge-core/src/python/forge_core/fxts/facts/runners/facts_runner.py`
 **Class:** `FACTSRunner(FxTSRunner)`
 **Status:** ✅ Implemented — `facts:schema-valid` plus 35 rule checks; enums read from the schema (FB-080)
-**Tests:** `tests/governance/facts/test_facts_runner.py`, `test_specs_schema_valid.py` (every spec), per-spec modules
+**Tests:** `forge-core/tests/fxts/facts/` (the runner and the schema); `tests/governance/facts/test_specs_schema_valid.py` (every spec) and the per-spec modules, which move with their modules
 
 ### Check Catalog
 

@@ -1,4 +1,4 @@
-# Forge: repository-level targets. The Go module has its own Makefile under go/.
+# Forge: repository-level targets. The Go module has its own Makefile under forge-core/src/go/.
 #
 # Tutorial package (FB-103), built by tutorial-forge (scripts/tutorial-forge/,
 # agent reference scripts/tutorial-forge/FSD.md). Config: tutorial.config.json

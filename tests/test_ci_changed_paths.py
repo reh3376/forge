@@ -166,7 +166,7 @@ class TestTheWorkflow:
     @pytest.mark.parametrize(
         ("job", "paths"),
         [
-            ("hub-go", ["go/", "forge-core/contract/proto/"]),
+            ("hub-go", ["forge-core/src/go/", "forge-core/contract/proto/"]),
             ("mes-module", ['"modules/Forge MES/"', *MES[1:]]),
         ],
     )

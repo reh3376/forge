@@ -387,6 +387,7 @@ def migrate_down(
 
 governance_app.command("validate-spec")(governance_cli.validate_spec)
 governance_app.command("schemas")(governance_cli.schemas_command)
+governance_app.command("index")(governance_cli.index_command)
 governance_app.command("schema-diff")(governance_cli.schema_diff)
 governance_app.command("schema-release")(governance_cli.schema_release)
 governance_app.command("schema-approve")(governance_cli.schema_approve)
