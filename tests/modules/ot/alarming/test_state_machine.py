@@ -7,7 +7,7 @@ Covers:
 - Process events while in administrative states (CLEAR/TRIGGER update saved state)
 - RESET override from any non-NORMAL state
 - Invalid transition rejection
-- get_valid_actions() completeness
+- get_accepted_actions() / get_operator_actions()
 """
 
 import pytest
@@ -253,7 +253,7 @@ class TestInvalidTransitions:
 
 
 # ---------------------------------------------------------------------------
-# can_transition / get_valid_actions
+# can_transition / get_accepted_actions / get_operator_actions
 # ---------------------------------------------------------------------------
 
 
@@ -267,12 +267,12 @@ class TestHelpers:
         assert sm.can_transition(alarm, AlarmAction.ACKNOWLEDGE) is False
 
     def test_valid_actions_from_normal(self, sm: AlarmStateMachine):
-        actions = sm.get_valid_actions(AlarmState.NORMAL)
+        actions = sm.get_accepted_actions(AlarmState.NORMAL)
         assert AlarmAction.TRIGGER in actions
         assert AlarmAction.ACKNOWLEDGE not in actions
 
     def test_valid_actions_from_active_unack(self, sm: AlarmStateMachine):
-        actions = sm.get_valid_actions(AlarmState.ACTIVE_UNACK)
+        actions = sm.get_accepted_actions(AlarmState.ACTIVE_UNACK)
         assert AlarmAction.ACKNOWLEDGE in actions
         assert AlarmAction.CLEAR in actions
         assert AlarmAction.SUPPRESS in actions
@@ -281,9 +281,26 @@ class TestHelpers:
         assert AlarmAction.RESET in actions
 
     def test_valid_actions_from_suppressed(self, sm: AlarmStateMachine):
-        actions = sm.get_valid_actions(AlarmState.SUPPRESSED)
+        actions = sm.get_accepted_actions(AlarmState.SUPPRESSED)
         assert AlarmAction.UNSUPPRESS in actions
         assert AlarmAction.RESET in actions
+        assert AlarmAction.CLEAR in actions and AlarmAction.TRIGGER in actions
+
+    def test_operator_actions_leave_out_what_the_process_and_system_raise(
+        self, sm: AlarmStateMachine
+    ):
+        assert sm.get_operator_actions(AlarmState.ACTIVE_UNACK) == [
+            AlarmAction.ACKNOWLEDGE,
+            AlarmAction.SHELVE,
+            AlarmAction.DISABLE,
+            AlarmAction.RESET,
+        ]
+        assert sm.get_operator_actions(AlarmState.SUPPRESSED) == [AlarmAction.RESET]
+        assert sm.get_operator_actions(AlarmState.SHELVED) == [
+            AlarmAction.UNSHELVE,
+            AlarmAction.RESET,
+        ]
+        assert sm.get_operator_actions(AlarmState.NORMAL) == []
 
 
 # ---------------------------------------------------------------------------

@@ -30,6 +30,7 @@ from itertools import product
 
 import pytest
 
+from forge.core.models.alarm import OPERATOR_ALARM_ACTIONS, SYSTEM_ALARM_ACTIONS
 from forge.modules.ot.alarming.models import AlarmAction, AlarmInstance, AlarmState
 from forge.modules.ot.alarming.state_machine import (
     AlarmStateMachine,
@@ -131,24 +132,26 @@ class TestEveryStep:
             after = step(config, action)
             assert after is None or (after[0] in STATES and after[1] in SAVED)
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "BACKLOG FB-220: get_valid_actions leaves out CLEAR and TRIGGER for a suppressed, "
-            "shelved or out-of-service alarm, which transition accepts"
-        ),
-    )
-    def test_the_list_of_valid_actions_is_what_the_machine_accepts(self) -> None:
+    def test_the_accepted_actions_are_what_the_machine_accepts(self) -> None:
+        """In every configuration, listed exactly when ``transition`` goes through."""
+        for state, saved in ALL_CONFIGS:
+            listed = MACHINE.get_accepted_actions(state)
+            assert len(listed) == len(set(listed)), f"{state.value}: an action is listed twice"
+            accepted = {a for a in ACTIONS if step((state, saved), a) is not None}
+            assert set(listed) == accepted, (
+                f"in {words((state, saved))}: listed and refused "
+                f"{sorted(a.value for a in set(listed) - accepted)}, accepted and not listed "
+                f"{sorted(a.value for a in accepted - set(listed))}"
+            )
+
+    def test_the_operator_actions_are_the_accepted_ones_a_person_may_be_offered(self) -> None:
+        """Never TRIGGER, CLEAR, SUPPRESS or UNSUPPRESS, in any state; nothing else left out."""
+        assert set(ACTIONS) == SYSTEM_ALARM_ACTIONS | OPERATOR_ALARM_ACTIONS
+        assert not SYSTEM_ALARM_ACTIONS & OPERATOR_ALARM_ACTIONS
         for state in STATES:
-            listed = set(MACHINE.get_valid_actions(state))
-            saved_values = SAVED if state in ADMIN else (None,)
-            for saved in saved_values:
-                accepted = {a for a in ACTIONS if step((state, saved), a) is not None}
-                assert listed == accepted, (
-                    f"in {words((state, saved))}: listed and refused "
-                    f"{sorted(a.value for a in listed - accepted)}, accepted and not listed "
-                    f"{sorted(a.value for a in accepted - listed)}"
-                )
+            offered = set(MACHINE.get_operator_actions(state))
+            assert not offered & SYSTEM_ALARM_ACTIONS, state.value
+            assert offered == set(MACHINE.get_accepted_actions(state)) - SYSTEM_ALARM_ACTIONS
 
 
 # ---------------------------------------------------------------------------
@@ -278,13 +281,6 @@ class TestEveryReachableConfiguration:
                 assert saved is not None, told(situation, "nothing is saved to return to")
                 assert saved not in ADMIN, told(situation, "it would return to an admin state")
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "BACKLOG FB-221: RESET from a suppressed, shelved or out-of-service alarm leaves "
-            "the saved return state behind on an alarm that is NORMAL"
-        ),
-    )
     def test_nothing_is_saved_outside_an_admin_state(self) -> None:
         for situation in reachable().values():
             state, saved = situation.config

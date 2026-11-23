@@ -66,3 +66,13 @@ _PRIORITY_RANK: dict[AlarmPriority, int] = {
     AlarmPriority.LOW: 3,
     AlarmPriority.DIAGNOSTIC: 4,
 }
+
+
+# Who raises an action. The process raises TRIGGER and CLEAR; the system suppresses and
+# unsuppresses (for example in an alarm flood). No screen offers these to a person. Every
+# other action is a decision a person makes, subject to their role. This is the one
+# definition: the view contract (FVTS) and the alarm state machine both read it.
+SYSTEM_ALARM_ACTIONS: frozenset[AlarmAction] = frozenset(
+    {AlarmAction.TRIGGER, AlarmAction.CLEAR, AlarmAction.SUPPRESS, AlarmAction.UNSUPPRESS}
+)
+OPERATOR_ALARM_ACTIONS: frozenset[AlarmAction] = frozenset(AlarmAction) - SYSTEM_ALARM_ACTIONS

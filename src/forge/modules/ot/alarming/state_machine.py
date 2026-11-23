@@ -16,7 +16,7 @@ Key ISA-18.2 rules encoded here:
 - ACKNOWLEDGE from CLEAR_UNACK → NORMAL  (late ack after clear)
 - SUPPRESS/SHELVE/DISABLE from any active state → administrative state (saves return)
 - UNSUPPRESS/UNSHELVE/ENABLE → returns to saved state (or NORMAL if cleared while admin)
-- RESET from any state → NORMAL (administrative override)
+- RESET from any state → NORMAL (administrative override; nothing is kept to return to)
 """
 
 from __future__ import annotations
@@ -24,6 +24,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
+from forge.core.models.alarm import SYSTEM_ALARM_ACTIONS
 from forge.modules.ot.alarming.models import (
     AlarmAction,
     AlarmInstance,
@@ -162,6 +163,10 @@ class AlarmStateMachine:
                 new_state = AlarmState.NORMAL
             alarm._state_before_admin = None
 
+        # RESET is the override: nothing is kept to return to (FB-221)
+        if action == AlarmAction.RESET:
+            alarm._state_before_admin = None
+
         alarm.state = new_state
 
         logger.debug(
@@ -178,8 +183,13 @@ class AlarmStateMachine:
             action=action,
         )
 
-    def get_valid_actions(self, state: AlarmState) -> list[AlarmAction]:
-        """Return all valid actions for a given state."""
+    def get_accepted_actions(self, state: AlarmState) -> list[AlarmAction]:
+        """Every action the machine accepts in *state*, whoever raises it.
+
+        This includes the process events TRIGGER and CLEAR, also for a suppressed, shelved
+        or out-of-service alarm, where they update the state the alarm returns to. For
+        what a person may be offered, use :meth:`get_operator_actions`.
+        """
         actions: list[AlarmAction] = []
 
         # Core transitions
@@ -191,6 +201,10 @@ class AlarmStateMachine:
         if state in _ADMIN_ENTRY_STATES:
             actions.extend(_ADMIN_ACTIONS.keys())
 
+        # Process events while in an administrative state
+        if state in _ADMIN_ACTIONS.values():
+            actions.extend(_PROCESS_EVENT_RETURN.keys())
+
         # Administrative exit
         for (s, a), _ in _ADMIN_RETURN.items():
             if s == state:
@@ -201,6 +215,15 @@ class AlarmStateMachine:
             actions.append(AlarmAction.RESET)
 
         return actions
+
+    def get_operator_actions(self, state: AlarmState) -> list[AlarmAction]:
+        """The accepted actions a person may be offered in *state*.
+
+        The accepted actions without those the process or the system raises
+        (``SYSTEM_ALARM_ACTIONS``: TRIGGER, CLEAR, SUPPRESS, UNSUPPRESS). Whether a given
+        person may take one is the role model's question, not this one's.
+        """
+        return [a for a in self.get_accepted_actions(state) if a not in SYSTEM_ALARM_ACTIONS]
 
     def _resolve(self, alarm: AlarmInstance, action: AlarmAction) -> AlarmState:
         """Resolve the target state for a transition.

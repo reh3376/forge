@@ -15,8 +15,8 @@ description: "Check a change to the forge-ot alarm state machine (ISA-18.2 state
 
 | File | What the check covers in it |
 |---|---|
-| `src/forge/modules/ot/alarming/state_machine.py` | `AlarmStateMachine.transition`, `can_transition`, `get_valid_actions`, `_resolve`, and the tables `_TRANSITIONS`, `_ADMIN_ENTRY_STATES`, `_ADMIN_ACTIONS`, `_ADMIN_RETURN` |
-| `src/forge/core/models/alarm.py` | `AlarmState`, `AlarmAction` (a new state or action changes the enumeration) |
+| `src/forge/modules/ot/alarming/state_machine.py` | `AlarmStateMachine.transition`, `can_transition`, `get_accepted_actions`, `get_operator_actions`, `_resolve`, and the tables `_TRANSITIONS`, `_ADMIN_ENTRY_STATES`, `_ADMIN_ACTIONS`, `_ADMIN_RETURN`, `_PROCESS_EVENT_RETURN` |
+| `src/forge/core/models/alarm.py` | `AlarmState`, `AlarmAction` (a new state or action changes the enumeration), `SYSTEM_ALARM_ACTIONS`, `OPERATOR_ALARM_ACTIONS` |
 | `src/forge/modules/ot/alarming/models.py` | `AlarmInstance.state`, `AlarmInstance._state_before_admin`, and that no other field affects a transition |
 
 Paths are as of the sync commit; the code moves to `forge-modules/forge-ot/` with BACKLOG FB-201.
@@ -35,17 +35,17 @@ If that prints commits you did not check, look before you trust a pass. Move the
 uv run pytest tests/modules/ot/alarming/test_state_machine_exhaustive.py -q
 ```
 
-Under a second. The expected result at the sync commit is `17 passed, 2 xfailed`. The two expected failures are two known findings (below).
+Under a second. The expected result at the sync commit is `20 passed`.
 
 ## What it does, and why a pass is a proof here
 
 The machine is finite. A transition reads and writes two fields of an alarm, `state` (7 values) and `_state_before_admin` (None or one of 7): 56 configurations, 10 actions.
 
-- **Every configuration and every action**, 560 cases, reachable or not, for the laws about one step: a refused action changes nothing; asking agrees with doing; RESET always ends in NORMAL.
+- **Every configuration and every action**, 560 cases, reachable or not, for the laws about one step: a refused action changes nothing; asking agrees with doing and changes nothing; RESET always ends in NORMAL; `get_accepted_actions` lists exactly what `transition` accepts; `get_operator_actions` is that list without the actions the process or the system raises.
 - **Every configuration reachable from a new alarm**, with the process condition tracked beside it (29 situations; 29 as well when questions are allowed as steps, since a question changes nothing). The search stops when no step leads anywhere new, so there is no depth bound.
 - **The assumption is checked:** `test_only_two_fields_matter` sets every other field to an unusual value and runs all 560 cases again.
 - **Able to fail:** three broken machines (one forgets a re-trigger while suppressed, one drops an unacknowledged alarm on CLEAR, one whose lookup writes the alarm) must each be caught.
-- **History:** the first run found that `can_transition` changed the alarm: asked whether CLEAR was possible on a suppressed alarm, it rewrote the state the alarm returns to, and a standing alarm came back as NORMAL (BACKLOG FB-219, the counterexample under "Reading a failure"). `_resolve` now only reads; `transition` does the write. `test_asking_changes_nothing` and `test_no_abnormal_condition_is_shown_as_normal_when_someone_asks` hold it.
+- **History:** the first run found that `can_transition` changed the alarm: asked whether CLEAR was possible on a suppressed alarm, it rewrote the state the alarm returns to, and a standing alarm came back as NORMAL (BACKLOG FB-219, the counterexample under "Reading a failure"). `_resolve` now only reads; `transition` does the write. `test_asking_changes_nothing` and `test_no_abnormal_condition_is_shown_as_normal_when_someone_asks` hold it. It also found that the one list of valid actions left out CLEAR and TRIGGER for an alarm out of service (FB-220: now two lists, the accepted actions and the operator's, from one definition in `forge.core.models.alarm`), and that RESET left a saved return state behind on a NORMAL alarm (FB-221: RESET now clears it).
 
 Nothing is sampled and nothing is bounded, so a pass covers this machine as written. It does not cover the alarm engine around it (detection, timers for shelving, persistence, the API).
 
@@ -63,16 +63,9 @@ The numbered lines are the actions in order from a new alarm. `(to return to X)`
 
 **A real bug or a wrong check?** If the steps end with an abnormal condition shown as NORMAL, or an alarm that would return to NORMAL while abnormal, the code is wrong: report it with the steps and do not change the check. If you changed the state diagram on purpose (a new state, a new action, a different return rule), the check is out of date: see below.
 
-## Known findings at the sync commit
-
-Each is a strict expected failure. When the code is fixed the test passes, the strict marker fails the run, and you remove the marker and the entry here.
-
-- **FB-220, `get_valid_actions` leaves out CLEAR and TRIGGER** for a suppressed, shelved or out-of-service alarm, which `transition` accepts. Test: `test_the_list_of_valid_actions_is_what_the_machine_accepts`. It may be intended (the list is of operator actions, and those two come from the process); then the method's name and the test should say so.
-- **FB-221, RESET leaves a saved return state behind.** TRIGGER, SUPPRESS, RESET gives an alarm that is NORMAL and still remembers ACTIVE_UNACK. Harmless today, because entering an admin state always overwrites it. Test: `test_nothing_is_saved_outside_an_admin_state`.
-
 ## A design point the check records and does not judge
 
-An unacknowledged alarm that is suppressed, clears while suppressed, and is then unsuppressed returns to NORMAL without ever being acknowledged. In service the same alarm would wait in CLEAR_UNACK for an acknowledgement. `state_machine.py` says this is intended ("or NORMAL if cleared while admin"). The check holds the in-service rule only (`test_an_unacknowledged_alarm_needs_an_acknowledgement_while_in_service`).
+An unacknowledged alarm that is suppressed, clears while suppressed, and is then unsuppressed returns to NORMAL without ever being acknowledged. In service the same alarm would wait in CLEAR_UNACK for an acknowledgement. `state_machine.py` says this is intended ("or NORMAL if cleared while admin"). The check holds the in-service rule only (`test_an_unacknowledged_alarm_needs_an_acknowledgement_while_in_service`). Whether it should stay that way is the owner's question, BACKLOG FB-225.
 
 ## When the code changes on purpose
 
