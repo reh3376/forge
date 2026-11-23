@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 168 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 169 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -91,7 +91,10 @@ note:
 - It curates that into **decision-quality data products** with lineage and quality objectives.
 - It renders every operator and management interface **from declarative specifications**.
 
-**Why it was built:** the Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business.
+**Why it was built:**
+
+- Forge is first and foremost a manufacturing sector solution for properly deployed digital infrastructure. The ultimate goal is to facilitate an enterprise's ability to make better decisions at all levels of the business based on the data generated within the business.
+- To quickly and effectively take advantage of new and emerging technologies as they become relevant to a given organization's needs.
 
 **Forge is a dynamic framework, not a fixed product (A-19).** Manufacturing differs from plant to plant even within one sector, so Forge is instantiated for a facility, a site or an enterprise by customization. That build-out is done in the **forge designer**, where users build with tools and widgets that are each governed by a specification. A user builds only within what the specifications allow.
 
@@ -246,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 168:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 169:
 
 **Working**
 
