@@ -364,7 +364,31 @@ Each is the owner's, asked one at a time. Until one is answered, the signed reco
 | C-6 | The structure rules: the manager is a layer above the hub. It imports the foundation and reaches hubs over the link, never by importing them; the foundation imports nothing of the manager. | §4, S-1 to S-3, and the import-direction test |
 | C-7 | A deployment with one site and no enterprise hub: which hub is under forge-core. | R-16 |
 
-### 11.5 What exists today
+### 11.5 Authority in the chain of command (in discussion, not signed)
+
+The owner's statements of 2026-11-22 and 23, recorded as said. Nothing here amends `roles.md` yet: R-16 (roles are assigned at the managing hub) and R-18 (a site's copy is never edited locally) stand until the owner amends them.
+
+**[OWNER]** On where roles are mastered: "If each hub must be able to continue to function if cut off from its superiors then some portion of the roles will need to be handled at each hub level, so this would advocate a semi-decentralized structure that gets its operating parameters from above, but is free to operate as it must within the confines of those operating parameters."
+
+**[OWNER]** On deciding while cut off: "Each hub best knows its operating conditions and what should be able to access it. This is no different in a human chain of command. In the absence of a manager's superior they must make interim decisions, when the superior returns the manager updates their superior on all that requires their attention. If it is determined that one of the 10 decisions the manager made is contrary to a rule the manager was not familiar with it must be rescinded and explained. […] Without the superior's approval the manager's decisions are temporary and subject to modification."
+
+**[OWNER]** On which decisions need review: "Rules or decisions that remain within the constraints passed down require no approval, they were approved when the behavioral contract was established, but decisions or roles that blur the line or sit outside the line but have defendable necessity in the moment are passed up for review before marked as interim.rejected or interim.approved."
+
+**[PROPOSED]** What follows from these, for the owner to confirm or correct:
+
+| # | Rule |
+|---|---|
+| AU-1 | **A behavioral contract comes down the chain.** Each level receives from the level above what it may decide for itself: the roles that exist, what each may do, and how much of that this level may hand out. It is data, with a hash, approved by the level above (a governed file, as roles files are to be under FSTS). |
+| AU-2 | **A decision within the contract is final when made.** It was approved when the contract was. It is reported upward for the record (R-17), not for approval. |
+| AU-3 | **A decision at or beyond the line is interim.** It is taken because the moment needs it, it carries the reason, and it goes up for review. The hub decides which side of the line a decision is on by checking it against the contract; a case the contract does not speak to counts as beyond the line. |
+| AU-4 | **Review ends in one of two states.** `interim.approved`: the decision stands. `interim.rejected`: it stops applying from then on, and the reason goes back down. |
+| AU-5 | **A decision belongs to the level that made it.** The level above approves or rejects; it does not rewrite. |
+| AU-6 | **What was done under an interim decision stays on record**, tied to that decision. A rejection does not undo it. |
+| AU-7 | **The pattern is one rule for every administrative decision**, not for roles alone (the owner: "decisions or roles"). |
+
+**[OPEN]** Whether some limits can never be crossed, even as an interim decision; whether an interim decision is in force while it waits for review; whether an approved interim decision of a kind that recurs is a reason to amend the contract.
+
+### 11.6 What exists today
 
 **[FACT]** The foundation is built and is the package `forge_core` (FB-199) with `forge-core/contract` (FB-227). Nothing of the manager is built: no inventory, no deployment-wide state, no distribution of changes. Hub-to-hub links have no transport yet (the transport contract, T-13; FB-164).
 
