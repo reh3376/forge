@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 165 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 166 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -246,7 +246,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 165:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 166:
 
 **Working**
 
@@ -358,7 +358,7 @@ note:
 | `forge-core/src/go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
 | `tests/` | The modules' tests and the tests that span layers; `tests/governance/` holds the framework gates that use the hub or a module's spec. forge-core's own tests are in `forge-core/tests` and the hub's in `forge-hub/tests` |
-| `docs/` | the key documents, `decisions/` (the signed records), `deployment/`, `governance/`, `tutorial.md` (this deck's source) |
+| `docs/` | the key documents, `decisions/` (the signed records), `tutorial.md` (this deck's source). forge-core's and the hub's own documents are in `forge-core/docs` and `forge-hub/docs` |
 | `deploy/docker` | the development compose stack and the hub image |
 
 note:
@@ -572,7 +572,7 @@ note:
 The hub owns the databases (decision A-6). This section covers the engines, routing, the twelve migrations, Forge-issued credentials, the "observe → shadow → own" path for module data, and the two schema registries.
 
 note:
-- Source: `docs/PRINCIPLES.md` §2 and §6, `docs/WHERE-WE-ARE.md` §3.3, `docs/DB_ORCHESTRATION_FRAMEWORK.md`, `forge-hub/src/python/forge_hub/storage`.
+- Source: `docs/PRINCIPLES.md` §2 and §6, `docs/WHERE-WE-ARE.md` §3.3, `forge-hub/docs/database-orchestration-framework.md`, `forge-hub/src/python/forge_hub/storage`.
 
 ---
 
@@ -681,7 +681,7 @@ stateDiagram-v2
   Own --> [*]: the module holds only Forge-issued credentials
 ```
 
-- The hybrid path from `docs/DB_ORCHESTRATION_FRAMEWORK.md`: adapters read spoke databases, a shadow writer mirrors into the hub, ownership transfers per module.
+- The hybrid path from `forge-hub/docs/database-orchestration-framework.md`: adapters read spoke databases, a shadow writer mirrors into the hub, ownership transfers per module.
 - Step 1 (grants and issued credentials) is delivered; steps 2–5 (the MES data into `mod_mes`) follow the forge-mes Go design, signed 2026-11-03 (FB-057, D-3).
 - `forge_hub.storage.shadow` and `forge_hub.storage.backfill` are the shadow writer and the historical backfill.
 
@@ -1162,7 +1162,7 @@ The owner's principle (2026-10-18): records from different sources only reconcil
 note:
 - The OPC-UA converter stores `SourceTimestamp` as the server sends it and, since FB-088 (2026-11-13), invents nothing when it is absent: the value is refused unless the connection declares origin `forge`. Since FB-094 steps 2 and 3 (2026-11-13) the server's clock is read on every response and on the probe cadence, keyed by the clock measured, and each stamp is corrected by that clock's filtered offset where it enters, the stamp as sent and the offset kept on the record. That row is marked 🟡 deliberately: the principle says a device whose clock cannot be read is not a valid source.
 - D-9 chooses among established standards: NTP/chrony strata mirroring the hub hierarchy, PTP/IEEE 1588 on the plant network, NTP four-timestamp measurement in-band, IEC 61850-5 tolerance classes, IEC 61850 `TimeQuality` and OPC UA `DataValue` fields on the record.
-- The deployment requirement (the NTP/PTP chain from the top hub, the tolerance classes, what fails closed, a new-site checklist) is `docs/deployment/clock-discipline.md` (FB-090).
+- The deployment requirement (the NTP/PTP chain from the top hub, the tolerance classes, what fails closed, a new-site checklist) is `forge-hub/docs/clock-discipline.md` (FB-090).
 
 ---
 
@@ -1752,7 +1752,7 @@ note:
 Why every clock in the system has to agree, and how Forge makes it so: stamps, measurement, correction, declaration and refusal, from the top hub down to a PLC. Earlier sections each showed a piece (the record in F2, the FACTS section in F4, the plant-floor probe in F5, the hub hierarchy in F8); this one puts them together.
 
 note:
-- Source: `docs/decisions/one-clock-ot-source-time.md` (D-9, signed 2026-11-03); `docs/PRINCIPLES.md` §2; `docs/deployment/clock-discipline.md`; `docs/WHERE-WE-ARE.md` §3.1 and §3.5; the code is `forge-core/src/python/forge_core/clock.py`.
+- Source: `docs/decisions/one-clock-ot-source-time.md` (D-9, signed 2026-11-03); `docs/PRINCIPLES.md` §2; `forge-hub/docs/clock-discipline.md`; `docs/WHERE-WE-ARE.md` §3.1 and §3.5; the code is `forge-core/src/python/forge_core/clock.py`.
 
 ---
 
@@ -1788,7 +1788,7 @@ flowchart TD
 ```
 
 - The highest hub provides time for every hub and spoke below it; each hub governs the modules and spokes attached directly to it; each spoke governs or measures the clocks of the systems behind it.
-- **The installation distributes time; Forge does not set clocks.** NTP strata mirror the hub hierarchy, and PTP runs on the plant network where the devices support it (D-9, P-1). The requirement and a new-site checklist are `docs/deployment/clock-discipline.md`.
+- **The installation distributes time; Forge does not set clocks.** NTP strata mirror the hub hierarchy, and PTP runs on the plant network where the devices support it (D-9, P-1). The requirement and a new-site checklist are `forge-hub/docs/clock-discipline.md`.
 - Forge does four things with the time it is given: it **stamps** (its own receipt), **measures** (every clock it can reach), **corrects** (a source stamp, once, where it enters) and **refuses** (a clock it cannot trust).
 
 | Class | Links | Tolerance |
@@ -2885,7 +2885,7 @@ note:
 - Every grant, every issued credential and every refusal is in the hub's access audit.
 
 note:
-- `forge db access` in U3; the design is `docs/DB_ORCHESTRATION_FRAMEWORK.md`.
+- `forge db access` in U3; the design is `forge-hub/docs/database-orchestration-framework.md`.
 
 ---
 
@@ -2938,7 +2938,7 @@ flowchart TD
 - "Cut off" means nothing is collected from that connection, or accepted from that system, and nothing is written to it until its clock is right. A value with a time you cannot trust is worse than no value.
 
 note:
-- `docs/decisions/one-clock-ot-source-time.md` (signed 2026-11-03) in plain words; the site requirement and a checklist for a new site are `docs/deployment/clock-discipline.md`.
+- `docs/decisions/one-clock-ot-source-time.md` (signed 2026-11-03) in plain words; the site requirement and a checklist for a new site are `forge-hub/docs/clock-discipline.md`.
 
 ---
 

@@ -76,16 +76,16 @@ This is the short form. [`docs/WHERE-WE-ARE.md`](docs/WHERE-WE-ARE.md) has every
 
 ## Where things are
 
-The repository is being reorganised into three self-contained parts, forge-core, forge-hub and forge-modules, each with the same standard folders ([`docs/decisions/repository-structure.md`](docs/decisions/repository-structure.md)). forge-core has moved, and so has the hub's package. The hub's tests and specs follow; the modules are still in `src/forge` until their move.
+The repository is being reorganised into three self-contained parts, forge-core, forge-hub and forge-modules, each with the same standard folders ([`docs/decisions/repository-structure.md`](docs/decisions/repository-structure.md)). forge-core and the hub have moved. The modules are still in `src/forge` until their move.
 
 | Path | Holds |
 |---|---|
 | [`forge-core/`](forge-core) | The foundation: `contract/` (proto files, framework schemas, governed lists), `src/python/forge_core` (the Python package), `src/go` (the Go models, generated bindings and module scaffold), `tests/`, `docs/`, and its own README |
-| [`forge-hub/`](forge-hub) | The hub: `src/python/forge_hub` (`link`, `ingest`, `context`, `storage`, `registry`, `curation`, `broker`, `api`, `gateway`, `observer`, `cli`), and its own README |
+| [`forge-hub/`](forge-hub) | The hub: `src/python/forge_hub` (`link`, `ingest`, `context`, `storage`, `registry`, `curation`, `broker`, `api`, `gateway`, `observer`, `cli`), `fxts/` (its own specs), `tests/`, `docs/`, and its own README |
 | [`src/forge/`](src/forge) | The modules, until they move: `adapters/` and `modules/ot` |
-| [`tests/`](tests) | Tests of the hub and the modules (until they follow their code), and tests that span layers |
+| [`tests/`](tests) | Tests of the modules (until they follow their code), and tests that span layers |
 | [`modules/Forge MES/`](modules/Forge%20MES) | The interim MES bridge (NestJS and Next.js). It has its own [`CLAUDE.md`](modules/Forge%20MES/CLAUDE.md) |
-| [`docs/`](docs) | The state and direction documents, the signed decision records, the framework pages, the tutorial's source |
+| [`docs/`](docs) | The state and direction documents, the signed decision records, the tutorial's source |
 | [`deploy/`](deploy) | The container image and the Compose stack. Compose is for development only; production runs on Kubernetes |
 | [`scripts/`](scripts) | The tutorial tools, the pinned TLA+ model checker, the restructuring scripts |
 | [`archive/`](archive) | An index of what was retired from the tree. The old content is not kept; `forge archive show <id>` reads it from history |
