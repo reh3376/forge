@@ -501,16 +501,8 @@ def test_every_sequence_keeps_the_promise() -> None:
     assert found is None, tell(*found)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BACKLOG FB-215: the gate compares the coerced value and the engine writes the "
-        "request's own value, so a commit of 150 or '150.0' for a reviewed 150.0 reaches "
-        "the controller as an int or a string"
-    ),
-)
 def test_the_value_written_is_the_value_reviewed() -> None:
-    """A finding in the current code, kept failing until the code is changed."""
+    """The controller gets the reviewed float itself, not another spelling (FB-215)."""
     found = first_break(DEPTH, exact=True)
     assert found is None, tell(*found)
 
@@ -595,6 +587,24 @@ def test_a_gate_that_reuses_tokens_is_caught_in_a_race(monkeypatch: pytest.Monke
     monkeypatch.setitem(globals(), "build", broken_build)
     problem = first_bad_interleaving(RACES[0])
     assert problem is not None and "written 2 times" in problem
+
+
+class _WritesTheRequestsOwnValue(ControlWriteEngine):
+    """The engine as it was before FB-215: the controller gets the value as spelled."""
+
+    def _value_to_write(self, request: WriteRequest) -> Any:
+        return request.value
+
+
+def test_an_engine_that_writes_the_requests_own_value_is_caught(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setitem(globals(), "ControlWriteEngine", _WritesTheRequestsOwnValue)
+    found = first_break(DEPTH, exact=True)
+    assert found is not None
+    steps, problem = found
+    assert "the reviewed value is 150.0 (float)" in problem, tell(steps, problem)
+    assert len(steps) == 2
 
 
 def test_a_counterexample_reads_in_plain_words() -> None:

@@ -269,3 +269,34 @@ class TestReviewModels:
         assert d["review_passed"] is False and d["review_error"] == ""
         assert d["stage_attempt"] is False and d["staged_at"] is None
         assert "review_token" not in d
+
+
+class TestBooleanCoercion:
+    """A boolean tag takes a boolean, 0 or 1, or a word for one; nothing else (FB-215)."""
+
+    @pytest.mark.parametrize(
+        ("value", "expected"),
+        [
+            (True, True),
+            (False, False),
+            (1, True),
+            (0, False),
+            (1.0, True),
+            ("true", True),
+            (" ON ", True),
+            ("1", True),
+            ("false", False),
+            ("Off", False),
+            ("0", False),
+        ],
+    )
+    def test_what_is_accepted(self, value: object, expected: bool) -> None:
+        cfg = TagWriteConfig(tag_path="t", data_type=DataType.BOOLEAN)
+        assert cfg.coerce(value) is expected
+
+    @pytest.mark.parametrize("value", ["", "no", "yes please", 2, -1, 0.5, None, [], "falsee"])
+    def test_what_is_refused(self, value: object) -> None:
+        """``bool("false")`` is True: a plain ``bool()`` would switch on what was to go off."""
+        cfg = TagWriteConfig(tag_path="t", data_type=DataType.BOOLEAN)
+        ok, error = cfg.validate_value(value)
+        assert not ok and "cannot coerce" in error

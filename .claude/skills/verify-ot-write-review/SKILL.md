@@ -7,7 +7,7 @@ description: "Check a change to the plant-floor write path (forge-ot control: th
 
 ## The promise and the harm
 
-**Promise:** on a tag whose confirmation is two-step, an operator's value reaches the process controller only when that exact write was staged and is then committed once, by the same person, with the same value, before its review token expires.
+**Promise:** on a tag whose confirmation is two-step, an operator's value reaches the process controller only when that exact write was staged and is then committed once, by the same person, with the same value, before its review token expires. What is written is the reviewed value itself, in the tag's type, however the commit spelled it.
 
 **Harm if it breaks:** a value nobody reviewed, or the same value twice, is written to a PLC that runs a process.
 
@@ -18,7 +18,7 @@ Run the check when a change touches any of these. Paths are as of the sync commi
 | File | What the check covers in it |
 |---|---|
 | `src/forge/modules/ot/control/review.py` | `WriteReviewer.check`, `stage`, `cancel`, `_same_write`, `_evict_expired`, `ReviewTicket.expired` |
-| `src/forge/modules/ot/control/write_engine.py` | `ControlWriteEngine.execute`, `stage`, `_write_and_readback` (the order of the layers and what is written) |
+| `src/forge/modules/ot/control/write_engine.py` | `ControlWriteEngine.execute`, `stage`, `_value_to_write`, `_write_and_readback` (the order of the layers and what is written) |
 | `src/forge/modules/ot/control/validation.py` | `WriteValidator.validate` as the first layer |
 | `src/forge/modules/ot/control/interlock.py` | `InterlockEngine.check` as a layer that can refuse after the token is used |
 | `src/forge/modules/ot/control/models.py`, `src/forge/core/models/control.py` | `WriteRequest`, `TagWriteConfig.coerce`, `ConfirmationMode`, `WriteOrigin` |
@@ -37,13 +37,13 @@ If that prints commits you did not check, the verification needs a look before y
 uv run pytest tests/modules/ot/control/test_review_gate_exhaustive.py -q
 ```
 
-About one second. It needs nothing beyond the project's locked dependencies. The deeper run, about fifteen seconds, for a change to the gate itself:
+About one second. It needs nothing beyond the project's locked dependencies. The deeper run, about half a minute, for a change to the gate itself:
 
 ```bash
 FORGE_REVIEW_GATE_DEPTH=4 uv run pytest tests/modules/ot/control/test_review_gate_exhaustive.py -q
 ```
 
-The expected result at the sync commit is `9 passed, 1 xfailed`. The one expected failure is a known finding (below), not noise.
+The expected result at the sync commit is `11 passed`.
 
 ## What it does
 
@@ -51,7 +51,8 @@ It is not a model. It drives the real `ControlWriteEngine` and `WriteReviewer` w
 
 - **Every sequence** of these steps up to the depth (3 by default, 14,939 sequences): a person stages a value; a person commits a value with no token, a made-up token or any issued token; a staged write is cancelled; 60 or 120 seconds pass (120 is the timeout to the second, the boundary); the interlock's check tag changes state.
 - **Every interleaving** of commits, a cancel and a second staging that run at once on one staged write, by stepping each coroutine by hand at every read and write of the controller (five races, up to 90 interleavings each).
-- **Able to fail:** four broken variants of the gate (a token usable twice, a token that never expires, a token not bound to its write, two-step not required) must each produce a counterexample, in sequence and in a race.
+- **Able to fail:** five broken variants (a token usable twice, a token that never expires, a token not bound to its write, two-step not required, an engine that writes the request's own value) must each produce a counterexample; the first also in a race.
+- **History:** the first run of this check found that a commit spelling a reviewed 150.0 as `150` or `"150.0"` reached the controller as an int or a string (BACKLOG FB-215). The engine now writes the coerced value (`ControlWriteEngine._value_to_write`), and `test_the_value_written_is_the_value_reviewed` holds it.
 
 **Bounds:** two people, two staged values and four spellings of a committed value, at most two staged writes held (`MAX_PENDING`), sequences of 3 or 4 steps, three coroutines at once. A pass covers these bounds. It does not prove the promise for every size.
 
@@ -76,18 +77,6 @@ A race failure names the race and the order the coroutines were stepped in, for 
 - The broken-variant tests fail with "the search did not notice": the check has lost its ability to fail. That is a defect in the check; fix it before trusting any pass.
 
 A broken gate can make the run slow (up to about ninety seconds), because every coroutine in a race then runs to the end.
-
-## Known finding at the sync commit
-
-`test_the_value_written_is_the_value_reviewed` is marked as an expected failure (strict), BACKLOG FB-215:
-
-```
-  1. op1 stages 150.0
-  2. op1 commits 150 with the token of staged write #0
-  -> the controller was written 150 (int); the reviewed value is 150.0 (float)
-```
-
-The gate compares the committed value after coercion (`WriteReviewer._same_write`), and the engine then writes the request's own value (`write_engine.py`, `write_tag(request.tag_path, request.value)`). So a commit that spells the reviewed number another way (`150`, `"150.0"`) reaches the controller as an int or a string. The number is the same; the type is not what was reviewed. When the code is changed to write the coerced value, this test starts passing, the strict marker fails the run, and you remove the marker and the finding from this file.
 
 ## When the code changes on purpose
 
