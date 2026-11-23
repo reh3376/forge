@@ -386,7 +386,9 @@ The owner's statements of 2026-11-22 and 23, recorded as said. Nothing here amen
 | AU-6 | **What was done under an interim decision stays on record**, tied to that decision. A rejection does not undo it. |
 | AU-7 | **The pattern is one rule for every administrative decision**, not for roles alone (the owner: "decisions or roles"). |
 
-**[OPEN]** Whether some limits can never be crossed, even as an interim decision; whether an interim decision is in force while it waits for review; whether an approved interim decision of a kind that recurs is a reason to amend the contract.
+**[OWNER]** Hard limits, 2026-11-23: there are limits that may not be crossed even as an interim decision, and the list of them is dynamic, "added to or subtracted from throughout the course of our full development of the forge framework". It is the governed list `forge-core/contract/lists/hard-limits.list.json`, approved by the owner, shaped as data the hub's decision point can test: each limit names the scopes it covers or the relation between who grants and who receives, says whether it applies always or only to an interim decision, who holds the act instead and why no later rejection can put it right, and what enforces it. A limit is retired, never deleted. The four at approval: `safety-interlock` (interim only: a contract may permit a bypass by a named role), `self-grant`, `grant-beyond-holding` and `owner-approval` (always: no contract may permit them). Nothing enforces them yet, and a test says so.
+
+**[OPEN]** Whether an interim decision is in force while it waits for review; whether an approved interim decision of a kind that recurs is a reason to amend the contract; the scope vocabulary the limits are written in (the five names under `owner-approval` are provisional until FB-189).
 
 ### 11.6 What exists today
 

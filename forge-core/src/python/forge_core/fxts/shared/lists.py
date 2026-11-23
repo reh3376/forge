@@ -32,10 +32,11 @@ APPLICATION_PROTOCOLS = "application-protocols"
 DATA_CLASSES = "data-classes"
 PRUNING_STRATEGIES = "pruning-strategies"
 CONTAINER_KINDS = "container-kinds"
+HARD_LIMITS = "hard-limits"
 #: The lists a module spec (FMTS) chooses from.
 NAMES = (MODULE_FUNCTIONS, APPLICATION_PROTOCOLS, DATA_CLASSES, PRUNING_STRATEGIES)
 #: Every governed list in the tree.
-ALL_NAMES = (*NAMES, CONTAINER_KINDS)
+ALL_NAMES = (*NAMES, CONTAINER_KINDS, HARD_LIMITS)
 
 
 @dataclass(frozen=True)
@@ -87,6 +88,8 @@ def _shape_problems(name: str, document: dict[str, Any]) -> list[str]:
         seen.add(entry_id)
         if not str(entry.get("description") or "").strip():
             problems.append(f"{name}: {entry_id} has no description")
+        if name == HARD_LIMITS:
+            problems.extend(_hard_limit_problems(name, entry_id, entry))
     return problems
 
 
@@ -127,6 +130,76 @@ def _data_class_problems(document: dict[str, Any]) -> list[str]:
                     "parent's rules and may only tighten its numbers"
                 )
     return problems
+
+
+#: What a hard limit is, as data the hub's decision point can test (D-17 §11.5).
+LIMIT_KINDS = ("scope", "relation")
+#: A scope the limit covers is written as the roles record writes one, with ``*`` for any.
+LIMIT_SCOPE = re.compile(r"^(\*|[a-z][a-z0-9_]*):(\*|[a-z][a-z0-9_]*):(\*|[a-z][a-z0-9_]*)$")
+#: A relation between the one who grants and the one who receives.
+LIMIT_RELATIONS = ("grantor-is-grantee", "grant-exceeds-grantor")
+#: ``interim``: only an interim decision is forbidden, the behavioral contract may permit
+#: the act. ``always``: no decision, and no contract, permits it.
+LIMIT_APPLIES = ("interim", "always")
+LIMIT_HOLDERS = ("contract", "level-above", "owner")
+LIMIT_STATUS = ("active", "retired")
+_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _hard_limit_problems(name: str, entry_id: str, entry: dict[str, Any]) -> list[str]:
+    """A limit says what it covers in a form that can be tested, why, and who holds it."""
+    found = [
+        f"{name}: {entry_id} does not say its {key}"
+        for key in ("reason", "held_how")
+        if not str(entry.get(key) or "").strip()
+    ]
+    for key, allowed in (
+        ("kind", LIMIT_KINDS),
+        ("applies", LIMIT_APPLIES),
+        ("held_by", LIMIT_HOLDERS),
+        ("status", LIMIT_STATUS),
+    ):
+        if entry.get(key) not in allowed:
+            found.append(f"{name}: {entry_id} has {key} {entry.get(key)!r}, not one of {allowed}")
+    scopes, relation = entry.get("scopes"), entry.get("relation")
+    if entry.get("kind") == "scope":
+        if not isinstance(scopes, list) or not scopes:
+            found.append(f"{name}: {entry_id} is of kind scope and lists no scopes")
+        else:
+            found.extend(
+                f"{name}: {entry_id} has the scope {scope!r}, not <domain>:<object>:<action>"
+                for scope in scopes
+                if not isinstance(scope, str) or not LIMIT_SCOPE.match(scope)
+            )
+        if relation is not None:
+            found.append(f"{name}: {entry_id} is of kind scope and also names a relation")
+    if entry.get("kind") == "relation":
+        if relation not in LIMIT_RELATIONS:
+            found.append(f"{name}: {entry_id} names the unknown relation {relation!r}")
+        if scopes is not None:
+            found.append(f"{name}: {entry_id} is of kind relation and also lists scopes")
+    if not _DATE.match(str(entry.get("added") or "")):
+        found.append(f"{name}: {entry_id} has no date it was added (YYYY-MM-DD)")
+    retired = entry.get("retired")
+    if entry.get("status") == "retired" and not _DATE.match(str(retired or "")):
+        found.append(f"{name}: {entry_id} is retired and has no date it was retired")
+    if entry.get("status") == "active" and retired is not None:
+        found.append(f"{name}: {entry_id} is active and carries a retired date")
+    if not isinstance(entry.get("enforced_by"), list):
+        found.append(
+            f"{name}: {entry_id} does not list what enforces it (an empty list if nothing)"
+        )
+    return found
+
+
+def active_hard_limits(lists_dir: Path | None = None) -> list[dict[str, Any]]:
+    """The limits in force: every listed limit that is not retired."""
+    return [e for e in load(HARD_LIMITS, lists_dir).entries if e.get("status") == "active"]
+
+
+def unenforced_hard_limits(lists_dir: Path | None = None) -> list[str]:
+    """Active limits that nothing enforces yet. A limit nobody checks is said to be so."""
+    return [str(e["id"]) for e in active_hard_limits(lists_dir) if not e.get("enforced_by")]
 
 
 def load(name: str, lists_dir: Path | None = None) -> GovernedList:

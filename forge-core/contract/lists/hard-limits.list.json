@@ -1,0 +1,77 @@
+{
+  "list": "hard-limits",
+  "title": "Hard limits on decisions in the chain of command",
+  "description": "What a level of the chain of command may not decide for itself. Each level decides within the behavioral contract it was handed, and may cross that contract's line in the moment with a stated reason, as an interim decision reviewed above (D-17 §11.5). These are the exceptions: acts a later rejection cannot put right, or that belong to one holder alone. A limit is matched by the hub's decision point, so each entry is data it can test: scopes it covers, or a relation between who grants and who receives. A behavioral contract may not permit what a limit that applies always forbids. A decision records the hash of this list as it was checked, so one made under an older list is reviewed against the current one. The list is expected to change as Forge is built: adding a limit, or retiring one, is one approved change to this list (owner, 2026-11-23). A retired limit stays listed, so a record that names it still resolves; its id is never used again.",
+  "entries": [
+    {
+      "id": "safety-interlock",
+      "description": "No interim decision bypasses, disables or weakens a safety interlock or a safety system, or gives anyone the right to.",
+      "kind": "scope",
+      "scopes": [
+        "*:interlock:bypass",
+        "*:safety:*"
+      ],
+      "applies": "interim",
+      "held_by": "contract",
+      "held_how": "A bypass happens only where the behavioral contract already permits it, by the role it names, with a reason, through the write path's own layers. Process control never bypasses an interlock or writes to a safety system at all (D-11, H-3 and H-4).",
+      "reason": "A write past a safety interlock acts on the process at once and cannot be undone by rejecting the decision afterwards.",
+      "status": "active",
+      "added": "2026-11-23",
+      "enforced_by": []
+    },
+    {
+      "id": "self-grant",
+      "description": "Nobody grants a role or a scope to themselves.",
+      "kind": "relation",
+      "relation": "grantor-is-grantee",
+      "applies": "always",
+      "held_by": "level-above",
+      "held_how": "Someone else who holds the right to grant it, at the same level or above.",
+      "reason": "Otherwise any holder of a grant right could lift themselves above their contract, and review would come after the act.",
+      "status": "active",
+      "added": "2026-11-23",
+      "enforced_by": []
+    },
+    {
+      "id": "grant-beyond-holding",
+      "description": "Nobody grants more than they hold: not a scope they lack, and not a reach wider than their own.",
+      "kind": "relation",
+      "relation": "grant-exceeds-grantor",
+      "applies": "always",
+      "held_by": "level-above",
+      "held_how": "The level above, which holds it, grants it.",
+      "reason": "Authority comes down the chain of command; a level that could hand out what it was never given would have no limit at all.",
+      "status": "active",
+      "added": "2026-11-23",
+      "enforced_by": []
+    },
+    {
+      "id": "owner-approval",
+      "description": "Nobody but the owner approves a spec hash, releases or approves a schema version, approves a governed list (this one included), or signs or amends a decision record.",
+      "kind": "scope",
+      "scopes": [
+        "governance:spec:approve",
+        "governance:schema:release",
+        "governance:schema:approve",
+        "governance:list:approve",
+        "governance:record:sign"
+      ],
+      "applies": "always",
+      "held_by": "owner",
+      "held_how": "The owner, on their explicit word.",
+      "reason": "These are what every other rule is checked against; one changed below the owner would make every check that follows mean something else.",
+      "status": "active",
+      "added": "2026-11-23",
+      "enforced_by": []
+    }
+  ],
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "cc1ffc2bee21cacef2350a4199464768d230e53421619f3821346de7d1fe0859",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-23T05:28:12Z"
+  }
+}
