@@ -161,3 +161,47 @@ def test_the_status_date_is_not_older_than_the_newest_commit() -> None:
     # another time zone, so allow the day before the newest commit and nothing older.
     earliest = (date.fromisoformat(newest) - timedelta(days=1)).isoformat()
     assert _state()[0] >= earliest, (_state()[0], newest)
+
+
+def _tutorial_prose() -> list[tuple[int, str, bool]]:
+    """``(line number, text, in a diagram)`` of every line a reader reads as prose.
+
+    Code blocks are left out; a Mermaid diagram is kept, because its labels are read.
+    Link targets, slide ids and inline code are not prose and are removed from a line.
+    """
+    lines: list[tuple[int, str, bool]] = []
+    fence = ""
+    for number, line in enumerate(TUTORIAL.split("\n"), start=1):
+        if line.startswith("```"):
+            fence = "" if fence else (line[3:].strip() or "code")
+            continue
+        if fence and fence != "mermaid":
+            continue
+        text = re.sub(r"<!--.*?-->|\]\([^)]*\)|`[^`]*`", " ", line)
+        lines.append((number, text, bool(fence)))
+    return lines
+
+
+def test_the_tutorial_is_written_in_the_third_person() -> None:
+    """The owner, 2026-11-23: "I want the entire tutorial written in third person narration."
+
+    No line addresses the reader or speaks as the writers. In a diagram a single capital
+    letter is a node's id, so only the lower-case words are looked for there.
+    """
+    prose = re.compile(
+        r"(?<![\w'-])(you|your|yours|yourself|we|us|our|ours|I|my|mine)(?![\w'-])", re.I
+    )
+    diagram = re.compile(r"(?<![\w'-])(you|your|yours|yourself|we|us|our|ours|my|mine)(?![\w'-])")
+    found = [
+        f"line {number}: {match.group(0)!r} in {text.strip()[:70]!r}"
+        for number, text, in_diagram in _tutorial_prose()
+        if (match := (diagram if in_diagram else prose).search(text))
+    ]
+    assert not found, "docs/tutorial.md is third-person narration:\n" + "\n".join(found[:20])
+
+
+def test_the_third_person_check_can_fail() -> None:
+    prose = re.compile(r"(?<![\w'-])(you|your|we|our|I)(?![\w'-])", re.I)
+    assert prose.search("When you add a route") and prose.search("Where We Are Today")
+    assert not prose.search("a site's own people build what the site needs")
+    assert not prose.search("[U3](#u3--the-hub-you-run)".replace("](#u3--the-hub-you-run)", " "))
