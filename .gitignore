@@ -58,3 +58,6 @@ forge-tutorial.zip
 
 # The owner's private working folder (D-17 §10.6, U-2): nothing in it is committed.
 docs/personal/
+
+# Tools fetched on first use, pinned by checksum (scripts/tla/tlc.sh); never committed.
+.tools/
