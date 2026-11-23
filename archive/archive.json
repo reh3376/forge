@@ -123,6 +123,23 @@
         "sidecars/whk-sidecar/src/types.ts",
         "sidecars/whk-sidecar/tsconfig.json"
       ]
+    },
+    {
+      "id": "top-level-module-builder-copy",
+      "name": "Second copy of the module builder at the top of the repository",
+      "purpose": "An early copy of the module builder that also lives in forge-core's SDK.",
+      "retired": "2026-11-23",
+      "reason": "Nothing imported it and it had drifted from the real one (FB-019); D-17 §10.5.",
+      "replaced_by": "forge-core/src/python/forge_core/sdk/module_builder",
+      "commit": "e9619439fcd3dc65bb7e1117fb7ceedb53ddb833",
+      "paths": [
+        "sdk/__init__.py",
+        "sdk/module_builder/__init__.py",
+        "sdk/module_builder/cli.py",
+        "sdk/module_builder/generators.py",
+        "sdk/module_builder/manifest_builder.py",
+        "sdk/module_builder/scaffolder.py"
+      ]
     }
   ]
 }

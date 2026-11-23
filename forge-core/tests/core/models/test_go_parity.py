@@ -1,6 +1,6 @@
 """The Go manufacturing models mirror the Python ones, held by one fixture (FB-016).
 
-``go/internal/models/manufacturing/testdata/python_models.json`` is written from
+``forge-core/src/go/internal/models/manufacturing/testdata/python_models.json`` is written from
 the Python models by this module (``python -m tests.core.models.test_go_parity``)
 and read by the Go package's ``parity_test.go``. It carries every enum's members,
 and per model its field list, the fields Python requires, the fields that default
@@ -57,6 +57,8 @@ from forge_core.models.manufacturing.enums import (
 
 FIXTURE = (
     Path(__file__).resolve().parents[4]
+    / "forge-core"
+    / "src"
     / "go"
     / "internal"
     / "models"

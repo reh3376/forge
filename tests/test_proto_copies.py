@@ -1,8 +1,8 @@
 """Every copy of the hub's proto files is the hub's (BACKLOG FB-174; D-15, T-2).
 
 ``forge-core/contract/proto`` is the contract between a hub and its modules. Two other trees keep
-copies of it: the Go tree generates its bindings from ``go/proto``, and the interim MES
-bridge loads its own copies at run time, together with a copy of the forge-mes manifest.
+copies of it: the Go tree generates its bindings from ``forge-core/src/go/proto``, and the
+interim MES bridge loads its own copies at run time, together with a copy of the forge-mes manifest.
 A copy that drifts is a module speaking a different contract without anyone being told,
 so this runs in the Python suite, which runs on every push and blocks a merge. The
 bridge's own parity test says the same, but it sits in a step that is advisory (FB-036).
@@ -19,7 +19,7 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[1]
 HUB = REPO / "forge-core" / "contract" / "proto"
-GO = REPO / "go" / "proto" / "forge" / "v1"
+GO = REPO / "forge-core" / "src" / "go" / "proto" / "forge" / "v1"
 BRIDGE = REPO / "modules" / "Forge MES" / "backend" / "src" / "forge"
 BRIDGE_PROTO = BRIDGE / "proto" / "forge" / "v1"
 HUB_MANIFEST = REPO / "src" / "forge" / "adapters" / "forge_mes" / "manifest.json"
@@ -64,8 +64,9 @@ def test_the_go_copy_differs_only_in_its_go_package(name: str) -> None:
     copy = (GO / name).read_text(encoding="utf-8")
     assert len(GO_PACKAGE.findall(hub)) == len(GO_PACKAGE.findall(copy)) == 1, name
     assert _without_go_package(copy) == _without_go_package(hub), (
-        f"go/proto/forge/v1/{name} differs from forge-core/contract/proto/{name} in more than its "
-        "go_package line: copy the hub's file, keep the Go go_package, and regenerate go/gen"
+        f"forge-core/src/go/proto/forge/v1/{name} differs from forge-core/contract/proto/{name} "
+        "in more than its go_package line: copy the contract's file, keep the Go go_package, "
+        "and regenerate forge-core/src/go/gen"
     )
 
 

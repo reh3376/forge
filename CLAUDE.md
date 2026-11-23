@@ -115,7 +115,7 @@ uv run pytest -q -rsx                        # the Python suite (tests/ and forg
 uv run ruff check . && uv run ruff format --check .   # the whole repository, as CI does
 uv run forge governance specs                # spec states and hash checks
 uv run forge archive list                    # retired documents: an index into the history, never the old text
-cd go && gofmt -l . && go vet ./... && go test ./...
+cd forge-core/src/go && gofmt -l . && go vet ./... && go test ./...
 make sync-tutorial-embed verify-tutorial-embed check-tutorial-build
 ```
 

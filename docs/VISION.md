@@ -68,7 +68,7 @@ Each connection is custom code written once, documented in an email, and broken 
 
 **Forge:** a module SDK and machine-checked contracts. A spoke or module is scaffolded from a template with a manifest, a FACTS spec (what it reads, writes, subscribes to, backfills; its context mapping; its error handling), tests, and a place in CI. The governance suite (FxTS: FATS for APIs, FACTS for adapters, FTTS for transport, FVTS for views, FDTS for data schemas, FHTS for hash integrity, FQTS, FSTS, FOTS, FPTS, FLTS, FNTS) turns each contract into a gate. A spoke that drifts fails its gate before it fails production.
 
-**Component:** `forge_core.sdk.module_builder` and the Go scaffold under `go/`, `forge_core.fxts.*`, CI jobs.
+**Component:** `forge_core.sdk.module_builder` and the Go scaffold under `forge-core/src/go/`, `forge_core.fxts.*`, CI jobs.
 
 **Solved when:** onboarding a new system is a day's work from the SDK, and a conformance failure anywhere blocks the merge, not the plant.
 
