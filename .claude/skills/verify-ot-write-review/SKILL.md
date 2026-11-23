@@ -23,10 +23,10 @@ Run the check when a change touches any of these. The code moved to `forge-modul
 | `forge-modules/forge-ot/src/python/forge_ot/control/interlock.py` | `InterlockEngine.check` as a layer that can refuse after the token is used |
 | `forge-modules/forge-ot/src/python/forge_ot/control/models.py`, `forge-core/src/python/forge_core/models/control.py` | `WriteRequest`, `TagWriteConfig.coerce`, `ConfirmationMode`, `WriteOrigin` |
 
-**Sync commit:** `b508bb05` (2026-11-23). The check was confirmed to describe the code at this commit. See what changed since:
+**Sync commit:** `7b2ebff9` (2026-11-23). The check was confirmed to describe the code at this commit. See what changed since:
 
 ```bash
-git log --oneline b508bb05..HEAD -- forge-modules/forge-ot/src/python/forge_ot/control/review.py forge-modules/forge-ot/src/python/forge_ot/control/write_engine.py forge-modules/forge-ot/src/python/forge_ot/control/validation.py forge-modules/forge-ot/src/python/forge_ot/control/interlock.py forge-modules/forge-ot/src/python/forge_ot/control/models.py forge-core/src/python/forge_core/models/control.py
+git log --oneline 7b2ebff9..HEAD -- forge-modules/forge-ot/src/python/forge_ot/control/review.py forge-modules/forge-ot/src/python/forge_ot/control/write_engine.py forge-modules/forge-ot/src/python/forge_ot/control/validation.py forge-modules/forge-ot/src/python/forge_ot/control/interlock.py forge-modules/forge-ot/src/python/forge_ot/control/models.py forge-core/src/python/forge_core/models/control.py
 ```
 
 If that prints commits you did not check, the verification needs a look before you trust a pass: read "When the code changes on purpose". Move the sync commit forward only after you have confirmed that the check still describes the code at the new commit.
