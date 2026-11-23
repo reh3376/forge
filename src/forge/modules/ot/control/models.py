@@ -327,10 +327,34 @@ class TagWriteConfig:
 # ---------------------------------------------------------------------------
 
 
+_TRUE_WORDS = frozenset({"true", "1", "on"})
+_FALSE_WORDS = frozenset({"false", "0", "off"})
+
+
+def _coerce_boolean(value: Any) -> bool:
+    """A boolean, 0 or 1, or a word for one. Anything else is refused.
+
+    ``bool("false")`` is True, so a plain ``bool()`` would turn a request to switch
+    something off into switching it on once the coerced value is what is written (FB-215).
+    """
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)) and value in (0, 1):
+        return bool(value)
+    if isinstance(value, str):
+        word = value.strip().lower()
+        if word in _TRUE_WORDS:
+            return True
+        if word in _FALSE_WORDS:
+            return False
+    msg = f"not a boolean: {value!r}"
+    raise ValueError(msg)
+
+
 def _coerce_value(value: Any, data_type: DataType) -> Any:
     """Coerce a Python value to the target OPC-UA type."""
     if data_type == DataType.BOOLEAN:
-        return bool(value)
+        return _coerce_boolean(value)
     if data_type == DataType.INT16:
         v = int(value)
         if not (-32768 <= v <= 32767):

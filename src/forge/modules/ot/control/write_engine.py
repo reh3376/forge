@@ -217,7 +217,7 @@ class ControlWriteEngine:
             return await self._finish(result)
 
         # Layer 5: OPC-UA Write + Read-Back
-        await self._write_and_readback(request, result)
+        await self._write_and_readback(request, result, self._value_to_write(request))
         return await self._finish(result)
 
     async def stage(self, request: WriteRequest) -> StageOutcome:
@@ -270,7 +270,18 @@ class ControlWriteEngine:
 
     # -- Layer 5: Write + Read-Back ------------------------------------------
 
-    async def _write_and_readback(self, request: WriteRequest, result: WriteResult) -> None:
+    def _value_to_write(self, request: WriteRequest) -> Any:
+        """The request's value in the tag's own type: what the layers checked (FB-215).
+
+        Validation and the review gate compare the value after coercion, so the
+        controller is written that same coerced value, never another spelling of it.
+        """
+        config = self._validator.get_config(request.tag_path)
+        return request.value if config is None else config.coerce(request.value)
+
+    async def _write_and_readback(
+        self, request: WriteRequest, result: WriteResult, value: Any
+    ) -> None:
         """Perform the OPC-UA write and read-back confirmation."""
         # Read old value (best-effort)
         try:
@@ -281,7 +292,7 @@ class ControlWriteEngine:
         # Write
         result.write_sent_at = datetime.now(UTC)
         try:
-            await self._writer.write_tag(request.tag_path, request.value)
+            await self._writer.write_tag(request.tag_path, value)
         except Exception as exc:
             result.status = WriteStatus.FAILED_WRITE
             result.write_error = str(exc)
@@ -299,9 +310,7 @@ class ControlWriteEngine:
             return
 
         # Compare
-        result.readback_matched = self._values_match(
-            request.value, result.new_value, request.data_type
-        )
+        result.readback_matched = self._values_match(value, result.new_value, request.data_type)
 
         if result.readback_matched:
             result.status = WriteStatus.CONFIRMED
