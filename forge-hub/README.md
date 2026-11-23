@@ -8,6 +8,7 @@ This page is orientation. The state of each part is in [`../docs/WHERE-WE-ARE.md
 
 | Path | Holds |
 |---|---|
+| [`fxts/`](fxts) | The hub's own governed files, one folder per framework, and their generated index ([`fxts/README.md`](fxts/README.md), by `forge governance index`). So far `fats/`: the 28 specs of the hub's API |
 | [`tests/`](tests) | The hub's tests, one folder per package (`link` for the hub's end of the transport). Helpers shared with forge-core's tests are at the root: `tests/tls.py`, `tests/samples.py`, `tests/otel.py` |
 | [`src/python/forge_hub`](src/python/forge_hub) | The hub's package: `link` (the hub's end of `forge.v1.AdapterService`), `ingest`, `context`, `storage` (the engines and the migrations), `registry`, `curation`, `broker`, `api` and `gateway` (the REST API and its auth), `observer`, `cli` (the `forge` command), and `conformance` (the kit that runs a module against a real hub) |
 
@@ -16,7 +17,7 @@ This page is orientation. The state of each part is in [`../docs/WHERE-WE-ARE.md
 | Still elsewhere | Until |
 |---|---|
 | Two tests that run the hub together with a module's code, in [`../tests`](../tests) | they span layers and stay at the root |
-| The hub's own specs (the API specs, the transport spec, its view spec, object schemas and view documents), in forge-core's `fxts` folders; and the hub's id, which those files still give as `forge-core` | the step of FB-200 that renames the id; each file is stamped again and approved by the owner |
+| The rest of the hub's own specs (the transport spec, its view spec, object schemas and view documents), in forge-core's framework folders; and the hub's id, which those files still give as `forge-core` | the step of FB-200 that renames the id; each file is stamped again and approved by the owner |
 | `docs/` and `fxts/` | the same steps |
 
 ## Rules

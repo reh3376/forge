@@ -29,6 +29,7 @@ COPY src/ ./src/
 COPY forge-core/src/ ./forge-core/src/
 COPY forge-core/contract/ ./forge-core/contract/
 COPY forge-hub/src/ ./forge-hub/src/
+COPY forge-hub/fxts/ ./forge-hub/fxts/
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --extra ot
 
@@ -51,6 +52,7 @@ COPY --from=builder /app/src /app/src
 COPY --from=builder /app/forge-core/src /app/forge-core/src
 COPY --from=builder /app/forge-core/contract /app/forge-core/contract
 COPY --from=builder /app/forge-hub/src /app/forge-hub/src
+COPY --from=builder /app/forge-hub/fxts /app/forge-hub/fxts
 COPY --from=builder /app/pyproject.toml /app/pyproject.toml
 
 # Ensure venv python is on PATH

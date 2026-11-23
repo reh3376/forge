@@ -22,7 +22,13 @@ import pytest
 from forge_core.fxts.fmts.runners.fmts_runner import load_backlog
 from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import check_schema_runner_parity, verify_spec_hash
-from forge_hub.cli.governance import FRAMEWORKS, REPO_ROOT, SPEC_ROOT, spec_files
+from forge_hub.cli.governance import (
+    FRAMEWORKS,
+    REPO_ROOT,
+    SPEC_ROOT,
+    framework_specs,
+    spec_files,
+)
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -57,7 +63,7 @@ def _schema(fw: str) -> dict[str, Any]:
 
 
 def _specs(fw: str) -> list[Path]:
-    return sorted(FRAMEWORKS[fw].specs_dir.glob(FRAMEWORKS[fw].pattern))
+    return framework_specs(FRAMEWORKS[fw])
 
 
 def _page(fw: str) -> str:
@@ -173,14 +179,16 @@ class TestEachFramework:
         assert unapproved == expected & unapproved == unapproved & set(PENDING_APPROVAL)
 
     def test_f6_and_f9_a_gate_and_the_commands(self, fw: str) -> None:
-        # A framework's gate is with forge-core's tests; one whose tests still use hub or
-        # module code is under tests/governance until those tests are separated (FB-227).
+        # A framework's gate is with the tests of what its specs describe: forge-core's, the
+        # hub's, or under tests/governance while its tests use a module's spec (FB-201).
         gates = [
             REPO_ROOT / "forge-core" / "tests" / "fxts" / fw,
+            REPO_ROOT / "forge-hub" / "tests" / "fxts" / fw,
             REPO_ROOT / "tests" / "governance" / fw,
         ]
         assert any(list(gate.glob("test_*.py")) for gate in gates), f"{fw} has no gate"
-        assert FRAMEWORKS[fw].schema.is_file() and FRAMEWORKS[fw].specs_dir.is_dir()
+        assert FRAMEWORKS[fw].schema.is_file()
+        assert any(folder.is_dir() for folder in FRAMEWORKS[fw].specs_dirs)
 
     def test_the_gaps_are_exactly_the_known_ones(self, fw: str) -> None:
         found = _gaps(fw)
@@ -202,5 +210,7 @@ def test_a_pending_spec_is_really_pending() -> None:
     """The list of pending approvals shrinks when the owner approves; it never goes stale."""
     for name in PENDING_APPROVAL:
         fw = name.split(".")[-2]
-        integrity = json.loads((FRAMEWORKS[fw].specs_dir / name).read_text())["integrity"]
+        files = [file for file in framework_specs(FRAMEWORKS[fw]) if file.name == name]
+        assert len(files) == 1, f"{name}: found {len(files)} files"
+        integrity = json.loads(files[0].read_text(encoding="utf-8"))["integrity"]
         assert integrity.get("hash_state") != "approved", f"{name} is approved: remove it"

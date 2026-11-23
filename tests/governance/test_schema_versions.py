@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any
 import pytest
 
 from forge_core.fxts.shared import schemas
-from forge_hub.cli.governance import FRAMEWORKS
+from forge_hub.cli.governance import FRAMEWORKS, framework_specs
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -238,7 +238,7 @@ class TestEveryFramework:
 
     def test_every_spec_records_a_registered_schema(self, fw: str) -> None:
         schema_dir = FRAMEWORKS[fw].schema.parent
-        for path in FRAMEWORKS[fw].specs_dir.glob(FRAMEWORKS[fw].pattern):
+        for path in framework_specs(FRAMEWORKS[fw]):
             spec = json.loads(path.read_text(encoding="utf-8"))
             row = schemas.find(schema_dir, spec["integrity"]["schema_version"])
             assert row is not None and row.schema_hash == spec["integrity"]["schema_hash"], path

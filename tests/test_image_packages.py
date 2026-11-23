@@ -87,10 +87,23 @@ def test_the_contract_is_in_the_image_and_in_a_built_package() -> None:
     assert contract in allowed, ".dockerignore keeps the contract out of the build context"
     manifest = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))
     included = manifest["tool"]["hatch"]["build"]["targets"]["wheel"]["force-include"]
-    assert included == {contract: "forge_core/_contract"}
+    assert included[contract] == "forge_core/_contract"
 
 
 def test_the_check_can_fail() -> None:
     assert not covered("forge-hub/src/forge_hub", ["src", "forge-core/src"])
     assert covered("forge-core/src/python/forge_core", ["src", "forge-core/src"])
     assert import_root("forge-core/src/python/forge_core") == "forge-core/src/python"
+
+
+def test_the_hubs_governed_files_are_in_the_image_and_in_a_built_package() -> None:
+    """The hub's own specs live outside its Python package (FB-200), like the contract."""
+    folder = "forge-hub/fxts"
+    assert (REPO / folder / "fats" / "healthz.json").is_file()
+    assert covered(folder, copied_into_builder()), "the builder stage does not copy the hub's fxts"
+    assert covered(folder, copied_into_runtime()), "the runtime stage does not copy the hub's fxts"
+    allowed = [line[1:].rstrip("/") for line in DOCKERIGNORE if line.startswith("!")]
+    assert folder in allowed, ".dockerignore keeps the hub's fxts out of the build context"
+    manifest = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))
+    included = manifest["tool"]["hatch"]["build"]["targets"]["wheel"]["force-include"]
+    assert included == {"forge-core/contract": "forge_core/_contract", folder: "forge_hub/_fxts"}

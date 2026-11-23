@@ -59,6 +59,8 @@ packages = ["src/forge", "forge-core/src/python/forge_core", "forge-hub/src/pyth
 # (forge_core.contract finds it in either place).
 [tool.hatch.build.targets.wheel.force-include]
 "forge-core/contract" = "forge_core/_contract"
+# The hub's own governed files, likewise outside its package (forge_hub.fxts finds them).
+"forge-hub/fxts" = "forge_hub/_fxts"
 
 [tool.ruff]
 target-version = "py312"
