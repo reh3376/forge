@@ -27,6 +27,7 @@ import json
 import re
 from typing import TYPE_CHECKING, Any, ClassVar
 
+from forge.core.models.alarm import SYSTEM_ALARM_ACTIONS as _SYSTEM_ALARM_ACTIONS
 from forge.governance.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
 from forge.governance.fvts import REPO_ROOT
 from forge.governance.fvts.profiles import (
@@ -49,8 +50,9 @@ if TYPE_CHECKING:
 
 FACTS_SPECS_DIR = FACTS_SCHEMA_PATH.parent.parent / "specs"
 
-# AlarmAction members that are system-initiated and therefore never UI actions.
-SYSTEM_ALARM_ACTIONS = frozenset({"TRIGGER", "CLEAR", "SUPPRESS", "UNSUPPRESS"})
+# AlarmAction members that are system-initiated and therefore never UI actions: the one
+# definition is forge.core.models.alarm (FB-220).
+SYSTEM_ALARM_ACTIONS = frozenset(action.value for action in _SYSTEM_ALARM_ACTIONS)
 
 # FVTS point data types → OT TagWriteConfig data types a tag_write may target.
 WRITABLE_TYPES: dict[str, frozenset[str]] = {
