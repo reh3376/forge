@@ -27,7 +27,7 @@ import json
 import re
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
+from forge_core.fxts import FXTS_ROOT
 from forge_core.fxts.fvts import REPO_ROOT
 from forge_core.fxts.fvts.profiles import (
     ALARM_OPERATIONS,
@@ -48,7 +48,7 @@ from forge_core.models.alarm import SYSTEM_ALARM_ACTIONS as _SYSTEM_ALARM_ACTION
 if TYPE_CHECKING:
     from pathlib import Path
 
-FACTS_SPECS_DIR = FACTS_SCHEMA_PATH.parent.parent / "specs"
+FACTS_SPECS_DIR = FXTS_ROOT / "facts" / "specs"
 
 # AlarmAction members that are system-initiated and therefore never UI actions: the one
 # definition is forge_core.models.alarm (FB-220).

@@ -15,6 +15,8 @@ Renderer: ``fvts/renderer.py`` — the reference renderer golden messages run th
 
 from pathlib import Path
 
-SCHEMA_PATH = Path(__file__).parent / "schema" / "fvts.schema.json"
+from forge_core import contract
+
+SCHEMA_PATH = contract.schema_path("fvts")
 SPECS_DIR = Path(__file__).parent / "specs"
 REPO_ROOT = Path(__file__).resolve().parents[6]

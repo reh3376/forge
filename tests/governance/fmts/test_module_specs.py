@@ -27,12 +27,12 @@ from typing import Any
 
 import pytest
 
-from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
+from forge_core.fxts import FXTS_ROOT
 from forge_core.fxts.fmts import REPO_ROOT, SPECS_DIR
 from forge_core.fxts.fmts.runners.fmts_runner import CONFORMANCE_KIT, FMTSRunner, load_backlog
 from forge_core.fxts.shared.runner import VerdictStatus
 
-FACTS_SPECS_DIR = FACTS_SCHEMA_PATH.parent.parent / "specs"
+FACTS_SPECS_DIR = FXTS_ROOT / "facts" / "specs"
 
 PENDING_APPROVAL = frozenset({"fmts:hash-approved"})
 ALLOWED_FAILURES: dict[str, frozenset[str]] = {

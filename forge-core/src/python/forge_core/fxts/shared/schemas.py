@@ -9,7 +9,7 @@ The owner's rules, signed 2026-11-18 (``docs/decisions/fxts-framework-baseline.m
   removes or narrows anything, and marks every spec for review;
 * each spec records the schema version and hash it was approved against.
 
-Layout, per framework, under ``forge-core/src/python/forge_core/fxts/<framework>/schema/``::
+Layout, per framework, under ``forge-core/contract/fxts/<framework>/schema/``::
 
     <framework>.schema.json                    the current version (what authors edit)
     versions/<framework>.v<version>.schema.json  one frozen copy per released version

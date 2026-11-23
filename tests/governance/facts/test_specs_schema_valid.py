@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 import pytest
 from jsonschema import Draft202012Validator
 
+from forge_core.fxts import FXTS_ROOT
 from forge_core.fxts.facts import SCHEMA_PATH
 from forge_core.fxts.facts.runners.facts_runner import (
     PACKAGED_SCHEMA_PATH,
@@ -29,7 +30,7 @@ from forge_core.fxts.shared.runner import VerdictStatus, verify_spec_hash
 if TYPE_CHECKING:
     from pathlib import Path
 
-SPECS_DIR = SCHEMA_PATH.parent.parent / "specs"
+SPECS_DIR = FXTS_ROOT / "facts" / "specs"
 SPEC_PATHS = sorted(SPECS_DIR.glob("*.facts.json"))
 
 #: adapter_id → why the spec does not validate yet (and which item fixes it).

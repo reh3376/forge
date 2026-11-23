@@ -72,6 +72,20 @@ def test_the_build_context_lets_every_package_in() -> None:
         )
 
 
+def test_the_contract_is_in_the_image_and_in_a_built_package() -> None:
+    """The contract lives outside the Python package (FB-227), so it is copied and included
+    by name: without it the image has the code and none of the schemas, lists or protos."""
+    contract = "forge-core/contract"
+    assert (REPO / contract / "proto" / "adapter_service.proto").is_file()
+    assert covered(contract, copied_into_builder()), "the builder stage does not copy the contract"
+    assert covered(contract, copied_into_runtime()), "the runtime stage does not copy the contract"
+    allowed = [line[1:].rstrip("/") for line in DOCKERIGNORE if line.startswith("!")]
+    assert contract in allowed, ".dockerignore keeps the contract out of the build context"
+    manifest = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))
+    included = manifest["tool"]["hatch"]["build"]["targets"]["wheel"]["force-include"]
+    assert included == {contract: "forge_core/_contract"}
+
+
 def test_the_check_can_fail() -> None:
     assert not covered("forge-hub/src/forge_hub", ["src", "forge-core/src"])
     assert covered("forge-core/src/python/forge_core", ["src", "forge-core/src"])

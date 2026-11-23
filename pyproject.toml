@@ -54,6 +54,12 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/forge", "forge-core/src/python/forge_core"]
 
+# forge-core's contract (proto files, framework schemas, governed lists) is language-neutral and
+# lives outside the Python package; a built package carries it as forge_core/_contract
+# (forge_core.contract finds it in either place).
+[tool.hatch.build.targets.wheel.force-include]
+"forge-core/contract" = "forge_core/_contract"
+
 [tool.ruff]
 target-version = "py312"
 line-length = 100

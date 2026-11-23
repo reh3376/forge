@@ -20,9 +20,9 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
+from forge_core import contract
 from forge_core.fxts.shared.runner import (
     FxTSRunner,
     FxTSVerdict,
@@ -32,11 +32,14 @@ from forge_core.fxts.shared.runner import (
 )
 from forge_core.schema_ref import SchemaRefError, require_versioned_ref
 
+if TYPE_CHECKING:
+    from pathlib import Path
+
 # ---------------------------------------------------------------------------
 # Vocabulary — read from facts.schema.json, never hand-copied (BACKLOG FB-080)
 # ---------------------------------------------------------------------------
 
-PACKAGED_SCHEMA_PATH = Path(__file__).resolve().parents[1] / "schema" / "facts.schema.json"
+PACKAGED_SCHEMA_PATH = contract.schema_path("facts")
 
 
 def schema_enum(schema: dict[str, Any], *path: str) -> frozenset[str]:

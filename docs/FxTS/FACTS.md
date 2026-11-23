@@ -29,7 +29,7 @@ Without FACTS, adapter development is ad hoc. Each adapter would make its own as
 
 ## Schema
 
-**Location:** `forge-core/src/python/forge_core/fxts/facts/schema/facts.schema.json`
+**Location:** `forge-core/contract/fxts/facts/schema/facts.schema.json`
 **Status:** ✅ Implemented: nine specs, all hashed and approved by the owner
 
 ### Adapter Specs

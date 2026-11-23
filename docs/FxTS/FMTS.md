@@ -127,7 +127,7 @@ Every run gives 29 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:h
 
 ## Governed lists
 
-Four fields take their values from lists that can grow without a schema version (owner, 2026-11-19). Each list is a file under `forge-core/src/python/forge_core/fxts/lists/`, hashed and approved by the owner like a spec, shown by `forge governance specs`, and changed with `forge governance stamp` and `approve`. A module spec fails `fmts:lists` while any of them does not verify or is not approved.
+Four fields take their values from lists that can grow without a schema version (owner, 2026-11-19). Each list is a file under `forge-core/contract/lists/`, hashed and approved by the owner like a spec, shown by `forge governance specs`, and changed with `forge governance stamp` and `approve`. A module spec fails `fmts:lists` while any of them does not verify or is not approved.
 
 | List | File | Used by | Entries today |
 |---|---|---|---|

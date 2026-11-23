@@ -30,7 +30,7 @@ FATS governs API contracts. When a FATS spec declares an endpoint, that endpoint
 
 ## Schema
 
-**Location:** `forge-core/src/python/forge_core/fxts/fats/schema/fats.schema.json`
+**Location:** `forge-core/contract/fxts/fats/schema/fats.schema.json`
 
 Top-level fields:
 

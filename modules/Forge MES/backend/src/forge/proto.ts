@@ -2,7 +2,7 @@
  * Proto loading and wire-format helpers for the forge.v1 AdapterService.
  *
  * The .proto files under ./proto/forge/v1 are vendored copies of the hub's
- * `src/forge/proto/*.proto`; `__tests__/forge-parity.spec.ts` fails when they
+ * `forge-core/contract/proto/*.proto`; `__tests__/forge-parity.spec.ts` fails when they
  * drift. Loading is dynamic (@grpc/proto-loader) so no codegen step exists.
  */
 import * as grpc from "@grpc/grpc-js";

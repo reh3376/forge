@@ -67,7 +67,7 @@ One client serves a control-room monitor and a phone. A screen is built from con
 | `reflow` | in a row or column that wraps and stacks as the display narrows | forms, tables, dashboards |
 | `switch` | shows one child, chosen by the width of the display | a screen that must be arranged differently on a phone |
 
-The list is `forge-core/src/python/forge_core/fxts/lists/container-kinds.list.json`, hashed and approved like a spec. Adding a kind is one approved change to it and never changes a saved screen.
+The list is `forge-core/contract/lists/container-kinds.list.json`, hashed and approved like a spec. Adding a kind is one approved change to it and never changes a saved screen.
 
 ## Expressions
 

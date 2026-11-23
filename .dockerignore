@@ -10,3 +10,4 @@ src/**/__pycache__/
 forge-core/*
 !forge-core/src/
 forge-core/src/**/__pycache__/
+!forge-core/contract/

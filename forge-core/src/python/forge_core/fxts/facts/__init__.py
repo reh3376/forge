@@ -9,6 +9,6 @@ Specs:  ``facts/specs/<adapter_id>.facts.json``
 Runner: ``facts/runners/facts_runner.py`` (Sprint 4)
 """
 
-from pathlib import Path
+from forge_core import contract
 
-SCHEMA_PATH = Path(__file__).parent / "schema" / "facts.schema.json"
+SCHEMA_PATH = contract.schema_path("facts")

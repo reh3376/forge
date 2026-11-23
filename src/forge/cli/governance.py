@@ -39,6 +39,7 @@ from typing import TYPE_CHECKING, Annotated, Any
 import typer
 
 import forge_core.fxts as _fxts
+from forge_core import contract
 from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import (
     add_spec_hash,
@@ -99,13 +100,18 @@ def write_integrity(path: Path, text: str, integrity: dict[str, Any]) -> None:
 
 def spec_files(root: Path) -> list[Path]:
     """Every governed file: each framework's specs, and the governed lists (FB-153)."""
-    return sorted(root.glob("*/specs/*.json")) + sorted(root.glob("lists/*.list.json"))
+    # The real tree keeps the governed lists in the contract; any other root is self-contained.
+    lists = contract.LISTS_DIR if root == SPEC_ROOT else root / "lists"
+    return sorted(root.glob("*/specs/*.json")) + sorted(lists.glob("*.list.json"))
 
 
 def schema_dir_of(spec_file: Path) -> Path | None:
     """The schema directory of the framework a spec file belongs to, when it has a registry."""
-    candidate = spec_file.resolve().parent.parent / "schema"
-    return candidate if (candidate / schemas.REGISTRY_NAME).is_file() else None
+    framework = spec_file.resolve().parent.parent
+    for candidate in (framework / "schema", contract.schema_dir(framework.name)):
+        if (candidate / schemas.REGISTRY_NAME).is_file():
+            return candidate
+    return None
 
 
 def schema_record(spec_file: Path, spec: dict[str, Any]) -> dict[str, str]:
@@ -346,7 +352,7 @@ FRAMEWORKS: dict[str, Framework] = {
         "FATS",
         SPEC_ROOT / "fats" / "specs",
         "*.json",
-        SPEC_ROOT / "fats" / "schema" / "fats.schema.json",
+        contract.schema_path("fats"),
         ("endpoint",),
         _fats_runner,
         live=True,
@@ -355,7 +361,7 @@ FRAMEWORKS: dict[str, Framework] = {
         "FACTS",
         SPEC_ROOT / "facts" / "specs",
         "*.facts.json",
-        SPEC_ROOT / "facts" / "schema" / "facts.schema.json",
+        contract.schema_path("facts"),
         ("adapter_identity", "adapter_id"),
         _facts_runner,
         live=True,
@@ -364,7 +370,7 @@ FRAMEWORKS: dict[str, Framework] = {
         "FVTS",
         SPEC_ROOT / "fvts" / "specs",
         "*.fvts.json",
-        SPEC_ROOT / "fvts" / "schema" / "fvts.schema.json",
+        contract.schema_path("fvts"),
         ("view_identity", "view_id"),
         _fvts_runner,
         live=False,
@@ -373,7 +379,7 @@ FRAMEWORKS: dict[str, Framework] = {
         "FTTS",
         SPEC_ROOT / "ftts" / "specs",
         "*.ftts.json",
-        SPEC_ROOT / "ftts" / "schema" / "ftts.schema.json",
+        contract.schema_path("ftts"),
         ("transport_identity", "transport_id"),
         _ftts_runner,
         live=True,
@@ -382,7 +388,7 @@ FRAMEWORKS: dict[str, Framework] = {
         "FUTS",
         SPEC_ROOT / "futs" / "specs",
         "*.futs.json",
-        SPEC_ROOT / "futs" / "schema" / "futs.schema.json",
+        contract.schema_path("futs"),
         ("identity", "id"),
         _futs_runner,
         live=False,
@@ -391,7 +397,7 @@ FRAMEWORKS: dict[str, Framework] = {
         "FMTS",
         SPEC_ROOT / "fmts" / "specs",
         "*.fmts.json",
-        SPEC_ROOT / "fmts" / "schema" / "fmts.schema.json",
+        contract.schema_path("fmts"),
         ("module_identity", "module_id"),
         _fmts_runner,
         live=False,

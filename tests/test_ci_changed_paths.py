@@ -19,7 +19,11 @@ import pytest
 REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / ".github" / "scripts" / "changed-paths.sh"
 WORKFLOW = (REPO / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
-MES = ("modules/Forge MES/", "src/forge/proto/", "src/forge/adapters/forge_mes/manifest.json")
+MES = (
+    "modules/Forge MES/",
+    "forge-core/contract/proto/",
+    "src/forge/adapters/forge_mes/manifest.json",
+)
 
 pytestmark = pytest.mark.skipif(
     shutil.which("bash") is None or shutil.which("git") is None,
@@ -162,7 +166,7 @@ class TestTheWorkflow:
     @pytest.mark.parametrize(
         ("job", "paths"),
         [
-            ("hub-go", ["go/", "src/forge/proto/"]),
+            ("hub-go", ["go/", "forge-core/contract/proto/"]),
             ("mes-module", ['"modules/Forge MES/"', *MES[1:]]),
         ],
     )
