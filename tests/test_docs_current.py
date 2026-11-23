@@ -74,26 +74,29 @@ def allowed_numbers(merged: list[tuple[int, str]], work_after_newest: int) -> se
 
 # The branch the state documents are kept on (CLAUDE.md, "How work is done here").
 DEVELOPMENT_BRANCH = "reh3376_dev01"
+CHECKED_BRANCHES = {"main", DEVELOPMENT_BRANCH}
 
 
 def foreign_branch(environment: dict[str, str]) -> str | None:
-    """The head branch of the pull request under test, when it is not the development branch.
+    """The branch under test in CI, when it is neither ``main`` nor the development branch.
 
-    GitHub sets ``GITHUB_HEAD_REF`` on a pull request run only. A branch made by someone
-    else (the dependency bot) carries the documents of the ``main`` it was cut from or
-    last merged, and nobody maintains them there, so it cannot name the newest pull
-    request and is not asked to (BACKLOG FB-214: PR 140 failed on exactly this once the
-    job had the full history). ``main`` and the development branch are always checked.
+    A branch made by someone else (the dependency bot) carries the documents of the
+    ``main`` it was cut from or last merged, and nobody maintains them there, so it cannot
+    name the newest pull request and is not asked to (BACKLOG FB-214: PR 140 failed on
+    exactly this once the job had the full history). GitHub names the branch in
+    ``GITHUB_HEAD_REF`` on a pull request run and in ``GITHUB_REF_NAME`` on a push run;
+    outside CI neither is set and the check always runs.
     """
     head = environment.get("GITHUB_HEAD_REF", "").strip()
-    return head if head and head != DEVELOPMENT_BRANCH else None
+    branch = head or environment.get("GITHUB_REF_NAME", "").strip()
+    return branch if branch and branch not in CHECKED_BRANCHES else None
 
 
 def _skip_on_a_foreign_branch() -> None:
     other = foreign_branch(dict(os.environ))
     if other is not None:
         pytest.skip(
-            f"pull request from '{other}', not from '{DEVELOPMENT_BRANCH}': the state documents "
+            f"branch '{other}' is neither main nor '{DEVELOPMENT_BRANCH}': the state documents "
             "are not maintained on that branch; the check runs on main after the merge"
         )
 
@@ -119,6 +122,13 @@ def test_which_branches_are_asked() -> None:
     assert foreign_branch({"GITHUB_HEAD_REF": ""}) is None
     assert foreign_branch({"GITHUB_HEAD_REF": DEVELOPMENT_BRANCH}) is None
     assert foreign_branch({"GITHUB_HEAD_REF": "dependabot/npm/next-15"}) == "dependabot/npm/next-15"
+    # a push run names the branch in GITHUB_REF_NAME and leaves GITHUB_HEAD_REF empty
+    assert foreign_branch({"GITHUB_REF_NAME": "main"}) is None
+    assert foreign_branch({"GITHUB_REF_NAME": DEVELOPMENT_BRANCH}) is None
+    assert foreign_branch({"GITHUB_REF_NAME": "dependabot/npm/next-15"}) == "dependabot/npm/next-15"
+    # a pull request run: the merge ref is not a branch name, the head branch decides
+    both = {"GITHUB_REF_NAME": "142/merge", "GITHUB_HEAD_REF": DEVELOPMENT_BRANCH}
+    assert foreign_branch(both) is None
 
 
 def test_what_the_documents_may_name() -> None:
