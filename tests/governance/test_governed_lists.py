@@ -188,3 +188,86 @@ class TestSubClasses:
         problems = " ".join(lists.load(lists.DATA_CLASSES, copy).problems)
         for expected in ("no known direction", "no known delivery rule", "names no link", "stored"):
             assert expected in problems
+
+
+class TestHardLimits:
+    """What a level may not decide for itself (D-17 §11.5; owner, 2026-11-23)."""
+
+    def _load(self, tmp_path: Path, entries: list[dict]) -> list[str]:
+        document = {"list": lists.HARD_LIMITS, "title": "t", "description": "d", "entries": entries}
+        (tmp_path / f"{lists.HARD_LIMITS}{lists.SUFFIX}").write_text(
+            json.dumps(document), encoding="utf-8"
+        )
+        return lists.load(lists.HARD_LIMITS, tmp_path).problems
+
+    def _limit(self, **changes: object) -> dict:
+        limit: dict = {
+            "id": "x",
+            "description": "something is forbidden",
+            "kind": "scope",
+            "scopes": ["ot:interlock:bypass"],
+            "applies": "interim",
+            "held_by": "contract",
+            "held_how": "where the contract permits it",
+            "reason": "it cannot be undone",
+            "status": "active",
+            "added": "2026-11-23",
+            "enforced_by": [],
+        }
+        limit.update(changes)
+        return {key: value for key, value in limit.items() if value is not ...}
+
+    def test_the_agreed_limits_are_listed_and_well_formed(self) -> None:
+        loaded = lists.load(lists.HARD_LIMITS)
+        shape = [p for p in loaded.problems if "approv" not in p and "hash" not in p]
+        assert shape == []
+        assert loaded.ids == {
+            "safety-interlock",
+            "self-grant",
+            "grant-beyond-holding",
+            "owner-approval",
+        }
+
+    def test_a_well_formed_limit_has_no_problem(self, tmp_path: Path) -> None:
+        problems = self._load(tmp_path, [self._limit()])
+        assert [p for p in problems if "hash" not in p] == []
+
+    @pytest.mark.parametrize(
+        ("changes", "expected"),
+        [
+            ({"reason": ""}, "does not say its reason"),
+            ({"held_how": ...}, "does not say its held_how"),
+            ({"kind": "wish"}, "has kind 'wish'"),
+            ({"applies": "sometimes"}, "has applies 'sometimes'"),
+            ({"held_by": "anyone"}, "has held_by 'anyone'"),
+            ({"scopes": []}, "lists no scopes"),
+            ({"scopes": ["interlock bypass"]}, "not <domain>:<object>:<action>"),
+            ({"relation": "grantor-is-grantee"}, "also names a relation"),
+            ({"kind": "relation", "scopes": ..., "relation": "is-tired"}, "unknown relation"),
+            ({"kind": "relation", "relation": "grantor-is-grantee"}, "also lists scopes"),
+            ({"added": "last week"}, "no date it was added"),
+            ({"status": "retired"}, "retired and has no date"),
+            ({"retired": "2026-12-01"}, "active and carries a retired date"),
+            ({"enforced_by": ...}, "does not list what enforces it"),
+        ],
+    )
+    def test_a_malformed_limit_is_named(self, tmp_path: Path, changes: dict, expected: str) -> None:
+        problems = self._load(tmp_path, [self._limit(**changes)])
+        assert any(expected in p for p in problems), problems
+
+    def test_a_retired_limit_stays_listed_and_is_not_in_force(self, tmp_path: Path) -> None:
+        retired = self._limit(id="old", status="retired", retired="2026-12-01")
+        self._load(tmp_path, [self._limit(), retired])
+        assert lists.load(lists.HARD_LIMITS, tmp_path).ids == {"x", "old"}
+        assert [e["id"] for e in lists.active_hard_limits(tmp_path)] == ["x"]
+
+    def test_a_limit_nothing_enforces_is_said_to_be_so(self, tmp_path: Path) -> None:
+        held = self._limit(id="held", enforced_by=["tests/somewhere.py"])
+        self._load(tmp_path, [self._limit(), held])
+        assert lists.unenforced_hard_limits(tmp_path) == ["x"]
+
+    def test_today_nothing_enforces_the_limits(self) -> None:
+        """The authority model is not built (FB-232, FB-233): said, not hidden."""
+        assert sorted(lists.unenforced_hard_limits()) == sorted(
+            e["id"] for e in lists.active_hard_limits()
+        )
