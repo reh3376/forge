@@ -3,7 +3,7 @@
 **Framework ID:** FVTS
 **Full Name:** Forge View Test Specification
 **CI Gate:** Hard-fail (merge-blocking) — `tests/governance/fvts/` runs in the `hub-python` job
-**Status:** v0.2.1 (a patch step of 2026-11-22 that corrects two descriptions, FB-226; the two specs stay on 0.2.0, which they declare). v0.2.0 (2026-11-21, FB-177: objects beside points, a minor step released and approved under the schema version rules). Schema, runner (`fvts_runner.py`, 21 checks), reference renderer, two golden sets and two specs: the hub's own (`forge-core.fvts.json`, approved by the owner) and the plant-floor reference (`forge-ot.fvts.json`, `pending_review` until FB-078). forge-display itself has no code (FB-181).
+**Status:** v0.2.1 (a patch step of 2026-11-22 that corrects two descriptions, FB-226; the two specs stay on 0.2.0, which they declare). v0.2.0 (2026-11-21, FB-177: objects beside points, a minor step released and approved under the schema version rules). Schema, runner (`fvts_runner.py`, 21 checks), reference renderer, two golden sets and two specs: the hub's own (`forge-hub.fvts.json`, approved by the owner) and the plant-floor reference (`forge-ot.fvts.json`, `pending_review` until FB-078). forge-display itself has no code (FB-181).
 **Phase:** TBD (forge-display)
 **MDEMG Analog:** None — new for forge-display
 
@@ -193,7 +193,7 @@ A golden message may carry `"profiles": [...]` to apply to some renderers only (
 
 | Spec | Status | Notes |
 |------|--------|-------|
-| `forge-core.fvts.json` | approved by the owner 2026-11-21 | The hub's own screens, the first thing forge-display renders (D-16, Q-15): status and health, modules, governance, users and roles. No points; seven objects, each with a schema under `forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/`. Read-only except for running a spec's checks: approving a spec and assigning a role stay off the screens until roles are enforced (FB-075). The hub is not a module and has no FACTS spec. Suite: `tests/governance/fvts/test_hub_views.py`. |
+| `forge-hub.fvts.json` (in `forge-hub/fxts/fvts`) | approved by the owner 2026-11-21; again 2026-11-23 with the hub's id (FB-200) | The hub's own screens, the first thing forge-display renders (D-16, Q-15): status and health, modules, governance, users and roles. No points; seven objects, each with a schema under `forge-hub/fxts/fvts/objects/`. Read-only except for running a spec's checks: approving a spec and assigning a role stay off the screens until roles are enforced (FB-075). The hub is not a module and has no FACTS spec. Suite: `forge-hub/tests/fxts/fvts/test_hub_views.py`. |
 | `forge-ot.fvts.json` | `hash_state: pending_review` (FB-078) | Reference contract: fermenter HMI screen, trend, alarm summary, settings; setpoint write via two-step review. Passes every runner check except `fvts:hash-approved`; with the OT write config (`deploy/ot/ot-control.example.json`) `fvts:action-target` fails because the fermenter points are invented — FB-078 replaces them. |
 
 ## Relationship to other FxTS frameworks

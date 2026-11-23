@@ -1,6 +1,6 @@
 """FVTS gate for the hub's own view contract, and the rules for objects (BACKLOG FB-177).
 
-This is the ``conformance_tests.suite_path`` of ``forge-core.fvts.json``: the hub's
+This is the ``conformance_tests.suite_path`` of ``forge-hub.fvts.json``: the hub's
 screens are the first thing forge-display renders (D-16, Q-15). The hub is not a module,
 so it has no FACTS spec, and its screens show collections of things (objects), not live
 points. The rest of the file holds the runner and the reference renderer to the rules
@@ -12,11 +12,12 @@ from __future__ import annotations
 import copy
 import json
 import shutil
-from typing import TYPE_CHECKING, Any
+from pathlib import Path
+from typing import Any
 
 import pytest
 
-from forge_core.fxts.fvts import REPO_ROOT, SPECS_DIR
+from forge_core.fxts.fvts import REPO_ROOT, SCHEMA_PATH
 from forge_core.fxts.fvts.renderer import (
     GoldenRenderError,
     ReferenceRenderer,
@@ -25,12 +26,10 @@ from forge_core.fxts.fvts.renderer import (
 )
 from forge_core.fxts.fvts.runners.fvts_runner import HUB_OWNER, FVTSRunner
 from forge_core.fxts.shared.runner import VerdictStatus, sha256_hex_obj
+from forge_hub import fxts as hub_fxts
 
-if TYPE_CHECKING:
-    from pathlib import Path
-
-HUB_SPEC_PATH = SPECS_DIR / "forge-core.fvts.json"
-GOLDEN = REPO_ROOT / "tests" / "governance" / "fvts" / "golden" / "forge-core"
+HUB_SPEC_PATH = hub_fxts.specs_dir("fvts") / "forge-hub.fvts.json"
+GOLDEN = Path(__file__).resolve().parent / "golden"
 PASS, FAIL = VerdictStatus.PASS, VerdictStatus.FAIL
 
 #: Failures the gate allows. Empty: the owner approved the hub's view spec.
@@ -42,6 +41,11 @@ SCREENS = {
     "hub.governance": ["hub.governed_file", "hub.schema_version"],
     "hub.access": ["hub.user", "hub.role", "hub.assignment"],
 }
+
+
+@pytest.fixture(scope="module")
+def runner() -> FVTSRunner:
+    return FVTSRunner(schema_path=SCHEMA_PATH)
 
 
 @pytest.fixture
@@ -60,7 +64,7 @@ def _text(verdict) -> str:
 
 class TestTheHubsContract:
     async def test_it_passes_every_check(self, runner: FVTSRunner, hub: dict[str, Any]) -> None:
-        report = await runner.run(target="forge-core-views", spec=hub)
+        report = await runner.run(target="forge-hub-views", spec=hub)
         by_status: dict[VerdictStatus, set[str]] = {}
         for verdict in report.verdicts:
             by_status.setdefault(verdict.status, set()).add(verdict.check_id)
@@ -72,7 +76,7 @@ class TestTheHubsContract:
         assert report.hash_verified is True and report.total == 21
 
     def test_it_is_the_hubs_and_shows_the_four_screens(self, hub: dict[str, Any]) -> None:
-        assert hub["view_identity"]["owner_module"] == HUB_OWNER == "forge-core"
+        assert hub["view_identity"]["owner_module"] == HUB_OWNER == "forge-hub"
         assert "facts_spec_ref" not in hub["view_identity"]
         assert {s["surface_id"]: s["objects"] for s in hub["surfaces"]} == SCREENS
         assert hub["data_bindings"]["points"] == []
@@ -134,12 +138,12 @@ class TestObjects:
 
     async def test_the_reference_the_owner_and_the_key_must_fit(self, runner, hub) -> None:
         objects = hub["data_bindings"]["objects"]
-        objects[0]["schema_ref"] = "forge://schemas/forge-core/Component/v2"
+        objects[0]["schema_ref"] = "forge://schemas/forge-hub/Component/v2"
         objects[1]["schema_ref"] = "forge://schemas/forge-wms/Module/v1"
         objects[2]["key_field"] = "approved_by"  # a field, but not a required one
         text = _text(await _verdict(runner, hub, "objects"))
         assert "the document's $id is" in text
-        assert "is not a schema of 'forge-core'" in text
+        assert "is not a schema of 'forge-hub'" in text
         assert "key field 'approved_by' is not a required field" in text
 
     async def test_a_command_targets_a_declared_object(self, runner, hub) -> None:

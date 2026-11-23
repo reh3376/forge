@@ -2,14 +2,14 @@
   "spec_version": "0.2.0",
   "spec_kind": "view",
   "identity": {
-    "id": "forge-core-modules",
+    "id": "forge-hub-modules",
     "name": "Modules",
     "version": "0.1.0",
     "description": "Every module registered with this hub: its state, why it is refused if it is, how far its clock is from the hub's. One of the hub's four standard screens."
   },
   "view": {
-    "owner_module": "forge-core",
-    "fvts_spec": "forge-core/src/python/forge_core/fxts/fvts/specs/forge-core.fvts.json",
+    "owner_module": "forge-hub",
+    "fvts_spec": "forge-hub/fxts/fvts/forge-hub.fvts.json",
     "surface_id": "hub.modules",
     "root": {
       "node_id": "screen",
@@ -55,8 +55,17 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "ba27dc94ef1c4835811ca90240ec48514958ba2a8d6d90e167fe7d78d095ba3a",
+    "previous_hash": "68998568574bc80a4ed6fa622735b11cb2db00028c2d3a893b2ac9ce594b3062",
     "change_history": [
+      {
+        "previous_hash": "68998568574bc80a4ed6fa622735b11cb2db00028c2d3a893b2ac9ce594b3062",
+        "new_hash": "a5dc5779d75f0e54351e30453295eb03e0f63b85f14bc75e166f3eb828849629",
+        "changed_at": "2026-11-23T17:37:15Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "the hub's id is forge-hub (D-17 \u00a76, FB-200): the view's id, its owner and the path of the hub's view spec"
+      },
       {
         "previous_hash": "ba27dc94ef1c4835811ca90240ec48514958ba2a8d6d90e167fe7d78d095ba3a",
         "new_hash": "68998568574bc80a4ed6fa622735b11cb2db00028c2d3a893b2ac9ce594b3062",
@@ -68,10 +77,10 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "68998568574bc80a4ed6fa622735b11cb2db00028c2d3a893b2ac9ce594b3062",
+    "spec_hash": "a5dc5779d75f0e54351e30453295eb03e0f63b85f14bc75e166f3eb828849629",
     "schema_version": "0.2.0",
     "schema_hash": "05fa4883f7f52ce66c03e0025d923b46a0a4721f947283dae329a43c45368b51",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T02:14:29Z"
+    "approved_at": "2026-11-23T17:43:48Z"
   }
 }

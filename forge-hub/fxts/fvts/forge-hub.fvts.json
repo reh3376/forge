@@ -1,10 +1,10 @@
 {
   "spec_version": "0.2.0",
   "view_identity": {
-    "view_id": "forge-core-views",
+    "view_id": "forge-hub-views",
     "name": "Forge hub — configuration and administration",
     "version": "0.1.0",
-    "owner_module": "forge-core",
+    "owner_module": "forge-hub",
     "description": "The hub's own screens, the first thing forge-display renders (D-16, Q-15): status and health, modules, governance, users and roles. The hub is not a module and has no FACTS spec; it describes its screens here like any module."
   },
   "scope": {
@@ -24,63 +24,63 @@
       {
         "object_id": "hub.component",
         "object_label": "Hub component",
-        "schema_ref": "forge://schemas/forge-core/HealthComponent/v1",
-        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/HealthComponent.v1.schema.json",
-        "schema_hash": "a70324992b6ff9d30d02c597a002488d54dcad5560c94af244480de106bfb171",
+        "schema_ref": "forge://schemas/forge-hub/HealthComponent/v1",
+        "schema_path": "forge-hub/fxts/fvts/objects/HealthComponent.v1.schema.json",
+        "schema_hash": "6e0ac4f1776e58814444a8c06bbcec2598e621af10cda5ff13b6d5e1ee570562",
         "key_field": "name",
         "delivery": "push"
       },
       {
         "object_id": "hub.module",
         "object_label": "Module",
-        "schema_ref": "forge://schemas/forge-core/Module/v1",
-        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/Module.v1.schema.json",
-        "schema_hash": "5467f211177d52254662b15554f0256279fc632452fac8a6c110f5f252c975fa",
+        "schema_ref": "forge://schemas/forge-hub/Module/v1",
+        "schema_path": "forge-hub/fxts/fvts/objects/Module.v1.schema.json",
+        "schema_hash": "4f25e438a93b54893a6dbc8a5f4fa941053dfbc334e70e960d00475cd6de099c",
         "key_field": "module_id",
         "delivery": "push"
       },
       {
         "object_id": "hub.governed_file",
         "object_label": "Spec or governed list",
-        "schema_ref": "forge://schemas/forge-core/GovernedFile/v1",
-        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/GovernedFile.v1.schema.json",
-        "schema_hash": "82ed48af9ec9047f87e63fe2ed024befcebc71c0c263316d24ec60c69de32d45",
+        "schema_ref": "forge://schemas/forge-hub/GovernedFile/v1",
+        "schema_path": "forge-hub/fxts/fvts/objects/GovernedFile.v1.schema.json",
+        "schema_hash": "518d74c140cbdb7cf299af24135cad1d8c7066fe6788f0056d8bdfd8c75d0b70",
         "key_field": "file",
         "delivery": "request"
       },
       {
         "object_id": "hub.schema_version",
         "object_label": "Schema version",
-        "schema_ref": "forge://schemas/forge-core/SchemaVersion/v1",
-        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/SchemaVersion.v1.schema.json",
-        "schema_hash": "4394e5b2617cfcb52dd8cbcbcdaffb098db54b3871d426d7fb0876bc8ec5c667",
+        "schema_ref": "forge://schemas/forge-hub/SchemaVersion/v1",
+        "schema_path": "forge-hub/fxts/fvts/objects/SchemaVersion.v1.schema.json",
+        "schema_hash": "dd2cc8ef474f3c1d9fceb66785a9b53b55dffeb58c5f9d304075d78cf0c14230",
         "key_field": "id",
         "delivery": "request"
       },
       {
         "object_id": "hub.user",
         "object_label": "User",
-        "schema_ref": "forge://schemas/forge-core/User/v1",
-        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/User.v1.schema.json",
-        "schema_hash": "1356e63d5a47df1bab9f7b3bafa0fc4cdf4f2b29436587bcc6a2ede3e1b98e83",
+        "schema_ref": "forge://schemas/forge-hub/User/v1",
+        "schema_path": "forge-hub/fxts/fvts/objects/User.v1.schema.json",
+        "schema_hash": "b27530d81108eaca751b9516678b1ab873749eec91c78775a64bb19754d744ea",
         "key_field": "user_id",
         "delivery": "request"
       },
       {
         "object_id": "hub.role",
         "object_label": "Role",
-        "schema_ref": "forge://schemas/forge-core/Role/v1",
-        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/Role.v1.schema.json",
-        "schema_hash": "97c941ca2cbd78c83520f68e22c0af5221a20fd605428d4157b17d61f2d1a9cf",
+        "schema_ref": "forge://schemas/forge-hub/Role/v1",
+        "schema_path": "forge-hub/fxts/fvts/objects/Role.v1.schema.json",
+        "schema_hash": "6f2198dc88507637b9bfc6e64304acbe802828dbcded64ec3ebad034d2d3b984",
         "key_field": "role_id",
         "delivery": "request"
       },
       {
         "object_id": "hub.assignment",
         "object_label": "Role assignment",
-        "schema_ref": "forge://schemas/forge-core/RoleAssignment/v1",
-        "schema_path": "forge-core/src/python/forge_core/fxts/fvts/objects/forge-core/RoleAssignment.v1.schema.json",
-        "schema_hash": "e3d0aabcbc5ad9d754b2a4f01245eb35ccb83973765a8197cfbb67cf73346e72",
+        "schema_ref": "forge://schemas/forge-hub/RoleAssignment/v1",
+        "schema_path": "forge-hub/fxts/fvts/objects/RoleAssignment.v1.schema.json",
+        "schema_hash": "4c192041160831a88c932ec5548a1e316e44b3e0af0f18db9c0a7ea77fe55583",
         "key_field": "assignment_id",
         "delivery": "request"
       }
@@ -218,8 +218,8 @@
     "isa101_high_performance": false
   },
   "conformance_tests": {
-    "suite_path": "tests/governance/fvts/test_hub_views.py",
-    "golden_messages_path": "tests/governance/fvts/golden/forge-core/",
+    "suite_path": "forge-hub/tests/fxts/fvts/test_hub_views.py",
+    "golden_messages_path": "forge-hub/tests/fxts/fvts/golden/",
     "renderers_under_test": [
       "desktop_app",
       "web",
@@ -232,8 +232,17 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "aa68b466c210c0ba758e9d29fccf7f2673c0071af0e7efa5b1be855a8eca437f",
+    "previous_hash": "9642291fff157f153470b75b466b9bb536563a889d921a98baf055299a39475d",
     "change_history": [
+      {
+        "previous_hash": "9642291fff157f153470b75b466b9bb536563a889d921a98baf055299a39475d",
+        "new_hash": "f49ed40092795c6210c40cb6dbc665da347bf78d4ebd5e327320a5ebce5cd1f6",
+        "changed_at": "2026-11-23T17:37:15Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "the hub's id is forge-hub (D-17 §6, FB-200): owner_module, view_id, the seven object schema ids with their paths and hashes; the suite and the golden messages are in forge-hub/tests"
+      },
       {
         "previous_hash": "aa68b466c210c0ba758e9d29fccf7f2673c0071af0e7efa5b1be855a8eca437f",
         "new_hash": "9642291fff157f153470b75b466b9bb536563a889d921a98baf055299a39475d",
@@ -245,10 +254,10 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "9642291fff157f153470b75b466b9bb536563a889d921a98baf055299a39475d",
+    "spec_hash": "f49ed40092795c6210c40cb6dbc665da347bf78d4ebd5e327320a5ebce5cd1f6",
     "schema_version": "0.2.0",
     "schema_hash": "1a9785248467232def2fe2f01959988cfaffad20c1098382510a7c3d125b1ec7",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T02:14:30Z"
+    "approved_at": "2026-11-23T17:43:48Z"
   }
 }

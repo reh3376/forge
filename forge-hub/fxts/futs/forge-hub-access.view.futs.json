@@ -2,14 +2,14 @@
   "spec_version": "0.2.0",
   "spec_kind": "view",
   "identity": {
-    "id": "forge-core-access",
+    "id": "forge-hub-access",
     "name": "Users and roles",
     "version": "0.1.0",
     "description": "Who may do what on this hub: users, roles and the assignments between them. Read-only until the role model is built (FB-075). One of the hub's four standard screens."
   },
   "view": {
-    "owner_module": "forge-core",
-    "fvts_spec": "forge-core/src/python/forge_core/fxts/fvts/specs/forge-core.fvts.json",
+    "owner_module": "forge-hub",
+    "fvts_spec": "forge-hub/fxts/fvts/forge-hub.fvts.json",
     "surface_id": "hub.access",
     "root": {
       "node_id": "screen",
@@ -83,8 +83,17 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "7309338b9f1b8eee41d5424bedf661377cb724a7ead14b01e12ea5099bfc02f0",
+    "previous_hash": "2bcb0a755f5b0aabb7117a06b1fc46e59d9d73fda947622c6d93549218cbbc76",
     "change_history": [
+      {
+        "previous_hash": "2bcb0a755f5b0aabb7117a06b1fc46e59d9d73fda947622c6d93549218cbbc76",
+        "new_hash": "be401ccec96e230bd2bca3541aae9b1b0eed0f284f11c56eb3ab6407e4fc559d",
+        "changed_at": "2026-11-23T17:37:15Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "the hub's id is forge-hub (D-17 \u00a76, FB-200): the view's id, its owner and the path of the hub's view spec"
+      },
       {
         "previous_hash": "7309338b9f1b8eee41d5424bedf661377cb724a7ead14b01e12ea5099bfc02f0",
         "new_hash": "2bcb0a755f5b0aabb7117a06b1fc46e59d9d73fda947622c6d93549218cbbc76",
@@ -96,10 +105,10 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "2bcb0a755f5b0aabb7117a06b1fc46e59d9d73fda947622c6d93549218cbbc76",
+    "spec_hash": "be401ccec96e230bd2bca3541aae9b1b0eed0f284f11c56eb3ab6407e4fc559d",
     "schema_version": "0.2.0",
     "schema_hash": "05fa4883f7f52ce66c03e0025d923b46a0a4721f947283dae329a43c45368b51",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T02:14:29Z"
+    "approved_at": "2026-11-23T17:43:48Z"
   }
 }

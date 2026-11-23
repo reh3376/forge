@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://schemas/forge-core/Module/v1",
+  "$id": "forge://schemas/forge-hub/Module/v1",
   "title": "Module",
   "description": "One module registered with this hub.",
   "type": "object",
