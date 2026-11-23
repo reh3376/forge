@@ -35,7 +35,7 @@ This page is the honest snapshot: what exists in the repository today, what is w
 | FATS specs | 28 (one per route the hub app serves; the hub test holds both directions) |
 | FVTS specs | 1 (forge-ot reference, `pending_review`; re-stamped by FB-074 for `REJECTED_REVIEW`) |
 | CI jobs | hub-python (installs from `uv.lock` with `uv sync --locked`, FB-096), hub-go, mes-module, secrets-scan, all four required on `main`; hub-go and mes-module always report but run their steps only when the branch touches what they check (FB-173, 2026-11-19); auto-PR workflow; Deploy Tutorial workflow (Node 22; runs the framework's tests, builds the deck and its two gates on every push that touches it, publishes `main` to GitHub Pages at https://reh3376.github.io/forge/; Pages enabled 2026-10-28) |
-| Commits | 1,899 (includes the imported MES history) |
+| Commits | 1,902 (includes the imported MES history) |
 
 ---
 
