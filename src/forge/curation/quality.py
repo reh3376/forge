@@ -21,8 +21,8 @@ from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 
-from forge.core.clock import require_utc
-from forge.core.models.contextual_record import ContextualRecord
+from forge_core.clock import require_utc
+from forge_core.models.contextual_record import ContextualRecord
 
 
 class QualityDimension(StrEnum):

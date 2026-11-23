@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 144 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-22` against the repository `reh3376/forge` at the merge of PR 145 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -149,7 +149,7 @@ note:
 
 | Term | What it means in Forge |
 |---|---|
-| **Hub** | forge-core (`src/forge`, Python). It owns the transport, the ingest pipeline, the databases, context, curation, governance and the time. Hubs form a hierarchy: area hubs under a site hub under an enterprise hub. |
+| **Hub** | forge-hub (Python, in `src/forge` until it gets its own folder). It owns the transport, the ingest pipeline, the databases, context, curation, governance and the time. Hubs form a hierarchy: area hubs under a site hub under an enterprise hub. |
 | **Module** (also **spoke**) | Anything that registers with a hub. A module speaks `forge.v1.AdapterService` to its hub over gRPC and reaches it no other way (A-1). |
 | **Management module** | A module Forge builds for a business function: `forge-mes`, `forge-wms`, `forge-cmms`, `forge-nms`, `forge-ims`, `forge-historian`, `forge-scanner`. Named `forge-<service>`. |
 | **Integration module** | A module that connects Forge to one third-party product: `forge-integ-erp-netsuite`. Named `forge-integ-<function>-<product>`. Its hub side is gRPC only; its application side uses whatever the product offers (REST, GraphQL, MQTT, OPC UA, SQL, …). Installations build their own in the designer. |
@@ -245,7 +245,7 @@ note:
 
 ## Where We Are Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 144:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 145:
 
 **Working**
 
@@ -279,8 +279,9 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-22 at PR 144:
 
 | Measure | Value (2026-11-19) |
 |---|---|
-| Python hub (`src/forge`) | 354 files, ~74,100 lines |
-| Python tests | 290 files, 5,103 collected, full suite green on the locked dependency set |
+| Python: forge-core (`forge-core/src/python/forge_core`) | 124 files, ~26,300 lines |
+| Python: hub and modules (`src/forge`) | 242 files, ~50,600 lines |
+| Python tests | 290 files, 5,104 collected, full suite green on the locked dependency set |
 | Go (`go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`modules/Forge MES`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -341,15 +342,16 @@ note:
 
 | Path | What lives there |
 |---|---|
-| `src/forge/core` | `ContextualRecord`, decisions, adapters, manufacturing entities (ISA-95 hierarchy), the embedded MQTT broker, the context field registry, the schema-reference grammar, the clock (`clock.py`: time exchange, offsets, the gates) |
+| `forge-core/src/python/forge_core` | `ContextualRecord`, decisions, adapters, manufacturing entities (ISA-95 hierarchy), the embedded MQTT broker, the context field registry, the schema-reference grammar, the clock (`clock.py`: time exchange, offsets, the gates) |
 | `src/forge/transport` · `proto` · `proto_gen` | the gRPC hub and module sides, the proto set and the generated Python bindings |
 | `src/forge/ingest` | the ingest pipeline, the FACTS check at Register, receipt stamping |
 | `src/forge/storage` | router, factory, engines (PostgreSQL, TimescaleDB, Neo4j, Redis), access control, migrations |
 | `src/forge/context` · `registry` · `curation` | Context Engine, Schema Registry, curation (normalization, data products, pipeline, lineage, quality) |
-| `src/forge/governance` | FxTS: one directory per built framework (`facts`, `fats`, `fmts`, `ftts`, `fvts`), each with `schema/`, `runners/`, `specs/`; `shared/` is the runner every framework is built on; `fhts/` is the hash framework; `fmts/conformance.py` is the conformance kit |
+| `forge-core/src/python/forge_core/fxts` | FxTS: one directory per built framework (`facts`, `fats`, `fmts`, `ftts`, `fvts`), each with `schema/`, `runners/`, `specs/`; `shared/` is the runner every framework is built on; `fhts/` is the hash framework; `fmts/conformance.py` is the conformance kit |
 | `src/forge/gateway` · `api` · `observer` · `cli` | auth and RBAC middleware, the hub FastAPI app, health, the `forge` CLI |
 | `src/forge/modules/ot` | forge-ot: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
-| `src/forge/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
+| `forge-core/src/python/forge_core/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
+| `forge-core/src/python/forge_core` | **forge-core**, the shared foundation, its own package `forge_core` since 2026-11-22 (D-17): the models and the clock, `fxts` (the frameworks), `sdk`, `adapter` (the base class and the generic adapters), `link` (a module's end of the link to a hub), `proto_gen`. It imports nothing of the hub or of a module, and a test holds that (`tests/test_layer_imports.py`). The hub and the modules still share `src/forge` |
 | `src/forge/adapters` | the Python adapters of eight modules (`forge_wms`, `forge_mes`, `forge_cmms`, `forge_nms`, `forge_ims`, `forge_historian`, `forge_scanner`, `forge_integ_erp_netsuite`), each with its manifest and config, and four empty generic packages (FB-148) |
 | `go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `modules/Forge MES` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
@@ -403,7 +405,7 @@ note:
 | Discovery | `Discover` | hub → spoke | enumerate what the source exposes |
 
 - Compiled protobuf over gRPC; JSON over gRPC is forbidden (decision A-1).
-- Go and Python bindings generated from one proto set (`src/forge/proto`, `src/forge/proto_gen`, `go/gen/forge`).
+- Go and Python bindings generated from one proto set (`src/forge/proto`, `forge-core/src/python/forge_core/proto_gen`, `go/gen/forge`).
 - A module is either hosted in the hub's process (forge-ot and the Python adapters today) or its own process in any language that speaks the proto (the interim MES bridge today; Go modules and the integration host later). Either way it reaches the hub through this service and nothing else: the hub's REST ingest route is being retired (FB-123).
 - **Who starts a call matters.** Register, Health and Ingest are started by the module. Configure, Start, Stop, Collect, Backfill, Subscribe, Write and Discover are started by the hub, through a callback address the module gave at Register.
 
@@ -429,14 +431,14 @@ flowchart TD
 ```
 
 - `RecordContext` carries the context field registry slot for slot, on the proto and in Go, with every producer and the TimescaleDB table following (FB-013).
-- A naive datetime or an offset-less string is rejected at the model (`forge.core.clock`, FB-014); ruff's `DTZ` rules block CI.
+- A naive datetime or an offset-less string is rejected at the model (`forge_core.clock`, FB-014); ruff's `DTZ` rules block CI.
 - The hub stamps `ingestion_time` with its own clock on receipt; the spoke states its own send time in `spoke_time`; nothing is invented (FB-087, FB-092).
 - Register, Health and Ingest also carry the time exchange (FB-092): the spoke sends T1, the hub answers with T2 and T3, and the spoke measures its clock against the hub's. F9 has the whole picture.
 - No record builder invents a source time either: a value without a source stamp is refused unless its connection declares `source_timestamp_origin: forge`; then Forge's read time stands in and the record says so (`source_clock`, `source_uncertainty_seconds`), and the refusal is on health, status, API and CLI (FB-088, 2026-11-13).
 - Every schema reference uses one grammar, `forge://schemas/<spoke>[/<Entity>][/v<version>]`, held at every boundary (FB-008).
 
 note:
-- The context field registry (`src/forge/core/registry`) and the manufacturing entity catalog (`docs/core/manufacturing-entity-catalog.md`) define what each slot means, so "area" is the same thing in every spoke.
+- The context field registry (`forge-core/src/python/forge_core/registry`) and the manufacturing entity catalog (`docs/core/manufacturing-entity-catalog.md`) define what each slot means, so "area" is the same thing in every spoke.
 - `spoke_time` is on the wire (proto field 10) since the hub-to-spoke time exchange landed (FB-092, 2026-11-15); until then it was the hub-local `sent_time`.
 
 ---
@@ -449,7 +451,7 @@ note:
 | Per-spoke callback token, scoped hub endpoints | ✅ | FB-063 |
 | Hub → spoke write-back over a session-bound callback | ✅ | FB-054 |
 | Durable adapter registry and ingest log | ✅ | FB-060, migration 007 |
-| FTTS transport spec and runner | ✅ | `src/forge/governance/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18; page `docs/FxTS/FTTS.md`. The transport contract it should become is decided and signed (D-15, `docs/decisions/transport-contract.md`): versioning, delivery, store and forward, command expiry, time-outs, security. None of that is built (FB-164) |
+| FTTS transport spec and runner | ✅ | `forge-core/src/python/forge_core/fxts/ftts/specs/grpc-hardened-transport.ftts.json`, hashed and approved by the owner on 2026-11-18; page `docs/FxTS/FTTS.md`. The transport contract it should become is decided and signed (D-15, `docs/decisions/transport-contract.md`): versioning, delivery, store and forward, command expiry, time-outs, security. None of that is built (FB-164) |
 | Transport parity tests for the Go module | ⬜ | FB-055 |
 | Hub time in the contract: the four-timestamp exchange on Register, Health and Ingest; a reporting spoke measured two-way | ✅ | FB-092 (2026-11-15) |
 | A spoke outside its tolerance, or one that reports no measurement, refused at Register and Ingest | ✅ | FB-093's hub half (2026-11-17; the plant-floor links fail closed since 2026-11-15) |
@@ -725,7 +727,7 @@ note:
 The spec is the contract. This section is the headline for contributors: spec-first governance, the four layers every framework shares, the family of frameworks and their state, what every framework must provide, hashing and the owner's approval, the anatomy of a FACTS spec, what every module must do (FMTS), and how to run the gates.
 
 note:
-- Source: `docs/PRINCIPLES.md` §3, `docs/FxTS/README.md`, `docs/governance/facts-developer-guide.md`, `docs/WHERE-WE-ARE.md` §3.9, `src/forge/governance`.
+- Source: `docs/PRINCIPLES.md` §3, `docs/FxTS/README.md`, `docs/governance/facts-developer-guide.md`, `docs/WHERE-WE-ARE.md` §3.9, `forge-core/src/python/forge_core/fxts`.
 
 ---
 
@@ -760,9 +762,9 @@ flowchart TD
 
 | Layer | Where |
 |---|---|
-| Schemas | `src/forge/governance/<framework>/schema/*.schema.json` |
-| Specs | `src/forge/governance/<framework>/specs/*.json` (FACTS: nine, one per spoke) |
-| Runners | `src/forge/governance/<framework>/runners/`, over the shared runner in `forge.governance.shared.runner` (hashing, verification, approval) |
+| Schemas | `forge-core/src/python/forge_core/fxts/<framework>/schema/*.schema.json` |
+| Specs | `forge-core/src/python/forge_core/fxts/<framework>/specs/*.json` (FACTS: nine, one per spoke) |
+| Runners | `forge-core/src/python/forge_core/fxts/<framework>/runners/`, over the shared runner in `forge_core.fxts.shared.runner` (hashing, verification, approval) |
 | Gate | the `hub-python` CI job runs the governance tests; `forge governance run` is the operator's path |
 
 note:
@@ -816,7 +818,7 @@ A framework is either **planned** (a page that says so; no code, no specs) or it
 
 note:
 - Why it exists, in the owner's words: "we need to ensure we are not generating excessive technical debt when building FxTS specs by ensuring these core purposes are met with each new instantiation of a FxTS spec."
-- Schema rules decided with it: within a major version a schema only gains; patch is wording, minor adds something optional, major adds a required field or removes or narrows anything and marks every spec for review. The owner approves each schema hash. The code is `src/forge/governance/shared/schemas.py`; the page is `docs/FxTS/FHTS.md`, "Schema Versions".
+- Schema rules decided with it: within a major version a schema only gains; patch is wording, minor adds something optional, major adds a required field or removes or narrows anything and marks every spec for review. The owner approves each schema hash. The code is `forge-core/src/python/forge_core/fxts/shared/schemas.py`; the page is `docs/FxTS/FHTS.md`, "Schema Versions".
 - Every run now gives three verdicts for a spec's standing: `hash-verified`, `hash-approved` and `schema-current`.
 
 ---
@@ -892,7 +894,7 @@ FACTS says what a module's data looks like. FMTS says what a module must do befo
 | M-15 | Refuses a command that arrives after its expiry; only for a module that declares process-control writes | not yet (FB-164); the declaration is checked now |
 | M-16 | Applies each business write-back once by its id and confirms it; only for a module that declares it takes them | not yet (FB-164); the declaration is checked now |
 
-- **The conformance kit** (`src/forge/governance/fmts/conformance.py`) runs the real hub on clocks it controls, puts the module's clock 5 s out, and checks that the hub refuses the module, that nothing is delivered, that the module's own health says why, and that it is readmitted when the clock is put right. The kit belongs to the hub and is handed to the runner; a runner handed none reports these checks as not run.
+- **The conformance kit** (`src/forge/conformance.py`) runs the real hub on clocks it controls, puts the module's clock 5 s out, and checks that the hub refuses the module, that nothing is delivered, that the module's own health says why, and that it is readmitted when the clock is put right. The kit belongs to the hub and is handed to the runner; a runner handed none reports these checks as not run.
 - **A waiver** is a requirement a module cannot meet yet, written in its spec with the reason and the backlog item that removes it. The owner approves it through the spec's hash; every run names it; it expires when its backlog item is closed. Three requirements are waived only with admin privileges: the two for time keeping (M-3, M-4) and refusing a late command (M-15).
 - **A check that could not run is reported as `NOT CHECKED`**, never as passed.
 
@@ -922,7 +924,7 @@ Some fields take a value from a list that must be able to grow: a new module fun
 | Pruning strategies | what a module does when its buffer is full | drop-oldest (the default), by-class-priority |
 | Container kinds | how a container of a screen arranges its children | fixed, reflow, switch |
 
-- Each list is a file in `src/forge/governance/lists/`, **hashed and approved by the owner like a spec**. `forge governance specs` shows it; `stamp` and `approve` work on it.
+- Each list is a file in `forge-core/src/python/forge_core/fxts/lists/`, **hashed and approved by the owner like a spec**. `forge governance specs` shows it; `stamp` and `approve` work on it.
 - The schema says only "an entry of the list"; the runner checks it. A list that does not verify, or that the owner has not approved, fails every module spec.
 - **To add an entry**: edit the list, stamp it, and the owner approves it. No schema version, no spec touched.
 
@@ -940,7 +942,7 @@ Some fields take a value from a list that must be able to grow: a new module fun
 
 note:
 - Whether a class travels module to hub, hub to module or hub to hub is an attribute of the class, not a class of its own. `control` travels hub to module only.
-- The numbers of each class (keepalive, deadlines, batch, buffer, expiry) are settled when the transport contract is built (FB-164). The code is `src/forge/governance/shared/lists.py`.
+- The numbers of each class (keepalive, deadlines, batch, buffer, expiry) are settled when the transport contract is built (FB-164). The code is `forge-core/src/python/forge_core/fxts/shared/lists.py`.
 
 ---
 
@@ -1127,7 +1129,7 @@ note:
 - The migration map covers all 52 `system.*` calls; 42 Tier 1 scripts are identified for conversion (`docs/p7-forge-ot/`).
 
 note:
-- The SDK lives in `src/forge/sdk/scripting`; the OT module's user scripts in `src/forge/modules/ot/scripts`.
+- The SDK lives in `forge-core/src/python/forge_core/sdk/scripting`; the OT module's user scripts in `src/forge/modules/ot/scripts`.
 
 ---
 
@@ -1355,7 +1357,7 @@ flowchart LR
   SP --> T["tests/<br/>spec, runner and adapter tests"]
 ```
 
-- `forge module init` generates this layout (`src/forge/sdk/module_builder`); `docs/MODULE_BUILDER.md` is the from-first-principles guide.
+- `forge module init` generates this layout (`forge-core/src/python/forge_core/sdk/module_builder`); `docs/MODULE_BUILDER.md` is the from-first-principles guide.
 - FMTS requirement M-11 checks the layout. The conformance kit finds the one `AdapterBase` subclass in `adapter.py` and drives it; a Python module off the template (forge-ot) supplies a small `conformance.py` hook beside its adapter.
 - Read `src/forge/adapters/forge_wms` as the reference: adapter, config, context, record builder, entity mappers.
 
@@ -1509,7 +1511,7 @@ note:
 From a raw value to a decision-quality figure and a recorded decision: the Context Engine, the manufacturing entities, the curation pipeline, data products with lineage, and the decision frame.
 
 note:
-- Source: `docs/VISION.md` P-2, P-3, P-9; `docs/PRINCIPLES.md` §4; `docs/WHERE-WE-ARE.md` §3.2–§3.3; `src/forge/context`, `src/forge/curation`, `src/forge/core/models`.
+- Source: `docs/VISION.md` P-2, P-3, P-9; `docs/PRINCIPLES.md` §4; `docs/WHERE-WE-ARE.md` §3.2–§3.3; `src/forge/context`, `src/forge/curation`, `forge-core/src/python/forge_core/models`.
 
 ---
 
@@ -1518,8 +1520,8 @@ note:
 - A module's FACTS spec maps source fields to Forge context fields and declares enrichment rules; the hub fills what the source cannot: **shift from timestamp, area from location, lot from the active batch**.
 - Context is what makes two records joinable; **time** is what makes them comparable. A record is ordered by its source time, never by when it arrived, which is why a replay after an outage does not corrupt a data product (F2, F9).
 - The **Context Engine** (F21) is served by the hub under `/v1/context` (12 routes; state changes behind `context:write`) with Postgres stores through the factory (FB-001, FB-005).
-- The **context field registry** (`src/forge/core/registry`) is the vocabulary; `RecordContext` carries it slot for slot (FB-013).
-- The **manufacturing entity catalog** (`docs/core/manufacturing-entity-catalog.md`) and the ISA-95 / ISA-88 hierarchy in `forge.core.models.manufacturing` define what context *means*: `MaterialItem`, `Lot` (with `item_id`, FB-010), `ProductionOrder`, equipment and areas.
+- The **context field registry** (`forge-core/src/python/forge_core/registry`) is the vocabulary; `RecordContext` carries it slot for slot (FB-013).
+- The **manufacturing entity catalog** (`docs/core/manufacturing-entity-catalog.md`) and the ISA-95 / ISA-88 hierarchy in `forge_core.models.manufacturing` define what context *means*: `MaterialItem`, `Lot` (with `item_id`, FB-010), `ProductionOrder`, equipment and areas.
 - Context is never silently dropped (invariant).
 
 | Open | Backlog |
@@ -1569,7 +1571,7 @@ note:
 - The same curated products are the training and evaluation sets for site-specific models, so expertise is captured where it is exercised.
 
 note:
-- `DataProduct` is a Pydantic model in `forge.core.models.data_product`; migration 003 mirrors it and the test suite holds the key fields.
+- `DataProduct` is a Pydantic model in `forge_core.models.data_product`; migration 003 mirrors it and the test suite holds the key fields.
 
 ---
 
@@ -1586,7 +1588,7 @@ The research basis (`docs/PRINCIPLES.md` §4): decision quality degrades from in
 
 For significant decisions the 13-point minimum frame is recorded: scope, current hypothesis, supporting evidence, **challenging evidence (required)**, alternative hypotheses, key assumptions with confidence, missing information, risk if wrong, opportunity if right, existing controls, **evidence of effectiveness (required)**, reassessment trigger, a named owner.
 
-- `forge.core.models.decision` holds the decision with the products and lineage it relied on; outcomes are observed against it (`forge.observer`).
+- `forge_core.models.decision` holds the decision with the products and lineage it relied on; outcomes are observed against it (`forge.observer`).
 - Every assumption is a tracked entity (active / validated / invalidated / superseded); new data that contradicts an active assumption alerts its owner.
 
 note:
@@ -1747,7 +1749,7 @@ note:
 Why every clock in the system has to agree, and how Forge makes it so: stamps, measurement, correction, declaration and refusal, from the top hub down to a PLC. Earlier sections each showed a piece (the record in F2, the FACTS section in F4, the plant-floor probe in F5, the hub hierarchy in F8); this one puts them together.
 
 note:
-- Source: `docs/decisions/one-clock-ot-source-time.md` (D-9, signed 2026-11-03); `docs/PRINCIPLES.md` §2; `docs/deployment/clock-discipline.md`; `docs/WHERE-WE-ARE.md` §3.1 and §3.5; the code is `src/forge/core/clock.py`.
+- Source: `docs/decisions/one-clock-ot-source-time.md` (D-9, signed 2026-11-03); `docs/PRINCIPLES.md` §2; `docs/deployment/clock-discipline.md`; `docs/WHERE-WE-ARE.md` §3.1 and §3.5; the code is `forge-core/src/python/forge_core/clock.py`.
 
 ---
 
@@ -1795,7 +1797,7 @@ flowchart TD
 | `edge-mqtt` | Sparkplug edge nodes, measured one way | 500 ms |
 
 note:
-- The classes and values are D-9's P-8, approved by the owner as proposed (Q-1); in code they are `TOLERANCE_CLASS_SECONDS` in `forge.core.clock`. The class is data on each link's declaration: a new class is a row, not a code change.
+- The classes and values are D-9's P-8, approved by the owner as proposed (Q-1); in code they are `TOLERANCE_CLASS_SECONDS` in `forge_core.clock`. The class is data on each link's declaration: a new class is a row, not a code change.
 - `T2` to `T5` exist for devices that report PTP synchronisation; a round-trip probe cannot resolve them (FB-116).
 
 ---
@@ -1932,7 +1934,7 @@ note:
 
 | When you … | Do this |
 |---|---|
-| stamp anything with Forge's own time | `forge.core.clock.utc_now()`; never a naive `datetime.now()` or `utcnow()` |
+| stamp anything with Forge's own time | `forge_core.clock.utc_now()`; never a naive `datetime.now()` or `utcnow()` |
 | define a model with a datetime field | derive from `OneClockModel` (manufacturing entities already do, through their base) |
 | build a record from a source value | `resolve_source_stamp(...)`, then `SourceStamp.timestamp_fields()`; never fall back to "now"; refuse with `adapter.refuse(exc)` |
 | add a spoke | declare `time_governance` in the FACTS spec and on the manifest; `forge governance run` checks it |
@@ -1999,7 +2001,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest tests -q -rsx                    # 5,103 tests, ~1 minute; lists each skip with its reason
+uv run pytest tests -q -rsx                    # 5,104 tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2087,7 +2089,7 @@ note:
 | add a module | scaffold with the module builder; write its FACTS spec and its FMTS spec; run `forge governance run facts <module>` and `forge governance run fmts <module>`; the module registers only when its manifest matches the approved FACTS spec |
 | change what crosses the wire | read `docs/decisions/transport-contract.md` first; within `forge.v1` only add; a wire change re-stamps the specs it touches. A proto file lives in three places (`src/forge/proto`, `go/proto/forge/v1`, the interim MES bridge's `backend/src/forge/proto`): change all three in the same change, keep the Go copy's own `go_package` line, and regenerate. `tests/test_proto_copies.py` fails otherwise. |
 | build something that will be done more than once | find its FxTS framework and build to the spec; if none fits, record that in `BACKLOG.md` |
-| add a module function, a protocol, a data class or a pruning strategy | edit the governed list in `src/forge/governance/lists/`, `forge governance stamp` it; the owner approves it. Not a schema change. |
+| add a module function, a protocol, a data class or a pruning strategy | edit the governed list in `forge-core/src/python/forge_core/fxts/lists/`, `forge governance stamp` it; the owner approves it. Not a schema change. |
 | skip a test | give the reason (`reason=`, a `// skip reason:` comment, a message to `t.Skip`); if the reason is "needs work", add a backlog item |
 | change a stored shape | a new migration (never edit an applied one); a test in `tests/storage/test_migrations.py` that reads the migration source |
 | expose a surface from a module | an FVTS spec; the runner checks it against the render-profile baseline |
@@ -2139,7 +2141,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/` mirrors `src/`: 290 files, 5,103 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/` mirrors `src/`: 290 files, 5,104 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.

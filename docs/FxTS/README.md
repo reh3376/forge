@@ -107,15 +107,15 @@ Every change records `source` (agent/manual/ci), `changed_by` (agent ID), and `r
 forge governance specs                 # --pending: only the ones awaiting approval
 
 # Re-hash a spec after editing it: history entry, pending_review, approver fields dropped
-forge governance stamp src/forge/governance/facts/specs/forge-wms.facts.json \
+forge governance stamp forge-core/src/python/forge_core/fxts/facts/specs/forge-wms.facts.json \
     --by claude-code --reason "FB-nnn: what changed" --source agent --change-type content
 
 # The owner approves the stored hash (refused when the content no longer matches it)
-forge governance approve src/forge/governance/facts/specs/forge-wms.facts.json --by reh3376
+forge governance approve forge-core/src/python/forge_core/fxts/facts/specs/forge-wms.facts.json --by reh3376
 
 # Validate a spec against the schema version it declares, or a named one
-forge governance validate-spec src/forge/governance/fvts/specs/forge-ot.fvts.json
-forge governance validate-spec src/forge/governance/fvts/specs/forge-ot.fvts.json --schema-version 0.1.0
+forge governance validate-spec forge-core/src/python/forge_core/fxts/fvts/specs/forge-ot.fvts.json
+forge governance validate-spec forge-core/src/python/forge_core/fxts/fvts/specs/forge-ot.fvts.json --schema-version 0.1.0
 
 # Schema versions: list them, compare two, release an edited schema, move a spec forward
 forge governance schemas
@@ -200,7 +200,7 @@ All frameworks inherit from a shared base:
 ## Directory Layout
 
 ```
-src/forge/governance/
+forge-core/src/python/forge_core/fxts/
 ├── shared/
 │   ├── __init__.py
 │   └── runner.py              # FxTSRunner base, verdict/report models, parity checker

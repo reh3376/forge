@@ -1,0 +1,102 @@
+{
+  "spec_version": "0.2.0",
+  "spec_kind": "view",
+  "identity": {
+    "id": "forge-core-governance",
+    "name": "Governance",
+    "version": "0.1.0",
+    "description": "Every spec, governed list and schema version with its state and hash, and what awaits approval. One of the hub's four standard screens."
+  },
+  "view": {
+    "owner_module": "forge-core",
+    "fvts_spec": "forge-core/src/python/forge_core/fxts/fvts/specs/forge-core.fvts.json",
+    "surface_id": "hub.governance",
+    "root": {
+      "node_id": "screen",
+      "container": "reflow",
+      "layout": {
+        "direction": "column",
+        "wrap": false,
+        "gap": 12
+      },
+      "children": [
+        {
+          "node_id": "title",
+          "widget": "text-label",
+          "props": {
+            "text": "Governance",
+            "emphasis": "strong"
+          }
+        },
+        {
+          "node_id": "hint",
+          "widget": "text-label",
+          "props": {
+            "text": "Approving stays a command-line action until roles are enforced. Running a spec's checks changes nothing.",
+            "emphasis": "muted"
+          }
+        },
+        {
+          "node_id": "run",
+          "widget": "action-button",
+          "props": {
+            "label": "Run a spec's checks",
+            "style": "secondary"
+          },
+          "act": {
+            "press": "governance.run_checks"
+          }
+        },
+        {
+          "node_id": "files",
+          "widget": "data-table",
+          "props": {
+            "title": "Specs and governed lists",
+            "columns": "file,framework,hash_state,verified,approved_by,approved_at,schema_version",
+            "page_size": 25
+          },
+          "bind": {
+            "rows": {
+              "object": "hub.governed_file"
+            }
+          }
+        },
+        {
+          "node_id": "schemas",
+          "widget": "data-table",
+          "props": {
+            "title": "Schema versions",
+            "columns": "framework,version,current,step,hash_state,approved_by,specs,summary",
+            "page_size": 25
+          },
+          "bind": {
+            "rows": {
+              "object": "hub.schema_version"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": "c2c33d04f7701acf19d8f0d746fc2a7ce5c5d94df220b1f8b58e0dc0bd711fe5",
+    "change_history": [
+      {
+        "previous_hash": "c2c33d04f7701acf19d8f0d746fc2a7ce5c5d94df220b1f8b58e0dc0bd711fe5",
+        "new_hash": "ae3b15c4c3ab8e5673ef2150eb029740ca2033d9c2965a0da64823413e0754ad",
+        "changed_at": "2026-11-23T02:07:49Z",
+        "source": "agent",
+        "changed_by": "claude-mythos-5-2",
+        "change_type": "content",
+        "reason": "paths follow the move of forge-core to its own folder (D-17 step 3, FB-199); nothing else changed"
+      }
+    ],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "ae3b15c4c3ab8e5673ef2150eb029740ca2033d9c2965a0da64823413e0754ad",
+    "schema_version": "0.2.0",
+    "schema_hash": "05fa4883f7f52ce66c03e0025d923b46a0a4721f947283dae329a43c45368b51",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-23T02:14:29Z"
+  }
+}

@@ -14,9 +14,9 @@ from typing import TYPE_CHECKING, Any
 from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from forge.core.models.contextual_record import ContextualRecord
-from forge.core.models.data_product import CurationSpec, DataProduct, DataProductStatus
 from forge.curation.engine import CurationEngine, validate_spec
+from forge_core.models.contextual_record import ContextualRecord
+from forge_core.models.data_product import CurationSpec, DataProduct, DataProductStatus
 
 if TYPE_CHECKING:
     from forge.curation.lineage import LineageTracker

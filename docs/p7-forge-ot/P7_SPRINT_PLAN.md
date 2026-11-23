@@ -49,7 +49,7 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 - **Tag template system** (UDT equivalent — parameterized templates with alarm/history configs, inheritance)
 - **Tag providers** (OPC-UA per PLC, Memory, Expression, Query, Event, Virtual)
 - **i3X-compliant OPC-UA address space exposure** (CESMII i3X spec adapted to FxTS — browse, discovery, live values, SSE subscriptions)
-- **Python 3.12+ scripting engine** (extends existing `forge.sdk` — new `forge.sdk.scripting` sub-package alongside `forge.sdk.module_builder`)
+- **Python 3.12+ scripting engine** (extends existing `forge_core.sdk` — new `forge_core.sdk.scripting` sub-package alongside `forge_core.sdk.module_builder`)
 - **forge.* SDK namespace** (forge.tag, forge.db, forge.net, forge.log, forge.alarm, forge.api — connects via AdapterBase interfaces)
 - **Script trigger system** (tag change, timer, event, alarm pipeline, REST endpoint handlers)
 - **MQTT pub/sub engine** (real-time tag value publishing, alarm state broadcasting, MES command subscription)
@@ -234,11 +234,11 @@ The OT Module replaces Ignition with a platform that **exceeds it in every meani
 
 #### Epic 2B.1: Scripting Engine Core — Extends Forge Module SDK (Sprint 8)
 
-The scripting engine is a new sub-package within the existing `forge.sdk` — NOT a standalone system. This keeps it consistent with `forge.sdk.module_builder` and means any Forge module (not just OT) can eventually use scripting.
+The scripting engine is a new sub-package within the existing `forge_core.sdk` — NOT a standalone system. This keeps it consistent with `forge_core.sdk.module_builder` and means any Forge module (not just OT) can eventually use scripting.
 
 | # | Task | Details |
 |---|------|---------|
-| 2B.1.1 | forge.sdk.scripting package | New sibling to `forge.sdk.module_builder`. Contains: `engine.py` (ScriptEngine), `sandbox.py`, `triggers.py`, `modules/` (forge.* namespace implementations) |
+| 2B.1.1 | forge_core.sdk.scripting package | New sibling to `forge_core.sdk.module_builder`. Contains: `engine.py` (ScriptEngine), `sandbox.py`, `triggers.py`, `modules/` (forge.* namespace implementations) |
 | 2B.1.2 | ScriptEngine class | Discovers .py files in module's `scripts/` directory, parses decorators, registers handlers. File watcher for hot-reload. Configurable per-module script directory |
 | 2B.1.3 | forge.tag SDK module | `forge.tag.read(path)`, `forge.tag.write(path, value)`, `forge.tag.browse(path)`, `forge.tag.get_config(path)` — connects to tag engine via existing `SubscriptionProvider` and `WritableAdapter` interfaces from `AdapterBase` |
 | 2B.1.4 | forge.db SDK module | `forge.db.query(sql, params, db)`, `forge.db.named_query(name, params)`, `forge.db.transaction(db)` context manager — leverages same connection pooling infrastructure available to all adapters |
@@ -599,8 +599,8 @@ Each area follows the same pattern as Epic 7.1: subscribe → migrate alarms →
 | Competitive Analysis | `docs/p7-forge-ot/COMPETITIVE_ANALYSIS.md` | Ignition module inventory, tag engine design, competitive landscape |
 | Principles | `docs/PRINCIPLES.md` | Adapter tiers, Ignition replacement strategy (§7), spoke priority scoring (§8) |
 | Where we are | `docs/WHERE-WE-ARE.md` | Spoke status table, test counts |
-| AdapterBase model | `src/forge/core/models/adapter.py` | Interface contract |
-| ContextualRecord model | `src/forge/core/models/contextual_record.py` | Record structure |
+| AdapterBase model | `forge-core/src/python/forge_core/models/adapter.py` | Interface contract |
+| ContextualRecord model | `forge-core/src/python/forge_core/models/contextual_record.py` | Record structure |
 | Ignition SCADA | `/whk-ignition-scada/` | 241 views, 9 tag providers, PLC connections |
 | Ignition Global | `/whk-distillery01-ignition-global/` | 57 modules, 1,539 Python files |
 | MES UNS Spec | `/forge-mes/docs/features/mqtt-integration/uns-mqtt-specification.md` | MQTT integration |

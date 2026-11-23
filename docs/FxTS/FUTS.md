@@ -67,7 +67,7 @@ One client serves a control-room monitor and a phone. A screen is built from con
 | `reflow` | in a row or column that wraps and stacks as the display narrows | forms, tables, dashboards |
 | `switch` | shows one child, chosen by the width of the display | a screen that must be arranged differently on a phone |
 
-The list is `src/forge/governance/lists/container-kinds.list.json`, hashed and approved like a spec. Adding a kind is one approved change to it and never changes a saved screen.
+The list is `forge-core/src/python/forge_core/fxts/lists/container-kinds.list.json`, hashed and approved like a spec. Adding a kind is one approved change to it and never changes a saved screen.
 
 ## Expressions
 
@@ -116,7 +116,7 @@ The twelve widgets are the first set the owner chose on 2026-11-20. More are add
 ```bash
 forge governance run futs value-display
 forge governance run futs forge-ot-ferm-overview
-forge governance validate-spec src/forge/governance/futs/specs/level-bar.widget.futs.json
+forge governance validate-spec forge-core/src/python/forge_core/fxts/futs/specs/level-bar.widget.futs.json
 ```
 
 `tests/governance/futs/test_futs.py` runs every spec in CI and names each failure it allows.

@@ -296,7 +296,7 @@ forge/
       alarming/                      <- ISA-18.2 alarm state machine
       control/                       <- Write interface with safety interlocks
       context/                       <- Context enrichment (equipment_id -> area, batch_id, etc.)
-      scripts/                       <- User scripts directory (hot-reloaded by forge.sdk.scripting)
+      scripts/                       <- User scripts directory (hot-reloaded by forge_core.sdk.scripting)
         tag_change/                  <- @forge.on_tag_change handlers
         timers/                      <- @forge.timer handlers
         events/                      <- @forge.on_event handlers
@@ -481,10 +481,10 @@ If we built nothing else — just cloned Ignition's functionality with Python 3.
 
 ### 9.1.1 Integration with Existing Forge Module SDK
 
-The scripting engine is NOT a standalone framework — it extends the **existing Forge module SDK** (`forge.sdk`). The SDK already provides:
+The scripting engine is NOT a standalone framework — it extends the **existing Forge module SDK** (`forge_core.sdk`). The SDK already provides:
 
-- `forge.sdk.module_builder` — ManifestBuilder, ModuleScaffolder, 6-file adapter pattern generators
-- `forge.adapters.base.interface` — AdapterBase, SubscriptionProvider, WritableAdapter, BackfillProvider, DiscoveryProvider
+- `forge_core.sdk.module_builder` — ManifestBuilder, ModuleScaffolder, 6-file adapter pattern generators
+- `forge_core.adapter.interface` — AdapterBase, SubscriptionProvider, WritableAdapter, BackfillProvider, DiscoveryProvider
 
 The scripting engine adds a new sibling sub-package:
 
@@ -607,11 +607,11 @@ async def on_critical_alarm(alarm: AlarmEvent):
 
 ### 9.7 Script Organization
 
-User scripts live in the OT Module's `scripts/` directory and are discovered/executed by the `forge.sdk.scripting.ScriptEngine`. Because the scripting runtime is part of the Forge SDK (not OT-specific), any future module could also host scripts — but OT is the primary consumer.
+User scripts live in the OT Module's `scripts/` directory and are discovered/executed by the `forge_core.sdk.scripting.ScriptEngine`. Because the scripting runtime is part of the Forge SDK (not OT-specific), any future module could also host scripts — but OT is the primary consumer.
 
 ```
 forge/modules/ot/
-  scripts/                         # Discovered and managed by forge.sdk.scripting.ScriptEngine
+  scripts/                         # Discovered and managed by forge_core.sdk.scripting.ScriptEngine
     tag_change/                    # @forge.on_tag_change handlers
       temperature_alerts.py
       vfd_fault_detection.py
@@ -632,7 +632,7 @@ forge/modules/ot/
       formatting.py
 ```
 
-The `forge.sdk.scripting` engine handles: decorator discovery, handler registration, hot-reload via file watching, sandbox enforcement, and execution scheduling. The `forge.tag` / `forge.db` / `forge.net` SDK modules connect back to the tag engine and adapter infrastructure through the same interfaces (`SubscriptionProvider`, `WritableAdapter`, `DiscoveryProvider`) that the hub uses.
+The `forge_core.sdk.scripting` engine handles: decorator discovery, handler registration, hot-reload via file watching, sandbox enforcement, and execution scheduling. The `forge.tag` / `forge.db` / `forge.net` SDK modules connect back to the tag engine and adapter infrastructure through the same interfaces (`SubscriptionProvider`, `WritableAdapter`, `DiscoveryProvider`) that the hub uses.
 
 ---
 
@@ -760,10 +760,10 @@ The `forge.sdk.scripting` engine handles: decorator discovery, handler registrat
 - `docs/p7-forge-ot/P7_SPRINT_PLAN.md` — Sprint development plan (v2.0, 7 phases, 22+ sprints)
 
 ### Existing Forge Infrastructure
-- `src/forge/adapters/opcua/__init__.py` — Empty stub (to be built)
-- `src/forge/adapters/mqtt_sparkplug/__init__.py` — Empty stub
-- `src/forge/core/models/adapter.py` — AdapterBase, AdapterTier, AdapterState
-- `src/forge/core/models/contextual_record.py` — ContextualRecord, RecordSource, RecordValue, etc.
+- `forge-core/src/python/forge_core/adapter/generic/opcua/__init__.py` — Empty stub (to be built)
+- `forge-core/src/python/forge_core/adapter/generic/mqtt_sparkplug/__init__.py` — Empty stub
+- `forge-core/src/python/forge_core/models/adapter.py` — AdapterBase, AdapterTier, AdapterState
+- `forge-core/src/python/forge_core/models/contextual_record.py` — ContextualRecord, RecordSource, RecordValue, etc.
 - `docs/PRINCIPLES.md` — Adapter tiers (§5), spoke onboarding priorities (§8); the OPC-UA example manifest and the P7 phase breakdown are in git history (`ARCHITECTURE.md`, `SPOKE_ONBOARDING.md`, retired by FB-081)
 - `docs/WHERE-WE-ARE.md` — Spoke status table (§3.4)
 

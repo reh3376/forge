@@ -5,11 +5,11 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from forge.sdk.scripting.modules.alarm import AlarmInfo, AlarmModule
-from forge.sdk.scripting.modules.db import DbModule, QueryResult, register_named_query
-from forge.sdk.scripting.modules.log import ForgeLogger, LogModule
-from forge.sdk.scripting.modules.net import HttpResponse
-from forge.sdk.scripting.modules.tag import BrowseNode, TagModule, TagReadResult
+from forge_core.sdk.scripting.modules.alarm import AlarmInfo, AlarmModule
+from forge_core.sdk.scripting.modules.db import DbModule, QueryResult, register_named_query
+from forge_core.sdk.scripting.modules.log import ForgeLogger, LogModule
+from forge_core.sdk.scripting.modules.net import HttpResponse
+from forge_core.sdk.scripting.modules.tag import BrowseNode, TagModule, TagReadResult
 
 # ===========================================================================
 # forge.tag
@@ -141,7 +141,7 @@ class TestDbModule:
 
     def test_named_query_registration(self):
         register_named_query("active_batches", "SELECT * FROM batches WHERE active = true")
-        from forge.sdk.scripting.modules.db import _named_queries
+        from forge_core.sdk.scripting.modules.db import _named_queries
 
         assert "active_batches" in _named_queries
 

@@ -1,7 +1,7 @@
 # Forge Module Builder SDK
 
 **Version:** 0.1.0
-**Location:** `src/forge/sdk/module_builder/`
+**Location:** `forge-core/src/python/forge_core/sdk/module_builder/`
 **CLI Entry:** `forge module init|list|validate`
 
 ---
@@ -147,7 +147,7 @@ tests/adapters/
 ├── conftest.py
 └── test_acme_erp.py
 
-src/forge/governance/facts/specs/
+forge-core/src/python/forge_core/fxts/facts/specs/
 └── acme-erp.facts.json
 ```
 
@@ -165,7 +165,7 @@ src/forge/governance/facts/specs/
 If you prefer Python over CLI flags:
 
 ```python
-from forge.sdk.module_builder import ManifestBuilder, ModuleScaffolder
+from forge_core.sdk.module_builder import ManifestBuilder, ModuleScaffolder
 
 # Step 1: Build the manifest
 manifest = (
@@ -594,17 +594,17 @@ The generated spec has `TODO` markers for:
 Once your spec is finalized, compute and set the integrity hash:
 
 ```python
-from forge.governance.shared.runner import compute_spec_hash
+from forge_core.fxts.shared.runner import compute_spec_hash
 import json
 
-with open("src/forge/governance/facts/specs/acme-erp.facts.json") as f:
+with open("forge-core/src/python/forge_core/fxts/facts/specs/acme-erp.facts.json") as f:
     spec = json.load(f)
 
 hash_value = compute_spec_hash(spec)
 spec["integrity"]["spec_hash"] = hash_value
 spec["integrity"]["hash_state"] = "pending_review"
 
-with open("src/forge/governance/facts/specs/acme-erp.facts.json", "w") as f:
+with open("forge-core/src/python/forge_core/fxts/facts/specs/acme-erp.facts.json", "w") as f:
     json.dump(spec, f, indent=2)
 ```
 
@@ -767,7 +767,7 @@ class ScaffoldResult:
 If you need fine-grained control, use generators directly:
 
 ```python
-from forge.sdk.module_builder.generators import (
+from forge_core.sdk.module_builder.generators import (
     generate_config,         # manifest → config.py source
     generate_adapter,        # manifest → adapter.py source
     generate_context,        # manifest → context.py source
@@ -890,7 +890,7 @@ The lifecycle is strict: `configure()` → `start()` → `collect()`. You cannot
 ## File Map
 
 ```
-src/forge/sdk/
+forge-core/src/python/forge_core/sdk/
 ├── __init__.py
 └── module_builder/
     ├── __init__.py              # Public API (ManifestBuilder, ModuleScaffolder)

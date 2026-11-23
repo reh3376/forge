@@ -17,18 +17,18 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from forge.adapters.base.interface import (
+from forge.adapters.forge_integ_erp_netsuite.config import ForgeIntegErpNetsuiteConfig
+from forge.adapters.forge_integ_erp_netsuite.context import build_record_context
+from forge.adapters.forge_integ_erp_netsuite.record_builder import build_contextual_record
+from forge.adapters.forge_integ_erp_netsuite.topics import ERPI_ACK_TOPICS, ERPI_ENTITY_TOPICS
+from forge_core.adapter.interface import (
     AdapterBase,
     BackfillProvider,
     DiscoveryProvider,
     SubscriptionProvider,
 )
-from forge.adapters.forge_integ_erp_netsuite.config import ForgeIntegErpNetsuiteConfig
-from forge.adapters.forge_integ_erp_netsuite.context import build_record_context
-from forge.adapters.forge_integ_erp_netsuite.record_builder import build_contextual_record
-from forge.adapters.forge_integ_erp_netsuite.topics import ERPI_ACK_TOPICS, ERPI_ENTITY_TOPICS
-from forge.core.clock import SourceStampMissingError
-from forge.core.models.adapter import (
+from forge_core.clock import SourceStampMissingError
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
     AdapterManifest,
@@ -42,7 +42,7 @@ from forge.core.models.adapter import (
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-    from forge.core.models.contextual_record import ContextualRecord
+    from forge_core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 

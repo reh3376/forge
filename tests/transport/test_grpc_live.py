@@ -26,11 +26,15 @@ import pytest
 _src = Path(__file__).resolve().parent.parent.parent / "src"
 if str(_src) not in sys.path:
     sys.path.insert(0, str(_src))
-# NOTE: the generated stubs import `forge.proto_gen.forge.v1`, so proto_gen must NOT be
+# NOTE: the generated stubs import `forge_core.proto_gen.forge.v1`, so proto_gen must NOT be
 # prepended to sys.path: doing so shadows the real `forge` package whenever this
 # conftest loads before any other test module has imported forge (BACKLOG FB-058).
 
-from forge.core.models.adapter import (
+from forge.transport.grpc_server import GrpcServer
+from forge.transport.hub_server import InMemoryServicer
+from forge_core.link.grpc_channel import GrpcChannel
+from forge_core.link.spoke_client import SpokeClient
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
     AdapterState,
@@ -38,7 +42,7 @@ from forge.core.models.adapter import (
     ConnectionParam,
     DataContract,
 )
-from forge.core.models.contextual_record import (
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,
@@ -47,10 +51,6 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.transport.grpc_channel import GrpcChannel
-from forge.transport.grpc_server import GrpcServer
-from forge.transport.hub_server import InMemoryServicer
-from forge.transport.spoke_client import SpokeClient
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -366,7 +366,7 @@ class TestGrpcTransportAdapter:
         servicer: InMemoryServicer,
     ) -> None:
         """GrpcTransportAdapter works with hardened binary protobuf gRPC."""
-        from forge.transport.transport_adapter import GrpcTransportAdapter
+        from forge_core.link.transport_adapter import GrpcTransportAdapter
 
         # Create a minimal mock adapter
         class MockAdapter:
@@ -443,7 +443,7 @@ class TestProtoWireFormat:
 
     async def test_proto_messages_are_binary(self) -> None:
         """Proto messages serialize to compact binary, not JSON text."""
-        from forge.transport.proto_bridge import (
+        from forge_core.link.proto_bridge import (
             contextual_record_to_proto,
         )
 
@@ -461,11 +461,11 @@ class TestProtoWireFormat:
 
     async def test_proto_round_trip_through_binary(self) -> None:
         """Proto message → binary → proto message preserves all fields."""
-        from forge.proto_gen.forge.v1 import contextual_record_pb2 as cr_pb2
-        from forge.transport.proto_bridge import (
+        from forge_core.link.proto_bridge import (
             contextual_record_to_proto,
             proto_to_contextual_record,
         )
+        from forge_core.proto_gen.forge.v1 import contextual_record_pb2 as cr_pb2
 
         original = _make_record(42)
         proto_msg = contextual_record_to_proto(original)

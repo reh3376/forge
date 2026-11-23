@@ -212,13 +212,13 @@ def generate_adapter(manifest: dict[str, Any]) -> str:
         "from pathlib import Path",
         "from typing import Any",
         "",
-        "from forge.adapters.base.interface import (",
+        "from forge_core.adapter.interface import (",
         f"    {imports_str},",
         ")",
         f"from forge.adapters.{snake}.config import {pascal}Config",
         f"from forge.adapters.{snake}.context import build_record_context",
         f"from forge.adapters.{snake}.record_builder import build_contextual_record",
-        "from forge.core.models.adapter import (",
+        "from forge_core.models.adapter import (",
         "    AdapterCapabilities,",
         "    AdapterHealth,",
         "    AdapterManifest,",
@@ -458,7 +458,7 @@ def generate_context(manifest: dict[str, Any]) -> str:
             "import logging",
             "from typing import Any",
             "",
-            "from forge.core.models.contextual_record import RecordContext",
+            "from forge_core.models.contextual_record import RecordContext",
             "",
             "logger = logging.getLogger(__name__)",
             "",
@@ -570,7 +570,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Any
 
-from forge.core.models.contextual_record import (
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,
@@ -872,7 +872,7 @@ def generate_tests(manifest: dict[str, Any]) -> str:
         f"from forge.adapters.{snake}.config import {pascal}Config",
         f"from forge.adapters.{snake}.context import build_record_context",
         f"from forge.adapters.{snake}.record_builder import build_contextual_record",
-        "from forge.core.models.adapter import AdapterState",
+        "from forge_core.models.adapter import AdapterState",
         "",
         "",
         "# ---------------------------------------------------------------------------",

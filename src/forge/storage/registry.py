@@ -16,7 +16,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
-from forge.core.schema_ref import SchemaRef, SchemaRefError
+from forge_core.schema_ref import SchemaRef, SchemaRefError
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +62,7 @@ class SchemaEntry:
     Attributes:
         schema_id: The version ref ``forge://schemas/<spoke>/<entity>/v<version>``,
             which must agree with ``spoke_id``, ``entity_name`` and ``version``
-            (``forge.core.schema_ref``, FB-008)
+            (``forge_core.schema_ref``, FB-008)
         spoke_id: Source spoke identifier (e.g., "forge-wms", "forge-mes")
         entity_name: Entity type name (e.g., "Barrel", "Recipe", "Device")
         version: Semantic version string

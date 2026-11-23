@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.sdk.scripting.sandbox import (
+from forge_core.sdk.scripting.sandbox import (
     SandboxConfig,
     ScriptSandbox,
 )
@@ -24,7 +24,8 @@ class TestModuleAllowlist:
     def test_forge_allowed(self):
         sandbox = ScriptSandbox()
         assert sandbox.is_module_allowed("forge")
-        assert sandbox.is_module_allowed("forge.sdk.scripting")
+        assert sandbox.is_module_allowed("forge.anything")
+        assert sandbox.is_module_allowed("forge_core.sdk.scripting")
         assert sandbox.is_module_allowed("forge.modules.ot")
 
     def test_blocked_modules(self):

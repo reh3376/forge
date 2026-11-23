@@ -29,12 +29,12 @@ Without FACTS, adapter development is ad hoc. Each adapter would make its own as
 
 ## Schema
 
-**Location:** `src/forge/governance/facts/schema/facts.schema.json`
+**Location:** `forge-core/src/python/forge_core/fxts/facts/schema/facts.schema.json`
 **Status:** ✅ Implemented: nine specs, all hashed and approved by the owner
 
 ### Adapter Specs
 
-State on 2026-10-17 (`FACTSRunner` over `src/forge/governance/facts/specs/`; "Runner" counts the 36-verdict set, `facts:integrity-hash-state` excluded):
+State on 2026-10-17 (`FACTSRunner` over `forge-core/src/python/forge_core/fxts/facts/specs/`; "Runner" counts the 36-verdict set, `facts:integrity-hash-state` excluded):
 
 | Spec | Tier | Data sources | Context mappings | Capabilities | Hash state | Runner |
 |------|------|--------------|------------------|--------------|------------|--------|
@@ -79,7 +79,7 @@ facts.schema.json
 │   ├── params[]          #   array of {name, type, required, secret, description, default (typed to match type), validation}
 │   └── auth_methods[]    #   array of strings (none, bearer_token, api_key, basic, oauth2, certificate, azure_entra_id, mtls, device_token)
 ├── data_contract         # object — What does the adapter produce?
-│   ├── schema_ref        #   string — contract ref forge://schemas/<spoke>/v<version> (forge.core.schema_ref)
+│   ├── schema_ref        #   string — contract ref forge://schemas/<spoke>/v<version> (forge_core.schema_ref)
 │   ├── output_format     #   enum — contextual_record | raw
 │   ├── context_fields[]  #   array of required context field names
 │   ├── optional_context_fields[] # array of optional context field names
@@ -124,7 +124,7 @@ The same section rides on the adapter manifest (`AdapterManifest.time_governance
 
 ## Runner
 
-**Location:** `src/forge/governance/facts/runners/facts_runner.py`
+**Location:** `forge-core/src/python/forge_core/fxts/facts/runners/facts_runner.py`
 **Class:** `FACTSRunner(FxTSRunner)`
 **Status:** ✅ Implemented — `facts:schema-valid` plus 35 rule checks; enums read from the schema (FB-080)
 **Tests:** `tests/governance/facts/test_facts_runner.py`, `test_specs_schema_valid.py` (every spec), per-spec modules
@@ -192,7 +192,7 @@ The same section rides on the adapter manifest (`AdapterManifest.time_governance
 ### Usage
 
 ```bash
-# Static validation: by adapter_id (looked up in src/forge/governance/facts/specs) or by file
+# Static validation: by adapter_id (looked up in forge-core/src/python/forge_core/fxts/facts/specs) or by file
 forge governance run facts forge-wms
 forge governance run facts path/to/forge-wms.facts.json
 
@@ -211,7 +211,7 @@ Spec integrity is on the CLI already (FB-021): `forge governance specs --pending
 
 ### forge-wms (Forge Warehouse Management System)
 
-**Spec File:** `src/forge/governance/facts/specs/forge-wms.facts.json`
+**Spec File:** `forge-core/src/python/forge_core/fxts/facts/specs/forge-wms.facts.json`
 **Tier:** MES_MOM
 **Protocol:** graphql+amqp
 **Capabilities:** read, subscribe, backfill, discover (no write)
@@ -225,7 +225,7 @@ Context fields: `manufacturing_unit_id` (barrel), `lot_id`, `physical_asset_id` 
 
 ### forge-mes (Forge Manufacturing Execution System)
 
-**Spec File:** `src/forge/governance/facts/specs/forge-mes.facts.json`
+**Spec File:** `forge-core/src/python/forge_core/fxts/facts/specs/forge-mes.facts.json`
 **Tier:** MES_MOM
 **Protocol:** graphql+amqp+mqtt
 **Capabilities:** read, write, subscribe, backfill, discover

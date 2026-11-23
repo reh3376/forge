@@ -7,7 +7,7 @@ This package provides:
   - transport_adapter: GrpcTransportAdapter wrapper for any AdapterBase
 """
 
-from forge.transport.serialization import (
+from forge_core.link.serialization import (
     proto_to_pydantic,
     pydantic_to_proto,
 )

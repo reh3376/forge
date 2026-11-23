@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from forge.sdk.module_builder.manifest_builder import ManifestBuilder
+from forge_core.sdk.module_builder.manifest_builder import ManifestBuilder
 
 # ---------------------------------------------------------------------------
 # Basic Construction

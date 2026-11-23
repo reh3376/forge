@@ -14,11 +14,11 @@ import pytest
 _src = Path(__file__).resolve().parent.parent.parent / "src"
 if str(_src) not in sys.path:
     sys.path.insert(0, str(_src))
-# NOTE: the generated stubs import `forge.proto_gen.forge.v1`, so proto_gen must NOT be
+# NOTE: the generated stubs import `forge_core.proto_gen.forge.v1`, so proto_gen must NOT be
 # prepended to sys.path: doing so shadows the real `forge` package whenever this
 # conftest loads before any other test module has imported forge (BACKLOG FB-058).
 
-from forge.core.models.adapter import (
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
     AdapterManifest,
@@ -27,7 +27,7 @@ from forge.core.models.adapter import (
     ConnectionParam,
     DataContract,
 )
-from forge.core.models.contextual_record import (
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,

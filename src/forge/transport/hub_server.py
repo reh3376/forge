@@ -23,20 +23,20 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
-from forge.core.clock import utc_now
-from forge.core.models.adapter import (
+from forge_core.clock import utc_now
+from forge_core.link.serialization import (
+    hub_time_to_proto,
+    proto_to_pydantic,
+    pydantic_to_proto,
+)
+from forge_core.models.adapter import (
     AdapterHealth,
     AdapterManifest,
     AdapterState,
     HubTime,
     SpokeTime,
 )
-from forge.core.models.contextual_record import ContextualRecord
-from forge.transport.serialization import (
-    hub_time_to_proto,
-    proto_to_pydantic,
-    pydantic_to_proto,
-)
+from forge_core.models.contextual_record import ContextualRecord
 
 if TYPE_CHECKING:
     from collections.abc import Callable

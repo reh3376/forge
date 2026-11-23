@@ -18,15 +18,15 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
-from forge.core.models.alarm import AlarmAction as AlarmAction  # re-exported for the module
-from forge.core.models.alarm import AlarmPriority, AlarmState
+from forge_core.models.alarm import AlarmAction as AlarmAction  # re-exported for the module
+from forge_core.models.alarm import AlarmPriority, AlarmState
 
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
 
 
-# AlarmState, AlarmAction and AlarmPriority are contract vocabulary: forge.core.models.alarm
+# AlarmState, AlarmAction and AlarmPriority are contract vocabulary: forge_core.models.alarm
 
 
 class AlarmType(enum.StrEnum):

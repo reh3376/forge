@@ -63,7 +63,7 @@ The fields the offset and the uncertainty travel in already exist on the record 
 
 ## The conformance kit
 
-`src/forge/governance/fmts/conformance.py`. M-4 to M-7 can only be checked on a running module, so the kit runs one. The kit runs a real hub, so it belongs to the hub and is handed to the runner (`FMTSRunner(conformance_kit=...)`; the `forge governance` command does this); a runner handed none reports the four as not checked, with that reason (D-17):
+`src/forge/conformance.py`. M-4 to M-7 can only be checked on a running module, so the kit runs one. The kit runs a real hub, so it belongs to the hub and is handed to the runner (`FMTSRunner(conformance_kit=...)`; the `forge governance` command does this); a runner handed none reports the four as not checked, with that reason (D-17):
 
 - **The reference hub** is the real hub servicer on clocks the kit controls. A refusal that takes three probes a second apart on a plant network takes no time here, and the hub that judges the module is the one in production.
 - **A driver** is how the kit reaches a module, and is the only part written per kind of module. `PythonAdapterDriver` drives any `AdapterBase` through the transport Python modules ship with.
@@ -127,7 +127,7 @@ Every run gives 29 verdicts: `fmts:schema-valid`, `fmts:identity-match`, `fmts:h
 
 ## Governed lists
 
-Four fields take their values from lists that can grow without a schema version (owner, 2026-11-19). Each list is a file under `src/forge/governance/lists/`, hashed and approved by the owner like a spec, shown by `forge governance specs`, and changed with `forge governance stamp` and `approve`. A module spec fails `fmts:lists` while any of them does not verify or is not approved.
+Four fields take their values from lists that can grow without a schema version (owner, 2026-11-19). Each list is a file under `forge-core/src/python/forge_core/fxts/lists/`, hashed and approved by the owner like a spec, shown by `forge governance specs`, and changed with `forge governance stamp` and `approve`. A module spec fails `fmts:lists` while any of them does not verify or is not approved.
 
 | List | File | Used by | Entries today |
 |---|---|---|---|
@@ -144,7 +144,7 @@ To add an entry: edit the list, `forge governance stamp <list> --by <you> --reas
 
 ## The module specs
 
-`src/forge/governance/fmts/specs/` holds one spec for each module that has a FACTS spec. `tests/governance/fmts/test_module_specs.py` runs all of them in CI and names every failure it allows.
+`forge-core/src/python/forge_core/fxts/fmts/specs/` holds one spec for each module that has a FACTS spec. `tests/governance/fmts/test_module_specs.py` runs all of them in CI and names every failure it allows.
 
 | Module | Kind | Waived | State |
 |---|---|---|---|
@@ -165,7 +165,7 @@ Module names (A-17): a module Forge builds is `forge-<service>`; a module that i
 ## Running it
 
 ```bash
-forge governance run fmts <module_id>             # looked up in src/forge/governance/fmts/specs
+forge governance run fmts <module_id>             # looked up in forge-core/src/python/forge_core/fxts/fmts/specs
 forge governance run fmts path/to/x.fmts.json     # or a spec file
 forge governance stamp path/to/x.fmts.json        # after an edit
 forge governance approve path/to/x.fmts.json --by reh3376    # the owner only

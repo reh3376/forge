@@ -14,9 +14,9 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
-from forge.core.models.manufacturing.lot import Lot
-from forge.core.models.manufacturing.manufacturing_unit import ManufacturingUnit
-from forge.core.models.manufacturing.operational_event import OperationalEvent
+from forge_core.models.manufacturing.lot import Lot
+from forge_core.models.manufacturing.manufacturing_unit import ManufacturingUnit
+from forge_core.models.manufacturing.operational_event import OperationalEvent
 
 logger = logging.getLogger(__name__)
 

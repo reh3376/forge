@@ -264,7 +264,7 @@ The Schema Registry is the single source of truth for what data Forge manages. E
 
 ```python
 class SchemaEntry:
-    schema_id: str              # version ref forge://schemas/<module>/<entity>/v<version>; one grammar for every forge://schemas id, see forge.core.schema_ref (FB-008)
+    schema_id: str              # version ref forge://schemas/<module>/<entity>/v<version>; one grammar for every forge://schemas id, see forge_core.schema_ref (FB-008)
     module_id: str              # e.g., "forge-wms", "forge-mes", "forge-core"
     entity_name: str            # e.g., "Barrel", "Recipe", "Device"
     version: str                # Semantic version: "1.0.0"

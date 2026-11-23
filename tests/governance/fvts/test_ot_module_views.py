@@ -12,12 +12,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from forge.governance.fvts.renderer import load_golden_messages, render_golden_set
-from forge.governance.shared.runner import VerdictStatus
+from forge_core.fxts.fvts.renderer import load_golden_messages, render_golden_set
+from forge_core.fxts.shared.runner import VerdictStatus
 from tests.governance.fvts.conftest import GOLDEN_DIR
 
 if TYPE_CHECKING:
-    from forge.governance.fvts.runners.fvts_runner import FVTSRunner
+    from forge_core.fxts.fvts.runners.fvts_runner import FVTSRunner
 
 ALLOWED_FAILURES = frozenset({"fvts:hash-approved"})
 

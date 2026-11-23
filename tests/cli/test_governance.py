@@ -12,7 +12,7 @@ from typer.testing import CliRunner
 
 from forge.cli import governance
 from forge.cli.main import app
-from forge.governance.shared.runner import verify_spec_hash
+from forge_core.fxts.shared.runner import verify_spec_hash
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -328,7 +328,7 @@ def test_run_rejects_unknown_frameworks_targets_and_formats(tmp_path: Path) -> N
 
 def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
     """A skipped requirement is printed on every run, and a failed one fails the run."""
-    from forge.governance.shared.runner import add_spec_hash, approve_spec_hash
+    from forge_core.fxts.shared.runner import add_spec_hash, approve_spec_hash
 
     spec = {
         "spec_version": "2.0.0",
@@ -364,7 +364,7 @@ def test_run_fmts_names_what_it_did_not_check(tmp_path: Path) -> None:
         },
         "references": {
             "facts": {
-                "path": "src/forge/governance/facts/specs/forge-wms.facts.json",
+                "path": "forge-core/src/python/forge_core/fxts/facts/specs/forge-wms.facts.json",
                 "adapter_id": "forge-wms",
             },
             "manifest": "src/forge/adapters/forge_wms/manifest.json",

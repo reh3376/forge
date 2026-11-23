@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from forge.core.models.manufacturing.process_definition import (
+from forge_core.models.manufacturing.process_definition import (
     ProcessDefinition,
 )
 

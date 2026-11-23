@@ -4,17 +4,17 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from forge.core.clock import ClockEstimate, SourceStampMissingError
-from forge.core.models.contextual_record import (
-    ContextualRecord,
-)
-from forge.core.models.contextual_record import (
-    QualityCode as CoreQualityCode,
-)
 from forge.modules.ot.context.record_builder import _map_quality, build_ot_record
 from forge.modules.ot.context.resolvers import EnrichmentContext
 from forge.modules.ot.opcua_client.types import DataType, QualityCode
 from forge.modules.ot.tag_engine.models import MemoryTag, StandardTag, TagValue
+from forge_core.clock import ClockEstimate, SourceStampMissingError
+from forge_core.models.contextual_record import (
+    ContextualRecord,
+)
+from forge_core.models.contextual_record import (
+    QualityCode as CoreQualityCode,
+)
 
 # ---------------------------------------------------------------------------
 # Fixtures

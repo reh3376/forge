@@ -7,8 +7,8 @@ from typing import Any
 
 import pytest
 
-from forge.governance.fvts.profiles import PROFILE_BASELINE, SitePolicy, effective_profile
-from forge.governance.fvts.renderer import (
+from forge_core.fxts.fvts.profiles import PROFILE_BASELINE, SitePolicy, effective_profile
+from forge_core.fxts.fvts.renderer import (
     WRITE_STATUSES,
     GoldenRenderError,
     ReferenceRenderer,

@@ -17,7 +17,7 @@ from forge.context.models import (
     OperatingMode,
 )
 from forge.context.shift import build_louisville_schedule
-from forge.core.models.contextual_record import RecordContext
+from forge_core.models.contextual_record import RecordContext
 
 
 @pytest.fixture

@@ -14,8 +14,8 @@ import logging
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from forge.core.clock import FORGE_CLOCK, resolve_source_stamp
-from forge.core.models.contextual_record import (
+from forge_core.clock import FORGE_CLOCK, resolve_source_stamp
+from forge_core.models.contextual_record import (
     ContextualRecord,
     RecordContext,
     RecordLineage,
@@ -23,14 +23,14 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.core.models.contextual_record import (
+from forge_core.models.contextual_record import (
     QualityCode as CoreQualityCode,
 )
 
 if TYPE_CHECKING:
-    from forge.core.clock import ClockEstimate
     from forge.modules.ot.context.resolvers import EnrichmentContext
     from forge.modules.ot.tag_engine.models import BaseTag, TagValue
+    from forge_core.clock import ClockEstimate
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ def build_ot_record(
     one-clock record P-6: the scan interval, or a Query tag's poll interval; a tag
     whose ``max_sampling_uncertainty_ms`` is tighter is refused at load); any other
     connection raises
-    :class:`~forge.core.clock.SourceStampMissingError`, which the adapter counts
+    :class:`~forge_core.clock.SourceStampMissingError`, which the adapter counts
     on its health. A Forge-born tag (memory, expression, derived, computed, event,
     reference: no connection) has Forge's clock as its source clock by nature.
 

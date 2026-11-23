@@ -6,7 +6,9 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from forge.core.models.contextual_record import (
+from forge.curation.engine import CurationEngine, validate_spec
+from forge.curation.registry import DataProductRegistry
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,
@@ -15,9 +17,7 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.core.models.data_product import CurationSpec
-from forge.curation.engine import CurationEngine, validate_spec
-from forge.curation.registry import DataProductRegistry
+from forge_core.models.data_product import CurationSpec
 
 T0 = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
 

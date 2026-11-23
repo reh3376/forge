@@ -217,7 +217,7 @@ class TestSchemaEntryId:
     def test_id_must_agree_with_spoke_entity_and_version(self):
         import pytest
 
-        from forge.core.schema_ref import SchemaRefError
+        from forge_core.schema_ref import SchemaRefError
 
         with pytest.raises(
             SchemaRefError, match=r"expected forge://schemas/forge-wms/Barrel/v2\.0\.0"

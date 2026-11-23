@@ -6,8 +6,6 @@ from typing import Any
 
 import pytest
 
-from forge.core.models.adapter import AdapterState
-from forge.core.models.contextual_record import QualityCode as CoreQualityCode
 from forge.modules.ot.bridge.adapter import IgnitionBridgeAdapter, _map_ignition_quality
 from forge.modules.ot.bridge.client import IgnitionRestClient
 from forge.modules.ot.bridge.models import (
@@ -17,6 +15,8 @@ from forge.modules.ot.bridge.models import (
 )
 from forge.modules.ot.bridge.tag_mapper import TagMapper
 from forge.modules.ot.opcua_client.paths import PathNormalizer
+from forge_core.models.adapter import AdapterState
+from forge_core.models.contextual_record import QualityCode as CoreQualityCode
 
 # ---------------------------------------------------------------------------
 # Mock transport (shared with test_client.py pattern)

@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from forge.adapters.base.interface import AdapterBase
-from forge.core import telemetry
-from forge.core.clock import SourceStampMissingError, TimeGovernanceConflictError
-from forge.core.models.adapter import (
+from forge_core import telemetry
+from forge_core.adapter.interface import AdapterBase
+from forge_core.clock import SourceStampMissingError, TimeGovernanceConflictError
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
     AdapterManifest,
@@ -25,7 +25,7 @@ from tests.otel import metric_reader, metrics_by_name
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-    from forge.core.models.contextual_record import ContextualRecord
+    from forge_core.models.contextual_record import ContextualRecord
 
 
 class _Adapter(AdapterBase):
@@ -69,7 +69,7 @@ def _refusal(tag: str = "t") -> SourceStampMissingError:
 async def test_a_refusal_counts_degrades_and_names_its_cause(caplog) -> None:
     adapter = _Adapter()
     await adapter.start()
-    with caplog.at_level(logging.DEBUG, logger="forge.adapters.base.interface"):
+    with caplog.at_level(logging.DEBUG, logger="forge_core.adapter.interface"):
         adapter.refuse(_refusal("a"))
         adapter.refuse(_refusal("b"))
     health = await adapter.health()

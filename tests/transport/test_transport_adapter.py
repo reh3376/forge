@@ -8,10 +8,10 @@ from pathlib import Path
 
 import pytest
 
-from forge.core.models.contextual_record import ContextualRecord
 from forge.transport.hub_server import InMemoryServicer
-from forge.transport.spoke_client import InMemoryChannel
-from forge.transport.transport_adapter import GrpcTransportAdapter
+from forge_core.link.spoke_client import InMemoryChannel
+from forge_core.link.transport_adapter import GrpcTransportAdapter
+from forge_core.models.contextual_record import ContextualRecord
 
 # ── Import WMS and MES adapters if available ──────────────────────────────
 

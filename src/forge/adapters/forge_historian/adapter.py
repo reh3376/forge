@@ -25,17 +25,17 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from forge.adapters.base.interface import (
+from forge.adapters.forge_historian.config import ForgeHistorianConfig
+from forge.adapters.forge_historian.context import build_record_context
+from forge.adapters.forge_historian.record_builder import build_contextual_record
+from forge_core.adapter.interface import (
     AdapterBase,
     BackfillProvider,
     DiscoveryProvider,
     SubscriptionProvider,
 )
-from forge.adapters.forge_historian.config import ForgeHistorianConfig
-from forge.adapters.forge_historian.context import build_record_context
-from forge.adapters.forge_historian.record_builder import build_contextual_record
-from forge.core.clock import SourceStampMissingError
-from forge.core.models.adapter import (
+from forge_core.clock import SourceStampMissingError
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
     AdapterManifest,

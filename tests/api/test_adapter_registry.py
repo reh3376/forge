@@ -11,16 +11,16 @@ from fastapi.testclient import TestClient
 
 from forge.api.main import create_app
 from forge.api.registry import AdapterRegistry
-from forge.core.models.adapter import (
+from forge.ingest.pipeline import IngestOutcome
+from forge.storage.adapter_registry import AdapterRow, InMemoryAdapterRegistryStore
+from forge.storage.config import StorageConfig
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
     AdapterManifest,
     AdapterState,
     DataContract,
 )
-from forge.ingest.pipeline import IngestOutcome
-from forge.storage.adapter_registry import AdapterRow, InMemoryAdapterRegistryStore
-from forge.storage.config import StorageConfig
 
 
 def manifest(adapter_id: str = "forge-mes") -> AdapterManifest:

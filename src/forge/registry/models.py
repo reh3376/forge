@@ -16,7 +16,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
-from forge.core.schema_ref import require_schema_id
+from forge_core.schema_ref import require_schema_id
 
 
 class SchemaType(StrEnum):
@@ -73,7 +73,7 @@ class SchemaMetadata:
     Attributes:
         schema_id: The schema id, ``forge://schemas/<spoke>/<Entity>`` (e.g.
             ``forge://schemas/forge-wms/Barrel``); the registry assigns the
-            versions, so the id carries none (``forge.core.schema_ref``, FB-008)
+            versions, so the id carries none (``forge_core.schema_ref``, FB-008)
         name: Human-readable name
         schema_type: Category of schema
         compatibility: Enforcement mode for version transitions

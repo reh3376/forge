@@ -27,12 +27,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from forge.adapters.base.interface import (
-    AdapterBase,
-    BackfillProvider,
-    DiscoveryProvider,
-    SubscriptionProvider,
-)
 from forge.adapters.forge_ims.client import ForgeImsClient, MockForgeImsClient
 from forge.adapters.forge_ims.collectors import (
     collect_events,
@@ -44,7 +38,13 @@ from forge.adapters.forge_ims.context import build_record_context
 from forge.adapters.forge_ims.record_builder import (
     build_contextual_record,
 )
-from forge.core.models.adapter import (
+from forge_core.adapter.interface import (
+    AdapterBase,
+    BackfillProvider,
+    DiscoveryProvider,
+    SubscriptionProvider,
+)
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterHealth,
     AdapterManifest,

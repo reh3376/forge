@@ -10,14 +10,14 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from forge.api.main import create_app
-from forge.core.models.adapter import (
+from forge.storage.config import StorageConfig
+from forge_core.link.spoke_callback import CALLBACK_PARAM, WriteDispatcher
+from forge_core.link.spoke_client import InMemoryChannel
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
     DataContract,
 )
-from forge.storage.config import StorageConfig
-from forge.transport.spoke_callback import CALLBACK_PARAM, WriteDispatcher
-from forge.transport.spoke_client import InMemoryChannel
 
 
 def _manifest(adapter_id: str = "forge-mes", *, write: bool = True) -> dict:

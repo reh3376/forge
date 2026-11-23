@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from forge.core.models.adapter import (
+from forge_core.link.proto_bridge import manifest_to_proto, proto_to_manifest
+from forge_core.link.serialization import proto_to_pydantic, pydantic_to_proto
+from forge_core.models.adapter import (
     AdapterCapabilities,
     AdapterManifest,
     AdapterTier,
@@ -10,8 +12,6 @@ from forge.core.models.adapter import (
     DataContract,
     TimeGovernance,
 )
-from forge.transport.proto_bridge import manifest_to_proto, proto_to_manifest
-from forge.transport.serialization import proto_to_pydantic, pydantic_to_proto
 
 GOVERNANCE = TimeGovernance(
     time_source="site-ptp",

@@ -10,7 +10,7 @@ from forge.adapters.forge_wms.mappers.physical_asset import (
 )
 from forge.adapters.forge_wms.mappers.production_order import map_production_order
 from forge.adapters.forge_wms.mappers.work_order import map_warehouse_job
-from forge.core.models.manufacturing.enums import (
+from forge_core.models.manufacturing.enums import (
     AssetType,
     EntityType,
     EventCategory,

@@ -16,7 +16,7 @@ description: "Check a change to the forge-ot alarm state machine (ISA-18.2 state
 | File | What the check covers in it |
 |---|---|
 | `src/forge/modules/ot/alarming/state_machine.py` | `AlarmStateMachine.transition`, `can_transition`, `get_accepted_actions`, `get_operator_actions`, `_resolve`, and the tables `_TRANSITIONS`, `_ADMIN_ENTRY_STATES`, `_ADMIN_ACTIONS`, `_ADMIN_RETURN`, `_PROCESS_EVENT_RETURN` |
-| `src/forge/core/models/alarm.py` | `AlarmState`, `AlarmAction` (a new state or action changes the enumeration), `SYSTEM_ALARM_ACTIONS`, `OPERATOR_ALARM_ACTIONS` |
+| `forge-core/src/python/forge_core/models/alarm.py` | `AlarmState`, `AlarmAction` (a new state or action changes the enumeration), `SYSTEM_ALARM_ACTIONS`, `OPERATOR_ALARM_ACTIONS` |
 | `src/forge/modules/ot/alarming/models.py` | `AlarmInstance.state`, `AlarmInstance._state_before_admin`, and that no other field affects a transition |
 
 Paths are as of the sync commit; the code moves to `forge-modules/forge-ot/` with BACKLOG FB-201.
@@ -24,7 +24,7 @@ Paths are as of the sync commit; the code moves to `forge-modules/forge-ot/` wit
 **Sync commit:** `88cc1c20` (2026-11-22). See what changed since:
 
 ```bash
-git log --oneline 88cc1c20..HEAD -- src/forge/modules/ot/alarming/state_machine.py src/forge/modules/ot/alarming/models.py src/forge/core/models/alarm.py
+git log --oneline 88cc1c20..HEAD -- src/forge/modules/ot/alarming/state_machine.py src/forge/modules/ot/alarming/models.py forge-core/src/python/forge_core/models/alarm.py
 ```
 
 If that prints commits you did not check, look before you trust a pass. Move the sync commit forward only after you have confirmed the check still describes the code.
@@ -45,7 +45,7 @@ The machine is finite. A transition reads and writes two fields of an alarm, `st
 - **Every configuration reachable from a new alarm**, with the process condition tracked beside it (29 situations; 29 as well when questions are allowed as steps, since a question changes nothing). The search stops when no step leads anywhere new, so there is no depth bound.
 - **The assumption is checked:** `test_only_two_fields_matter` sets every other field to an unusual value and runs all 560 cases again.
 - **Able to fail:** three broken machines (one forgets a re-trigger while suppressed, one drops an unacknowledged alarm on CLEAR, one whose lookup writes the alarm) must each be caught.
-- **History:** the first run found that `can_transition` changed the alarm: asked whether CLEAR was possible on a suppressed alarm, it rewrote the state the alarm returns to, and a standing alarm came back as NORMAL (BACKLOG FB-219, the counterexample under "Reading a failure"). `_resolve` now only reads; `transition` does the write. `test_asking_changes_nothing` and `test_no_abnormal_condition_is_shown_as_normal_when_someone_asks` hold it. It also found that the one list of valid actions left out CLEAR and TRIGGER for an alarm out of service (FB-220: now two lists, the accepted actions and the operator's, from one definition in `forge.core.models.alarm`), and that RESET left a saved return state behind on a NORMAL alarm (FB-221: RESET now clears it).
+- **History:** the first run found that `can_transition` changed the alarm: asked whether CLEAR was possible on a suppressed alarm, it rewrote the state the alarm returns to, and a standing alarm came back as NORMAL (BACKLOG FB-219, the counterexample under "Reading a failure"). `_resolve` now only reads; `transition` does the write. `test_asking_changes_nothing` and `test_no_abnormal_condition_is_shown_as_normal_when_someone_asks` hold it. It also found that the one list of valid actions left out CLEAR and TRIGGER for an alarm out of service (FB-220: now two lists, the accepted actions and the operator's, from one definition in `forge_core.models.alarm`), and that RESET left a saved return state behind on a NORMAL alarm (FB-221: RESET now clears it).
 
 Nothing is sampled and nothing is bounded, so a pass covers this machine as written. It does not cover the alarm engine around it (detection, timers for shelving, persistence, the API).
 

@@ -3,7 +3,7 @@
 from datetime import UTC, datetime
 from zoneinfo import ZoneInfo
 
-from forge.sdk.scripting.modules.date import DateModule, _java_to_strftime
+from forge_core.sdk.scripting.modules.date import DateModule, _java_to_strftime
 
 # ---------------------------------------------------------------------------
 # Java format conversion

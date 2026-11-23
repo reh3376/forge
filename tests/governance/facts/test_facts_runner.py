@@ -18,14 +18,16 @@ from typing import Any
 
 import pytest
 
+from forge_core.fxts import FXTS_ROOT
+
 # ---------------------------------------------------------------------------
 # Path setup — runner lives under src/
 # ---------------------------------------------------------------------------
 
 SRC_ROOT = Path(__file__).resolve().parents[3] / "src"
-SCHEMA_PATH = SRC_ROOT / "forge" / "governance" / "facts" / "schema" / "facts.schema.json"
-WMS_SPEC_PATH = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "forge-wms.facts.json"
-MES_SPEC_PATH = SRC_ROOT / "forge" / "governance" / "facts" / "specs" / "forge-mes.facts.json"
+SCHEMA_PATH = FXTS_ROOT / "facts" / "schema" / "facts.schema.json"
+WMS_SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-wms.facts.json"
+MES_SPEC_PATH = FXTS_ROOT / "facts" / "specs" / "forge-mes.facts.json"
 
 
 # ---------------------------------------------------------------------------
@@ -57,7 +59,7 @@ def runner():
     import sys
 
     sys.path.insert(0, str(SRC_ROOT))
-    from forge.governance.facts.runners.facts_runner import FACTSRunner
+    from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
 
     return FACTSRunner(schema_path=str(SCHEMA_PATH))
 
@@ -67,7 +69,7 @@ def verdict_status():
     import sys
 
     sys.path.insert(0, str(SRC_ROOT))
-    from forge.governance.shared.runner import VerdictStatus
+    from forge_core.fxts.shared.runner import VerdictStatus
 
     return VerdictStatus
 

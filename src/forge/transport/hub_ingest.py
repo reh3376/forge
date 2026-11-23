@@ -16,7 +16,7 @@ Replaces ``InMemoryServicer`` in the hub API. Differences:
 * The hub fails closed on a spoke's clock (FB-093, hub half): every Register,
   Health and Ingest request is a probe of it, and a spoke whose clock is
   unreadable or outside its declared class has its Register and its Ingest
-  refused until three good probes (:class:`~forge.core.clock.SpokeClockGates`).
+  refused until three good probes (:class:`~forge_core.clock.SpokeClockGates`).
 """
 
 from __future__ import annotations
@@ -27,32 +27,32 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
-from forge.core import telemetry
-from forge.core.clock import (
+from forge.ingest.facts_check import FactsCheckResult, check_manifest_against_facts
+from forge.ingest.pipeline import IngestOutcome, IngestPipeline, IngestStats
+from forge.transport.hub_server import AdapterServiceServicer, AdapterSession
+from forge_core import telemetry
+from forge_core.clock import (
     TIME_GOVERNANCE_MISSING,
     ClockGateTransition,
     ClockRefusedError,
     tolerance_for_class,
 )
-from forge.core.models.adapter import (
+from forge_core.link.serialization import proto_to_pydantic, pydantic_to_proto
+from forge_core.link.spoke_callback import CALLBACK_PARAM
+from forge_core.models.adapter import (
     AdapterHealth,
     AdapterManifest,
     AdapterState,
     SpokeTime,
     TimeGovernance,
 )
-from forge.ingest.facts_check import FactsCheckResult, check_manifest_against_facts
-from forge.ingest.pipeline import IngestOutcome, IngestPipeline, IngestStats
-from forge.transport.hub_server import AdapterServiceServicer, AdapterSession
-from forge.transport.serialization import proto_to_pydantic, pydantic_to_proto
-from forge.transport.spoke_callback import CALLBACK_PARAM
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
 
-    from forge.core.models.contextual_record import ContextualRecord
-    from forge.transport.spoke_callback import WriteDispatcher
+    from forge_core.link.spoke_callback import WriteDispatcher
+    from forge_core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 

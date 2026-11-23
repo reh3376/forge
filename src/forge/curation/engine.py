@@ -1,6 +1,6 @@
 """Curation engine — one pipeline per data product, run on demand or on ingest (FB-009).
 
-The engine turns a product's :class:`~forge.core.models.data_product.CurationSpec`
+The engine turns a product's :class:`~forge_core.models.data_product.CurationSpec`
 into a :class:`CurationPipeline` (normalise, bucket, aggregate), runs it, keeps
 the product's latest quality report and a bounded window of its curated
 records, and hands every curated record to ``persist`` so it lands in the
@@ -19,7 +19,6 @@ import logging
 from collections import deque
 from typing import TYPE_CHECKING, Any
 
-from forge.core.models.data_product import CurationSpec, DataProduct, DataProductStatus
 from forge.curation.aggregation import AggregationFunction, AggregationSpec
 from forge.curation.lineage import LineageTracker
 from forge.curation.normalization import TIME_WINDOWS, UnitRegistry, build_whk_unit_registry
@@ -33,11 +32,12 @@ from forge.curation.pipeline import (
 )
 from forge.curation.quality import QualityMonitor, QualityReport
 from forge.curation.registry import DataProductRegistry
+from forge_core.models.data_product import CurationSpec, DataProduct, DataProductStatus
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Iterable
 
-    from forge.core.models.contextual_record import ContextualRecord
+    from forge_core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 

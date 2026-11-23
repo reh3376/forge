@@ -6,13 +6,6 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from forge.core.models.contextual_record import (
-    ContextualRecord,
-    RecordLineage,
-    RecordSource,
-    RecordTimestamp,
-    RecordValue,
-)
 from forge.curation.quality import (
     CompletenessRule,
     ConsistencyRule,
@@ -21,6 +14,13 @@ from forge.curation.quality import (
     QualityMonitor,
     QualityReport,
     RangeRule,
+)
+from forge_core.models.contextual_record import (
+    ContextualRecord,
+    RecordLineage,
+    RecordSource,
+    RecordTimestamp,
+    RecordValue,
 )
 from tests.curation.conftest import make_record_batch
 

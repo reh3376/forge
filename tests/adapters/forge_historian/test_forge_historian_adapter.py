@@ -28,8 +28,9 @@ from forge.adapters.forge_historian.record_builder import (
     _parse_timestamp,
     build_contextual_record,
 )
-from forge.core.models.adapter import AdapterState, AdapterTier
-from forge.core.models.contextual_record import QualityCode
+from forge_core.fxts import FXTS_ROOT
+from forge_core.models.adapter import AdapterState, AdapterTier
+from forge_core.models.contextual_record import QualityCode
 
 # ── Fixtures ──────────────────────────────────────────────────────
 
@@ -569,15 +570,7 @@ class TestFACTSSpec:
 
     @pytest.fixture()
     def spec(self) -> dict[str, Any]:
-        spec_path = (
-            Path(__file__).parent.parent.parent.parent
-            / "src"
-            / "forge"
-            / "governance"
-            / "facts"
-            / "specs"
-            / "forge-historian.facts.json"
-        )
+        spec_path = FXTS_ROOT / "facts" / "specs" / "forge-historian.facts.json"
         return json.loads(spec_path.read_text())
 
     def test_spec_loads(self, spec):
@@ -605,8 +598,8 @@ class TestFACTSSpec:
 
     @pytest.mark.asyncio()
     async def test_facts_runner_passes(self, spec):
-        from forge.governance.facts.runners.facts_runner import FACTSRunner
-        from forge.governance.shared.runner import VerdictStatus
+        from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
+        from forge_core.fxts.shared.runner import VerdictStatus
 
         runner = FACTSRunner()
         report = await runner.run(target="forge-historian", spec=spec)
@@ -623,7 +616,7 @@ class TestFACTSSpec:
 
     @pytest.mark.asyncio()
     async def test_hash_verification(self, spec):
-        from forge.governance.shared.runner import verify_spec_hash
+        from forge_core.fxts.shared.runner import verify_spec_hash
 
         ok, msg = verify_spec_hash(spec)
         assert ok, f"Hash mismatch: {msg}"

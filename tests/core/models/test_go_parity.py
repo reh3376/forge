@@ -23,8 +23,8 @@ from uuid import UUID
 
 import pytest
 
-from forge.core.models import manufacturing as package
-from forge.core.models.manufacturing import (
+from forge_core.models import manufacturing as package
+from forge_core.models.manufacturing import (
     BusinessEntity,
     Lot,
     ManufacturingUnit,
@@ -40,8 +40,8 @@ from forge.core.models.manufacturing import (
     WorkOrderDependency,
     enums,
 )
-from forge.core.models.manufacturing.base import ManufacturingModelBase
-from forge.core.models.manufacturing.enums import (
+from forge_core.models.manufacturing.base import ManufacturingModelBase
+from forge_core.models.manufacturing.enums import (
     AssetOperationalState,
     AssetType,
     EntityType,

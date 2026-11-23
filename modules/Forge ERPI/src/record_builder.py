@@ -16,7 +16,7 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
-from forge.core.models.contextual_record import (
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,

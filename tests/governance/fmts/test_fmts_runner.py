@@ -5,21 +5,21 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Any
 
-from forge.governance.fmts import SCHEMA_PATH
-from forge.governance.fmts.runners.fmts_runner import (
+from forge_core.fxts.fmts import SCHEMA_PATH
+from forge_core.fxts.fmts.runners.fmts_runner import (
     ADMIN_WAIVABLE,
     CONFORMANCE_KIT,
     REQUIREMENTS,
     FMTSRunner,
     load_backlog,
 )
-from forge.governance.shared.runner import VerdictStatus, check_schema_runner_parity
+from forge_core.fxts.shared.runner import VerdictStatus, check_schema_runner_parity
 from tests.governance.fmts.conftest import sign
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from forge.governance.shared.runner import FxTSReport, FxTSVerdict
+    from forge_core.fxts.shared.runner import FxTSReport, FxTSVerdict
 
 PASS, FAIL, SKIP = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.SKIP
 REASON = "The interim bridge keeps this until its replacement exists."
@@ -262,7 +262,7 @@ class TestFunctionIntegrationAndDataClasses:
     ) -> None:
         import shutil
 
-        from forge.governance.shared import lists
+        from forge_core.fxts.shared import lists
 
         copy = tmp_path / "lists"
         shutil.copytree(lists.LISTS_DIR, copy)
@@ -301,7 +301,7 @@ class TestPlumbing:
         assert verdicts["fmts:hash-verified"].status == FAIL
 
     async def test_an_unapproved_spec_fails(self, runner, spec, repo) -> None:
-        from forge.governance.shared.runner import add_spec_hash
+        from forge_core.fxts.shared.runner import add_spec_hash
 
         spec.pop("integrity")
         add_spec_hash(spec, changed_by="test")
@@ -370,7 +370,7 @@ class TestWaivers:
     async def test_time_keeping_is_waived_only_with_admin_privileges(
         self, runner, unsigned, repo
     ) -> None:
-        from forge.governance.shared.runner import add_spec_hash
+        from forge_core.fxts.shared.runner import add_spec_hash
 
         assert frozenset({"M-3", "M-4", "M-15"}) == ADMIN_WAIVABLE
         for requirement in sorted(ADMIN_WAIVABLE):
@@ -395,7 +395,7 @@ class TestWaivers:
     async def test_an_ordinary_waiver_does_not_wait_for_approval(
         self, runner, unsigned, repo
     ) -> None:
-        from forge.governance.shared.runner import add_spec_hash
+        from forge_core.fxts.shared.runner import add_spec_hash
 
         _waive(unsigned, "M-9")
         add_spec_hash(unsigned, changed_by="test")

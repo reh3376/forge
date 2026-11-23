@@ -12,23 +12,23 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from pydantic import ValidationError
 
-from forge.core.models.adapter import (
+from forge_core.link.serialization import (
+    proto_to_pydantic,
+    pydantic_to_proto,
+)
+from forge_core.models.adapter import (
     AdapterHealth,
     AdapterManifest,
     AdapterState,
     AdapterTier,
     DataContract,
 )
-from forge.core.models.contextual_record import (
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,
     RecordTimestamp,
     RecordValue,
-)
-from forge.transport.serialization import (
-    proto_to_pydantic,
-    pydantic_to_proto,
 )
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -78,7 +78,7 @@ class TestContextualRecordRoundTrip:
         """The stamp as sent, the offset and the time quality (FB-094 step 3), dict form."""
         from datetime import timedelta
 
-        from forge.core.clock import TimeQuality
+        from forge_core.clock import TimeQuality
 
         ts = sample_record.timestamp
         ts.source_time_as_sent = ts.source_time + timedelta(seconds=1)
@@ -475,7 +475,7 @@ class TestRegistrySlotsOnTheWire:
         assert restored.context.work_order_id == "WO-7"
 
     def test_old_shift_key_is_still_read(self) -> None:
-        from forge.transport.serialization import _proto_to_record_context
+        from forge_core.link.serialization import _proto_to_record_context
 
         assert _proto_to_record_context({"shift": "A"}).shift_id == "A"
         assert _proto_to_record_context({}).event_timestamp is None
@@ -483,7 +483,7 @@ class TestRegistrySlotsOnTheWire:
     def test_proto_message_round_trip(self) -> None:
         from datetime import UTC, datetime
 
-        from forge.transport.proto_bridge import proto_to_record_context, record_context_to_proto
+        from forge_core.link.proto_bridge import proto_to_record_context, record_context_to_proto
 
         ctx = RecordContext(
             shift_id="B",

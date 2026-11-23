@@ -16,11 +16,6 @@ from typing import Any
 import pytest
 
 from forge.adapters.forge_wms.adapter import ForgeWmsAdapter
-from forge.core.models.adapter import AdapterState
-from forge.core.models.contextual_record import (
-    ContextualRecord,
-    QualityCode,
-)
 from forge.curation.lineage import LineageTracker
 from forge.curation.normalization import UnitRegistry
 from forge.curation.quality import QualityMonitor
@@ -32,6 +27,11 @@ from forge.storage.registry import (
     StorageEngine,
 )
 from forge.storage.router import DataRouter, RoutingDecision
+from forge_core.models.adapter import AdapterState
+from forge_core.models.contextual_record import (
+    ContextualRecord,
+    QualityCode,
+)
 
 # ═══════════════════════════════════════════════════════════════════
 # 1. Adapter Lifecycle

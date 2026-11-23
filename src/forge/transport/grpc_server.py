@@ -32,21 +32,21 @@ if TYPE_CHECKING:
 import grpc
 import grpc.aio
 
-from forge.core.clock import REFUSAL_CAUSE_HEADER, ClockRefusedError
-from forge.core.models.adapter import HubTime
-from forge.proto_gen.forge.v1 import adapter_pb2 as adapter_msg
-from forge.proto_gen.forge.v1 import adapter_service_pb2 as service_msg
-from forge.proto_gen.forge.v1 import adapter_service_pb2_grpc as service_grpc
-from forge.proto_gen.forge.v1 import contextual_record_pb2 as record_msg
 from forge.transport.hub_server import AdapterServiceServicer
-from forge.transport.proto_bridge import (
+from forge_core.clock import REFUSAL_CAUSE_HEADER, ClockRefusedError
+from forge_core.link.proto_bridge import (
     health_to_proto,
     hub_time_to_proto,
     proto_to_contextual_record,
     proto_to_manifest,
     proto_to_spoke_time,
 )
-from forge.transport.serialization import headers_to_spoke_time
+from forge_core.link.serialization import headers_to_spoke_time
+from forge_core.models.adapter import HubTime
+from forge_core.proto_gen.forge.v1 import adapter_pb2 as adapter_msg
+from forge_core.proto_gen.forge.v1 import adapter_service_pb2 as service_msg
+from forge_core.proto_gen.forge.v1 import adapter_service_pb2_grpc as service_grpc
+from forge_core.proto_gen.forge.v1 import contextual_record_pb2 as record_msg
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +131,7 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
         received_at = self._servicer.clock()  # T2 of the time exchange (FB-092)
         try:
             manifest = proto_to_manifest(request.manifest)
-            from forge.transport.serialization import pydantic_to_proto
+            from forge_core.link.serialization import pydantic_to_proto
 
             manifest_dict = pydantic_to_proto(manifest)
             result = await self._servicer.register(
@@ -251,7 +251,7 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
             )
             # result_dict is already a proto-compatible dict from hub_server
             # Convert it to a proper proto message via the Pydantic model
-            from forge.transport.serialization import proto_to_pydantic
+            from forge_core.link.serialization import proto_to_pydantic
 
             health_model = proto_to_pydantic(result_dict, "AdapterHealth")
             response = health_to_proto(health_model)
@@ -308,7 +308,7 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
             async for proto_record in request_iterator:
                 # Convert proto message to dict for the existing servicer
                 pydantic_record = proto_to_contextual_record(proto_record)
-                from forge.transport.serialization import pydantic_to_proto
+                from forge_core.link.serialization import pydantic_to_proto
 
                 record_dict = pydantic_to_proto(pydantic_record)
                 await self._servicer.receive_record(session_id, record_dict)

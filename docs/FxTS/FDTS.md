@@ -49,4 +49,4 @@ fdts.schema.json
 
 ## Implementation Status
 
-Not yet implemented. Scaffold exists at `src/forge/governance/` but FDTS directory not yet created. Will be built as part of the F10 governance infrastructure phase.
+Not yet implemented. Scaffold exists at `forge-core/src/python/forge_core/fxts/` but FDTS directory not yet created. Will be built as part of the F10 governance infrastructure phase.

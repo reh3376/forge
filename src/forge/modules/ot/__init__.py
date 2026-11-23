@@ -13,9 +13,9 @@ Architecture:
     alarming/       — ISA-18.2 alarm state machine
     control/        — Write interface with safety interlocks
     context/        — Context enrichment (equipment → area, batch, recipe)
-    scripts/        — User scripts (managed by forge.sdk.scripting)
+    scripts/        — User scripts (managed by forge_core.sdk.scripting)
 
-The scripting runtime lives in forge.sdk.scripting (not here) because
+The scripting runtime lives in forge_core.sdk.scripting (not here) because
 it extends the Forge Module SDK and can serve any module.
 """
 

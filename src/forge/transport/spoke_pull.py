@@ -1,7 +1,7 @@
 """Hub-side consumers of the spoke-hosted pull RPCs (BACKLOG FB-061).
 
 The hub reaches a spoke through the callback target it advertised on
-Configure (see :mod:`forge.transport.spoke_callback`). Two pull modes sit
+Configure (see :mod:`forge_core.link.spoke_callback`). Two pull modes sit
 on top of that:
 
 * :func:`backfill_into_pipeline` — ``Backfill`` for a time range, streamed
@@ -31,10 +31,10 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Callable, Iterable
 
-    from forge.core.models.adapter import AdapterManifest
-    from forge.core.models.contextual_record import ContextualRecord
     from forge.ingest.pipeline import IngestOutcome, IngestPipeline
-    from forge.transport.spoke_callback import WriteDispatcher
+    from forge_core.link.spoke_callback import WriteDispatcher
+    from forge_core.models.adapter import AdapterManifest
+    from forge_core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 
@@ -155,7 +155,7 @@ async def backfill_into_pipeline(
 ) -> PullOutcome:
     """Replay ``[start, end]`` from the spoke into the ingest pipeline.
 
-    Raises :class:`~forge.transport.spoke_callback.WriteDispatchError` when
+    Raises :class:`~forge_core.link.spoke_callback.WriteDispatchError` when
     the spoke cannot be reached; records already ingested stay ingested.
     """
     stream = dispatcher.backfill(adapter_id, start, end, tags=list(tags), max_records=max_records)

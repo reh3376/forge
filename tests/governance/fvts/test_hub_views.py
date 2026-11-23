@@ -16,15 +16,15 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from forge.governance.fvts import REPO_ROOT, SPECS_DIR
-from forge.governance.fvts.renderer import (
+from forge_core.fxts.fvts import REPO_ROOT, SPECS_DIR
+from forge_core.fxts.fvts.renderer import (
     GoldenRenderError,
     ReferenceRenderer,
     load_golden_messages,
     render_golden_set,
 )
-from forge.governance.fvts.runners.fvts_runner import HUB_OWNER, FVTSRunner
-from forge.governance.shared.runner import VerdictStatus, sha256_hex_obj
+from forge_core.fxts.fvts.runners.fvts_runner import HUB_OWNER, FVTSRunner
+from forge_core.fxts.shared.runner import VerdictStatus, sha256_hex_obj
 
 if TYPE_CHECKING:
     from pathlib import Path

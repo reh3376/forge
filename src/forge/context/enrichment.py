@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from forge.context.equipment import EquipmentStore
     from forge.context.mode import ModeStore
     from forge.context.models import ShiftSchedule
-    from forge.core.models.contextual_record import RecordContext
+    from forge_core.models.contextual_record import RecordContext
 
 logger = logging.getLogger(__name__)
 

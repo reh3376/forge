@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.sdk.scripting.modules.file import FileModule
+from forge_core.sdk.scripting.modules.file import FileModule
 
 # ---------------------------------------------------------------------------
 # Fixtures

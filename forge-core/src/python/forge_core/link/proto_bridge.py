@@ -1,0 +1,662 @@
+# ruff: noqa: UP017
+"""Pydantic ↔ Protobuf message bridge for hardened gRPC transport.
+
+Converts between Forge Pydantic domain models and compiled protobuf
+message objects. Unlike the dict-based serialization module, this bridge
+works with actual proto message instances — the same types that gRPC
+serializes to/from binary on the wire.
+
+Architecture:
+    Pydantic model ──to_proto()──► Proto message ──gRPC binary──► wire
+    wire ──gRPC binary──► Proto message ──from_proto()──► Pydantic model
+
+The bridge ensures:
+  1. Type fidelity: proto schema enforces field types at serialization
+  2. Round-trip correctness: pydantic → proto → pydantic is lossless
+  3. Enum mapping: Python StrEnum ↔ proto int enum via explicit tables
+  4. Timestamp precision: datetime ↔ google.protobuf.Timestamp (nanosecond)
+  5. oneof typed_value: RecordValue.raw dispatched to correct proto variant
+"""
+
+from __future__ import annotations
+
+import json
+import math
+from datetime import datetime, timezone
+from typing import Any
+from uuid import UUID
+
+from google.protobuf.timestamp_pb2 import Timestamp
+
+from forge_core.models.adapter import (
+    AdapterCapabilities,
+    AdapterHealth,
+    AdapterManifest,
+    AdapterState,
+    AdapterTier,
+    ConnectionParam,
+    ConnectionTimeGovernance,
+    DataContract,
+    HubTime,
+    SpokeTime,
+    TimeGovernance,
+)
+from forge_core.models.contextual_record import (
+    ContextualRecord,
+    QualityCode,
+    RecordContext,
+    RecordLineage,
+    RecordSource,
+    RecordTimestamp,
+    RecordValue,
+    TimeQuality,
+)
+from forge_core.proto_gen.forge.v1 import adapter_pb2 as adapter_msg
+from forge_core.proto_gen.forge.v1 import contextual_record_pb2 as record_msg
+from forge_core.proto_gen.forge.v1 import enums_pb2 as enums
+
+# ---------------------------------------------------------------------------
+# Enum mapping tables (Python StrEnum value → proto int)
+# ---------------------------------------------------------------------------
+
+_QUALITY_TO_PROTO: dict[str, int] = {
+    "GOOD": enums.QUALITY_CODE_GOOD,
+    "UNCERTAIN": enums.QUALITY_CODE_UNCERTAIN,
+    "BAD": enums.QUALITY_CODE_BAD,
+    "NOT_AVAILABLE": enums.QUALITY_CODE_NOT_AVAILABLE,
+}
+_PROTO_TO_QUALITY: dict[int, str] = {v: k for k, v in _QUALITY_TO_PROTO.items()}
+
+_ADAPTER_STATE_TO_PROTO: dict[str, int] = {
+    "REGISTERED": enums.ADAPTER_STATE_REGISTERED,
+    "CONNECTING": enums.ADAPTER_STATE_CONNECTING,
+    "HEALTHY": enums.ADAPTER_STATE_HEALTHY,
+    "DEGRADED": enums.ADAPTER_STATE_DEGRADED,
+    "FAILED": enums.ADAPTER_STATE_FAILED,
+    "STOPPED": enums.ADAPTER_STATE_STOPPED,
+}
+_PROTO_TO_ADAPTER_STATE: dict[int, str] = {v: k for k, v in _ADAPTER_STATE_TO_PROTO.items()}
+
+_ADAPTER_TIER_TO_PROTO: dict[str, int] = {
+    "OT": enums.ADAPTER_TIER_OT,
+    "MES_MOM": enums.ADAPTER_TIER_MES_MOM,
+    "ERP_BUSINESS": enums.ADAPTER_TIER_ERP_BUSINESS,
+    "HISTORIAN": enums.ADAPTER_TIER_HISTORIAN,
+    "DOCUMENT": enums.ADAPTER_TIER_DOCUMENT,
+}
+_PROTO_TO_ADAPTER_TIER: dict[int, str] = {v: k for k, v in _ADAPTER_TIER_TO_PROTO.items()}
+
+
+# ---------------------------------------------------------------------------
+# Timestamp helpers
+# ---------------------------------------------------------------------------
+
+
+def _dt_to_timestamp(dt: datetime | None) -> Timestamp | None:
+    """Convert Python datetime to google.protobuf.Timestamp."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    ts = Timestamp()
+    ts.FromDatetime(dt)
+    return ts
+
+
+def _timestamp_to_dt(ts: Timestamp | None) -> datetime | None:
+    """Convert google.protobuf.Timestamp to Python datetime."""
+    if ts is None or (ts.seconds == 0 and ts.nanos == 0):
+        return None
+    return ts.ToDatetime(tzinfo=timezone.utc)
+
+
+# ---------------------------------------------------------------------------
+# RecordValue.raw ↔ oneof typed_value
+# ---------------------------------------------------------------------------
+
+
+def _set_typed_value(msg: record_msg.RecordValue, raw: Any) -> None:
+    """Set the oneof typed_value field on a RecordValue proto message."""
+    if raw is None:
+        return  # Leave oneof unset
+    if isinstance(raw, bool):
+        msg.bool_value = raw
+    elif isinstance(raw, int):
+        msg.integer_value = raw
+    elif isinstance(raw, float):
+        if math.isnan(raw) or math.isinf(raw):
+            msg.string_value = str(raw)
+        else:
+            msg.number_value = raw
+    elif isinstance(raw, str):
+        msg.string_value = raw
+    elif isinstance(raw, bytes):
+        msg.bytes_value = raw
+    elif isinstance(raw, (dict, list)):
+        msg.json_value = json.dumps(raw, default=str)
+    else:
+        msg.json_value = json.dumps(raw, default=str)
+
+
+def _get_typed_value(msg: record_msg.RecordValue) -> Any:
+    """Extract the raw value from a RecordValue proto message's oneof."""
+    which = msg.WhichOneof("typed_value")
+    if which is None:
+        return None
+    if which == "number_value":
+        return msg.number_value
+    if which == "integer_value":
+        return msg.integer_value
+    if which == "string_value":
+        return msg.string_value
+    if which == "bool_value":
+        return msg.bool_value
+    if which == "bytes_value":
+        return msg.bytes_value
+    if which == "json_value":
+        return json.loads(msg.json_value)
+    return None
+
+
+def dt_to_timestamp(dt: datetime | None) -> Timestamp | None:
+    """Public wrapper: datetime -> google.protobuf.Timestamp (None passes through)."""
+    return _dt_to_timestamp(dt)
+
+
+def timestamp_to_dt(ts: Timestamp | None) -> datetime | None:
+    """Public wrapper: google.protobuf.Timestamp -> aware datetime."""
+    return _timestamp_to_dt(ts)
+
+
+def set_typed_value(msg: Any, raw: Any) -> None:
+    """Set the ``typed_value`` oneof on any message that carries it.
+
+    ``RecordValue`` and ``WriteRequest`` share the same oneof layout
+    (number/string/bool/bytes/json/integer), so one setter serves both.
+    """
+    _set_typed_value(msg, raw)
+
+
+def get_typed_value(msg: Any) -> Any:
+    """Read the ``typed_value`` oneof from any message that carries it."""
+    return _get_typed_value(msg)
+
+
+# ---------------------------------------------------------------------------
+# Pydantic → Proto message converters
+# ---------------------------------------------------------------------------
+
+
+def record_source_to_proto(source: RecordSource) -> record_msg.RecordSource:
+    """Convert Pydantic RecordSource to proto RecordSource."""
+    return record_msg.RecordSource(
+        adapter_id=source.adapter_id,
+        system=source.system,
+        tag_path=source.tag_path or "",
+        connection_id=source.connection_id or "",
+    )
+
+
+def record_timestamp_to_proto(ts: RecordTimestamp) -> record_msg.RecordTimestamp:
+    """Convert Pydantic RecordTimestamp to proto RecordTimestamp."""
+    proto_ts = record_msg.RecordTimestamp()
+    source_ts = _dt_to_timestamp(ts.source_time)
+    if source_ts is not None:
+        proto_ts.source_time.CopyFrom(source_ts)
+    if ts.server_time is not None:
+        server_ts = _dt_to_timestamp(ts.server_time)
+        if server_ts is not None:
+            proto_ts.server_time.CopyFrom(server_ts)
+    ingest_ts = _dt_to_timestamp(ts.ingestion_time)
+    if ingest_ts is not None:
+        proto_ts.ingestion_time.CopyFrom(ingest_ts)
+    if ts.source_clock:
+        proto_ts.source_clock = ts.source_clock
+    if ts.source_uncertainty_seconds is not None:
+        proto_ts.source_uncertainty_seconds = ts.source_uncertainty_seconds
+    if ts.source_time_as_sent is not None:
+        as_sent = _dt_to_timestamp(ts.source_time_as_sent)
+        if as_sent is not None:
+            proto_ts.source_time_as_sent.CopyFrom(as_sent)
+    if ts.source_offset_seconds is not None:
+        proto_ts.source_offset_seconds = ts.source_offset_seconds
+    if ts.time_quality is not None:
+        quality = ts.time_quality
+        proto_ts.time_quality.accuracy_class = quality.accuracy_class
+        for name in ("synchronized", "clock_failure", "leap_seconds_known"):
+            flag = getattr(quality, name)
+            if flag is not None:
+                setattr(proto_ts.time_quality, name, flag)
+    spoke_ts = _dt_to_timestamp(ts.spoke_time)
+    if spoke_ts is not None:
+        proto_ts.spoke_time.CopyFrom(spoke_ts)
+    return proto_ts
+
+
+def record_value_to_proto(value: RecordValue) -> record_msg.RecordValue:
+    """Convert Pydantic RecordValue to proto RecordValue."""
+    proto_val = record_msg.RecordValue(
+        engineering_units=value.engineering_units or "",
+        quality=_QUALITY_TO_PROTO.get(value.quality.value, enums.QUALITY_CODE_UNSPECIFIED),
+        data_type=value.data_type,
+    )
+    _set_typed_value(proto_val, value.raw)
+    return proto_val
+
+
+def record_context_to_proto(ctx: RecordContext) -> record_msg.RecordContext:
+    """Convert Pydantic RecordContext to proto RecordContext."""
+    extra_map: dict[str, str] = {}
+    for k, v in ctx.extra.items():
+        extra_map[k] = v if isinstance(v, str) else json.dumps(v, default=str)
+
+    msg = record_msg.RecordContext(
+        equipment_id=ctx.equipment_id or "",
+        area=ctx.area or "",
+        site=ctx.site or "",
+        batch_id=ctx.batch_id or "",
+        lot_id=ctx.lot_id or "",
+        recipe_id=ctx.recipe_id or "",
+        operating_mode=ctx.operating_mode or "",
+        shift_id=ctx.shift_id or "",
+        operator_id=ctx.operator_id or "",
+        event_type=ctx.event_type or "",
+        work_order_id=ctx.work_order_id or "",
+        extra=extra_map,
+    )
+    event_timestamp = _dt_to_timestamp(ctx.event_timestamp)
+    if event_timestamp is not None:
+        msg.event_timestamp.CopyFrom(event_timestamp)
+    return msg
+
+
+def record_lineage_to_proto(lineage: RecordLineage) -> record_msg.RecordLineage:
+    """Convert Pydantic RecordLineage to proto RecordLineage."""
+    return record_msg.RecordLineage(
+        schema_ref=lineage.schema_ref,
+        adapter_id=lineage.adapter_id,
+        adapter_version=lineage.adapter_version,
+        transformation_chain=list(lineage.transformation_chain),
+    )
+
+
+def contextual_record_to_proto(record: ContextualRecord) -> record_msg.ContextualRecord:
+    """Convert Pydantic ContextualRecord to proto ContextualRecord message."""
+    return record_msg.ContextualRecord(
+        record_id=str(record.record_id),
+        source=record_source_to_proto(record.source),
+        timestamp=record_timestamp_to_proto(record.timestamp),
+        value=record_value_to_proto(record.value),
+        context=record_context_to_proto(record.context),
+        lineage=record_lineage_to_proto(record.lineage),
+    )
+
+
+def capabilities_to_proto(caps: AdapterCapabilities) -> adapter_msg.AdapterCapabilities:
+    """Convert Pydantic AdapterCapabilities to proto AdapterCapabilities."""
+    return adapter_msg.AdapterCapabilities(
+        read=caps.read,
+        write=caps.write,
+        subscribe=caps.subscribe,
+        backfill=caps.backfill,
+        discover=caps.discover,
+    )
+
+
+def connection_param_to_proto(param: ConnectionParam) -> adapter_msg.ConnectionParam:
+    """Convert Pydantic ConnectionParam to proto ConnectionParam."""
+    return adapter_msg.ConnectionParam(
+        name=param.name,
+        description=param.description or "",
+        required=param.required,
+        secret=param.secret,
+        default_value=param.default or "",
+    )
+
+
+def data_contract_to_proto(contract: DataContract) -> adapter_msg.DataContract:
+    """Convert Pydantic DataContract to proto DataContract."""
+    return adapter_msg.DataContract(
+        schema_ref=contract.schema_ref,
+        output_format=contract.output_format,
+        context_fields=list(contract.context_fields),
+    )
+
+
+def manifest_to_proto(manifest: AdapterManifest) -> adapter_msg.AdapterManifest:
+    """Convert Pydantic AdapterManifest to proto AdapterManifest message."""
+    proto_manifest = adapter_msg.AdapterManifest(
+        adapter_id=manifest.adapter_id,
+        name=manifest.name,
+        version=manifest.version,
+        type=manifest.type,
+        protocol=manifest.protocol,
+        tier=_ADAPTER_TIER_TO_PROTO.get(manifest.tier.value, enums.ADAPTER_TIER_UNSPECIFIED),
+        capabilities=capabilities_to_proto(manifest.capabilities),
+        data_contract=data_contract_to_proto(manifest.data_contract),
+        health_check_interval_ms=manifest.health_check_interval_ms,
+        connection_params=[connection_param_to_proto(p) for p in manifest.connection_params],
+        auth_methods=list(manifest.auth_methods),
+    )
+    # metadata → google.protobuf.Struct
+    if manifest.metadata:
+        proto_manifest.metadata.update(manifest.metadata)
+    if manifest.time_governance is not None:
+        proto_manifest.time_governance.CopyFrom(time_governance_to_proto(manifest.time_governance))
+    return proto_manifest
+
+
+def time_governance_to_proto(tg: TimeGovernance) -> adapter_msg.TimeGovernance:
+    """Convert Pydantic TimeGovernance to its proto message (FB-090)."""
+    msg = adapter_msg.TimeGovernance(
+        time_source=tg.time_source,
+        sync_protocol=tg.sync_protocol,
+        clock_read_method=tg.clock_read_method or "",
+        clock_probe_interval_seconds=tg.clock_probe_interval_seconds,
+        source_timestamp_origin=tg.source_timestamp_origin,
+        tolerance_class=tg.tolerance_class,
+        fail_closed=tg.fail_closed,
+    )
+    for entry in tg.connections:
+        conn = msg.connections.add()
+        conn.name = entry.name
+        conn.clock_read_method = entry.clock_read_method or ""
+        if entry.clock_probe_interval_seconds is not None:
+            conn.clock_probe_interval_seconds = entry.clock_probe_interval_seconds
+        conn.source_timestamp_origin = entry.source_timestamp_origin or ""
+        conn.tolerance_class = entry.tolerance_class or ""
+    return msg
+
+
+def proto_to_time_governance(msg: adapter_msg.TimeGovernance) -> TimeGovernance:
+    """Convert a proto TimeGovernance message to the Pydantic model (FB-090)."""
+    return TimeGovernance(
+        time_source=msg.time_source,
+        sync_protocol=msg.sync_protocol,
+        clock_read_method=msg.clock_read_method or None,
+        clock_probe_interval_seconds=msg.clock_probe_interval_seconds,
+        source_timestamp_origin=msg.source_timestamp_origin,
+        tolerance_class=msg.tolerance_class,
+        fail_closed=msg.fail_closed,
+        connections=[
+            ConnectionTimeGovernance(
+                name=c.name,
+                clock_read_method=c.clock_read_method or None,
+                clock_probe_interval_seconds=(
+                    c.clock_probe_interval_seconds
+                    if c.HasField("clock_probe_interval_seconds")
+                    else None
+                ),
+                source_timestamp_origin=c.source_timestamp_origin or None,
+                tolerance_class=c.tolerance_class or None,
+            )
+            for c in msg.connections
+        ],
+    )
+
+
+def health_to_proto(health: AdapterHealth) -> adapter_msg.AdapterHealth:
+    """Convert Pydantic AdapterHealth to proto AdapterHealth message."""
+    proto_health = adapter_msg.AdapterHealth(
+        adapter_id=health.adapter_id,
+        state=_ADAPTER_STATE_TO_PROTO.get(
+            health.state.value,
+            enums.ADAPTER_STATE_UNSPECIFIED,
+        ),
+        error_message=health.error_message or "",
+        records_collected=health.records_collected,
+        records_failed=health.records_failed,
+        uptime_seconds=health.uptime_seconds,
+    )
+    last_check = _dt_to_timestamp(health.last_check)
+    if last_check is not None:
+        proto_health.last_check.CopyFrom(last_check)
+    last_healthy = _dt_to_timestamp(health.last_healthy)
+    if last_healthy is not None:
+        proto_health.last_healthy.CopyFrom(last_healthy)
+    if health.hub_time is not None:
+        proto_health.hub_time.CopyFrom(hub_time_to_proto(health.hub_time))
+    return proto_health
+
+
+# ---------------------------------------------------------------------------
+# The hub <-> spoke time exchange (one clock, FB-092)
+# ---------------------------------------------------------------------------
+
+
+def spoke_time_to_proto(spoke_time: SpokeTime) -> adapter_msg.SpokeTime:
+    """The spoke's half of the exchange: T1 and its last measured offset and round trip."""
+    msg = adapter_msg.SpokeTime()
+    transmit = _dt_to_timestamp(spoke_time.transmit_time)
+    if transmit is not None:
+        msg.transmit_time.CopyFrom(transmit)
+    if spoke_time.offset_seconds is not None:
+        msg.offset_seconds = spoke_time.offset_seconds
+    if spoke_time.round_trip_seconds is not None:
+        msg.round_trip_seconds = spoke_time.round_trip_seconds
+    measured = _dt_to_timestamp(spoke_time.measured_at)
+    if measured is not None:
+        msg.measured_at.CopyFrom(measured)
+    return msg
+
+
+def proto_to_spoke_time(msg: adapter_msg.SpokeTime) -> SpokeTime | None:
+    """A request's ``spoke_time``, or None when the spoke sent no T1 (before FB-092)."""
+    if not msg.HasField("transmit_time"):
+        return None
+    return SpokeTime(
+        transmit_time=_timestamp_to_dt(msg.transmit_time),
+        offset_seconds=msg.offset_seconds if msg.HasField("offset_seconds") else None,
+        round_trip_seconds=(msg.round_trip_seconds if msg.HasField("round_trip_seconds") else None),
+        measured_at=_timestamp_to_dt(msg.measured_at) if msg.HasField("measured_at") else None,
+    )
+
+
+def hub_time_to_proto(hub_time: HubTime) -> adapter_msg.HubTime:
+    """The hub's half of the exchange: T2 (receive) and T3 (transmit)."""
+    msg = adapter_msg.HubTime()
+    receive = _dt_to_timestamp(hub_time.receive_time)
+    transmit = _dt_to_timestamp(hub_time.transmit_time)
+    if receive is not None:
+        msg.receive_time.CopyFrom(receive)
+    if transmit is not None:
+        msg.transmit_time.CopyFrom(transmit)
+    return msg
+
+
+def proto_to_hub_time(msg: adapter_msg.HubTime) -> HubTime | None:
+    """A response's ``hub_time``, or None when the hub sent none (a hub before FB-092)."""
+    if not msg.HasField("receive_time") or not msg.HasField("transmit_time"):
+        return None
+    return HubTime(
+        receive_time=_timestamp_to_dt(msg.receive_time),
+        transmit_time=_timestamp_to_dt(msg.transmit_time),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Proto message → Pydantic converters
+# ---------------------------------------------------------------------------
+
+
+def proto_to_record_source(msg: record_msg.RecordSource) -> RecordSource:
+    """Convert proto RecordSource to Pydantic RecordSource."""
+    return RecordSource(
+        adapter_id=msg.adapter_id,
+        system=msg.system,
+        tag_path=msg.tag_path or None,
+        connection_id=msg.connection_id or None,
+    )
+
+
+def proto_to_record_timestamp(msg: record_msg.RecordTimestamp) -> RecordTimestamp:
+    """Convert proto RecordTimestamp to Pydantic RecordTimestamp.
+
+    ``ingestion_time`` is left unset when the spoke sent none: the hub stamps it
+    on receipt (FB-087). The spoke's own send time is ``spoke_time`` (field 10,
+    FB-092); a stamp an older spoke put in ``ingestion_time`` is moved there on
+    receipt.
+    """
+    kwargs: dict[str, Any] = {
+        "source_time": _timestamp_to_dt(msg.source_time),
+        "server_time": _timestamp_to_dt(msg.server_time),
+    }
+    ingestion_time = _timestamp_to_dt(msg.ingestion_time)
+    if ingestion_time is not None:
+        kwargs["ingestion_time"] = ingestion_time
+    # The one-clock fields (FB-088): an empty source_clock is "undeclared"; the
+    # uncertainty is proto3 optional, so presence is checked rather than zero.
+    if msg.source_clock:
+        kwargs["source_clock"] = msg.source_clock
+    if msg.HasField("source_uncertainty_seconds"):
+        kwargs["source_uncertainty_seconds"] = msg.source_uncertainty_seconds
+    if msg.HasField("source_time_as_sent"):
+        kwargs["source_time_as_sent"] = _timestamp_to_dt(msg.source_time_as_sent)
+    if msg.HasField("source_offset_seconds"):
+        kwargs["source_offset_seconds"] = msg.source_offset_seconds
+    if msg.HasField("time_quality"):
+        quality = msg.time_quality
+        kwargs["time_quality"] = TimeQuality(
+            synchronized=quality.synchronized if quality.HasField("synchronized") else None,
+            clock_failure=quality.clock_failure if quality.HasField("clock_failure") else None,
+            leap_seconds_known=(
+                quality.leap_seconds_known if quality.HasField("leap_seconds_known") else None
+            ),
+            accuracy_class=quality.accuracy_class or "unspecified",
+        )
+    if msg.HasField("spoke_time"):
+        kwargs["spoke_time"] = _timestamp_to_dt(msg.spoke_time)
+    return RecordTimestamp(**kwargs)
+
+
+def proto_to_record_value(msg: record_msg.RecordValue) -> RecordValue:
+    """Convert proto RecordValue to Pydantic RecordValue."""
+    raw = _get_typed_value(msg)
+    quality_str = _PROTO_TO_QUALITY.get(msg.quality, "GOOD")
+    return RecordValue(
+        raw=raw,
+        engineering_units=msg.engineering_units or None,
+        quality=QualityCode(quality_str),
+        data_type=msg.data_type or "string",
+    )
+
+
+def proto_to_record_context(msg: record_msg.RecordContext) -> RecordContext:
+    """Convert proto RecordContext to Pydantic RecordContext."""
+    extra: dict[str, Any] = {}
+    for k, v in msg.extra.items():
+        try:
+            extra[k] = json.loads(v)
+        except (json.JSONDecodeError, ValueError):
+            extra[k] = v
+
+    return RecordContext(
+        equipment_id=msg.equipment_id or None,
+        area=msg.area or None,
+        site=msg.site or None,
+        batch_id=msg.batch_id or None,
+        lot_id=msg.lot_id or None,
+        recipe_id=msg.recipe_id or None,
+        operating_mode=msg.operating_mode or None,
+        shift_id=msg.shift_id or None,
+        operator_id=msg.operator_id or None,
+        event_type=msg.event_type or None,
+        event_timestamp=(
+            _timestamp_to_dt(msg.event_timestamp) if msg.HasField("event_timestamp") else None
+        ),
+        work_order_id=msg.work_order_id or None,
+        extra=extra,
+    )
+
+
+def proto_to_record_lineage(msg: record_msg.RecordLineage) -> RecordLineage:
+    """Convert proto RecordLineage to Pydantic RecordLineage."""
+    return RecordLineage(
+        schema_ref=msg.schema_ref,
+        adapter_id=msg.adapter_id,
+        adapter_version=msg.adapter_version,
+        transformation_chain=list(msg.transformation_chain),
+    )
+
+
+def proto_to_contextual_record(msg: record_msg.ContextualRecord) -> ContextualRecord:
+    """Convert proto ContextualRecord message to Pydantic ContextualRecord."""
+    return ContextualRecord(
+        record_id=UUID(msg.record_id) if msg.record_id else None,
+        source=proto_to_record_source(msg.source),
+        timestamp=proto_to_record_timestamp(msg.timestamp),
+        value=proto_to_record_value(msg.value),
+        context=proto_to_record_context(msg.context),
+        lineage=proto_to_record_lineage(msg.lineage),
+    )
+
+
+def proto_to_capabilities(msg: adapter_msg.AdapterCapabilities) -> AdapterCapabilities:
+    """Convert proto AdapterCapabilities to Pydantic AdapterCapabilities."""
+    return AdapterCapabilities(
+        read=msg.read,
+        write=msg.write,
+        subscribe=msg.subscribe,
+        backfill=msg.backfill,
+        discover=msg.discover,
+    )
+
+
+def proto_to_connection_param(msg: adapter_msg.ConnectionParam) -> ConnectionParam:
+    """Convert proto ConnectionParam to Pydantic ConnectionParam."""
+    return ConnectionParam(
+        name=msg.name,
+        description=msg.description or None,
+        required=msg.required,
+        secret=msg.secret,
+        default=msg.default_value or None,
+    )
+
+
+def proto_to_data_contract(msg: adapter_msg.DataContract) -> DataContract:
+    """Convert proto DataContract to Pydantic DataContract."""
+    return DataContract(
+        schema_ref=msg.schema_ref,
+        output_format=msg.output_format or "contextual_record",
+        context_fields=list(msg.context_fields),
+    )
+
+
+def proto_to_manifest(msg: adapter_msg.AdapterManifest) -> AdapterManifest:
+    """Convert proto AdapterManifest message to Pydantic AdapterManifest."""
+    tier_str = _PROTO_TO_ADAPTER_TIER.get(msg.tier, "OT")
+    return AdapterManifest(
+        adapter_id=msg.adapter_id,
+        name=msg.name,
+        version=msg.version,
+        type=msg.type,
+        protocol=msg.protocol,
+        tier=AdapterTier(tier_str),
+        capabilities=proto_to_capabilities(msg.capabilities),
+        data_contract=proto_to_data_contract(msg.data_contract),
+        health_check_interval_ms=msg.health_check_interval_ms,
+        connection_params=[proto_to_connection_param(p) for p in msg.connection_params],
+        auth_methods=list(msg.auth_methods) if msg.auth_methods else ["none"],
+        metadata=dict(msg.metadata) if msg.HasField("metadata") else {},
+        time_governance=(
+            proto_to_time_governance(msg.time_governance)
+            if msg.HasField("time_governance")
+            else None
+        ),
+    )
+
+
+def proto_to_health(msg: adapter_msg.AdapterHealth) -> AdapterHealth:
+    """Convert proto AdapterHealth message to Pydantic AdapterHealth."""
+    state_str = _PROTO_TO_ADAPTER_STATE.get(msg.state, "REGISTERED")
+    return AdapterHealth(
+        adapter_id=msg.adapter_id,
+        state=AdapterState(state_str),
+        last_check=_timestamp_to_dt(msg.last_check),
+        last_healthy=_timestamp_to_dt(msg.last_healthy),
+        error_message=msg.error_message or None,
+        records_collected=msg.records_collected,
+        records_failed=msg.records_failed,
+        uptime_seconds=msg.uptime_seconds,
+        hub_time=proto_to_hub_time(msg.hub_time) if msg.HasField("hub_time") else None,
+    )

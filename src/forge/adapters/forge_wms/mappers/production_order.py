@@ -17,8 +17,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from forge.core.models.manufacturing.enums import OrderStatus
-from forge.core.models.manufacturing.production_order import ProductionOrder
+from forge_core.models.manufacturing.enums import OrderStatus
+from forge_core.models.manufacturing.production_order import ProductionOrder
 
 logger = logging.getLogger(__name__)
 

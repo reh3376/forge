@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from forge.core.models.manufacturing.material_item import MaterialItem
+from forge_core.models.manufacturing.material_item import MaterialItem
 
 logger = logging.getLogger(__name__)
 

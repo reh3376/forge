@@ -5,9 +5,9 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from forge.core.models.adapter import DataContract
-from forge.core.models.contextual_record import RecordLineage
-from forge.core.schema_ref import (
+from forge_core.models.adapter import DataContract
+from forge_core.models.contextual_record import RecordLineage
+from forge_core.schema_ref import (
     SchemaRef,
     SchemaRefError,
     is_schema_ref,

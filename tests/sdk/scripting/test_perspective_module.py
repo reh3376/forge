@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.sdk.scripting.modules.perspective import PerspectiveModule
+from forge_core.sdk.scripting.modules.perspective import PerspectiveModule
 
 # ---------------------------------------------------------------------------
 # Mock event bus

@@ -36,7 +36,11 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
-from forge.core.clock import (
+from forge.modules.ot.opcua_client.paths import PathNormalizer
+from forge.modules.ot.opcua_client.types import ConnectionState
+from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
+from forge.modules.ot.tag_engine.providers.base import ProviderState
+from forge_core.clock import (
     CLOCK_OK,
     SERVER_LINK,
     ClockEstimate,
@@ -47,15 +51,11 @@ from forge.core.clock import (
     ClockSample,
     source_clock_name,
 )
-from forge.modules.ot.opcua_client.paths import PathNormalizer
-from forge.modules.ot.opcua_client.types import ConnectionState
-from forge.modules.ot.tag_engine.providers.acquisition import AcquisitionEngine
-from forge.modules.ot.tag_engine.providers.base import ProviderState
 
 if TYPE_CHECKING:
-    from forge.core.models.adapter import TimeGovernance
     from forge.modules.ot.control.config import PlcConnectionSpec
     from forge.modules.ot.tag_engine.registry import TagRegistry
+    from forge_core.models.adapter import TimeGovernance
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +80,7 @@ ClockStateListener = Callable[[str, ClockGateTransition], Any]
 
 
 class OpcUaCurrentTimeReader:
-    """The OPC UA :class:`~forge.core.clock.ClockReader`: ``ServerStatus.CurrentTime``.
+    """The OPC UA :class:`~forge_core.clock.ClockReader`: ``ServerStatus.CurrentTime``.
 
     One read of ``i=2258`` yields T3 between Forge's T1 and T4; it is also the liveness
     probe (FB-070), since a dead session cannot answer it. ``None`` when the server

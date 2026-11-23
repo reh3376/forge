@@ -40,7 +40,6 @@ from typing import Any, Literal
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from forge.core.models.adapter import ToleranceClass
 from forge.modules.ot.control.changeover_orchestrator import (
     OT_ADAPTER_ID,
     AreaChangeoverConfig,
@@ -57,6 +56,7 @@ from forge.modules.ot.control.recipe_integration import (
     RecipeParameterMapping,
     RecipeWriteConfig,
 )
+from forge_core.models.adapter import ToleranceClass
 
 DEFAULT_CONFIG_ENV = "FORGE_OT_CONTROL_CONFIG"
 

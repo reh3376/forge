@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 
-from forge.core.models.contextual_record import RecordTimestamp
-from forge.transport.proto_bridge import (
+from forge_core.link.proto_bridge import (
     proto_to_record_timestamp,
     record_msg,
     record_timestamp_to_proto,
 )
+from forge_core.models.contextual_record import RecordTimestamp
 
 SOURCE = datetime(2026, 1, 1, 12, 0, tzinfo=UTC)
 SPOKE = datetime(2026, 1, 1, 12, 0, 1, tzinfo=UTC)
@@ -58,7 +58,7 @@ def test_the_one_clock_fields_cross_the_wire_and_absence_stays_absent() -> None:
 
 def test_the_correction_fields_cross_the_wire() -> None:
     """source_time_as_sent, source_offset_seconds and time_quality (FB-094 step 3)."""
-    from forge.core.clock import TimeQuality
+    from forge_core.clock import TimeQuality
 
     ts = RecordTimestamp(
         source_time=SOURCE,

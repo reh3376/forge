@@ -24,8 +24,8 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
-from forge.core.models.manufacturing.enums import EventCategory, EventSeverity
-from forge.core.models.manufacturing.operational_event import OperationalEvent
+from forge_core.models.manufacturing.enums import EventCategory, EventSeverity
+from forge_core.models.manufacturing.operational_event import OperationalEvent
 
 logger = logging.getLogger(__name__)
 

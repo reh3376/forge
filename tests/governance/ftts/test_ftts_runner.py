@@ -23,8 +23,9 @@ if str(_src) not in sys.path:
 
 import pytest
 
-from forge.governance.ftts.runners.ftts_runner import FTTSRunner
-from forge.governance.shared.runner import VerdictStatus
+from forge_core.fxts import FXTS_ROOT
+from forge_core.fxts.ftts.runners.ftts_runner import FTTSRunner
+from forge_core.fxts.shared.runner import VerdictStatus
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -32,17 +33,9 @@ from forge.governance.shared.runner import VerdictStatus
 
 SPEC_PATH = (
     Path(__file__).resolve().parents[3]
-    / "src/forge/governance/ftts/specs/grpc-hardened-transport.ftts.json"
+    / "forge-core/src/python/forge_core/fxts/ftts/specs/grpc-hardened-transport.ftts.json"
 )
-SCHEMA_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "src"
-    / "forge"
-    / "governance"
-    / "ftts"
-    / "schema"
-    / "ftts.schema.json"
-)
+SCHEMA_PATH = FXTS_ROOT / "ftts" / "schema" / "ftts.schema.json"
 
 
 @pytest.fixture()

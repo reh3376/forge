@@ -8,7 +8,9 @@ from uuid import uuid4
 
 import pytest
 
-from forge.core.models.contextual_record import (
+from forge.curation.lineage import LineageEntry, TransformationStep
+from forge.storage.engines.neo4j_engine import Neo4jGraphWriter, Neo4jLineageWriter
+from forge_core.models.contextual_record import (
     ContextualRecord,
     QualityCode,
     RecordContext,
@@ -17,8 +19,6 @@ from forge.core.models.contextual_record import (
     RecordTimestamp,
     RecordValue,
 )
-from forge.curation.lineage import LineageEntry, TransformationStep
-from forge.storage.engines.neo4j_engine import Neo4jGraphWriter, Neo4jLineageWriter
 
 # An un-awaited coroutine in a mock is a bug, not a warning (FB-023).
 pytestmark = pytest.mark.filterwarnings("error::RuntimeWarning")

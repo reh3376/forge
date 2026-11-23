@@ -38,7 +38,7 @@ import logging
 from datetime import datetime  # noqa: TC003
 from typing import Any
 
-from forge.core.models.contextual_record import ContextualRecord  # noqa: TC001
+from forge_core.models.contextual_record import ContextualRecord  # noqa: TC001
 
 logger = logging.getLogger(__name__)
 

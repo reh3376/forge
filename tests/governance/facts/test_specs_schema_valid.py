@@ -15,15 +15,15 @@ from typing import TYPE_CHECKING
 import pytest
 from jsonschema import Draft202012Validator
 
-from forge.governance.facts import SCHEMA_PATH
-from forge.governance.facts.runners.facts_runner import (
+from forge_core.fxts.facts import SCHEMA_PATH
+from forge_core.fxts.facts.runners.facts_runner import (
     PACKAGED_SCHEMA_PATH,
     VOCABULARY,
     FACTSRunner,
     FactsVocabulary,
     schema_enum,
 )
-from forge.governance.shared.runner import VerdictStatus, verify_spec_hash
+from forge_core.fxts.shared.runner import VerdictStatus, verify_spec_hash
 
 if TYPE_CHECKING:
     from pathlib import Path

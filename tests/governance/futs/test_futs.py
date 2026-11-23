@@ -15,10 +15,10 @@ from typing import TYPE_CHECKING, Any
 import pytest
 from jsonschema import Draft202012Validator
 
-from forge.governance.futs import REPO_ROOT, SCHEMA_PATH, SPECS_DIR
-from forge.governance.futs.runners.futs_runner import FUTSRunner
-from forge.governance.shared import lists, schemas
-from forge.governance.shared.runner import (
+from forge_core.fxts.futs import REPO_ROOT, SCHEMA_PATH, SPECS_DIR
+from forge_core.fxts.futs.runners.futs_runner import FUTSRunner
+from forge_core.fxts.shared import lists, schemas
+from forge_core.fxts.shared.runner import (
     VerdictStatus,
     add_spec_hash,
     approve_spec_hash,
@@ -334,9 +334,9 @@ class TestBindingACollection:
 
     def test_every_object_of_a_surface_is_on_its_screen(self) -> None:
         fvts = json.loads(
-            (REPO_ROOT / "src/forge/governance/fvts/specs/forge-core.fvts.json").read_text(
-                encoding="utf-8"
-            )
+            (
+                REPO_ROOT / "forge-core/src/python/forge_core/fxts/fvts/specs/forge-core.fvts.json"
+            ).read_text(encoding="utf-8")
         )
         surfaces = {s["surface_id"]: set(s["objects"]) for s in fvts["surfaces"]}
         for view_id, surface_id in HUB_SCREENS.items():

@@ -28,7 +28,7 @@ A distillery runs on a dozen systems bought at different times from different ve
 
 **Forge:** hub and spoke. Every system is a *spoke* that speaks one contract, `forge.v1.AdapterService` (Register, Configure, Start, Stop, Health, Ingest, Collect, Subscribe, Unsubscribe, Write, Backfill, Discover), to the *hub* (forge-core). Every record that crosses that boundary is a `ContextualRecord`: value, quality code, timestamps, source identity and a `RecordContext` (site, area, equipment, lot, shift, operator, work order, operating mode, …). The hub validates, routes and persists it.
 
-**Component:** transport (`forge.transport`), ingest (`forge.ingest`), core models (`forge.core.models`), the adapter base classes (`forge.adapters.base`).
+**Component:** transport (`forge.transport`), ingest (`forge.ingest`), core models (`forge_core.models`), the adapter base classes (`forge_core.adapter`).
 
 **Solved when:** every production system at a site has a spoke, and any two records from any two systems can be joined on context without a human mapping step.
 
@@ -38,7 +38,7 @@ A tag value `TIT_2010 = 61.2` is useless without knowing it is Cooker 01's tempe
 
 **Forge:** context is a first-class, declared part of every integration. A spoke's FACTS specification maps source fields to Forge context fields and declares enrichment rules; the hub's enrichment pipeline fills what the source cannot (shift from timestamp, area from location, lot from the active batch). The manufacturing entity catalog (`docs/core/manufacturing-entity-catalog.md`) and the ISA-95 / ISA-88 typed hierarchy define what context *means*, so "area" is the same thing in every spoke.
 
-**Component:** FACTS context mapping, `forge.context` (Context Engine), `forge.core.models.manufacturing`, the OT module's context resolvers.
+**Component:** FACTS context mapping, `forge.context` (Context Engine), `forge_core.models.manufacturing`, the OT module's context resolvers.
 
 **Solved when:** no record is persisted without its required context fields, and the required set is declared per spoke and checked by the FACTS gate.
 
@@ -58,7 +58,7 @@ The OT layer (tags, alarms, historian, scripting, HMI screens) is a vendor produ
 
 **Forge:** an OT module (forge-ot) that is a thin, open wrapper over OPC-UA (asyncua owns the wire protocol): a nine-type tag engine, ISA-18.2 alarming, a Python 3.12+ scripting SDK covering the `system.*` surface plants already use, an i3X-shaped REST interface, and history. Where a site keeps its vendor SCADA, an *integration module* (forge-ignition) bridges it; the dual-write validator proves parity before a cut-over. HMI/SCADA itself is an optional module (forge-hmi-scada) activated per site (decision A-4).
 
-**Component:** `forge.modules.ot` (opcua_client, tag_engine, alarming, bridge, i3x, scripting SDK under `forge.sdk.scripting`), forge-ignition, forge-hmi-scada.
+**Component:** `forge.modules.ot` (opcua_client, tag_engine, alarming, bridge, i3x, scripting SDK under `forge_core.sdk.scripting`), forge-ignition, forge-hmi-scada.
 
 **Solved when:** a site can run its OT layer on Forge alone, or on its vendor product behind forge-ignition, with the same surfaces either way.
 
@@ -68,7 +68,7 @@ Each connection is custom code written once, documented in an email, and broken 
 
 **Forge:** a module SDK and machine-checked contracts. A spoke or module is scaffolded from a template with a manifest, a FACTS spec (what it reads, writes, subscribes to, backfills; its context mapping; its error handling), tests, and a place in CI. The governance suite (FxTS: FATS for APIs, FACTS for adapters, FTTS for transport, FVTS for views, FDTS for data schemas, FHTS for hash integrity, FQTS, FSTS, FOTS, FPTS, FLTS, FNTS) turns each contract into a gate. A spoke that drifts fails its gate before it fails production.
 
-**Component:** `forge.sdk.module_builder` and the Go scaffold under `go/`, `forge.governance.*`, CI jobs.
+**Component:** `forge_core.sdk.module_builder` and the Go scaffold under `go/`, `forge_core.fxts.*`, CI jobs.
 
 **Solved when:** onboarding a new system is a day's work from the SDK, and a conformance failure anywhere blocks the merge, not the plant.
 
@@ -88,7 +88,7 @@ Specifications are documents; anyone, or any coding agent, can relax a timeout, 
 
 **Forge:** hash governance (FHTS). Every governed specification carries a hash of its content, a state (`approved`, `modified`, `pending_review`, `reverted`, `unknown`), a change history naming who or what changed it, and an approver. Agents re-stamp as `pending_review`; only the owner approves. Runners verify the hash before trusting the spec; the hub's Register check verifies a spoke's FACTS hash before accepting the spoke. The engineering workflow itself is governed: one backlog item per PR, every finding fixed or recorded, documentation current before every push, and a local, graph-backed project memory (MDEMG/Jiminy) that records constraints and outcomes for the agents that work on the codebase.
 
-**Component:** `forge.governance.shared.runner` (hashing, verification, approval), `forge.governance.fhts`, `forge.ingest.facts_check`, the backlog/roadmap workflow, MDEMG.
+**Component:** `forge_core.fxts.shared.runner` (hashing, verification, approval), `forge_core.fxts.fhts`, `forge.ingest.facts_check`, the backlog/roadmap workflow, MDEMG.
 
 **Solved when:** an unapproved change to any governed spec fails CI and is visible in the spec's own history.
 
@@ -98,7 +98,7 @@ Each application brings its own frontend stack, its own screens, its own idea of
 
 **Forge:** modules describe, forge-display renders (decision A-3). A module publishes an FVTS specification: the points it exposes (with units, precision, ranges, staleness), its alarms, its actions, its surfaces, and the render profiles it supports. forge-display, the one UI runtime, renders those surfaces on four profiles with a normative baseline — desktop HMI (20 Hz, writes, all alarm operations, kiosk), desktop app (10 Hz, no writes, acknowledge only), web (4 Hz) and mobile (1 Hz) — and a module can only tighten the baseline, never loosen it. ISA-101 styling, alarm presentation and staleness marking are the renderer's job, not each module's.
 
-**Component:** `forge.governance.fvts` (schema, runner, render-profile baseline, reference renderer, golden messages), forge-display.
+**Component:** `forge_core.fxts.fvts` (schema, runner, render-profile baseline, reference renderer, golden messages), forge-display.
 
 **Solved when:** no module in the repository contains UI code, and the same FVTS spec renders on all four profiles.
 
@@ -106,9 +106,9 @@ Each application brings its own frontend stack, its own screens, its own idea of
 
 A confidently wrong decision costs more than the data problem that caused it, the cost is spread across many units and shifts, and the root cause is rarely captured. Analytics projects produce dashboards, not better decisions.
 
-**Forge:** the decision is a record. Data products feed decision support (human-in-the-loop, semi-autonomous where a site allows it), the decision taken is stored with the products and lineage it was based on (`forge.core.models.decision`), and outcomes are observed against it. The same curated products are the training and evaluation sets for site-specific models, so expertise is captured where it is exercised.
+**Forge:** the decision is a record. Data products feed decision support (human-in-the-loop, semi-autonomous where a site allows it), the decision taken is stored with the products and lineage it was based on (`forge_core.models.decision`), and outcomes are observed against it. The same curated products are the training and evaluation sets for site-specific models, so expertise is captured where it is exercised.
 
-**Component:** `forge.curation`, `forge.core.models.decision`, `forge.observer`, data products for ML/AI use.
+**Component:** `forge.curation`, `forge_core.models.decision`, `forge.observer`, data products for ML/AI use.
 
 **Solved when:** a decision can be replayed: what was known, what was decided, what happened.
 

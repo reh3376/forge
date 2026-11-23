@@ -7,9 +7,9 @@ from typing import Any
 import pytest
 from jsonschema import Draft202012Validator
 
-from forge.governance.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
-from forge.governance.fmts.runners.fmts_runner import REQUIREMENTS
-from forge.governance.shared.runner import load_schema
+from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
+from forge_core.fxts.fmts.runners.fmts_runner import REQUIREMENTS
+from forge_core.fxts.shared.runner import load_schema
 
 
 def _errors(schema: dict, spec: dict) -> list[str]:

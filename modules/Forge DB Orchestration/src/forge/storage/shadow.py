@@ -22,9 +22,9 @@ from typing import TYPE_CHECKING
 from forge.storage.registry import StorageEngine
 
 if TYPE_CHECKING:
-    from forge.core.models.contextual_record import ContextualRecord
     from forge.storage.pool import PoolManager
     from forge.storage.router import DataRouter, RoutingDecision
+    from forge_core.models.contextual_record import ContextualRecord
 
 logger = logging.getLogger(__name__)
 

@@ -7,7 +7,7 @@ decodes each response header and discards it (``UaClient.read`` returns
 ``response.Results``); :func:`install_response_header_tap` wraps the client's
 low-level ``_send_request`` so the header is read off a copy of the response buffer,
 the way asyncua's own ``check_answer`` reads it for faults, and handed to a sink as a
-:class:`~forge.core.clock.ClockSample`. The tap never touches the request itself: a
+:class:`~forge_core.clock.ClockSample`. The tap never touches the request itself: a
 header that cannot be read is counted and skipped.
 
 The design is the one-clock record's §4.2 and P-2 (``docs/decisions/one-clock-ot-
@@ -25,12 +25,12 @@ from typing import TYPE_CHECKING, Any
 from asyncua import ua
 from asyncua.ua.ua_binary import nodeid_from_binary, struct_from_binary
 
-from forge.core.clock import ClockSample, utc_now
+from forge_core.clock import ClockSample, utc_now
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from forge.core.clock import ClockSink
+    from forge_core.clock import ClockSink
 
 logger = logging.getLogger(__name__)
 

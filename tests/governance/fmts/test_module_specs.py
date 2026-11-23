@@ -1,7 +1,8 @@
 """The gate: every module in the repository against its FMTS spec (BACKLOG FB-136).
 
-Each spec under ``src/forge/governance/fmts/specs`` runs through the FMTSRunner against
-this checkout. Every check must pass or be a named skip, except the failures listed
+Each spec under ``forge_core/fxts/fmts/specs`` (in forge-core) runs through the
+FMTSRunner against this checkout. Every check must pass or be a named skip, except the
+failures listed
 here. Each listed failure is a known gap with a backlog item, and its entry is removed
 when the gap is closed:
 
@@ -26,10 +27,10 @@ from typing import Any
 
 import pytest
 
-from forge.governance.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
-from forge.governance.fmts import REPO_ROOT, SPECS_DIR
-from forge.governance.fmts.runners.fmts_runner import CONFORMANCE_KIT, FMTSRunner, load_backlog
-from forge.governance.shared.runner import VerdictStatus
+from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
+from forge_core.fxts.fmts import REPO_ROOT, SPECS_DIR
+from forge_core.fxts.fmts.runners.fmts_runner import CONFORMANCE_KIT, FMTSRunner, load_backlog
+from forge_core.fxts.shared.runner import VerdictStatus
 
 FACTS_SPECS_DIR = FACTS_SCHEMA_PATH.parent.parent / "specs"
 

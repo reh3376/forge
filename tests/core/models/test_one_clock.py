@@ -12,10 +12,10 @@ from datetime import UTC, datetime, timedelta, timezone
 import pytest
 from pydantic import ValidationError
 
-from forge.core.clock import OneClockModel, require_utc, utc_now
-from forge.core.models.contextual_record import RecordTimestamp
-from forge.core.models.data_product import DataProduct, DataProductSchema
-from forge.core.models.decision import Assumption, DecisionFrame, EvidenceLink, EvidenceType
+from forge_core.clock import OneClockModel, require_utc, utc_now
+from forge_core.models.contextual_record import RecordTimestamp
+from forge_core.models.data_product import DataProduct, DataProductSchema
+from forge_core.models.decision import Assumption, DecisionFrame, EvidenceLink, EvidenceType
 
 EASTERN = timezone(timedelta(hours=-5))
 NAIVE = datetime(2026, 1, 1, 12, 0, 0)  # noqa: DTZ001 — naive on purpose: the thing under test

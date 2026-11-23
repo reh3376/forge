@@ -2,7 +2,7 @@
 
 import pytest
 
-from forge.sdk.scripting.modules.security import SecurityModule, UserInfo
+from forge_core.sdk.scripting.modules.security import SecurityModule, UserInfo
 
 # ---------------------------------------------------------------------------
 # Mock user provider

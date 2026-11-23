@@ -24,12 +24,12 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
-from forge.core.models.alarm import SYSTEM_ALARM_ACTIONS
 from forge.modules.ot.alarming.models import (
     AlarmAction,
     AlarmInstance,
     AlarmState,
 )
+from forge_core.models.alarm import SYSTEM_ALARM_ACTIONS
 
 logger = logging.getLogger("forge.alarm.state_machine")
 

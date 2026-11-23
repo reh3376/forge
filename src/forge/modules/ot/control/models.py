@@ -26,14 +26,14 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
-from forge.core.models.control import WriteRole, WriteStatus
+from forge_core.models.control import WriteRole, WriteStatus
 
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
 
 
-# WriteStatus and WriteRole are contract vocabulary: forge.core.models.control
+# WriteStatus and WriteRole are contract vocabulary: forge_core.models.control
 
 
 class WriteOrigin(enum.StrEnum):

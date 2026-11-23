@@ -8,7 +8,7 @@ from forge.adapters.forge_wms.context import (
     derive_shift,
     normalize_event_type,
 )
-from forge.core.models.contextual_record import RecordContext
+from forge_core.models.contextual_record import RecordContext
 
 # ── Shift Enrichment ───────────────────────────────────────────────
 

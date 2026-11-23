@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from forge.core.models.data_product import DataProduct, DataProductSchema
+from forge_core.models.data_product import DataProduct, DataProductSchema
 
 _SCHEMA = DataProductSchema(schema_ref="forge://schemas/test/v1", version="1.0.0")
 _BASE = {"product_id": "dp-1", "name": "Test", "description": "A product", "owner": "tester"}
