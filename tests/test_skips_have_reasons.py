@@ -24,6 +24,7 @@ SKIPPED_DIRS = {"node_modules", ".venv", "__pycache__", ".next", "dist", "build"
 PYTHON_ROOTS = (
     "tests",
     "forge-core/tests",
+    "forge-hub/tests",
     "modules/Forge DB Orchestration",
     "modules/Forge CMMS",
     "modules/Forge ERPI",

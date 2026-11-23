@@ -1,0 +1,124 @@
+"""Shared fixtures for curation layer tests."""
+
+from __future__ import annotations
+
+import datetime as _dt_mod
+from datetime import datetime
+from uuid import UUID
+
+import pytest
+
+from forge_core.models.contextual_record import (
+    ContextualRecord,
+    QualityCode,
+    RecordContext,
+    RecordLineage,
+    RecordSource,
+    RecordTimestamp,
+    RecordValue,
+)
+from forge_hub.curation.lineage import LineageTracker
+from forge_hub.curation.normalization import UnitRegistry, build_whk_unit_registry
+from forge_hub.curation.quality import QualityMonitor
+from forge_hub.curation.registry import DataProductRegistry
+
+
+@pytest.fixture()
+def sample_record() -> ContextualRecord:
+    """A fully populated WMS ContextualRecord with °F temperature."""
+    return ContextualRecord(
+        record_id=UUID("01234567-89ab-cdef-0123-456789abcdef"),
+        source=RecordSource(
+            adapter_id="forge-wms",
+            system="forge-wms-prod",
+            tag_path="Area1/Fermenter3/Temperature",
+        ),
+        timestamp=RecordTimestamp(
+            source_time=datetime(2026, 4, 5, 14, 30, 0, 123000, tzinfo=_dt_mod.UTC),
+            server_time=datetime(2026, 4, 5, 14, 30, 0, 150000, tzinfo=_dt_mod.UTC),
+            ingestion_time=datetime(2026, 4, 5, 14, 30, 0, 200000, tzinfo=_dt_mod.UTC),
+        ),
+        value=RecordValue(
+            raw=78.4,
+            engineering_units="°F",
+            quality=QualityCode.GOOD,
+            data_type="float64",
+        ),
+        context=RecordContext(
+            equipment_id="FERM-003",
+            area="Fermentation",
+            site="Louisville",
+            batch_id="B2026-0405-003",
+            lot_id="L2026-0405",
+            recipe_id="R-BOURBON-001",
+            operating_mode="PRODUCTION",
+            shift_id="B",
+        ),
+        lineage=RecordLineage(
+            schema_ref="forge://schemas/forge-wms/v0.1.0",
+            adapter_id="forge-wms",
+            adapter_version="0.1.0",
+            transformation_chain=["collect", "enrich_context"],
+        ),
+    )
+
+
+@pytest.fixture()
+def mes_record() -> ContextualRecord:
+    """An MES ContextualRecord with °C temperature."""
+    return ContextualRecord(
+        record_id=UUID("abcdef01-2345-6789-abcd-ef0123456789"),
+        source=RecordSource(
+            adapter_id="forge-mes",
+            system="forge-mes-prod",
+            tag_path="Area1/Fermenter3/Temperature",
+        ),
+        timestamp=RecordTimestamp(
+            source_time=datetime(2026, 4, 5, 14, 32, 0, tzinfo=_dt_mod.UTC),
+            server_time=datetime(2026, 4, 5, 14, 32, 0, tzinfo=_dt_mod.UTC),
+            ingestion_time=datetime(2026, 4, 5, 14, 32, 0, 500000, tzinfo=_dt_mod.UTC),
+        ),
+        value=RecordValue(
+            raw=25.8,
+            engineering_units="°C",
+            quality=QualityCode.GOOD,
+            data_type="float64",
+        ),
+        context=RecordContext(
+            equipment_id="FERM-003",
+            area="Fermentation",
+            batch_id="B2026-0405-003",
+            lot_id="L2026-0405",
+            operating_mode="PRODUCTION",
+        ),
+        lineage=RecordLineage(
+            schema_ref="forge://schemas/forge-mes/v0.1.0",
+            adapter_id="forge-mes",
+            adapter_version="0.1.0",
+            transformation_chain=["collect"],
+        ),
+    )
+
+
+@pytest.fixture()
+def unit_registry() -> UnitRegistry:
+    """Pre-loaded WHK unit registry."""
+    return build_whk_unit_registry()
+
+
+@pytest.fixture()
+def product_registry() -> DataProductRegistry:
+    """Empty data product registry."""
+    return DataProductRegistry()
+
+
+@pytest.fixture()
+def lineage_tracker() -> LineageTracker:
+    """Empty lineage tracker."""
+    return LineageTracker()
+
+
+@pytest.fixture()
+def quality_monitor() -> QualityMonitor:
+    """Empty quality monitor."""
+    return QualityMonitor()
