@@ -82,33 +82,33 @@ async function getServiceAccountToken(): Promise<string | null> {
   }
 }
 
-export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   return handleRequest(request, params, 'GET')
 }
 
-export async function POST(request: NextRequest, { params }: { params: { path: string[] } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   return handleRequest(request, params, 'POST')
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { path: string[] } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   return handleRequest(request, params, 'PUT')
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: { path: string[] } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   return handleRequest(request, params, 'PATCH')
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { path: string[] } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   return handleRequest(request, params, 'DELETE')
 }
 
 async function handleRequest(
   request: NextRequest,
-  params: { path: string[] },
+  params: Promise<{ path: string[] }>,
   method: string
 ) {
   try {
-    // Await params to fix Next.js 15 warning
+    // Next.js 15: route parameters arrive as a promise
     const { path: pathArray } = await params
     
     // Reconstruct the path
