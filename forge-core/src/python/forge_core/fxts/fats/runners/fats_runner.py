@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 import httpx
 
+from forge_core import contract
 from forge_core.fxts.fats.checks import CHECKS as FATS_CHECKS
 from forge_core.fxts.shared.runner import (
     FxTSRunner,
@@ -134,23 +135,28 @@ class FATSRunner(FxTSRunner):
     # --- Individual check implementations ---
 
     def _check_spec_version(self, spec: dict[str, Any]) -> FxTSVerdict:
+        """``fats:spec-version``: the spec names a version released in the FATS schema
+        registry (it is validated against that version)."""
+        from forge_core.fxts.shared import schemas
+
         version = spec.get("spec_version")
-        if version == "0.1.0":
+        released = [row.version for row in schemas.versions(contract.schema_dir("fats"))]
+        if version in released:
             return FxTSVerdict(
                 check_id="fats:spec-version",
                 spec_ref="FATS/spec_version",
                 status=VerdictStatus.PASS,
-                message="Spec version is 0.1.0.",
+                message=f"Spec version is {version}.",
             )
         return FxTSVerdict(
             check_id="fats:spec-version",
             spec_ref="FATS/spec_version",
             status=VerdictStatus.FAIL,
-            message=f"Expected spec_version '0.1.0', got '{version}'.",
+            message=f"spec_version '{version}' is not a released FATS version ({released}).",
             violations=[
                 SpecViolation(
                     field="spec_version",
-                    expected="0.1.0",
+                    expected=" | ".join(released),
                     actual=version,
                     message="Unsupported spec version.",
                 )
@@ -327,6 +333,8 @@ class FATSRunner(FxTSRunner):
                 start = time.monotonic()
                 resp = await client.request(method, url)
                 elapsed_ms = (time.monotonic() - start) * 1000
+            # the route answered: what each live verdict below rests on
+            route = [f"artifact:route:{method} {target}"]
 
             # Status code check
             expected_status = spec.get("response", {}).get("success_status")
@@ -338,6 +346,7 @@ class FATSRunner(FxTSRunner):
                         status=VerdictStatus.PASS,
                         message=f"Status {resp.status_code} matches spec.",
                         evidence={"status_code": resp.status_code},
+                        reached=route,
                     )
                 )
             elif expected_status:
@@ -355,6 +364,7 @@ class FATSRunner(FxTSRunner):
                                 message="Status code mismatch.",
                             )
                         ],
+                        reached=route,
                     )
                 )
 
@@ -372,6 +382,7 @@ class FATSRunner(FxTSRunner):
                             "latency_ms": round(elapsed_ms, 1),
                             "max_latency_ms": max_latency,
                         },
+                        reached=route,
                     )
                 )
 

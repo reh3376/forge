@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-24` against the repository `reh3376/forge` at the merge of PR 184 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-24` against the repository `reh3376/forge` at the merge of PR 185 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,14 +249,14 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-24 at PR 184:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-24 at PR 185:
 
 **Working**
 
 1. **The hub-to-module contract works end to end.** A module registers, is checked against its FACTS spec, pushes records that are persisted, is pulled (Collect, Backfill, Subscribe) and receives write-backs, over TLS/mTLS both ways with per-module tokens. The check at Register is weaker than the signed module requirements: a module with no spec is accepted with a warning, approval is not read, and the REST and pull routes and the hosted module are not checked at all. The design that closes this is signed (D-18) and not built (FB-256 to FB-263).
 2. **One clock is enforced on the links that exist.** Every Register, Health and Ingest is a time exchange. The hub refuses a module whose clock is outside its class or that reports no measurement; forge-ot does the same to each PLC connection. No record builder invents a source time.
 3. **forge-ot runs inside the hub**: OPC UA connections, the tag engine, the control-write defense chain, and the MES changeover sequence.
-4. **Six frameworks have a runner** (FACTS, FATS, FTTS, FVTS, FMTS, FUTS). All 70 governed specs and lists carry a hash that verifies; 69 are approved by the owner. A run fails in every framework when a hash does not verify or is not approved. **What a passing spec proves is less than it should be:** an audit on 2026-11-23 found that most of what a spec declares is compared with the spec itself, never with the code, and that the real code disagrees with its specs in every framework (`forge-core/docs/fxts/AUDIT-2026-11-23.md`; BACKLOG FB-264 to FB-274). The first three repairs are in: a check that did not run is no longer counted as passed (FB-265); what is governed is a closed set, so a spec cannot sit outside the governed folders or be copied unnoticed (FB-268); and CI runs a gate that lets a failing or unrun check through only where the owner has accepted that gap, with the backlog item that closes it (FB-266). Run on every governed spec today, 17 runs pass, 46 are incomplete and 1 fails.
+4. **Six frameworks have a runner** (FACTS, FATS, FTTS, FVTS, FMTS, FUTS). All 70 governed specs and lists carry a hash that verifies; 69 are approved by the owner. A run fails in every framework when a hash does not verify or is not approved. **What a passing spec proves is less than it should be:** an audit on 2026-11-23 found that most of what a spec declares is compared with the spec itself, never with the code, and that the real code disagrees with its specs in every framework (`forge-core/docs/fxts/AUDIT-2026-11-23.md`; BACKLOG FB-264 to FB-274). The first three repairs are in: a check that did not run is no longer counted as passed (FB-265); what is governed is a closed set, so a spec cannot sit outside the governed folders or be copied unnoticed (FB-268); and CI runs a gate that lets a failing or unrun check through only where the owner has accepted that gap, with the backlog item that closes it (FB-266). Since D-19 every verdict names what it rests on (the spec itself, another file, or the real thing), each schema marks which properties are claims about the real thing, and every claim that no check of the real thing reached is listed in the run, so no spec passes outright until such checks exist; 47 accepted gaps name the items that add them. Run on every governed spec today, 0 runs pass, 63 are incomplete and 1 fails.
 5. **Every module has a module spec, and no module's run passes.** Nine modules have an FMTS spec; eight are approved. Each waives at least four requirements, so each run is incomplete. A conformance kit runs each Python module against a reference hub with its clock set wrong; the audit found that the kit passes an empty adapter shell and that seven of the nine modules are stubs that call no source system (FB-272).
 
 **The modules, as they are**
@@ -286,7 +286,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-24 at PR 184:
 | Python: forge-core (`forge-core/src/python/forge_core`) | 116 files, ~26,600 lines |
 | Python: forge-hub (`forge-hub/src/python/forge_hub`) | 90 files, ~17,300 lines |
 | Python: the modules (nine packages under `forge-modules`) | 144 files, ~31,400 lines |
-| Python tests | 289 files, 5,375 collected, full suite green on the locked dependency set |
+| Python tests | 291 files, 6,282 collected, full suite green on the locked dependency set |
 | Go (`forge-core/src/go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`forge-modules/forge-mes/bridge`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -973,7 +973,7 @@ forge governance stamp <spec.json>           # after an edit: history entry, pen
 forge governance approve <spec.json> --by reh3376   # the owner, on their own word, never on their behalf
 ```
 
-- `run` covers FATS, FACTS, FVTS, FTTS, FMTS and FUTS (FB-021, FB-083, FB-135). A run ends as `PASS`, `FAIL` or `INCOMPLETE`, with exit codes 0, 1 and 3: it passes only when every check ran and passed, and it lists every check that did not run or is waived (FB-265). A run that is not asked for live checks says so and is incomplete.
+- `run` covers FATS, FACTS, FVTS, FTTS, FMTS and FUTS (FB-021, FB-083, FB-135). A run ends as `PASS`, `FAIL` or `INCOMPLETE`, with exit codes 0, 1 and 3: it passes only when every check ran and passed, and it lists every check that did not run or is waived (FB-265). A run that is not asked for live checks says so and is incomplete. Each verdict names what it reached (`reached`) and so the kind of evidence it rests on; each claim of the spec (a property its schema marks `claim`) that no check of the real thing reached in the run is listed per section as `<fw>:evidence-<section>`, not run (D-19).
 - **The gate** is `forge governance check`, and CI runs it on every push. A check that fails or did not run gets through only by an *accepted gap*: an entry of `forge-core/fxts/accepted-gaps.json` that names the spec, the check, an open backlog item and the reason, and that the owner approved as it is now (`forge governance gap-approve`). Changing an entry ends its approval; an entry whose gap is closed, or whose backlog item is closed, stops the gate until it is removed. So the list of accepted gaps grows only on the owner's word and shrinks as the work is done. A broken check, a stale index or a bad schema registry never gets through (FB-266). Nor does a file out of place: every file in a governed folder must be one known kind, and a spec or governed list found anywhere else is refused, except samples under `tests/**/fixtures/`; two specs with one identity are refused too, and an API spec's identity is its method and its path (FB-268).
 - FATS is not yet held in both directions: the audit of 2026-11-23 found that 22 of the hub's 50 API routes have no spec, and that the inventory test covers only the context and schema routes (FB-269).
 - The FVTS runner has a render-profile baseline and golden messages; a module can only tighten the baseline, never loosen it.
@@ -2010,7 +2010,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest -q -rsx                          # 5,375 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
+uv run pytest -q -rsx                          # 6,282 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2154,7 +2154,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/`, `forge-core/tests` and `forge-hub/tests`: 289 files, 5,375 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/`, `forge-core/tests` and `forge-hub/tests`: 291 files, 6,282 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -2259,7 +2259,7 @@ note:
 | D-16 | The forge-display design (`forge-display.md`) | signed 2026-11-20; its three provisional points measured and made final the same day; nothing built |
 | D-17 | The structure of the repository (`repository-structure.md`) | signed 2026-11-22: forge-core (shared foundation), forge-hub (the hub), forge-modules, each a self-contained folder with the same standard entries (`README.md`, `docs/`, `fxts/`, `src/`, `tests/`; amended the same day); the three layers are in place, the modules' tests and documents remain (FB-201) |
 | D-18 | Admission: how a hub decides that a module may attach (`approved-spec-register.md`) | signed 2026-11-23: one decision for every way of attaching, on a spec promoted on that hub; what admission requires and who may approve are data; nothing built (FB-256 to FB-263) |
-| D-19 | Approvals and evidence (`approvals-and-evidence.md`) | signed 2026-11-24: every verdict names its kind of evidence; a claim the real thing is not checked against is an accepted gap; an approval is an SSH-signed record of the content, schema, module, run and sequence; nothing built |
+| D-19 | Approvals and evidence (`approvals-and-evidence.md`) | signed 2026-11-24: every verdict names its kind of evidence; a claim the real thing is not checked against is an accepted gap; an approval is an SSH-signed record of the content, schema, module, run and sequence; steps 1 (evidence kinds) and 2 (claim marks and their gaps) built, step 2's amendments (§12) awaiting the owner |
 
 **Waiting for the owner**: the generator for Go and TypeScript types (FB-186, an install); the numbers of each data class, when the transport contract is built (FB-164); forge-creds (FB-142); a new site id and the last old names (FB-150).
 

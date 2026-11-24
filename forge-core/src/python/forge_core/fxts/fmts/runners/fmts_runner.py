@@ -54,6 +54,7 @@ from forge_core.fxts.shared.runner import (
     SpecViolation,
     VerdictStatus,
     load_schema,
+    reached_file,
     verify_spec_hash,
 )
 
@@ -307,11 +308,25 @@ class FMTSRunner(FxTSRunner):
                 ),
             ]
         facts_spec, facts_error = _load_json(repo_root / spec["references"]["facts"]["path"])
+        facts_file = (
+            [reached_file(repo_root / spec["references"]["facts"]["path"])]
+            if isinstance(facts_spec, dict)
+            else []
+        )
+        backlog_files = (
+            []
+            if kwargs.get("backlog") is not None
+            else [
+                reached_file(repo_root / name)
+                for name in ("BACKLOG.md", "BACKLOG-DONE.md")
+                if (repo_root / name).is_file()
+            ]
+        )
         governed = {name: lists.load(name, kwargs.get("lists_dir")) for name in lists.NAMES}
         requirement_checks = {
             "M-1": lambda: self._check_m1(spec, repo_root),
             "M-2": lambda: self._check_m2(spec, repo_root, facts_spec, facts_error),
-            "M-3": lambda: self._check_m3(spec, facts_spec),
+            "M-3": lambda: self._check_m3(spec, facts_spec, facts_file=facts_file),
             "M-8": lambda: self._check_m8(spec),
             "M-9": lambda: self._check_m9(spec, repo_root),
             "M-10": lambda: self._check_m10(spec, repo_root),
@@ -321,11 +336,11 @@ class FMTSRunner(FxTSRunner):
         verdicts = [
             *head,
             self._check_source_paths(spec, repo_root),
-            self._check_waivers(spec, backlog),
+            self._check_waivers(spec, backlog, backlog_files=backlog_files),
             self._check_lists(governed),
             self._check_function(spec, governed),
             self._check_integration(spec, governed),
-            self._check_transport(spec, facts_spec, governed),
+            self._check_transport(spec, facts_spec, governed, facts_file=facts_file),
         ]
         wanted = [
             r for r in CONFORMANCE_KIT if not (spec["baseline"][r] == "waived" and r in waived)
@@ -359,6 +374,7 @@ class FMTSRunner(FxTSRunner):
         ok: str,
         *,
         evidence: dict[str, Any] | None = None,
+        reached: list[str] | None = None,
     ) -> FxTSVerdict:
         if violations:
             head = "; ".join(v.message for v in violations[:3])
@@ -370,6 +386,7 @@ class FMTSRunner(FxTSRunner):
                 message=f"{len(violations)} violation(s): {head}{more}",
                 violations=violations,
                 evidence=evidence or {},
+                reached=list(reached or []),
             )
         return FxTSVerdict(
             check_id=f"fmts:{check}",
@@ -377,7 +394,13 @@ class FMTSRunner(FxTSRunner):
             status=VerdictStatus.PASS,
             message=ok,
             evidence=evidence or {},
+            reached=list(reached or []),
         )
+
+    @staticmethod
+    def _list_file(governed_list: lists.GovernedList) -> list[str]:
+        """The governed list's file, when there is one to have read."""
+        return [reached_file(governed_list.path)] if governed_list.path.is_file() else []
 
     @staticmethod
     def _check_id(requirement: str) -> str:
@@ -477,6 +500,7 @@ class FMTSRunner(FxTSRunner):
             violations,
             f"The {len(governed)} governed lists verify and are approved by the owner.",
             evidence={name: len(g.entries) for name, g in governed.items()},
+            reached=[f for g in governed.values() for f in self._list_file(g)],
         )
 
     def _check_function(
@@ -503,6 +527,7 @@ class FMTSRunner(FxTSRunner):
             violations,
             f"Function '{function}' is in the governed list.",
             evidence={"function": function},
+            reached=self._list_file(governed[lists.MODULE_FUNCTIONS]),
         )
 
     def _check_integration(
@@ -566,6 +591,7 @@ class FMTSRunner(FxTSRunner):
             violations,
             f"Integrates '{section['product']}' over {', '.join(section['interfaces'])}.",
             evidence={"product": section["product"], "interfaces": section["interfaces"]},
+            reached=self._list_file(governed[lists.APPLICATION_PROTOCOLS]),
         )
 
     def _class_violations(
@@ -653,7 +679,12 @@ class FMTSRunner(FxTSRunner):
         return violations
 
     def _check_transport(
-        self, spec: dict[str, Any], facts_spec: Any, governed: dict[str, lists.GovernedList]
+        self,
+        spec: dict[str, Any],
+        facts_spec: Any,
+        governed: dict[str, lists.GovernedList],
+        *,
+        facts_file: list[str] | None = None,
     ) -> FxTSVerdict:
         """``fmts:transport``: what the module declares for its link agrees with its claims,
         with the governed lists and with its FACTS spec."""
@@ -720,6 +751,7 @@ class FMTSRunner(FxTSRunner):
                 "facts_write": writes,
                 "data_classes": transport["data_classes"],
             },
+            reached=[*(facts_file or []), *self._list_file(governed[lists.DATA_CLASSES])],
         )
 
     async def _run_kit(
@@ -774,7 +806,11 @@ class FMTSRunner(FxTSRunner):
                 hub, factory, params=params, events=events, load=load
             )
         )
-        return results, KitBlocked("")
+        driven = [f"artifact:kit:{spec['module_identity']['module_id']}"]
+        return {
+            requirement: verdict.model_copy(update={"reached": driven})
+            for requirement, verdict in results.items()
+        }, KitBlocked("")
 
     # ------------------------------------------------------------------
     # fmts:schema-valid, fmts:identity-match, fmts:hash-*, fmts:enum-parity
@@ -869,6 +905,7 @@ class FMTSRunner(FxTSRunner):
             "$defs",
             violations,
             "Tolerance classes match FACTS; the baseline lists the sixteen requirements.",
+            reached=[reached_file(FACTS_SCHEMA_PATH)],
         )
 
     # ------------------------------------------------------------------
@@ -891,6 +928,11 @@ class FMTSRunner(FxTSRunner):
             "module_identity/source_paths",
             violations,
             f"{len(paths)} source path(s) exist.",
+            reached=[
+                reached_file(repo_root / rel)
+                for rel in paths
+                if self._inside(repo_root, rel) and (repo_root / rel).exists()
+            ],
         )
 
     @staticmethod
@@ -902,7 +944,13 @@ class FMTSRunner(FxTSRunner):
             return False
         return True
 
-    def _check_waivers(self, spec: dict[str, Any], backlog: dict[str, bool]) -> FxTSVerdict:
+    def _check_waivers(
+        self,
+        spec: dict[str, Any],
+        backlog: dict[str, bool],
+        *,
+        backlog_files: list[str] | None = None,
+    ) -> FxTSVerdict:
         baseline, waivers = spec["baseline"], spec["waivers"]
         integrity = spec.get("integrity") or {}
         approved_by = (
@@ -979,6 +1027,7 @@ class FMTSRunner(FxTSRunner):
                 "admin_waivers": sorted(seen & ADMIN_WAIVABLE),
                 "approved_by": approved_by,
             },
+            reached=list(backlog_files or []) if waivers else [],
         )
 
     # ------------------------------------------------------------------
@@ -988,6 +1037,7 @@ class FMTSRunner(FxTSRunner):
     def _check_m1(self, spec: dict[str, Any], repo_root: Path) -> FxTSVerdict:
         violations = []
         scanned = 0
+        searched: list[str] = []
         for rel in spec["module_identity"]["source_paths"]:
             root = repo_root / rel
             if not self._inside(repo_root, rel) or not root.exists():
@@ -995,6 +1045,8 @@ class FMTSRunner(FxTSRunner):
             for path in _walk(root):
                 if path.suffix not in SOURCE_SUFFIXES:
                     continue
+                if not searched or searched[-1] != reached_file(root):
+                    searched.append(reached_file(root))
                 scanned += 1
                 try:
                     text = path.read_text(encoding="utf-8", errors="replace")
@@ -1023,6 +1075,7 @@ class FMTSRunner(FxTSRunner):
             f"hub_link is gRPC forge.v1.AdapterService; no hub REST route in {scanned} "
             "source file(s).",
             evidence={"files_scanned": scanned, "routes": list(HUB_REST_ROUTES)},
+            reached=searched,
         )
 
     # ------------------------------------------------------------------
@@ -1122,13 +1175,19 @@ class FMTSRunner(FxTSRunner):
             "baseline/M-2",
             violations,
             f"FACTS spec '{ref['adapter_id']}' is approved and the manifest matches its identity.",
+            reached=[
+                *([reached_file(repo_root / ref["path"])] if isinstance(facts_spec, dict) else []),
+                *([reached_file(repo_root / manifest_rel)] if isinstance(manifest, dict) else []),
+            ],
         )
 
     # ------------------------------------------------------------------
     # fmts:m3 — the time contract
     # ------------------------------------------------------------------
 
-    def _check_m3(self, spec: dict[str, Any], facts_spec: Any) -> FxTSVerdict:
+    def _check_m3(
+        self, spec: dict[str, Any], facts_spec: Any, *, facts_file: list[str] | None = None
+    ) -> FxTSVerdict:
         contract = spec["time_contract"]
         kind = spec["module_identity"]["kind"]
         governance = (
@@ -1203,6 +1262,7 @@ class FMTSRunner(FxTSRunner):
             f"{len(contract['third_party_systems'])} third-party system(s), "
             f"plant-floor devices {devices}.",
             evidence={"hub_tolerance_class": governance.get("tolerance_class")},
+            reached=list(facts_file or []) if isinstance(facts_spec, dict) else [],
         )
 
     def _database_violations(self, index: int, database: dict[str, Any]) -> list[SpecViolation]:
@@ -1369,10 +1429,12 @@ class FMTSRunner(FxTSRunner):
         is_display = identity["kind"] == "display"
         violations = []
         ui_files: list[str] = []
+        read: list[str] = []
         for rel in identity["source_paths"]:
             root = repo_root / rel
             if not self._inside(repo_root, rel) or not root.exists():
                 continue  # reported by fmts:source-paths
+            read.append(reached_file(root))
             ui_files.extend(
                 str(path.relative_to(repo_root))
                 for path in _walk(root)
@@ -1418,6 +1480,8 @@ class FMTSRunner(FxTSRunner):
         facts_adapter = spec["references"]["facts"]["adapter_id"]
         for rel in fvts_refs:
             view, error = _load_json(repo_root / rel)
+            if isinstance(view, dict):
+                read.append(reached_file(repo_root / rel))
             if not isinstance(view, dict):
                 violations.append(
                     SpecViolation(
@@ -1445,6 +1509,7 @@ class FMTSRunner(FxTSRunner):
             if is_display
             else f"No user interface code; {len(fvts_refs)} FVTS spec(s) describe the screens.",
             evidence={"ui_files": len(ui_files), "fvts": list(fvts_refs)},
+            reached=read,
         )
 
     # ------------------------------------------------------------------
@@ -1466,6 +1531,7 @@ class FMTSRunner(FxTSRunner):
                 "",
             )
         document, error = _load_json(repo_root / rel)
+        read = [reached_file(repo_root / rel)] if isinstance(document, dict) else []
         roles = document.get("roles") if isinstance(document, dict) else None
         if not isinstance(roles, list) or not roles:
             reason = error or "it has no non-empty 'roles' list"
@@ -1537,6 +1603,7 @@ class FMTSRunner(FxTSRunner):
             violations,
             f"{len(roles)} role(s) declared with their scopes.",
             evidence={"roles": [r for r in role_ids if isinstance(r, str)]},
+            reached=read,
         )
 
     # ------------------------------------------------------------------
@@ -1548,6 +1615,7 @@ class FMTSRunner(FxTSRunner):
         identity = spec["module_identity"]
         language = identity["language"]
         violations = []
+        looked_in: list[str] = []
         expected = {"python-adapter": ("python", PYTHON_ADAPTER_FILES), "go-module": ("go", ())}
         if template == "none":
             violations.append(
@@ -1573,6 +1641,7 @@ class FMTSRunner(FxTSRunner):
                 for rel in identity["source_paths"]
                 if self._inside(repo_root, rel) and (repo_root / rel).is_dir()
             ]
+            looked_in = [reached_file(root) for root in roots]
             violations.extend(
                 SpecViolation(
                     field="module_identity.source_paths",
@@ -1588,6 +1657,7 @@ class FMTSRunner(FxTSRunner):
             violations,
             f"The module has the {template} layout.",
             evidence={"template": template},
+            reached=looked_in,
         )
 
     # ------------------------------------------------------------------

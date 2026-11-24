@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://fxts/ftts/v0.1.0",
+  "$id": "forge://fxts/ftts/v0.2.0",
   "title": "Forge Transport Test Specification (FTTS)",
   "description": "Governs the gRPC + Protobuf transport layer between Forge hub and spoke modules. Ensures compiled binary protobuf on the wire, schema-enforced message types, round-trip fidelity, and proper gRPC patterns.",
   "type": "object",
@@ -20,14 +20,21 @@
   "properties": {
     "spec_version": {
       "type": "string",
-      "const": "0.1.0",
+      "x-forge-evidence": "structure",
+      "const": "0.2.0",
       "description": "FTTS schema version. Must match exactly."
     },
-
     "transport_identity": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Identifies this transport layer.",
-      "required": ["transport_id", "name", "version", "protocol", "proto_package"],
+      "required": [
+        "transport_id",
+        "name",
+        "version",
+        "protocol",
+        "proto_package"
+      ],
       "properties": {
         "transport_id": {
           "type": "string",
@@ -57,23 +64,43 @@
         }
       }
     },
-
     "proto_contract": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Declares the proto file inventory — what .proto files define the contract.",
-      "required": ["proto_files", "service_name", "message_types", "enum_types"],
+      "required": [
+        "proto_files",
+        "service_name",
+        "message_types",
+        "enum_types"
+      ],
       "properties": {
         "proto_files": {
           "type": "array",
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": ["file", "purpose"],
+            "required": [
+              "file",
+              "purpose"
+            ],
             "properties": {
-              "file": { "type": "string", "description": "Proto file name (e.g. 'enums.proto')." },
-              "purpose": { "type": "string", "description": "What this file defines." },
-              "message_count": { "type": "integer", "minimum": 0 },
-              "enum_count": { "type": "integer", "minimum": 0 }
+              "file": {
+                "type": "string",
+                "description": "Proto file name (e.g. 'enums.proto')."
+              },
+              "purpose": {
+                "type": "string",
+                "description": "What this file defines."
+              },
+              "message_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "enum_count": {
+                "type": "integer",
+                "minimum": 0
+              }
             }
           }
         },
@@ -84,26 +111,39 @@
         "message_types": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "All proto message type names that must exist."
         },
         "enum_types": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "All proto enum type names that must exist."
         }
       }
     },
-
     "wire_format": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Wire format requirements — what goes on the TCP connection.",
-      "required": ["encoding", "compilation_required", "json_forbidden", "schema_enforced"],
+      "required": [
+        "encoding",
+        "compilation_required",
+        "json_forbidden",
+        "schema_enforced"
+      ],
       "properties": {
         "encoding": {
           "type": "string",
-          "enum": ["protobuf-binary", "protobuf-json", "json"],
+          "enum": [
+            "protobuf-binary",
+            "protobuf-json",
+            "json"
+          ],
           "description": "Required wire encoding. 'protobuf-binary' means compiled stubs."
         },
         "compilation_required": {
@@ -128,11 +168,16 @@
         }
       }
     },
-
     "serialization_bridge": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Governs the Pydantic ↔ Proto message conversion boundary.",
-      "required": ["bridge_module", "round_trip_lossless", "type_mappings", "enum_mappings"],
+      "required": [
+        "bridge_module",
+        "round_trip_lossless",
+        "type_mappings",
+        "enum_mappings"
+      ],
       "properties": {
         "bridge_module": {
           "type": "string",
@@ -147,12 +192,27 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": ["pydantic_type", "proto_type", "to_proto_fn", "from_proto_fn"],
+            "required": [
+              "pydantic_type",
+              "proto_type",
+              "to_proto_fn",
+              "from_proto_fn"
+            ],
             "properties": {
-              "pydantic_type": { "type": "string" },
-              "proto_type": { "type": "string" },
-              "to_proto_fn": { "type": "string", "description": "Function that converts Pydantic → Proto." },
-              "from_proto_fn": { "type": "string", "description": "Function that converts Proto → Pydantic." }
+              "pydantic_type": {
+                "type": "string"
+              },
+              "proto_type": {
+                "type": "string"
+              },
+              "to_proto_fn": {
+                "type": "string",
+                "description": "Function that converts Pydantic → Proto."
+              },
+              "from_proto_fn": {
+                "type": "string",
+                "description": "Function that converts Proto → Pydantic."
+              }
             }
           },
           "description": "Every Pydantic model that crosses the wire must have a mapping."
@@ -162,18 +222,35 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": ["python_enum", "proto_enum", "direction"],
+            "required": [
+              "python_enum",
+              "proto_enum",
+              "direction"
+            ],
             "properties": {
-              "python_enum": { "type": "string" },
-              "proto_enum": { "type": "string" },
-              "direction": { "type": "string", "enum": ["bidirectional", "to_proto_only", "from_proto_only"] }
+              "python_enum": {
+                "type": "string"
+              },
+              "proto_enum": {
+                "type": "string"
+              },
+              "direction": {
+                "type": "string",
+                "enum": [
+                  "bidirectional",
+                  "to_proto_only",
+                  "from_proto_only"
+                ]
+              }
             }
           },
           "description": "Every enum that crosses the wire must have a bidirectional mapping."
         },
         "typed_value_variants": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "RecordValue.raw oneof variants (e.g. 'number_value', 'string_value')."
         },
         "timestamp_format": {
@@ -182,11 +259,16 @@
         }
       }
     },
-
     "server_requirements": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Requirements for the hub-side gRPC server implementation.",
-      "required": ["server_module", "servicer_class", "uses_compiled_registration", "uses_compiled_servicer_base"],
+      "required": [
+        "server_module",
+        "servicer_class",
+        "uses_compiled_registration",
+        "uses_compiled_servicer_base"
+      ],
       "properties": {
         "server_module": {
           "type": "string",
@@ -214,11 +296,15 @@
         }
       }
     },
-
     "client_requirements": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Requirements for the spoke-side gRPC client implementation.",
-      "required": ["channel_module", "channel_class", "uses_compiled_stub"],
+      "required": [
+        "channel_module",
+        "channel_class",
+        "uses_compiled_stub"
+      ],
       "properties": {
         "channel_module": {
           "type": "string",
@@ -242,50 +328,91 @@
         }
       }
     },
-
     "rpc_contract": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "The RPC contract — which methods exist, their streaming type, and metadata protocol.",
-      "required": ["rpcs", "metadata_protocol"],
+      "required": [
+        "rpcs",
+        "metadata_protocol"
+      ],
       "properties": {
         "rpcs": {
           "type": "array",
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": ["method", "type", "request_type", "response_type", "plane"],
+            "required": [
+              "method",
+              "type",
+              "request_type",
+              "response_type",
+              "plane"
+            ],
             "properties": {
-              "method": { "type": "string", "description": "RPC method name." },
+              "method": {
+                "type": "string",
+                "description": "RPC method name."
+              },
               "type": {
                 "type": "string",
-                "enum": ["unary_unary", "unary_stream", "stream_unary", "stream_stream"],
+                "enum": [
+                  "unary_unary",
+                  "unary_stream",
+                  "stream_unary",
+                  "stream_stream"
+                ],
                 "description": "gRPC streaming type."
               },
-              "request_type": { "type": "string", "description": "Proto request message type." },
-              "response_type": { "type": "string", "description": "Proto response message type." },
+              "request_type": {
+                "type": "string",
+                "description": "Proto request message type."
+              },
+              "response_type": {
+                "type": "string",
+                "description": "Proto response message type."
+              },
               "plane": {
                 "type": "string",
-                "enum": ["control", "data", "capability"],
+                "enum": [
+                  "control",
+                  "data",
+                  "capability"
+                ],
                 "description": "Which logical plane this RPC belongs to."
               },
-              "description": { "type": "string" }
+              "description": {
+                "type": "string"
+              }
             }
           }
         },
         "metadata_protocol": {
           "type": "object",
           "description": "gRPC metadata headers used for session identification.",
-          "required": ["headers"],
+          "required": [
+            "headers"
+          ],
           "properties": {
             "headers": {
               "type": "array",
               "items": {
                 "type": "object",
-                "required": ["key", "purpose"],
+                "required": [
+                  "key",
+                  "purpose"
+                ],
                 "properties": {
-                  "key": { "type": "string" },
-                  "purpose": { "type": "string" },
-                  "required": { "type": "boolean", "default": false }
+                  "key": {
+                    "type": "string"
+                  },
+                  "purpose": {
+                    "type": "string"
+                  },
+                  "required": {
+                    "type": "boolean",
+                    "default": false
+                  }
                 }
               }
             }
@@ -293,11 +420,14 @@
         }
       }
     },
-
     "error_protocol": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Error handling requirements for gRPC transport.",
-      "required": ["uses_grpc_status_codes", "status_code_mapping"],
+      "required": [
+        "uses_grpc_status_codes",
+        "status_code_mapping"
+      ],
       "properties": {
         "uses_grpc_status_codes": {
           "type": "boolean",
@@ -308,20 +438,32 @@
           "minItems": 1,
           "items": {
             "type": "object",
-            "required": ["condition", "grpc_code"],
+            "required": [
+              "condition",
+              "grpc_code"
+            ],
             "properties": {
-              "condition": { "type": "string", "description": "When this status is set." },
-              "grpc_code": { "type": "string", "description": "gRPC status code name (e.g. 'INTERNAL')." }
+              "condition": {
+                "type": "string",
+                "description": "When this status is set."
+              },
+              "grpc_code": {
+                "type": "string",
+                "description": "gRPC status code name (e.g. 'INTERNAL')."
+              }
             }
           }
         }
       }
     },
-
     "conformance_tests": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Declares the test suite that validates this transport spec.",
-      "required": ["total", "categories"],
+      "required": [
+        "total",
+        "categories"
+      ],
       "properties": {
         "total": {
           "type": "integer",
@@ -330,21 +472,45 @@
         },
         "categories": {
           "type": "object",
-          "additionalProperties": { "type": "integer", "minimum": 1 },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 1
+          },
           "description": "Test categories and counts."
         }
       }
     },
-
     "integrity": {
       "type": "object",
+      "x-forge-evidence": "structure",
       "description": "FHTS Layer 1 integrity block — hash governance.",
       "properties": {
-        "hash_method": { "type": "string" },
-        "spec_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-        "hash_state": { "type": "string", "enum": ["approved", "modified", "pending_review", "reverted", "unknown"] },
-        "previous_hash": { "type": ["string", "null"] },
-        "approved_by": { "type": "string" },
+        "hash_method": {
+          "type": "string"
+        },
+        "spec_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "hash_state": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "modified",
+            "pending_review",
+            "reverted",
+            "unknown"
+          ]
+        },
+        "previous_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approved_by": {
+          "type": "string"
+        },
         "schema_version": {
           "type": "string",
           "pattern": "^\\d+\\.\\d+\\.\\d+$",
@@ -355,29 +521,49 @@
           "pattern": "^[a-f0-9]{64}$",
           "description": "The hash of that schema version, from the framework's schema registry."
         },
-        "approved_at": { "type": "string" },
+        "approved_at": {
+          "type": "string"
+        },
         "change_history": {
           "type": "array",
           "maxItems": 3,
           "items": {
             "type": "object",
-            "required": ["previous_hash", "new_hash", "changed_at"],
+            "required": [
+              "previous_hash",
+              "new_hash",
+              "changed_at"
+            ],
             "properties": {
-              "previous_hash": { "type": "string" },
-              "new_hash": { "type": "string" },
-              "changed_at": { "type": "string" },
-              "source": { "type": "string" },
-              "changed_by": { "type": "string" },
-              "change_type": { "type": "string" },
-              "reason": { "type": "string" }
+              "previous_hash": {
+                "type": "string"
+              },
+              "new_hash": {
+                "type": "string"
+              },
+              "changed_at": {
+                "type": "string"
+              },
+              "source": {
+                "type": "string"
+              },
+              "changed_by": {
+                "type": "string"
+              },
+              "change_type": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              }
             }
           }
         }
       }
     },
-
     "metadata": {
       "type": "object",
+      "x-forge-evidence": "description",
       "description": "Free-form metadata (no schema validation)."
     }
   }

@@ -1285,14 +1285,24 @@ def _strongest(kinds: list[str]) -> str:
 
 def evidence_table(runs: list[GateRun]) -> dict[str, dict[str, Any]]:
     """For each framework: every declared check with its kind and how often it observed
-    something on the governed specs; and for each top-level property of the framework's
-    schema, the strongest evidence any declared check could give and the strongest one
-    observed today."""
+    something on the governed specs; and every unit its schema's marks divide a spec into
+    (D-19, AE-3), with its mark, the strongest evidence any declared check could give it
+    and the strongest one observed today. A unit's checks are those declared to cover it,
+    a property above it or one below it."""
+    from forge_core.fxts.shared import schemas
+
     table: dict[str, dict[str, Any]] = {}
     for name, framework in sorted(FRAMEWORKS.items()):
         runner = framework.make_runner(framework.schema)
-        schema = json.loads(framework.schema.read_text(encoding="utf-8"))
-        properties = sorted(schema.get("properties", {}))
+        schema_dir = framework.schema.parent
+        source = schemas.marks_version(schema_dir)
+        if source is not None:
+            units = schemas.mark_units(source.load())
+            marks_from = f"{name} {source.version}"
+        else:
+            head = schemas.latest(schema_dir)
+            units = schemas.mark_units(head.load(), honour_marks=False) if head else []
+            marks_from = "no approved version: every top-level property is a claim"
         observed: dict[str, dict[str, int]] = {}
         for run in runs:
             if run.framework != name:
@@ -1309,18 +1319,24 @@ def evidence_table(runs: list[GateRun]) -> dict[str, dict[str, Any]]:
             checks.append(
                 {"id": check.id, "kind": str(check.kind), "covers": list(check.covers), **seen}
             )
-        by_property: dict[str, dict[str, str]] = {}
-        for prop in properties:
-            touching = [
-                c
-                for c in checks
-                if any(p in ("", f"/{prop}") or p.startswith(f"/{prop}/") for p in c["covers"])
-            ]
-            by_property[prop] = {
+
+        def touches(cover: str, unit: str) -> bool:
+            return (
+                cover == ""
+                or cover == unit
+                or unit.startswith(cover + "/")
+                or cover.startswith(unit + "/")
+            )
+
+        by_unit: dict[str, dict[str, str]] = {}
+        for unit, mark in units:
+            touching = [c for c in checks if any(touches(p, unit) for p in c["covers"])]
+            by_unit[unit] = {
+                "mark": mark,
                 "declared": _strongest([c["kind"] for c in touching]),
                 "observed": _strongest([c["kind"] for c in touching if c["observed"]]),
             }
-        table[name] = {"checks": checks, "properties": by_property}
+        table[name] = {"marks_from": marks_from, "checks": checks, "units": by_unit}
     return table
 
 
@@ -1334,8 +1350,8 @@ def evidence_command(
 
     Runs every governed spec as the gate does (no live checks), and shows each declared
     check with its kind and whether it observed anything, then each top-level property of
-    the framework's schema with the strongest evidence a check could give it and the
-    strongest it got today (D-19, AE-1, AE-2).
+    the framework's schema with its mark, the strongest evidence a check could give it and
+    the strongest it got today (D-19, AE-1 to AE-3).
     """
     import asyncio
 
@@ -1361,6 +1377,9 @@ def evidence_command(
             )
             covers = ", ".join(check["covers"]) or "(the framework, not a spec)"
             typer.echo(f"  {check['kind']:<8} {check['id']:<42} {seen:<32} {covers}")
-        typer.echo("  property                          strongest declared  strongest observed")
-        for prop, kinds in entry["properties"].items():
-            typer.echo(f"  {prop:<33} {kinds['declared']:<19} {kinds['observed']}")
+        typer.echo(f"  marks from {entry['marks_from']}")
+        typer.echo(f"  {'unit':<33} {'mark':<12} {'strongest declared':<19} strongest observed")
+        for unit, kinds in entry["units"].items():
+            typer.echo(
+                f"  {unit:<33} {kinds['mark']:<12} {kinds['declared']:<19} {kinds['observed']}"
+            )

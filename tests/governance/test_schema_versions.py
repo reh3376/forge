@@ -21,18 +21,21 @@ from forge_hub.cli.governance import FRAMEWORKS, framework_specs
 if TYPE_CHECKING:
     from pathlib import Path
 
+MARK = schemas.MARK_KEY
 BASE: dict[str, Any] = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "forge://fxts/demo/v1.0.0",
     "type": "object",
     "required": ["spec_version", "name"],
     "properties": {
-        "spec_version": {"type": "string", "const": "1.0.0"},
-        "name": {"type": "string", "description": "The name."},
-        "kind": {"type": "string", "enum": ["a", "b"]},
-        "integrity": {"type": "object"},
+        "spec_version": {"type": "string", "const": "1.0.0", MARK: "structure"},
+        "name": {"type": "string", "description": "The name.", MARK: "claim"},
+        "kind": {"type": "string", "enum": ["a", "b"], MARK: "claim"},
+        "integrity": {"type": "object", MARK: "structure"},
     },
 }
+#: An optional property a release adds; a released schema marks every property (D-19, AE-3).
+ALIAS: dict[str, Any] = {"type": "string", MARK: "claim"}
 
 
 def versioned(schema: dict[str, Any], version: str) -> dict[str, Any]:
@@ -74,7 +77,7 @@ class TestTheStepAChangeNeeds:
 
     def test_an_optional_field_or_an_enum_value_is_minor(self) -> None:
         new = copy.deepcopy(BASE)
-        new["properties"]["alias"] = {"type": "string"}
+        new["properties"]["alias"] = copy.deepcopy(ALIAS)
         new["properties"]["kind"]["enum"].append("c")
         changes = schemas.diff(BASE, new)
         assert {c.step for c in changes} == {"minor"} and len(changes) == 2
@@ -118,7 +121,7 @@ class TestRelease:
         self, demo: Path
     ) -> None:
         edited = copy.deepcopy(BASE)
-        edited["properties"]["alias"] = {"type": "string"}
+        edited["properties"]["alias"] = copy.deepcopy(ALIAS)
         write(demo, edited)
         (problem,) = schemas.registry_problems(demo)
         assert "differs from version 1.0.0" in problem and "schema-release" in problem
@@ -134,7 +137,7 @@ class TestRelease:
 
     def test_a_minor_release_keeps_both_versions(self, demo: Path) -> None:
         edited = versioned(BASE, "1.1.0")
-        edited["properties"]["alias"] = {"type": "string"}
+        edited["properties"]["alias"] = copy.deepcopy(ALIAS)
         write(demo, edited)
         row = schemas.release(demo, summary="alias", released_at="t")
         assert (row.version, row.step) == ("1.1.0", "minor")
@@ -212,7 +215,7 @@ class TestWhatASpecRecords:
         schemas.approve(demo, "1.0.0", by="owner", at="t")
         spec = spec_for(demo)
         minor = versioned(BASE, "1.1.0")
-        minor["properties"]["alias"] = {"type": "string"}
+        minor["properties"]["alias"] = copy.deepcopy(ALIAS)
         write(demo, minor)
         schemas.release(demo, summary="alias", released_at="t")
         assert schemas.spec_schema_problem(demo, spec) is None

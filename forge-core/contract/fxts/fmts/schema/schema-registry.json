@@ -43,6 +43,47 @@
       "released_at": "2026-11-19T21:45:42Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-19T22:07:00Z"
+    },
+    {
+      "version": "2.1.0",
+      "file": "versions/fmts.v2.1.0.schema.json",
+      "schema_hash": "a7ea1e4b4c15a25315ab47f1a172f03ca5890a0fc7af777ff53241b143b15ba7",
+      "hash_state": "approved",
+      "step": "minor",
+      "summary": "D-19 step 2 (FB-264): every top-level property carries its evidence mark, x-forge-evidence: claim (says something about the real thing), description (text for people; nothing decides on it) or structure (about the spec as a document). Marks only: what a spec may say is unchanged, so no spec needs review (AE-3).",
+      "changes": [
+        "properties.baseline.properties.M-1.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-10.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-11.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-12.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-13.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-14.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-15.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-16.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-2.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-3.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-4.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-5.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-6.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-7.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-8.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.baseline.properties.M-9.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.hub_link.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.integration.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.integrity.x-forge-evidence: evidence mark added: 'structure' (minor)",
+        "properties.metadata.x-forge-evidence: evidence mark added: 'description' (minor)",
+        "properties.module_identity.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.references.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.scaffold.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.spec_version.x-forge-evidence: evidence mark added: 'structure' (minor)",
+        "properties.time_contract.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.transport.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.user_interface.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.waivers.x-forge-evidence: evidence mark added: 'structure' (minor)"
+      ],
+      "released_at": "2026-11-24T18:32:23Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-24T18:44:51Z"
     }
   ]
 }

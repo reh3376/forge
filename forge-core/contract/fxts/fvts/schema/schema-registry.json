@@ -34,6 +34,39 @@
       "released_at": "2026-11-23T02:24:12Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-23T02:30:20Z"
+    },
+    {
+      "version": "0.3.0",
+      "file": "versions/fvts.v0.3.0.schema.json",
+      "schema_hash": "e38eea4f4c58876e36478fc11be19ee856cee33f163cc4114aa8ebfa5f973f61",
+      "hash_state": "approved",
+      "step": "minor",
+      "summary": "D-19 step 2 (FB-264): every top-level property carries its evidence mark, x-forge-evidence: claim (says something about the real thing), description (text for people; nothing decides on it) or structure (about the spec as a document). Marks only: what a spec may say is unchanged, so no spec needs review (AE-3).",
+      "changes": [
+        "properties.actions.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.alarms.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.conformance_tests.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.data_bindings.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.design_system.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.history.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.integrity.x-forge-evidence: evidence mark added: 'structure' (minor)",
+        "properties.live_updates.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.metadata.x-forge-evidence: evidence mark added: 'description' (minor)",
+        "properties.render_profiles.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.scope.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.settings.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.spec_version.x-forge-evidence: evidence mark added: 'structure' (minor)",
+        "properties.surfaces.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.view_identity.properties.description.x-forge-evidence: evidence mark added: 'description' (minor)",
+        "properties.view_identity.properties.facts_spec_ref.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.view_identity.properties.name.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.view_identity.properties.owner_module.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.view_identity.properties.version.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.view_identity.properties.view_id.x-forge-evidence: evidence mark added: 'claim' (minor)"
+      ],
+      "released_at": "2026-11-24T18:32:23Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-24T18:44:51Z"
     }
   ]
 }

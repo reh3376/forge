@@ -19,6 +19,7 @@ from forge_core.fxts.shared.runner import (
     check_schema_runner_parity,
 )
 from forge_ot.control.config import load_control_config
+from tests.governance.evidence import expected_evidence
 
 PASS, FAIL = VerdictStatus.PASS, VerdictStatus.FAIL
 WRITE_CONFIG_PATH = (
@@ -51,7 +52,11 @@ class TestParity:
         statuses = {v.status for v in report.verdicts}
         assert VerdictStatus.NOT_IMPLEMENTED not in statuses
         assert VerdictStatus.ERROR not in statuses
-        assert report.total == 21
+        # 21 checks, and one evidence finding per section whose claims nothing real reached
+        # (D-19 step 2): exactly those the marks, the spec and this run's verdicts give.
+        evidence = {v.check_id for v in report.verdicts if ":evidence-" in v.check_id}
+        assert evidence == expected_evidence("fvts", spec, report)
+        assert report.total == 21 + len(evidence)
         assert report.framework == "FVTS" and report.hash_verified is True
 
     async def test_no_spec_is_an_error(self, runner: FVTSRunner) -> None:

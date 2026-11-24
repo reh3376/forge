@@ -25,7 +25,7 @@ def errors(validator: Draft202012Validator, spec: dict[str, Any]) -> list[str]:
 
 def test_schema_is_valid_draft_2020_12(schema: dict[str, Any]) -> None:
     Draft202012Validator.check_schema(schema)
-    assert schema["$id"] == "forge://fxts/fvts/v0.2.1"
+    assert schema["$id"] == "forge://fxts/fvts/v0.3.0"
     assert len(schema["required"]) == 13
     assert len(schema["properties"]) == 15  # 13 required + metadata + integrity
 

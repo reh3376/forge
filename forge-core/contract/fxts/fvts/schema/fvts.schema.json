@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://fxts/fvts/v0.2.1",
+  "$id": "forge://fxts/fvts/v0.3.0",
   "title": "Forge View Test Specification (FVTS)",
   "description": "Governs the contract between Forge modules and forge-display. A module never renders UI; it declares what can be shown (data bindings, history, alarms), what can be done (actions, settings) and on which surfaces and render profiles. forge-display renderers (desktop HMI, desktop app, web, mobile) consume this contract. One FVTS spec per module.",
   "type": "object",
@@ -23,7 +23,8 @@
   "properties": {
     "spec_version": {
       "type": "string",
-      "const": "0.2.1",
+      "x-forge-evidence": "structure",
+      "const": "0.3.0",
       "description": "FVTS schema version this spec conforms to. Must match exactly."
     },
     "view_identity": {
@@ -39,6 +40,7 @@
       "properties": {
         "view_id": {
           "type": "string",
+          "x-forge-evidence": "claim",
           "pattern": "^[a-z][a-z0-9-]*$",
           "minLength": 3,
           "maxLength": 64,
@@ -46,30 +48,36 @@
         },
         "name": {
           "type": "string",
+          "x-forge-evidence": "claim",
           "minLength": 1,
           "maxLength": 128
         },
         "version": {
           "type": "string",
+          "x-forge-evidence": "claim",
           "pattern": "^\\d+\\.\\d+\\.\\d+",
           "description": "Semver version of this view contract. A breaking change to any binding, action or surface requires a major bump."
         },
         "owner_module": {
           "type": "string",
+          "x-forge-evidence": "claim",
           "pattern": "^[a-z][a-z0-9-]*$",
           "description": "module/adapter_id of the module that owns this contract (matches its FACTS adapter_identity.adapter_id)."
         },
         "facts_spec_ref": {
           "type": "string",
+          "x-forge-evidence": "claim",
           "description": "Path or forge:// URI of the owning module's FACTS spec. Data sources bound here must be declared there."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "x-forge-evidence": "description"
         }
       }
     },
     "scope": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Where in the plant hierarchy this contract's views apply, and which RecordContext fields every view must carry.",
       "required": [
         "isa95_levels",
@@ -104,6 +112,7 @@
     },
     "data_bindings": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Every value a renderer may display. Renderers may only bind to points declared here.",
       "required": [
         "points"
@@ -127,6 +136,7 @@
     },
     "live_updates": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Subscription contract for live values.",
       "required": [
         "transport",
@@ -186,6 +196,7 @@
     },
     "history": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Trend/history query contract.",
       "required": [
         "enabled"
@@ -255,6 +266,7 @@
     },
     "alarms": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Alarm presentation and operator-operation contract. Alarm logic lives in the owning module (ISA-18.2 state machine); this governs how it is shown and operated.",
       "required": [
         "enabled"
@@ -315,6 +327,7 @@
     },
     "actions": {
       "type": "array",
+      "x-forge-evidence": "claim",
       "description": "Everything a user can do from a view. Safety behaviour (role, confirmation, interlocks, audit) is declared here and enforced in forge-core, never only in the UI.",
       "items": {
         "$ref": "#/$defs/action"
@@ -322,6 +335,7 @@
     },
     "settings": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Module configuration exposed for editing. Forms are generated from the referenced JSON Schema.",
       "required": [
         "exposed"
@@ -368,6 +382,7 @@
     },
     "render_profiles": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Which forge-display render profiles this module supports, and any tightening of the platform baseline (see FVTS.md). Specs may tighten a baseline, never loosen it.",
       "required": [
         "supported"
@@ -403,6 +418,7 @@
     },
     "surfaces": {
       "type": "array",
+      "x-forge-evidence": "claim",
       "minItems": 1,
       "description": "The screens/views this module offers. Configured surfaces are data authored per site; coded surfaces are application code. Both may only use declared points and actions.",
       "items": {
@@ -411,6 +427,7 @@
     },
     "design_system": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "required": [
         "tokens_ref",
         "isa101_high_performance"
@@ -429,6 +446,7 @@
     },
     "conformance_tests": {
       "type": "object",
+      "x-forge-evidence": "claim",
       "description": "Declares the test suite that validates this contract.",
       "required": [
         "suite_path"
@@ -449,10 +467,12 @@
     },
     "metadata": {
       "type": "object",
+      "x-forge-evidence": "description",
       "description": "Free-form metadata (no schema validation)."
     },
     "integrity": {
       "type": "object",
+      "x-forge-evidence": "structure",
       "description": "FHTS Layer 1 integrity block — hash governance.",
       "properties": {
         "hash_method": {

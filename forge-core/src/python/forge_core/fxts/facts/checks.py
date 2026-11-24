@@ -61,10 +61,18 @@ CHECKS: tuple[Check, ...] = (
     Check(
         "facts:live",
         ("/connection", "/capabilities", "/data_contract", "/lifecycle", "/error_handling"),
-        ARTIFACT,
-        "not built: nothing compares an adapter spec with the module's code (FB-271)",
+        NONE,
+        (
+            "not built: nothing compares an adapter spec with the module's code (FB-271); "
+            "artifact once built"
+        ),
     ),
-    Check("facts:metadata", ("/metadata",), SELF),
+    Check(
+        "facts:metadata",
+        ("/metadata",),
+        NONE,
+        "free text for people: read only to count its keys; decides nothing (D-19, AE-3)",
+    ),
     Check("facts:schema-valid", ("",), SELF),
     Check("facts:spec-load", ("",), SELF),
     Check("facts:spec-version", ("/spec_version",), SELF),

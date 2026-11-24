@@ -141,6 +141,664 @@
         "by": "reh3376",
         "at": "2026-11-24T03:18:19Z"
       }
+    },
+    {
+      "id": "fats-evidence-endpoint",
+      "framework": "fats",
+      "spec": "*",
+      "check": "fats:evidence-endpoint",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-269",
+      "reason": "A spec's claim in endpoint is checked only against the API spec itself; no run in the gate compares it with the route the hub serves. The comparison with the app built in process is FB-269. (D-19, AE-4)",
+      "approval": {
+        "hash": "8719cddf93a2b3ebd14a386d46bf609606c9748dbebdea960fc0d335378af14a",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fats-evidence-method",
+      "framework": "fats",
+      "spec": "*",
+      "check": "fats:evidence-method",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-269",
+      "reason": "A spec's claim in method is checked only against the API spec itself; no run in the gate compares it with the route the hub serves. The comparison with the app built in process is FB-269. (D-19, AE-4)",
+      "approval": {
+        "hash": "3961560c54603e28ac6ffe10cd908ee8c934ff18f9e36ae888962fe4dba35933",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fats-evidence-authentication",
+      "framework": "fats",
+      "spec": "*",
+      "check": "fats:evidence-authentication",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-269",
+      "reason": "A spec's claim in authentication is checked only against the API spec itself; no run in the gate compares it with the route the hub serves. The comparison with the app built in process is FB-269. (D-19, AE-4)",
+      "approval": {
+        "hash": "1a41e56ae114171a3512706056456aa0a4e0db8126a2ec85121e8e983abb4e50",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fats-evidence-request",
+      "framework": "fats",
+      "spec": "*",
+      "check": "fats:evidence-request",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-269",
+      "reason": "A spec's claim in request is checked only against the API spec itself; no run in the gate compares it with the route the hub serves. The comparison with the app built in process is FB-269. (D-19, AE-4)",
+      "approval": {
+        "hash": "4a924bc4b6ff08b13c10720a8e0316f73f390f72991292a8e636832c4dc0f40d",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fats-evidence-response",
+      "framework": "fats",
+      "spec": "*",
+      "check": "fats:evidence-response",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-269",
+      "reason": "A spec's claim in response is checked only against the API spec itself; no run in the gate compares it with the route the hub serves. The comparison with the app built in process is FB-269. (D-19, AE-4)",
+      "approval": {
+        "hash": "57d2b6d96819d903c2e94d92978a74699b46f63be903664f733aeff20e1a3e4f",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fats-evidence-rate-limit",
+      "framework": "fats",
+      "spec": "*",
+      "check": "fats:evidence-rate-limit",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-269",
+      "reason": "A spec's claim in rate_limit is checked only against the API spec itself; no run in the gate compares it with the route the hub serves. The comparison with the app built in process is FB-269. (D-19, AE-4)",
+      "approval": {
+        "hash": "f78293706ea1aa28b14d6d11a2b209e31b349e6ebbab42947d3e0750002a3d44",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "facts-evidence-adapter-identity",
+      "framework": "facts",
+      "spec": "*",
+      "check": "facts:evidence-adapter-identity",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-271",
+      "reason": "A spec's claim in adapter_identity is checked only against the adapter spec itself and other files; no check compares it with the module's code or its running adapter (FB-271). (D-19, AE-4)",
+      "approval": {
+        "hash": "27d59167194e35ab048672f69ba5100d8030460955d050451fa71169debe92c2",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "facts-evidence-capabilities",
+      "framework": "facts",
+      "spec": "*",
+      "check": "facts:evidence-capabilities",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-271",
+      "reason": "A spec's claim in capabilities is checked only against the adapter spec itself and other files; no check compares it with the module's code or its running adapter (FB-271). (D-19, AE-4)",
+      "approval": {
+        "hash": "881e5b01594c3f838a24f2a109b44fd618b8b4de2b82573990022f40548bf511",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "facts-evidence-lifecycle",
+      "framework": "facts",
+      "spec": "*",
+      "check": "facts:evidence-lifecycle",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-271",
+      "reason": "A spec's claim in lifecycle is checked only against the adapter spec itself and other files; no check compares it with the module's code or its running adapter (FB-271). (D-19, AE-4)",
+      "approval": {
+        "hash": "39ba30e46b30a7eeea88423edbfa48105935185ba49460ad9f14346f656283a5",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "facts-evidence-connection",
+      "framework": "facts",
+      "spec": "*",
+      "check": "facts:evidence-connection",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-271",
+      "reason": "A spec's claim in connection is checked only against the adapter spec itself and other files; no check compares it with the module's code or its running adapter (FB-271). (D-19, AE-4)",
+      "approval": {
+        "hash": "084873c09531be92e834a197735d8fc10711de5080e9c599383bee05f70b49c0",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "facts-evidence-data-contract",
+      "framework": "facts",
+      "spec": "*",
+      "check": "facts:evidence-data-contract",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-271",
+      "reason": "A spec's claim in data_contract is checked only against the adapter spec itself and other files; no check compares it with the module's code or its running adapter (FB-271). (D-19, AE-4)",
+      "approval": {
+        "hash": "2e5d6ae2a1164c053476f5c5bb8d640c78eaca5a03c34168910673129aaf8b22",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "facts-evidence-context-mapping",
+      "framework": "facts",
+      "spec": "*",
+      "check": "facts:evidence-context-mapping",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-271",
+      "reason": "A spec's claim in context_mapping is checked only against the adapter spec itself and other files; no check compares it with the module's code or its running adapter (FB-271). (D-19, AE-4)",
+      "approval": {
+        "hash": "a94ce7754f5b848f791c2c9652ccf4974a80213f6946b69f416761ec29b86c3b",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "facts-evidence-error-handling",
+      "framework": "facts",
+      "spec": "*",
+      "check": "facts:evidence-error-handling",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-271",
+      "reason": "A spec's claim in error_handling is checked only against the adapter spec itself and other files; no check compares it with the module's code or its running adapter (FB-271). (D-19, AE-4)",
+      "approval": {
+        "hash": "763222db32e161c7ef25de754785d07f265a95e395a6de2a555d812c2e4cc9b8",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "facts-evidence-time-governance",
+      "framework": "facts",
+      "spec": "*",
+      "check": "facts:evidence-time-governance",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-271",
+      "reason": "A spec's claim in time_governance is checked only against the adapter spec itself and other files; no check compares it with the module's code or its running adapter (FB-271). (D-19, AE-4)",
+      "approval": {
+        "hash": "578c27a8283d6b3624b26a41bc9452b972217f279a4bbc9428c05083d2d3eff2",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "ftts-evidence-transport-identity",
+      "framework": "ftts",
+      "spec": "*",
+      "check": "ftts:evidence-transport-identity",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-270",
+      "reason": "A spec's claim in transport_identity is checked only against the transport spec itself; the live checks of the servicer, the client and the bridge run only by hand, never in the gate (FB-270). (D-19, AE-4)",
+      "approval": {
+        "hash": "113861a807c04e2336df0dda9aa98b19923558190c362ad3ca6f9d958ac76d67",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "ftts-evidence-proto-contract",
+      "framework": "ftts",
+      "spec": "*",
+      "check": "ftts:evidence-proto-contract",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-270",
+      "reason": "A spec's claim in proto_contract is checked only against the transport spec itself; the live checks of the servicer, the client and the bridge run only by hand, never in the gate (FB-270). (D-19, AE-4)",
+      "approval": {
+        "hash": "83d28361a887491eca83e8c5bb206a249e1d0ba6612fd97d9852ec93f56d9ceb",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "ftts-evidence-wire-format",
+      "framework": "ftts",
+      "spec": "*",
+      "check": "ftts:evidence-wire-format",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-270",
+      "reason": "A spec's claim in wire_format is checked only against the transport spec itself; the live checks of the servicer, the client and the bridge run only by hand, never in the gate (FB-270). (D-19, AE-4)",
+      "approval": {
+        "hash": "4e400f5f107cfd051769fa06c339e561b24b17d4200233d94c1f6ecd20e5b722",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "ftts-evidence-serialization-bridge",
+      "framework": "ftts",
+      "spec": "*",
+      "check": "ftts:evidence-serialization-bridge",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-270",
+      "reason": "A spec's claim in serialization_bridge is checked only against the transport spec itself; the live checks of the servicer, the client and the bridge run only by hand, never in the gate (FB-270). (D-19, AE-4)",
+      "approval": {
+        "hash": "2ce01ec0d018cfa89a8481b14a8f1817ab8b770eb58c22f81d37286382e689f4",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "ftts-evidence-server-requirements",
+      "framework": "ftts",
+      "spec": "*",
+      "check": "ftts:evidence-server-requirements",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-270",
+      "reason": "A spec's claim in server_requirements is checked only against the transport spec itself; the live checks of the servicer, the client and the bridge run only by hand, never in the gate (FB-270). (D-19, AE-4)",
+      "approval": {
+        "hash": "29fc5cb64d9317f3c498b0d3565169d8334e135992353fae31b19340d00ce4a7",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "ftts-evidence-client-requirements",
+      "framework": "ftts",
+      "spec": "*",
+      "check": "ftts:evidence-client-requirements",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-270",
+      "reason": "A spec's claim in client_requirements is checked only against the transport spec itself; the live checks of the servicer, the client and the bridge run only by hand, never in the gate (FB-270). (D-19, AE-4)",
+      "approval": {
+        "hash": "f7d4e39b6cb1f9652b12916960062f15023c3c3ff5154c99b0f8c709bd87eb1d",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "ftts-evidence-rpc-contract",
+      "framework": "ftts",
+      "spec": "*",
+      "check": "ftts:evidence-rpc-contract",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-270",
+      "reason": "A spec's claim in rpc_contract is checked only against the transport spec itself; the live checks of the servicer, the client and the bridge run only by hand, never in the gate (FB-270). (D-19, AE-4)",
+      "approval": {
+        "hash": "a11aff1eb5eac79169027d56c044b4ecbce1ec914f75227f54a13b24c1ea2ba0",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "ftts-evidence-error-protocol",
+      "framework": "ftts",
+      "spec": "*",
+      "check": "ftts:evidence-error-protocol",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-270",
+      "reason": "A spec's claim in error_protocol is checked only against the transport spec itself; the live checks of the servicer, the client and the bridge run only by hand, never in the gate (FB-270). (D-19, AE-4)",
+      "approval": {
+        "hash": "bc18947a439451356377343cf18883b72feffbf85282fdbb403ca8f5c5025fc9",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "ftts-evidence-conformance-tests",
+      "framework": "ftts",
+      "spec": "*",
+      "check": "ftts:evidence-conformance-tests",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-270",
+      "reason": "A spec's claim in conformance_tests is checked only against the transport spec itself; the live checks of the servicer, the client and the bridge run only by hand, never in the gate (FB-270). (D-19, AE-4)",
+      "approval": {
+        "hash": "d162178148ac9c229d295e9c667ccbc2b9120f4332f5c3135901868f775b3f99",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-view-identity",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-view-identity",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in view_identity is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "295514ef38a83cb94ca8356e8ba236de75bee082d418b37b813c6286014a331a",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-scope",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-scope",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in scope is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "ad900dfa48260b6d287a0d26b36118f211310fbd7c0cc488c00a6f91aad5a1c9",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-data-bindings",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-data-bindings",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in data_bindings is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "e74fc35a5ce49a5bd325615f88ec2bc060cc467dbf69723ad19e1f7b1cc4d7a0",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-live-updates",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-live-updates",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in live_updates is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "4340a5a02602e68e52facd21bec21bb7a831a9622cc9ad424e926c4773c1f6a8",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-history",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-history",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in history is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "a0a1e1f9c7e57ae7704ec0e3ebd9c6b2b3f6d26bc546c3c0ed608f0385c04b20",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-alarms",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-alarms",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in alarms is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "3dbdc14d258b17af73186efd2aa4d3c1722f63ef688b00a2cb4c40fdcde62538",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-actions",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-actions",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in actions is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "9ea788130d448fa6911a63df8bc2baa649946fcbbb00105bf2a982126916f30e",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-settings",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-settings",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in settings is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "ece7dfea199fe9e1e17105cadd7fd74bd4e37b2160e51776fa2978a7ced77c83",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-render-profiles",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-render-profiles",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in render_profiles is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "a43a08bb2cfa69c3b070c5e6c2dba4ecb6b19046214ad0aede0b0d2a5eba2295",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-surfaces",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-surfaces",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in surfaces is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "b1602df4edeba7d7e708c26f809c80cdd38a9e40ba261f861ff6e53b80a10d33",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-design-system",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-design-system",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in design_system is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "0666f5367c7436799b61cac5742817bfd606d507ef2c3f7bea564ba614ae1258",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fvts-evidence-conformance-tests",
+      "framework": "fvts",
+      "spec": "*",
+      "check": "fvts:evidence-conformance-tests",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in conformance_tests is checked only against the view spec itself and other files (FACTS specs, governed lists); nothing checks it against forge-display, which does not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "f9bae4303a941d3ad2c0ae6db72ff245722443670e24130f144038d34ac5b25b",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "futs-evidence-identity",
+      "framework": "futs",
+      "spec": "*",
+      "check": "futs:evidence-identity",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in identity is checked only against the widget or view spec itself and other files; nothing checks it against forge-display's widgets, renderer or expression compiler, which do not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "66f7a1f585ae70ac9b30e530def321892b013a60b0d36cb5b44fa0163827937e",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "futs-evidence-widget",
+      "framework": "futs",
+      "spec": "*",
+      "check": "futs:evidence-widget",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in widget is checked only against the widget or view spec itself and other files; nothing checks it against forge-display's widgets, renderer or expression compiler, which do not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "39a0bbb0b09a7071fa0312c3a0b722ac143538dd1305f56d0815f29c1a9e7f66",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "futs-evidence-view",
+      "framework": "futs",
+      "spec": "*",
+      "check": "futs:evidence-view",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-289",
+      "reason": "A spec's claim in view is checked only against the widget or view spec itself and other files; nothing checks it against forge-display's widgets, renderer or expression compiler, which do not exist yet (FB-289). (D-19, AE-4)",
+      "approval": {
+        "hash": "a31331aede0d62d03137a8b3e9b76781443025a8f5326dcb6058181f460c6b5f",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fmts-evidence-module-identity",
+      "framework": "fmts",
+      "spec": "*",
+      "check": "fmts:evidence-module-identity",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-272",
+      "reason": "A spec's claim in module_identity is checked against the module spec itself and the module's files, not by running the module; the conformance kit reaches only M-4 to M-7 (FB-272). (D-19, AE-4)",
+      "approval": {
+        "hash": "e83f710f65095383bf7b7903bb5883cdfe8daf280e1a994d343f9a1f8738e9f4",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fmts-evidence-hub-link",
+      "framework": "fmts",
+      "spec": "*",
+      "check": "fmts:evidence-hub-link",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-272",
+      "reason": "A spec's claim in hub_link is checked against the module spec itself and the module's files, not by running the module; the conformance kit reaches only M-4 to M-7 (FB-272). (D-19, AE-4)",
+      "approval": {
+        "hash": "9c66fefdb7c6dd6072e13b2c85ed3ecdfdd1e1929258617670c5c2c9b188b001",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fmts-evidence-transport",
+      "framework": "fmts",
+      "spec": "*",
+      "check": "fmts:evidence-transport",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-164",
+      "reason": "A spec's claim in transport is checked against the module spec and other files only; nothing runs the module's link to the hub against the transport contract, which is not built (FB-164). (D-19, AE-4)",
+      "approval": {
+        "hash": "584f325ae16065595a7c1f617d056c519f55089463a1f6b986694fe02554c6bb",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fmts-evidence-integration",
+      "framework": "fmts",
+      "spec": "*",
+      "check": "fmts:evidence-integration",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-272",
+      "reason": "A spec's claim in integration is checked against the module spec itself and the module's files, not by running the module; the conformance kit reaches only M-4 to M-7 (FB-272). (D-19, AE-4)",
+      "approval": {
+        "hash": "2eda896510f52987736bce9153b06cdbcb8c3507d112f7662e274c4604355a8a",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fmts-evidence-references",
+      "framework": "fmts",
+      "spec": "*",
+      "check": "fmts:evidence-references",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-272",
+      "reason": "A spec's claim in references is checked against the module spec itself and the module's files, not by running the module; the conformance kit reaches only M-4 to M-7 (FB-272). (D-19, AE-4)",
+      "approval": {
+        "hash": "0cefe3a128cde1d62949ea9f45efdfe33e00fa3ea5d60fa599da54f4b5f5c6c4",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fmts-evidence-baseline",
+      "framework": "fmts",
+      "spec": "*",
+      "check": "fmts:evidence-baseline",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-272",
+      "reason": "A spec's claim in baseline is checked against the module spec itself and the module's files, not by running the module; the conformance kit reaches only M-4 to M-7 (FB-272). (D-19, AE-4)",
+      "approval": {
+        "hash": "7ff4f6b80b69c25a313af4afe8441bd9d5392416682d4a625104c8469b64dbb3",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fmts-evidence-time-contract",
+      "framework": "fmts",
+      "spec": "*",
+      "check": "fmts:evidence-time-contract",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-272",
+      "reason": "A spec's claim in time_contract is checked against the module spec itself and the module's files, not by running the module; the conformance kit reaches only M-4 to M-7 (FB-272). (D-19, AE-4)",
+      "approval": {
+        "hash": "cfca4306009ab94df45c11eee3c0b90991f999a38d5f0ba38aab88e37ce07817",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fmts-evidence-user-interface",
+      "framework": "fmts",
+      "spec": "*",
+      "check": "fmts:evidence-user-interface",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-272",
+      "reason": "A spec's claim in user_interface is checked against the module spec itself and the module's files, not by running the module; the conformance kit reaches only M-4 to M-7 (FB-272). (D-19, AE-4)",
+      "approval": {
+        "hash": "e7e066fc9c186dd24b72f2adf38cd49d52ed4b7d69c65955b29b07a4be89c404",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
+    },
+    {
+      "id": "fmts-evidence-scaffold",
+      "framework": "fmts",
+      "spec": "*",
+      "check": "fmts:evidence-scaffold",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-272",
+      "reason": "A spec's claim in scaffold is checked against the module spec itself and the module's files, not by running the module; the conformance kit reaches only M-4 to M-7 (FB-272). (D-19, AE-4)",
+      "approval": {
+        "hash": "99a6228f880a8a4d12f919d5ca79b3fd4ccf5fbc4010fb50b03d10e3e738f7db",
+        "by": "reh3376",
+        "at": "2026-11-24T18:45:20Z"
+      }
     }
   ]
 }

@@ -38,13 +38,19 @@ from typer.testing import CliRunner
 
 from forge_core import contract
 from forge_core.fxts.fmts.runners.fmts_runner import REQUIREMENTS
-from forge_core.fxts.shared.runner import Check, EvidenceKind, FxTSVerdict, VerdictStatus
+from forge_core.fxts.shared.runner import (
+    Check,
+    EvidenceKind,
+    FxTSVerdict,
+    VerdictStatus,
+    evidence_kind_of,
+)
 from forge_hub.cli import governance as governance_cli
 from forge_hub.cli.main import app
 
-FRAMEWORKS = ("fats", "facts", "ftts", "fvts", "futs", "fmts")
+#: Every framework in the registry, so a framework added later is held to the law too.
+FRAMEWORKS = tuple(sorted(governance_cli.FRAMEWORKS))
 FXTS = Path(contract.__file__).resolve().parents[3] / "src" / "python" / "forge_core" / "fxts"
-SHARED_NAMES = {"hash-verified", "hash-approved", "schema-current", "runner-error"}
 
 
 def _sources(fw: str) -> list[Path]:
@@ -215,7 +221,11 @@ def test_every_verdict_on_every_governed_spec_names_its_kind() -> None:
             where = f"{run.spec.name}: {verdict.check_id}"
             assert declared is not None and not verdict.evidence.get("undeclared"), where
             unobserved = verdict.status in (VerdictStatus.NOT_RUN, VerdictStatus.WAIVED)
-            want = EvidenceKind.NONE if unobserved else declared.kind
+            want = (
+                EvidenceKind.NONE
+                if unobserved
+                else evidence_kind_of(declared.kind, verdict.reached)
+            )
             assert verdict.evidence_kind == want, where
     assert seen > 1000
 
@@ -225,10 +235,12 @@ def test_the_evidence_command_reports_every_framework() -> None:
     assert result.exit_code == 0, result.output
     table = json.loads(result.output)
     assert set(table) == set(FRAMEWORKS)
-    fats = table["fats"]["properties"]
+    fats = table["fats"]["units"]
     # declared: the live checks reach the route; observed in the gate: only the spec itself
-    assert fats["endpoint"] == {"declared": "artifact", "observed": "self"}
-    assert table["fmts"]["properties"]["baseline"]["observed"] == "artifact"  # the kit
+    assert fats["/endpoint"] == {"mark": "claim", "declared": "artifact", "observed": "self"}
+    fmts = table["fmts"]["units"]
+    kit = fmts.get("/baseline/M-4") or fmts["/baseline"]  # parts once the marks are approved
+    assert kit["observed"] == "artifact"  # the conformance kit ran the module
 
 
 # -- able to fail --------------------------------------------------------------------

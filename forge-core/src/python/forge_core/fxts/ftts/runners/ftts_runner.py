@@ -17,6 +17,7 @@ import importlib
 import re
 from typing import TYPE_CHECKING, Any, ClassVar
 
+from forge_core import contract
 from forge_core.fxts.ftts.checks import CHECKS as FTTS_CHECKS
 from forge_core.fxts.shared.runner import (
     FxTSRunner,
@@ -168,23 +169,28 @@ class FTTSRunner(FxTSRunner):
     # ------------------------------------------------------------------
 
     def _check_spec_version(self, spec: dict[str, Any]) -> FxTSVerdict:
+        """``ftts:spec-version``: the spec names a version released in the FTTS schema
+        registry (it is validated against that version)."""
+        from forge_core.fxts.shared import schemas
+
         version = spec.get("spec_version")
-        if version == "0.1.0":
+        released = [row.version for row in schemas.versions(contract.schema_dir("ftts"))]
+        if version in released:
             return FxTSVerdict(
                 check_id="ftts:spec-version",
                 spec_ref="FTTS/spec_version",
                 status=VerdictStatus.PASS,
-                message="Spec version is 0.1.0.",
+                message=f"Spec version is {version}.",
             )
         return FxTSVerdict(
             check_id="ftts:spec-version",
             spec_ref="FTTS/spec_version",
             status=VerdictStatus.FAIL,
-            message=f"Expected spec_version '0.1.0', got '{version}'.",
+            message=f"spec_version '{version}' is not a released FTTS version ({released}).",
             violations=[
                 SpecViolation(
                     field="spec_version",
-                    expected="0.1.0",
+                    expected=" | ".join(released),
                     actual=version,
                     message="Unsupported spec version.",
                 ),
@@ -1392,6 +1398,7 @@ class FTTSRunner(FxTSRunner):
                             spec_ref="FTTS/live/bridge-functions",
                             status=VerdictStatus.FAIL,
                             message=f"Bridge functions not found: {missing_fns}.",
+                            reached=[f"artifact:module:{bridge_module_name}"],
                         )
                     )
                 else:
@@ -1401,6 +1408,7 @@ class FTTSRunner(FxTSRunner):
                             spec_ref="FTTS/live/bridge-functions",
                             status=VerdictStatus.PASS,
                             message="All declared bridge functions exist.",
+                            reached=[f"artifact:module:{bridge_module_name}"],
                         )
                     )
             except ImportError as exc:
@@ -1432,6 +1440,7 @@ class FTTSRunner(FxTSRunner):
                             spec_ref="FTTS/live/server-class",
                             status=VerdictStatus.PASS,
                             message=f"Servicer class '{servicer_class_name}' found.",
+                            reached=[f"artifact:module:{server_module_name}"],
                         )
                     )
                 else:
@@ -1444,6 +1453,7 @@ class FTTSRunner(FxTSRunner):
                                 f"Servicer class '{servicer_class_name}' "
                                 f"not in {server_module_name}."
                             ),
+                            reached=[f"artifact:module:{server_module_name}"],
                         )
                     )
             except ImportError as exc:
@@ -1475,6 +1485,7 @@ class FTTSRunner(FxTSRunner):
                             spec_ref="FTTS/live/client-class",
                             status=VerdictStatus.PASS,
                             message=f"Channel class '{channel_class_name}' found.",
+                            reached=[f"artifact:module:{client_module_name}"],
                         )
                     )
                 else:
@@ -1486,6 +1497,7 @@ class FTTSRunner(FxTSRunner):
                             message=(
                                 f"Channel class '{channel_class_name}' not in {client_module_name}."
                             ),
+                            reached=[f"artifact:module:{client_module_name}"],
                         )
                     )
             except ImportError as exc:

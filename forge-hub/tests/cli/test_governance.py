@@ -5,18 +5,16 @@ from __future__ import annotations
 import json
 import re
 import shutil
-from typing import TYPE_CHECKING
+from pathlib import Path
 
 import pytest
+from tests.governance.evidence import expected_evidence
 from typer.testing import CliRunner
 
 from forge_core.fxts import locations
-from forge_core.fxts.shared.runner import verify_spec_hash
+from forge_core.fxts.shared.runner import FxTSReport, verify_spec_hash
 from forge_hub.cli import governance
 from forge_hub.cli.main import app
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 runner = CliRunner()
 
@@ -70,6 +68,13 @@ def run(*args: str) -> tuple[int, str]:
 
 
 # -- specs ------------------------------------------------------------------
+
+
+def _evidence_of(framework: str, report: dict) -> set[str]:
+    """The evidence findings a JSON report must hold (D-19 step 2): each section of the
+    spec it ran holding a claim no check of the real thing reached in that run."""
+    spec = json.loads(Path(report["metadata"]["spec_file"]).read_text(encoding="utf-8"))
+    return expected_evidence(framework, spec, FxTSReport.model_validate(report))
 
 
 def test_specs_lists_state_approver_and_verification(root: Path) -> None:
@@ -254,10 +259,16 @@ def test_run_facts_by_adapter_id_and_by_file(root: Path) -> None:
     specs = root / "facts" / "specs"
     # Nothing failed, and the checks against the adapter's code did not run: the run is
     # incomplete, exit 3, and says so (D-14 F-7, FB-265, FB-271).
+    # So are the claims no check of the real thing reached (D-19 step 2).
+    code, out = run("run", "facts", str(specs / "forge-wms.facts.json"), "--format", "json")
+    evidence = _evidence_of("facts", json.loads(out))
+    assert evidence, "the adapter spec makes claims nothing real checks"
+
     code, out = run("run", "facts", "forge-wms", "--specs", str(specs))
     assert code == governance.EXIT_INCOMPLETE == 3, out
-    assert "[INCOMPLETE] FACTS — forge-wms" in out and "1 not run" in out
+    assert "[INCOMPLETE] FACTS — forge-wms" in out and f"{1 + len(evidence)} not run" in out
     assert "[NOT_RUN] facts:live: NOT RUN" in out
+    assert all(f"[NOT_RUN] {check}: NOT RUN" in out for check in evidence)
     assert "this run does not show that the spec is met" in out
     assert "All checks" not in out and "Failed checks:" not in out
 
@@ -268,7 +279,7 @@ def test_run_facts_by_adapter_id_and_by_file(root: Path) -> None:
     assert report["framework"] == "FACTS" and report["target"] == "forge-wms"
     assert report["metadata"]["spec_file"] == str(specs / "forge-wms.facts.json")
     not_passed = {v["check_id"]: v["status"] for v in report["verdicts"] if v["status"] != "PASS"}
-    assert not_passed == {"facts:live": "NOT_RUN"}
+    assert not_passed == {"facts:live": "NOT_RUN"} | dict.fromkeys(evidence, "NOT_RUN")
 
 
 def test_run_facts_reports_a_pending_stamp_as_the_one_failed_check(root: Path) -> None:
@@ -295,26 +306,42 @@ def test_run_lists_the_failed_checks_and_exits_1(tmp_path: Path) -> None:
     assert "facts:identity-id-format" in out and "[HASH MISMATCH]" in out
 
 
-def test_run_fvts_reference_only_waits_on_the_owner(tmp_path: Path) -> None:
+def test_run_fvts_reference_waits_on_the_owner_and_on_checks_of_the_real_thing(
+    tmp_path: Path,
+) -> None:
+    """The reference contract fails only on its approval, pending the owner, and leaves
+    not run only the claims no check of the real thing reached (D-19 step 2)."""
     out_file = tmp_path / "fvts.json"
     code, out = run("run", "fvts", str(FVTS_OT), "--format", "json", "--output", str(out_file))
     report = json.loads(out)
     assert report == json.loads(out_file.read_text(encoding="utf-8"))
-    assert report["framework"] == "FVTS" and len(report["verdicts"]) == 21
-    not_ok = {v["check_id"] for v in report["verdicts"] if v["status"] != "PASS"}
-    assert not_ok <= {"fvts:hash-approved"}  # pending the owner's approval, nothing else
-    assert code == (1 if not_ok else 0)
-    assert report["outcome"] == ("FAIL" if not_ok else "PASS")
+    evidence = _evidence_of("fvts", report)
+    assert report["framework"] == "FVTS" and len(report["verdicts"]) == 21 + len(evidence)
+    not_ok = {v["check_id"]: v["status"] for v in report["verdicts"] if v["status"] != "PASS"}
+    failed = {c for c, status in not_ok.items() if status == "FAIL"}
+    assert failed <= {"fvts:hash-approved"}  # pending the owner's approval, nothing else
+    assert {c for c, status in not_ok.items() if status != "FAIL"} == evidence
+    assert all(not_ok[c] == "NOT_RUN" for c in evidence)
+    outcome = "FAIL" if failed else ("INCOMPLETE" if evidence else "PASS")
+    assert report["outcome"] == outcome
+    assert code == {"FAIL": 1, "INCOMPLETE": governance.EXIT_INCOMPLETE, "PASS": 0}[outcome]
 
 
 def test_run_ftts_and_fats_load_their_specs() -> None:
     # The FTTS spec is hashed since FB-160 and the owner approved it on 2026-11-18.
     # All 41 static checks pass and the run is incomplete: nothing compared the spec with
     # the proto or the servicer (FB-265, FB-270).
+    # So are the claims no check of the real thing reached (D-19 step 2).
+    code, out = run("run", "ftts", "grpc-hardened-transport", "--format", "json")
+    evidence = _evidence_of("ftts", json.loads(out))
     code, out = run("run", "ftts", "grpc-hardened-transport")
     assert code == governance.EXIT_INCOMPLETE, out
-    assert "[INCOMPLETE] FTTS — grpc-hardened-transport: 41/42 checks passed, 1 not run" in out
+    total, not_run = 42 + len(evidence), 1 + len(evidence)
+    assert (
+        f"[INCOMPLETE] FTTS — grpc-hardened-transport: 41/{total} checks passed, {not_run} not run"
+    ) in out
     assert "[NOT_RUN] ftts:live: NOT RUN" in out
+    assert all(f"[NOT_RUN] {check}: NOT RUN" in out for check in evidence)
 
     code, out = run("run", "fats", "/v1/health", "--format", "json")
     report = json.loads(out)

@@ -1,6 +1,6 @@
 # What every FxTS framework provides — design record
 
-**Status:** approved by reh3376 on 2026-11-18 (the owner answered Q-1 to Q-6 one at a time and declared the answers the signature; the status line was set on that word) · **Backlog:** FB-152 (with FB-149, FB-151) · **Roadmap:** decisions A-13, A-15
+**Status:** approved by reh3376 on 2026-11-18 (the owner answered Q-1 to Q-6 one at a time and declared the answers the signature; the status line was set on that word); **amended 2026-11-24** by the owner with F-11, F-12 and a note to F-2 (§7, from D-19 Q-4) · **Backlog:** FB-152 (with FB-149, FB-151) · **Roadmap:** decisions A-13, A-15
 **Participants:** reh3376 (owner, decides and signs), Claude (surveys, asks, records, proposes)
 
 Every statement is tagged **[OWNER]** (decided by the owner, with the date), **[FACT]** (what the code says today, with the path) or **[PROPOSED]** (Claude's recommendation, not approved).
@@ -43,14 +43,14 @@ The purposes the owner named are met by two frameworks of eleven (FMTS and FVTS)
 
 ## 4. The baseline
 
-The owner answered §5 on 2026-11-18. F-1 to F-10 stand as amended by those answers and are **[OWNER]**.
+The owner answered §5 on 2026-11-18. F-1 to F-10 stand as amended by those answers and are **[OWNER]**; F-11 and F-12 are **[OWNER]** from 2026-11-24 (§7).
 
 A framework that has specs meets all of these. Each is checked by one test that walks `src/forge/governance/` (`tests/governance/test_framework_baseline.py`).
 
 | # | Requirement |
 |---|---|
 | F-1 | **A stated purpose**: which repeatable work the framework standardizes, in its documentation page. |
-| F-2 | **A versioned schema**, with one `$id` convention, every released version kept in the tree, and a hash for each version (FB-151). |
+| F-2 | **A versioned schema**, with one `$id` convention, every released version kept in the tree, and a hash for each version (FB-151). *Amended 2026-11-24 by the owner (§7): a mark change is a minor step and every release records its changes; a property named like a wording keyword is a name, not wording.* |
 | F-3 | **A runner with schema-runner parity**: every schema field is enforced or the run fails. |
 | F-4 | **Every spec carries an integrity block**, and the runner gives two verdicts for it: the hash verifies, and the hash is approved by the owner. A spec whose content does not match its hash fails. |
 | F-5 | **Every spec lives in the `fxts/` folder of what it describes** (named `fxts/` by D-17's amendment of 2026-11-22) and is listed by `forge governance specs`. No spec file exists outside such a folder. *Reworded by the owner on 2026-11-22 (D-17, `repository-structure.md` Q-6); it read "Every spec lives in the framework's `specs/` directory … No spec file exists outside it", and that is still how the files lie until FB-200 and FB-201 move them.* |
@@ -59,6 +59,8 @@ A framework that has specs meets all of these. Each is checked by one test that 
 | F-8 | **A documentation page and a row in the summary** (`docs/FxTS/README.md`), both stating the framework's real state. |
 | F-9 | **The commands**: `forge governance run`, `stamp`, `approve`, `validate-spec` work for the framework. |
 | F-10 | **A spec records the schema version and hash it was approved against**; when the schema has changed since, the spec is reported as needing review (FB-151). |
+| F-11 | **Every verdict names its kind of evidence** (`self`, `file`, `artifact`, `none`). Each runner declares, as data, every check it gives, the spec properties it covers and the kind it reaches; a verdict names what it reached and its kind is the strongest thing named, capped by its declaration. A verdict with no declaration is an error. *Added 2026-11-24 by the owner (§7; D-19 AE-1, AE-2, §12 S-1).* |
+| F-12 | **Every claim a spec makes has a check of the real thing, or an accepted gap naming the backlog item that adds one.** The schema marks every property `claim`, `description` or `structure` (`x-forge-evidence`), split cleanly; a claim no check of the real thing reached in a run is the finding `<fw>:evidence-<section>`, not run. *Added 2026-11-24 by the owner (§7; D-19 AE-3, AE-4, §12 S-2 to S-6).* |
 
 ## 5. Questions for the owner
 
@@ -82,3 +84,13 @@ One backlog item and one PR per step.
 | 3 | The baseline test, `tests/governance/test_framework_baseline.py`, with each allowed failure named; the summary document and every framework page brought to the code; FTTS gets its page and row (FB-149). | FB-149, FB-152 |
 | 4 | The owner approves FATS and FTTS from a table of their specs (Q-2). | FB-161 |
 | 5 | Schema versions: one id form, every version kept, the schema registry with hashes, the spec's record of its schema, the commands to list, compare, validate against a version and migrate, the change test (Q-5). | FB-151 |
+
+## 7. Amendment from D-19 (2026-11-24)
+
+**[OWNER] 2026-11-24: accepted** (the owner, asked whether F-11, F-12 and the F-2 note are accepted: "Accept all three"). From D-19 Q-4. D-19 (`docs/decisions/approvals-and-evidence.md`) asks three amendments of this baseline. Two are built by its step 2 and are put to the owner now; the third, F-4 (the integrity block keeps the hash and the schema, and the approval becomes a signed record), comes with step 3. §4 carries them.
+
+| # | Requirement |
+|---|---|
+| F-11 | **Every verdict names its kind of evidence**: the spec itself (`self`), another file (`file`), the real thing (`artifact`), or nothing (`none`). Each runner declares, as data, every check it gives, the spec properties it covers and the kind it reaches; a verdict names what it reached, and its kind is the strongest thing named, capped by the declaration. A verdict with no declaration is an error. (D-19 AE-1, AE-2, §12 S-1.) |
+| F-12 | **Every claim a spec makes has a check of the real thing, or an accepted gap naming the backlog item that adds one.** The framework's schema marks every property `claim`, `description` or `structure` (`x-forge-evidence`), split cleanly; a claim no check of the real thing reached in a run is the finding `<fw>:evidence-<section>`, not run. (D-19 AE-3, AE-4, §12 S-2 to S-6.) |
+| F-2, note | **A mark change is a minor step**, and a release records every change it makes; a property named like a wording keyword is a name, not wording. (D-19 §12 S-7, S-8.) |

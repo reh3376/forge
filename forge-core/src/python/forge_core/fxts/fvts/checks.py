@@ -34,7 +34,12 @@ CHECKS: tuple[Check, ...] = (
     Check("fvts:golden-messages", ("/conformance_tests/golden_messages_path",), FILE),
     Check("fvts:identity-match", ("/view_identity/view_id",), SELF),
     Check("fvts:isa101-required", ("/design_system/isa101_high_performance",), SELF),
-    Check("fvts:metadata", ("/metadata",), SELF),
+    Check(
+        "fvts:metadata",
+        ("/metadata",),
+        NONE,
+        "free text for people: read only to count its keys; decides nothing (D-19, AE-3)",
+    ),
     Check("fvts:objects", ("/data_bindings/objects",), FILE),
     Check("fvts:owner-in-facts", ("/view_identity/owner_module",), FILE),
     Check("fvts:profile-action-filter", ("/surfaces/actions",), SELF),

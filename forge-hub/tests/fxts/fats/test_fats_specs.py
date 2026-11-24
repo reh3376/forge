@@ -9,11 +9,12 @@ import pytest
 
 from forge_core import contract
 from forge_core.fxts.fats.runners.fats_runner import FATSRunner
+from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import VerdictStatus
 from forge_hub import fxts as hub_fxts
 
 SPECS_DIR = hub_fxts.specs_dir("fats")  # the hub's own specs of its API
-SCHEMA_PATH = contract.schema_path("fats")
+SCHEMA_DIR = contract.schema_dir("fats")
 
 # Discover all spec files
 SPEC_FILES = sorted(SPECS_DIR.glob("*.json"))
@@ -21,18 +22,13 @@ SPEC_FILES = sorted(SPECS_DIR.glob("*.json"))
 SPEC_FILES = [f for f in SPEC_FILES if f.name != "__init__.py"]
 
 
-@pytest.fixture(scope="module")
-def fats_schema() -> dict:
-    """Load the FATS JSON schema."""
-    return json.loads(SCHEMA_PATH.read_text())
-
-
-@pytest.fixture(scope="module")
-def validator(fats_schema):
-    """Create a jsonschema validator for the FATS schema."""
+def validator_for(spec: dict):
+    """A validator for the schema version the spec was approved against (F-10): a later
+    release does not change what an approved spec is checked against."""
     import jsonschema
 
-    return jsonschema.Draft202012Validator(fats_schema)
+    schema = json.loads(schemas.schema_for_spec(SCHEMA_DIR, spec).read_text())
+    return jsonschema.Draft202012Validator(schema)
 
 
 class TestFatsSpecsExist:
@@ -89,10 +85,10 @@ class TestFatsSpecValidation:
         data = json.loads(spec_file.read_text())
         assert isinstance(data, dict)
 
-    def test_validates_against_schema(self, spec_file: Path, validator):
-        """Spec file must conform to fats.schema.json."""
+    def test_validates_against_schema(self, spec_file: Path):
+        """Spec file must conform to the FATS schema version it records."""
         data = json.loads(spec_file.read_text())
-        errors = list(validator.iter_errors(data))
+        errors = list(validator_for(data).iter_errors(data))
         assert errors == [], f"{spec_file.name} schema violations: " + "; ".join(
             e.message for e in errors
         )
