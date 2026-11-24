@@ -72,6 +72,7 @@ A point is one live value. Most of what a hub or a management module shows is no
 - **forge-display generates tables, forms and detail pages from the object's schema** (D-16, Q-3). A field added to the schema appears on the screens without forge-display changing.
 - **An object's schema is covered by the spec's approval.** Its hash is part of the spec's content, so a schema changed after approval fails `fvts:objects` until the spec is stamped and the owner approves it again.
 - **A surface lists the objects it shows**, as it lists its points. A `module_command` may name the object it acts on (`target_object`); the same role, confirmation and audit rules apply as for any action.
+- **Every object schema is used, and says what its name says** (FB-268). A file under `fxts/fvts/objects` is named `<Entity>.v<N>.schema.json`, its `$id` is `forge://schemas/<owner>/<Entity>/v<N>`, and some view spec of its owner lists it; the gate refuses an orphan or a disagreement. Two-part versions (`v1.7`: a major release and seven minor changes since) are the owner's decision of 2026-11-24 and are built in FB-284.
 - **A contract declares at least one point or one object.** The hub's has no points.
 - A reference renderer message, `object_list`, holds every item to the object's schema and takes its columns from the schema, not from the items.
 

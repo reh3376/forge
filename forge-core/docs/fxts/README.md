@@ -131,10 +131,16 @@ A check of a spec that failed or did not run is a *finding*. A finding gets thro
 | A check that broke (`ERROR`), a field with no check (`NOT_IMPLEMENTED`), a run with no verdict | refused, whatever the file says |
 | A failure accepted for every spec at once, two entries that cover the same findings, a file that does not read | cannot be written: the file is refused, and then it accepts nothing |
 | A stale generated index, a schema registry problem, a governed list that is not usable | refused, whatever the file says |
+| A file in a governed folder that is not a kind it may hold, or a spec or governed list outside the governed folders | refused, whatever the file says (the closed set, below) |
+| Two specs of one framework with one identity, or a spec not named by its framework's rule | refused, whatever the file says |
 
 An entry's approval is the hash of everything else in the entry, with who approved it and when (`forge governance gap-approve <id> --by reh3376`, on the owner's word). Changing any field afterwards ends the approval. So the file grows, or an entry changes, only on the owner's word, and it shrinks without anyone's: an entry whose gap is closed has to go. A waived requirement of a module is not a finding: the waiver is in the module's spec, which the owner approved. `forge governance gaps` lists the entries and whether each is approved.
 
 The rule is written once, in `judge` (`forge_core/fxts/shared/gaps.py`), and checked for every case on the real code by `forge-core/tests/fxts/test_gaps_exhaustive.py` (skill `.claude/skills/verify-fxts-gate`). The framework tests that once kept their own tables of allowed failures read the file instead (`forge_hub.cli.governance.accepted_checks`).
+
+**The closed set (FB-268).** Every file in a governed folder (an `fxts` folder of the hub or a module, `forge-core/fxts`, `forge-core/contract`) is exactly one kind: a spec of that folder's framework, an object schema, a generated index, the accepted gaps, a schema, a released schema version, a schema registry, a governed list, a proto file or its configuration, or a placeholder. The kinds are data, one rule per place (`RULES` in `forge_core/fxts/locations.py`), and `kind_of(path)` gives every path exactly one kind; that is proved for every folder, suffix and depth a rule names by `forge-core/tests/fxts/test_kinds.py` (skill `.claude/skills/verify-fxts-kinds`). A file no rule names is refused, and so is a spec or a governed list anywhere else, found by its name or by the spec's hash it carries. Samples for tests live under `tests/**/fixtures/` and are left alone (the owner, 2026-11-24). The file list is git's (`git ls-files --cached --others --exclude-standard`), so an ignored file such as `.DS_Store` is not seen, a new file not yet added is, and a checkout without git fails the gate with that cause.
+
+**One identity per spec.** A spec is found by its identity in its framework: an API spec by its method and path (`GET /v1/schemas`), the others by their id. Two specs with one identity are refused, and `forge governance run` given an id that more than one spec has names them all and runs none. Where a framework names its files by rule (`<adapter_id>.facts.json`, `<module_id>.fmts.json`, `<transport_id>.ftts.json`, `<id>.<kind>.futs.json`, `<owner_module>.fvts.json`), a file named otherwise is refused. An object schema's `$id` agrees with its file name and owner, and some view spec of its owner uses it.
 
 What the gate does not do yet: it does not prove that a check can fail (FB-278), the hash framework is not part of it (FB-279), the approval is a name in a field and not a signature (FB-267), and the command line has no permission check point for an approval (FB-280).
 
@@ -182,6 +188,7 @@ forge governance run fvts forge-hub-views --format json --output reports/fvts-fo
 forge governance run ftts grpc-hardened-transport
 forge governance run fmts path/to/module.fmts.json # the module requirements; what did not run or is waived is listed
 forge governance run fats /v1/health --live        # live checks: FATS, FACTS, FTTS
+forge governance run fats "POST /v1/schemas"       # an API spec is a method and a path; a path two specs share is refused
 
 # The gate: every framework over every governed spec; exit 1 unless nothing is refused
 forge governance check

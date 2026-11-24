@@ -280,7 +280,7 @@ def governance_run(
         report = asyncio.run(
             governance_cli.run_framework(name, target, specs_dir=spec_dir, live=live)
         )
-    except FileNotFoundError as exc:
+    except (FileNotFoundError, governance_cli.AmbiguousSpecError) as exc:
         typer.echo(str(exc))
         raise typer.Exit(code=1) from None
     governance_cli.emit_report(report, fmt, output)

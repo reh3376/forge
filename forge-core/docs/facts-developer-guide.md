@@ -465,7 +465,7 @@ Shift definitions must match: same timezone, same day/night boundaries.
 
 | Adapter | File | Data Sources | Capabilities | Tests |
 |---------|------|-------------|--------------|-------|
-| `forge-wms` | `specs/forge-wms.facts.json` | 14 (9 GraphQL, 1 subscription, 3 RabbitMQ, 1 REST) | read, subscribe, backfill, discover | 48 |
-| `forge-mes` | `specs/forge-mes.facts.json` | 17 (10 GraphQL, 1 mutation, 1 RabbitMQ, 2 MQTT, 1 WS, 2 REST) | read, write, subscribe, backfill, discover | 64 |
+| `forge-wms` | `forge-modules/forge-wms/fxts/facts/forge-wms.facts.json` | 14 (9 GraphQL, 1 subscription, 3 RabbitMQ, 1 REST) | read, subscribe, backfill, discover | 48 |
+| `forge-mes` | `forge-modules/forge-mes/fxts/facts/forge-mes.facts.json` | 17 (10 GraphQL, 1 mutation, 1 RabbitMQ, 2 MQTT, 1 WS, 2 REST) | read, write, subscribe, backfill, discover | 64 |
 
 These serve as reference implementations. When writing a new spec, start from the one closest to your adapter's architecture and modify it.

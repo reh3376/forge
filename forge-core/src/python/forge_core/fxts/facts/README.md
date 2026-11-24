@@ -6,14 +6,12 @@ consistent, and hash-verified contracts.
 ## Package Structure
 
 ```
-facts/
-├── schema/
-│   └── facts.schema.json          # JSON Schema draft 2020-12 (10 top-level properties)
-├── specs/
-│   ├── forge-wms.facts.json         # WMS adapter spec (14 data sources)
-│   └── forge-mes.facts.json         # MES adapter spec (17 data sources)
+facts/                             # this package: the runner only
 └── runners/
     └── facts_runner.py            # FACTSRunner — static + live checks
+
+forge-core/contract/fxts/facts/schema/   # the schema, its released versions and registry
+forge-modules/<module>/fxts/facts/       # each module's spec, <adapter_id>.facts.json
 ```
 
 ## Quick Start

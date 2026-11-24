@@ -10,34 +10,34 @@ forge-core's: [`../../forge-core/fxts/README.md`](../../forge-core/fxts/README.m
 
 | Spec | Id | Format | State | Hash | Approved by |
 |---|---|---|---|---|---|
-| [`healthz.json`](fats/healthz.json) | `/healthz` | 0.1.0 | approved | `bdb3633c7f31` | reh3376 |
-| [`readyz.json`](fats/readyz.json) | `/readyz` | 0.1.0 | approved | `40332d18dc9d` | reh3376 |
-| [`v1_adapters_list.json`](fats/v1_adapters_list.json) | `/v1/adapters` | 0.1.0 | approved | `54d506f072ed` | reh3376 |
-| [`v1_adapters_register.json`](fats/v1_adapters_register.json) | `/v1/adapters/register` | 0.1.0 | approved | `78497774e3c2` | reh3376 |
-| [`v1_context_batches_active.json`](fats/v1_context_batches_active.json) | `/v1/context/batches/active` | 0.1.0 | approved | `cda087c85870` | reh3376 |
-| [`v1_context_batches_complete.json`](fats/v1_context_batches_complete.json) | `/v1/context/batches/{batch_id}/complete` | 0.1.0 | approved | `5cf21cd0f19b` | reh3376 |
-| [`v1_context_batches_register.json`](fats/v1_context_batches_register.json) | `/v1/context/batches` | 0.1.0 | approved | `425bdeef18b4` | reh3376 |
-| [`v1_context_enrich.json`](fats/v1_context_enrich.json) | `/v1/context/enrich` | 0.1.0 | approved | `63361ac28d1c` | reh3376 |
-| [`v1_context_equipment_children.json`](fats/v1_context_equipment_children.json) | `/v1/context/equipment/{equipment_id}/children` | 0.1.0 | approved | `07ade1e47349` | reh3376 |
-| [`v1_context_equipment_delete.json`](fats/v1_context_equipment_delete.json) | `/v1/context/equipment/{equipment_id}` | 0.1.0 | approved | `fc7f5c8dceed` | reh3376 |
-| [`v1_context_equipment_get.json`](fats/v1_context_equipment_get.json) | `/v1/context/equipment/{equipment_id}` | 0.1.0 | approved | `6635c81e3b67` | reh3376 |
-| [`v1_context_equipment_list.json`](fats/v1_context_equipment_list.json) | `/v1/context/equipment` | 0.1.0 | approved | `ecac8fa631aa` | reh3376 |
-| [`v1_context_equipment_register.json`](fats/v1_context_equipment_register.json) | `/v1/context/equipment` | 0.1.0 | approved | `3e479b746262` | reh3376 |
-| [`v1_context_modes_get.json`](fats/v1_context_modes_get.json) | `/v1/context/modes/{equipment_id}` | 0.1.0 | approved | `90a8c27fcfc8` | reh3376 |
-| [`v1_context_modes_set.json`](fats/v1_context_modes_set.json) | `/v1/context/modes` | 0.1.0 | approved | `a9ebbaff4543` | reh3376 |
-| [`v1_context_shifts_resolve.json`](fats/v1_context_shifts_resolve.json) | `/v1/context/shifts/resolve` | 0.1.0 | approved | `d805ba2b6ef6` | reh3376 |
-| [`v1_health.json`](fats/v1_health.json) | `/v1/health` | 0.1.0 | approved | `9a06a23082bd` | reh3376 |
-| [`v1_info.json`](fats/v1_info.json) | `/v1/info` | 0.1.0 | approved | `29244a79a1ab` | reh3376 |
-| [`v1_records_ingest.json`](fats/v1_records_ingest.json) | `/v1/records` | 0.1.0 | approved | `7420c2a6cd91` | reh3376 |
-| [`v1_registry_add_version.json`](fats/v1_registry_add_version.json) | `/v1/schemas/{schema_id}/versions` | 0.1.0 | approved | `f0c76a7a3009` | reh3376 |
-| [`v1_registry_compatibility.json`](fats/v1_registry_compatibility.json) | `/v1/schemas/{schema_id}/compatibility` | 0.1.0 | approved | `5019b7c4a017` | reh3376 |
-| [`v1_registry_delete.json`](fats/v1_registry_delete.json) | `/v1/schemas/{schema_id}` | 0.1.0 | approved | `2b618091f3ae` | reh3376 |
-| [`v1_registry_diff.json`](fats/v1_registry_diff.json) | `/v1/schemas/{schema_id}/diff/{from_version}/{to_version}` | 0.1.0 | approved | `0d3e86e824c2` | reh3376 |
-| [`v1_registry_get.json`](fats/v1_registry_get.json) | `/v1/schemas/{schema_id}` | 0.1.0 | approved | `0c437aa61243` | reh3376 |
-| [`v1_registry_get_version.json`](fats/v1_registry_get_version.json) | `/v1/schemas/{schema_id}/versions/{version}` | 0.1.0 | approved | `06fb9fc8946f` | reh3376 |
-| [`v1_registry_list.json`](fats/v1_registry_list.json) | `/v1/schemas` | 0.1.0 | approved | `66e5cab2e064` | reh3376 |
-| [`v1_registry_register.json`](fats/v1_registry_register.json) | `/v1/schemas` | 0.1.0 | approved | `aa5bcb02b1ed` | reh3376 |
-| [`v1_registry_versions.json`](fats/v1_registry_versions.json) | `/v1/schemas/{schema_id}/versions` | 0.1.0 | approved | `14cb350a9414` | reh3376 |
+| [`healthz.json`](fats/healthz.json) | `GET /healthz` | 0.1.0 | approved | `bdb3633c7f31` | reh3376 |
+| [`readyz.json`](fats/readyz.json) | `GET /readyz` | 0.1.0 | approved | `40332d18dc9d` | reh3376 |
+| [`v1_adapters_list.json`](fats/v1_adapters_list.json) | `GET /v1/adapters` | 0.1.0 | approved | `54d506f072ed` | reh3376 |
+| [`v1_adapters_register.json`](fats/v1_adapters_register.json) | `POST /v1/adapters/register` | 0.1.0 | approved | `78497774e3c2` | reh3376 |
+| [`v1_context_batches_active.json`](fats/v1_context_batches_active.json) | `GET /v1/context/batches/active` | 0.1.0 | approved | `cda087c85870` | reh3376 |
+| [`v1_context_batches_complete.json`](fats/v1_context_batches_complete.json) | `POST /v1/context/batches/{batch_id}/complete` | 0.1.0 | approved | `5cf21cd0f19b` | reh3376 |
+| [`v1_context_batches_register.json`](fats/v1_context_batches_register.json) | `POST /v1/context/batches` | 0.1.0 | approved | `425bdeef18b4` | reh3376 |
+| [`v1_context_enrich.json`](fats/v1_context_enrich.json) | `POST /v1/context/enrich` | 0.1.0 | approved | `63361ac28d1c` | reh3376 |
+| [`v1_context_equipment_children.json`](fats/v1_context_equipment_children.json) | `GET /v1/context/equipment/{equipment_id}/children` | 0.1.0 | approved | `07ade1e47349` | reh3376 |
+| [`v1_context_equipment_delete.json`](fats/v1_context_equipment_delete.json) | `DELETE /v1/context/equipment/{equipment_id}` | 0.1.0 | approved | `fc7f5c8dceed` | reh3376 |
+| [`v1_context_equipment_get.json`](fats/v1_context_equipment_get.json) | `GET /v1/context/equipment/{equipment_id}` | 0.1.0 | approved | `6635c81e3b67` | reh3376 |
+| [`v1_context_equipment_list.json`](fats/v1_context_equipment_list.json) | `GET /v1/context/equipment` | 0.1.0 | approved | `ecac8fa631aa` | reh3376 |
+| [`v1_context_equipment_register.json`](fats/v1_context_equipment_register.json) | `POST /v1/context/equipment` | 0.1.0 | approved | `3e479b746262` | reh3376 |
+| [`v1_context_modes_get.json`](fats/v1_context_modes_get.json) | `GET /v1/context/modes/{equipment_id}` | 0.1.0 | approved | `90a8c27fcfc8` | reh3376 |
+| [`v1_context_modes_set.json`](fats/v1_context_modes_set.json) | `POST /v1/context/modes` | 0.1.0 | approved | `a9ebbaff4543` | reh3376 |
+| [`v1_context_shifts_resolve.json`](fats/v1_context_shifts_resolve.json) | `POST /v1/context/shifts/resolve` | 0.1.0 | approved | `d805ba2b6ef6` | reh3376 |
+| [`v1_health.json`](fats/v1_health.json) | `GET /v1/health` | 0.1.0 | approved | `9a06a23082bd` | reh3376 |
+| [`v1_info.json`](fats/v1_info.json) | `GET /v1/info` | 0.1.0 | approved | `29244a79a1ab` | reh3376 |
+| [`v1_records_ingest.json`](fats/v1_records_ingest.json) | `POST /v1/records` | 0.1.0 | approved | `7420c2a6cd91` | reh3376 |
+| [`v1_registry_add_version.json`](fats/v1_registry_add_version.json) | `POST /v1/schemas/{schema_id}/versions` | 0.1.0 | approved | `f0c76a7a3009` | reh3376 |
+| [`v1_registry_compatibility.json`](fats/v1_registry_compatibility.json) | `POST /v1/schemas/{schema_id}/compatibility` | 0.1.0 | approved | `5019b7c4a017` | reh3376 |
+| [`v1_registry_delete.json`](fats/v1_registry_delete.json) | `DELETE /v1/schemas/{schema_id}` | 0.1.0 | approved | `2b618091f3ae` | reh3376 |
+| [`v1_registry_diff.json`](fats/v1_registry_diff.json) | `GET /v1/schemas/{schema_id}/diff/{from_version}/{to_version}` | 0.1.0 | approved | `0d3e86e824c2` | reh3376 |
+| [`v1_registry_get.json`](fats/v1_registry_get.json) | `GET /v1/schemas/{schema_id}` | 0.1.0 | approved | `0c437aa61243` | reh3376 |
+| [`v1_registry_get_version.json`](fats/v1_registry_get_version.json) | `GET /v1/schemas/{schema_id}/versions/{version}` | 0.1.0 | approved | `06fb9fc8946f` | reh3376 |
+| [`v1_registry_list.json`](fats/v1_registry_list.json) | `GET /v1/schemas` | 0.1.0 | approved | `66e5cab2e064` | reh3376 |
+| [`v1_registry_register.json`](fats/v1_registry_register.json) | `POST /v1/schemas` | 0.1.0 | approved | `aa5bcb02b1ed` | reh3376 |
+| [`v1_registry_versions.json`](fats/v1_registry_versions.json) | `GET /v1/schemas/{schema_id}/versions` | 0.1.0 | approved | `14cb350a9414` | reh3376 |
 
 ## FTTS
 

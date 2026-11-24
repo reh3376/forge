@@ -6,7 +6,8 @@
  * FORGE_HUB_ENABLED=true.
  *
  * Retry, circuit-breaker and dead-letter thresholds mirror the
- * `error_handling` section of `specs/forge-mes.facts.json`.
+ * `error_handling` section of the module's FACTS spec,
+ * `forge-modules/forge-mes/fxts/facts/forge-mes.facts.json`.
  */
 import {
   SOURCE_TIMESTAMP_ORIGINS,
