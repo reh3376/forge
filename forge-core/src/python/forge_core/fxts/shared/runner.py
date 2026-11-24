@@ -17,6 +17,7 @@ Design principles (from UxTS lineage):
 from __future__ import annotations
 
 import abc
+import functools
 import hashlib
 import json
 import re
@@ -118,6 +119,32 @@ class EvidenceKind(StrEnum):
     NONE = "none"
 
 
+#: From weakest to strongest.
+EVIDENCE_ORDER: tuple[EvidenceKind, ...] = (
+    EvidenceKind.NONE,
+    EvidenceKind.SELF,
+    EvidenceKind.FILE,
+    EvidenceKind.ARTIFACT,
+)
+
+#: One thing a verdict reached: ``file:<path in the repository>`` or ``artifact:<what>``
+#: (a module imported, the app built in process, the proto, the conformance kit's run).
+REACHED_FORM = re.compile(r"^(file|artifact):\S.*$")
+
+_REPO = Path(__file__).resolve().parents[6]
+
+
+def reached_file(path: Path | str) -> str:
+    """``file:<path>`` for a file a check read, relative to the repository when it is in
+    it (a report never carries the machine's own paths)."""
+    path = Path(path)
+    try:
+        shown = path.resolve().relative_to(_REPO).as_posix()
+    except ValueError:
+        shown = path.name
+    return f"file:{shown}"
+
+
 class FxTSVerdict(BaseModel):
     """Result of a single spec check within a runner."""
 
@@ -128,8 +155,11 @@ class FxTSVerdict(BaseModel):
     violations: list[SpecViolation] = Field(default_factory=list)
     evidence: dict[str, Any] = Field(default_factory=dict)
     duration_ms: float = 0.0
-    #: Set by the runner base from the check's declaration (``FxTSRunner.run``); a runner
-    #: never sets it by hand (D-19, AE-1, AE-2).
+    #: What the check reached beyond the spec: ``file:<path>`` or ``artifact:<what>``
+    #: (``REACHED_FORM``). A check that reached nothing names nothing (D-19 step 2).
+    reached: list[str] = Field(default_factory=list)
+    #: Set by the runner base (``FxTSRunner.with_evidence``) from the check's declaration
+    #: and what the verdict names as reached; a runner never sets it by hand (D-19, AE-1).
     evidence_kind: EvidenceKind | None = None
 
 
@@ -180,6 +210,12 @@ SHARED_CHECKS: tuple[Check, ...] = (
         (),
         EvidenceKind.NONE,
         "the framework's schema against its runner, not a spec",
+    ),
+    Check(
+        "{framework}:evidence-{section}",
+        (),
+        EvidenceKind.NONE,
+        "claims of the spec that no check of the real thing reached in this run (D-19, AE-4)",
     ),
 )
 
@@ -830,9 +866,87 @@ class FxTSRunner(abc.ABC):
                     "evidence": {**verdict.evidence, "undeclared": True},
                 }
             )
-        unobserved = verdict.status in (VerdictStatus.NOT_RUN, VerdictStatus.WAIVED)
-        kind = EvidenceKind.NONE if unobserved else declared.kind
-        return verdict.model_copy(update={"evidence_kind": kind})
+        if verdict.status in (VerdictStatus.NOT_RUN, VerdictStatus.WAIVED):
+            return verdict.model_copy(update={"evidence_kind": EvidenceKind.NONE})
+        malformed = [r for r in verdict.reached if not REACHED_FORM.match(r)]
+        if malformed:
+            return verdict.model_copy(
+                update={
+                    "status": VerdictStatus.ERROR,
+                    "evidence_kind": EvidenceKind.NONE,
+                    "message": (
+                        f"'{verdict.check_id}' names what it reached as {malformed}, not as "
+                        f"file:<path> or artifact:<what> (D-19 step 2). It said "
+                        f"{verdict.status}: {verdict.message}"
+                    ),
+                }
+            )
+        return verdict.model_copy(
+            update={"evidence_kind": evidence_kind_of(declared.kind, verdict.reached)}
+        )
+
+    def evidence_findings(
+        self, spec: dict[str, Any] | None, verdicts: list[FxTSVerdict]
+    ) -> list[FxTSVerdict]:
+        """One ``<fw>:evidence-<section>`` verdict, not run, for each top-level section of
+        the spec that holds a claim no check of the real thing reached in this run
+        (D-19, AE-3, AE-4).
+
+        The marks are read from the latest schema version the owner approved, whatever
+        version the spec was approved against; with none approved every top-level
+        property is a claim. A claim the spec does not make (the property is absent)
+        gives nothing. A claim is reached when a verdict of kind ``artifact`` in this run
+        comes from a check declared to cover it or a property above it. ``[]`` for a
+        runner with no registered framework schema (a test double).
+        """
+        from forge_core.fxts.shared import schemas
+
+        if spec is None or self._schema_path is None:
+            return []
+        schema_dir = self._schema_path.parent
+        if schema_dir.name == "versions":
+            schema_dir = schema_dir.parent
+        if not (schema_dir / schemas.REGISTRY_NAME).is_file():
+            return []
+        source = schemas.marks_version(schema_dir)
+        if source is not None:
+            units = _cached_units(str(source.file), source.schema_hash, True)
+            marks_from = f"{self.framework} {source.version}"
+        else:
+            head = schemas.latest(schema_dir)
+            units = _cached_units(str(head.file), head.schema_hash, False) if head else ()
+            marks_from = f"{self.framework}: no approved version, every top-level property a claim"
+        covers = [
+            pointer
+            for v in verdicts
+            if v.evidence_kind is EvidenceKind.ARTIFACT
+            and (declared := self.declaration_of(v.check_id)) is not None
+            for pointer in declared.covers
+        ]
+        uncovered: dict[str, list[str]] = {}
+        for pointer, mark in units:
+            if mark != "claim" or not _present(spec, pointer):
+                continue
+            if any(c == "" or c == pointer or pointer.startswith(c + "/") for c in covers):
+                continue
+            uncovered.setdefault(pointer.split("/")[1], []).append(pointer)
+        name = self.framework.lower()
+        return [
+            FxTSVerdict(
+                check_id=f"{name}:evidence-{schemas.section_id(section)}",
+                spec_ref=f"{self.framework}/{section}",
+                status=VerdictStatus.NOT_RUN,
+                message=(
+                    f"NOT RUN: no check of the real thing reached {', '.join(pointers)} in this "
+                    f"run; the spec's claim there is checked only against itself or other "
+                    f"files. The accepted gap for {name}:evidence-{schemas.section_id(section)} "
+                    f"names the backlog item that adds the check (`forge governance gaps`; "
+                    f"D-19, AE-4; marks from {marks_from})."
+                ),
+                evidence={"uncovered": pointers, "marks_from": marks_from},
+            )
+            for section, pointers in uncovered.items()
+        ]
 
     @abc.abstractmethod
     def implemented_fields(self) -> set[str]:
@@ -967,6 +1081,14 @@ class FxTSRunner(abc.ABC):
             ),
             violations=[violation] if violation else [],
             evidence={"schema_version": recorded},
+            reached=[
+                reached_file(schema_dir / schemas.REGISTRY_NAME),
+                *(
+                    [reached_file(found.file)]
+                    if (found := schemas.find(schema_dir, str(recorded))) is not None
+                    else []
+                ),
+            ],
         )
 
     async def run(self, target: str, **kwargs: Any) -> FxTSReport:
@@ -1080,5 +1202,54 @@ class FxTSRunner(abc.ABC):
             )
 
         report.verdicts = [self.with_evidence(v) for v in report.verdicts]
+        # What the spec claims that nothing real was checked against (D-19, AE-4). A fault
+        # here is the runner's error, never a run with no findings.
+        try:
+            findings = self.evidence_findings(spec, report.verdicts)
+        except Exception as exc:
+            findings = [
+                FxTSVerdict(
+                    check_id=f"{self.framework.lower()}:runner-error",
+                    spec_ref=f"{self.framework}/runner",
+                    status=VerdictStatus.ERROR,
+                    message=(
+                        "The runner broke while finding the claims no check of the real "
+                        f"thing reached: {type(exc).__name__}: {exc}"
+                    ),
+                    evidence={"exception": type(exc).__name__},
+                )
+            ]
+        report.verdicts.extend(self.with_evidence(v) for v in findings)
         report.finished_at = datetime.now(UTC)
         return report
+
+
+def evidence_kind_of(declared: EvidenceKind, reached: list[str]) -> EvidenceKind:
+    """The kind a verdict that ran rests on: the strongest thing it names as reached
+    (``self`` when it names nothing), never stronger than its check's declaration."""
+    named = [
+        EvidenceKind.ARTIFACT if r.startswith("artifact:") else EvidenceKind.FILE for r in reached
+    ]
+    strongest = max(named, key=EVIDENCE_ORDER.index, default=EvidenceKind.SELF)
+    return min(declared, strongest, key=EVIDENCE_ORDER.index)
+
+
+@functools.cache
+def _cached_units(file: str, schema_hash: str, honour_marks: bool) -> tuple[tuple[str, str], ...]:
+    """A released version's units; a released version never changes, and its hash is part
+    of the key."""
+    from forge_core.fxts.shared import schemas
+
+    schema = json.loads(Path(file).read_text(encoding="utf-8"))
+    return tuple(schemas.mark_units(schema, honour_marks=honour_marks))
+
+
+def _present(spec: dict[str, Any], pointer: str) -> bool:
+    """Whether the spec says something at a pointer: every step is an object holding the
+    next name, and the value is not null."""
+    node: Any = spec
+    for segment in pointer.strip("/").split("/"):
+        if not isinstance(node, dict) or segment not in node:
+            return False
+        node = node[segment]
+    return node is not None

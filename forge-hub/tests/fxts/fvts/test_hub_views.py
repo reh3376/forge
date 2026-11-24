@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from tests.governance.evidence import expected_not_run
 
 from forge_core.fxts.fvts import REPO_ROOT, SCHEMA_PATH
 from forge_core.fxts.fvts.renderer import (
@@ -63,6 +64,9 @@ def _text(verdict) -> str:
 
 class TestTheHubsContract:
     async def test_it_passes_every_check(self, runner: FVTSRunner, hub: dict[str, Any]) -> None:
+        """Every check that ran passed, and what did not run is exactly the accepted gaps
+        and the claims no check of the real thing reached (D-19 step 2): forge-display does
+        not exist, so the contract is checked only against itself and other files."""
         report = await runner.run(target="forge-hub-views", spec=hub)
         by_status: dict[VerdictStatus, set[str]] = {}
         for verdict in report.verdicts:
@@ -74,7 +78,10 @@ class TestTheHubsContract:
         assert by_status.get(FAIL, set()) == allowed, [
             (v.check_id, v.message) for v in report.verdicts if v.status is FAIL
         ]
-        assert report.hash_verified is True and report.total == 21
+        not_run = by_status.get(VerdictStatus.NOT_RUN, set())
+        assert not_run == expected_not_run("fvts", HUB_SPEC_PATH.name, hub, report)
+        evidence = {c for c in not_run if ":evidence-" in c}
+        assert report.hash_verified is True and report.total == 21 + len(evidence)
 
     def test_it_is_the_hubs_and_shows_the_four_screens(self, hub: dict[str, Any]) -> None:
         assert hub["view_identity"]["owner_module"] == HUB_OWNER == "forge-hub"

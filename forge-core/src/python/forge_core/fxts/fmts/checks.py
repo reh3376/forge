@@ -24,8 +24,8 @@ CHECKS: tuple[Check, ...] = (
     Check(
         "fmts:enum-parity",
         (),
-        ARTIFACT,
-        "the framework's enums against the Python models; covers no spec property",
+        FILE,
+        "the FACTS schema's enums against the framework's own constants; covers no spec property",
     ),
     Check("fmts:function", ("/module_identity/function",), FILE),
     Check("fmts:identity-match", ("/module_identity/module_id",), SELF),
@@ -40,25 +40,34 @@ CHECKS: tuple[Check, ...] = (
     Check("fmts:m10", ("/baseline/M-10",), FILE),
     Check("fmts:m11", ("/baseline/M-11",), FILE, "the scaffold's files exist"),
     Check(
-        "fmts:m12", ("/baseline/M-12",), ARTIFACT, "the transport contract is not built (FB-164)"
+        "fmts:m12",
+        ("/baseline/M-12",),
+        NONE,
+        "the transport contract is not built (FB-164); artifact once built",
     ),
     Check(
-        "fmts:m13", ("/baseline/M-13",), ARTIFACT, "the transport contract is not built (FB-164)"
+        "fmts:m13",
+        ("/baseline/M-13",),
+        NONE,
+        "the transport contract is not built (FB-164); artifact once built",
     ),
     Check(
-        "fmts:m14", ("/baseline/M-14",), ARTIFACT, "the transport contract is not built (FB-164)"
+        "fmts:m14",
+        ("/baseline/M-14",),
+        NONE,
+        "the transport contract is not built (FB-164); artifact once built",
     ),
     Check(
         "fmts:m15",
         ("/baseline/M-15",),
-        FILE,
-        "a claim of not applicable is held to the FACTS spec's capabilities",
+        SELF,
+        "a claim of not applicable is held to the spec's own transport section",
     ),
     Check(
         "fmts:m16",
         ("/baseline/M-16",),
-        FILE,
-        "a claim of not applicable is held to the FACTS spec's capabilities",
+        SELF,
+        "a claim of not applicable is held to the spec's own transport section",
     ),
     Check("fmts:m2", ("/baseline/M-2",), FILE),
     Check("fmts:m3", ("/baseline/M-3",), FILE),
@@ -73,7 +82,12 @@ CHECKS: tuple[Check, ...] = (
         FILE,
         "file suffixes in the module's source paths, not a run of the module",
     ),
-    Check("fmts:metadata", ("/metadata",), SELF),
+    Check(
+        "fmts:metadata",
+        ("/metadata",),
+        NONE,
+        "free text for people: read only to count its keys; decides nothing (D-19, AE-3)",
+    ),
     Check("fmts:requirements", ("/baseline",), SELF),
     Check("fmts:schema-valid", ("",), SELF),
     Check("fmts:source-paths", ("/module_identity/source_paths",), FILE),

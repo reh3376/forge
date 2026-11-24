@@ -43,6 +43,7 @@ from forge_core.fxts.shared.runner import (
     FxTSVerdict,
     SpecViolation,
     VerdictStatus,
+    reached_file,
 )
 from forge_core.models.alarm import SYSTEM_ALARM_ACTIONS as _SYSTEM_ALARM_ACTIONS
 
@@ -147,7 +148,16 @@ _OBJECT = frozenset(
 HUB_OWNER = "forge-hub"
 
 
-def load_facts_specs(directory: Path | None = None) -> dict[str, dict[str, Any]]:
+class FactsSpecs(dict[str, dict[str, Any]]):
+    """FACTS specs keyed by adapter_id, with the file each was read from (``files``), so a
+    check that reads one can name it (D-19 step 2)."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.files: dict[str, Path] = {}
+
+
+def load_facts_specs(directory: Path | None = None) -> FactsSpecs:
     """Every FACTS spec keyed by its adapter_id: from ``directory``, or, without one, from
     every module's ``fxts/facts`` folder (``locations``)."""
     files = (
@@ -155,13 +165,23 @@ def load_facts_specs(directory: Path | None = None) -> dict[str, dict[str, Any]]
         if directory is not None
         else locations.spec_files("facts", "*.facts.json")
     )
-    specs: dict[str, dict[str, Any]] = {}
+    specs = FactsSpecs()
     for file in files:
         spec = json.loads(file.read_text(encoding="utf-8"))
         adapter_id = spec.get("adapter_identity", {}).get("adapter_id")
         if adapter_id:
             specs[adapter_id] = spec
+            specs.files[adapter_id] = file
     return specs
+
+
+def _facts_files(facts_specs: dict[str, dict[str, Any]], adapter_ids: list[str]) -> list[str]:
+    """The files of the FACTS specs read for these adapters, when it is known where they
+    came from (a caller's own dict names none)."""
+    files: dict[str, Path] = getattr(facts_specs, "files", {})
+    return [
+        reached_file(files[a]) for a in sorted(set(adapter_ids)) if a in files and a in facts_specs
+    ]
 
 
 def tag_pattern(tag_path: str) -> re.Pattern[str]:
@@ -271,6 +291,7 @@ class FVTSRunner(FxTSRunner):
         ok: str,
         *,
         evidence: dict[str, Any] | None = None,
+        reached: list[str] | None = None,
     ) -> FxTSVerdict:
         if violations:
             head = "; ".join(v.message for v in violations[:3])
@@ -282,6 +303,7 @@ class FVTSRunner(FxTSRunner):
                 message=f"{len(violations)} violation(s): {head}{more}",
                 violations=violations,
                 evidence=evidence or {},
+                reached=list(reached or []),
             )
         return FxTSVerdict(
             check_id=f"fvts:{check}",
@@ -289,6 +311,7 @@ class FVTSRunner(FxTSRunner):
             status=VerdictStatus.PASS,
             message=ok,
             evidence=evidence or {},
+            reached=list(reached or []),
         )
 
     @staticmethod
@@ -424,6 +447,12 @@ class FVTSRunner(FxTSRunner):
             violations,
             f"{len(expected)} mirrored enums match their Python models.",
             evidence={name: sorted(values) for name, values in expected.items()},
+            reached=[
+                "artifact:module:forge_core.models.alarm",
+                "artifact:module:forge_core.models.contextual_record",
+                "artifact:module:forge_core.models.control",
+                "artifact:module:forge_core.fxts.fvts.profiles",
+            ],
         )
 
     # ------------------------------------------------------------------
@@ -450,7 +479,8 @@ class FVTSRunner(FxTSRunner):
                 )
             )
         ref = identity.get("facts_spec_ref")
-        if ref and not ref.startswith("forge://") and not (repo_root / ref).is_file():
+        ref_file = (repo_root / ref) if ref and not ref.startswith("forge://") else None
+        if ref_file is not None and not ref_file.is_file():
             violations.append(
                 SpecViolation(
                     field="view_identity.facts_spec_ref",
@@ -476,6 +506,10 @@ class FVTSRunner(FxTSRunner):
             violations,
             f"owner '{owner}' and bound adapters {bound} all have FACTS specs.",
             evidence={"owner_module": owner, "bound_adapters": bound},
+            reached=[
+                *_facts_files(facts_specs, [owner, *bound]),
+                *([reached_file(ref_file)] if ref_file is not None and ref_file.is_file() else []),
+            ],
         )
 
     # ------------------------------------------------------------------
@@ -530,6 +564,7 @@ class FVTSRunner(FxTSRunner):
                 )
             )
         root = repo_root.resolve()
+        read: list[str] = []
         for entry in declared:
             oid = entry.get("object_id")
             where = f"data_bindings.objects[{oid}]"
@@ -546,6 +581,7 @@ class FVTSRunner(FxTSRunner):
                     )
                 )
                 continue
+            read.append(reached_file(path))
             try:
                 document = json.loads(path.read_text(encoding="utf-8"))
                 jsonschema.Draft202012Validator.check_schema(document)
@@ -634,6 +670,7 @@ class FVTSRunner(FxTSRunner):
             if declared
             else "No objects; the contract shows points.",
             evidence={"objects": sorted(str(i) for i in ids)},
+            reached=read,
         )
 
     def _check_surface_refs(self, spec: dict[str, Any]) -> FxTSVerdict:
@@ -693,6 +730,7 @@ class FVTSRunner(FxTSRunner):
         tags = write_tags(write_config) if write_config is not None else None
         violations: list[SpecViolation] = []
         checked: list[str] = []
+        held_to_facts = False
         for action in spec.get("actions", []):
             aid, kind = action.get("action_id"), action.get("kind")
             if kind == "alarm_operation" and not alarms_enabled:
@@ -727,6 +765,8 @@ class FVTSRunner(FxTSRunner):
                         ),
                     )
                 )
+            if owner_facts is not None:
+                held_to_facts = True
             if (
                 owner_facts is not None
                 and owner_facts.get("capabilities", {}).get("write") is not True
@@ -748,6 +788,7 @@ class FVTSRunner(FxTSRunner):
                 "tag_write_actions": checked,
                 "write_config": "checked" if tags is not None else "not provided",
             },
+            reached=_facts_files(facts_specs, [owner]) if held_to_facts else [],
         )
 
     @staticmethod
@@ -1105,11 +1146,16 @@ class FVTSRunner(FxTSRunner):
                     message=f"golden_messages_path {golden!r} is not a directory under {repo_root}",
                 )
             )
+        found = [
+            reached_file(repo_root / suite) if suite and (repo_root / suite).is_file() else None,
+            reached_file(repo_root / golden) if golden and (repo_root / golden).is_dir() else None,
+        ]
         return self._verdict(
             "conformance-paths",
             "conformance_tests",
             violations,
             f"suite '{suite}' and golden set '{golden}' exist.",
+            reached=[f for f in found if f is not None],
         )
 
     def _check_golden_messages(
@@ -1118,10 +1164,16 @@ class FVTSRunner(FxTSRunner):
         tests = spec.get("conformance_tests", {})
         renderers = list(tests.get("renderers_under_test", []))
         violations: list[SpecViolation] = []
+        read: list[str] = []
         if messages is None:
             golden = tests.get("golden_messages_path")
             directory = (repo_root / golden) if golden else None
             messages = load_golden_messages(directory) if directory and directory.is_dir() else []
+            if directory is not None:
+                read = [
+                    reached_file(directory / name)
+                    for name in sorted({m.source.split("[", 1)[0] for m in messages})
+                ]
         if not renderers:
             violations.append(
                 SpecViolation(
@@ -1160,6 +1212,7 @@ class FVTSRunner(FxTSRunner):
             violations,
             f"{len(messages)} golden message(s) render on {renderers}.",
             evidence={"renderers": runs, "messages": [m.source for m in messages]},
+            reached=read,
         )
 
     def _check_metadata(self, spec: dict[str, Any]) -> FxTSVerdict:

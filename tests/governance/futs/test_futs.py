@@ -28,6 +28,7 @@ from forge_core.fxts.shared.runner import (
     verify_spec_hash,
 )
 from forge_hub.cli import governance as governance_cli
+from tests.governance.evidence import expected_evidence, expected_not_run
 
 PASS, FAIL, UNRUN = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.NOT_RUN
 SCHEMA = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
@@ -122,7 +123,7 @@ def _node(view: dict[str, Any], node_id: str) -> dict[str, Any]:
 class TestSchemaAndParity:
     def test_the_schema_is_valid_and_registered(self) -> None:
         Draft202012Validator.check_schema(SCHEMA)
-        assert SCHEMA["$id"] == "forge://fxts/futs/v0.2.0"
+        assert SCHEMA["$id"] == "forge://fxts/futs/v0.3.0"
         assert schemas.registry_problems(SCHEMA_PATH.parent) == []
 
     def test_the_runner_enforces_every_schema_field(self, runner: FUTSRunner) -> None:
@@ -156,9 +157,8 @@ class TestTheSpecs:
         assert by_status.get(FAIL, set()) == governance_cli.accepted_checks(
             "futs", path.name, "FAIL"
         )
-        assert by_status.get(UNRUN, set()) == governance_cli.accepted_checks(
-            "futs", path.name, "NOT_RUN"
-        )
+        # Not run: the accepted gaps, and the claims nothing real reached (D-19 step 2).
+        assert by_status.get(UNRUN, set()) == expected_not_run("futs", path.name, spec, report)
         assert report.hash_verified is True
 
     def test_every_widget_with_a_binding_shows_quality_and_staleness(self) -> None:
@@ -199,8 +199,13 @@ class TestAViewDocument:
     async def test_the_reference_passes_and_names_what_it_did_not_check(self, runner, view) -> None:
         report = await runner.run(target=VIEW, spec=view)
         skipped = [v for v in report.verdicts if v.status == UNRUN]
-        assert [v.check_id for v in skipped] == ["futs:expressions"]
-        assert skipped[0].message.startswith("NOT RUN") and "FB-181" in skipped[0].message
+        checks = [v for v in skipped if ":evidence-" not in v.check_id]
+        assert [v.check_id for v in checks] == ["futs:expressions"]
+        assert checks[0].message.startswith("NOT RUN") and "FB-181" in checks[0].message
+        # and each section whose claims nothing real reached (D-19 step 2)
+        evidence = {v.check_id for v in skipped if ":evidence-" in v.check_id}
+        assert evidence == expected_evidence("futs", view, report)
+        assert all(v.message.startswith("NOT RUN") for v in skipped)
 
     async def test_a_widget_without_a_spec(self, runner, view) -> None:
         _node(view, "temp")["widget"] = "gauge-dial"

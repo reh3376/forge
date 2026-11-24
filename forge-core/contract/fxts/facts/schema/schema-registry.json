@@ -34,6 +34,30 @@
       "released_at": "2026-11-23T18:20:15Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-23T18:34:09Z"
+    },
+    {
+      "version": "0.3.0",
+      "file": "versions/facts.v0.3.0.schema.json",
+      "schema_hash": "6450ce97d9d68bfb541f39fccb52d825a1dd2dca74d4890773f6a45705c9a20d",
+      "hash_state": "approved",
+      "step": "minor",
+      "summary": "D-19 step 2 (FB-264): every top-level property carries its evidence mark, x-forge-evidence: claim (says something about the real thing), description (text for people; nothing decides on it) or structure (about the spec as a document). Marks only: what a spec may say is unchanged, so no spec needs review (AE-3).",
+      "changes": [
+        "properties.adapter_identity.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.capabilities.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.connection.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.context_mapping.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.data_contract.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.error_handling.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.integrity.x-forge-evidence: evidence mark added: 'structure' (minor)",
+        "properties.lifecycle.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.metadata.x-forge-evidence: evidence mark added: 'description' (minor)",
+        "properties.spec_version.x-forge-evidence: evidence mark added: 'structure' (minor)",
+        "properties.time_governance.x-forge-evidence: evidence mark added: 'claim' (minor)"
+      ],
+      "released_at": "2026-11-24T18:32:23Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-24T18:44:50Z"
     }
   ]
 }

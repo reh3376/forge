@@ -21,6 +21,7 @@ from forge_core.fxts.fmts import REPO_ROOT
 from forge_core.fxts.fmts.runners.fmts_runner import CONFORMANCE_KIT, FMTSRunner, load_backlog
 from forge_core.fxts.shared.runner import RunOutcome, VerdictStatus
 from forge_hub.cli import governance as governance_cli
+from tests.governance.evidence import expected_evidence, expected_not_run
 
 NOT_APPLICABLE: dict[str, set[str]] = {"forge-ot": {"M-16"}, "forge-mes": {"M-15"}}
 NO_DOWNWARD_WRITES = {"M-15", "M-16"}
@@ -56,14 +57,18 @@ async def test_module_meets_its_spec(runner: FMTSRunner, module_id: str) -> None
     for verdict in report.verdicts:
         by_status.setdefault(verdict.status, set()).add(verdict.check_id)
 
-    assert report.total == 29 and report.hash_verified is True
+    # 29 checks, and one evidence finding per section whose claims nothing real reached
+    # (D-19 step 2): exactly those the marks, the spec and this run's verdicts give.
+    evidence = {v.check_id for v in report.verdicts if ":evidence-" in v.check_id}
+    assert evidence == expected_evidence("fmts", spec, report)
+    assert report.total == 29 + len(evidence) and report.hash_verified is True
     assert by_status.get(VerdictStatus.NOT_IMPLEMENTED, set()) == set()  # schema-runner parity
     assert by_status.get(VerdictStatus.ERROR, set()) == set()
     name = f"{module_id}.fmts.json"
     failed = by_status.get(VerdictStatus.FAIL, set())
     not_run = by_status.get(VerdictStatus.NOT_RUN, set())
     assert failed == governance_cli.accepted_checks("fmts", name, "FAIL"), failed
-    assert not_run == governance_cli.accepted_checks("fmts", name, "NOT_RUN"), not_run
+    assert not_run == expected_not_run("fmts", name, spec, report), not_run
     waived = {_check(w["requirement"]) for w in spec["waivers"]}
     assert by_status.get(VerdictStatus.WAIVED, set()) == waived
     # Every module waives something, so no module's run passes: it is incomplete, or it

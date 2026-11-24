@@ -8,7 +8,9 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
+from forge_core.fxts.fmts import SCHEMA_PATH
 from forge_core.fxts.fmts.runners.fmts_runner import REQUIREMENTS
+from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import load_schema
 
 
@@ -19,11 +21,15 @@ def _errors(schema: dict, spec: dict) -> list[str]:
 class TestSchema:
     def test_is_a_valid_draft_2020_12_schema(self, schema: dict) -> None:
         Draft202012Validator.check_schema(schema)
-        assert schema["$id"] == "forge://fxts/fmts/v2.0.0"
-        assert schema["properties"]["spec_version"]["const"] == "2.0.0"
+        assert schema["$id"] == "forge://fxts/fmts/v2.1.0"
+        assert schema["properties"]["spec_version"]["const"] == "2.1.0"
 
-    def test_the_reference_spec_validates(self, schema: dict, spec: dict) -> None:
-        assert _errors(schema, spec) == []
+    def test_the_reference_spec_validates(self, spec: dict) -> None:
+        """Against the version it records, 2.0.0, as the nine module specs are (F-10): the
+        minor release 2.1.0 added only evidence marks (D-19 step 2)."""
+        own = load_schema(schemas.schema_for_spec(SCHEMA_PATH.parent, spec))
+        assert spec["spec_version"] == spec["integrity"]["schema_version"] == "2.0.0"
+        assert _errors(own, spec) == []
 
     def test_baseline_lists_the_sixteen_requirements(self, schema: dict) -> None:
         baseline = schema["properties"]["baseline"]

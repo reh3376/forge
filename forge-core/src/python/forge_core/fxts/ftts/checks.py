@@ -63,7 +63,12 @@ CHECKS: tuple[Check, ...] = (
     Check("ftts:live-client-import", ("/client_requirements/channel_module",), ARTIFACT),
     Check("ftts:live-server-class", ("/server_requirements/servicer_class",), ARTIFACT),
     Check("ftts:live-server-import", ("/server_requirements/server_module",), ARTIFACT),
-    Check("ftts:metadata", ("/metadata",), SELF),
+    Check(
+        "ftts:metadata",
+        ("/metadata",),
+        NONE,
+        "free text for people: read only to count its keys; decides nothing (D-19, AE-3)",
+    ),
     Check("ftts:proto-enum-types", ("/proto_contract/enum_types",), SELF),
     Check("ftts:proto-files-present", ("/proto_contract/proto_files",), SELF),
     Check("ftts:proto-message-types", ("/proto_contract/message_types",), SELF),

@@ -27,6 +27,7 @@ from forge_core.fxts.shared.runner import (
     FxTSVerdict,
     SpecViolation,
     VerdictStatus,
+    reached_file,
     verify_spec_hash,
 )
 
@@ -148,6 +149,7 @@ class FUTSRunner(FxTSRunner):
         ok: str,
         *,
         evidence: dict[str, Any] | None = None,
+        reached: list[str] | None = None,
     ) -> FxTSVerdict:
         if violations:
             head = "; ".join(v.message for v in violations[:3])
@@ -159,6 +161,7 @@ class FUTSRunner(FxTSRunner):
                 message=f"{len(violations)} violation(s): {head}{more}",
                 violations=violations,
                 evidence=evidence or {},
+                reached=list(reached or []),
             )
         return FxTSVerdict(
             check_id=f"futs:{check}",
@@ -166,6 +169,19 @@ class FUTSRunner(FxTSRunner):
             status=VerdictStatus.PASS,
             message=ok,
             evidence=evidence or {},
+            reached=list(reached or []),
+        )
+
+    def _widget_files(self, instances: list, widgets: dict, *, usable: bool = True) -> list[str]:
+        """The widget spec files the instances' checks read: every one read for them, or
+        only those that could be used (a check skips an instance whose widget it cannot)."""
+        return sorted(
+            {
+                self._read_widgets[node["widget"]]
+                for node, _ in instances
+                if node["widget"] in self._read_widgets
+                and (not usable or widgets[node["widget"]][0] is not None)
+            }
         )
 
     def _check_schema(self, spec: dict[str, Any]) -> FxTSVerdict:
@@ -305,11 +321,18 @@ class FUTSRunner(FxTSRunner):
     ) -> list[FxTSVerdict]:
         kinds = lists.load(CONTAINER_KINDS, lists_dir)
         self._repo_root = repo_root
+        self._object_files: list[str] = []
         nodes = list(_walk(view["root"]))
         instances = [(node, parent) for node, parent in nodes if "widget" in node]
         fvts, fvts_error = _load(repo_root / view["fvts_spec"])
+        self._fvts_file = (
+            [reached_file(repo_root / view["fvts_spec"])] if isinstance(fvts, dict) else []
+        )
         surface, fvts_verdict = self._check_fvts(view, fvts, fvts_error)
-        widgets = self._load_widgets({node["widget"] for node, _ in instances}, specs_dir)
+        read: dict[str, Path] = {}
+        widgets = self._load_widgets({node["widget"] for node, _ in instances}, specs_dir, read)
+        self._read_widgets = {wid: reached_file(path) for wid, path in read.items()}
+        list_file = [reached_file(kinds.path)] if kinds.path.is_file() else []
         return [
             self._verdict(
                 "lists",
@@ -319,8 +342,9 @@ class FUTSRunner(FxTSRunner):
                     for p in kinds.problems
                 ],
                 "The governed list of container kinds verifies and is approved by the owner.",
+                reached=list_file,
             ),
-            self._check_nodes(view, nodes, kinds),
+            self._check_nodes(view, nodes, kinds).model_copy(update={"reached": list_file}),
             fvts_verdict,
             self._check_widgets(instances, widgets),
             self._check_props(instances, widgets),
@@ -332,7 +356,7 @@ class FUTSRunner(FxTSRunner):
         ]
 
     def _load_widgets(
-        self, ids: set[str], specs_dir: Path | None
+        self, ids: set[str], specs_dir: Path | None, read: dict[str, Path] | None = None
     ) -> dict[str, tuple[dict[str, Any] | None, str]]:
         """Each widget spec a view document uses, or why it cannot be used.
 
@@ -346,6 +370,8 @@ class FUTSRunner(FxTSRunner):
             spec, error = (
                 _load(file) if file is not None else (None, f"{name} is in no fxts folder")
             )
+            if spec is not None and file is not None and read is not None:
+                read[widget_id] = file
             if spec is None:
                 out[widget_id] = (None, f"no widget spec ({error})")
                 continue
@@ -513,6 +539,7 @@ class FUTSRunner(FxTSRunner):
             "view/fvts_spec",
             violations,
             f"Lays out surface '{view['surface_id']}' of {view['owner_module']}'s view spec.",
+            reached=self._fvts_file,
         )
 
     def _check_widgets(self, instances: list, widgets: dict) -> FxTSVerdict:
@@ -528,6 +555,7 @@ class FUTSRunner(FxTSRunner):
             violations,
             f"{len(instances)} widget instances of {len(widgets)} approved widget specs.",
             evidence={"widgets": sorted(widgets)},
+            reached=self._widget_files(instances, widgets, usable=False),
         )
 
     def _check_props(self, instances: list, widgets: dict) -> FxTSVerdict:
@@ -563,7 +591,11 @@ class FUTSRunner(FxTSRunner):
                         )
                     )
         return self._verdict(
-            "props", "view/props", violations, "Every property is one the widget declares."
+            "props",
+            "view/props",
+            violations,
+            "Every property is one the widget declares.",
+            reached=self._widget_files(instances, widgets),
         )
 
     def _check_bindings(
@@ -686,6 +718,11 @@ class FUTSRunner(FxTSRunner):
                 "Every binding is one the widget declares, to a point of the "
                 "surface, of a fitting type."
             ),
+            reached=[
+                *self._widget_files(instances, widgets),
+                *(self._fvts_file if any(node.get("bind") for node, _ in instances) else []),
+                *sorted(set(self._object_files)),
+            ],
         )
 
     def _object_violations(
@@ -713,6 +750,10 @@ class FUTSRunner(FxTSRunner):
         if not columns:
             return []
         schema, error = _load(self._repo_root / objects[object_id]["schema_path"])
+        if isinstance(schema, dict):
+            self._object_files.append(
+                reached_file(self._repo_root / objects[object_id]["schema_path"])
+            )
         if not isinstance(schema, dict):
             return [SpecViolation(field=where, message=f"the schema of '{object_id}': {error}")]
         fields = set(schema.get("properties", {}))
@@ -802,6 +843,10 @@ class FUTSRunner(FxTSRunner):
             violations,
             "Every action is one the widget offers and the surface declares; the core decides "
             "whether a user may take it.",
+            reached=[
+                *self._widget_files(instances, widgets),
+                *(self._fvts_file if any(node.get("act") for node, _ in instances) else []),
+            ],
         )
 
     def _check_events(
@@ -813,8 +858,11 @@ class FUTSRunner(FxTSRunner):
             violations.append(
                 SpecViolation(field="view.scripts", message="a script id is used twice")
             )
+        scripts_found: list[str] = []
         for script in scripts.values():
             path = (repo_root / script["script_path"]).resolve()
+            if repo_root.resolve() in path.parents and path.is_file():
+                scripts_found.append(reached_file(path))
             if repo_root.resolve() not in path.parents or not path.is_file():
                 violations.append(
                     SpecViolation(
@@ -843,7 +891,11 @@ class FUTSRunner(FxTSRunner):
                         )
                     )
         return self._verdict(
-            "events", "view/events", violations, "Every event handler names a declared script."
+            "events",
+            "view/events",
+            violations,
+            "Every event handler names a declared script.",
+            reached=[*self._widget_files(instances, widgets), *scripts_found],
         )
 
     def _check_profiles(
@@ -872,4 +924,8 @@ class FUTSRunner(FxTSRunner):
             "view/profiles",
             violations,
             f"Every widget supports the surface's profiles ({profiles}).",
+            reached=[
+                *self._widget_files(instances, widgets),
+                *(self._fvts_file if surface is not None else []),
+            ],
         )

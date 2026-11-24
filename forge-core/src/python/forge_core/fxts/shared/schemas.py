@@ -45,6 +45,15 @@ _WORDING = frozenset({"description", "title", "$comment", "examples", "default"}
 #: Keys whose values are sub-schemas keyed by name.
 _NAMED = ("properties", "$defs", "patternProperties")
 
+#: The evidence mark of a schema property (D-19, AE-3): what a spec's value there is.
+MARK_KEY = "x-forge-evidence"
+#: ``claim``: says something about the real thing. ``description``: text for people,
+#: which nothing may read to decide anything. ``structure``: selects the schema or the
+#: shape (a version, a kind, the integrity block, an identity).
+MARKS = ("claim", "description", "structure")
+#: The mark of a top-level property that carries none (the strictest).
+ROOT_MARK = "claim"
+
 
 def schema_hash(schema: dict[str, Any]) -> str:
     """The hash of a whole schema document, by the method spec hashes use."""
@@ -180,10 +189,26 @@ def _is_version_marker(path: str) -> bool:
     return path in ("$id", "properties.spec_version.const")
 
 
+def _is_name(path: str) -> bool:
+    """Whether the last part of a path is a name (a property, a definition) rather than a
+    keyword: a property named ``description`` is not the keyword ``description``."""
+    parts = path.rsplit(".", 2)
+    return len(parts) > 1 and parts[-2] in _NAMED
+
+
 def _compare(old: Any, new: Any, path: str, out: list[Change]) -> None:
     if old == new or _is_version_marker(path):
         return
     key = path.rsplit(".", 1)[-1]
+    if _is_name(path):
+        if isinstance(old, dict) and isinstance(new, dict):
+            _compare_objects(old, new, path, out)
+        else:
+            out.append(Change(path, f"changed from {old!r} to {new!r}", "major"))
+        return
+    if key == MARK_KEY:
+        out.append(Change(path, f"evidence mark changed from {old!r} to {new!r}", "minor"))
+        return
     if key in _WORDING:
         out.append(Change(path, "wording changed", "patch"))
         return
@@ -218,15 +243,23 @@ def _compare_objects(
         if key in old and key in new:
             _compare(old[key], new[key], child, out)
         elif key in new:
-            if key in _WORDING:
+            if named:
+                out.append(Change(child, "added", "minor"))
+            elif key == MARK_KEY:
+                out.append(Change(child, f"evidence mark added: {new[key]!r}", "minor"))
+            elif key in _WORDING:
                 out.append(Change(child, "wording added", "patch"))
-            elif named or key in _NAMED:
+            elif key in _NAMED:
                 out.append(Change(child, "added", "minor"))
             elif key == "required":
                 for name in new[key]:
                     out.append(Change(f"{child}[{name}]", "now required", "major"))
             else:
                 out.append(Change(child, f"constraint added: {new[key]!r}", "major"))
+        elif named:
+            out.append(Change(child, "removed", "major"))
+        elif key == MARK_KEY:
+            out.append(Change(child, f"evidence mark removed: {old[key]!r}", "minor"))
         elif key in _WORDING:
             out.append(Change(child, "wording removed", "patch"))
         elif key == "required":
@@ -381,8 +414,13 @@ def release(schema_dir: Path, *, summary: str, released_at: str) -> SchemaVersio
     if const != version:
         msg = f"properties.spec_version.const is {const!r}; it must be {version!r}, as in $id"
         raise ValueError(msg)
+    problems = mark_problems(schema)
+    if problems:
+        msg = "its evidence marks do not split it cleanly (D-19, AE-3): " + "; ".join(problems)
+        raise ValueError(msg)
     head = latest(schema_dir)
     step = "baseline"
+    changes: list[Change] = []
     if head is not None:
         if schema_hash(schema) == head.schema_hash:
             msg = f"{working.name} is version {head.version} unchanged; there is nothing to release"
@@ -394,7 +432,8 @@ def release(schema_dir: Path, *, summary: str, released_at: str) -> SchemaVersio
                 f"version is {head.version}. Raise the version in $id and in spec_version"
             )
             raise ValueError(msg)
-        needed = needed_step(diff(head.load(), schema)) or "patch"
+        changes = diff(head.load(), schema)
+        needed = needed_step(changes) or "patch"
         if STEPS.index(declared) < STEPS.index(needed):
             msg = f"{head.version} -> {version} is a {declared} step; these changes need {needed}"
             raise ValueError(msg)
@@ -411,6 +450,7 @@ def release(schema_dir: Path, *, summary: str, released_at: str) -> SchemaVersio
             "hash_state": "pending_review",
             "step": step,
             "summary": summary,
+            "changes": [f"{c.path}: {c.what} ({c.step})" for c in changes],
             "released_at": released_at,
         }
     )
@@ -442,3 +482,121 @@ def approve(schema_dir: Path, version: str, *, by: str, at: str) -> SchemaVersio
     found = find(schema_dir, version)
     assert found is not None
     return found
+
+
+# -- evidence marks (D-19, AE-3) -------------------------------------------------------
+
+
+def _resolved(
+    schema: dict[str, Any], node: Any, seen: tuple[str, ...]
+) -> tuple[dict[str, Any], tuple[str, ...]]:
+    """A property's schema with its ``$ref`` chain merged in (siblings win), and the refs
+    followed on the way, so a recursive definition is walked once."""
+    node = node if isinstance(node, dict) else {}
+    while (
+        isinstance(node.get("$ref"), str)
+        and node["$ref"].startswith("#/")
+        and node["$ref"] not in seen
+    ):
+        ref = node["$ref"]
+        target: Any = schema
+        for segment in ref[2:].split("/"):
+            target = target.get(segment, {}) if isinstance(target, dict) else {}
+        seen = (*seen, ref)
+        node = {
+            **(target if isinstance(target, dict) else {}),
+            **{k: v for k, v in node.items() if k != "$ref"},
+        }
+    return node, seen
+
+
+def _children(
+    schema: dict[str, Any], node: dict[str, Any], seen: tuple[str, ...]
+) -> list[tuple[str, dict[str, Any], tuple[str, ...]]]:
+    props = node.get("properties")
+    if not isinstance(props, dict):
+        return []
+    out = []
+    for name, child in props.items():
+        resolved, child_seen = _resolved(schema, child, seen)
+        out.append((name, resolved, child_seen))
+    return out
+
+
+def _marked_below(schema: dict[str, Any], node: dict[str, Any], seen: tuple[str, ...]) -> bool:
+    return any(
+        MARK_KEY in child or _marked_below(schema, child, child_seen)
+        for _, child, child_seen in _children(schema, node, seen)
+    )
+
+
+def section_id(name: str) -> str:
+    """The part of an evidence finding's id that names a top-level property."""
+    return name.replace("_", "-").lower()
+
+
+def mark_units(schema: dict[str, Any], *, honour_marks: bool = True) -> list[tuple[str, str]]:
+    """Every unit a schema's marks divide a spec into: (JSON pointer, mark).
+
+    A marked property with nothing marked below it is one unit. A property with marks
+    below it is mixed: its parts are walked, and a part with no mark takes the nearest
+    mark above it; a top-level property with none is a claim, the strictest. With
+    ``honour_marks=False`` every top-level property is one claim (no version approved).
+    """
+    units: list[tuple[str, str]] = []
+
+    def walk(node: dict[str, Any], pointer: str, inherited: str, seen: tuple[str, ...]) -> None:
+        mark = node.get(MARK_KEY) if honour_marks else None
+        effective = mark if isinstance(mark, str) else inherited
+        if not honour_marks or not _marked_below(schema, node, seen):
+            units.append((pointer, effective))
+            return
+        for name, child, child_seen in _children(schema, node, seen):
+            walk(child, f"{pointer}/{name}", effective, child_seen)
+
+    for name, child, seen in _children(schema, schema, ()):
+        walk(child, f"/{name}", ROOT_MARK, seen)
+    return units
+
+
+def mark_problems(schema: dict[str, Any]) -> list[str]:
+    """What keeps a schema's marks from splitting it cleanly: every property lies under
+    exactly one mark, every top-level property is marked or mixed, every part of a mixed
+    property is marked or mixed, the marks come from the closed list, and no two
+    top-level properties give the same section id."""
+    problems: list[str] = []
+
+    def walk(
+        node: dict[str, Any], pointer: str, seen: tuple[str, ...], under_mark: str | None
+    ) -> None:
+        mark = node.get(MARK_KEY)
+        below = _marked_below(schema, node, seen)
+        if mark is not None and mark not in MARKS:
+            problems.append(f"{pointer}: {mark!r} is not one of {', '.join(MARKS)}")
+        if mark is not None and under_mark is not None:
+            problems.append(f"{pointer}: marked inside {under_mark}, which is marked")
+        if mark is None and under_mark is None and not below:
+            problems.append(f"{pointer}: not marked, and nothing below it is")
+            return
+        for name, child, child_seen in _children(schema, node, seen):
+            walk(
+                child, f"{pointer}/{name}", child_seen, pointer if mark is not None else under_mark
+            )
+
+    sections: dict[str, str] = {}
+    for name, child, seen in _children(schema, schema, ()):
+        walk(child, f"/{name}", seen, None)
+        sid = section_id(name)
+        if not re.fullmatch(r"[a-z0-9-]+", sid):
+            problems.append(f"/{name}: gives the section id {sid!r}, not of [a-z0-9-]")
+        elif sid in sections:
+            problems.append(f"/{name} and /{sections[sid]} give the same section id {sid!r}")
+        sections.setdefault(sid, name)
+    return problems
+
+
+def marks_version(schema_dir: Path) -> SchemaVersion | None:
+    """The version whose marks are in force: the latest one the owner approved. A release
+    awaiting approval changes nothing until it is approved (D-19 step 2, case 2)."""
+    approved = [v for v in versions(schema_dir) if v.approved and v.hash_state != "historical"]
+    return approved[-1] if approved else None

@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING, Any
 
 from forge_core.fxts.fvts.renderer import load_golden_messages, render_golden_set
 from forge_core.fxts.shared.runner import VerdictStatus
+from tests.governance.evidence import expected_evidence
 from tests.governance.fvts.conftest import GOLDEN_DIR
 
 if TYPE_CHECKING:
@@ -37,7 +38,11 @@ async def test_reference_contract_passes_every_check(
         (v.check_id, v.message) for v in report.verdicts if v.status is VerdictStatus.FAIL
     ]
     assert report.hash_verified is True, report.hash_message
-    assert report.total == 21
+    # 21 checks, and one evidence finding per section whose claims nothing real reached
+    # (D-19 step 2): exactly those the marks, the spec and this run's verdicts give.
+    evidence = {v.check_id for v in report.verdicts if ":evidence-" in v.check_id}
+    assert evidence == expected_evidence("fvts", reference_spec, report)
+    assert report.total == 21 + len(evidence)
 
 
 def test_approval_state_is_honest(reference_spec: dict[str, Any]) -> None:

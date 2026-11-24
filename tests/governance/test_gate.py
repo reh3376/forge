@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import asyncio
 import functools
+import re
 from collections import Counter
 
 from forge_core.fxts.shared.runner import RunOutcome
@@ -43,13 +44,32 @@ def test_the_repository_passes_its_gate() -> None:
     assert result.accepted, "a gate that accepted nothing ran nothing"
 
 
+#: An evidence finding (D-19 step 2, AE-4): one per section of a spec holding claims that
+#: no check of the real thing reached.
+EVIDENCE_FINDING = re.compile(r"^[a-z]+:evidence-[a-z0-9-]+$")
+
+
 def test_every_check_that_did_not_run_names_its_backlog_item() -> None:
-    """A reader of a run sees what closes the gap without opening the gaps file."""
+    """A reader of a run sees what closes the gap without opening the gaps file.
+
+    An evidence finding is the one exception, by design: its backlog item is held in one
+    place, the accepted gap of its section (``spec: "*"``), and its message points there.
+    So each one must be covered by an accepted gap the owner approved whose item is open,
+    which is what the gate itself demands of it."""
+    evidence = 0
     for run in _runs():
         for verdict in run.report.not_run:
+            if EVIDENCE_FINDING.fullmatch(verdict.check_id):
+                evidence += 1
+                accepted = governance_cli.accepted_checks(run.framework, run.spec.name, "NOT_RUN")
+                assert verdict.check_id in accepted, (
+                    f"{run.spec.name}: {verdict.check_id} has no approved gap with an open item"
+                )
+                continue
             assert "FB-" in verdict.message, (
                 f"{run.spec.name}: {verdict.check_id} did not run and names no backlog item"
             )
+    assert evidence, "no run gave an evidence finding: the exception covers nothing"
 
 
 def test_the_numbers_the_documents_quote() -> None:

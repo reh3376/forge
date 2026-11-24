@@ -1,4 +1,4 @@
-"""Every FxTS framework against what a framework must provide (D-14, F-1 to F-10).
+"""Every FxTS framework against what a framework must provide (D-14, F-1 to F-12).
 
 ``docs/decisions/fxts-framework-baseline.md``, signed by the owner on 2026-11-18. A
 framework is either planned (a documentation page that says so; no code, no specs) or
@@ -194,6 +194,16 @@ class TestEachFramework:
         assert any(list(gate.glob("test_*.py")) for gate in gates), f"{fw} has no gate"
         assert FRAMEWORKS[fw].schema.is_file()
         assert any(folder.is_dir() for folder in FRAMEWORKS[fw].specs_dirs)
+
+    def test_f11_the_runner_declares_every_check_it_gives(self, fw: str) -> None:
+        """D-14 F-11 (D-19 AE-2): the full law is tests/governance/test_declared_checks.py."""
+        runner = FRAMEWORKS[fw].make_runner(FRAMEWORKS[fw].schema)
+        assert runner.CHECKS, f"{fw} declares none of its checks (forge_core/fxts/{fw}/checks.py)"
+
+    def test_f12_the_schema_marks_every_property(self, fw: str) -> None:
+        """D-14 F-12 (D-19 AE-3): every property is a claim, a description or structure,
+        split cleanly; the law is tests/governance/test_evidence_claims.py."""
+        assert schemas.mark_problems(_schema(fw)) == []
 
     def test_the_framework_meets_the_whole_baseline(self, fw: str) -> None:
         """A baseline gap is never accepted (FB-266): it is fixed, or the framework is a

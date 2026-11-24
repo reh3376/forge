@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "forge://fxts/futs/v0.2.0",
+  "$id": "forge://fxts/futs/v0.3.0",
   "title": "FUTS — Forge UI Test Specification",
   "description": "What a screen is made of. Two kinds of spec: a widget spec (what one widget accepts) and a view document (a laid-out screen, built from containers and widget instances). Decided in docs/decisions/forge-display.md (D-16, signed 2026-11-20).",
   "type": "object",
@@ -13,11 +13,13 @@
   "properties": {
     "spec_version": {
       "type": "string",
-      "const": "0.2.0",
+      "x-forge-evidence": "structure",
+      "const": "0.3.0",
       "description": "FUTS schema version this spec is written against."
     },
     "spec_kind": {
       "type": "string",
+      "x-forge-evidence": "structure",
       "enum": [
         "widget",
         "view"
@@ -36,6 +38,7 @@
       "properties": {
         "id": {
           "type": "string",
+          "x-forge-evidence": "claim",
           "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
           "minLength": 2,
           "maxLength": 64,
@@ -43,31 +46,38 @@
         },
         "name": {
           "type": "string",
+          "x-forge-evidence": "claim",
           "minLength": 1,
           "maxLength": 128
         },
         "version": {
           "type": "string",
+          "x-forge-evidence": "claim",
           "pattern": "^\\d+\\.\\d+\\.\\d+",
           "description": "Semantic version of this widget or view."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "x-forge-evidence": "description"
         }
       }
     },
     "widget": {
-      "$ref": "#/$defs/widgetSpec"
+      "$ref": "#/$defs/widgetSpec",
+      "x-forge-evidence": "claim"
     },
     "view": {
-      "$ref": "#/$defs/viewDocument"
+      "$ref": "#/$defs/viewDocument",
+      "x-forge-evidence": "claim"
     },
     "metadata": {
       "type": "object",
+      "x-forge-evidence": "description",
       "description": "Free-form notes. Not enforced."
     },
     "integrity": {
       "type": "object",
+      "x-forge-evidence": "structure",
       "additionalProperties": false,
       "description": "The FHTS block.",
       "properties": {

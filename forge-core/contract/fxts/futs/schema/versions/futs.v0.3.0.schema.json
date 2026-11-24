@@ -1,0 +1,656 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://fxts/futs/v0.3.0",
+  "title": "FUTS — Forge UI Test Specification",
+  "description": "What a screen is made of. Two kinds of spec: a widget spec (what one widget accepts) and a view document (a laid-out screen, built from containers and widget instances). Decided in docs/decisions/forge-display.md (D-16, signed 2026-11-20).",
+  "type": "object",
+  "required": [
+    "spec_version",
+    "spec_kind",
+    "identity"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "spec_version": {
+      "type": "string",
+      "x-forge-evidence": "structure",
+      "const": "0.3.0",
+      "description": "FUTS schema version this spec is written against."
+    },
+    "spec_kind": {
+      "type": "string",
+      "x-forge-evidence": "structure",
+      "enum": [
+        "widget",
+        "view"
+      ],
+      "description": "widget: what one widget accepts. view: a laid-out screen."
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "version"
+      ],
+      "description": "What the spec is.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-forge-evidence": "claim",
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 64,
+          "description": "Kebab-case id, unique among the specs of its kind."
+        },
+        "name": {
+          "type": "string",
+          "x-forge-evidence": "claim",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "version": {
+          "type": "string",
+          "x-forge-evidence": "claim",
+          "pattern": "^\\d+\\.\\d+\\.\\d+",
+          "description": "Semantic version of this widget or view."
+        },
+        "description": {
+          "type": "string",
+          "x-forge-evidence": "description"
+        }
+      }
+    },
+    "widget": {
+      "$ref": "#/$defs/widgetSpec",
+      "x-forge-evidence": "claim"
+    },
+    "view": {
+      "$ref": "#/$defs/viewDocument",
+      "x-forge-evidence": "claim"
+    },
+    "metadata": {
+      "type": "object",
+      "x-forge-evidence": "description",
+      "description": "Free-form notes. Not enforced."
+    },
+    "integrity": {
+      "type": "object",
+      "x-forge-evidence": "structure",
+      "additionalProperties": false,
+      "description": "The FHTS block.",
+      "properties": {
+        "hash_method": {
+          "type": "string"
+        },
+        "spec_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "hash_state": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "modified",
+            "pending_review",
+            "reverted",
+            "unknown"
+          ]
+        },
+        "previous_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approved_by": {
+          "type": "string"
+        },
+        "approved_at": {
+          "type": "string"
+        },
+        "schema_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "The schema version this spec was stamped and approved against (D-14, F-10)."
+        },
+        "schema_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "The hash of that schema version, from the framework's schema registry."
+        },
+        "change_history": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "spec_kind": {
+            "const": "widget"
+          }
+        },
+        "required": [
+          "spec_kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "widget"
+        ],
+        "not": {
+          "required": [
+            "view"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "spec_kind": {
+            "const": "view"
+          }
+        },
+        "required": [
+          "spec_kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "view"
+        ],
+        "not": {
+          "required": [
+            "widget"
+          ]
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "widgetSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "category",
+        "properties",
+        "bindings",
+        "shows",
+        "actions",
+        "events",
+        "profiles"
+      ],
+      "description": "What one widget accepts. A widget is given only what its spec defines.",
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "general",
+            "plant-floor"
+          ]
+        },
+        "properties": {
+          "type": "array",
+          "description": "What a designer may set on an instance.",
+          "items": {
+            "$ref": "#/$defs/widgetProperty"
+          }
+        },
+        "bindings": {
+          "type": "array",
+          "description": "What may be bound to a point of the module's view spec.",
+          "items": {
+            "$ref": "#/$defs/widgetBinding"
+          }
+        },
+        "shows": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "quality",
+            "staleness"
+          ],
+          "description": "A widget with a binding shows the quality and the staleness of what it is bound to; a bad or stale value is never shown as a good one.",
+          "properties": {
+            "quality": {
+              "type": "boolean"
+            },
+            "staleness": {
+              "type": "boolean"
+            }
+          }
+        },
+        "actions": {
+          "type": "array",
+          "description": "What a user can do through the widget. Each is bound, in a view document, to an action the module's view spec declares; the core decides whether it is allowed.",
+          "items": {
+            "$ref": "#/$defs/widgetAction"
+          }
+        },
+        "events": {
+          "type": "array",
+          "description": "Moments a view document may attach an event handler to.",
+          "items": {
+            "$ref": "#/$defs/widgetEvent"
+          }
+        },
+        "profiles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "desktop_hmi",
+              "desktop_app",
+              "web",
+              "mobile"
+            ]
+          },
+          "description": "The render profiles the widget supports."
+        }
+      }
+    },
+    "widgetProperty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prop_name",
+        "prop_type",
+        "prop_required"
+      ],
+      "properties": {
+        "prop_name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "maxLength": 48
+        },
+        "prop_type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "number",
+            "boolean",
+            "enum",
+            "token"
+          ],
+          "description": "token: a design token, never a raw colour or size."
+        },
+        "prop_required": {
+          "type": "boolean"
+        },
+        "prop_enum": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "prop_default": {},
+        "prop_description": {
+          "type": "string"
+        }
+      }
+    },
+    "widgetBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding_name",
+        "value_type",
+        "binding_required",
+        "expression_allowed"
+      ],
+      "properties": {
+        "binding_name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "maxLength": 48
+        },
+        "value_type": {
+          "type": "string",
+          "enum": [
+            "number",
+            "boolean",
+            "enum",
+            "string",
+            "any",
+            "series",
+            "alarms",
+            "objects"
+          ],
+          "description": "What the binding takes. For a point: number, boolean, enum, string or any. series: the history of a numeric point. alarms: the alarm set of the module. objects: one of the module's collections."
+        },
+        "binding_required": {
+          "type": "boolean"
+        },
+        "expression_allowed": {
+          "type": "boolean",
+          "description": "Whether a CEL expression may transform the bound value."
+        },
+        "binding_description": {
+          "type": "string"
+        }
+      }
+    },
+    "widgetAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_name",
+        "action_kind"
+      ],
+      "properties": {
+        "action_name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "maxLength": 48
+        },
+        "action_kind": {
+          "type": "string",
+          "enum": [
+            "tag_write",
+            "alarm_operation",
+            "module_command",
+            "navigate"
+          ]
+        },
+        "action_description": {
+          "type": "string"
+        }
+      }
+    },
+    "widgetEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_name"
+      ],
+      "properties": {
+        "event_name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "maxLength": 48
+        },
+        "event_description": {
+          "type": "string"
+        }
+      }
+    },
+    "viewDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_module",
+        "fvts_spec",
+        "surface_id",
+        "root"
+      ],
+      "description": "A laid-out screen. It is data: a tree of containers and widget instances.",
+      "properties": {
+        "owner_module": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 64,
+          "description": "The module whose data and actions the screen shows."
+        },
+        "fvts_spec": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path of that module's view spec (FVTS), relative to the repository root."
+        },
+        "surface_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The surface of the view spec this screen lays out. The screen may use only that surface's points and actions."
+        },
+        "root": {
+          "$ref": "#/$defs/container"
+        },
+        "scripts": {
+          "type": "array",
+          "description": "Python event handlers the screen refers to. They run in the server's workers, never in the browser.",
+          "items": {
+            "$ref": "#/$defs/scriptRef"
+          }
+        }
+      }
+    },
+    "container": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "container",
+        "children"
+      ],
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "maxLength": 48
+        },
+        "container": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 64,
+          "description": "The kind of container: an entry of the governed list `container-kinds`."
+        },
+        "place": {
+          "$ref": "#/$defs/place"
+        },
+        "layout": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "How the container arranges its children. Which fields apply depends on its kind; the runner checks them.",
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "scale": {
+              "type": "string",
+              "enum": [
+                "fit",
+                "none"
+              ]
+            },
+            "direction": {
+              "type": "string",
+              "enum": [
+                "row",
+                "column"
+              ]
+            },
+            "wrap": {
+              "type": "boolean"
+            },
+            "gap": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "breakpoints": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/breakpoint"
+              }
+            }
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/container"
+              },
+              {
+                "$ref": "#/$defs/widgetInstance"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "breakpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min_width",
+        "show"
+      ],
+      "properties": {
+        "min_width": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "The child is shown when the display is at least this wide and no wider breakpoint applies."
+        },
+        "show": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "maxLength": 48
+        }
+      }
+    },
+    "place": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y",
+        "w",
+        "h"
+      ],
+      "description": "Position and size inside a container with fixed positions.",
+      "properties": {
+        "x": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "y": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "w": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "widgetInstance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "widget"
+      ],
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "maxLength": 48
+        },
+        "widget": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+          "minLength": 2,
+          "maxLength": 64,
+          "description": "The id of a widget spec."
+        },
+        "place": {
+          "$ref": "#/$defs/place"
+        },
+        "props": {
+          "type": "object",
+          "description": "Values for the widget's properties."
+        },
+        "bind": {
+          "type": "object",
+          "description": "By binding name: the point, and an optional expression.",
+          "additionalProperties": {
+            "$ref": "#/$defs/bound"
+          }
+        },
+        "act": {
+          "type": "object",
+          "description": "By the widget's action name: the id of an action of the module's view spec, or the node id of a view to go to.",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "on": {
+          "type": "object",
+          "description": "By the widget's event name: the id of a script of this document.",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "maxLength": 48
+          }
+        }
+      }
+    },
+    "bound": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "point": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A point id of the module's view spec: one live value."
+        },
+        "expression": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "description": "A CEL expression over `v` (the value) and `q` (its quality). Compiled and type-checked by the Go server; the browser evaluates only what Go accepted."
+        },
+        "object": {
+          "type": "string",
+          "minLength": 1,
+          "description": "An object id of the module's view spec: a collection, shown by a widget whose binding takes `objects`. A binding names a point or an object, never both (runner check futs:bindings)."
+        }
+      }
+    },
+    "scriptRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "script_id",
+        "script_path"
+      ],
+      "properties": {
+        "script_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "maxLength": 48
+        },
+        "script_path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

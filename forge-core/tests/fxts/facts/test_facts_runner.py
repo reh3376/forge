@@ -19,6 +19,8 @@ import pytest
 
 from forge_core import contract
 from forge_core.fxts import locations
+from forge_core.fxts.shared import schemas
+from forge_core.fxts.shared.runner import EvidenceKind
 
 SCHEMA_PATH = contract.schema_path("facts")
 WMS_SPEC_PATH = locations.spec_path("facts", "forge-wms.facts.json")
@@ -974,8 +976,55 @@ class TestLiveChecks:
     @pytest.mark.parametrize("live", [True, False])
     def test_a_run_never_passes_without_the_live_checks(self, runner, wms_spec, live):
         report = _run(runner.run(target="forge-wms", spec=wms_spec, live=live))
-        assert [v.check_id for v in report.not_run] == ["facts:live"]
+        assert _not_run_checks(report) == ["facts:live"]
+        assert _evidence(report) == _expected_evidence(runner, wms_spec, report)
         assert not report.passed
+
+
+def _not_run_checks(report: Any) -> list[str]:
+    """The checks that did not run, apart from the evidence findings."""
+    return [v.check_id for v in report.not_run if ":evidence-" not in v.check_id]
+
+
+def _evidence(report: Any) -> set[str]:
+    return {v.check_id for v in report.not_run if ":evidence-" in v.check_id}
+
+
+def _expected_evidence(runner: Any, spec: dict[str, Any], report: Any) -> set[str]:
+    """The evidence findings the run must give (D-19 step 2, AE-4): each section holding a
+    claim the spec makes that no verdict of kind ``artifact`` in the run reached, by the
+    marks of the latest approved schema version. Derived here from the marks, the spec and
+    the run's other verdicts; the law is proved in tests/governance/test_evidence_claims.py."""
+    schema_dir = contract.schema_dir("facts")
+    source = schemas.marks_version(schema_dir)
+    units = (
+        schemas.mark_units(source.load())
+        if source is not None
+        else schemas.mark_units(schemas.latest(schema_dir).load(), honour_marks=False)
+    )
+    covers = {
+        pointer
+        for v in report.verdicts
+        if v.evidence_kind is EvidenceKind.ARTIFACT
+        and (declared := runner.declaration_of(v.check_id)) is not None
+        for pointer in declared.covers
+    }
+
+    def present(pointer: str) -> bool:
+        node: Any = spec
+        for part in pointer.strip("/").split("/"):
+            if not isinstance(node, dict) or part not in node:
+                return False
+            node = node[part]
+        return node is not None
+
+    return {
+        f"facts:evidence-{schemas.section_id(pointer.split('/')[1])}"
+        for pointer, mark in units
+        if mark == "claim"
+        and present(pointer)
+        and not any(c == "" or c == pointer or pointer.startswith(c + "/") for c in covers)
+    }
 
 
 # =========================================================================
@@ -1001,7 +1050,8 @@ class TestIntegrationWMS:
         )
         # No real adapter spec passes: the checks against the module's code do not exist.
         assert report.failed is bool(expected) and not report.passed
-        assert [v.check_id for v in report.not_run] == ["facts:live"]
+        assert _not_run_checks(report) == ["facts:live"]
+        assert _evidence(report) == _expected_evidence(runner, wms_spec, report)
 
     def test_wms_hash_verified(self, runner, wms_spec):
         report = _run(runner.run(target="forge-wms", spec=wms_spec))
@@ -1039,7 +1089,8 @@ class TestIntegrationMES:
         )
         # No real adapter spec passes: the checks against the module's code do not exist.
         assert report.failed is bool(expected) and not report.passed
-        assert [v.check_id for v in report.not_run] == ["facts:live"]
+        assert _not_run_checks(report) == ["facts:live"]
+        assert _evidence(report) == _expected_evidence(runner, mes_spec, report)
 
     def test_mes_hash_verified(self, runner, mes_spec):
         report = _run(runner.run(target="forge-mes", spec=mes_spec))

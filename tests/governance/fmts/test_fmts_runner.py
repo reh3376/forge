@@ -14,6 +14,7 @@ from forge_core.fxts.fmts.runners.fmts_runner import (
     load_backlog,
 )
 from forge_core.fxts.shared.runner import VerdictStatus, check_schema_runner_parity
+from tests.governance.evidence import expected_evidence
 from tests.governance.fmts.conftest import sign
 
 if TYPE_CHECKING:
@@ -73,7 +74,11 @@ class TestAModuleThatMeetsTheBaseline:
         # requirements and the kit cannot drive it, and none of that counts as passed.
         assert not report.failed and report.outcome == "INCOMPLETE"
         assert report.hash_verified is True and report.framework == "FMTS"
-        assert report.total == 29
+        # 29 checks, and one evidence finding per section whose claims nothing real reached
+        # (D-19 step 2): exactly those the marks, the spec and this run's verdicts give.
+        evidence = {v.check_id for v in report.verdicts if ":evidence-" in v.check_id}
+        assert evidence == expected_evidence("fmts", spec, report)
+        assert report.total == 29 + len(evidence)
         for requirement in ("m1", "m2", "m3", "m8", "m9", "m10", "m11"):
             assert verdicts[f"fmts:{requirement}"].status == PASS, verdicts[f"fmts:{requirement}"]
         for check in (
@@ -311,8 +316,10 @@ class TestPlumbing:
 
     async def test_schema_failure_stops_the_requirement_checks(self, runner, unsigned, repo):
         del unsigned["time_contract"]
-        report = await _run(runner, sign(unsigned), repo)
-        assert [v.check_id for v in report.verdicts] == [
+        signed = sign(unsigned)
+        report = await _run(runner, signed, repo)
+        ids = [v.check_id for v in report.verdicts]
+        assert ids[:7] == [
             "fmts:schema-valid",
             "fmts:identity-match",
             "fmts:hash-verified",
@@ -321,6 +328,9 @@ class TestPlumbing:
             "fmts:requirements",
             "fmts:schema-current",
         ]
+        # then one evidence finding per section of claims nothing real reached (D-19 step 2)
+        assert len(ids[7:]) == len(set(ids[7:]))
+        assert set(ids[7:]) == expected_evidence("fmts", signed, report)
         verdicts = _by_id(report)
         assert verdicts["fmts:schema-valid"].status == FAIL and report.failed
         # the checks that did not run are said to have not run, never left out (FB-265)

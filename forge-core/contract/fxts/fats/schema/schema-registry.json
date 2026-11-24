@@ -12,6 +12,27 @@
       "released_at": "2026-11-19T00:00:00Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-19T18:03:46Z"
+    },
+    {
+      "version": "0.2.0",
+      "file": "versions/fats.v0.2.0.schema.json",
+      "schema_hash": "1323c0a7d9bca6aa7068b213cc56206ab252fcb64ec7c3461042c5b15034310a",
+      "hash_state": "approved",
+      "step": "minor",
+      "summary": "D-19 step 2 (FB-264): every top-level property carries its evidence mark, x-forge-evidence: claim (says something about the real thing), description (text for people; nothing decides on it) or structure (about the spec as a document). Marks only: what a spec may say is unchanged, so no spec needs review (AE-3).",
+      "changes": [
+        "properties.authentication.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.endpoint.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.integrity.x-forge-evidence: evidence mark added: 'structure' (minor)",
+        "properties.method.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.rate_limit.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.request.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.response.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.spec_version.x-forge-evidence: evidence mark added: 'structure' (minor)"
+      ],
+      "released_at": "2026-11-24T18:32:23Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-24T18:44:50Z"
     }
   ]
 }

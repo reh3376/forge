@@ -26,16 +26,22 @@ one.
 |---|---|---|---|---|---|
 | facts | 0.1.0 | baseline | approved | `fd84db40f1a7` | reh3376 |
 | facts | 0.1.1 | patch | approved | `c0c31a8e69bd` | reh3376 |
-| facts | 0.2.0* | minor | approved | `3bd3ba948e64` | reh3376 |
-| fats | 0.1.0* | baseline | approved | `3de49ce1d8c5` | reh3376 |
+| facts | 0.2.0 | minor | approved | `3bd3ba948e64` | reh3376 |
+| facts | 0.3.0* | minor | approved | `6450ce97d9d6` | reh3376 |
+| fats | 0.1.0 | baseline | approved | `3de49ce1d8c5` | reh3376 |
+| fats | 0.2.0* | minor | approved | `1323c0a7d9bc` | reh3376 |
 | fmts | 0.1.0 | baseline | historical | `8052f7932a90` |  |
 | fmts | 0.2.0 | baseline | approved | `849a1bbcf3a9` | reh3376 |
 | fmts | 1.0.0 | major | approved | `49e1e80a99ad` | reh3376 |
-| fmts | 2.0.0* | major | approved | `2789bb323f90` | reh3376 |
-| ftts | 0.1.0* | baseline | approved | `121616f19462` | reh3376 |
+| fmts | 2.0.0 | major | approved | `2789bb323f90` | reh3376 |
+| fmts | 2.1.0* | minor | approved | `a7ea1e4b4c15` | reh3376 |
+| ftts | 0.1.0 | baseline | approved | `121616f19462` | reh3376 |
+| ftts | 0.2.0* | minor | approved | `0c03e750724b` | reh3376 |
 | futs | 0.1.0 | baseline | approved | `80f42ac6a5ec` | reh3376 |
-| futs | 0.2.0* | minor | approved | `05fa4883f7f5` | reh3376 |
+| futs | 0.2.0 | minor | approved | `05fa4883f7f5` | reh3376 |
+| futs | 0.3.0* | minor | approved | `0f703e0f905d` | reh3376 |
 | fvts | 0.1.0 | baseline | approved | `9e4bf0b831f1` | reh3376 |
 | fvts | 0.2.0 | minor | approved | `1a9785248467` | reh3376 |
-| fvts | 0.2.1* | patch | approved | `df3d3f198168` | reh3376 |
+| fvts | 0.2.1 | patch | approved | `df3d3f198168` | reh3376 |
+| fvts | 0.3.0* | minor | approved | `e38eea4f4c58` | reh3376 |
 | lists | 0.1.0* | baseline | approved | `c9cb17e17a24` | reh3376 |

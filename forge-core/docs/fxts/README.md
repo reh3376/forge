@@ -116,7 +116,7 @@ A run that was not asked for live checks says so with one `NOT_RUN` verdict (`fa
 
 The law, "a run never passes unless every check ran and passed", is checked for every case on the real code by `tests/governance/test_verdicts_exhaustive.py`; the skill `.claude/skills/verify-fxts-verdicts` says what it covers and how to read a failure.
 
-### What a verdict rests on: kinds of evidence (D-19)
+### What a verdict rests on: kinds of evidence and claims (D-19)
 
 Every verdict names the kind of evidence it rests on (D-19, AE-1), in the field `evidence_kind` of the verdict and of the JSON report:
 
@@ -125,11 +125,15 @@ Every verdict names the kind of evidence it rests on (D-19, AE-1), in the field 
 | `self` | the spec against itself or its own schema |
 | `file` | another file: another spec, a manifest, a governed list, the schema registry, the backlog, the names of a module's files, a text search of its sources |
 | `artifact` | the real thing: code imported or introspected, the app built in process, the proto, the module run through the conformance kit |
-| `none` | nothing of the spec: the check did not run, is waived, or looks at the runner itself |
+| `none` | nothing: the check did not run, is waived, looks at the runner itself, or reads only a description |
 
-Each framework declares, as data, every check its runner gives (`forge_core/fxts/<fw>/checks.py`; the shared checks in `fxts/shared/runner.py`): the check's id, or a form with `{name}` placeholders for an id built at run time; the spec properties it looks at, as JSON pointers; and the kind it reaches when it runs (AE-2). The runner base gives each verdict the kind of its declaration, `none` when it did not run or is waived; a verdict whose id is declared nowhere becomes an `ERROR` that names the id, so no check is added without saying what it rests on. That law is checked for every id written in the runners and every verdict on every governed spec by `tests/governance/test_declared_checks.py` (skill `.claude/skills/verify-fxts-evidence`).
+Each framework declares, as data, every check its runner gives (`forge_core/fxts/<fw>/checks.py`; the shared checks in `fxts/shared/runner.py`): the check's id, or a form with `{name}` placeholders for an id built at run time; the spec properties it looks at, as JSON pointers; and the strongest kind it can reach (AE-2). A verdict names what it actually reached in `reached`, as `file:<path in the repository>` or `artifact:<what>`. The runner base gives it the strongest kind it names, `self` when it names nothing, never stronger than its declaration, and `none` when it did not run or is waived. A verdict whose id is declared nowhere, or that names what it reached in another form, becomes an `ERROR` that says so. So a check that passes with nothing to look at (a view with no expressions) rests on the spec alone, whatever it could reach.
 
-`forge governance evidence [framework]` shows each framework's declared checks, their kinds and whether they observed anything on the governed specs, and for each top-level property of the schema the strongest evidence a check could give it and the strongest it got today. In the API framework, for example, `endpoint` has a declared check of the real route, but in the gate it is observed only against the spec itself, because that check runs only with `--live`. Step 2 of D-19 turns every claim with no check of the real thing into a gate finding, let through only as an accepted gap naming the work that adds the check.
+**Claims.** Each framework's schema marks every property with `x-forge-evidence` (AE-3): `claim` (it says something about the real thing), `description` (text for people; a check that reads one is declared `none`) or `structure` (about the spec as a document: its version, its kind, its integrity block, the owner's waivers). The marks split the schema cleanly: every property lies under exactly one mark, and a mixed property marks its parts (FMTS marks each of M-1 to M-16). A release whose marks do not split it is refused, and adding, changing or removing a mark is a minor step, listed by name in the release's `changes`. The marks in force are those of the latest version the owner approved.
+
+In every run, each claim the spec makes that no verdict of kind `artifact` reached (from a check declared to cover it or a property above it) is listed in one `NOT_RUN` verdict per top-level section, `<fw>:evidence-<section>` (AE-4). The run is therefore incomplete until a check of the real thing covers every claim; the gate lets each section through only by an accepted gap naming the backlog item that adds the check. A run with `--live` that reaches the route clears that claim for that run.
+
+`forge governance evidence [framework]` shows each framework's declared checks, their kinds and whether they observed anything on the governed specs, and each claim, description or structure unit of the schema with the strongest evidence a check could give it and the strongest it got today. In the API framework, for example, `/endpoint` has a declared check of the real route, but in the gate it is checked only against the spec itself, because that check runs only with `--live`. The laws are checked for every case on the real code by `tests/governance/test_declared_checks.py` and `tests/governance/test_evidence_claims.py` (skill `.claude/skills/verify-fxts-evidence`).
 
 ### The gate: what gets through, and who decides
 
@@ -300,7 +304,7 @@ forge-core/src/python/forge_core/fxts/
 
 ## What every framework provides
 
-Signed by the owner on 2026-11-18: [`docs/decisions/fxts-framework-baseline.md`](../../../docs/decisions/fxts-framework-baseline.md) (D-14), ten requirements, F-1 to F-10. A framework is either **planned** (a documentation page that says so; no code, no specs) or it meets the whole baseline. In force today:
+Signed by the owner on 2026-11-18: [`docs/decisions/fxts-framework-baseline.md`](../../../docs/decisions/fxts-framework-baseline.md) (D-14), twelve requirements, F-1 to F-12 (F-11 and F-12 added 2026-11-24 from D-19). A framework is either **planned** (a documentation page that says so; no code, no specs) or it meets the whole baseline. In force today:
 
 - **Every spec carries a hash** (F-4). The 28 FATS specs and the FTTS spec were stamped on 2026-11-18, and the owner approved them the same day. One spec awaits approval: `forge-mes.fmts.json` (FB-155).
 - **Every run gives two verdicts for it**, in every framework, from the shared runner: `<framework>:hash-verified` fails when the spec's content does not match its recorded hash, `<framework>:hash-approved` when the owner has not approved it. A spec with no hash fails both.
@@ -308,7 +312,9 @@ Signed by the owner on 2026-11-18: [`docs/decisions/fxts-framework-baseline.md`]
 
 - **Every schema is versioned and hashed** (F-2), and **every spec records the schema version and hash it was approved against** (F-10), since 2026-11-19 (FB-151). A released version is never edited; a change is a new version whose hash the owner approves; every run gives a third verdict, `<framework>:schema-current`. The rules, the layout and the commands are in [FHTS, "Schema Versions"](FHTS.md#schema-versions).
 
-`tests/governance/test_framework_baseline.py` walks every framework against the ten on every run. It allows no gap: the list of known gaps is empty since FB-151.
+- **Every verdict names its kind of evidence, and every claim has a check of the real thing or an accepted gap** (F-11, F-12, added 2026-11-24 from D-19): see "What a verdict rests on" above.
+
+`tests/governance/test_framework_baseline.py` walks every framework against the twelve on every run. It allows no gap: the list of known gaps is empty since FB-151.
 
 ## Writing a New Spec
 
