@@ -73,12 +73,16 @@ Top-level fields:
 
 ### Usage
 
+An API spec's identity is its method and its path (FB-268): `GET /v1/schemas` and `POST /v1/schemas` are two specs. A path that two specs share is refused as an id, with both named; give the method, or the file. Two specs with one method and path are refused by the gate.
+
 ```bash
-# Static validation (spec-only, no HTTP calls)
-forge governance run fats --spec path/to/spec.fats.json
+# Static validation (spec-only, no HTTP calls): a spec by its identity, or its file
+forge governance run fats "GET /v1/health"
+forge governance run fats /v1/health                       # a path only one spec has
+forge governance run fats forge-hub/fxts/fats/v1_health.json
 
 # Live validation against a running service
-forge governance run fats --spec path/to/spec.fats.json --live --base-url http://localhost:8000
+forge governance run fats "GET /v1/health" --live
 ```
 
 ### Programmatic Usage

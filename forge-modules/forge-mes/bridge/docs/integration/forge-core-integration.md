@@ -43,7 +43,7 @@ MES backend (NestJS)                                forge-core hub (Python)
 |---|---|---|
 | Proto files | `backend/src/forge/proto/forge/v1/*.proto` | Vendored copies of the hub's `src/forge/proto/*.proto`; `forge-parity.spec.ts` fails on drift. Loaded at runtime with `@grpc/proto-loader` (no codegen). |
 | Manifest | `backend/src/forge/forge-mes.manifest.json` | Copy of the hub's `adapters/forge_mes/manifest.json`; same parity test. Sent on `Register`. |
-| FACTS spec | `specs/forge-mes.facts.json` | Source of the context fields, enrichment rules, retry/circuit/dead-letter policy and lifecycle timings mirrored in code. |
+| FACTS spec | `forge-modules/forge-mes/fxts/facts/forge-mes.facts.json` | Source of the context fields, enrichment rules, retry/circuit/dead-letter policy and lifecycle timings mirrored in code. |
 | Routing metadata | `x-forge-adapter-id`, `x-forge-session-id` | Attached to every `Ingest` stream; the hub reads them to find the session. |
 | Callback address | `grpc_callback_url` Configure param | `host:port` of `ForgeSpokeServer`; the hub's `WriteDispatcher` dials it for `Write`/`Discover`/`Health`. Listed in the manifest as an optional, non-secret connection param. |
 | Schema ref | `forge://schemas/forge-mes/v0.1.0` | `lineage.schema_ref` on every record. |

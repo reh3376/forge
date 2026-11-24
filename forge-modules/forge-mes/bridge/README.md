@@ -1,6 +1,6 @@
 # Forge MES — Manufacturing Execution System module
 
-> **Forge module** · spoke of the Forge hub (forge-core) · adapter id `forge-mes` · FACTS spec `specs/forge-mes.facts.json`
+> **Forge module** · spoke of the Forge hub (forge-core) · adapter id `forge-mes` · FACTS spec `forge-modules/forge-mes/fxts/facts/forge-mes.facts.json`
 >
 > This directory is the Forge MES module. It was migrated from `WhiskeyHouse/whk-mes` on 2026-10-15; forge-mes replaces whk-mes. Every Forge module has two main sections, a backend and a frontend:
 >

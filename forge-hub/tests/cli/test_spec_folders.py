@@ -104,7 +104,8 @@ def test_the_hubs_index_is_generated_and_current() -> None:
     assert page.read_text(encoding="utf-8") == text, f"{page.name} is stale: run the command"
     assert "Do not edit." in text
     assert text.count("| [`") == len(list(hub_fxts.FXTS_DIR.glob("*/*.json")))
-    assert "| [`healthz.json`](fats/healthz.json) | `/healthz` | 0.1.0 | approved |" in text
+    # an API spec is shown by its method and path, its identity since FB-268
+    assert "| [`healthz.json`](fats/healthz.json) | `GET /healthz` | 0.1.0 | approved |" in text
 
 
 def test_the_index_command_covers_both_pages() -> None:

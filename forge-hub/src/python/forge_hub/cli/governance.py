@@ -31,6 +31,7 @@ packaged schema, and the report prints as text or JSON (``--format``,
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -379,6 +380,16 @@ class Framework:
     identity: tuple[str, ...]  # path of the id the runner checks the target against
     make_runner: Callable[[Path], FxTSRunner]
     live: bool  # the runner takes a ``live`` flag
+    #: Fields that, before the identity, make a spec one of a kind in its framework: an
+    #: API spec is a method and a path (FB-268). Empty when the identity alone is unique.
+    qualifiers: tuple[tuple[str, ...], ...] = ()
+    #: The file name a spec must have, from its own fields (``{a.b}`` is a field path);
+    #: empty where no rule holds (the API specs are named by hand).
+    file_name: str = ""
+
+    @property
+    def name(self) -> str:
+        return self.label.lower()
 
 
 FRAMEWORKS: dict[str, Framework] = {
@@ -390,6 +401,7 @@ FRAMEWORKS: dict[str, Framework] = {
         ("endpoint",),
         _fats_runner,
         live=True,
+        qualifiers=(("method",),),
     ),
     "facts": Framework(
         "FACTS",
@@ -399,6 +411,7 @@ FRAMEWORKS: dict[str, Framework] = {
         ("adapter_identity", "adapter_id"),
         _facts_runner,
         live=True,
+        file_name="{adapter_identity.adapter_id}.facts.json",
     ),
     "fvts": Framework(
         "FVTS",
@@ -408,6 +421,7 @@ FRAMEWORKS: dict[str, Framework] = {
         ("view_identity", "view_id"),
         _fvts_runner,
         live=False,
+        file_name="{view_identity.owner_module}.fvts.json",
     ),
     "ftts": Framework(
         "FTTS",
@@ -417,6 +431,7 @@ FRAMEWORKS: dict[str, Framework] = {
         ("transport_identity", "transport_id"),
         _ftts_runner,
         live=True,
+        file_name="{transport_identity.transport_id}.ftts.json",
     ),
     "futs": Framework(
         "FUTS",
@@ -426,6 +441,7 @@ FRAMEWORKS: dict[str, Framework] = {
         ("identity", "id"),
         _futs_runner,
         live=False,
+        file_name="{identity.id}.{spec_kind}.futs.json",
     ),
     "fmts": Framework(
         "FMTS",
@@ -435,6 +451,7 @@ FRAMEWORKS: dict[str, Framework] = {
         ("module_identity", "module_id"),
         _fmts_runner,
         live=False,
+        file_name="{module_identity.module_id}.fmts.json",
     ),
 }
 
@@ -447,6 +464,7 @@ def framework_specs(
         file
         for directory in (directories or framework.specs_dirs)
         for file in directory.glob(framework.pattern)
+        if locations.is_spec_name(framework.name, file.name)
     ]
     return sorted(found, key=lambda path: path.name)
 
@@ -456,6 +474,28 @@ def identity_of(spec: dict[str, Any], path: tuple[str, ...]) -> str:
     for key in path:
         node = node.get(key) if isinstance(node, dict) else None
     return node if isinstance(node, str) else ""
+
+
+def key_of(spec: dict[str, Any], framework: Framework) -> str:
+    """What makes a spec one of a kind in its framework: its qualifiers, then its identity.
+    ``GET /v1/schemas`` for an API spec, the id alone for the others (FB-268)."""
+    parts = [identity_of(spec, path) for path in (*framework.qualifiers, framework.identity)]
+    return " ".join(part for part in parts if part)
+
+
+def expected_file_name(spec: dict[str, Any], framework: Framework) -> str:
+    """The file name the framework's rule gives this spec; empty where there is no rule."""
+    if not framework.file_name:
+        return ""
+    return re.sub(
+        r"\{([a-z_.]+)\}",
+        lambda field: identity_of(spec, tuple(field.group(1).split("."))),
+        framework.file_name,
+    )
+
+
+class AmbiguousSpecError(LookupError):
+    """An id that more than one spec has: the lookup names them and picks none (FB-268)."""
 
 
 def resolve_spec(
@@ -471,13 +511,24 @@ def resolve_spec(
         spec = json.loads(path.read_text(encoding="utf-8"))
         return path, spec, identity_of(spec, framework.identity) or path.stem
     directories = (specs_dir,) if specs_dir else framework.specs_dirs
+    found: list[tuple[Path, dict[str, Any]]] = []
     for file in framework_specs(framework, directories):
         try:
             spec = json.loads(file.read_text(encoding="utf-8"))
         except ValueError:
             continue
-        if identity_of(spec, framework.identity) == target:
-            return file, spec, target
+        if target in (key_of(spec, framework), identity_of(spec, framework.identity)):
+            found.append((file, spec))
+    if len(found) == 1:
+        file, spec = found[0]
+        return file, spec, identity_of(spec, framework.identity)
+    if found:
+        names = ", ".join(f"{key_of(spec, framework)} ({file.name})" for file, spec in found)
+        msg = (
+            f"'{target}' is {len(found)} {framework.label} specs: {names}. "
+            "Name one by its full id, or pass its file."
+        )
+        raise AmbiguousSpecError(msg)
     where = ", ".join(str(directory) for directory in directories)
     msg = f"no {framework.label} spec for '{target}' in {where} (pass a spec file instead)"
     raise FileNotFoundError(msg)
@@ -696,7 +747,7 @@ def render_hub_index() -> str:
             integrity = spec.get("integrity", {})
             lines.append(
                 f"| [`{file.name}`]({name}/{file.name}) "
-                f"| `{identity_of(spec, framework.identity) or file.stem}` "
+                f"| `{key_of(spec, framework) or file.stem}` "
                 f"| {spec.get('spec_version', '')} | {integrity.get('hash_state', '')} "
                 f"| `{_short(integrity.get('spec_hash') or '')}` "
                 f"| {integrity.get('approved_by') or ''} |"
@@ -962,11 +1013,146 @@ def _shown(path: Path) -> Path:
     return path.relative_to(REPO_ROOT) if path.is_relative_to(REPO_ROOT) else path
 
 
+#: A JSON file elsewhere larger than this is not read for a spec's hash: no spec is this big.
+STRAY_SCAN_LIMIT = 2_000_000
+
+
+def repository_files(repo_root: Path = REPO_ROOT) -> list[str]:
+    """Every file a commit could hold: tracked, and new but not ignored, from git.
+
+    Git is the one source of what is in the repository, and of what is ignored. A checkout
+    without git cannot be checked, and says so (FB-268: a walk of the folders would see
+    ignored files, unless it copied the ignore rules).
+    """
+    import subprocess
+
+    try:
+        done = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(repo_root),
+                "ls-files",
+                "--cached",
+                "--others",
+                "--exclude-standard",
+                "-z",
+            ],
+            capture_output=True,
+            check=False,
+        )
+    except OSError as exc:
+        raise GovernanceError(f"cannot list the repository's files: {exc}") from exc
+    if done.returncode != 0:
+        cause = done.stderr.decode(errors="replace").strip().splitlines() or ["no message"]
+        raise GovernanceError(f"cannot list the repository's files with git: {cause[0]}")
+    return sorted(p for p in done.stdout.decode().split("\0") if p)
+
+
+class GovernanceError(RuntimeError):
+    """The gate cannot look at what it must: it fails, with this as its cause."""
+
+
+def _carries_a_spec_hash(path: Path) -> bool:
+    if path.suffix != ".json" or path.stat().st_size > STRAY_SCAN_LIMIT:
+        return False
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    integrity = document.get("integrity") if isinstance(document, dict) else None
+    return isinstance(integrity, dict) and bool(integrity.get("spec_hash"))
+
+
+def closed_set_problems(repo_root: Path = REPO_ROOT, files: list[str] | None = None) -> list[str]:
+    """Every governed folder holds only governed kinds, and nothing governed lies elsewhere.
+
+    A file in a governed folder that no rule names is refused; so is a spec or a governed
+    list outside them, found by its name or by the spec's hash it carries. Test fixtures
+    under ``tests/**/fixtures/`` are samples and are left alone. Each object schema's
+    ``$id`` agrees with its file name and owner, and some view spec of its owner uses it.
+    """
+    problems: list[str] = []
+    try:
+        files = files if files is not None else repository_files(repo_root)
+    except GovernanceError as exc:
+        return [str(exc)]
+    objects: dict[str, locations.Kind] = {}
+    for rel in files:
+        if "node_modules" in rel.split("/"):
+            continue  # third-party code (FB-130), never a governed file
+        kind = locations.kind_of(rel)
+        if kind.name == "unknown":
+            problems.append(
+                f"{rel}: not a kind of file this governed folder may hold; move it, name it as "
+                "its kind, or remove it"
+            )
+        elif kind.name == "stray" or (
+            kind.name == "not-governed" and _carries_a_spec_hash(repo_root / rel)
+        ):
+            problems.append(
+                f"{rel}: a governed file outside the governed folders; it belongs in the fxts "
+                "folder of what it describes, or in tests/**/fixtures/ if it is a sample"
+            )
+        elif kind.name == "object-schema":
+            objects[rel] = kind
+    used = {
+        str(entry.get("schema_path"))
+        for name in ("fvts",)
+        for file in framework_specs(FRAMEWORKS[name])
+        for entry in load_spec(file)[1].get("data_bindings", {}).get("objects", [])
+        if isinstance(entry, dict)
+    }
+    for rel, kind in sorted(objects.items()):
+        stem = rel.rsplit("/", 1)[-1].removesuffix(".schema.json")
+        entity, version = stem.rsplit(".", 1)
+        want = f"forge://schemas/{kind.owner}/{entity}/{version}"
+        try:
+            found = json.loads((repo_root / rel).read_text(encoding="utf-8")).get("$id")
+        except (OSError, ValueError) as exc:
+            problems.append(f"{rel}: not readable as JSON ({exc})")
+            continue
+        if found != want:
+            problems.append(f"{rel}: its $id is {found!r}; its name and owner say {want!r}")
+        if rel not in used:
+            problems.append(f"{rel}: no view spec of {kind.owner} uses it; remove it or use it")
+    return problems
+
+
+def identity_problems() -> list[str]:
+    """Within each framework, one spec per identity, and each file named by its rule."""
+    problems: list[str] = []
+    for name, framework in sorted(FRAMEWORKS.items()):
+        seen: dict[str, str] = {}
+        for file in framework_specs(framework):
+            try:
+                spec = load_spec(file)[1]
+            except (OSError, ValueError) as exc:
+                problems.append(f"{file.name}: not readable as JSON ({exc})")
+                continue
+            key = key_of(spec, framework)
+            if not key:
+                problems.append(
+                    f"{name} {file.name}: it has no id ({'.'.join(framework.identity)})"
+                )
+            elif key in seen:
+                problems.append(f"{name}: {seen[key]} and {file.name} are both '{key}'")
+            else:
+                seen[key] = file.name
+            expected = expected_file_name(spec, framework)
+            if expected and file.name != expected:
+                problems.append(f"{name} {file.name}: its rule names it {expected}")
+    return problems
+
+
 def gate_problems() -> list[str]:
-    """What is never accepted: a schema registry, a governed list or an index that is wrong."""
+    """What is never accepted: a file out of place, two specs with one identity, a schema
+    registry, a governed list or an index that is wrong."""
     from forge_core.fxts.shared import lists
 
-    problems = [f"schema registry: {problem}" for problem in schema_problems()]
+    problems = [f"closed set: {problem}" for problem in closed_set_problems()]
+    problems += [f"identity: {problem}" for problem in identity_problems()]
+    problems += [f"schema registry: {problem}" for problem in schema_problems()]
     for name in lists.ALL_NAMES:
         problems += [f"governed list: {problem}" for problem in lists.load(name).problems]
     for page, text in index_pages():
