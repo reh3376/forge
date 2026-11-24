@@ -8,7 +8,7 @@ the module whose data it shows: it may bind only the points and call only the ac
 the surface it lays out.
 
 Expressions are CEL. The Go server compiles and type-checks them (D-16, S-2); this
-runner cannot, and says so on every run with ``NOT CHECKED``.
+runner cannot, and says so on every run with a ``NOT_RUN`` verdict.
 """
 
 from __future__ import annotations
@@ -736,9 +736,9 @@ class FUTSRunner(FxTSRunner):
         return FxTSVerdict(
             check_id="futs:expressions",
             spec_ref="FUTS/view/expressions",
-            status=VerdictStatus.SKIP,
+            status=VerdictStatus.NOT_RUN,
             message=(
-                f"NOT CHECKED: {len(expressions)} CEL expression(s). The Go server compiles "
+                f"NOT RUN: {len(expressions)} CEL expression(s). The Go server compiles "
                 f"and type-checks an expression; it is not built ({EXPRESSION_ITEM})."
             ),
             evidence={

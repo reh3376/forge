@@ -44,7 +44,7 @@ A module without an approved FMTS spec is not a Forge module. The hub does not e
 
 M-12 to M-16 are the amendment of 2026-11-19 (`docs/decisions/forge-module-requirements.md` §9): what the transport contract (D-15) requires of a module. Two words are the owner's definitions. A **command** is a write to a tag in a process controller (PLC or HMI) that directly affects a process: delivered at most once, never stored, and it expires. A **business write-back** is a message down to a business system: delivered and confirmed once and only once, kept while a link is down, and it does not expire as a command does. A module that declares neither is not bound by M-15 or M-16 and claims `not_applicable`; the runner holds that claim to the module's FACTS spec. M-15 is waived only with admin privileges, like M-3 and M-4.
 
-A requirement that was not checked is reported on every run as `SKIP` with the text `NOT CHECKED` and the reason. It is never counted as passed, and `forge governance run fmts` prints it under "Not checked:".
+A requirement that was not checked is reported on every run as `NOT_RUN` with the reason. It is never counted as passed: a run with one is `INCOMPLETE`, not `PASS`, `forge governance run fmts` prints it under "Not run:" and exits 3 (FB-265; the verdicts and outcomes are in `README.md`, "What a run says"). A module that breaks while the kit loads it is an `ERROR`, which fails the run.
 
 ## The time contract
 
@@ -70,7 +70,7 @@ The fields the offset and the uncertainty travel in already exist on the record 
 - **The runner runs the kit** for every module on the `python-adapter` template. It finds the one adapter class in the module's `adapter.py`, gives it placeholder connection parameters (hosts under `.invalid`, so nothing is reached) and the module's fixture, if it has one.
 - **A fixture** is `tests/governance/fmts/conformance/<module_id>.json`: optional `params` and raw source `events`. Without events the module sends nothing and M-6 is reported as not checked.
 - **A Python module off the template supplies a hook**, `conformance.py` beside its `adapter.py`: `conformance_adapter()` builds the adapter as the module builds it, and `conformance_load(adapter)` gives it something to send. The OT module has one: its adapter on a real tag registry, with two stamped tags.
-- A module the kit cannot drive (another language, another process) is reported as `NOT CHECKED` for all four (FB-155).
+- A module the kit cannot drive (another language, another process) is reported as `NOT_RUN` for all four (FB-155).
 
 What the kit found on the OT module, fixed with its hook (2026-11-18): collect awaited a registry method only the test doubles had; the tag-change callback's signature did not match the registry's call, so no subscription fired; the manifest and three record producers carried an older schema reference than the approved FACTS spec, so the hub would have refused the registration and rejected every record.
 
@@ -92,7 +92,7 @@ A module that cannot yet meet a requirement says so in its spec:
 ```
 
 - The owner approves a waiver by approving the spec's hash. Nobody else can.
-- A waived requirement is reported on every run as `SKIP` with the text `WAIVED until FB-nnn` and the reason.
+- A waived requirement is reported on every run as `WAIVED`, with the text `WAIVED until FB-nnn` and the reason, under "Waived:". A run with a waiver is `INCOMPLETE`, never `PASS`: every module waives something today, so no module's run passes.
 - The backlog item must be in `BACKLOG.md` and open. When it is closed (its description starts with `**Done` or `**Fixed`), the waiver has expired and the run fails until the requirement is met and the waiver removed.
 - A claim of `waived` with no waiver, or a waiver for a requirement claimed `met`, fails. In both cases the requirement is still enforced.
 - **M-3 and M-4 are waived only with admin privileges** (owner, 2026-11-18, Q-10 of the record). They are the time-keeping requirements. A waiver of either counts only once the spec's hash is approved; on a spec that is not approved, `fmts:waivers` fails and names it. Only the owner approves a hash today. The waiver covers this check only: the hub still refuses at runtime a module that does not exchange time.

@@ -960,12 +960,22 @@ class TestNoSpec:
 class TestLiveChecks:
     """Verify live checks return SKIP (placeholder)."""
 
-    def test_live_checks_return_skip(self, runner, verdict_status):
+    def test_live_checks_are_reported_as_not_run(self, runner, verdict_status):
+        """Nothing compares an adapter spec with the module's code (FB-271). Asked for,
+        the live checks say they are not implemented; not asked for, that they did not
+        run. Either way the run is told, and cannot pass (D-14 F-7, FB-265)."""
         spec = _minimal_spec()
         verdicts = _run(runner._live_checks(spec, "test-adapter"))
-        assert len(verdicts) == 1
-        assert verdicts[0].status == verdict_status.SKIP
-        assert "not yet implemented" in verdicts[0].message.lower()
+        assert [(v.check_id, v.status) for v in verdicts] == [
+            ("facts:live", verdict_status.NOT_RUN)
+        ]
+        assert "not implemented" in verdicts[0].message and "FB-271" in verdicts[0].message
+
+    @pytest.mark.parametrize("live", [True, False])
+    def test_a_run_never_passes_without_the_live_checks(self, runner, wms_spec, live):
+        report = _run(runner.run(target="forge-wms", spec=wms_spec, live=live))
+        assert [v.check_id for v in report.not_run] == ["facts:live"]
+        assert not report.passed
 
 
 # =========================================================================
@@ -989,7 +999,9 @@ class TestIntegrationWMS:
         assert {v.check_id for v in fails} == expected, (
             f"FAIL verdicts: {[(v.check_id, v.message) for v in fails]}"
         )
-        assert report.passed is (not expected)
+        # No real adapter spec passes: the checks against the module's code do not exist.
+        assert report.failed is bool(expected) and not report.passed
+        assert [v.check_id for v in report.not_run] == ["facts:live"]
 
     def test_wms_hash_verified(self, runner, wms_spec):
         report = _run(runner.run(target="forge-wms", spec=wms_spec))
@@ -1025,7 +1037,9 @@ class TestIntegrationMES:
         assert {v.check_id for v in fails} == expected, (
             f"FAIL verdicts: {[(v.check_id, v.message) for v in fails]}"
         )
-        assert report.passed is (not expected)
+        # No real adapter spec passes: the checks against the module's code do not exist.
+        assert report.failed is bool(expected) and not report.passed
+        assert [v.check_id for v in report.not_run] == ["facts:live"]
 
     def test_mes_hash_verified(self, runner, mes_spec):
         report = _run(runner.run(target="forge-mes", spec=mes_spec))
@@ -1052,11 +1066,12 @@ class TestIntegrationMES:
 class TestCrossSpecConsistency:
     """Verify cross-spec governance properties hold."""
 
-    def test_both_specs_pass(self, runner, wms_spec, mes_spec):
+    def test_neither_spec_fails_and_neither_passes(self, runner, wms_spec, mes_spec):
         wms_report = _run(runner.run(target="forge-wms", spec=wms_spec))
         mes_report = _run(runner.run(target="forge-mes", spec=mes_spec))
-        assert wms_report.passed is (not _expected_fails(wms_spec))
-        assert mes_report.passed is (not _expected_fails(mes_spec))
+        assert wms_report.failed is bool(_expected_fails(wms_spec))
+        assert mes_report.failed is bool(_expected_fails(mes_spec))
+        assert not wms_report.passed and not mes_report.passed  # facts:live did not run
 
     def test_both_hashes_verified(self, runner, wms_spec, mes_spec):
         wms_report = _run(runner.run(target="forge-wms", spec=wms_spec))

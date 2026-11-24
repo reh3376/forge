@@ -85,9 +85,36 @@ Every FxTS spec carries a self-contained integrity hash — a tamper/drift detec
 | `true` | `modified` | Content matches but state not approved — **needs review** |
 | `false` | `modified` | Content changed AND not approved — **investigate immediately** |
 | `false` | `approved` | Content changed AFTER approval — **agent drift or tampering** |
-| `null` | `unknown` | No integrity block — hash verification skipped |
+| `null` | `unknown` | No integrity block: the two shared verdicts, `hash-verified` and `hash-approved`, fail |
 
 **Key insight:** `hash_verified=false` with `hash_state=approved` is the most critical signal. It means content was modified AFTER approval — exactly the kind of silent drift that AI agents can introduce.
+
+### What a run says: verdicts and the outcome
+
+A check gives one verdict. There is no verdict that means "skipped" (D-14, F-7; FB-265):
+
+| Verdict | Means | Effect on the run |
+|---|---|---|
+| `PASS` | the check ran and what it looked at is as the spec says | none |
+| `FAIL` | the check ran and found a violation | the run fails |
+| `ERROR` | the check, or the runner, broke while running; the cause is in the message | the run fails |
+| `NOT_IMPLEMENTED` | the schema lets a spec declare a field that the runner has no check for | the run fails |
+| `NOT_RUN` | the check did not run; the message says why and names the backlog item | the run cannot pass |
+| `WAIVED` | the spec waives the requirement until a named backlog item (FMTS) | the run cannot pass |
+
+A run has one of three outcomes, and `outcome_of` in `shared/runner.py` is the one place the rule is written:
+
+| Outcome | When | `forge governance run` exits |
+|---|---|---|
+| `PASS` | there is at least one verdict and every verdict is `PASS` | 0 |
+| `FAIL` | a verdict is `FAIL`, `ERROR` or `NOT_IMPLEMENTED`, or there is no verdict at all | 1 |
+| `INCOMPLETE` | nothing failed, and a verdict is `NOT_RUN` or `WAIVED` | 3 |
+
+`INCOMPLETE` is not a softer pass. It says that nothing in the run showed a fault and that the run did not look at everything, so it does not show that the spec is met. The summary line names every count that is not zero (`[INCOMPLETE] FMTS — forge-wms: 25/29 checks passed, 4 waived`), the report lists each check that did not run or is waived with its reason, and the JSON report carries `outcome`. A runner that raises gives one `ERROR` verdict, `<framework>:runner-error`, with the exception and where it was raised.
+
+A run that was not asked for live checks says so with one `NOT_RUN` verdict (`fats:live`, `facts:live`, `ftts:live`): a static run has compared the spec with itself and with other files, never with the running thing (the audit of 2026-11-23, `AUDIT-2026-11-23.md`; BACKLOG FB-264).
+
+The law, "a run never passes unless every check ran and passed", is checked for every case on the real code by `tests/governance/test_verdicts_exhaustive.py`; the skill `.claude/skills/verify-fxts-verdicts` says what it covers and how to read a failure.
 
 ### AI Agent Governance
 
@@ -131,7 +158,7 @@ forge governance schema-approve fmts 0.3.0 --by reh3376
 forge governance run facts forge-wms
 forge governance run fvts forge-hub-views --format json --output reports/fvts-forge-hub.json
 forge governance run ftts grpc-hardened-transport
-forge governance run fmts path/to/module.fmts.json # the module requirements; skipped checks are listed
+forge governance run fmts path/to/module.fmts.json # the module requirements; what did not run or is waived is listed
 forge governance run fats /v1/health --live        # live checks: FATS, FACTS, FTTS
 ```
 

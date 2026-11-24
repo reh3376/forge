@@ -111,6 +111,20 @@ class FATSRunner(FxTSRunner):
         if live:
             live_verdicts = await self._live_checks(spec, target)
             verdicts.extend(live_verdicts)
+        else:
+            verdicts.append(
+                FxTSVerdict(
+                    check_id="fats:live",
+                    spec_ref="FATS/live",
+                    status=VerdictStatus.NOT_RUN,
+                    message=(
+                        "NOT RUN: the checks of a spec against the running API: the run was "
+                        "not asked for live checks. Nothing in this run compared the spec "
+                        "with the route (BACKLOG FB-269)."
+                    ),
+                    evidence={"unverified": True, "blocked_on": "FB-269"},
+                )
+            )
 
         return verdicts
 

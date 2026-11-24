@@ -95,7 +95,7 @@ A view document also gets:
 | `futs:widgets` | a widget has no spec, or its spec is edited or not approved |
 | `futs:props` | a property is not the widget's, is of the wrong type, or a required one is not set |
 | `futs:bindings` | a binding is not the widget's; a required one is not bound; it names both a point and an object, or neither; the point or object is not of the surface; the point's type does not fit; a widget that takes an object is given a point, or the other way round; a table's column is not a field of the object's schema; an expression is used where none is taken |
-| `futs:expressions` | never fails here: reported as `NOT CHECKED` when the document has expressions |
+| `futs:expressions` | never fails here: `NOT_RUN` when the document has expressions, which makes the run `INCOMPLETE`, not passed |
 | `futs:actions` | an action is not the widget's, not of the surface, or of another kind |
 | `futs:events` | an event is not the widget's, or its script is not declared or not a file in the repository |
 | `futs:profiles` | a widget does not support a profile the surface allows |

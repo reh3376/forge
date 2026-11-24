@@ -515,12 +515,12 @@ async def check_m6(make: Callable[[ReferenceHub], ModuleDriver]) -> FxTSVerdict:
         return FxTSVerdict(
             check_id="fmts:m6",
             spec_ref="FMTS/baseline/M-6",
-            status=VerdictStatus.SKIP,
+            status=VerdictStatus.NOT_RUN,
             message=(
-                "NOT CHECKED: M-6 (stamps UTC and never invents a source time): the module "
-                "sent no record. Its spec names no sample events for the conformance kit."
+                "NOT RUN: M-6 (stamps UTC and never invents a source time): the module "
+                "sent no record. Its spec names no sample events for the conformance kit (FB-272)."
             ),
-            evidence={"waived": False, "unverified": True, "blocked_on": "sample events"},
+            evidence={"waived": False, "unverified": True, "blocked_on": "FB-272"},
         )
     violations: list[SpecViolation] = []
     for index, record in enumerate(hub.sink.records):

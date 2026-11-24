@@ -25,7 +25,7 @@ from forge_core.fxts.facts.runners.facts_runner import FACTSRunner
 runner = FACTSRunner(schema_path="schema/facts.schema.json")
 spec = json.load(open("specs/forge-wms.facts.json"))
 report = asyncio.run(runner.run(target="forge-wms", spec=spec))
-print(f"{'PASS' if report.passed else 'FAIL'}: {report.pass_count}/{report.total}")
+print(report.summary())  # the outcome is PASS, FAIL or INCOMPLETE; see report.not_run
 ```
 
 ## Status

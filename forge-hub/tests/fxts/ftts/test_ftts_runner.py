@@ -100,7 +100,7 @@ class TestFullSpecPasses:
         failures = [
             v
             for v in report.verdicts
-            if v.status not in (VerdictStatus.PASS, VerdictStatus.SKIP)
+            if v.status not in (VerdictStatus.PASS, VerdictStatus.NOT_RUN)
             and v.check_id not in allowed
         ]
         assert not failures, "Unexpected failures:\n" + "\n".join(

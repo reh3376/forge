@@ -20,11 +20,12 @@ the ``python-adapter`` template the runner finds the adapter class in the
 module's ``adapter.py``, drives it against a reference hub and reports what
 happened. A Python module off the template supplies a ``conformance.py`` hook
 beside its ``adapter.py`` (the OT module does). A module the kit cannot drive
-(another language, another process: FB-155) is reported as SKIP "NOT CHECKED" with
-that cause, never as passed.
+(another language, another process: FB-155) is reported as ``NOT_RUN`` with that
+cause, never as passed; a module that breaks while it is loaded is an ``ERROR``.
 
-A requirement the spec waives is reported as SKIP with the waiver's reason
-and backlog item on every run. A waiver whose backlog item is closed or
+A requirement the spec waives is reported as ``WAIVED`` with the waiver's reason
+and backlog item on every run. A run with a requirement not run or waived is
+INCOMPLETE, not passed (FB-265). A waiver whose backlog item is closed or
 missing fails. A waiver of M-3 or M-4 (time-keeping) needs admin privileges:
 it fails until the spec's hash is approved.
 
@@ -40,6 +41,7 @@ from __future__ import annotations
 
 import json
 import re
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
@@ -228,6 +230,18 @@ def _load_json(path: Path) -> tuple[Any, str]:
         return None, f"not readable as JSON: {exc}"
 
 
+@dataclass(frozen=True)
+class KitBlocked:
+    """Why the conformance kit gave no verdict for a module.
+
+    ``broke`` separates the two cases: the kit cannot drive this module (the checks are
+    not run), or loading the module raised (an error, which fails the run).
+    """
+
+    why: str
+    broke: bool = False
+
+
 class FMTSRunner(FxTSRunner):
     """Module requirements runner for the FMTS framework."""
 
@@ -273,8 +287,22 @@ class FMTSRunner(FxTSRunner):
         ]
         if schema_verdict.status != VerdictStatus.PASS:
             # The remaining checks read fields the schema guarantees; without it they
-            # would report noise. The schema failure is the finding.
-            return head
+            # would report noise. The schema failure is the finding, and the checks that
+            # did not run are said to have not run (D-14 F-7, FB-265).
+            return [
+                *head,
+                FxTSVerdict(
+                    check_id="fmts:requirements",
+                    spec_ref="FMTS/baseline",
+                    status=VerdictStatus.NOT_RUN,
+                    message=(
+                        f"NOT RUN: the {len(REQUIREMENTS)} requirement checks and the checks "
+                        "of the spec's sections: the spec is not valid against its schema, "
+                        "so there is nothing sound for them to read."
+                    ),
+                    evidence={"unverified": True, "blocked_on": "fmts:schema-valid"},
+                ),
+            ]
         facts_spec, facts_error = _load_json(repo_root / spec["references"]["facts"]["path"])
         governed = {name: lists.load(name, kwargs.get("lists_dir")) for name in lists.NAMES}
         requirement_checks = {
@@ -299,7 +327,7 @@ class FMTSRunner(FxTSRunner):
         wanted = [
             r for r in CONFORMANCE_KIT if not (spec["baseline"][r] == "waived" and r in waived)
         ]
-        kit, kit_blocked = await self._run_kit(spec, repo_root) if wanted else ({}, "")
+        kit, kit_blocked = await self._run_kit(spec, repo_root) if wanted else ({}, KitBlocked(""))
         for requirement in REQUIREMENTS:
             if spec["baseline"][requirement] == "waived" and requirement in waived:
                 verdicts.append(self._waived(requirement, waived[requirement]))
@@ -356,7 +384,7 @@ class FMTSRunner(FxTSRunner):
         return FxTSVerdict(
             check_id=f"fmts:{self._check_id(requirement)}",
             spec_ref=f"FMTS/baseline/{requirement}",
-            status=VerdictStatus.SKIP,
+            status=VerdictStatus.WAIVED,
             message=(
                 f"WAIVED until {waiver['backlog_item']}: {requirement} "
                 f"({REQUIREMENTS[requirement]}) is not enforced. Reason: {waiver['reason']}"
@@ -364,14 +392,27 @@ class FMTSRunner(FxTSRunner):
             evidence={"waived": True, "backlog_item": waiver["backlog_item"]},
         )
 
-    def _needs_conformance_kit(self, requirement: str, why: str) -> FxTSVerdict:
+    def _needs_conformance_kit(self, requirement: str, blocked: KitBlocked) -> FxTSVerdict:
+        """The kit did not give a verdict: it could not drive the module (not run), or
+        loading the module broke (an error, which fails the run)."""
+        if blocked.broke:
+            return FxTSVerdict(
+                check_id=f"fmts:{self._check_id(requirement)}",
+                spec_ref=f"FMTS/baseline/{requirement}",
+                status=VerdictStatus.ERROR,
+                message=(
+                    f"{requirement} ({REQUIREMENTS[requirement]}) could not be checked: "
+                    f"{blocked.why}. The claim 'met' is unverified."
+                ),
+                evidence={"waived": False, "unverified": True},
+            )
         return FxTSVerdict(
             check_id=f"fmts:{self._check_id(requirement)}",
             spec_ref=f"FMTS/baseline/{requirement}",
-            status=VerdictStatus.SKIP,
+            status=VerdictStatus.NOT_RUN,
             message=(
-                f"NOT CHECKED: {requirement} ({REQUIREMENTS[requirement]}) needs a running "
-                f"module, and the conformance kit cannot drive this one: {why} "
+                f"NOT RUN: {requirement} ({REQUIREMENTS[requirement]}) needs a running "
+                f"module, and the conformance kit cannot drive this one: {blocked.why} "
                 f"({CONFORMANCE_KIT_ITEM}). The claim 'met' is unverified."
             ),
             evidence={"waived": False, "unverified": True, "blocked_on": CONFORMANCE_KIT_ITEM},
@@ -381,9 +422,9 @@ class FMTSRunner(FxTSRunner):
         return FxTSVerdict(
             check_id=f"fmts:{self._check_id(requirement)}",
             spec_ref=f"FMTS/baseline/{requirement}",
-            status=VerdictStatus.SKIP,
+            status=VerdictStatus.NOT_RUN,
             message=(
-                f"NOT CHECKED: {requirement} ({REQUIREMENTS[requirement]}) is behaviour of the "
+                f"NOT RUN: {requirement} ({REQUIREMENTS[requirement]}) is behaviour of the "
                 "transport contract, which is not built, so the conformance kit has no check "
                 f"for it ({TRANSPORT_KIT_ITEM}). The claim 'met' is unverified."
             ),
@@ -680,11 +721,13 @@ class FMTSRunner(FxTSRunner):
 
     async def _run_kit(
         self, spec: dict[str, Any], repo_root: Path
-    ) -> tuple[dict[str, FxTSVerdict], str]:
+    ) -> tuple[dict[str, FxTSVerdict], KitBlocked]:
         """Run the conformance kit on the module; the verdicts, or why it could not run."""
         conformance = self._kit
         if conformance is None:
-            return {}, "no conformance kit was handed to this runner (the hub supplies it)"
+            return {}, KitBlocked(
+                "no conformance kit was handed to this runner (the hub supplies it)"
+            )
 
         template = spec["scaffold"]["template"]
         paths = spec["module_identity"]["source_paths"]
@@ -696,7 +739,7 @@ class FMTSRunner(FxTSRunner):
                 found = [rel for rel in paths if (repo_root / rel / "adapter.py").is_file()]
                 module_name = conformance.adapter_module_name(found[0]) if found else None
                 if module_name is None:
-                    return {}, (
+                    return {}, KitBlocked(
                         "its adapter.py is not in the module's own package under "
                         "forge-modules/<module>/src/python"
                     )
@@ -708,13 +751,16 @@ class FMTSRunner(FxTSRunner):
                 ]
                 hook = conformance.load_hook(hooked[0]) if hooked else None
                 if hook is None:
-                    return {}, (
+                    return {}, KitBlocked(
                         f"it is not on the python-adapter template (template '{template}') "
                         f"and supplies no {conformance.HOOK_FILE} hook"
                     )
                 factory, load = hook
         except Exception as exc:
-            return {}, f"it could not be loaded ({type(exc).__name__}: {exc})"
+            # Not "the kit cannot drive it": loading it broke, which is a failure with a cause.
+            return {}, KitBlocked(
+                f"the module could not be loaded ({type(exc).__name__}: {exc})", broke=True
+            )
         params = {
             **conformance.placeholder_params(manifest if isinstance(manifest, dict) else {}),
             **fixture.get("params", {}),
@@ -725,7 +771,7 @@ class FMTSRunner(FxTSRunner):
                 hub, factory, params=params, events=events, load=load
             )
         )
-        return results, ""
+        return results, KitBlocked("")
 
     # ------------------------------------------------------------------
     # fmts:schema-valid, fmts:identity-match, fmts:hash-*, fmts:enum-parity

@@ -43,6 +43,7 @@ from forge_core import contract
 from forge_core.fxts import locations
 from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import (
+    RunOutcome,
     add_spec_hash,
     approve_spec_hash,
     compute_spec_hash,
@@ -67,6 +68,10 @@ LISTS = "lists"
 REPO_ROOT = Path(__file__).resolve().parents[5]
 
 #: Who or what made a change (the FACTS schema's ``change_history[].source``).
+#: Exit code of ``forge governance run`` when nothing failed and a check did not run or is
+#: waived. 1 is a failure; 2 is the command line's own usage error.
+EXIT_INCOMPLETE = 3
+
 CHANGE_SOURCES = ("manual", "ci", "agent", "spec_update")
 CHANGE_TYPES = ("structural", "content", "config")
 
@@ -501,22 +506,29 @@ def emit_report(report: FxTSReport, fmt: str, output: Path | None) -> None:
         typer.echo(report.to_json())
         return
     typer.echo(report.summary())
-    if not report.passed:
+    if not report.verdicts:
+        typer.echo("\nNo check ran: a run that checked nothing has shown nothing.")
+    if report.failures:
         typer.echo("\nFailed checks:")
-        for v in report.verdicts:
-            if v.status not in ("PASS", "SKIP"):
+        for v in report.failures:
+            typer.echo(f"  [{v.status}] {v.check_id}: {v.message}")
+            for violation in v.violations:
+                typer.echo(f"    -> {violation.field}: {violation.message}")
+    # A check that did not run, or that a waiver switches off, is named on every run
+    # and is never folded into "passed" (D-14, F-7; FB-265).
+    for title, verdicts in (("Not run", report.not_run), ("Waived", report.waived)):
+        if verdicts:
+            typer.echo(f"\n{title}:")
+            for v in verdicts:
                 typer.echo(f"  [{v.status}] {v.check_id}: {v.message}")
-                for violation in v.violations:
-                    typer.echo(f"    -> {violation.field}: {violation.message}")
-    else:
-        typer.echo("All checks passed.")
-    skipped = [v for v in report.verdicts if v.status == "SKIP"]
-    if skipped:
-        # A skipped check is not a passed one: a waiver or an unverified claim is
-        # named on every run, never folded into "passed".
-        typer.echo("\nNot checked:")
-        for v in skipped:
-            typer.echo(f"  [SKIP] {v.check_id}: {v.message}")
+    if report.outcome is RunOutcome.PASS:
+        typer.echo("All checks ran and passed.")
+    elif report.outcome is RunOutcome.INCOMPLETE:
+        unobserved = len(report.not_run) + len(report.waived)
+        typer.echo(
+            f"\nNo check failed, but {unobserved} did not run or are waived: "
+            "this run does not show that the spec is met."
+        )
     if output is not None:
         typer.echo(f"JSON report written to {output}")
 
