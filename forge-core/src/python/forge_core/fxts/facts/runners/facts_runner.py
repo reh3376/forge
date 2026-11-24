@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from forge_core import contract
+from forge_core.fxts.facts.checks import CHECKS as FACTS_CHECKS
 from forge_core.fxts.shared.runner import (
     FxTSRunner,
     FxTSVerdict,
@@ -171,6 +172,8 @@ class FACTSRunner(FxTSRunner):
         )
         report = await runner.run(target="forge-wms", spec=spec_dict)
     """
+
+    CHECKS = FACTS_CHECKS
 
     framework = "FACTS"
     version = "0.1.0"

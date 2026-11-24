@@ -19,11 +19,13 @@ from __future__ import annotations
 import abc
 import hashlib
 import json
+import re
 import traceback
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, computed_field
@@ -99,6 +101,23 @@ class SpecViolation(BaseModel):
     severity: str = "error"  # error | warning
 
 
+class EvidenceKind(StrEnum):
+    """What a verdict rests on (D-19, AE-1).
+
+    ``SELF``: the spec against itself or its own schema. ``FILE``: against another
+    governed or repository file (another spec, a manifest, a governed list, a schema
+    registry, the backlog, the names of files). ``ARTIFACT``: against the real thing: code
+    imported or introspected, the app built in process, the proto, the module run through
+    the conformance kit. ``NONE``: nothing was observed, because the check did not run,
+    is waived, or looks at the runner rather than the spec.
+    """
+
+    SELF = "self"
+    FILE = "file"
+    ARTIFACT = "artifact"
+    NONE = "none"
+
+
 class FxTSVerdict(BaseModel):
     """Result of a single spec check within a runner."""
 
@@ -109,6 +128,60 @@ class FxTSVerdict(BaseModel):
     violations: list[SpecViolation] = Field(default_factory=list)
     evidence: dict[str, Any] = Field(default_factory=dict)
     duration_ms: float = 0.0
+    #: Set by the runner base from the check's declaration (``FxTSRunner.run``); a runner
+    #: never sets it by hand (D-19, AE-1, AE-2).
+    evidence_kind: EvidenceKind | None = None
+
+
+_PLACEHOLDER = re.compile(r"\{[a-z_]+\}")
+
+
+@dataclass(frozen=True)
+class Check:
+    """One check a runner can give, declared as data (D-19, AE-2).
+
+    ``id`` is the verdict's check id, or a form with ``{name}`` placeholders for an id
+    built at run time (``facts:lifecycle-{field}``). ``covers`` are JSON pointers into a
+    spec of the framework, the properties the check looks at; empty for a check of the
+    framework itself rather than a spec (``fvts:enum-parity``). ``kind`` is the evidence
+    the check reaches when it runs.
+    """
+
+    id: str
+    covers: tuple[str, ...]
+    kind: EvidenceKind
+    note: str = ""
+
+    @property
+    def is_pattern(self) -> bool:
+        return bool(_PLACEHOLDER.search(self.id))
+
+    def matches(self, check_id: str) -> bool:
+        if not self.is_pattern:
+            return check_id == self.id
+        parts = _PLACEHOLDER.split(self.id)
+        return re.fullmatch(r"\S+?".join(re.escape(part) for part in parts), check_id) is not None
+
+
+#: The checks the runner base gives in every framework; ``{framework}`` is the
+#: framework's name in lower case.
+SHARED_CHECKS: tuple[Check, ...] = (
+    Check("{framework}:hash-verified", ("/integrity/spec_hash",), EvidenceKind.SELF),
+    Check("{framework}:hash-approved", ("/integrity/hash_state",), EvidenceKind.SELF),
+    Check(
+        "{framework}:schema-current",
+        ("/integrity/schema_version",),
+        EvidenceKind.FILE,
+        "against the schema registry and the released schema file",
+    ),
+    Check("{framework}:runner-error", (), EvidenceKind.NONE, "the runner broke; nothing observed"),
+    Check(
+        "parity:{field}",
+        (),
+        EvidenceKind.NONE,
+        "the framework's schema against its runner, not a spec",
+    ),
+)
 
 
 # ---------------------------------------------------------------------------
@@ -716,6 +789,51 @@ class FxTSRunner(abc.ABC):
     async def _run_checks(self, target: str, **kwargs: Any) -> list[FxTSVerdict]:
         """Execute framework-specific checks. Must be implemented by subclass."""
 
+    #: Every check this framework's runner gives, besides the shared ones (D-19, AE-2).
+    CHECKS: ClassVar[tuple[Check, ...]] = ()
+
+    def declared_checks(self) -> tuple[Check, ...]:
+        """The shared checks, named for this framework, then the framework's own."""
+        name = self.framework.lower()
+        shared = tuple(
+            Check(c.id.replace("{framework}", name), c.covers, c.kind, c.note)
+            for c in SHARED_CHECKS
+        )
+        return shared + tuple(self.CHECKS)
+
+    def declaration_of(self, check_id: str) -> Check | None:
+        """The declaration a verdict's id matches: an exact id first, then a pattern."""
+        declared = self.declared_checks()
+        exact = [c for c in declared if not c.is_pattern and c.id == check_id]
+        if exact:
+            return exact[0]
+        return next((c for c in declared if c.is_pattern and c.matches(check_id)), None)
+
+    def with_evidence(self, verdict: FxTSVerdict) -> FxTSVerdict:
+        """The verdict with its kind of evidence, from its declaration (D-19, AE-1, AE-2).
+
+        A verdict whose id is declared nowhere becomes an error naming the id, so a check
+        cannot be added without saying what it rests on. A check that did not run or is
+        waived observed nothing, whatever it would have reached.
+        """
+        declared = self.declaration_of(verdict.check_id)
+        if declared is None:
+            return verdict.model_copy(
+                update={
+                    "status": VerdictStatus.ERROR,
+                    "evidence_kind": EvidenceKind.NONE,
+                    "message": (
+                        f"undeclared check: '{verdict.check_id}' is not declared in "
+                        f"{type(self).__name__}.CHECKS (D-19, AE-2). It said "
+                        f"{verdict.status}: {verdict.message}"
+                    ),
+                    "evidence": {**verdict.evidence, "undeclared": True},
+                }
+            )
+        unobserved = verdict.status in (VerdictStatus.NOT_RUN, VerdictStatus.WAIVED)
+        kind = EvidenceKind.NONE if unobserved else declared.kind
+        return verdict.model_copy(update={"evidence_kind": kind})
+
     @abc.abstractmethod
     def implemented_fields(self) -> set[str]:
         """Return the set of schema fields this runner enforces.
@@ -961,5 +1079,6 @@ class FxTSRunner(abc.ABC):
                 )
             )
 
+        report.verdicts = [self.with_evidence(v) for v in report.verdicts]
         report.finished_at = datetime.now(UTC)
         return report

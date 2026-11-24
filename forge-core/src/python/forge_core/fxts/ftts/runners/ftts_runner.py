@@ -17,6 +17,7 @@ import importlib
 import re
 from typing import TYPE_CHECKING, Any, ClassVar
 
+from forge_core.fxts.ftts.checks import CHECKS as FTTS_CHECKS
 from forge_core.fxts.shared.runner import (
     FxTSRunner,
     FxTSVerdict,
@@ -68,6 +69,8 @@ class FTTSRunner(FxTSRunner):
             target="grpc-hardened-transport", spec=spec_dict,
         )
     """
+
+    CHECKS = FTTS_CHECKS
 
     framework = "FTTS"
     version = "0.1.0"

@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 import httpx
 
+from forge_core.fxts.fats.checks import CHECKS as FATS_CHECKS
 from forge_core.fxts.shared.runner import (
     FxTSRunner,
     FxTSVerdict,
@@ -33,6 +34,8 @@ class FATSRunner(FxTSRunner):
         )
         report = await runner.run(target="/v1/health")
     """
+
+    CHECKS = FATS_CHECKS
 
     framework = "FATS"
     version = "0.1.0"

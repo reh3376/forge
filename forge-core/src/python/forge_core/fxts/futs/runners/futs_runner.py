@@ -20,6 +20,7 @@ import jsonschema
 
 from forge_core.fxts import locations
 from forge_core.fxts.futs import REPO_ROOT
+from forge_core.fxts.futs.checks import CHECKS as FUTS_CHECKS
 from forge_core.fxts.shared import lists
 from forge_core.fxts.shared.runner import (
     FxTSRunner,
@@ -96,6 +97,8 @@ def _walk(node: dict[str, Any], parent: dict[str, Any] | None = None):
 
 class FUTSRunner(FxTSRunner):
     """UI runner for the FUTS framework: widget specs and view documents."""
+
+    CHECKS = FUTS_CHECKS
 
     framework = "FUTS"
     version = "0.1.0"

@@ -46,6 +46,7 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 from forge_core.fxts.facts import SCHEMA_PATH as FACTS_SCHEMA_PATH
 from forge_core.fxts.fmts import REPO_ROOT
+from forge_core.fxts.fmts.checks import CHECKS as FMTS_CHECKS
 from forge_core.fxts.shared import lists
 from forge_core.fxts.shared.runner import (
     FxTSRunner,
@@ -244,6 +245,8 @@ class KitBlocked:
 
 class FMTSRunner(FxTSRunner):
     """Module requirements runner for the FMTS framework."""
+
+    CHECKS = FMTS_CHECKS
 
     framework = "FMTS"
     version = "0.1.0"

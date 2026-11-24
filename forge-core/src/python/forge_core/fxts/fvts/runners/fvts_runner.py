@@ -29,6 +29,7 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 from forge_core.fxts import locations
 from forge_core.fxts.fvts import REPO_ROOT
+from forge_core.fxts.fvts.checks import CHECKS as FVTS_CHECKS
 from forge_core.fxts.fvts.profiles import (
     ALARM_OPERATIONS,
     PROFILE_BASELINE,
@@ -205,6 +206,8 @@ def write_tags(write_config: Any) -> list[dict[str, Any]]:
 
 class FVTSRunner(FxTSRunner):
     """Module ↔ forge-display contract runner for the FVTS framework."""
+
+    CHECKS = FVTS_CHECKS
 
     framework = "FVTS"
     version = "0.1.0"

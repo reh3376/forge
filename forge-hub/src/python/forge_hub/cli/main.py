@@ -404,6 +404,7 @@ governance_app.command("migrate-spec")(governance_cli.migrate_spec)
 governance_app.command("check")(governance_cli.check_command)
 governance_app.command("gaps")(governance_cli.gaps_command)
 governance_app.command("gap-approve")(governance_cli.gap_approve)
+governance_app.command("evidence")(governance_cli.evidence_command)
 
 
 # ---------------------------------------------------------------------------

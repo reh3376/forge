@@ -1271,3 +1271,96 @@ def gap_approve(
     GAPS_PATH.write_text(
         json.dumps(document, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
+
+
+# -- what each framework's checks rest on (D-19, AE-1, AE-2) -------------------------
+
+#: From weakest to strongest: what a property's checks can at best show about it.
+EVIDENCE_ORDER = ("none", "self", "file", "artifact")
+
+
+def _strongest(kinds: list[str]) -> str:
+    return max(kinds, key=EVIDENCE_ORDER.index) if kinds else "none"
+
+
+def evidence_table(runs: list[GateRun]) -> dict[str, dict[str, Any]]:
+    """For each framework: every declared check with its kind and how often it observed
+    something on the governed specs; and for each top-level property of the framework's
+    schema, the strongest evidence any declared check could give and the strongest one
+    observed today."""
+    table: dict[str, dict[str, Any]] = {}
+    for name, framework in sorted(FRAMEWORKS.items()):
+        runner = framework.make_runner(framework.schema)
+        schema = json.loads(framework.schema.read_text(encoding="utf-8"))
+        properties = sorted(schema.get("properties", {}))
+        observed: dict[str, dict[str, int]] = {}
+        for run in runs:
+            if run.framework != name:
+                continue
+            for verdict in run.report.verdicts:
+                declared = runner.declaration_of(verdict.check_id)
+                key = declared.id if declared else verdict.check_id
+                seen = observed.setdefault(key, {"observed": 0, "not_observed": 0})
+                kind = verdict.evidence_kind or "none"
+                seen["observed" if kind != "none" else "not_observed"] += 1
+        checks = []
+        for check in runner.declared_checks():
+            seen = observed.get(check.id, {"observed": 0, "not_observed": 0})
+            checks.append(
+                {"id": check.id, "kind": str(check.kind), "covers": list(check.covers), **seen}
+            )
+        by_property: dict[str, dict[str, str]] = {}
+        for prop in properties:
+            touching = [
+                c
+                for c in checks
+                if any(p in ("", f"/{prop}") or p.startswith(f"/{prop}/") for p in c["covers"])
+            ]
+            by_property[prop] = {
+                "declared": _strongest([c["kind"] for c in touching]),
+                "observed": _strongest([c["kind"] for c in touching if c["observed"]]),
+            }
+        table[name] = {"checks": checks, "properties": by_property}
+    return table
+
+
+def evidence_command(
+    framework: Annotated[
+        str | None, typer.Argument(help="One framework (fats, facts, ...); all when left out")
+    ] = None,
+    as_json: Annotated[bool, typer.Option("--json", help="Machine-readable output")] = False,
+) -> None:
+    """What each framework's checks rest on: the spec itself, another file, or the real thing.
+
+    Runs every governed spec as the gate does (no live checks), and shows each declared
+    check with its kind and whether it observed anything, then each top-level property of
+    the framework's schema with the strongest evidence a check could give it and the
+    strongest it got today (D-19, AE-1, AE-2).
+    """
+    import asyncio
+
+    if framework is not None and framework not in FRAMEWORKS:
+        typer.echo(f"Unknown framework '{framework}' ({', '.join(sorted(FRAMEWORKS))}).")
+        raise typer.Exit(code=1)
+    runs = asyncio.run(gate_runs())
+    table = evidence_table(runs)
+    if framework is not None:
+        table = {framework: table[framework]}
+    if as_json:
+        typer.echo(json.dumps(table, indent=2))
+        return
+    for name, entry in table.items():
+        typer.echo(f"{name.upper()}")
+        for check in entry["checks"]:
+            seen = (
+                f"observed on {check['observed']}"
+                if check["observed"]
+                else (
+                    "never run here" if check["not_observed"] else "not given by any governed spec"
+                )
+            )
+            covers = ", ".join(check["covers"]) or "(the framework, not a spec)"
+            typer.echo(f"  {check['kind']:<8} {check['id']:<42} {seen:<32} {covers}")
+        typer.echo("  property                          strongest declared  strongest observed")
+        for prop, kinds in entry["properties"].items():
+            typer.echo(f"  {prop:<33} {kinds['declared']:<19} {kinds['observed']}")
