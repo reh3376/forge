@@ -19,6 +19,7 @@ from forge_core import contract
 from forge_core.fxts.ftts.runners.ftts_runner import FTTSRunner
 from forge_core.fxts.shared.runner import VerdictStatus
 from forge_hub import fxts as hub_fxts
+from forge_hub.cli import governance as governance_cli
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -89,23 +90,26 @@ class TestFullSpecPasses:
     ) -> None:
         """Real FTTS spec passes every check, the owner's approval included (2026-11-18).
 
-        The spec carries a hash since FB-160 (D-14). No failure is allowed.
+        The spec carries a hash since FB-160 (D-14). What may fail or not run is in one
+        place, the accepted gaps (FB-266).
         """
-        allowed: set[str] = set()
-        report = await runner.run(
-            target="grpc-hardened-transport",
-            spec=spec,
-        )
+        name = "grpc-hardened-transport.ftts.json"
+        report = await runner.run(target="grpc-hardened-transport", spec=spec)
         assert report.hash_verified is True
-        failures = [
-            v
-            for v in report.verdicts
-            if v.status not in (VerdictStatus.PASS, VerdictStatus.NOT_RUN)
-            and v.check_id not in allowed
-        ]
-        assert not failures, "Unexpected failures:\n" + "\n".join(
-            f"  {v.check_id}: {v.message}" for v in failures
-        )
+        found = {
+            status: {v.check_id for v in report.verdicts if v.status == status}
+            for status in VerdictStatus
+            if status != VerdictStatus.PASS
+        }
+        expected = {
+            status: (
+                governance_cli.accepted_checks("ftts", name, str(status))
+                if status in (VerdictStatus.FAIL, VerdictStatus.NOT_RUN)
+                else set()
+            )
+            for status in found
+        }
+        assert found == expected
 
     async def test_report_metadata(
         self,

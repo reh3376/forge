@@ -119,6 +119,7 @@ uv sync --locked --extra dev --extra ot      # install from the lock file
 uv run pytest -q -rsx                        # the Python suite (tests/ and forge-core/tests), about a minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # the whole repository, as CI does
 uv run forge governance specs                # spec states and hash checks
+uv run forge governance check                # the gate CI runs: every framework over every governed spec; only the owner's accepted gaps get through
 uv run forge archive list                    # retired documents: an index into the history, never the old text
 cd forge-core/src/go && gofmt -l . && go vet ./... && go test ./...
 make sync-tutorial-embed verify-tutorial-embed check-tutorial-build

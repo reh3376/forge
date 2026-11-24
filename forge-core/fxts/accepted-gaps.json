@@ -1,0 +1,146 @@
+{
+  "title": "Accepted gaps of this repository's governed specs",
+  "description": "What the gate (`forge governance check`) lets through: a check that fails or did not run, for a named spec or for every spec of a framework, until the backlog item named is closed. An entry counts only while the owner's approval covers its exact content (`forge governance gap-approve`). An entry that covers nothing, or whose backlog item is closed, stops the gate, so the file only shrinks without the owner. See forge-core/docs/fxts/README.md, \"The gate\".",
+  "gaps": [
+    {
+      "id": "fats-live",
+      "framework": "fats",
+      "spec": "*",
+      "check": "fats:live",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-269",
+      "reason": "No run compares an API spec with the route it describes: the runner checks the spec against itself. The comparison with the app built in process is FB-269.",
+      "approval": {
+        "hash": "228c51f829f27c792b96ecbc6fb25f74b98f43691a81f926f687b29b234e6955",
+        "by": "reh3376",
+        "at": "2026-11-24T03:18:19Z"
+      }
+    },
+    {
+      "id": "facts-live",
+      "framework": "facts",
+      "spec": "*",
+      "check": "facts:live",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-271",
+      "reason": "No check compares an adapter spec with the module's code; the live checks are not implemented.",
+      "approval": {
+        "hash": "7a9da420c3439a1ffa97f82bdf1a91ec45cceadd0946a4811c06fe823cc3192a",
+        "by": "reh3376",
+        "at": "2026-11-24T03:18:19Z"
+      }
+    },
+    {
+      "id": "ftts-live",
+      "framework": "ftts",
+      "spec": "*",
+      "check": "ftts:live",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-270",
+      "reason": "No run compares the transport spec with the proto or the servicer; the runner never opens a proto file.",
+      "approval": {
+        "hash": "2e987c47ff47b8c92c25df03248a098419ec9f61a5b3b99b6f42aa4c8ba0aa04",
+        "by": "reh3376",
+        "at": "2026-11-24T03:18:19Z"
+      }
+    },
+    {
+      "id": "fmts-mes-m4",
+      "framework": "fmts",
+      "spec": "forge-mes.fmts.json",
+      "check": "fmts:m4",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-155",
+      "reason": "The conformance kit cannot drive the interim MES bridge, which runs in another process and language.",
+      "approval": {
+        "hash": "42294ebcedf76e1c8c3e700e157badb9c57d069588fc4f5bd16f3b5bcdde61f4",
+        "by": "reh3376",
+        "at": "2026-11-24T03:18:19Z"
+      }
+    },
+    {
+      "id": "fmts-mes-m5",
+      "framework": "fmts",
+      "spec": "forge-mes.fmts.json",
+      "check": "fmts:m5",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-155",
+      "reason": "The conformance kit cannot drive the interim MES bridge, which runs in another process and language.",
+      "approval": {
+        "hash": "b7e6c2c5d3f2b9bef3d41829f125b7a5669fd969cf90cf18372073e1ec29c6e6",
+        "by": "reh3376",
+        "at": "2026-11-24T03:18:19Z"
+      }
+    },
+    {
+      "id": "fmts-mes-m6",
+      "framework": "fmts",
+      "spec": "forge-mes.fmts.json",
+      "check": "fmts:m6",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-155",
+      "reason": "The conformance kit cannot drive the interim MES bridge, which runs in another process and language.",
+      "approval": {
+        "hash": "1358c8c439510cedc5ce8ff1c75bc918f62369ef683dfbe9f8c6b55e9c0c9452",
+        "by": "reh3376",
+        "at": "2026-11-24T03:18:19Z"
+      }
+    },
+    {
+      "id": "fmts-mes-m7",
+      "framework": "fmts",
+      "spec": "forge-mes.fmts.json",
+      "check": "fmts:m7",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-155",
+      "reason": "The conformance kit cannot drive the interim MES bridge, which runs in another process and language.",
+      "approval": {
+        "hash": "3a1d4e2636d3bc34be53ff02a58b509bd44c2b4ba334e42ee033354ce4d8b8ba",
+        "by": "reh3376",
+        "at": "2026-11-24T03:18:19Z"
+      }
+    },
+    {
+      "id": "fmts-mes-not-approved",
+      "framework": "fmts",
+      "spec": "forge-mes.fmts.json",
+      "check": "fmts:hash-approved",
+      "status": "FAIL",
+      "backlog_item": "FB-155",
+      "reason": "The owner has not approved the interim MES bridge's module spec; it waits until the kit can drive the bridge.",
+      "approval": {
+        "hash": "da0b02f8c740f88a9900b38a17906e24dc2f35e42cad6d16aa4bd39a3079211d",
+        "by": "reh3376",
+        "at": "2026-11-24T03:18:19Z"
+      }
+    },
+    {
+      "id": "fmts-mes-waivers",
+      "framework": "fmts",
+      "spec": "forge-mes.fmts.json",
+      "check": "fmts:waivers",
+      "status": "FAIL",
+      "backlog_item": "FB-155",
+      "reason": "The spec waives time-keeping requirements, and such a waiver counts only in a spec the owner has approved.",
+      "approval": {
+        "hash": "46f45785661ffc6c70ce886250e8635124fd4ce34556951875c5bb4f49a92e80",
+        "by": "reh3376",
+        "at": "2026-11-24T03:18:19Z"
+      }
+    },
+    {
+      "id": "fmts-scanner-m6",
+      "framework": "fmts",
+      "spec": "forge-scanner.fmts.json",
+      "check": "fmts:m6",
+      "status": "NOT_RUN",
+      "backlog_item": "FB-272",
+      "reason": "The scanner module has no sample events for the conformance kit, so its time check has never run.",
+      "approval": {
+        "hash": "f4473a0ac254420b2fbb9446a404e7f3835975427940c749e7a91a0bb874effc",
+        "by": "reh3376",
+        "at": "2026-11-24T03:18:19Z"
+      }
+    }
+  ]
+}

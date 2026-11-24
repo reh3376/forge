@@ -6,9 +6,10 @@ it meets the whole baseline. This walks ``forge-core/src/python/forge_core/fxts`
 documentation on every run, so a framework cannot be added half-finished and the summary document
 cannot fall behind the code (BACKLOG FB-149, FB-152).
 
-A requirement that is not met yet is named in ``KNOWN_GAPS`` with the backlog item that
-closes it. The test fails when a gap appears that is not listed, and also when a listed
-gap has been closed, so the list is removed as the work is done.
+A requirement that is not met is a failure: a baseline gap is never accepted. A spec the
+owner has not approved is let through only by an accepted gap the owner approved
+(``forge-core/fxts/accepted-gaps.json``, FB-266), which the gate holds to an open backlog
+item and removes when the spec is approved.
 """
 
 from __future__ import annotations
@@ -20,9 +21,9 @@ from typing import TYPE_CHECKING, Any
 import pytest
 
 from forge_core.fxts import locations
-from forge_core.fxts.fmts.runners.fmts_runner import load_backlog
 from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import check_schema_runner_parity, verify_spec_hash
+from forge_hub.cli import governance as governance_cli
 from forge_hub.cli.governance import (
     FRAMEWORKS,
     REPO_ROOT,
@@ -51,12 +52,6 @@ BUILT = tuple(sorted(FRAMEWORKS))
 #: The one schema id form the owner decided (D-14, Q-5).
 ID_FORM = re.compile(r"^forge://fxts/[a-z]+/v\d+\.\d+\.\d+$")
 ANY_VERSIONED_ID = re.compile(r"^forge://[a-z]+/[a-z]+/v\d+\.\d+\.\d+$")
-
-#: Requirements not met yet, per framework, each with the backlog item that closes it.
-#: Empty since FB-151 (2026-11-19): every framework meets all ten.
-KNOWN_GAPS: dict[str, dict[str, str]] = {}
-#: Specs whose hash the owner has not approved, each with the item that leads to it.
-PENDING_APPROVAL = {"forge-mes.fmts.json": "FB-155"}
 
 
 def _schema(fw: str) -> dict[str, Any]:
@@ -179,16 +174,14 @@ class TestEachFramework:
             verified, message = verify_spec_hash(spec)
             assert verified is True, f"{path.name}: {message}"
 
-    def test_f4_every_spec_is_approved_or_named_as_pending(self, fw: str) -> None:
-        unapproved = set()
+    def test_f4_every_spec_is_approved_or_its_approval_is_an_accepted_gap(self, fw: str) -> None:
         for path in _specs(fw):
             integrity = json.loads(path.read_text(encoding="utf-8"))["integrity"]
             if integrity.get("hash_state") != "approved" or not integrity.get("approved_by"):
-                unapproved.add(path.name)
-        expected = {
-            name for name in PENDING_APPROVAL if name.endswith(f".{fw}.json") and unapproved
-        }
-        assert unapproved == expected & unapproved == unapproved & set(PENDING_APPROVAL)
+                accepted = governance_cli.accepted_checks(fw, path.name, "FAIL")
+                assert f"{fw}:hash-approved" in accepted, (
+                    f"{path.name} is not approved by the owner, and no accepted gap says so"
+                )
 
     def test_f6_and_f9_a_gate_and_the_commands(self, fw: str) -> None:
         # A framework's gate is with the tests of what its specs describe: forge-core's, the
@@ -202,27 +195,7 @@ class TestEachFramework:
         assert FRAMEWORKS[fw].schema.is_file()
         assert any(folder.is_dir() for folder in FRAMEWORKS[fw].specs_dirs)
 
-    def test_the_gaps_are_exactly_the_known_ones(self, fw: str) -> None:
-        found = _gaps(fw)
-        known = KNOWN_GAPS.get(fw, {})
-        assert set(found) == set(known), (
-            f"{fw}: found {sorted(found)}, listed {sorted(known)}. A gap that is not listed "
-            "is a new defect; a listed gap that is gone must be removed from KNOWN_GAPS."
-        )
-
-
-def test_every_named_gap_and_pending_approval_has_an_open_backlog_item() -> None:
-    backlog = load_backlog(REPO_ROOT)
-    items = {item for gaps in KNOWN_GAPS.values() for item in gaps.values()}
-    items |= set(PENDING_APPROVAL.values())
-    assert {item: backlog.get(item) for item in items} == dict.fromkeys(items, True)
-
-
-def test_a_pending_spec_is_really_pending() -> None:
-    """The list of pending approvals shrinks when the owner approves; it never goes stale."""
-    for name in PENDING_APPROVAL:
-        fw = name.split(".")[-2]
-        files = [file for file in framework_specs(FRAMEWORKS[fw]) if file.name == name]
-        assert len(files) == 1, f"{name}: found {len(files)} files"
-        integrity = json.loads(files[0].read_text(encoding="utf-8"))["integrity"]
-        assert integrity.get("hash_state") != "approved", f"{name} is approved: remove it"
+    def test_the_framework_meets_the_whole_baseline(self, fw: str) -> None:
+        """A baseline gap is never accepted (FB-266): it is fixed, or the framework is a
+        planned one."""
+        assert _gaps(fw) == {}, f"{fw} does not meet the baseline: {_gaps(fw)}"

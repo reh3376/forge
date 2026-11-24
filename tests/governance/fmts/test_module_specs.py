@@ -1,23 +1,12 @@
-"""The gate: every module in the repository against its FMTS spec (BACKLOG FB-136).
+"""Every module in the repository against its FMTS spec (BACKLOG FB-136).
 
-Each module's spec (``forge-modules/<module>/fxts/fmts``) runs through the
-FMTSRunner against this checkout. Every check must pass or be a named skip, except the
-failures listed
-here. Each listed failure is a known gap with a backlog item, and its entry is removed
-when the gap is closed:
-
-* ``fmts:hash-approved`` on every spec the owner has not approved yet: they are
-  ``pending_review``. Nobody writes that approval on the owner's behalf. ``forge-wms`` is
-  approved (2026-11-18) and has no allowed failure.
-* ``fmts:waivers`` on ``forge-mes``: its waiver of M-3 is a time-keeping waiver, which
-  counts only with admin privileges, that is once the owner approves the spec (Q-10).
-* ``forge-mes`` stays ``pending_review``: the owner approves a module spec only when the
-  conformance kit has run M-4 to M-7 against the module, and the kit cannot drive the
-  interim bridge, a TypeScript process (FB-155).
+Each module's spec (``forge-modules/<module>/fxts/fmts``) runs through the FMTSRunner
+against this checkout. A check may fail or not run only where an accepted gap that the
+owner approved says so (``forge-core/fxts/accepted-gaps.json``, read through
+``forge_hub.cli.governance.accepted_checks``; FB-266). A waived requirement is read from
+the spec itself, which the owner approved: changing a waiver changes the spec's hash.
 
 M-4 to M-7 are run by the conformance kit for the modules on the Python adapter template.
-``NOT_RUN`` names what the kit did not check and why: M-6 where a module has no sample
-events for the kit, and all four for the two modules the kit cannot drive (FB-155).
 """
 
 from __future__ import annotations
@@ -31,57 +20,10 @@ from forge_core.fxts import locations
 from forge_core.fxts.fmts import REPO_ROOT
 from forge_core.fxts.fmts.runners.fmts_runner import CONFORMANCE_KIT, FMTSRunner, load_backlog
 from forge_core.fxts.shared.runner import RunOutcome, VerdictStatus
+from forge_hub.cli import governance as governance_cli
 
-PENDING_APPROVAL = frozenset({"fmts:hash-approved"})
-ALLOWED_FAILURES: dict[str, frozenset[str]] = {
-    # approved by the owner on 2026-11-18: no failure is allowed
-    "forge-wms": frozenset(),
-    "forge-cmms": frozenset(),
-    "forge-integ-erp-netsuite": frozenset(),
-    "forge-nms": frozenset(),
-    "forge-historian": frozenset(),
-    "forge-ims": frozenset(),
-    "forge-scanner": frozenset(),  # its M-3 waiver counts: approved with admin privileges
-    "forge-ot": frozenset(),
-    "forge-mes": PENDING_APPROVAL | {"fmts:waivers"},
-}
-#: The transport contract is not built, so every module waives M-12 to M-14 until it is
-#: (FB-165, FB-164). M-15 binds only forge-ot (process-control writes) and M-16 only
-#: forge-mes (business write-backs); for every other module they are not applicable.
-TRANSPORT = {"M-12": "FB-164", "M-13": "FB-164", "M-14": "FB-164"}
-WAIVED: dict[str, dict[str, str]] = {
-    "forge-mes": {
-        "M-3": "FB-145",
-        "M-8": "FB-057",
-        "M-9": "FB-181",
-        "M-10": "FB-141",
-        "M-11": "FB-076",
-        **TRANSPORT,
-        "M-16": "FB-164",
-    },
-    "forge-ot": {"M-10": "FB-141", "M-11": "FB-146", **TRANSPORT, "M-15": "FB-164"},
-    "forge-scanner": {"M-3": "FB-117", "M-10": "FB-141", **TRANSPORT},
-}
-ROLES_ONLY = {"M-10": "FB-141", **TRANSPORT}
 NOT_APPLICABLE: dict[str, set[str]] = {"forge-ot": {"M-16"}, "forge-mes": {"M-15"}}
 NO_DOWNWARD_WRITES = {"M-15", "M-16"}
-#: Requirements the conformance kit did not check, per module. Everything else of
-#: M-4 to M-7 was run against the module and passed.
-NO_SAMPLE_EVENTS = frozenset({"M-6"})
-NOT_RUN: dict[str, frozenset[str]] = {
-    # these four have sample events for the kit, so all four requirements are checked
-    "forge-wms": frozenset(),
-    "forge-cmms": frozenset(),
-    "forge-integ-erp-netsuite": frozenset(),
-    "forge-nms": frozenset(),
-    "forge-historian": frozenset(),
-    "forge-ims": frozenset(),
-    "forge-mes": frozenset({"M-4", "M-5", "M-6", "M-7"}),  # TypeScript, another process
-    "forge-ot": frozenset(),  # off the template; driven through its own conformance.py hook
-    # no sample events for the kit, so its time check never ran (the audit, FB-272)
-    "forge-scanner": NO_SAMPLE_EVENTS,
-}
-
 SPEC_FILES = locations.spec_files("fmts", "*.fmts.json")
 MODULE_IDS = [path.name.removesuffix(".fmts.json") for path in SPEC_FILES]
 
@@ -117,22 +59,19 @@ async def test_module_meets_its_spec(runner: FMTSRunner, module_id: str) -> None
     assert report.total == 29 and report.hash_verified is True
     assert by_status.get(VerdictStatus.NOT_IMPLEMENTED, set()) == set()  # schema-runner parity
     assert by_status.get(VerdictStatus.ERROR, set()) == set()
-    # A module with no row here is a failure of this test, never an allowed gap (FB-266).
-    assert by_status.get(VerdictStatus.FAIL, set()) == ALLOWED_FAILURES[module_id]
-
-    waived = WAIVED.get(module_id, ROLES_ONLY)
-    not_run = {_check(r) for r in NOT_RUN[module_id] if r not in waived}
-    assert by_status.get(VerdictStatus.NOT_RUN, set()) == not_run
-    assert by_status.get(VerdictStatus.WAIVED, set()) == {_check(r) for r in waived}
+    name = f"{module_id}.fmts.json"
+    failed = by_status.get(VerdictStatus.FAIL, set())
+    not_run = by_status.get(VerdictStatus.NOT_RUN, set())
+    assert failed == governance_cli.accepted_checks("fmts", name, "FAIL"), failed
+    assert not_run == governance_cli.accepted_checks("fmts", name, "NOT_RUN"), not_run
+    waived = {_check(w["requirement"]) for w in spec["waivers"]}
+    assert by_status.get(VerdictStatus.WAIVED, set()) == waived
     # Every module waives something, so no module's run passes: it is incomplete, or it
     # fails. That is the true state of the nine today (D-14 F-7, FB-265, FB-272).
-    assert report.outcome is (
-        RunOutcome.FAIL if ALLOWED_FAILURES[module_id] else RunOutcome.INCOMPLETE
-    )
-    assert not report.passed
-    ran = {_check(r) for r in CONFORMANCE_KIT} - not_run - {_check(r) for r in waived}
+    assert waived and not report.passed
+    assert report.outcome is (RunOutcome.FAIL if failed else RunOutcome.INCOMPLETE)
+    ran = {_check(r) for r in CONFORMANCE_KIT} - not_run - waived
     assert ran <= by_status.get(VerdictStatus.PASS, set())
-    assert {w["requirement"]: w["backlog_item"] for w in spec["waivers"]} == waived
     not_bound = {r for r, claim in spec["baseline"].items() if claim == "not_applicable"}
     assert not_bound == NOT_APPLICABLE.get(module_id, NO_DOWNWARD_WRITES)
     assert {_check(r) for r in not_bound} <= by_status.get(VerdictStatus.PASS, set())
