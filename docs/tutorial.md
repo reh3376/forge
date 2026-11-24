@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-24` against the repository `reh3376/forge` at the merge of PR 180 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-24` against the repository `reh3376/forge` at the merge of PR 181 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-24 at PR 180:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-24 at PR 181:
 
 **Working**
 
@@ -2063,7 +2063,7 @@ note:
 |---|---|
 | **Every finding is fixed or recorded** in `BACKLOG.md`; nothing is skipped | 2026-10-15 |
 | **Every decision is front-loaded**: the problem is stated and the design is taken through the cases it would fail on later, before anything is built or put to the owner. Speed is never a reason | 2026-11-23 |
-| **Two gates, and the owner is the gate**: before building and before pushing the work stops, states what is recommended, prints the keywords (`/gates`) and waits for `go` or keywords such as `+design+arena` or `+blast` | 2026-11-23 |
+| **Two gates, and the owner is the gate**: before building and before pushing the work stops, states what is recommended, prints the keywords (`/gates`) and waits for `go` or keywords such as `+design+arena` or `+blast`. A coding agent new to the repository reads `docs/gates-for-coding-agents.md`: the keywords, the pstack plugin they need and how to install it, and how to make sure the tables show | 2026-11-23 |
 | **Role-level security is built into everything as it is built**: every function that reads protected data or changes state names the permission it needs and asks at a check point handed to it; the roles themselves come later | 2026-11-23 |
 | **Documentation is current before every push**: `docs/WHERE-WE-ARE.md` rows, numbers and status date, the roadmap and the backlog; the two READMEs are orientation and carry no counts | 2026-10-16 |
 | **The developer and user tutorial is current before every push**: `docs/tutorial.md` reviewed against the change, updated, rebuilt (`make sync-tutorial-embed`) and checked | 2026-11-17 (owner) |

@@ -19,10 +19,10 @@ description: "Check a change to what counts as a governed file (the kinds a gove
 
 It does **not** cover what the gate does with a kind (`closed_set_problems`, `identity_problems` in `forge-hub/src/python/forge_hub/cli/governance.py`, tested in `forge-hub/tests/cli/test_governance_closed_set.py`), or whether git's file list is the repository's (that is git's).
 
-**Sync commit:** the commit that closes FB-268 (it is named in `BACKLOG-DONE.md`, row FB-268, once the change is merged). See what changed since:
+**Sync commit:** `044b9be3` (2026-11-24, the change that closed FB-268). See what changed since:
 
 ```bash
-git log --oneline <that commit>..HEAD -- forge-core/src/python/forge_core/fxts/locations.py
+git log --oneline 044b9be3..HEAD -- forge-core/src/python/forge_core/fxts/locations.py
 ```
 
 If that prints commits you did not check, look before you trust a pass. Move the sync commit forward only after you have confirmed the check still describes the code.
