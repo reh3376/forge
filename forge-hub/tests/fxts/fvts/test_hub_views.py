@@ -27,13 +27,12 @@ from forge_core.fxts.fvts.renderer import (
 from forge_core.fxts.fvts.runners.fvts_runner import HUB_OWNER, FVTSRunner
 from forge_core.fxts.shared.runner import VerdictStatus, sha256_hex_obj
 from forge_hub import fxts as hub_fxts
+from forge_hub.cli import governance as governance_cli
 
 HUB_SPEC_PATH = hub_fxts.specs_dir("fvts") / "forge-hub.fvts.json"
 GOLDEN = Path(__file__).resolve().parent / "golden"
 PASS, FAIL = VerdictStatus.PASS, VerdictStatus.FAIL
 
-#: Failures the gate allows. Empty: the owner approved the hub's view spec.
-ALLOWED_FAILURES: frozenset[str] = frozenset()
 #: The four screens the owner put first (D-16, Q-15), and what each shows.
 SCREENS = {
     "hub.status": ["hub.component"],
@@ -70,7 +69,9 @@ class TestTheHubsContract:
             by_status.setdefault(verdict.status, set()).add(verdict.check_id)
         assert by_status.get(VerdictStatus.NOT_IMPLEMENTED, set()) == set()
         assert by_status.get(VerdictStatus.ERROR, set()) == set()
-        assert by_status.get(FAIL, set()) == ALLOWED_FAILURES, [
+        # What may fail is in one place, the accepted gaps (FB-266).
+        allowed = governance_cli.accepted_checks("fvts", HUB_SPEC_PATH.name, "FAIL")
+        assert by_status.get(FAIL, set()) == allowed, [
             (v.check_id, v.message) for v in report.verdicts if v.status is FAIL
         ]
         assert report.hash_verified is True and report.total == 21

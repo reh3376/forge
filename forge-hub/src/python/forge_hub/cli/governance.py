@@ -41,6 +41,7 @@ import typer
 import forge_core.fxts as _fxts
 from forge_core import contract
 from forge_core.fxts import locations
+from forge_core.fxts.shared import gaps as accepted_gaps
 from forge_core.fxts.shared import schemas
 from forge_core.fxts.shared.runner import (
     RunOutcome,
@@ -885,4 +886,202 @@ def migrate_spec(
         reason=reason or f"schema {name} {declared} -> {to}",
         source=source,
         change_type="structural",
+    )
+
+
+# -- the gate (FB-266) ---------------------------------------------------------
+
+#: The accepted gaps of this repository, beside the generated index of its specs. Not a
+#: spec, not in the contract, not shipped: only the gate reads it.
+GAPS_PATH = REPO_ROOT / "forge-core" / "fxts" / accepted_gaps.FILE_NAME
+#: The permission an approval of an accepted gap needs. The command line has no check point
+#: for it yet, and says so on every approval (BACKLOG FB-280).
+GAP_APPROVE_SCOPE = "governance:gap:approve"
+
+
+def accepted_checks(framework: str, spec: str, status: str) -> set[str]:
+    """The checks of one governed spec that this repository's accepted gaps let through
+    with this status: only entries the owner approved, whose backlog item is open. A file
+    that cannot be read accepts nothing. A framework's own tests read this, so the gaps
+    are written in one place (FB-266)."""
+    from forge_core.fxts.fmts.runners.fmts_runner import load_backlog
+
+    entries, problems = accepted_gaps.load(GAPS_PATH)
+    if problems:
+        return set()
+    return accepted_gaps.accepted_checks(
+        entries, load_backlog(REPO_ROOT), framework=framework, spec=spec, status=status
+    )
+
+
+@dataclass(frozen=True)
+class GateRun:
+    """One governed spec run through its framework's runner, for the gate."""
+
+    framework: str
+    spec: Path
+    report: FxTSReport
+
+
+async def gate_runs() -> list[GateRun]:
+    """Every governed spec of every framework, through its real runner."""
+    return [
+        GateRun(name, file, await run_framework(name, str(file)))
+        for name in sorted(FRAMEWORKS)
+        for file in framework_specs(FRAMEWORKS[name])
+    ]
+
+
+def gate_findings(runs: list[GateRun]) -> list[accepted_gaps.Finding]:
+    """Every check of every run that did not pass.
+
+    A waived requirement is not a finding: the waiver is in the spec, which the owner
+    approved, and a waiver in a spec that is not approved fails a check of its own. A run
+    with no verdict at all is a finding that is never accepted.
+    """
+    from forge_core.fxts.shared.runner import VerdictStatus
+
+    findings: list[accepted_gaps.Finding] = []
+    for run in runs:
+        name, spec = run.framework, run.spec.name
+        if not run.report.verdicts:
+            findings.append(
+                accepted_gaps.Finding(
+                    name, spec, f"{name}:run", accepted_gaps.NO_VERDICT, "no check ran"
+                )
+            )
+        findings += [
+            accepted_gaps.Finding(name, spec, v.check_id, str(v.status), v.message)
+            for v in run.report.verdicts
+            if v.status not in (VerdictStatus.PASS, VerdictStatus.WAIVED)
+        ]
+    return findings
+
+
+def _shown(path: Path) -> Path:
+    return path.relative_to(REPO_ROOT) if path.is_relative_to(REPO_ROOT) else path
+
+
+def gate_problems() -> list[str]:
+    """What is never accepted: a schema registry, a governed list or an index that is wrong."""
+    from forge_core.fxts.shared import lists
+
+    problems = [f"schema registry: {problem}" for problem in schema_problems()]
+    for name in lists.ALL_NAMES:
+        problems += [f"governed list: {problem}" for problem in lists.load(name).problems]
+    for page, text in index_pages():
+        if not (page.is_file() and page.read_text(encoding="utf-8") == text):
+            problems.append(f"{page.relative_to(REPO_ROOT)}: stale; run `forge governance index`")
+    return problems
+
+
+async def gate(
+    gaps_path: Path | None = None, runs: list[GateRun] | None = None
+) -> accepted_gaps.GateResult:
+    """Run the whole gate on this repository and decide it (``accepted_gaps.judge``)."""
+    from forge_core.fxts.fmts.runners.fmts_runner import load_backlog
+
+    entries, file_problems = accepted_gaps.load(gaps_path or GAPS_PATH)
+    return accepted_gaps.judge(
+        gate_findings(runs if runs is not None else await gate_runs()),
+        entries,
+        load_backlog(REPO_ROOT),
+        [*file_problems, *gate_problems()],
+    )
+
+
+def check_command() -> None:
+    """The gate: every framework over every governed spec; exit 1 unless nothing is refused.
+
+    A check that fails or did not run stops it unless an accepted gap covers it
+    (`forge governance gaps`). So do an accepted gap that covers nothing, one whose
+    backlog item is closed, and anything wrong with a schema registry, a governed list
+    or a generated index.
+    """
+    import asyncio
+
+    result = asyncio.run(gate())
+    for problem in result.problems:
+        typer.echo(f"PROBLEM  {problem}")
+    for refusal in result.refused:
+        typer.echo(f"REFUSED  {refusal.finding}: {refusal.why}")
+        if refusal.finding.message:
+            typer.echo(f"           {refusal.finding.message[:200]}")
+    for gap in result.unused:
+        typer.echo(
+            f"UNUSED   {gap.id}: it covers nothing that was found; the gap is closed, "
+            "remove the entry"
+        )
+    for gap, state in result.closed:
+        typer.echo(f"CLOSED   {gap.id}: its backlog item {gap.backlog_item} is {state}")
+    by_gap: dict[str, int] = {}
+    for _, gap in result.accepted:
+        by_gap[gap.id] = by_gap.get(gap.id, 0) + 1
+    for gap_id, count in sorted(by_gap.items()):
+        typer.echo(f"accepted {gap_id}: {count} finding(s)")
+    if result.ok:
+        typer.echo(
+            f"Gate passed: {len(result.accepted)} finding(s), each covered by an accepted gap "
+            f"({len(by_gap)} in {_shown(GAPS_PATH)}); nothing refused."
+        )
+        return
+    typer.echo(
+        f"Gate FAILED: {len(result.problems)} problem(s), {len(result.refused)} refused, "
+        f"{len(result.unused)} unused, {len(result.closed)} with a closed item."
+    )
+    raise typer.Exit(code=1)
+
+
+def gaps_command() -> None:
+    """List the accepted gaps and whether the owner approved each as it is now."""
+    entries, problems = accepted_gaps.load(GAPS_PATH)
+    for problem in problems:
+        typer.echo(f"PROBLEM  {problem}")
+    for gap in entries:
+        state = (
+            f"approved by {gap.approval.by} {gap.approval.at}" if gap.approved else "NOT APPROVED"
+        )
+        typer.echo(
+            f"{gap.id}: {gap.framework} {gap.spec} {gap.check} [{gap.status}] "
+            f"until {gap.backlog_item}: {state}"
+        )
+    waiting = sum(1 for gap in entries if not gap.approved)
+    typer.echo(f"{len(entries)} accepted gap(s): {waiting} awaiting the owner's approval.")
+    if problems:
+        raise typer.Exit(code=1)
+
+
+def gap_approve(
+    ids: Annotated[list[str], typer.Argument(help="The id of each entry to approve")],
+    by: Annotated[str, typer.Option("--by", help="The approving owner (recorded on the entry)")],
+) -> None:
+    """Record the owner's approval of accepted gaps, each as it is now.
+
+    Like `approve`, it records the name it is given and nothing else, so it must be the
+    owner who runs it, or it is run on the owner's explicit word.
+    """
+    if not by.strip():
+        typer.echo("--by names the approving owner; it cannot be empty.")
+        raise typer.Exit(code=1)
+    typer.echo(
+        f"No permission check point is wired for {GAP_APPROVE_SCOPE} on the command line "
+        "(FB-280): the name given to --by is recorded and nothing else."
+    )
+    entries, problems = accepted_gaps.load(GAPS_PATH)
+    if problems:
+        for problem in problems:
+            typer.echo(f"PROBLEM  {problem}")
+        raise typer.Exit(code=1)
+    unknown = sorted(set(ids) - {gap.id for gap in entries})
+    if unknown:
+        typer.echo(f"No accepted gap with the id: {', '.join(unknown)}")
+        raise typer.Exit(code=1)
+    at = utc_stamp()
+    document = json.loads(GAPS_PATH.read_text(encoding="utf-8"))
+    for index, gap in enumerate(entries):
+        if gap.id in ids:
+            document["gaps"][index]["approval"] = gap.approved_by(by, at).approval.model_dump()
+            typer.echo(f"{gap.id}: approved by {by.strip()} at {at}.")
+    GAPS_PATH.write_text(
+        json.dumps(document, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )

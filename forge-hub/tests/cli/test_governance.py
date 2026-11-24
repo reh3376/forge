@@ -13,7 +13,6 @@ from typer.testing import CliRunner
 from forge_core.fxts import locations
 from forge_core.fxts.shared.runner import verify_spec_hash
 from forge_hub.cli import governance
-from forge_hub.cli import governance as governance_cli
 from forge_hub.cli.main import app
 
 if TYPE_CHECKING:
@@ -256,14 +255,14 @@ def test_run_facts_by_adapter_id_and_by_file(root: Path) -> None:
     # Nothing failed, and the checks against the adapter's code did not run: the run is
     # incomplete, exit 3, and says so (D-14 F-7, FB-265, FB-271).
     code, out = run("run", "facts", "forge-wms", "--specs", str(specs))
-    assert code == governance_cli.EXIT_INCOMPLETE == 3, out
+    assert code == governance.EXIT_INCOMPLETE == 3, out
     assert "[INCOMPLETE] FACTS — forge-wms" in out and "1 not run" in out
     assert "[NOT_RUN] facts:live: NOT RUN" in out
     assert "this run does not show that the spec is met" in out
     assert "All checks" not in out and "Failed checks:" not in out
 
     code, out = run("run", "facts", str(specs / "forge-wms.facts.json"), "--format", "json")
-    assert code == governance_cli.EXIT_INCOMPLETE, out
+    assert code == governance.EXIT_INCOMPLETE, out
     report = json.loads(out)
     assert report["outcome"] == "INCOMPLETE"
     assert report["framework"] == "FACTS" and report["target"] == "forge-wms"
@@ -313,7 +312,7 @@ def test_run_ftts_and_fats_load_their_specs() -> None:
     # All 41 static checks pass and the run is incomplete: nothing compared the spec with
     # the proto or the servicer (FB-265, FB-270).
     code, out = run("run", "ftts", "grpc-hardened-transport")
-    assert code == governance_cli.EXIT_INCOMPLETE, out
+    assert code == governance.EXIT_INCOMPLETE, out
     assert "[INCOMPLETE] FTTS — grpc-hardened-transport: 41/42 checks passed, 1 not run" in out
     assert "[NOT_RUN] ftts:live: NOT RUN" in out
 

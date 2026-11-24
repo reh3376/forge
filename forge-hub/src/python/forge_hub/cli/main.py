@@ -401,6 +401,9 @@ governance_app.command("schema-diff")(governance_cli.schema_diff)
 governance_app.command("schema-release")(governance_cli.schema_release)
 governance_app.command("schema-approve")(governance_cli.schema_approve)
 governance_app.command("migrate-spec")(governance_cli.migrate_spec)
+governance_app.command("check")(governance_cli.check_command)
+governance_app.command("gaps")(governance_cli.gaps_command)
+governance_app.command("gap-approve")(governance_cli.gap_approve)
 
 
 # ---------------------------------------------------------------------------

@@ -116,6 +116,28 @@ A run that was not asked for live checks says so with one `NOT_RUN` verdict (`fa
 
 The law, "a run never passes unless every check ran and passed", is checked for every case on the real code by `tests/governance/test_verdicts_exhaustive.py`; the skill `.claude/skills/verify-fxts-verdicts` says what it covers and how to read a failure.
 
+### The gate: what gets through, and who decides
+
+`forge governance check` runs every framework over every governed spec, then checks the schema registries, the governed lists and the generated indexes. CI runs it on every push, as its own step after the test suite, and `tests/governance/test_gate.py` runs the same function so `pytest` alone gives a developer the gate's answer (FB-266).
+
+A check of a spec that failed or did not run is a *finding*. A finding gets through only when an **accepted gap** covers it: an entry in `forge-core/fxts/accepted-gaps.json` that names the framework, the spec (or `*`, every spec of the framework, for a check that did not run only), the check, the status (`FAIL` or `NOT_RUN`), an open backlog item and the reason, and that the owner approved as it is now.
+
+| What | The gate |
+|---|---|
+| A finding covered by an approved entry whose backlog item is open | let through, and counted under the entry |
+| A finding nothing covers, or covered only by an entry not approved as it is now | refused |
+| An entry that covers nothing that was found | refused: the gap is closed, the entry is removed |
+| An entry whose backlog item is closed or is in neither backlog file | refused |
+| A check that broke (`ERROR`), a field with no check (`NOT_IMPLEMENTED`), a run with no verdict | refused, whatever the file says |
+| A failure accepted for every spec at once, two entries that cover the same findings, a file that does not read | cannot be written: the file is refused, and then it accepts nothing |
+| A stale generated index, a schema registry problem, a governed list that is not usable | refused, whatever the file says |
+
+An entry's approval is the hash of everything else in the entry, with who approved it and when (`forge governance gap-approve <id> --by reh3376`, on the owner's word). Changing any field afterwards ends the approval. So the file grows, or an entry changes, only on the owner's word, and it shrinks without anyone's: an entry whose gap is closed has to go. A waived requirement of a module is not a finding: the waiver is in the module's spec, which the owner approved. `forge governance gaps` lists the entries and whether each is approved.
+
+The rule is written once, in `judge` (`forge_core/fxts/shared/gaps.py`), and checked for every case on the real code by `forge-core/tests/fxts/test_gaps_exhaustive.py` (skill `.claude/skills/verify-fxts-gate`). The framework tests that once kept their own tables of allowed failures read the file instead (`forge_hub.cli.governance.accepted_checks`).
+
+What the gate does not do yet: it does not prove that a check can fail (FB-278), the hash framework is not part of it (FB-279), the approval is a name in a field and not a signature (FB-267), and the command line has no permission check point for an approval (FB-280).
+
 ### AI Agent Governance
 
 FHTS specifically targets errors made by AI coding agents:
@@ -160,6 +182,11 @@ forge governance run fvts forge-hub-views --format json --output reports/fvts-fo
 forge governance run ftts grpc-hardened-transport
 forge governance run fmts path/to/module.fmts.json # the module requirements; what did not run or is waived is listed
 forge governance run fats /v1/health --live        # live checks: FATS, FACTS, FTTS
+
+# The gate: every framework over every governed spec; exit 1 unless nothing is refused
+forge governance check
+forge governance gaps                              # the accepted gaps, and whether each is approved
+forge governance gap-approve fats-live --by reh3376 # the owner, on their own word
 ```
 
 Every runner verifies the hash of the spec it runs; `stamp` and `approve` rewrite only the

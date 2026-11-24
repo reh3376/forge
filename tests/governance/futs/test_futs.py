@@ -27,6 +27,7 @@ from forge_core.fxts.shared.runner import (
     check_schema_runner_parity,
     verify_spec_hash,
 )
+from forge_hub.cli import governance as governance_cli
 
 PASS, FAIL, UNRUN = VerdictStatus.PASS, VerdictStatus.FAIL, VerdictStatus.NOT_RUN
 SCHEMA = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
@@ -51,10 +52,6 @@ HUB_SCREENS = {
     "forge-hub-governance": "hub.governance",
     "forge-hub-access": "hub.access",
 }
-#: Failures the gate allows, by spec id. A spec the owner approved is allowed none.
-ALLOWED_FAILURES: dict[str, frozenset[str]] = {}
-#: Checks that could not be run, by spec id: CEL is compiled by the Go server (FB-181).
-NOT_RUN: dict[str, frozenset[str]] = {VIEW: frozenset({"futs:expressions"})}
 
 
 #: The reference view document: a sample for these tests, not a governed file (FB-078).
@@ -155,8 +152,13 @@ class TestTheSpecs:
             by_status.setdefault(verdict.status, set()).add(verdict.check_id)
         assert by_status.get(VerdictStatus.NOT_IMPLEMENTED, set()) == set()
         assert by_status.get(VerdictStatus.ERROR, set()) == set()
-        assert by_status.get(FAIL, set()) == ALLOWED_FAILURES.get(ident, frozenset())
-        assert by_status.get(UNRUN, set()) == NOT_RUN.get(ident, frozenset())
+        # What may fail or not run is in one place, the accepted gaps (FB-266).
+        assert by_status.get(FAIL, set()) == governance_cli.accepted_checks(
+            "futs", path.name, "FAIL"
+        )
+        assert by_status.get(UNRUN, set()) == governance_cli.accepted_checks(
+            "futs", path.name, "NOT_RUN"
+        )
         assert report.hash_verified is True
 
     def test_every_widget_with_a_binding_shows_quality_and_staleness(self) -> None:
