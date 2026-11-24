@@ -287,7 +287,7 @@ Setup: `npx dotenv-vault pull`
 The `mes-module` job in the repository's `.github/workflows/ci.yml` installs from `package-lock.json` (`npm ci`), builds `shared`, generates the Prisma client and then runs:
 
 - the backend type check and the frontend type check, both blocking. The frontend compiles under `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess` and `noPropertyAccessFromIndexSignature`; fix an error in the code, do not relax a flag;
-- backend jest, advisory (root `BACKLOG.md` FB-036).
+- backend jest on `src/forge` only, the bridge's link to the hub, blocking. The old application's other backend tests are not run in CI and are not to be fixed: forge-mes is to be written in Go and that code does not carry over (the owner, 2026-11-23; root `BACKLOG.md` FB-036).
 
 Things that have cost time here:
 
