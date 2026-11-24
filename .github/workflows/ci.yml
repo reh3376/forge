@@ -136,13 +136,15 @@ jobs:
         if: steps.changes.outputs.run == 'true'
         run: npx tsc --noEmit -p tsconfig.json
         working-directory: forge-modules/forge-mes/bridge/backend
-      - name: backend unit tests (advisory until BACKLOG FB-036 is verified)
+      - name: backend tests of the link to the hub
         if: steps.changes.outputs.run == 'true'
-        # --forceExit: Jest finishes in ~5 min but open Prisma/RabbitMQ handles from the DB-less
-        # suites (FB-036) kept the process alive ~15 min more (BACKLOG FB-052).
-        run: npx jest --ci --passWithNoTests --forceExit
+        # Blocking. Only the bridge's link to the hub (src/forge): it is the one module outside
+        # Python that speaks the hub contract, and a change to the contract can break it. The
+        # old application's own business tests are not run: forge-mes is to be written in Go
+        # (D-3), so they test code that will not carry over (the owner, 2026-11-23; FB-036).
+        # No --passWithNoTests: a path that matches no test fails the step.
+        run: npx jest --ci src/forge
         working-directory: forge-modules/forge-mes/bridge/backend
-        continue-on-error: true
       - name: frontend type-check
         if: steps.changes.outputs.run == 'true'
         # Blocking since BACKLOG FB-028 (2026-11-17): the interim frontend type-checks clean

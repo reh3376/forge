@@ -21,10 +21,10 @@ description: "Check a change to the FxTS gate (what `forge governance check` let
 
 It does **not** cover whether a runner gives the right verdict (the frameworks' own tests, FB-278), whether a check can fail at all (FB-278), or whether the approval is the owner's: it is a name in a field, as every spec approval is today (FB-267, FB-280).
 
-**Sync commit:** the commit that closes FB-266 (it is named in `BACKLOG-DONE.md`, row FB-266, once the change is merged). See what changed since:
+**Sync commit:** `61d986d5` (2026-11-23, the change that closed FB-266). See what changed since:
 
 ```bash
-git log --oneline <that commit>..HEAD -- forge-core/src/python/forge_core/fxts/shared/gaps.py forge-hub/src/python/forge_hub/cli/governance.py
+git log --oneline 61d986d5..HEAD -- forge-core/src/python/forge_core/fxts/shared/gaps.py forge-hub/src/python/forge_hub/cli/governance.py
 ```
 
 If that prints commits you did not check, look before you trust a pass. Move the sync commit forward only after you have confirmed the check still describes the code.

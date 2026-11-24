@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 177 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-23` against the repository `reh3376/forge` at the merge of PR 178 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 177:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-23 at PR 178:
 
 **Working**
 
@@ -1401,7 +1401,7 @@ note:
 | Its data into the hub's `mod_mes` | ⬜ FB-057 steps 2–5 |
 | Frontend retired in favour of forge-display | ⬜ after forge-display exists |
 
-- The bridge's frontend type check is clean and blocks in CI (FB-028). Its backend test step is advisory: five suites need a database and test settings the job does not have (FB-036).
+- The bridge's frontend type check is clean and blocks in CI (FB-028). Its backend test step runs only the tests of the bridge's link to the hub, and blocks: the old application's own business tests are not run, because forge-mes is to be written in Go and that code does not carry over (FB-036).
 - Do not build new product surface on the bridge's frontend. It is the MES user interface only until forge-display exists.
 - The bridge has its own instruction file, `forge-modules/forge-mes/bridge/CLAUDE.md`.
 

@@ -5,7 +5,8 @@ copies of it: the Go tree generates its bindings from ``forge-core/src/go/proto`
 interim MES bridge loads its own copies at run time, together with a copy of the forge-mes manifest.
 A copy that drifts is a module speaking a different contract without anyone being told,
 so this runs in the Python suite, which runs on every push and blocks a merge. The
-bridge's own parity test says the same, but it sits in a step that is advisory (FB-036).
+bridge's own parity test (``src/forge/__tests__/forge-parity.spec.ts``) says the same, and blocks
+since FB-036, but only when the bridge or the contract changes.
 
 A change to a proto file is therefore one change in three places.
 """
