@@ -116,6 +116,21 @@ A run that was not asked for live checks says so with one `NOT_RUN` verdict (`fa
 
 The law, "a run never passes unless every check ran and passed", is checked for every case on the real code by `tests/governance/test_verdicts_exhaustive.py`; the skill `.claude/skills/verify-fxts-verdicts` says what it covers and how to read a failure.
 
+### What a verdict rests on: kinds of evidence (D-19)
+
+Every verdict names the kind of evidence it rests on (D-19, AE-1), in the field `evidence_kind` of the verdict and of the JSON report:
+
+| Kind | The check looked at |
+|---|---|
+| `self` | the spec against itself or its own schema |
+| `file` | another file: another spec, a manifest, a governed list, the schema registry, the backlog, the names of a module's files, a text search of its sources |
+| `artifact` | the real thing: code imported or introspected, the app built in process, the proto, the module run through the conformance kit |
+| `none` | nothing of the spec: the check did not run, is waived, or looks at the runner itself |
+
+Each framework declares, as data, every check its runner gives (`forge_core/fxts/<fw>/checks.py`; the shared checks in `fxts/shared/runner.py`): the check's id, or a form with `{name}` placeholders for an id built at run time; the spec properties it looks at, as JSON pointers; and the kind it reaches when it runs (AE-2). The runner base gives each verdict the kind of its declaration, `none` when it did not run or is waived; a verdict whose id is declared nowhere becomes an `ERROR` that names the id, so no check is added without saying what it rests on. That law is checked for every id written in the runners and every verdict on every governed spec by `tests/governance/test_declared_checks.py` (skill `.claude/skills/verify-fxts-evidence`).
+
+`forge governance evidence [framework]` shows each framework's declared checks, their kinds and whether they observed anything on the governed specs, and for each top-level property of the schema the strongest evidence a check could give it and the strongest it got today. In the API framework, for example, `endpoint` has a declared check of the real route, but in the gate it is observed only against the spec itself, because that check runs only with `--live`. Step 2 of D-19 turns every claim with no check of the real thing into a gate finding, let through only as an accepted gap naming the work that adds the check.
+
 ### The gate: what gets through, and who decides
 
 `forge governance check` runs every framework over every governed spec, then checks the schema registries, the governed lists and the generated indexes. CI runs it on every push, as its own step after the test suite, and `tests/governance/test_gate.py` runs the same function so `pytest` alone gives a developer the gate's answer (FB-266).
@@ -189,6 +204,9 @@ forge governance run ftts grpc-hardened-transport
 forge governance run fmts path/to/module.fmts.json # the module requirements; what did not run or is waived is listed
 forge governance run fats /v1/health --live        # live checks: FATS, FACTS, FTTS
 forge governance run fats "POST /v1/schemas"       # an API spec is a method and a path; a path two specs share is refused
+
+# What each framework's checks rest on: the spec itself, another file, or the real thing
+forge governance evidence fats
 
 # The gate: every framework over every governed spec; exit 1 unless nothing is refused
 forge governance check
