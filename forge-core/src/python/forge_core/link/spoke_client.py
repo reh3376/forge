@@ -352,12 +352,20 @@ class SpokeClient:
                 yield pydantic_to_proto(record)
                 count += 1
 
+        if self._session_id is None or self._adapter_id is None:
+            msg = "Not registered: a stream names its module and session (FB-292)"
+            raise RuntimeError(msg)
         spoke_time = self._spoke_time_now()
         response = await self.channel.send_stream(
             "Collect",
             _serialize(),
-            # T1 and the last measurement, in headers: the request is a stream of records
-            metadata=spoke_time_to_headers(spoke_time),
+            # the module and its session (the hub guesses neither, FB-292), then T1 and the
+            # last measurement: the request is a stream of records
+            metadata=[
+                ("x-forge-adapter-id", self._adapter_id),
+                ("x-forge-session-id", self._session_id),
+                *spoke_time_to_headers(spoke_time),
+            ],
         )
         self._complete_exchange(spoke_time.transmit_time, response)
         self._records_sent += count

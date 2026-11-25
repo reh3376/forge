@@ -26,6 +26,7 @@ from forge_core.models.contextual_record import (
 from forge_hub.ingest.pipeline import IngestOutcome, IngestPipeline, InMemoryRecordSink
 from forge_hub.link.grpc_server import GrpcServer
 from forge_hub.link.hub_ingest import HubIngestServicer
+from forge_hub.link.hub_server import is_unguessable_session_id
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -82,7 +83,7 @@ class TestRegistration:
         servicer = HubIngestServicer(on_registered=seen.append)
         reg = await servicer.register(pydantic_to_proto(mes_manifest()))
         assert reg["accepted"] is True
-        assert reg["session_id"].startswith("session-forge-mes-")
+        assert is_unguessable_session_id(reg["session_id"], "forge-mes")
         assert "ok" in reg["message"]
         assert [m.adapter_id for m in seen] == ["forge-mes"]
         state = servicer.session_state(reg["session_id"])
@@ -515,6 +516,9 @@ class GatedHub:
             on_health=lambda _adapter_id, health: self.seen.append(health),
         )
         self.gates = self.servicer.gates
+        # sessions age on the clock the test moves (FB-292)
+        start = self.clocks.t
+        self.servicer.monotonic = lambda: (self.clocks.t - start).total_seconds()
 
     def spoke(self) -> SpokeClient:
         return SpokeClient(channel=InMemoryChannel(self.servicer), now=self.clocks.spoke)
@@ -617,6 +621,9 @@ class TestSpokeClockGate:
         assert hub.state == OUT_OF_TOLERANCE
 
         hub.clocks.skew = timedelta(0)
+        # the old process is gone: its session goes quiet past the stale window, so the new
+        # process's Register may replace it (FB-292); while it was active it could not
+        hub.clocks.advance(hub.servicer.stale_seconds + 1)
         restarted = hub.spoke()  # a new process: no session and no measurement yet
         attempts = 0
         while restarted.session_id is None:

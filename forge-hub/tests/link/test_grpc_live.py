@@ -42,7 +42,7 @@ from forge_core.models.contextual_record import (
     RecordValue,
 )
 from forge_hub.link.grpc_server import GrpcServer
-from forge_hub.link.hub_server import InMemoryServicer
+from forge_hub.link.hub_server import InMemoryServicer, is_unguessable_session_id
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -171,7 +171,7 @@ class TestGrpcControlPlane:
         """Register an adapter over real gRPC with binary protobuf."""
         client = SpokeClient(channel=channel)
         session_id = await client.register(manifest)
-        assert session_id.startswith("session-test-adapter-")
+        assert is_unguessable_session_id(session_id, "test-adapter")
 
     async def test_full_lifecycle(
         self,
@@ -399,7 +399,7 @@ class TestGrpcTransportAdapter:
 
         # Full lifecycle
         session_id = await transport.register()
-        assert session_id.startswith("session-mock-adapter-")
+        assert is_unguessable_session_id(session_id, "mock-adapter")
 
         await transport.configure({"url": "http://test:3000"})
         assert adapter._configured

@@ -45,7 +45,7 @@ from forge_core.models.adapter import (
 )
 from forge_hub.ingest.facts_check import FactsCheckResult, check_manifest_against_facts
 from forge_hub.ingest.pipeline import IngestOutcome, IngestPipeline, IngestStats
-from forge_hub.link.hub_server import AdapterServiceServicer, AdapterSession
+from forge_hub.link.hub_server import SESSION_REPLACED, AdapterServiceServicer, AdapterSession
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -122,6 +122,7 @@ class HubIngestServicer(AdapterServiceServicer):
         manifest_dict: dict[str, Any],
         *,
         spoke_time: SpokeTime | None = None,
+        peer: str | None = None,
     ) -> dict[str, Any]:
         manifest = proto_to_pydantic(manifest_dict, "AdapterManifest")
         check = check_manifest_against_facts(
@@ -154,7 +155,12 @@ class HubIngestServicer(AdapterServiceServicer):
         if changed:
             await self._announce(adapter_id, now)
 
-        result = await super().register(manifest_dict)
+        result = await super().register(manifest_dict, peer=peer)
+        if not result.get("accepted"):
+            # a second Register while the module's session is active (FB-292): counted
+            # with the other refusals, named in the trailer by the transport
+            telemetry.record_refusal(adapter_id, str(result.get("refusal_cause", "")))
+            return result
         session_id = result["session_id"]
         self._state[session_id] = SessionIngestState(facts=check)
         if self._on_registered is not None:
@@ -176,6 +182,14 @@ class HubIngestServicer(AdapterServiceServicer):
         if self.write_dispatcher is not None:
             self.write_dispatcher.register_callback(adapter_id, session_id, params)
         return result
+
+    async def on_session_replaced(self, session: AdapterSession) -> None:
+        """A stale session replaced by a new Register: its write-back callback and ingest
+        state go with it, so write-backs reach only the new session (FB-292)."""
+        self._state.pop(session.session_id, None)
+        if self.write_dispatcher is not None:
+            self.write_dispatcher.forget(session.session_id)
+        telemetry.record_refusal(session.adapter_id, SESSION_REPLACED)
 
     async def stop(self, adapter_id: str, session_id: str, graceful: bool = True) -> dict[str, Any]:
         flushed = 0

@@ -6,7 +6,7 @@ import pytest
 
 from forge_core.link.serialization import pydantic_to_proto
 from forge_core.models.adapter import AdapterManifest, AdapterState, AdapterTier, DataContract
-from forge_hub.link.hub_server import InMemoryServicer
+from forge_hub.link.hub_server import InMemoryServicer, is_unguessable_session_id
 
 
 @pytest.fixture()
@@ -35,7 +35,7 @@ class TestRegister:
     ) -> None:
         result = await servicer.register(manifest_dict)
         assert result["accepted"] is True
-        assert result["session_id"].startswith("session-test-adapter-")
+        assert is_unguessable_session_id(result["session_id"], "test-adapter")
 
     async def test_register_creates_session(
         self,
