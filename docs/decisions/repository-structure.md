@@ -361,7 +361,7 @@ Each is the owner's, asked one at a time. Until one is answered, the signed reco
 | C-3 | Whether the time authority stays with the top hub, time being operational. | `one-clock-ot-source-time.md` |
 | C-4 | Where forge-core runs: its own process beside the enterprise hub, or inside it. | A-1; the image and deployment **Answered 2026-11-24 by the owner (D-21, Q-9): its own service in the deployment's top site's cluster, highly available, reached by every hub over mutual TLS.** |
 | C-5 | What a site that is cut off may administer for itself, and how that is reconciled afterwards. | R-18 (the derived copy) |
-| C-6 | The structure rules: the manager is a layer above the hub. It imports the foundation and reaches hubs over the link, never by importing them; the foundation imports nothing of the manager. | §4, S-1 to S-3, and the import-direction test |
+| C-6 | The structure rules: the manager is a layer above the hub. It imports the foundation and reaches hubs over the link, never by importing them; the foundation imports nothing of the manager. | §4, S-1 to S-3, and the import-direction test **Answered 2026-11-25 by the owner (D-23, Q-3): the manager is the Python package `forge_manager`, its own layer: it imports only the foundation and reaches hubs over the link; nothing imports it, the foundation included; the layer test gains it. The certificate issuer is in the foundation, so the manager and every hub issue with the same code.** |
 | C-7 | A deployment with one site and no enterprise hub: which hub is under forge-core. | R-16 |
 
 ### 11.5 Authority in the chain of command (in discussion, not signed)

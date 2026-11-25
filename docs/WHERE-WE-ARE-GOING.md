@@ -1,6 +1,6 @@
 # Where we are going
 
-**Status date:** 2026-11-17 · **Owner:** reh3376
+**Status date:** 2026-11-25 · **Owner:** reh3376
 **Companions:** [What Forge will be](VISION.md) (the destination, in full) · [Where we are](WHERE-WE-ARE.md) (the snapshot) · [Roadmap](ROADMAP.md) (decisions, workstreams, sequence, decision queue) · [Principles](PRINCIPLES.md) (what does not change with the code) · [Backlog](../BACKLOG.md) (the unit of work)
 
 This is the short statement of direction. It names the destination, the principles already decided, the milestones between here and there, what is next, and what gates it. Detail lives in the companions; this page should fit in one reading.
@@ -56,7 +56,7 @@ The sequence in [`ROADMAP.md`](ROADMAP.md) §4, set by the owner on 2026-11-20:
 
 1. The FUTS schemas for view documents and widgets (done 2026-11-20, FB-176), the view contract's profile table (done 2026-11-21, FB-178), the hub's own view spec and object schemas (done 2026-11-21, FB-177), the hub's four screens as view documents (done 2026-11-22, FB-187), with generated types (FB-186).
 2. ~~The spike~~ done 2026-11-20; the three provisional points are final (FB-179).
-3. The role model in force on the hub (FB-075).
+3. The role model in force on the hub (FB-075), now built as the security framework (D-21, signed 2026-11-24, with its chapters D-20 and D-22) in the order of its §11 (FB-293): step 1, the trust root and identities, is designed in D-23 (signed 2026-11-25) and built as 1a and 1b; scoped roles on every route come with step 2.
 4. The Go module SDK with the parts of the transport contract forge-display needs, and the view service messages (FB-017, FB-164, FB-180).
 5. The forge-display server and runtime renderer: the four hub screens, then forge-ot's HMI screens on live data (FB-181).
 6. The Python worker pool in the SDK, and the approved-package list per hub (FB-182, FB-183).

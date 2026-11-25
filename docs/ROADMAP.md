@@ -1,6 +1,6 @@
 # Forge Roadmap
 
-**Status date:** 2026-11-17 · **Owner:** reh3376 · **Companion:** [`BACKLOG.md`](../BACKLOG.md)
+**Status date:** 2026-11-25 · **Owner:** reh3376 · **Companion:** [`BACKLOG.md`](../BACKLOG.md)
 
 The backlog is the unit of work (one `FB-nnn` per problem, one PR per item). This document is the map above it: what the platform is becoming, which decisions are in force, how the open work groups into workstreams, the order to take it in, and the questions only the owner can answer. Update it whenever an item changes state, a decision is made, or a workstream is added. The destination is [`VISION.md`](VISION.md), the short statement of direction is [`WHERE-WE-ARE-GOING.md`](WHERE-WE-ARE-GOING.md), and the component-by-component snapshot is [`WHERE-WE-ARE.md`](WHERE-WE-ARE.md).
 
@@ -202,7 +202,7 @@ Decided by the owner on 2026-11-20 (the forge-display design record, Q-16). It r
 |---|---|---|
 | 1 | **The FUTS schemas** for view documents and widgets (done 2026-11-20, FB-176; generated types are FB-186), the view contract's profile table for role-based writes and alarm operations (done 2026-11-21, FB-178), the hub's own view spec and object schemas (done 2026-11-21, FB-177), and the hub's four screens as view documents (done 2026-11-22, FB-187) | FB-186 |
 | 2 | ~~**The spike**~~ done 2026-11-20: Connect only held 60 frames a second with 500 widgets all changing at 20 Hz; TLS with HTTP/2 found to be required; CEL agreed with Go; the three provisional points made final | FB-179 |
-| 3 | **The role model in force on the hub** | FB-075 |
+| 3 | **The role model in force on the hub**, built as the security framework (D-21) in its §11 order; step 1 designed in D-23 | FB-075, FB-293 |
 | 4 | **The Go module SDK**, with the parts of the transport contract forge-display needs and the view service messages | FB-017, FB-164, FB-180 |
 | 5 | **The forge-display server and runtime renderer** with a few widgets: the four hub screens, then forge-ot's HMI screens on live data | FB-181 |
 | 6 | **The Python worker pool** in the SDK, and the approved-package list per hub | FB-182, FB-183 |
