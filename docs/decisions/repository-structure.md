@@ -359,7 +359,7 @@ Each is the owner's, asked one at a time. Until one is answered, the signed reco
 | C-1 | How a hub reaches forge-core. | **Answered 2026-11-22: up the chain of command.** The owner's words: "We long ago established how hubs interact with each other. Each hub only worries about the modules / spokes attached to it and the hub one layer up attached to it." So forge-core is the layer above the enterprise hub; state rolls up one layer at a time and changes roll down the same way. No hub below the enterprise hub connects to forge-core. This is the transport contract's T-13 ("a hub is a module to its parent") applied once more at the top; nothing signed changes. |
 | C-2 | Where roles are mastered: today at the "managing hub", the top hub. | `roles.md`, R-16 and R-18 |
 | C-3 | Whether the time authority stays with the top hub, time being operational. | `one-clock-ot-source-time.md` |
-| C-4 | Where forge-core runs: its own process beside the enterprise hub, or inside it. | A-1; the image and deployment |
+| C-4 | Where forge-core runs: its own process beside the enterprise hub, or inside it. | A-1; the image and deployment **Answered 2026-11-24 by the owner (D-21, Q-9): its own service in the deployment's top site's cluster, highly available, reached by every hub over mutual TLS.** |
 | C-5 | What a site that is cut off may administer for itself, and how that is reconciled afterwards. | R-18 (the derived copy) |
 | C-6 | The structure rules: the manager is a layer above the hub. It imports the foundation and reaches hubs over the link, never by importing them; the foundation imports nothing of the manager. | §4, S-1 to S-3, and the import-direction test |
 | C-7 | A deployment with one site and no enterprise hub: which hub is under forge-core. | R-16 |

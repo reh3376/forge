@@ -22,10 +22,10 @@ description: "Check a change to how an FxTS run is judged (verdict statuses, the
 
 It does **not** cover whether a runner gives the right verdict for a given spec, or whether a check that should exist does. Those are the frameworks' own tests and BACKLOG FB-264, FB-266.
 
-**Sync commit:** the commit of D-19 step 2 (named in the FB-264 row once merged; checked 2026-11-24 against every change since `fb21b80e`: 61d986d5, 044b9be3, 536a96c1 and step 2, none of which changes `outcome_of` or the report). See what changed since:
+**Sync commit:** `e755ac86` (D-19 step 2, PR 186; checked 2026-11-24 against every change since `fb21b80e`: 61d986d5, 044b9be3, 536a96c1 and step 2, none of which changes `outcome_of` or the report). See what changed since:
 
 ```bash
-git log --oneline <that commit>..HEAD -- forge-core/src/python/forge_core/fxts/shared/runner.py forge-hub/src/python/forge_hub/cli/governance.py forge-hub/src/python/forge_hub/cli/main.py
+git log --oneline e755ac86..HEAD -- forge-core/src/python/forge_core/fxts/shared/runner.py forge-hub/src/python/forge_hub/cli/governance.py forge-hub/src/python/forge_hub/cli/main.py
 ```
 
 If that prints commits you did not check, look before you trust a pass. Move the sync commit forward only after you have confirmed the check still describes the code.
