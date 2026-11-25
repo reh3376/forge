@@ -240,6 +240,8 @@ services:
       FORGE_AUTH_ENABLED: "false"
       FORGE_JWT_SECRET: "${FORGE_JWT_SECRET:-forge-dev-secret-do-not-use-in-prod}"
       FORGE_JWT_ALGORITHM: "${FORGE_JWT_ALGORITHM:-HS256}"
+      FORGE_JWT_ISSUER: "${FORGE_JWT_ISSUER:-forge-dev-hub}"
+      FORGE_JWT_AUDIENCE: "${FORGE_JWT_AUDIENCE:-forge-hub}"
       FORGE_API_KEYS: "${FORGE_API_KEYS:-}"
       FORGE_RATE_LIMIT_REDIS: "false"
       FORGE_OTEL_ENABLED: "false"

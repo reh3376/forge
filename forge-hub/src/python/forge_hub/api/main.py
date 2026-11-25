@@ -32,6 +32,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from forge_core import telemetry
+from forge_core.coerce import env_boolean
 from forge_core.link.spoke_callback import WriteDispatcher, WriteDispatchError
 from forge_core.link.spoke_client import ChannelTls
 from forge_core.models.adapter import (
@@ -54,6 +55,7 @@ from forge_hub.curation.engine import CurationEngine
 from forge_hub.curation.lineage import LineageTracker
 from forge_hub.curation.registry import DataProductRegistry
 from forge_hub.gateway.auth import auth_config_from_env, configure_auth
+from forge_hub.gateway.auth import describe as auth_describe
 from forge_hub.gateway.models import ForgeUser  # noqa: TC001 — FastAPI dependency type
 from forge_hub.gateway.rbac import require_scope
 from forge_hub.ingest import IngestPipeline, build_pipeline_from_storage
@@ -234,8 +236,16 @@ def create_app(
         else WriteDispatcher(can_write=_can_write, tls=ChannelTls.from_env())
     )
     # Auth kill-switch and credentials from FORGE_AUTH_ENABLED / FORGE_API_KEYS / JWT env;
-    # the endpoints that drive a spoke require the adapters:write scope (FB-063).
+    # the endpoints that drive a spoke require the adapters:write scope (FB-063). An
+    # ambiguous flag or a JWT secret without issuer and audience stops the hub here, with
+    # its cause; with authentication off every caller is the anonymous administrator, which
+    # /v1/info and /readyz say (FB-291).
     configure_auth(auth_config_from_env())
+    if not auth_describe()["enabled"]:
+        logger.warning(
+            "Authentication is OFF (FORGE_AUTH_ENABLED): every caller is the anonymous "
+            "administrator; development only (FB-291, D-21 SF-2)"
+        )
     runtime: dict[str, Any] = {}
     start_time = time.monotonic()
     # Spoke subscriptions streaming into the pipeline (FB-061).
@@ -287,7 +297,8 @@ def create_app(
     grpc_server = None
     grpc_port = int(os.getenv("FORGE_GRPC_PORT", "50051"))
     grpc_tls = ServerTls.from_env()
-    grpc_require_tls = os.getenv("FORGE_GRPC_REQUIRE_TLS", "false").lower() == "true"
+    grpc_require_tls = env_boolean("FORGE_GRPC_REQUIRE_TLS", False)
+    grpc_enabled = env_boolean("FORGE_GRPC_ENABLED", True)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -305,7 +316,6 @@ def create_app(
         )
 
         # Start gRPC server for spoke communication
-        grpc_enabled = os.getenv("FORGE_GRPC_ENABLED", "true").lower() == "true"
         if grpc_enabled:
             try:
                 from forge_hub.link.grpc_server import GrpcServer
@@ -404,7 +414,7 @@ def create_app(
         result = await health_orch.check_all()
         if result.status == "unhealthy":
             raise HTTPException(status_code=503, detail=result.to_dict())
-        return {"status": "ready", "platform": result.status}
+        return {"status": "ready", "platform": result.status, "auth": auth_describe()}
 
     # ------------------------------------------------------------------
     # Adapter registry endpoints
@@ -675,7 +685,8 @@ def create_app(
             "platform": "forge",
             "version": "0.1.0",
             "grpc_port": grpc_port,
-            "grpc_enabled": os.getenv("FORGE_GRPC_ENABLED", "true").lower() == "true",
+            "grpc_enabled": grpc_enabled,
+            "auth": auth_describe(),
             "grpc_tls": {
                 **(grpc_tls.describe() if grpc_tls is not None else {"enabled": False}),
                 "required": grpc_require_tls,

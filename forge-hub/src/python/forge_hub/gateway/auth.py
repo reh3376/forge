@@ -4,8 +4,11 @@ Supports two authentication schemes:
     1. Bearer JWT (HS256 by default, RS256 for production JWKS)
     2. X-API-Key header (static keys from FORGE_API_KEYS env var)
 
-The FORGE_AUTH_ENABLED env var acts as a kill-switch for development.
-When disabled, all requests are treated as admin.
+The FORGE_AUTH_ENABLED env var acts as a kill-switch for development: when it is off,
+every request is treated as an anonymous administrator, and ``describe()`` says so on
+``/v1/info`` and ``/readyz``. The flag is read by the one boolean rule
+(``forge_core.coerce``), never by comparing a string (FB-291). Both the switch and the
+anonymous administrator go in the security framework's step 2 (D-21 SF-2, FB-293).
 """
 
 from __future__ import annotations
@@ -17,6 +20,7 @@ from typing import Any
 from fastapi import Depends, Request
 from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
 
+from forge_core.coerce import env_boolean
 from forge_hub.gateway.models import AuthConfig, ForgeUser, Role
 
 logger = logging.getLogger(__name__)
@@ -42,11 +46,28 @@ def configure_auth(config: AuthConfig) -> None:
     _config = config
 
 
+class AuthConfigError(ValueError):
+    """The authentication settings cannot be used; the hub refuses to start and says why."""
+
+
 def auth_config_from_env() -> AuthConfig:
-    """Build AuthConfig from environment variables."""
-    enabled = os.getenv("FORGE_AUTH_ENABLED", "false").lower() == "true"
+    """Build AuthConfig from environment variables.
+
+    Refused, never defaulted: an ambiguous ``FORGE_AUTH_ENABLED``, and a JWT secret without
+    ``FORGE_JWT_ISSUER`` and ``FORGE_JWT_AUDIENCE`` while authentication is on (FB-291).
+    """
+    enabled = env_boolean("FORGE_AUTH_ENABLED", False)
     jwt_secret = os.getenv("FORGE_JWT_SECRET", "")
     jwt_algorithm = os.getenv("FORGE_JWT_ALGORITHM", "HS256")
+    jwt_issuer = os.getenv("FORGE_JWT_ISSUER", "").strip()
+    jwt_audience = os.getenv("FORGE_JWT_AUDIENCE", "").strip()
+    if enabled and jwt_secret and not (jwt_issuer and jwt_audience):
+        msg = (
+            "FORGE_AUTH_ENABLED is on and FORGE_JWT_SECRET is set, but FORGE_JWT_ISSUER and "
+            "FORGE_JWT_AUDIENCE are not both set: every accepted token must name its issuer "
+            "and audience (FB-291)"
+        )
+        raise AuthConfigError(msg)
 
     # Parse API keys: "key1:user1:admin,key2:user2:viewer"
     api_keys: dict[str, ForgeUser] = {}
@@ -69,8 +90,22 @@ def auth_config_from_env() -> AuthConfig:
         enabled=enabled,
         jwt_secret=jwt_secret,
         jwt_algorithm=jwt_algorithm,
+        jwt_issuer=jwt_issuer,
+        jwt_audience=jwt_audience,
         api_keys=api_keys,
     )
+
+
+def describe() -> dict[str, Any]:
+    """Authentication's state, for status, health and the API: never silent (FB-291)."""
+    return {
+        "enabled": _config.enabled,
+        "anonymous_administrator": not _config.enabled,
+        "jwt": bool(_config.enabled and _config.jwt_secret),
+        "jwt_issuer": _config.jwt_issuer or None,
+        "jwt_audience": _config.jwt_audience or None,
+        "api_keys": len(_config.api_keys) if _config.enabled else 0,
+    }
 
 
 def _scopes_for_role(role: Role) -> frozenset[str]:
@@ -101,6 +136,9 @@ def _decode_jwt(token: str) -> dict[str, Any] | None:
             token,
             _config.jwt_secret,
             algorithms=[_config.jwt_algorithm],
+            issuer=_config.jwt_issuer,
+            audience=_config.jwt_audience,
+            options={"require": ["exp", "iss", "aud", "sub"]},
         )
         return payload
     except Exception:
@@ -128,8 +166,12 @@ async def get_current_user(
     if bearer and bearer.credentials:
         claims = _decode_jwt(bearer.credentials)
         if claims:
-            user_id = claims.get("sub", "unknown")
-            role = Role(claims.get("role", "viewer"))
+            user_id = claims["sub"]
+            try:
+                role = Role(claims.get("role", "viewer"))
+            except ValueError:
+                # An unknown role is a token this hub cannot honour: 401, never a crash.
+                raise _auth_error(request) from None
             scope_str = claims.get("scopes", "")
             scopes = frozenset(scope_str.split(",")) if scope_str else _scopes_for_role(role)
             return ForgeUser(

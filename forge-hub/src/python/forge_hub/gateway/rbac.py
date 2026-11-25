@@ -16,6 +16,9 @@ Usage in routes::
 
 from __future__ import annotations
 
+import fnmatch
+import functools
+
 from fastapi import Depends, Request
 from starlette.exceptions import HTTPException
 
@@ -65,13 +68,39 @@ def require_role(role: Role):
     return _check
 
 
+@functools.cache
+def _hard_limited_patterns() -> tuple[str, ...]:
+    """The scope patterns of every active hard limit, from the governed list."""
+    from forge_core.fxts.shared.lists import active_hard_limits
+
+    return tuple(
+        str(pattern)
+        for limit in active_hard_limits()
+        if limit.get("kind") == "scope"
+        for pattern in limit.get("scopes") or ()
+    )
+
+
+def is_hard_limited(scope: str) -> bool:
+    """Whether a scope falls under a hard limit (`hard-limits.list.json`), such as
+    ``ot:interlock:bypass`` or an approval scope."""
+    return any(fnmatch.fnmatchcase(scope, pattern) for pattern in _hard_limited_patterns())
+
+
 def _is_authorized(user: ForgeUser, scope: str) -> bool:
-    """Check if a user is authorized for a given scope."""
-    # Wildcard scope grants everything
-    if "*" in user.scopes:
-        return True
+    """Check if a user is authorized for a given scope.
+
+    A hard-limited scope is granted only by its exact name: no ``*`` and no ``domain:*``
+    covers it (FB-291), so an administrator's wildcard never reaches an interlock bypass
+    or an approval.
+    """
     # Direct scope match
     if scope in user.scopes:
+        return True
+    if is_hard_limited(scope):
+        return False
+    # Wildcard scope grants everything else
+    if "*" in user.scopes:
         return True
     # Check namespace wildcard: "adapters:*" covers "adapters:read"
     namespace = scope.split(":")[0] if ":" in scope else ""

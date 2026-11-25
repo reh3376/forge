@@ -16,6 +16,7 @@ from typing import Any
 from fastapi import FastAPI, Request  # noqa: TC002
 from fastapi.responses import JSONResponse  # noqa: TC002
 
+from forge_core.coerce import env_boolean
 from forge_hub.gateway.auth import auth_config_from_env, configure_auth
 from forge_hub.gateway.errors import install_error_handlers, problem_response
 from forge_hub.gateway.rate_limit import (
@@ -66,7 +67,7 @@ def create_gateway_app(
     install_error_handlers(app)
 
     # Initialize rate limiter
-    use_redis = os.getenv("FORGE_RATE_LIMIT_REDIS", "false").lower() == "true"
+    use_redis = env_boolean("FORGE_RATE_LIMIT_REDIS", False)
     redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
     rate_limiter: InMemoryRateLimiter | RedisRateLimiter = (
         RedisRateLimiter(redis_url=redis_url) if use_redis else InMemoryRateLimiter()
