@@ -14,7 +14,7 @@ from forge_core.models.adapter import (
     DataContract,
 )
 from forge_core.models.contextual_record import ContextualRecord
-from forge_hub.link.hub_server import InMemoryServicer
+from forge_hub.link.hub_server import InMemoryServicer, is_unguessable_session_id
 
 
 @pytest.fixture()
@@ -47,7 +47,7 @@ class TestSpokeClientLifecycle:
         manifest: AdapterManifest,
     ) -> None:
         session_id = await client.register(manifest)
-        assert session_id.startswith("session-test-spoke-")
+        assert is_unguessable_session_id(session_id, "test-spoke")
         assert client.session_id == session_id
 
     async def test_configure(

@@ -17,6 +17,7 @@ from forge_core.link.grpc_channel import GrpcChannel
 from forge_core.link.spoke_client import ChannelTls, SpokeClient
 from forge_core.models.adapter import AdapterManifest
 from forge_hub.api.main import create_app
+from forge_hub.link.hub_server import is_unguessable_session_id
 from forge_hub.storage.config import StorageConfig
 
 if TYPE_CHECKING:
@@ -64,7 +65,7 @@ def test_hub_grpc_port_serves_tls_from_env(tmp_path: Path) -> None:
             }
 
             sid = _register_over_tls(server.port, cert_path)
-            assert sid.startswith("session-forge-mes")
+            assert is_unguessable_session_id(sid, "forge-mes")
             assert "forge-mes" in {a["adapter_id"] for a in client.get("/v1/adapters").json()}
 
 

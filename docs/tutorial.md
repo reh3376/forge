@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-25` against the repository `reh3376/forge` at the merge of PR 187 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-25` against the repository `reh3376/forge` at the merge of PR 188 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-25 at PR 187:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-25 at PR 188:
 
 **Working**
 
@@ -286,7 +286,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-25 at PR 187:
 | Python: forge-core (`forge-core/src/python/forge_core`) | 116 files, ~26,600 lines |
 | Python: forge-hub (`forge-hub/src/python/forge_hub`) | 90 files, ~17,300 lines |
 | Python: the modules (nine packages under `forge-modules`) | 144 files, ~31,400 lines |
-| Python tests | 294 files, 6,360 collected, full suite green on the locked dependency set |
+| Python tests | 295 files, 6,369 collected, full suite green on the locked dependency set |
 | Go (`forge-core/src/go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`forge-modules/forge-mes/bridge`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -412,6 +412,7 @@ note:
 - Compiled protobuf over gRPC; JSON over gRPC is forbidden (decision A-1).
 - Go and Python bindings generated from one proto set (`forge-core/contract/proto`, `forge-core/src/python/forge_core/proto_gen`, `forge-core/src/go/gen/forge`).
 - A module is either hosted in the hub's process (forge-ot and the Python adapters today) or its own process in any language that speaks the proto (the interim MES bridge today; Go modules and the integration host later). Either way it reaches the hub through this service and nothing else: the hub's REST ingest route is being retired (FB-123).
+- **A session is the module's, and only its.** A Register opens a session with an unguessable id (256 random bits); under mutual TLS it is bound to the certificate that opened it, and every later call on it must come from the same certificate. Every Ingest names its module and its session, and nothing is guessed. While a module's session is active (a call within `FORGE_SESSION_STALE_SECONDS`, 90 s by default), a second Register for it is refused by name, so no caller can take over a running module; once the session is stale, a new Register replaces it and the old write-back address goes with it; the same certificate may restart at once. Refusals and replacements are counted on `/v1/info` (FB-292).
 - **Who starts a call matters.** Register, Health and Ingest are started by the module. Configure, Start, Stop, Collect, Backfill, Subscribe, Write and Discover are started by the hub, through a callback address the module gave at Register.
 
 note:
@@ -2010,7 +2011,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest -q -rsx                          # 6,360 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
+uv run pytest -q -rsx                          # 6,369 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2154,7 +2155,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/`, `forge-core/tests` and `forge-hub/tests`: 294 files, 6,360 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/`, `forge-core/tests` and `forge-hub/tests`: 295 files, 6,369 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.

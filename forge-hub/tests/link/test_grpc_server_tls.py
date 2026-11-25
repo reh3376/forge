@@ -16,6 +16,7 @@ from forge_core.models.adapter import AdapterManifest
 from forge_hub.ingest.pipeline import IngestPipeline, InMemoryRecordSink
 from forge_hub.link.grpc_server import GrpcServer, ServerTls
 from forge_hub.link.hub_ingest import HubIngestServicer
+from forge_hub.link.hub_server import is_unguessable_session_id
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -76,7 +77,7 @@ async def test_spoke_handshake_over_tls_and_plaintext_refused(tmp_path: Path) ->
     await hub.start()
     try:
         sid = await handshake(hub.port, ChannelTls(ca_path=str(cert_path)))
-        assert sid.startswith("session-forge-mes")
+        assert is_unguessable_session_id(sid, "forge-mes")
 
         # A plaintext client cannot talk to the TLS port.
         with pytest.raises(Exception):  # noqa: B017 — grpc raises AioRpcError(UNAVAILABLE)
@@ -96,7 +97,7 @@ async def test_mtls_requires_a_trusted_client_certificate(tmp_path: Path) -> Non
         client_tls = ChannelTls(
             ca_path=str(cert_path), cert_path=str(cert_path), key_path=str(key_path)
         )
-        assert (await handshake(hub.port, client_tls)).startswith("session-forge-mes")
+        assert is_unguessable_session_id((await handshake(hub.port, client_tls)), "forge-mes")
         with pytest.raises(Exception):  # noqa: B017 — handshake fails without a client cert
             await asyncio.wait_for(
                 handshake(hub.port, ChannelTls(ca_path=str(cert_path))), timeout=15

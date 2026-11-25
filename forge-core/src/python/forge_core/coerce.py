@@ -46,3 +46,23 @@ def env_boolean(name: str, default: bool) -> bool:
     if raw is None or raw.strip() == "":
         return default
     return boolean(raw, name=name)
+
+
+def positive_int(value: object, *, name: str) -> int:
+    """A whole number above zero, as an int or its digits; anything else is refused by name."""
+    if isinstance(value, bool):
+        pass
+    elif isinstance(value, int) and value > 0:
+        return value
+    elif isinstance(value, str) and value.strip().isdigit() and int(value.strip()) > 0:
+        return int(value.strip())
+    msg = f"{name}={value!r} is not a whole number above zero"
+    raise AmbiguousValueError(msg)
+
+
+def env_positive_int(name: str, default: int) -> int:
+    """An environment setting through :func:`positive_int`; unset or empty takes the default."""
+    raw = os.environ.get(name)
+    if raw is None or raw.strip() == "":
+        return default
+    return positive_int(raw, name=name)

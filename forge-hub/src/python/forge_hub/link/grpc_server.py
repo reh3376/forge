@@ -1,4 +1,4 @@
-# ruff: noqa: TC001, N802
+# ruff: noqa: N802
 """Hardened gRPC server — compiled protobuf servicer for hub-side AdapterService.
 
 Wraps the existing AdapterServiceServicer in a real grpc.aio server using
@@ -46,7 +46,7 @@ from forge_core.proto_gen.forge.v1 import adapter_pb2 as adapter_msg
 from forge_core.proto_gen.forge.v1 import adapter_service_pb2 as service_msg
 from forge_core.proto_gen.forge.v1 import adapter_service_pb2_grpc as service_grpc
 from forge_core.proto_gen.forge.v1 import contextual_record_pb2 as record_msg
-from forge_hub.link.hub_server import AdapterServiceServicer
+from forge_hub.link.hub_server import SESSION_MISSING, AdapterServiceServicer, SessionRefusedError
 
 logger = logging.getLogger(__name__)
 
@@ -114,6 +114,17 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
     def __init__(self, servicer: AdapterServiceServicer) -> None:
         self._servicer = servicer
 
+    def _refuse_session(self, context: grpc.aio.ServicerContext, exc: SessionRefusedError) -> None:
+        """A session refused by name (FB-292): the cause in the trailer, never INTERNAL."""
+        context.set_trailing_metadata(((REFUSAL_CAUSE_HEADER, exc.cause),))
+        code = (
+            grpc.StatusCode.FAILED_PRECONDITION
+            if exc.cause == SESSION_MISSING
+            else grpc.StatusCode.PERMISSION_DENIED
+        )
+        context.set_code(code)
+        context.set_details(str(exc))
+
     def _hub_time(self, received_at: datetime) -> adapter_msg.HubTime:
         """T2 (``received_at``) and T3 (now) for a response (one clock, FB-092)."""
         return hub_time_to_proto(
@@ -139,6 +150,8 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
                 # T1, and the measurement of a spoke that has completed an exchange: a
                 # refused spoke proves its clock with it and is readmitted (FB-093)
                 spoke_time=proto_to_spoke_time(request.spoke_time),
+                # the session is bound to the identity that opened it (FB-292)
+                peer=peer_identity(context),
             )
             cause = result.get("refusal_cause")
             if cause:
@@ -166,6 +179,9 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
     ) -> service_msg.ConfigureResponse:
         """Configure an adapter with connection parameters."""
         try:
+            self._servicer.check_session(
+                request.adapter_id, request.session_id, peer_identity(context)
+            )
             params = dict(request.params)
             result = await self._servicer.configure(
                 request.adapter_id,
@@ -176,6 +192,9 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
                 success=result.get("success", False),
                 message=result.get("message", ""),
             )
+        except SessionRefusedError as exc:
+            self._refuse_session(context, exc)
+            return service_msg.ConfigureResponse(success=False, message=str(exc))
         except Exception as exc:
             logger.exception("Configure RPC failed")
             context.set_code(grpc.StatusCode.INTERNAL)
@@ -192,6 +211,9 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
     ) -> service_msg.StartResponse:
         """Start an adapter."""
         try:
+            self._servicer.check_session(
+                request.adapter_id, request.session_id, peer_identity(context)
+            )
             result = await self._servicer.start(
                 request.adapter_id,
                 request.session_id,
@@ -200,6 +222,9 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
                 success=result.get("success", False),
                 message=result.get("message", ""),
             )
+        except SessionRefusedError as exc:
+            self._refuse_session(context, exc)
+            return service_msg.StartResponse(success=False, message=str(exc))
         except Exception as exc:
             logger.exception("Start RPC failed")
             context.set_code(grpc.StatusCode.INTERNAL)
@@ -216,6 +241,9 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
     ) -> service_msg.StopResponse:
         """Stop an adapter."""
         try:
+            self._servicer.check_session(
+                request.adapter_id, request.session_id, peer_identity(context)
+            )
             result = await self._servicer.stop(
                 request.adapter_id,
                 request.session_id,
@@ -226,6 +254,9 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
                 message=result.get("message", ""),
                 records_flushed=result.get("records_flushed", 0),
             )
+        except SessionRefusedError as exc:
+            self._refuse_session(context, exc)
+            return service_msg.StopResponse(success=False, message=str(exc))
         except Exception as exc:
             logger.exception("Stop RPC failed")
             context.set_code(grpc.StatusCode.INTERNAL)
@@ -243,6 +274,9 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
         """Return adapter health status."""
         received_at = self._servicer.clock()  # T2 of the time exchange (FB-092)
         try:
+            self._servicer.check_session(
+                request.adapter_id, request.session_id, peer_identity(context)
+            )
             result_dict = await self._servicer.health(
                 request.adapter_id,
                 request.session_id,
@@ -257,6 +291,9 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
             response = health_to_proto(health_model)
             response.hub_time.CopyFrom(self._hub_time(received_at))
             return response
+        except SessionRefusedError as exc:
+            self._refuse_session(context, exc)
+            return adapter_msg.AdapterHealth()
         except Exception as exc:
             logger.exception("Health RPC failed")
             context.set_code(grpc.StatusCode.INTERNAL)
@@ -279,25 +316,19 @@ class ForgeAdapterServiceServicer(service_grpc.AdapterServiceServicer):
         # Extract metadata
         metadata = dict(context.invocation_metadata())
         session_id = metadata.get("x-forge-session-id")
-        _adapter_id = metadata.get("x-forge-adapter-id")  # reserved for future routing
+        adapter_id = metadata.get("x-forge-adapter-id")
         # T1 and the spoke's last measurement arrive in headers because the request is
         # a stream of records (FB-092). The measurement is the probe of the spoke's
         # clock for this call (FB-093); a call without one counts as unreadable.
         spoke_time = headers_to_spoke_time(metadata)
 
-        if not session_id:
-            # Fallback: use most recent session
-            sessions = list(self._servicer._sessions.values())
-            if sessions:
-                session_id = sessions[-1].session_id
-            else:
-                context.set_code(grpc.StatusCode.FAILED_PRECONDITION)
-                context.set_details("No active sessions")
-                return service_msg.IngestResponse(
-                    records_received=0,
-                    success=False,
-                    message="No active sessions",
-                )
+        # The stream names its session and its module, and both must agree with the
+        # connection that opened the session; nothing is guessed (FB-292).
+        try:
+            self._servicer.check_session(adapter_id, session_id, peer_identity(context))
+        except SessionRefusedError as exc:
+            self._refuse_session(context, exc)
+            return service_msg.IngestResponse(records_received=0, success=False, message=str(exc))
 
         count = 0
         try:
@@ -457,3 +488,19 @@ class GrpcServer:
         """Block until the server terminates."""
         if self._server:
             await self._server.wait_for_termination(timeout)
+
+
+def peer_identity(context: grpc.aio.ServicerContext) -> str | None:
+    """The connection's identity under mutual TLS: its certificate's first subject
+    alternative name, else its common name; ``None`` on a link without a client
+    certificate (FB-292). D-21's machine identity binds this to the module's id."""
+    try:
+        auth = context.auth_context() or {}
+    except Exception:  # an in-process or test context has none
+        return None
+    for key in ("x509_subject_alternative_name", "x509_common_name"):
+        values = auth.get(key) or []
+        if values:
+            value = values[0]
+            return "x509:" + (value.decode() if isinstance(value, bytes) else str(value))
+    return None

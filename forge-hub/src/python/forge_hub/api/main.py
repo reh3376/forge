@@ -687,6 +687,10 @@ def create_app(
             "grpc_port": grpc_port,
             "grpc_enabled": grpc_enabled,
             "auth": auth_describe(),
+            # sessions on the module link: refused and replaced by cause (FB-292)
+            "link_sessions": (
+                runtime["servicer"].describe_sessions() if runtime.get("servicer") else None
+            ),
             "grpc_tls": {
                 **(grpc_tls.describe() if grpc_tls is not None else {"enabled": False}),
                 "required": grpc_require_tls,

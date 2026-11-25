@@ -8,7 +8,7 @@ import pytest
 from forge_core.link.spoke_client import InMemoryChannel
 from forge_core.link.transport_adapter import GrpcTransportAdapter
 from forge_core.models.contextual_record import ContextualRecord
-from forge_hub.link.hub_server import InMemoryServicer
+from forge_hub.link.hub_server import InMemoryServicer, is_unguessable_session_id
 
 # ── Import WMS and MES adapters if available ──────────────────────────────
 
@@ -46,7 +46,7 @@ class TestWmsTransportAdapter:
         transport = GrpcTransportAdapter(adapter=adapter, channel=channel)
 
         session_id = await transport.register()
-        assert session_id.startswith("session-forge-wms-")
+        assert is_unguessable_session_id(session_id, "forge-wms")
         assert transport.adapter_id == "forge-wms"
 
     async def test_full_lifecycle_wms(
@@ -119,7 +119,7 @@ class TestMesTransportAdapter:
         transport = GrpcTransportAdapter(adapter=adapter, channel=channel)
 
         session_id = await transport.register()
-        assert session_id.startswith("session-forge-mes-")
+        assert is_unguessable_session_id(session_id, "forge-mes")
         assert transport.adapter_id == "forge-mes"
 
     async def test_full_lifecycle_mes(self, servicer: InMemoryServicer) -> None:
