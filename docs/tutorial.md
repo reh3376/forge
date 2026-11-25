@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-24` against the repository `reh3376/forge` at the merge of PR 185 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-25` against the repository `reh3376/forge` at the merge of PR 186 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-24 at PR 185:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-24 at PR 186:
 
 **Working**
 
@@ -2260,6 +2260,9 @@ note:
 | D-17 | The structure of the repository (`repository-structure.md`) | signed 2026-11-22: forge-core (shared foundation), forge-hub (the hub), forge-modules, each a self-contained folder with the same standard entries (`README.md`, `docs/`, `fxts/`, `src/`, `tests/`; amended the same day); the three layers are in place, the modules' tests and documents remain (FB-201) |
 | D-18 | Admission: how a hub decides that a module may attach (`approved-spec-register.md`) | signed 2026-11-23: one decision for every way of attaching, on a spec promoted on that hub; what admission requires and who may approve are data; nothing built (FB-256 to FB-263) |
 | D-19 | Approvals and evidence (`approvals-and-evidence.md`) | signed 2026-11-24: every verdict names its kind of evidence; a claim the real thing is not checked against is an accepted gap; an approval is an SSH-signed record of the content, schema, module, run and sequence; steps 1 (evidence kinds) and 2 (claim marks and their gaps) built, step 2's amendments (§12) awaiting the owner |
+| D-20 | Approval signing (`approval-signing.md`) | signed 2026-11-25: the security framework's signing chapter; a signed release list per approval act, the owner's key in every root change, every approved version kept; nothing built |
+| D-21 | The security framework (`security-framework.md`) | signed 2026-11-24: one framework for identity, sign-in, sessions, permissions, machine identity, secrets, audit, release integrity and signing; IEC 62443 SL-C 3 mechanisms; development is different data on the same framework, never a switch; forge-core holds each deployment's trust anchor; nothing built |
+| D-22 | The permissions framework (`permissions-framework.md`) | signed 2026-11-25: the security framework's authorization chapter; one decision point and a permission on every object and widget; nothing built |
 
 **Waiting for the owner**: the generator for Go and TypeScript types (FB-186, an install); the numbers of each data class, when the transport contract is built (FB-164); forge-creds (FB-142); a new site id and the last old names (FB-150).
 

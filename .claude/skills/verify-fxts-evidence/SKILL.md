@@ -30,10 +30,10 @@ description: "Check that every verdict any FxTS runner gives matches a declared 
 
 It does **not** decide whether what a verdict names in `reached` was really touched, or whether a declared kind or a mark is honest: a reviewer reads them (`artifact` only when the real thing is run, imported, introspected or called; a text search of files is `file`; a property is `claim` if the real thing could disagree with it). Each release's `changes` names every mark change for the owner's review.
 
-**Sync commit:** the commit that builds D-19 step 2 (named in the FB-264 row once merged; step 1 was `536a96c1`, PR 185). See what changed since:
+**Sync commit:** `e755ac86` (D-19 step 2, PR 186; step 1 was `536a96c1`, PR 185). See what changed since:
 
 ```bash
-git log --oneline <that commit>..HEAD -- forge-core/src/python/forge_core/fxts forge-hub/src/python/forge_hub/conformance.py forge-core/contract/fxts
+git log --oneline e755ac86..HEAD -- forge-core/src/python/forge_core/fxts forge-hub/src/python/forge_hub/conformance.py forge-core/contract/fxts
 ```
 
 ## Run it
