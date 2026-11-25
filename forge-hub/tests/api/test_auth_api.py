@@ -151,3 +151,24 @@ async def test_hub_served_reads_and_computations_stay_open(client) -> None:
     assert resolved.status_code == 200
     # Without a credential the hub still says who may call once auth is on.
     assert (await client.get("/v1/schemas")).status_code == 200
+
+
+async def test_info_reports_that_authentication_is_on(client) -> None:
+    """FB-291: authentication's state is on the API, never silent."""
+    info = (await client.get("/v1/info", headers={"X-API-Key": "view-key"})).json()
+    assert info["auth"]["enabled"] is True
+    assert info["auth"]["anonymous_administrator"] is False
+    assert info["auth"]["api_keys"] == 2
+
+
+async def test_an_ambiguous_flag_stops_the_hub_before_it_serves() -> None:
+    """FB-291: ``FORGE_AUTH_ENABLED=enabled`` used to mean off; now the hub refuses to start."""
+    from forge_core.coerce import AmbiguousValueError
+
+    env = {"FORGE_GRPC_ENABLED": "false", "FORGE_AUTH_ENABLED": "enabled"}
+    with (
+        patch.dict(os.environ, env),
+        pytest.raises(AmbiguousValueError, match="FORGE_AUTH_ENABLED"),
+    ):
+        create_app(storage_config=StorageConfig())
+    configure_auth(AuthConfig(enabled=False))

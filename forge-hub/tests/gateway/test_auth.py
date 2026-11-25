@@ -15,6 +15,10 @@ from forge_hub.gateway.auth import (
 from forge_hub.gateway.errors import install_error_handlers
 from forge_hub.gateway.models import AuthConfig, ForgeUser, Role
 
+#: The claims every accepted token must carry (FB-291): an expiry, the issuer and audience
+#: the hub is configured with.
+_BOUND = {"exp": 4102444800, "iss": "test-hub", "aud": "forge-hub"}
+
 
 @pytest.fixture
 def auth_app() -> FastAPI:
@@ -47,7 +51,9 @@ def _auth_enabled():
     configure_auth(
         AuthConfig(
             enabled=True,
-            jwt_secret="test-secret",
+            jwt_secret="test-secret-of-at-least-32-bytes!!",
+            jwt_issuer="test-hub",
+            jwt_audience="forge-hub",
             jwt_algorithm="HS256",
             api_keys={
                 "test-key-admin": ForgeUser(
@@ -124,8 +130,8 @@ class TestJwtAuth:
         import jwt
 
         token = jwt.encode(
-            {"sub": "jwt-user", "role": "operator"},
-            "test-secret",
+            {"sub": "jwt-user", "role": "operator", **_BOUND},
+            "test-secret-of-at-least-32-bytes!!",
             algorithm="HS256",
         )
         client = TestClient(auth_app)
@@ -153,8 +159,13 @@ class TestJwtAuth:
         import jwt
 
         token = jwt.encode(
-            {"sub": "scoped-user", "role": "viewer", "scopes": "records:read,adapters:read"},
-            "test-secret",
+            {
+                "sub": "scoped-user",
+                "role": "viewer",
+                "scopes": "records:read,adapters:read",
+                **_BOUND,
+            },
+            "test-secret-of-at-least-32-bytes!!",
             algorithm="HS256",
         )
         client = TestClient(auth_app)
@@ -181,6 +192,8 @@ class TestAuthConfigFromEnv:
     def test_parses_api_keys(self, monkeypatch):
         monkeypatch.setenv("FORGE_AUTH_ENABLED", "true")
         monkeypatch.setenv("FORGE_JWT_SECRET", "secret")
+        monkeypatch.setenv("FORGE_JWT_ISSUER", "test-hub")
+        monkeypatch.setenv("FORGE_JWT_AUDIENCE", "forge-hub")
         monkeypatch.setenv("FORGE_API_KEYS", "k1:user1:admin,k2:user2:viewer")
         config = auth_config_from_env()
         assert config.enabled is True

@@ -14,6 +14,9 @@ class AuthConfig:
     enabled: bool = True
     jwt_secret: str = ""
     jwt_algorithm: str = "HS256"
+    #: Every accepted JWT must name this issuer and this audience (FB-291).
+    jwt_issuer: str = ""
+    jwt_audience: str = ""
     api_keys: dict[str, ForgeUser] = field(default_factory=dict)
 
 

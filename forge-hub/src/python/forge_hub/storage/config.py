@@ -5,6 +5,8 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 
+from forge_core.coerce import env_boolean
+
 
 @dataclass(frozen=True)
 class PostgresConfig:
@@ -139,7 +141,7 @@ class StorageConfig:
                 endpoint=os.getenv("MINIO_ENDPOINT", "localhost:9000"),
                 access_key=os.getenv("MINIO_ACCESS_KEY", "forge"),
                 secret_key=os.getenv("MINIO_SECRET_KEY", "changeme"),
-                secure=os.getenv("MINIO_SECURE", "false").lower() == "true",
+                secure=env_boolean("MINIO_SECURE", False),
             ),
             kafka=KafkaConfig(
                 bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"),
