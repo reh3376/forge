@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-25` against the repository `reh3376/forge` at the merge of PR 190 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-25` against the repository `reh3376/forge` at the merge of PR 191 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-25 at PR 190:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-25 at PR 191:
 
 **Working**
 
@@ -356,7 +356,7 @@ note:
 | `forge-hub/src/python/forge_hub/gateway` · `api` · `observer` · `cli` | auth and RBAC middleware, the hub FastAPI app, health, the `forge` CLI |
 | `forge-modules/forge-ot/src/python/forge_ot` | forge-ot: OPC-UA client, tag engine, alarming, control, MQTT, bridge, i3X, changeover |
 | `forge-core/src/python/forge_core/sdk` | the module builder and the scripting SDK (`forge.*` namespace) |
-| `forge-core/src/python/forge_core` | **forge-core**, the shared foundation, its own package `forge_core` since 2026-11-22 (D-17): the models and the clock, `fxts` (the frameworks), `sdk`, `adapter` (the base class and the generic adapters), `link` (a module's end of the link to a hub), `proto_gen`. Its language-neutral part is `forge-core/contract`: the proto files, every framework's schema with its released versions, and the governed lists (`forge_core.contract` says where it is; a built package and the image carry it). It imports nothing of the hub or of a module, and a test holds that (`tests/test_layer_imports.py`). The hub is its own package too, `forge_hub` in `forge-hub/src/python`; the modules are still in `src/forge` |
+| `forge-core/src/python/forge_core` | **forge-core**, the shared foundation, its own package `forge_core` since 2026-11-22 (D-17): the models and the clock, `fxts` (the frameworks), `sdk`, `adapter` (the base class and the generic adapters), `link` (a module's end of the link to a hub), `trust` (the trust root's certificates since 2026-11-25: the certificate profile read from a governed list, an issuer that refuses any request outside it, the verifier, the anchor's form and the stages, signing through PKCS#11 with a key that stays on its device; D-23), `proto_gen`. Its language-neutral part is `forge-core/contract`: the proto files, every framework's schema with its released versions, and the governed lists (`forge_core.contract` says where it is; a built package and the image carry it). It imports nothing of the hub or of a module, and a test holds that (`tests/test_layer_imports.py`). The hub is its own package too, `forge_hub` in `forge-hub/src/python`; the modules are still in `src/forge` |
 | `forge-modules/forge-<name>` | one folder per module: its Python package in `src/python/forge_<name>` (with its manifest and config) and its specs in `fxts/<framework>`. Eight adapters (`forge-wms`, `forge-mes`, `forge-cmms`, `forge-nms`, `forge-ims`, `forge-historian`, `forge-scanner`, `forge-integ-erp-netsuite`) and forge-ot; `forge-display` holds the widget specs; `forge-mes/bridge` is the interim MES bridge |
 | `forge-core/src/go/` | Go models mirroring the core models, the scaffold, generated bindings, daemon and CLI stubs |
 | `forge-modules/forge-mes/bridge` | the interim MES bridge (NestJS + Next.js), with its own `CLAUDE.md` |
@@ -2011,13 +2011,13 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest -q -rsx                          # 6,369 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
+uv run pytest -q -rsx                          # 6,550 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
-(cd go && go build ./... && go vet ./... && go test ./...)
+(cd forge-core/src/go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
 ```
 
-- Python 3.12+, uv, ruff, Docker for the services; Go 1.26 for `forge-core/src/go/`; Node 20 for the interim MES bridge's CI job and Node 22 for the tutorial build.
+- Python 3.12+, uv, ruff, Docker for the services; Go 1.26 for `forge-core/src/go/`; SoftHSM for the trust root's tests that sign on a device (`softhsm2` on Ubuntu, `brew install softhsm` on a Mac; without it those tests skip and say why, and CI requires it); Node 20 for the interim MES bridge's CI job and Node 22 for the tutorial build.
 - Every Python dependency is locked in `uv.lock`; `--locked` fails on a stale lock, so a dependency moves only through a committed re-lock (FB-096):
 
 ```bash

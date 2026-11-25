@@ -12,6 +12,32 @@
       "released_at": "2026-11-23T05:34:58Z",
       "approved_by": "reh3376",
       "approved_at": "2026-11-23T05:38:09Z"
+    },
+    {
+      "version": "0.2.0",
+      "file": "versions/lists.v0.2.0.schema.json",
+      "schema_hash": "25f1ba6351ab9ce6d18bee66ae560353917e5ee1b9baed8d24c93ba122040f20",
+      "hash_state": "approved",
+      "step": "minor",
+      "summary": "FB-293 step 1a: evidence marks on every top-level field (D-19 AE-3), and the entry shapes of the trust root's three lists (D-23 T-4, T-9): certificateRole, authenticatorModel, deviceAttestationRoot, bound by name in forge_core.fxts.shared.lists",
+      "changes": [
+        "$defs.authenticatorModel: added (minor)",
+        "$defs.certificateRole: added (minor)",
+        "$defs.deviceAttestationRoot: added (minor)",
+        "description: wording changed (patch)",
+        "properties.deliveries.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.description.x-forge-evidence: evidence mark added: 'description' (minor)",
+        "properties.directions.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.entries.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.integrity.x-forge-evidence: evidence mark added: 'structure' (minor)",
+        "properties.links.x-forge-evidence: evidence mark added: 'claim' (minor)",
+        "properties.list.x-forge-evidence: evidence mark added: 'structure' (minor)",
+        "properties.spec_version.x-forge-evidence: evidence mark added: 'structure' (minor)",
+        "properties.title.x-forge-evidence: evidence mark added: 'description' (minor)"
+      ],
+      "released_at": "2026-11-25T18:15:45Z",
+      "approved_by": "reh3376",
+      "approved_at": "2026-11-25T23:04:17Z"
     }
   ]
 }

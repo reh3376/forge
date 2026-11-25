@@ -22,7 +22,7 @@ def test_it_holds_the_four_proto_files_the_lists_and_every_schema() -> None:
         "contextual_record.proto",
         "enums.proto",
     ]
-    assert len(list(contract.LISTS_DIR.glob("*.list.json"))) == 6
+    assert len(list(contract.LISTS_DIR.glob("*.list.json"))) == 7
     for framework in ("facts", "fats", "fmts", "ftts", "futs", "fvts"):
         assert contract.schema_path(framework).is_file(), framework
         assert (contract.schema_dir(framework) / "schema-registry.json").is_file(), framework

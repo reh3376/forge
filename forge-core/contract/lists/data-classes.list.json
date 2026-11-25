@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "list": "data-classes",
   "title": "Data classes",
   "description": "What travels on a link, by its rule. A class is named parent or parent.child; a sub-class inherits every rule of its parent and may only tighten its numbers, never change the delivery rule or loosen anything (owner, 2026-11-19, FB-153). Direction and the links a class may travel are attributes of the class, not classes. The numbers of each class (keepalive, deadlines, batch, buffer, expiry) are settled when the transport contract is built (FB-164). Adding a class is one approved change to this list and never a breaking change.",
@@ -195,8 +195,17 @@
   ],
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "8d58d34f13f0653cf1e46ec3df61a3696f3abc6237c6a893e9f82161a9de5e04",
+    "previous_hash": "e9d0e4ba034613071e38b82d125be691ed2572a34ef631479d19cb29bddaffb2",
     "change_history": [
+      {
+        "previous_hash": "e9d0e4ba034613071e38b82d125be691ed2572a34ef631479d19cb29bddaffb2",
+        "new_hash": "359f970a080ec6ba823ae1c6429cd50124e7996bb980f078d15c7811efcdd6ac",
+        "changed_at": "2026-11-25T18:33:19Z",
+        "source": "agent",
+        "changed_by": "claude-opus-5-5",
+        "change_type": "structural",
+        "reason": "FB-293 step 1a: the list declares list format 0.2.0 (evidence marks on every field, the trust root's entry shapes); its entries are unchanged"
+      },
       {
         "previous_hash": "8d58d34f13f0653cf1e46ec3df61a3696f3abc6237c6a893e9f82161a9de5e04",
         "new_hash": "e9d0e4ba034613071e38b82d125be691ed2572a34ef631479d19cb29bddaffb2",
@@ -208,10 +217,10 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "e9d0e4ba034613071e38b82d125be691ed2572a34ef631479d19cb29bddaffb2",
-    "schema_version": "0.1.0",
-    "schema_hash": "c9cb17e17a24bba4afcd76f6d87fbe0719064b6a853e91eedc4240ab129e668b",
+    "spec_hash": "359f970a080ec6ba823ae1c6429cd50124e7996bb980f078d15c7811efcdd6ac",
+    "schema_version": "0.2.0",
+    "schema_hash": "25f1ba6351ab9ce6d18bee66ae560353917e5ee1b9baed8d24c93ba122040f20",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T05:38:10Z"
+    "approved_at": "2026-11-25T23:04:18Z"
   }
 }

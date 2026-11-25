@@ -1,0 +1,589 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "forge://fxts/lists/v0.2.0",
+  "title": "Governed list",
+  "description": "A governed list: a closed set of named values that specs, hubs and modules choose from or are held to. Sender: forge-core, where the owner approves it. Transmission: in the contract, and down the chain of command one level at a time, where it may arrive late or after this format has moved on. Receiver: a runner, a hub's decision point or a person, who must be able to tell from the list alone what it is (list), which construction it is (spec_version), that it is the approved one (integrity) and what each value means (entries). A receiver that does not know the spec_version refuses the list and keeps the last one it understood. A list that needs a vocabulary of its own beside its entries is named in this schema with the fields it adds, as data-classes is; no other list carries them. Three lists of the trust root (D-23) hold their entries to a shape given in $defs: certificate-roles to certificateRole, authenticator-models to authenticatorModel and device-attestation-roots to deviceAttestationRoot. They are bound by name in forge_core.fxts.shared.lists, because a new branch of the top-level allOf is a major step that would send every list back for review (FB-301).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spec_version",
+    "list",
+    "title",
+    "description",
+    "entries",
+    "integrity"
+  ],
+  "properties": {
+    "spec_version": {
+      "type": "string",
+      "const": "0.2.0",
+      "description": "The version of this format the list is written in.",
+      "x-forge-evidence": "structure"
+    },
+    "list": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "The list's name; the file is <list>.list.json.",
+      "x-forge-evidence": "structure"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What the list is, in a few words.",
+      "x-forge-evidence": "description"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What the values are for, who chooses from them, and the decision that set the list.",
+      "x-forge-evidence": "description"
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/entry"
+      },
+      "description": "The values. Order is kept.",
+      "x-forge-evidence": "claim"
+    },
+    "directions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "description": "data-classes only: the directions a class of data may travel.",
+      "x-forge-evidence": "claim"
+    },
+    "deliveries": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "description": "data-classes only: the delivery rules a class may have.",
+      "x-forge-evidence": "claim"
+    },
+    "links": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "description": "data-classes only: the links a class may travel.",
+      "x-forge-evidence": "claim"
+    },
+    "integrity": {
+      "type": "object",
+      "description": "The FHTS block: the hash of everything else in the list, its state, and who approved it.",
+      "x-forge-evidence": "structure"
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": [
+        "id",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)?$",
+          "description": "The value as it is written where it is chosen. Dotted for a child of another entry."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What the value means."
+        }
+      },
+      "description": "One value. A list may give its entries more fields; a list named below is held to the shape given for it."
+    },
+    "hardLimit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "description",
+        "kind",
+        "applies",
+        "held_by",
+        "held_how",
+        "reason",
+        "status",
+        "added",
+        "enforced_by"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "scope",
+            "relation"
+          ],
+          "description": "How the limit is tested: by the scopes a decision exercises or grants, or by a relation between who grants and who receives."
+        },
+        "scopes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(\\*|[a-z][a-z0-9_]*):(\\*|[a-z][a-z0-9_]*):(\\*|[a-z][a-z0-9_]*)$"
+          },
+          "description": "Scopes the limit covers, <domain>:<object>:<action>, with * for any."
+        },
+        "relation": {
+          "enum": [
+            "grantor-is-grantee",
+            "grant-exceeds-grantor"
+          ]
+        },
+        "applies": {
+          "enum": [
+            "interim",
+            "always"
+          ],
+          "description": "interim: only an interim decision is forbidden, and a behavioral contract may permit the act. always: no decision and no contract permits it."
+        },
+        "held_by": {
+          "enum": [
+            "contract",
+            "level-above",
+            "owner"
+          ],
+          "description": "Who may do it instead."
+        },
+        "held_how": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why no later rejection can put the act right."
+        },
+        "status": {
+          "enum": [
+            "active",
+            "retired"
+          ],
+          "description": "A retired limit stays listed so that a record naming it still resolves; its id is never used again."
+        },
+        "added": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "retired": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "enforced_by": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "What holds the limit today: tests or checks, by path or id. Empty when nothing does."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "scope"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "scopes"
+            ],
+            "not": {
+              "required": [
+                "relation"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "relation"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "relation"
+            ],
+            "not": {
+              "required": [
+                "scopes"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "retired"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "retired"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "retired"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "certificateRole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "description",
+        "issued_by",
+        "identity",
+        "ca",
+        "path_length",
+        "key_usage",
+        "extended_key_usage",
+        "curve",
+        "signs_with"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "The role, as the anchor's policy and the verifiers name it."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What a certificate of this role is for."
+        },
+        "issued_by": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "The role whose key signs a certificate of this one; its own id for a self-signed certificate root."
+        },
+        "identity": {
+          "enum": [
+            "deployment",
+            "hub",
+            "module"
+          ],
+          "description": "The form of its SPIFFE id: spiffe://<deployment>, .../hub/<hub>, or .../hub/<hub>/module/<module>."
+        },
+        "ca": {
+          "type": "boolean",
+          "description": "Whether it may sign certificates (basic constraints, critical)."
+        },
+        "path_length": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "The path length a CA role carries; null for a leaf."
+        },
+        "key_usage": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "digital_signature",
+              "key_cert_sign",
+              "crl_sign"
+            ]
+          },
+          "description": "Exactly these key usages, critical."
+        },
+        "extended_key_usage": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "server_auth",
+              "client_auth"
+            ]
+          },
+          "description": "Exactly these extended key usages; empty means the extension is absent."
+        },
+        "curve": {
+          "enum": [
+            "secp256r1",
+            "secp384r1"
+          ],
+          "description": "The curve of the certificate's key."
+        },
+        "signs_with": {
+          "enum": [
+            "sha256",
+            "sha384",
+            null
+          ],
+          "description": "The hash this role's key signs with; null for a role that signs nothing."
+        }
+      },
+      "description": "One role of certificate in the trust root's profile (D-23 T-4): written once, read by the issuer and by both verifiers. No role carries name constraints."
+    },
+    "authenticatorModel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "description",
+        "aaguid",
+        "attestation_format",
+        "roots",
+        "intermediates",
+        "required_properties",
+        "biometric",
+        "fido_certificate",
+        "fips_certificate",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "A name for the model; its AAGUID is a field, since an id starts with a letter."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The model and the firmware the entry covers."
+        },
+        "aaguid": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "description": "The model's AAGUID, as its attestation certificate and authenticator data carry it."
+        },
+        "attestation_format": {
+          "const": "packed",
+          "description": "Only packed attestation with a certificate chain is accepted (D-23 T-9)."
+        },
+        "roots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^-----BEGIN CERTIFICATE-----\\n[A-Za-z0-9+/=\\n]+-----END CERTIFICATE-----\\n?$"
+          },
+          "description": "The maker's attestation roots for the model, in PEM."
+        },
+        "intermediates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^-----BEGIN CERTIFICATE-----\\n[A-Za-z0-9+/=\\n]+-----END CERTIFICATE-----\\n?$"
+          },
+          "description": "Intermediates between a root and the model's attestation certificates, which OpenSSH does not write."
+        },
+        "required_properties": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "device_bound",
+            "user_verification",
+            "cred_protect"
+          ],
+          "properties": {
+            "device_bound": {
+              "const": true
+            },
+            "user_verification": {
+              "const": "required"
+            },
+            "cred_protect": {
+              "const": 3
+            }
+          },
+          "description": "What every enrolment of the model must show: backup-eligible clear, user verification, credProtect level 3."
+        },
+        "biometric": {
+          "const": false,
+          "description": "No model with a biometric method is listed: metadata cannot tell whether several people enrol fingerprints."
+        },
+        "fido_certificate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The FIDO certification number, checked by hand."
+        },
+        "fips_certificate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The FIPS 140 (CMVP) certificate number, checked by hand; null when it has none."
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where each fact came from: the maker's published roots, never FIDO's metadata, which is not redistributed."
+        }
+      },
+      "description": "One model of security key a person may enrol (D-23 T-9)."
+    },
+    "deviceAttestationRoot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "description",
+        "kind",
+        "roots",
+        "intermediates",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "A name for the attestation root."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Which devices it attests."
+        },
+        "kind": {
+          "enum": [
+            "yubikey-piv",
+            "yubihsm2",
+            "tpm"
+          ],
+          "description": "The kind of device whose key attestation chains to it."
+        },
+        "roots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^-----BEGIN CERTIFICATE-----\\n[A-Za-z0-9+/=\\n]+-----END CERTIFICATE-----\\n?$"
+          },
+          "description": "The maker's attestation roots, in PEM."
+        },
+        "intermediates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^-----BEGIN CERTIFICATE-----\\n[A-Za-z0-9+/=\\n]+-----END CERTIFICATE-----\\n?$"
+          },
+          "description": "Intermediates between a root and a device's attestation key."
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where the roots were published."
+        }
+      },
+      "description": "One attestation root for the devices that hold the trust root's keys (D-23 T-3)."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "list": {
+            "const": "hard-limits"
+          }
+        },
+        "required": [
+          "list"
+        ]
+      },
+      "then": {
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/$defs/hardLimit"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "list": {
+            "const": "data-classes"
+          }
+        },
+        "required": [
+          "list"
+        ]
+      },
+      "then": {
+        "required": [
+          "directions",
+          "deliveries",
+          "links"
+        ]
+      },
+      "else": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "directions"
+              ]
+            },
+            {
+              "required": [
+                "deliveries"
+              ]
+            },
+            {
+              "required": [
+                "links"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

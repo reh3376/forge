@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "list": "module-functions",
   "title": "Module functions",
   "description": "The service a module performs, whether Forge builds it or an integration module connects a product that does it. A module spec's module_identity.function is one of these (owner, 2026-11-19, FB-153). Adding a function is one approved change to this list.",
@@ -63,8 +63,17 @@
   ],
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "a702b34be57f2370b3f49eeac357afe0097cd5aadc281e7bb542f91b7666a035",
+    "previous_hash": "eb84395ceba43b3a5c7c95ddbf309bfe8c702cdd9d577138fa9c72c0d6633c40",
     "change_history": [
+      {
+        "previous_hash": "eb84395ceba43b3a5c7c95ddbf309bfe8c702cdd9d577138fa9c72c0d6633c40",
+        "new_hash": "a9f2a90caa5370e2d4a348502cb4330ab01c05e83cfbb6b5e84adf7d7df8169a",
+        "changed_at": "2026-11-25T18:33:18Z",
+        "source": "agent",
+        "changed_by": "claude-opus-5-5",
+        "change_type": "structural",
+        "reason": "FB-293 step 1a: the list declares list format 0.2.0 (evidence marks on every field, the trust root's entry shapes); its entries are unchanged"
+      },
       {
         "previous_hash": "a702b34be57f2370b3f49eeac357afe0097cd5aadc281e7bb542f91b7666a035",
         "new_hash": "eb84395ceba43b3a5c7c95ddbf309bfe8c702cdd9d577138fa9c72c0d6633c40",
@@ -76,10 +85,10 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "eb84395ceba43b3a5c7c95ddbf309bfe8c702cdd9d577138fa9c72c0d6633c40",
-    "schema_version": "0.1.0",
-    "schema_hash": "c9cb17e17a24bba4afcd76f6d87fbe0719064b6a853e91eedc4240ab129e668b",
+    "spec_hash": "a9f2a90caa5370e2d4a348502cb4330ab01c05e83cfbb6b5e84adf7d7df8169a",
+    "schema_version": "0.2.0",
+    "schema_hash": "25f1ba6351ab9ce6d18bee66ae560353917e5ee1b9baed8d24c93ba122040f20",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T05:38:10Z"
+    "approved_at": "2026-11-25T23:04:17Z"
   }
 }
