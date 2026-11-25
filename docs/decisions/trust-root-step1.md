@@ -87,6 +87,8 @@ D-21 §11 step 1: the anchor, the certificate authority and identities; the deve
 
 Each law gets an exhaustive check on the real code and a `.claude/skills/verify-*` skill with the pull request that builds it (CLAUDE.md, "A law is proved"); every proof script of §8 becomes a test of the build.
 
+*Amended 2026-11-25 by the owner (step 1a's design, Q-B): when each part takes hold.* Law 3 for the anchor: from step 1a an anchor counts only as the pinned genesis and every later version is refused by name; a later version counts on the authorities' threshold from step 1b, which builds D-20's FIDO core for signed enrolment. Law 3 for the allow-lists: they are approved as every governed list is until signed approvals exist (D-21 step 5). Law 4's first half (no hub release accepts a test anchor): from D-21 step 5, when a release carries its identity; its second half holds from step 1a. Until a part takes hold, its verify skill states it and reports it as not run, never as passing.
+
 ## 8. What the attack found, and where each went
 
 | # | Finding | Where |
@@ -140,7 +142,7 @@ The proof scripts are in the session's scratch folder; each becomes a test of th
 | Q-5 | Installs, each when its pull request needs it: on the owner's Mac `ykman`, `yubico-piv-tool` (for `ykcs11`), Homebrew's cask `yubihsm2-sdk` (the connector) and `openssh-sk-provider` (approved); Yubico's `yubihsm-pkcs11` package in the image; SoftHSM in CI. | Accept. **Answered 2026-11-25: "Accept".** |
 | Q-6 | Add `python-pkcs11` to the lock file (the manager's database uses `asyncpg`, SQLAlchemy and Alembic, already locked). | Accept. **Answered 2026-11-25: "Accept".** |
 | Q-7 | FIDO's metadata: never redistributed by the vendor; a deployment fetches it under its own agreement (T-9). | Accept; a legal review before any commercial use. **Answered 2026-11-25: "Accept".** |
-| Q-8 | FxTS specs for the ceremony, enrolment and allow-list releases (A-13): kinds of FSTS spec (the security framework's FxTS framework, planned; D-22 PF-3 made the permission catalog its first kind), written with the pull requests that build them; FSTS meets D-14's whole baseline when its first kind is built, never half-built. | Accept. **Answered 2026-11-25: "Accept".** |
+| Q-8 | FxTS specs for the ceremony, enrolment and allow-list releases (A-13): kinds of FSTS spec (the security framework's FxTS framework, planned; D-22 PF-3 made the permission catalog its first kind), written with the pull requests that build them; FSTS meets D-14's whole baseline when its first kind is built, never half-built. | Accept. **Answered 2026-11-25: "Accept".** *Amended 2026-11-25 by the owner (step 1a's design, Q-A): the allow-lists are governed lists (T-9) and are released as every governed list is (schema-checked, hashed, approved by the owner), with a per-list check that parses their root certificates; FSTS starts in step 1b with the ceremony and enrolment as its first kinds.* |
 | Q-9 | Amend D-21 §11 ("each a pull request") for step 1: steps 1a and 1b, each a pull request (T-11, §9). | Accept. **Answered 2026-11-25: "Accept".** |
 | Q-10 | Sign the record (D-23). | After Q-1 to Q-9. **Answered 2026-11-25: "Sign it".** |
 

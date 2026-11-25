@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-25` against the repository `reh3376/forge` at the merge of PR 189 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-25` against the repository `reh3376/forge` at the merge of PR 190 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-25 at PR 189:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-25 at PR 190:
 
 **Working**
 
@@ -1705,7 +1705,7 @@ note:
 ## Credentials and Secrets
 
 - The hub owns the databases and issues credentials (`forge db access`, F3): a module never carries a database password it created itself; the password is printed once and never stored.
-- Hub ↔ module traffic is TLS or mTLS in both directions with a per-module callback token. Both are optional today. The signed transport contract makes mutual TLS **required in production**, with a development mode that is deliberate and visible on status, a short-lived token renewed on the open stream, and revocation that takes effect at once (D-15, not built).
+- Hub ↔ module traffic is TLS or mTLS in both directions with a per-module callback token. Both are optional today. The hub's switch for client certificates is read by the one boolean rule: an unclear word, or requiring client certificates with no CA to check them against, stops the hub at start with its cause, where an unclear word once turned client certificates off without a word (FB-296). The signed transport contract makes mutual TLS **required in production**, with a development mode that is deliberate and visible on status, a short-lived token renewed on the open stream, and revocation that takes effect at once (D-15, not built).
 - **forge-creds**, a central credential module, is the owner's direction for everything a module needs a secret for, third-party systems included: entered once, held behind an existing secret store, referenced by name, handed to a module at Configure and never readable by a script. It has no design record yet (FB-142), and mutual TLS in production depends on it.
 - The interim MES bridge still reads a cloud vault directly when one is configured; that is interim.
 - Configuration comes from `.env` files and environment variables; no credential, IP or key is hard-coded.

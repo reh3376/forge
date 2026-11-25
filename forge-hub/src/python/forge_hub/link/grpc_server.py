@@ -33,6 +33,7 @@ import grpc
 import grpc.aio
 
 from forge_core.clock import REFUSAL_CAUSE_HEADER, ClockRefusedError
+from forge_core.coerce import boolean
 from forge_core.link.proto_bridge import (
     health_to_proto,
     hub_time_to_proto,
@@ -60,12 +61,24 @@ class ServerTls:
     ``require_client_cert`` says otherwise. Built from ``<prefix>_CERT`` /
     ``_KEY`` / ``_CA`` by :meth:`from_env`. Pairs with the spoke side's
     ``FORGE_HUB_TLS_*`` (NestJS backend) and ``ChannelTls`` (Python spokes).
+
+    Requiring client certificates with no CA to check them against cannot be built:
+    it used to reach the server's start, where the error was logged and the hub ran
+    on without its module link (FB-296, FB-300).
     """
 
     cert_path: str
     key_path: str
     ca_path: str | None = None
     require_client_cert: bool | None = None
+
+    def __post_init__(self) -> None:
+        if self.require_client_cert is True and not self.ca_path:
+            msg = (
+                "client certificates are required but no CA is set to verify them against "
+                "(set FORGE_GRPC_TLS_CA, or FORGE_GRPC_TLS_REQUIRE_CLIENT_CERT=false)"
+            )
+            raise ValueError(msg)
 
     @classmethod
     def from_env(cls, prefix: str = "FORGE_GRPC_TLS") -> ServerTls | None:
@@ -77,8 +90,11 @@ class ServerTls:
         if cert is None or key is None:
             msg = f"{prefix}_CERT and {prefix}_KEY must both be set for a TLS gRPC server"
             raise ValueError(msg)
-        raw = os.getenv(f"{prefix}_REQUIRE_CLIENT_CERT", "").strip().lower()
-        require = None if raw == "" else raw in ("1", "true", "yes", "on")
+        # The one boolean rule: an unclear word stops the hub with its cause; it used to
+        # be read as "no", which turned client certificates off without a word (FB-296).
+        name = f"{prefix}_REQUIRE_CLIENT_CERT"
+        raw = os.getenv(name, "")
+        require = None if raw.strip() == "" else boolean(raw, name=name)
         return cls(cert_path=cert, key_path=key, ca_path=ca, require_client_cert=require)
 
     @property
@@ -86,9 +102,6 @@ class ServerTls:
         return bool(self.ca_path) if self.require_client_cert is None else self.require_client_cert
 
     def credentials(self) -> grpc.ServerCredentials:
-        if self.mtls and not self.ca_path:
-            msg = "require_client_cert needs ca_path to verify client certificates against"
-            raise ValueError(msg)
         cert = Path(self.cert_path).read_bytes()
         key = Path(self.key_path).read_bytes()
         ca = Path(self.ca_path).read_bytes() if self.ca_path else None
