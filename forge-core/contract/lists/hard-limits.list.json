@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "list": "hard-limits",
   "title": "Hard limits on decisions in the chain of command",
   "description": "What a level of the chain of command may not decide for itself. Each level decides within the behavioral contract it was handed, and may cross that contract's line in the moment with a stated reason, as an interim decision reviewed above (D-17 §11.5). These are the exceptions: acts a later rejection cannot put right, or that belong to one holder alone. A limit is matched by the hub's decision point, so each entry is data it can test: scopes it covers, or a relation between who grants and who receives. A behavioral contract may not permit what a limit that applies always forbids. A decision records the hash of this list as it was checked, so one made under an older list is reviewed against the current one. The list is expected to change as Forge is built: adding a limit, or retiring one, is one approved change to this list (owner, 2026-11-23). A retired limit stays listed, so a record that names it still resolves; its id is never used again.",
@@ -68,8 +68,17 @@
   ],
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "cc1ffc2bee21cacef2350a4199464768d230e53421619f3821346de7d1fe0859",
+    "previous_hash": "6cfff4437075f854a066c5f2a38b8a3a43d3fcf798f671b78ef14909abceef83",
     "change_history": [
+      {
+        "previous_hash": "6cfff4437075f854a066c5f2a38b8a3a43d3fcf798f671b78ef14909abceef83",
+        "new_hash": "3f7b0fc75e779425b9b2d7c8047f0d70903102e7e98279b7c06cab86f48c835d",
+        "changed_at": "2026-11-25T18:33:19Z",
+        "source": "agent",
+        "changed_by": "claude-opus-5-5",
+        "change_type": "structural",
+        "reason": "FB-293 step 1a: the list declares list format 0.2.0 (evidence marks on every field, the trust root's entry shapes); its entries are unchanged"
+      },
       {
         "previous_hash": "cc1ffc2bee21cacef2350a4199464768d230e53421619f3821346de7d1fe0859",
         "new_hash": "6cfff4437075f854a066c5f2a38b8a3a43d3fcf798f671b78ef14909abceef83",
@@ -81,10 +90,10 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "6cfff4437075f854a066c5f2a38b8a3a43d3fcf798f671b78ef14909abceef83",
-    "schema_version": "0.1.0",
-    "schema_hash": "c9cb17e17a24bba4afcd76f6d87fbe0719064b6a853e91eedc4240ab129e668b",
+    "spec_hash": "3f7b0fc75e779425b9b2d7c8047f0d70903102e7e98279b7c06cab86f48c835d",
+    "schema_version": "0.2.0",
+    "schema_hash": "25f1ba6351ab9ce6d18bee66ae560353917e5ee1b9baed8d24c93ba122040f20",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T05:38:10Z"
+    "approved_at": "2026-11-25T23:04:18Z"
   }
 }

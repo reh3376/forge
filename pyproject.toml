@@ -27,6 +27,10 @@ dependencies = [
     "aio-pika>=9.0.0",
     "minio>=7.2.0",
     "pyjwt[crypto]>=2.9.0",
+    # Certificates for the trust root (D-23): issued and verified by forge_core.trust,
+    # signed through PKCS#11 by a key held on a device (FB-293 step 1a).
+    "cryptography>=50.0.2",
+    "python-pkcs11>=0.10.1",
 ]
 
 [project.optional-dependencies]

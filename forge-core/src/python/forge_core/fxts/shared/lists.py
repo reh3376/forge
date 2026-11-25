@@ -33,10 +33,23 @@ DATA_CLASSES = "data-classes"
 PRUNING_STRATEGIES = "pruning-strategies"
 CONTAINER_KINDS = "container-kinds"
 HARD_LIMITS = "hard-limits"
+#: The trust root's lists (D-23): the certificate profile, and the two allow-lists that
+#: arrive with step 1b's ceremony, checked against the real devices.
+CERTIFICATE_ROLES = "certificate-roles"
+AUTHENTICATOR_MODELS = "authenticator-models"
+DEVICE_ATTESTATION_ROOTS = "device-attestation-roots"
+#: Lists whose entries are held to a shape in the list schema's ``$defs``, bound here by
+#: name: a new branch of the schema's top-level ``allOf`` is a major step that would send
+#: every list back for review (FB-301).
+ENTRY_SHAPES = {
+    CERTIFICATE_ROLES: "certificateRole",
+    AUTHENTICATOR_MODELS: "authenticatorModel",
+    DEVICE_ATTESTATION_ROOTS: "deviceAttestationRoot",
+}
 #: The lists a module spec (FMTS) chooses from.
 NAMES = (MODULE_FUNCTIONS, APPLICATION_PROTOCOLS, DATA_CLASSES, PRUNING_STRATEGIES)
 #: Every governed list in the tree.
-ALL_NAMES = (*NAMES, CONTAINER_KINDS, HARD_LIMITS)
+ALL_NAMES = (*NAMES, CONTAINER_KINDS, HARD_LIMITS, CERTIFICATE_ROLES)
 
 
 @dataclass(frozen=True)
@@ -175,6 +188,66 @@ def _format_problems(name: str, document: dict[str, Any]) -> list[str]:
     ]
 
 
+def _entry_shape_problems(name: str, document: dict[str, Any]) -> list[str]:
+    """For a list bound by name (:data:`ENTRY_SHAPES`): every entry against its shape, and
+    what the shape alone cannot say (a role graph that ends at one root; certificates that
+    parse, with every root a CA)."""
+    from jsonschema import Draft202012Validator
+
+    from forge_core.fxts.shared import schemas
+
+    shape = ENTRY_SHAPES.get(name)
+    if shape is None or not isinstance(document, dict):
+        return []
+    try:
+        schema = json.loads(
+            schemas.schema_for_spec(SCHEMA_DIR, document).read_text(encoding="utf-8")
+        )
+    except (OSError, ValueError, KeyError):
+        return []  # an unknown format is refused by _format_problems, by name
+    defs = schema.get("$defs", {})
+    if shape not in defs:
+        return [
+            f"{name}: list format {document.get('spec_version')!r} has no shape for it; write "
+            "it in 0.2.0 or later"
+        ]
+    validator = Draft202012Validator({"$defs": defs, "$ref": f"#/$defs/{shape}"})
+    entries = [e for e in document.get("entries", []) if isinstance(e, dict)]
+    problems = [
+        f"{name}: {entry.get('id')}: /{'/'.join(str(p) for p in error.absolute_path)}: "
+        f"{error.message[:160]}"
+        for entry in entries
+        for error in validator.iter_errors(entry)
+    ]
+    if problems:
+        return problems
+    if name == CERTIFICATE_ROLES:
+        from forge_core.trust.profile import role_problems
+
+        return [f"{name}: {p}" for p in role_problems(entries)]
+    return _certificate_problems(name, entries)
+
+
+def _certificate_problems(name: str, entries: list[dict[str, Any]]) -> list[str]:
+    from cryptography import x509
+
+    problems = []
+    for entry in entries:
+        for key in ("roots", "intermediates"):
+            for index, pem in enumerate(entry.get(key, [])):
+                try:
+                    cert = x509.load_pem_x509_certificate(str(pem).encode())
+                    ca = cert.extensions.get_extension_for_class(x509.BasicConstraints).value.ca
+                except (ValueError, x509.ExtensionNotFound) as exc:
+                    problems.append(
+                        f"{name}: {entry.get('id')}: {key}[{index}] is not usable: {exc}"
+                    )
+                    continue
+                if not ca:
+                    problems.append(f"{name}: {entry.get('id')}: {key}[{index}] is not a CA")
+    return problems
+
+
 def load(name: str, lists_dir: Path | None = None) -> GovernedList:
     """A governed list with everything wrong with it; ``usable`` when nothing is."""
     from forge_core.fxts.shared.runner import verify_spec_hash
@@ -187,6 +260,7 @@ def load(name: str, lists_dir: Path | None = None) -> GovernedList:
     problems = _format_problems(name, document) + _shape_problems(name, document)
     if name == DATA_CLASSES:
         problems += _data_class_problems(document)
+    problems += _entry_shape_problems(name, document)
     integrity = document.get("integrity")
     if not isinstance(integrity, dict) or not integrity.get("spec_hash"):
         problems.append(f"{name}: it carries no hash; stamp it")

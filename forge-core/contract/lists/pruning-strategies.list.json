@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "list": "pruning-strategies",
   "title": "Store-and-forward pruning strategies",
   "description": "What a module does when its store-and-forward buffer is full. A module spec declares the strategies it supports; the hub admin chooses one. Whatever the strategy, every loss is counted and shown, and the audit class is never pruned (owner, 2026-11-19, FB-153; amends T-6).",
@@ -17,8 +17,17 @@
   ],
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "59d005c98cb691aa361e80c3ca54b97b717ab5b1e4aa30e2a87bb364ddd17db7",
+    "previous_hash": "097f801702943e47e9ab958902aa08b4463aaabf4113de5ddf69be31fab4fdd2",
     "change_history": [
+      {
+        "previous_hash": "097f801702943e47e9ab958902aa08b4463aaabf4113de5ddf69be31fab4fdd2",
+        "new_hash": "9e9b47d0a11ad7ded8e9cb9d949ad2d7ae0030bea98af1664d022d50c98f8ccc",
+        "changed_at": "2026-11-25T18:33:19Z",
+        "source": "agent",
+        "changed_by": "claude-opus-5-5",
+        "change_type": "structural",
+        "reason": "FB-293 step 1a: the list declares list format 0.2.0 (evidence marks on every field, the trust root's entry shapes); its entries are unchanged"
+      },
       {
         "previous_hash": "59d005c98cb691aa361e80c3ca54b97b717ab5b1e4aa30e2a87bb364ddd17db7",
         "new_hash": "097f801702943e47e9ab958902aa08b4463aaabf4113de5ddf69be31fab4fdd2",
@@ -30,10 +39,10 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "097f801702943e47e9ab958902aa08b4463aaabf4113de5ddf69be31fab4fdd2",
-    "schema_version": "0.1.0",
-    "schema_hash": "c9cb17e17a24bba4afcd76f6d87fbe0719064b6a853e91eedc4240ab129e668b",
+    "spec_hash": "9e9b47d0a11ad7ded8e9cb9d949ad2d7ae0030bea98af1664d022d50c98f8ccc",
+    "schema_version": "0.2.0",
+    "schema_hash": "25f1ba6351ab9ce6d18bee66ae560353917e5ee1b9baed8d24c93ba122040f20",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T05:38:10Z"
+    "approved_at": "2026-11-25T23:04:18Z"
   }
 }

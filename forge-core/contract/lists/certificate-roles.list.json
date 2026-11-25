@@ -1,0 +1,83 @@
+{
+  "spec_version": "0.2.0",
+  "list": "certificate-roles",
+  "title": "The roles of certificate in the trust root",
+  "description": "The certificate profile of D-23 T-4, written once: who issues each role, the form of its SPIFFE id, whether it is a CA and its path length, exactly which key usages and extended key usages it carries, its curve and the hash its key signs with. The issuer (forge_core.trust.issuer) builds every certificate from it and refuses anything outside it; the Python verifier and the Go verifier (forge-core/src/go/trust) hold every certificate to it. The anchor's policy pins this list's hash, so a change is a new anchor version under the authorities' threshold. No role carries name constraints. Lifetimes are capped by the anchor's policy, never here.",
+  "entries": [
+    {
+      "id": "certificate-root",
+      "description": "A certificate root of the deployment, on its own device and kept offline (D-23 T-1, T-2): it signs hub intermediates and nothing else.",
+      "issued_by": "certificate-root",
+      "identity": "deployment",
+      "ca": true,
+      "path_length": 1,
+      "key_usage": [
+        "key_cert_sign",
+        "crl_sign"
+      ],
+      "extended_key_usage": [],
+      "curve": "secp384r1",
+      "signs_with": "sha384"
+    },
+    {
+      "id": "hub-intermediate",
+      "description": "A hub's intermediate, on the hub's device; it counts only while the anchor lists its key (D-23 T-1), and it issues the hub's own leaves and its modules'.",
+      "issued_by": "certificate-root",
+      "identity": "hub",
+      "ca": true,
+      "path_length": 0,
+      "key_usage": [
+        "key_cert_sign",
+        "crl_sign"
+      ],
+      "extended_key_usage": [],
+      "curve": "secp256r1",
+      "signs_with": "sha256"
+    },
+    {
+      "id": "hub-leaf",
+      "description": "The hub itself on a link: to its modules, to the hub above it and to forge-core, as server and as client.",
+      "issued_by": "hub-intermediate",
+      "identity": "hub",
+      "ca": false,
+      "path_length": null,
+      "key_usage": [
+        "digital_signature"
+      ],
+      "extended_key_usage": [
+        "server_auth",
+        "client_auth"
+      ],
+      "curve": "secp256r1",
+      "signs_with": null
+    },
+    {
+      "id": "module-leaf",
+      "description": "A module on its link to its hub, as client and as the server of the hub's callbacks.",
+      "issued_by": "hub-intermediate",
+      "identity": "module",
+      "ca": false,
+      "path_length": null,
+      "key_usage": [
+        "digital_signature"
+      ],
+      "extended_key_usage": [
+        "server_auth",
+        "client_auth"
+      ],
+      "curve": "secp256r1",
+      "signs_with": null
+    }
+  ],
+  "integrity": {
+    "hash_state": "approved",
+    "previous_hash": null,
+    "change_history": [],
+    "hash_method": "sha256-c14n-v1",
+    "spec_hash": "c1483a35614ab74adb9f4d054472b6e3988bef2056b664d8cbb4bab8aa6f856a",
+    "schema_version": "0.2.0",
+    "schema_hash": "25f1ba6351ab9ce6d18bee66ae560353917e5ee1b9baed8d24c93ba122040f20",
+    "approved_by": "reh3376",
+    "approved_at": "2026-11-25T23:04:17Z"
+  }
+}

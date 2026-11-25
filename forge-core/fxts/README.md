@@ -10,12 +10,13 @@ carries a hash, and only the owner approves one.
 
 | List | What it is | Entries | Format | State | Hash | Approved by |
 |---|---|---|---|---|---|---|
-| [`application-protocols`](../contract/lists/application-protocols.list.json) | Application-side protocols | 7 | 0.1.0 | approved | `96841a27fa04` | reh3376 |
-| [`container-kinds`](../contract/lists/container-kinds.list.json) | Container kinds | 3 | 0.1.0 | approved | `8afc4083a141` | reh3376 |
-| [`data-classes`](../contract/lists/data-classes.list.json) | Data classes | 13 | 0.1.0 | approved | `e9d0e4ba0346` | reh3376 |
-| [`hard-limits`](../contract/lists/hard-limits.list.json) | Hard limits on decisions in the chain of command | 4 | 0.1.0 | approved | `6cfff4437075` | reh3376 |
-| [`module-functions`](../contract/lists/module-functions.list.json) | Module functions | 14 | 0.1.0 | approved | `eb84395ceba4` | reh3376 |
-| [`pruning-strategies`](../contract/lists/pruning-strategies.list.json) | Store-and-forward pruning strategies | 2 | 0.1.0 | approved | `097f80170294` | reh3376 |
+| [`application-protocols`](../contract/lists/application-protocols.list.json) | Application-side protocols | 7 | 0.2.0 | approved | `290d54d1d329` | reh3376 |
+| [`certificate-roles`](../contract/lists/certificate-roles.list.json) | The roles of certificate in the trust root | 4 | 0.2.0 | approved | `c1483a35614a` | reh3376 |
+| [`container-kinds`](../contract/lists/container-kinds.list.json) | Container kinds | 3 | 0.2.0 | approved | `049cef6925ba` | reh3376 |
+| [`data-classes`](../contract/lists/data-classes.list.json) | Data classes | 13 | 0.2.0 | approved | `359f970a080e` | reh3376 |
+| [`hard-limits`](../contract/lists/hard-limits.list.json) | Hard limits on decisions in the chain of command | 4 | 0.2.0 | approved | `3f7b0fc75e77` | reh3376 |
+| [`module-functions`](../contract/lists/module-functions.list.json) | Module functions | 14 | 0.2.0 | approved | `a9f2a90caa53` | reh3376 |
+| [`pruning-strategies`](../contract/lists/pruning-strategies.list.json) | Store-and-forward pruning strategies | 2 | 0.2.0 | approved | `9e9b47d0a11a` | reh3376 |
 
 ## Schema versions
 
@@ -44,4 +45,5 @@ one.
 | fvts | 0.2.0 | minor | approved | `1a9785248467` | reh3376 |
 | fvts | 0.2.1 | patch | approved | `df3d3f198168` | reh3376 |
 | fvts | 0.3.0* | minor | approved | `e38eea4f4c58` | reh3376 |
-| lists | 0.1.0* | baseline | approved | `c9cb17e17a24` | reh3376 |
+| lists | 0.1.0 | baseline | approved | `c9cb17e17a24` | reh3376 |
+| lists | 0.2.0* | minor | approved | `25f1ba6351ab` | reh3376 |

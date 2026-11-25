@@ -23,7 +23,9 @@ jobs:
   hub-python:
     name: hub-python
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
-    runs-on: ubuntu-latest
+    # Pinned, so SoftHSM's version cannot change under the trust root's tests without a commit
+    # (FB-293 step 1a; ubuntu-latest moves to a new release on GitHub's schedule).
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
@@ -36,6 +38,12 @@ jobs:
       # .venv with the Python setup-uv selected.
       - name: Install from the lock (dev + ot extras)
         run: uv sync --locked --extra dev --extra ot
+      # SoftHSM, the software stand-in for a security device under the test stage (D-21 SF-2,
+      # D-23 Q-5): the trust root's issuer signs on it through PKCS#11, as it will on a YubiKey,
+      # a YubiHSM 2 or a TPM. A test tool only: it is never part of an installation. Pinned, so
+      # its version moves only by a commit (with the runner above).
+      - name: Install SoftHSM (test only)
+        run: sudo apt-get update -q && sudo apt-get install -y -q softhsm2=2.6.1-2.2ubuntu3
       - name: ruff check
         run: .venv/bin/ruff check . --output-format github
       - name: ruff format
@@ -44,6 +52,9 @@ jobs:
         # -rsx: every skipped and expected-failure test is listed with its reason on each run
         # (owner, 2026-11-18: a skipped test without a visible reason is a silent gap)
         run: .venv/bin/pytest -q --no-header -p no:cacheprovider -rsx
+        env:
+          # Here a missing SoftHSM fails the run; on a machine without it those tests skip, saying why.
+          FORGE_TEST_SOFTHSM_REQUIRED: "true"
       - name: governance gate
         # Every framework over every governed spec. A check that fails or did not run gets
         # through only by an accepted gap the owner approved (forge-core/fxts/accepted-gaps.json,

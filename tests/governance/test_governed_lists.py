@@ -328,6 +328,6 @@ class TestTheFormatOfAList:
         from forge_hub.cli import governance
 
         rows = [row for row in governance.schema_rows() if row["framework"] == "lists"]
-        assert [row["version"] for row in rows] == ["0.1.0"]
-        assert rows[0]["specs"] == len(lists.ALL_NAMES)
+        assert [row["version"] for row in rows] == ["0.1.0", "0.2.0"]
+        assert rows[-1]["specs"] == len(lists.ALL_NAMES)  # every list declares the current one
         assert governance.schema_problems() == []

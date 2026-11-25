@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "list": "container-kinds",
   "title": "Container kinds",
   "description": "How a container of a view document arranges its children. A screen is built from containers, mixed freely, so one screen can hold a process graphic with fixed positions beside a form that reflows (owner, 2026-11-20, FB-176). Adding a kind is one approved change to this list and never changes a saved screen.",
@@ -35,8 +35,17 @@
   ],
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "77f34ff2b96cb3d4d95ad163e84df41f25700064a7ed9e709854ea4ed451f120",
+    "previous_hash": "8afc4083a1415c7c2fa4f4987fd3d815dcf5695cc79626d28d4431d09008b9a8",
     "change_history": [
+      {
+        "previous_hash": "8afc4083a1415c7c2fa4f4987fd3d815dcf5695cc79626d28d4431d09008b9a8",
+        "new_hash": "049cef6925bafc794701967e2e487ab6071039159b99d1295391aa91b1b37c6d",
+        "changed_at": "2026-11-25T18:33:19Z",
+        "source": "agent",
+        "changed_by": "claude-opus-5-5",
+        "change_type": "structural",
+        "reason": "FB-293 step 1a: the list declares list format 0.2.0 (evidence marks on every field, the trust root's entry shapes); its entries are unchanged"
+      },
       {
         "previous_hash": "77f34ff2b96cb3d4d95ad163e84df41f25700064a7ed9e709854ea4ed451f120",
         "new_hash": "8afc4083a1415c7c2fa4f4987fd3d815dcf5695cc79626d28d4431d09008b9a8",
@@ -48,10 +57,10 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "8afc4083a1415c7c2fa4f4987fd3d815dcf5695cc79626d28d4431d09008b9a8",
-    "schema_version": "0.1.0",
-    "schema_hash": "c9cb17e17a24bba4afcd76f6d87fbe0719064b6a853e91eedc4240ab129e668b",
+    "spec_hash": "049cef6925bafc794701967e2e487ab6071039159b99d1295391aa91b1b37c6d",
+    "schema_version": "0.2.0",
+    "schema_hash": "25f1ba6351ab9ce6d18bee66ae560353917e5ee1b9baed8d24c93ba122040f20",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T05:38:10Z"
+    "approved_at": "2026-11-25T23:04:18Z"
   }
 }

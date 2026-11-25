@@ -28,7 +28,7 @@ def test_it_lists_every_schema_version_and_marks_the_current_one() -> None:
             assert f"| {framework} | {row.version}{mark} | {row.step} |" in page
             rows += 1
     assert rows >= 14
-    assert "| lists | 0.1.0* |" in page
+    assert "| lists | 0.2.0* |" in page  # the current list format, marked
 
 
 def test_nothing_in_it_is_typed_by_hand() -> None:

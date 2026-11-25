@@ -53,13 +53,14 @@ So a hub that is cut off does not wait for permission to keep its plant running,
 | The foundation: the FxTS frameworks (runners, the shared runner, the hash framework) | built | [`src/python/forge_core/fxts`](src/python/forge_core/fxts) |
 | The foundation: the SDK (module builder, scripting) | built | [`src/python/forge_core/sdk`](src/python/forge_core/sdk) |
 | The foundation: the adapter base class and the generic adapters; a module's end of the link to a hub | built | [`src/python/forge_core/adapter`](src/python/forge_core/adapter), [`src/python/forge_core/link`](src/python/forge_core/link) |
-| The foundation in Go (models, generated bindings, the module scaffold) | built | [`src/go`](src/go) |
+| The trust root's certificates (D-23): the profile, the issuer that refuses anything outside it, the verifier, the anchor's form and the stages; signing through PKCS#11 on a device | built (step 1a); the manager, the identity log, enrolment and the ceremony are step 1b | [`src/python/forge_core/trust`](src/python/forge_core/trust) |
+| The foundation in Go (models, generated bindings, the module scaffold, the certificate verifier twin of the Python one) | built | [`src/go`](src/go) |
 | The index of forge-core's governed files, generated | built | [`fxts/README.md`](fxts/README.md), by `forge governance index` |
 | The foundation's documents: a page per framework, the FACTS developer guide, the module builder guide | built | [`docs/`](docs) |
 | The foundation's own tests | built | [`tests/`](tests). Framework tests that also use the hub or a module's spec are root tests: [`../tests/governance`](../tests/governance) |
 | **The manager** | **not built** | no inventory, no deployment-wide state, no distribution of changes, no behavioral contract, no review of interim decisions |
 
-Still to be decided for the manager: where it runs, and whether the time authority stays with the top hub. These are among C-1 to C-7 in the record. The manager is tracked as FB-232 and the authority model as FB-233 in [`BACKLOG.md`](../BACKLOG.md).
+Where the manager runs is decided (its own service, D-21 Q-9) and so is its layer (the Python package `forge_manager`, importing only the foundation; D-23 Q-3). Whether the time authority stays with the top hub is still open. These are among C-1 to C-7 in the record. The manager is tracked as FB-232 and the authority model as FB-233 in [`BACKLOG.md`](../BACKLOG.md).
 
 ## The rules forge-core is held to
 

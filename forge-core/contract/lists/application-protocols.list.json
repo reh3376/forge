@@ -1,5 +1,5 @@
 {
-  "spec_version": "0.1.0",
+  "spec_version": "0.2.0",
   "list": "application-protocols",
   "title": "Application-side protocols",
   "description": "How an integration module reaches the third-party application it connects. Its hub side is gRPC only (M-1); its application side uses one or more of these (owner, 2026-11-18 and 2026-11-19). Adding a protocol is one approved change to this list.",
@@ -35,8 +35,17 @@
   ],
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "3ae21a0711b2883096552f0e0d44585857c3b233af625fa9ee2d3f9317197e41",
+    "previous_hash": "96841a27fa04d62c21612c7f311e09876502fd6ab611ef66ffce29592854f8bf",
     "change_history": [
+      {
+        "previous_hash": "96841a27fa04d62c21612c7f311e09876502fd6ab611ef66ffce29592854f8bf",
+        "new_hash": "290d54d1d329149ec2659c45ea7ee6eca5ad53fa16def522bac8affcf5947187",
+        "changed_at": "2026-11-25T18:33:18Z",
+        "source": "agent",
+        "changed_by": "claude-opus-5-5",
+        "change_type": "structural",
+        "reason": "FB-293 step 1a: the list declares list format 0.2.0 (evidence marks on every field, the trust root's entry shapes); its entries are unchanged"
+      },
       {
         "previous_hash": "3ae21a0711b2883096552f0e0d44585857c3b233af625fa9ee2d3f9317197e41",
         "new_hash": "96841a27fa04d62c21612c7f311e09876502fd6ab611ef66ffce29592854f8bf",
@@ -48,10 +57,10 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "96841a27fa04d62c21612c7f311e09876502fd6ab611ef66ffce29592854f8bf",
-    "schema_version": "0.1.0",
-    "schema_hash": "c9cb17e17a24bba4afcd76f6d87fbe0719064b6a853e91eedc4240ab129e668b",
+    "spec_hash": "290d54d1d329149ec2659c45ea7ee6eca5ad53fa16def522bac8affcf5947187",
+    "schema_version": "0.2.0",
+    "schema_hash": "25f1ba6351ab9ce6d18bee66ae560353917e5ee1b9baed8d24c93ba122040f20",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T05:38:09Z"
+    "approved_at": "2026-11-25T23:04:18Z"
   }
 }
