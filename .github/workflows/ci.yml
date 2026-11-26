@@ -61,6 +61,69 @@ jobs:
         # BACKLOG FB-266); a broken check, a stale index or a bad schema registry never does.
         run: .venv/bin/forge governance check
 
+  hub-image:
+    # The hub image is built and proved on every change that could break it, natively for each
+    # architecture a plant may run (FB-231, D-24 I-1, I-3). It publishes nothing: its output is
+    # a build record (the image's digest and BuildKit's provenance) for the release manifest
+    # (FB-305). Like hub-go it always reports, and its steps run only when something the image
+    # is built from has changed.
+    name: hub-image (${{ matrix.arch }})
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # the changed-files comparison needs the branch's history
+      - name: anything to check?
+        id: changes
+        run: >
+          .github/scripts/changed-paths.sh hub-image
+          deploy/docker/ .dockerignore pyproject.toml uv.lock README.md
+          forge-core/src/ forge-core/contract/ forge-hub/src/ forge-hub/fxts/ forge-modules/
+          .github/workflows/ci.yml .github/scripts/
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          BEFORE_SHA: ${{ github.event.before }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      - name: builder (BuildKit in a container, for the OCI export and its provenance)
+        if: steps.changes.outputs.run == 'true'
+        run: docker buildx create --name forge --driver docker-container --use
+      - name: build the image
+        if: steps.changes.outputs.run == 'true'
+        run: >
+          docker buildx build --file deploy/docker/Dockerfile.forge
+          --platform linux/${{ matrix.arch }} --provenance=false --load --tag forge-hub:ci .
+      - name: prove it from inside
+        if: steps.changes.outputs.run == 'true'
+        run: >
+          docker run --rm -v "$PWD/.github/scripts/image-smoke.py:/smoke.py:ro"
+          forge-hub:ci python /smoke.py
+      - name: export it with its provenance and write the build record
+        if: steps.changes.outputs.run == 'true'
+        run: |
+          docker buildx build --file deploy/docker/Dockerfile.forge \
+            --platform linux/${{ matrix.arch }} --provenance=mode=max \
+            --output type=oci,dest="$RUNNER_TEMP/forge-hub.oci.tar" \
+            --metadata-file "$RUNNER_TEMP/metadata.json" .
+          python3 .github/scripts/image-record.py "$RUNNER_TEMP/metadata.json" \
+            linux/${{ matrix.arch }} "$RUNNER_TEMP/forge-hub-image-${{ matrix.arch }}.json"
+      - name: keep the build record
+        if: steps.changes.outputs.run == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: forge-hub-image-${{ matrix.arch }}
+          path: ${{ runner.temp }}/forge-hub-image-${{ matrix.arch }}.json
+          if-no-files-found: error
+
   hub-go:
     name: hub-go
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository

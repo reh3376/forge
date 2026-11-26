@@ -173,6 +173,22 @@ class TestTheWorkflow:
         [
             ("hub-go", ["forge-core/src/go/", "forge-core/contract/proto/"]),
             ("mes-module", ['"forge-modules/forge-mes/bridge/"', *MES[1:]]),
+            # FB-231: everything the hub image is built from (deploy/docker/Dockerfile.forge)
+            (
+                "hub-image",
+                [
+                    "deploy/docker/",
+                    ".dockerignore",
+                    "pyproject.toml",
+                    "uv.lock",
+                    "README.md",
+                    "forge-core/src/",
+                    "forge-core/contract/",
+                    "forge-hub/src/",
+                    "forge-hub/fxts/",
+                    "forge-modules/",
+                ],
+            ),
         ],
     )
     def test_the_job_names_what_it_checks_and_its_own_definition(
@@ -185,7 +201,7 @@ class TestTheWorkflow:
             assert path in call.group(1), f"{job} does not watch {path}"
         assert "fetch-depth: 0" in body
 
-    @pytest.mark.parametrize("job", ["hub-go", "mes-module"])
+    @pytest.mark.parametrize("job", ["hub-go", "mes-module", "hub-image"])
     def test_every_step_after_the_decision_depends_on_it(self, job: str) -> None:
         body = self._job(job)
         steps = re.split(r"^      - ", body.split("    steps:\n", 1)[1], flags=re.M)[1:]
@@ -200,3 +216,22 @@ class TestTheWorkflow:
 
     def test_the_script_is_executable(self) -> None:
         assert os.access(SCRIPT, os.X_OK)
+
+
+def test_the_image_job_watches_everything_the_image_is_built_from() -> None:
+    """FB-230 was a package root the Dockerfile did not copy; this is the other side: a path
+    the Dockerfile copies that hub-image does not watch would let a change break the image
+    unbuilt. Every COPY source (not a stage or another image) is under a watched prefix."""
+    dockerfile = (REPO / "deploy" / "docker" / "Dockerfile.forge").read_text(encoding="utf-8")
+    match = re.search(r"changed-paths\.sh hub-image\n(.*?)\n        env:", WORKFLOW, re.S)
+    assert match, "hub-image does not call the script"
+    watched = match.group(1).split()
+    sources = [
+        part
+        for line in dockerfile.splitlines()
+        if line.startswith("COPY ") and "--from=" not in line
+        for part in line.split()[1:-1]
+    ]
+    assert sources, "no COPY found in the Dockerfile"
+    unwatched = [s for s in sources if not any(s.lstrip("./").startswith(w) for w in watched)]
+    assert unwatched == [], f"hub-image does not watch {unwatched}"
