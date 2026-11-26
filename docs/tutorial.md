@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-25` against the repository `reh3376/forge` at the merge of PR 191 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-25` against the repository `reh3376/forge` at the merge of PR 192 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-25 at PR 191:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-25 at PR 192:
 
 **Working**
 
@@ -2265,6 +2265,7 @@ note:
 | D-21 | The security framework (`security-framework.md`) | signed 2026-11-24: one framework for identity, sign-in, sessions, permissions, machine identity, secrets, audit, release integrity and signing; IEC 62443 SL-C 3 mechanisms; development is different data on the same framework, never a switch; forge-core holds each deployment's trust anchor; nothing built |
 | D-22 | The permissions framework (`permissions-framework.md`) | signed 2026-11-25: the security framework's authorization chapter; one decision point and a permission on every object and widget; nothing built |
 | D-23 | The trust root and identities (`trust-root-step1.md`) | signed 2026-11-25: the design of the security framework's first step; three security keys held by the owner, any two of which change the trust anchor; every key generated on its device and attested; enrolment checked against an allow-list of security-key models; nothing built |
+| D-24 | Installation and devices (`installation-and-devices.md`) | signed 2026-11-25: a site installs nothing by hand; the installer stands up forge-core and the top hub, and every site is installed through forge-core down the chain; only images named in a signed, numbered release are admitted; a signer container beside each service that signs is the only holder of its YubiHSM 2 or TPM; nothing built |
 
 **Waiting for the owner**: the generator for Go and TypeScript types (FB-186, an install); the numbers of each data class, when the transport contract is built (FB-164); forge-creds (FB-142); a new site id and the last old names (FB-150).
 
@@ -2887,7 +2888,7 @@ Who may do what, where, and how systems get their credentials.
 - In a multi-site enterprise, roles are assigned at the managing hub and inherited by sites; a site keeps verifying sign-ins while the link to headquarters is down.
 - **Each hub is independent in who may do what on it.** The approver on one area hub may not be the approver on the next. One **super admin** has full access to every hub in the enterprise.
 
-Where it stands: the role model is decided and signed (2026-11-03), and the security framework that builds it is signed (D-21, 2026-11-24) but not built. The design of its first step is signed as D-23 (2026-11-25): the trust anchor changes only with two of the owner's three security keys, every key is generated on its device and attested, and a person's security key is enrolled only on a request that approvers sign, checked against an allow-list of security-key models. The hub's authentication is off by default in development, and it says so on `/v1/info` and `/readyz`; its flag is read by the one boolean rule, so `1`, `yes` and `on` mean on and an unclear value stops the hub at start; tokens must name their expiry, issuer and audience; and no wildcard grant reaches a hard-limited permission such as an interlock bypass or an approval (FB-291). Scoped roles on every route are not yet enforced (FB-075; D-21's step 2).
+Where it stands: the role model is decided and signed (2026-11-03), and the security framework that builds it is signed (D-21, 2026-11-24) but not built. The design of its first step is signed as D-23 (2026-11-25): the trust anchor changes only with two of the owner's three security keys, every key is generated on its device and attested, and a person's security key is enrolled only on a request that approvers sign, checked against an allow-list of security-key models. How a site installs and reaches those devices is signed as D-24 (2026-11-25): everything a site runs comes from a numbered release that names every image by digest, the installer stands up forge-core and the top hub, every site is installed through forge-core one layer at a time, and each service that signs asks a signer container beside it, the only holder of its device, for a typed act it is permitted. The hub's authentication is off by default in development, and it says so on `/v1/info` and `/readyz`; its flag is read by the one boolean rule, so `1`, `yes` and `on` mean on and an unclear value stops the hub at start; tokens must name their expiry, issuer and audience; and no wildcard grant reaches a hard-limited permission such as an interlock bypass or an approval (FB-291). Scoped roles on every route are not yet enforced (FB-075; D-21's step 2).
 
 note:
 - `docs/decisions/roles.md` (R-1 … R-19, signed 2026-11-03); `docs/WHERE-WE-ARE.md` §3.10.

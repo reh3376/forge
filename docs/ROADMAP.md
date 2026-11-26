@@ -104,7 +104,7 @@ Goal: one contract, both directions encrypted and authenticated, every RPC serve
 | FB-003 Postgres-backed `AccessController` | Done 2026-10-22 | `PersistentAccessController` over migration 008; the storage factory and `forge db access` share it; migration 008 and the alembic driver corrected on the way; 002's downgrade (FB-098) and the spoke roles' placeholder login (FB-099, migration 012) done 2026-10-26. |
 | FB-004 schema naming (`mod_<x>` everywhere) · FB-059 migration 004 table | Not started | Pair with FB-057. FB-005 (registry and equipment tables, migration 009) done 2026-10-22. |
 | FB-097 converge the two schema registries | Design record signed 2026-11-03 (D-10): eight implementation steps, one PR each | FB-006 (RabbitMQ and MinIO health checks), FB-008 (one schema-reference grammar) and FB-009 (per-product curation, run on ingest) done 2026-10-22. |
-| Kubernetes production deployment (compose is dev-only) | Not started | Owner note; no backlog id yet. |
+| Kubernetes production deployment (compose is dev-only) | Designed (D-24, 2026-11-25) | Installation in two phases and devices through a signer container: `docs/decisions/installation-and-devices.md`; built as FB-231 then FB-305 to FB-313. |
 
 **One clock:** FB-093 makes time governance fail closed (the OT links since 2026-11-15: a PLC connection whose clock is unreadable or outside its class for three probes stops delivering; the spoke link since 2026-11-17: a spoke whose requests report a clock outside its class, or no measurement, for three probes is refused): the hub refuses Register and rejects Ingest from a party outside the clock tolerance for its class, and surfaces it on health and alerts (owner's principle, 2026-10-18).
 

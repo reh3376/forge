@@ -23,7 +23,7 @@ description: "Check a change to the trust root's certificates (D-23 law 1: no ce
 | `tests/trust_world.py` | the oracle: the catalog of faults (`MUTATIONS`, `LEAF_FAULTS`) and the crafter that makes them, apart from the issuer |
 | `tests/trust_edges.py` | the edges: malformed DER, odd encodings and other hashes, each with its declared answer (`ANSWERS`) and whether Go's parser reads it |
 
-**Sync commit:** this change (FB-293 step 1a; the commit is named here after its pull request merges). See what changed since:
+**Sync commit:** `62735cc6` (2026-11-25, FB-293 step 1a, PR 192). See what changed since:
 
 ```bash
 git log --oneline <sync>..HEAD -- forge-core/src/python/forge_core/trust forge-core/src/go/trust forge-core/contract/lists/certificate-roles.list.json tests/trust_world.py tests/trust_edges.py
