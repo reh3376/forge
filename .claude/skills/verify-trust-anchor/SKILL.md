@@ -20,7 +20,7 @@ description: "Check a change to which trust anchor counts and to the stages (D-2
 | `forge-core/src/python/forge_core/trust/anchor.py` | `accept` (the causes `unpinned`, `not-pinned`, `malformed`, `test-anchor-on-release`), `pin_of`, the `Anchor` model's validator, `anchor_problems` |
 | `forge-core/src/python/forge_core/trust/stages.py` | `Stage`, `RELEASE`, `release_refusal`, `chain_refusal` |
 
-**Sync commit:** this change (FB-293 step 1a; the commit is named here after its pull request merges). See what changed since:
+**Sync commit:** `62735cc6` (2026-11-25, FB-293 step 1a, PR 192). See what changed since:
 
 ```bash
 git log --oneline <sync>..HEAD -- forge-core/src/python/forge_core/trust/anchor.py forge-core/src/python/forge_core/trust/stages.py
