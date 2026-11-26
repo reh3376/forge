@@ -79,6 +79,16 @@ func decodeStrict(what string, data []byte, v any, keys map[string]keyRule) erro
 	return nil
 }
 
+// pemContent is a PEM block's encoded content without its line breaks: what two spellings of
+// one block share. The block has passed checkPEM, so its first line is the header and the
+// content ends at the footer. It is compared as text; the keys are not read as keys yet
+// (FB-317).
+func pemContent(value string) string {
+	_, rest, _ := strings.Cut(value, "\n")
+	body, _, _ := strings.Cut(rest, "-----END")
+	return strings.ReplaceAll(body, "\n", "")
+}
+
 func checkPEM(what, value string) error {
 	if !pemPattern.MatchString(value) {
 		return fmt.Errorf("%s is not one PEM block", what)
@@ -223,7 +233,7 @@ type Anchor struct {
 	CertificateRoots     []CertificateRoot `json:"certificate_roots"`
 	HubIntermediates     []HubIntermediate `json:"hub_intermediates"`
 	DistributionKey      string            `json:"distribution_key"`
-	FreshnessKey         string            `json:"freshness_key"`
+	FreshnessKeys        []string          `json:"freshness_keys"`
 	TestAttestationRoots []string          `json:"test_attestation_roots"`
 	Policy               Policy            `json:"policy"`
 }
@@ -232,7 +242,7 @@ var anchorKeys = map[string]keyRule{
 	"form": required, "deployment": required, "version": required, "stage": required,
 	"root_keys": required, "root_threshold": required, "release_keys": required,
 	"certificate_roots": required, "hub_intermediates": required, "distribution_key": required,
-	"freshness_key": required, "test_attestation_roots": 0, "policy": required,
+	"freshness_keys": required, "test_attestation_roots": 0, "policy": required,
 }
 
 func (a *Anchor) UnmarshalJSON(data []byte) error {
@@ -271,8 +281,20 @@ func (a *Anchor) check() error {
 	if err := checkPEM("anchor: the distribution key", a.DistributionKey); err != nil {
 		return err
 	}
-	if err := checkPEM("anchor: the freshness key", a.FreshnessKey); err != nil {
-		return err
+	// One or two freshness keys, each its own device's (D-21 §14 FR-2 as amended by D-24 Q-7).
+	if len(a.FreshnessKeys) < 1 || len(a.FreshnessKeys) > 2 {
+		return fmt.Errorf("anchor: %d freshness keys; one or two", len(a.FreshnessKeys))
+	}
+	for _, key := range a.FreshnessKeys {
+		if err := checkPEM("anchor: a freshness key", key); err != nil {
+			return err
+		}
+	}
+	if len(a.FreshnessKeys) == 2 && pemContent(a.FreshnessKeys[0]) == pemContent(a.FreshnessKeys[1]) {
+		return errors.New("anchor: a freshness key is listed twice: two keys are two devices' keys")
+	}
+	if a.Stage == StageProduction && len(a.FreshnessKeys) != 2 {
+		return errors.New("anchor: a production anchor holds two freshness keys, one per device (D-24 Q-7)")
 	}
 	for _, root := range a.TestAttestationRoots {
 		if err := checkPEM("anchor: a test attestation root", root); err != nil {

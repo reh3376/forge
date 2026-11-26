@@ -322,7 +322,7 @@ def world(stage: str = "test") -> World:
         ],
         "hub_intermediates": [{"hub": HUB, "certificate": pem(intermediate)}],
         "distribution_key": public_pem(key("secp256r1", 5001)),
-        "freshness_key": public_pem(key("secp256r1", 5002)),
+        "freshness_keys": [public_pem(key("secp256r1", 5002)), public_pem(key("secp256r1", 5003))],
         "test_attestation_roots": [] if stage == "production" else [pem(attestation_root)],
         "policy": {
             "profile": prof.hash,

@@ -8,7 +8,9 @@ everything a later step needs, so no step has to start a new genesis to add one:
   release keys for approval acts, the two roles kept apart (D-20 SG-1, SG-2);
 * the certificate roots, X.509 keys on their own devices, each with its device's attestation;
 * the hub intermediates that count: a certificate root alone can mint nothing that counts;
-* the distribution-signing and freshness keys (D-21 SF-21, §14);
+* the distribution-signing key and the freshness keys (D-21 SF-21, §14): two freshness keys,
+  each on its own device, either counting, so forge-core can fail over (FR-2 as amended by
+  D-24 Q-7); a development or test anchor on one machine may hold one;
 * the policy: the profile's hash, each role's lifetime cap, the security-key type, how many
   intermediates a hub keeps, and whether separation of duties is met;
 * the stage, and any test attestation roots (never in production).
@@ -45,6 +47,13 @@ _Name = Annotated[str, Field(pattern=rf"^{NAME_PATTERN}$")]
 _Pem = Annotated[
     str, Field(pattern=r"^-----BEGIN [A-Z ]+-----\n[A-Za-z0-9+/=\n]+-----END [A-Z ]+-----\n?$")
 ]
+
+
+def _encoded(pem: str) -> str:
+    """A PEM block's encoded content without its line breaks: what two spellings of one block
+    share. The block has passed ``_Pem``, so its first line is the header and the content ends
+    at the footer. It is compared as text; the keys are not read as keys yet (FB-317)."""
+    return pem.split("\n", 1)[1].split("-----END", 1)[0].replace("\n", "")
 
 
 class _Strict(BaseModel):
@@ -99,7 +108,7 @@ class Anchor(_Strict):
     certificate_roots: tuple[CertificateRoot, ...] = Field(min_length=1)
     hub_intermediates: tuple[HubIntermediate, ...]
     distribution_key: _Pem
-    freshness_key: _Pem
+    freshness_keys: tuple[_Pem, ...] = Field(min_length=1, max_length=2)
     test_attestation_roots: tuple[_Pem, ...] = ()
     policy: Policy
 
@@ -122,6 +131,12 @@ class Anchor(_Strict):
             raise ValueError(msg)
         if self.stage is Stage.PRODUCTION and self.test_attestation_roots:
             msg = "a production anchor holds no test attestation root (D-21 SF-2)"
+            raise ValueError(msg)
+        if len({_encoded(k) for k in self.freshness_keys}) != len(self.freshness_keys):
+            msg = "a freshness key is listed twice: two keys are two devices' keys"
+            raise ValueError(msg)
+        if self.stage is Stage.PRODUCTION and len(self.freshness_keys) != 2:
+            msg = "a production anchor holds two freshness keys, one per device (D-24 Q-7)"
             raise ValueError(msg)
         return self
 
