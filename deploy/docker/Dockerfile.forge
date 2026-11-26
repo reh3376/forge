@@ -60,7 +60,10 @@ COPY --from=builder /app/forge-hub/fxts /app/forge-hub/fxts
 COPY --from=builder /app/forge-modules /app/forge-modules
 COPY --from=builder /app/pyproject.toml /app/pyproject.toml
 # The init container's entrypoint is part of the image, never mounted from a host (FB-312)
-COPY --chmod=0644 deploy/docker/init-entrypoint.sh /app/deploy/docker/init-entrypoint.sh
+# 0755, not 0644: --chmod also sets the mode of the folders COPY creates, and a folder without
+# its execute bit cannot be entered, so the unprivileged user could not reach the script
+# (FB-315: the mode FB-312 chose left the init container unable to start)
+COPY --chmod=0755 deploy/docker/init-entrypoint.sh /app/deploy/docker/init-entrypoint.sh
 
 # Ensure venv python is on PATH
 ENV PATH="/app/.venv/bin:$PATH"

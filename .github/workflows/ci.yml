@@ -66,7 +66,7 @@ jobs:
     # architecture a plant may run (FB-231, D-24 I-1, I-3). It publishes nothing: its output is
     # a build record (the image's digest and BuildKit's provenance) for the release manifest
     # (FB-305). Like hub-go it always reports, and its steps run only when something the image
-    # is built from has changed.
+    # is built from has changed. It also starts the development stack with the image (FB-315).
     name: hub-image (${{ matrix.arch }})
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     strategy:
@@ -107,6 +107,21 @@ jobs:
         run: >
           docker run --rm -v "$PWD/.github/scripts/image-smoke.py:/smoke.py:ro"
           forge-hub:ci python /smoke.py
+      # The development stack with this image: every service up, the init container's
+      # migrations against the real pinned databases, and the hub healthy. It had never started
+      # the hub (migration 004 failed on plain Postgres) and nothing ran it, so nobody saw
+      # (FB-315).
+      - name: the development stack starts with it
+        if: steps.changes.outputs.run == 'true'
+        run: |
+          docker tag forge-hub:ci forge-ci-forge-hub
+          docker tag forge-hub:ci forge-ci-forge-init
+          compose="docker compose -p forge-ci -f deploy/docker/docker-compose.yml"
+          trap '$compose ps; $compose logs --tail 80' ERR
+          $compose up -d --wait postgres timescaledb neo4j redis kafka rabbitmq
+          $compose run --rm --no-deps forge-init
+          $compose up -d --wait --no-build --no-deps forge-hub
+          $compose ps
       - name: export it with its provenance and write the build record
         if: steps.changes.outputs.run == 'true'
         run: |

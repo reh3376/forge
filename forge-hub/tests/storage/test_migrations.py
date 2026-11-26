@@ -191,6 +191,33 @@ class TestMigration008:
         assert "ON CONFLICT (module_id, schema_name)" in _UPSERT_PERMISSION
 
 
+class TestBothDatabases:
+    """The one chain runs against plain Postgres and against TimescaleDB (``run up --target
+    all``), so nothing in it may assume TimescaleDB is there (FB-315: migration 004 did, the
+    development stack's init failed on it, and the hub never started)."""
+
+    def test_no_migration_assumes_the_timescaledb_extension(self):
+        unguarded = []
+        for path in sorted((MIGRATIONS_DIR / "versions").glob("0*.py")):
+            code = path.read_text(encoding="utf-8").split("def upgrade()", 1)[1]
+            for block in code.split("op.execute(")[1:]:
+                sql = block.split("\n    )", 1)[0]
+                if (
+                    "create_hypertable" in sql
+                    and "pg_extension WHERE extname = 'timescaledb'" not in sql
+                ):
+                    unguarded.append(f"{path.name}: create_hypertable outside the extension check")
+                if "CREATE EXTENSION" in sql and "pg_available_extensions" not in sql:
+                    unguarded.append(
+                        f"{path.name}: CREATE EXTENSION without checking it is available"
+                    )
+        assert unguarded == [], "\n".join(unguarded)
+
+    def test_the_check_sees_an_unguarded_call(self):
+        old_004 = 'op.execute("CREATE EXTENSION IF NOT EXISTS timescaledb")'
+        assert "CREATE EXTENSION" in old_004 and "pg_available_extensions" not in old_004
+
+
 class TestOnlineRuns:
     """Online runs go through asyncpg, the one PostgreSQL driver the project declares (FB-003)."""
 

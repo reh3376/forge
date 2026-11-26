@@ -3,7 +3,11 @@
 Replaces inline SQL from deploy/docker/init-entrypoint.sh lines 145-171.
 Creates the contextual_records hypertable and adapter_metrics hypertable.
 
-NOTE: This migration targets TimescaleDB (FORGE_MIGRATE_TARGET=timescale).
+The one chain runs against both databases (``run up --target all``): the plain Postgres one
+has no TimescaleDB, so the extension is enabled only where its files are installed, and a table
+becomes a hypertable only where the extension is enabled, as migration 006 does. Before FB-315
+this ran ``CREATE EXTENSION timescaledb`` unconditionally, which plain Postgres refuses, so the
+development stack's init container failed here and the hub never started.
 
 Revision ID: 004
 Create Date: 2026-04-12
@@ -19,7 +23,17 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.execute("CREATE EXTENSION IF NOT EXISTS timescaledb")
+    op.execute(
+        """
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = 'timescaledb') THEN
+                CREATE EXTENSION IF NOT EXISTS timescaledb;
+            END IF;
+        END
+        $$;
+        """
+    )
 
     # Contextual records hypertable
     op.create_table(
@@ -35,9 +49,19 @@ def upgrade() -> None:
     )
 
     op.execute(
-        "SELECT create_hypertable('contextual_records', 'time', "
-        "if_not_exists => TRUE, "
-        "chunk_time_interval => INTERVAL '1 day')"
+        """
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'timescaledb') THEN
+                PERFORM create_hypertable(
+                    'contextual_records', 'time',
+                    if_not_exists => TRUE,
+                    chunk_time_interval => INTERVAL '1 day'
+                );
+            END IF;
+        END
+        $$;
+        """
     )
 
     op.create_index(
@@ -62,9 +86,19 @@ def upgrade() -> None:
     )
 
     op.execute(
-        "SELECT create_hypertable('adapter_metrics', 'time', "
-        "if_not_exists => TRUE, "
-        "chunk_time_interval => INTERVAL '1 day')"
+        """
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'timescaledb') THEN
+                PERFORM create_hypertable(
+                    'adapter_metrics', 'time',
+                    if_not_exists => TRUE,
+                    chunk_time_interval => INTERVAL '1 day'
+                );
+            END IF;
+        END
+        $$;
+        """
     )
 
     op.create_index(
