@@ -19,3 +19,9 @@ forge-modules/forge-mes/bridge/
 forge-modules/**/__pycache__/
 forge-modules/*/tests/
 forge-modules/*/docs/
+# The init container's entrypoint, built into the image (FB-312)
+!deploy/
+deploy/*
+!deploy/docker/
+deploy/docker/*
+!deploy/docker/init-entrypoint.sh

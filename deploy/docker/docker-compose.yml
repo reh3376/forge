@@ -24,7 +24,7 @@ services:
   # ==================================================================
 
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16-alpine@sha256:f2f98726820d0342055351c6e9d36e705f5bfffb3dd53ff556325114b08afb6d
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-forge}
       POSTGRES_USER: ${POSTGRES_USER:-forge}
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
 
   timescaledb:
-    image: timescale/timescaledb:latest-pg16
+    image: timescale/timescaledb:latest-pg16@sha256:5d7a2f9d9d593315368338aa6054fda37d7707b4a12a912e30dcb7523385e2b4
     environment:
       POSTGRES_DB: ${TIMESCALE_DB:-forge_ts}
       POSTGRES_USER: ${TIMESCALE_USER:-forge}
@@ -58,9 +58,11 @@ services:
     restart: unless-stopped
 
   neo4j:
-    image: neo4j:5-community
+    image: neo4j:5-community@sha256:c5fd91e41d44858ea678813fd53f8e60602e771a7656c502385247ffbcb0aec0
     environment:
       NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-changeme}
+      # APOC core ships inside the image (labs/apoc-*-core.jar) and is copied, not downloaded:
+      # proved by starting it with no network (FB-312)
       NEO4J_PLUGINS: '["apoc"]'
     ports:
       - "7474:7474"
@@ -76,7 +78,7 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:7-alpine
+    image: redis:7-alpine@sha256:7f7d30b7fdd09467bac58198a1f166dd69789d348d4fe859cccb20e0cf287fbe
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
@@ -89,22 +91,29 @@ services:
     restart: unless-stopped
 
   kafka:
-    image: bitnami/kafka:3.7
+    # Apache's own image: bitnami/kafka is no longer published (not found, 2026-11-26; FB-312).
+    # One node in KRaft mode, broker and controller together, as before.
+    image: apache/kafka:3.9.1@sha256:4ceccc577f03f51f6af8dbfda55194d0d892f4fa7913ffbded567ce3895622ed
     environment:
-      KAFKA_CFG_NODE_ID: 1
-      KAFKA_CFG_PROCESS_ROLES: broker,controller
-      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
     ports:
       - "9092:9092"
     volumes:
-      - forge-kafka-data:/bitnami/kafka
+      - forge-kafka-data:/var/lib/kafka/data
     healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -112,7 +121,7 @@ services:
     restart: unless-stopped
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:3-management@sha256:e582c0bc7766f3342496d8485efb5a1df782b5ce3886ad017e2eaae442311f69
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-forge}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-changeme}
@@ -131,6 +140,10 @@ services:
     restart: unless-stopped
 
   minio:
+    # MinIO no longer publishes images (Docker Hub and quay.io refuse the pull, 2026-11-26), so
+    # it cannot be pinned; its replacement is FB-314. Opt in with --profile object-store; until
+    # then the hub reports object storage unreachable on its health endpoint.
+    profiles: ["object-store"]
     image: minio/minio:latest
     command: server /data --console-address ":9001"
     environment:
@@ -156,6 +169,7 @@ services:
     build:
       context: ../..
       dockerfile: deploy/docker/Dockerfile.forge
+    # The entrypoint is built into the image (FB-312); rebuild after changing it
     entrypoint: ["/bin/bash", "/app/deploy/docker/init-entrypoint.sh"]
     environment:
       POSTGRES_HOST: postgres
@@ -177,9 +191,6 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       RABBITMQ_URL: amqp://${RABBITMQ_USER:-forge}:${RABBITMQ_PASS:-changeme}@rabbitmq:5672/${RABBITMQ_VHOST:-/}
       RABBITMQ_HOST: rabbitmq
-    volumes:
-      # Mount init script from host (for dev iteration)
-      - ../../deploy/docker/init-entrypoint.sh:/app/deploy/docker/init-entrypoint.sh:ro
     depends_on:
       postgres:
         condition: service_healthy
@@ -246,7 +257,7 @@ services:
       FORGE_RATE_LIMIT_REDIS: "false"
       FORGE_OTEL_ENABLED: "false"
     healthcheck:
-      test: ["CMD", "curl", "-fs", "http://localhost:8000/healthz"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=4)"]
       interval: 10s
       timeout: 5s
       retries: 5

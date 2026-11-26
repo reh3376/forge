@@ -24,11 +24,20 @@ log() { echo -e "${GREEN}[forge-init]${NC} $*"; }
 warn() { echo -e "${YELLOW}[forge-init]${NC} $*"; }
 fail() { echo -e "${RED}[forge-init]${NC} $*"; exit "${2:-1}"; }
 
+# The image installs no apt package (FB-312): every wait below is Python from the image's own
+# environment. PostgreSQL answers an SSLRequest with one byte, 'S' or 'N', only once it accepts
+# connections, which is the readiness pg_isready reported.
+
 # --- Wait for PostgreSQL ---
 wait_for_pg() {
     local host="${1}" port="${2}" user="${3}" elapsed=0
-    log "Waiting for PostgreSQL at ${host}:${port} ..."
-    until pg_isready -h "${host}" -p "${port}" -U "${user}" -q 2>/dev/null; do
+    log "Waiting for PostgreSQL at ${host}:${port} (user ${user}) ..."
+    until python3 -c "
+import socket, struct
+s = socket.create_connection(('${host}', ${port}), timeout=3)
+s.sendall(struct.pack('!ii', 8, 80877103))
+assert s.recv(1) in (b'S', b'N')
+" 2>/dev/null; do
         elapsed=$((elapsed + INTERVAL))
         if [ "${elapsed}" -ge "${MAX_WAIT}" ]; then
             fail "PostgreSQL not ready after ${MAX_WAIT}s" 1
@@ -42,7 +51,9 @@ wait_for_pg() {
 wait_for_neo4j() {
     local host="${1}" port="${2}" elapsed=0
     log "Waiting for Neo4j at ${host}:${port} ..."
-    until curl -sf "http://${host}:7474" >/dev/null 2>&1; do
+    until python3 -c "
+import urllib.request; urllib.request.urlopen('http://${host}:${port}', timeout=3)
+" 2>/dev/null; do
         elapsed=$((elapsed + INTERVAL))
         if [ "${elapsed}" -ge "${MAX_WAIT}" ]; then
             fail "Neo4j not ready after ${MAX_WAIT}s" 1

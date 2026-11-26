@@ -231,6 +231,7 @@ def test_the_image_job_watches_everything_the_image_is_built_from() -> None:
         for line in dockerfile.splitlines()
         if line.startswith("COPY ") and "--from=" not in line
         for part in line.split()[1:-1]
+        if not part.startswith("--")  # COPY's own flags, such as --chmod
     ]
     assert sources, "no COPY found in the Dockerfile"
     unwatched = [s for s in sources if not any(s.lstrip("./").startswith(w) for w in watched)]
