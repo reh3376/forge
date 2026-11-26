@@ -5,12 +5,16 @@
 # Every Python version comes from uv.lock (FB-096): the image is built with `uv sync --locked`,
 # which fails when pyproject.toml and the lock disagree. The root .dockerignore keeps the build
 # context to the files copied below.
+#
+# Every image this builds from is named by digest, so the same commit builds from the same bytes
+# (FB-312, D-24 I-3); the tag beside each digest is for people, and Dependabot moves both together.
+# The runtime image installs no package with apt and runs as an unprivileged user.
 
 # ---- Stage 1: Builder ----
-FROM python:3.12-slim AS builder
+FROM python:3.12-slim@sha256:191083cdf6c7bda8c76158983163ead5d5cf7b77cf3033e805bb0f5296f51b4b AS builder
 
 # Install uv (standalone binary — no pip needed); the 0.9 line wrote the committed lock
-COPY --from=ghcr.io/astral-sh/uv:0.9 /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.9@sha256:538e0b39736e7feae937a65983e49d2ab75e1559d35041f9878b7b7e51de91e4 /uv /usr/local/bin/uv
 
 WORKDIR /app
 # Use the image's Python 3.12 (never download one) and copy, not hardlink, out of the cache mount
@@ -33,17 +37,17 @@ COPY forge-hub/fxts/ ./forge-hub/fxts/
 COPY forge-modules/ ./forge-modules/
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --extra ot
+# Readable by the unprivileged runtime user whatever the modes in the builder's checkout (a
+# checkout can hold files only its owner may read; FB-312, found running the image as non-root)
+RUN chmod -R a+rX /app/forge-core /app/forge-hub /app/forge-modules /app/pyproject.toml
 
 
 # ---- Stage 2: Runtime ----
-FROM python:3.12-slim AS runtime
+FROM python:3.12-slim@sha256:191083cdf6c7bda8c76158983163ead5d5cf7b77cf3033e805bb0f5296f51b4b AS runtime
 
-# Runtime dependencies (pg_isready for health checks, curl for debugging)
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-       postgresql-client \
-       curl \
-    && rm -rf /var/lib/apt/lists/*
+# No apt packages: the health check and the init entrypoint's waits are Python (FB-312). The
+# service runs as an unprivileged user that owns nothing in the image.
+RUN useradd --system --uid 10001 --no-create-home --shell /usr/sbin/nologin forge
 
 WORKDIR /app
 
@@ -55,18 +59,23 @@ COPY --from=builder /app/forge-hub/src /app/forge-hub/src
 COPY --from=builder /app/forge-hub/fxts /app/forge-hub/fxts
 COPY --from=builder /app/forge-modules /app/forge-modules
 COPY --from=builder /app/pyproject.toml /app/pyproject.toml
+# The init container's entrypoint is part of the image, never mounted from a host (FB-312)
+COPY --chmod=0644 deploy/docker/init-entrypoint.sh /app/deploy/docker/init-entrypoint.sh
 
 # Ensure venv python is on PATH
 ENV PATH="/app/.venv/bin:$PATH"
-ENV PYTHONPATH="/app/forge-core/src/python:/app/forge-hub/src/python:/app/forge-modules/forge-cmms/src/python:/app/forge-modules/forge-historian/src/python:/app/forge-modules/forge-ims/src/python:/app/forge-modules/forge-integ-erp-netsuite/src/python:/app/forge-modules/forge-mes/src/python:/app/forge-modules/forge-nms/src/python:/app/forge-modules/forge-ot/src/python:/app/forge-modules/forge-scanner/src/python:/app/forge-modules/forge-wms/src/python:$PYTHONPATH"
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH="/app/forge-core/src/python:/app/forge-hub/src/python:/app/forge-modules/forge-cmms/src/python:/app/forge-modules/forge-historian/src/python:/app/forge-modules/forge-ims/src/python:/app/forge-modules/forge-integ-erp-netsuite/src/python:/app/forge-modules/forge-mes/src/python:/app/forge-modules/forge-nms/src/python:/app/forge-modules/forge-ot/src/python:/app/forge-modules/forge-scanner/src/python:/app/forge-modules/forge-wms/src/python"
+# No trailing $PYTHONPATH: an empty entry would put the working folder on the import path (FB-312)
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 
 # Default ports
 EXPOSE 8000 50051
 
 # Health check
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 \
-    CMD curl -fs http://localhost:8000/healthz || exit 1
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=4)"]
+
+USER 10001
 
 # Default command: run the Hub API
 CMD ["uvicorn", "forge_hub.api.main:app", \

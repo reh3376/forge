@@ -1,10 +1,25 @@
 version: 2
 updates:
+  # Actions are pinned by commit SHA with the version beside it (FB-312); Dependabot moves both.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule: { interval: "weekly" }
     groups:
       github-actions:
+        patterns: ["*"]
+  # The hub image and the development stack name every image by digest (FB-312, D-24 I-3); these
+  # keep the digests current, one reviewed pull request a week.
+  - package-ecosystem: "docker"
+    directory: "/deploy/docker"
+    schedule: { interval: "weekly" }
+    groups:
+      hub-image:
+        patterns: ["*"]
+  - package-ecosystem: "docker-compose"
+    directory: "/deploy/docker"
+    schedule: { interval: "weekly" }
+    groups:
+      dev-stack:
         patterns: ["*"]
   # uv, not pip: the pip ecosystem edits pyproject.toml alone and every such PR fails the
   # `uv sync --locked` gate (FB-096); uv bumps pyproject.toml and uv.lock together (FB-102).
