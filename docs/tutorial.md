@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-25` against the repository `reh3376/forge` at the merge of PR 192 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-26` against the repository `reh3376/forge` at the merge of PR 193 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-25 at PR 192:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-26 at PR 193:
 
 **Working**
 
@@ -2011,7 +2011,7 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest -q -rsx                          # 6,550 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
+uv run pytest -q -rsx                          # 6,553 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd forge-core/src/go && go build ./... && go vet ./... && go test ./...)
 docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
@@ -2040,7 +2040,7 @@ flowchart LR
   D --> G["gitleaks on the commits"]
   G --> P["git push origin HEAD:reh3376_dev01"]
   P --> PR["auto-pr.yml opens the PR<br/>(bot author)"]
-  PR --> CI["CI: hub-python · hub-go · mes-module · secrets-scan"]
+  PR --> CI["CI: hub-python · hub-go · mes-module · secrets-scan · hub-image"]
   CI --> M["Owner merges on green"]
   M --> S["git fetch && git merge --ff-only origin/main"]
   S --> I
@@ -2055,7 +2055,7 @@ flowchart LR
 
 note:
 - CI runs on every push to every branch so checks attach to the commits behind auto-opened PRs; same-repo PRs do not run twice.
-- All four jobs are required checks on `main`, so all four always report. Two of them do their work only when it is relevant: `hub-go` when the branch touches `forge-core/src/go/` or `forge-core/contract/proto/`, `mes-module` when it touches `forge-modules/forge-mes/bridge/`, the proto files or the forge-mes manifest. Otherwise the job passes in seconds and says "nothing to check" in its log and summary. The whole branch is compared with `main`, not only the last push, and when the comparison cannot be made the job runs in full (`.github/scripts/changed-paths.sh`).
+- The first four jobs are required checks on `main`, so all four always report. `hub-image` (FB-231) builds the hub image natively for amd64 and arm64, proves it from inside (every package root imports as a real package, the hub app loads, `forge --help` runs) and keeps a build record of the image's digest and its provenance, the input of D-24's release manifest; it always reports and is not yet a required check. Three jobs do their work only when it is relevant: `hub-go` when the branch touches `forge-core/src/go/` or `forge-core/contract/proto/`, `mes-module` when it touches `forge-modules/forge-mes/bridge/`, the proto files or the forge-mes manifest, and `hub-image` when it touches anything the image is built from (a test holds that it watches every path the Dockerfile copies). Otherwise the job passes in seconds and says "nothing to check" in its log and summary. The whole branch is compared with `main`, not only the last push, and when the comparison cannot be made the job runs in full (`.github/scripts/changed-paths.sh`).
 
 ---
 
