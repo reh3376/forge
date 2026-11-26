@@ -349,3 +349,82 @@ func TestEdges(t *testing.T) {
 		})
 	}
 }
+
+// TestAnchorFreshnessKeys holds the anchor's freshness keys to D-21 §14 FR-2 as amended by
+// D-24 Q-7 (FB-311): one or two, each its own device's, and two in production.
+func TestAnchorFreshnessKeys(t *testing.T) {
+	v, _, _ := loadVectors(t)
+	var base map[string]any
+	if err := json.Unmarshal(v.Cases[0].Anchor, &base); err != nil {
+		t.Fatal(err)
+	}
+	keys := base["freshness_keys"].([]any)
+	if len(keys) != 2 {
+		t.Fatalf("the vectors' anchor holds %d freshness keys; want 2", len(keys))
+	}
+	first := keys[0].(string)
+	head, rest, _ := strings.Cut(first, "\n")
+	body, foot, _ := strings.Cut(rest, "-----END")
+	content := strings.ReplaceAll(body, "\n", "")
+	var lines []string
+	for i := 0; i < len(content); i += 32 {
+		lines = append(lines, content[i:min(i+32, len(content))])
+	}
+	rewrapped := head + "\n" + strings.Join(lines, "\n") + "\n-----END" + foot
+	if rewrapped == first {
+		t.Fatal("the rewrapped key is spelled as the first one; the case would prove nothing")
+	}
+	old := map[string]any{}
+	for k, val := range base {
+		if k != "freshness_keys" {
+			old[k] = val
+		}
+	}
+	old["freshness_key"] = first
+	if raw, err := json.Marshal(old); err != nil {
+		t.Fatal(err)
+	} else if _, err := DecodeAnchor(raw); err == nil {
+		t.Fatal("an anchor in the form with one freshness_key was accepted")
+	}
+	cases := []struct {
+		name    string
+		change  map[string]any
+		refused bool
+	}{
+		{"two keys, as written", map[string]any{}, false},
+		{"a key broken at another width, with another key", map[string]any{"freshness_keys": []any{rewrapped, keys[1]}}, false},
+		{"the same key broken at another width", map[string]any{"freshness_keys": []any{first, rewrapped}}, true},
+		{"the same key without its last line break", map[string]any{"freshness_keys": []any{first, strings.TrimSuffix(first, "\n")}}, true},
+		{"a key that is not PEM", map[string]any{"freshness_keys": []any{first, "x"}}, true},
+		{"one key outside a list", map[string]any{"freshness_keys": first}, true},
+		{"one key under the test stage", map[string]any{"freshness_keys": keys[:1]}, false},
+		{"one key under the development stage", map[string]any{"stage": "development", "freshness_keys": keys[:1]}, false},
+		{"one key in production", map[string]any{"stage": "production", "test_attestation_roots": []any{}, "freshness_keys": keys[:1]}, true},
+		{"two keys in production", map[string]any{"stage": "production", "test_attestation_roots": []any{}}, false},
+		{"the same key twice", map[string]any{"freshness_keys": []any{keys[0], keys[0]}}, true},
+		{"three keys", map[string]any{"freshness_keys": []any{keys[0], keys[1], keys[0]}}, true},
+		{"none", map[string]any{"freshness_keys": []any{}}, true},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			doc := map[string]any{}
+			for k, val := range base {
+				doc[k] = val
+			}
+			for k, val := range c.change {
+				doc[k] = val
+			}
+			raw, err := json.Marshal(doc)
+			if err != nil {
+				t.Fatal(err)
+			}
+			_, err = DecodeAnchor(raw)
+			if c.refused && err == nil {
+				t.Fatal("accepted; want refused")
+			}
+			if !c.refused && err != nil {
+				t.Fatalf("refused (%v); want accepted", err)
+			}
+		})
+	}
+}
