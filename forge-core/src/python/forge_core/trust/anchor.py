@@ -15,6 +15,11 @@ everything a later step needs, so no step has to start a new genesis to add one:
   intermediates a hub keeps, and whether separation of duties is met;
 * the stage, and any test attestation roots (never in production).
 
+Every key the anchor names (its certificate roots', its hub intermediates', the distribution
+key, the freshness keys) is read when the anchor is decoded: an admitted key in its one
+encoding (``keys``), named once, in one role (FB-317). The authorities' FIDO credentials and
+the attestation chains are held to a shape here and read by step 1b.
+
 Which version counts (law 3, D-23 §7 as amended 2026-11-25): from step 1a only the pinned
 genesis, matched by its canonical hash; every other version is refused by name until step 1b
 builds D-20's FIDO core, after which a version counts on the authorities' threshold. A hub
@@ -39,6 +44,7 @@ from pydantic import (
 
 from forge_core.fxts.shared.runner import sha256_hex_obj
 from forge_core.trust.ids import NAME_PATTERN
+from forge_core.trust.keys import KeyRefusedError, certificate_key_der, public_key_der
 from forge_core.trust.stages import Stage, release_refusal
 
 FORM = "forge-anchor/1"
@@ -49,11 +55,8 @@ _Pem = Annotated[
 ]
 
 
-def _encoded(pem: str) -> str:
-    """A PEM block's encoded content without its line breaks: what two spellings of one block
-    share. The block has passed ``_Pem``, so its first line is the header and the content ends
-    at the footer. It is compared as text; the keys are not read as keys yet (FB-317)."""
-    return pem.split("\n", 1)[1].split("-----END", 1)[0].replace("\n", "")
+#: What the refusal of a key named twice says, the same words in Go.
+KEY_TWICE = "one key is listed twice"
 
 
 class _Strict(BaseModel):
@@ -132,13 +135,41 @@ class Anchor(_Strict):
         if self.stage is Stage.PRODUCTION and self.test_attestation_roots:
             msg = "a production anchor holds no test attestation root (D-21 SF-2)"
             raise ValueError(msg)
-        if len({_encoded(k) for k in self.freshness_keys}) != len(self.freshness_keys):
-            msg = "a freshness key is listed twice: two keys are two devices' keys"
-            raise ValueError(msg)
         if self.stage is Stage.PRODUCTION and len(self.freshness_keys) != 2:
             msg = "a production anchor holds two freshness keys, one per device (D-24 Q-7)"
             raise ValueError(msg)
+        self._keys_once()
         return self
+
+    def _keys_once(self) -> None:
+        """Every key the anchor names is an admitted key in its one encoding, and no key is
+        named twice, in one role or in two (FB-317): one device's key cannot stand for two
+        certificate roots, two hubs' intermediates, or a freshness key and anything else
+        (D-21 FR-2: the freshness key signs nothing else)."""
+        slots = [
+            *(
+                (f"certificate root {r.id}", certificate_key_der, r.certificate)
+                for r in self.certificate_roots
+            ),
+            *(
+                (f"hub intermediate {n} ({h.hub})", certificate_key_der, h.certificate)
+                for n, h in enumerate(self.hub_intermediates, 1)
+            ),
+            ("the distribution key", public_key_der, self.distribution_key),
+            *(
+                (f"freshness key {n}", public_key_der, k)
+                for n, k in enumerate(self.freshness_keys, 1)
+            ),
+        ]
+        named: dict[bytes, str] = {}
+        for name, read, text in slots:
+            try:
+                key = read(text)
+            except KeyRefusedError as exc:
+                raise ValueError(f"{name} {exc}") from exc
+            if key in named:
+                raise ValueError(f"{KEY_TWICE}: {named[key]} and {name}")
+            named[key] = name
 
     def root_certificates(self) -> list[x509.Certificate]:
         return [

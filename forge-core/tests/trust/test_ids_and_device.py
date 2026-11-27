@@ -11,7 +11,7 @@ from cryptography.hazmat.primitives import serialization
 from tests.trust_world import CAPS, DEPLOYMENT, HUB, MODULE, NOW, world
 
 from forge_core.fxts.shared import lists
-from forge_core.trust import signer
+from forge_core.trust import keys, signer
 from forge_core.trust.anchor import Anchor
 from forge_core.trust.ids import Identity, IdError, SpiffeId
 from forge_core.trust.issuer import Request, issue
@@ -164,6 +164,24 @@ def test_a_key_that_could_leave_the_device_is_refused(softhsm: tuple[str, str, s
         with pytest.raises(signer.DeviceKeyError, match="not exactly one"):
             signer.find_key(opened, label="no-such-key")
     assert pkcs11  # the module is the one CI installs
+
+
+@pytest.mark.parametrize("curve", sorted(keys.CURVES))
+def test_a_key_a_device_exports_is_one_the_anchor_admits(
+    softhsm: tuple[str, str, str], curve: str
+) -> None:
+    """The anchor admits a key in one encoding only (FB-317). It is the encoding a device
+    key exports, so an anchor made at a ceremony is never refused for how a key is written,
+    and it holds the device's own key."""
+    module, label, pin = softhsm
+    spki = serialization.PublicFormat.SubjectPublicKeyInfo
+    with signer.session(module, token_label=label, pin=pin) as opened:
+        public = signer.generate_key(opened, curve=curve, label=f"anchor-{curve}").public_key()
+    exported = public.public_bytes(serialization.Encoding.PEM, spki).decode()
+    assert keys.public_key_der(exported) == public.public_bytes(serialization.Encoding.DER, spki)
+    w = world()
+    document = {**w.anchor, "freshness_keys": [exported, w.anchor["freshness_keys"][1]]}
+    assert Anchor.model_validate(document).freshness_keys[0] == exported
 
 
 # ---------------------------------------------------------------------------

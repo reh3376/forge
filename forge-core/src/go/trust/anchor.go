@@ -79,16 +79,6 @@ func decodeStrict(what string, data []byte, v any, keys map[string]keyRule) erro
 	return nil
 }
 
-// pemContent is a PEM block's encoded content without its line breaks: what two spellings of
-// one block share. The block has passed checkPEM, so its first line is the header and the
-// content ends at the footer. It is compared as text; the keys are not read as keys yet
-// (FB-317).
-func pemContent(value string) string {
-	_, rest, _ := strings.Cut(value, "\n")
-	body, _, _ := strings.Cut(rest, "-----END")
-	return strings.ReplaceAll(body, "\n", "")
-}
-
 func checkPEM(what, value string) error {
 	if !pemPattern.MatchString(value) {
 		return fmt.Errorf("%s is not one PEM block", what)
@@ -290,9 +280,6 @@ func (a *Anchor) check() error {
 			return err
 		}
 	}
-	if len(a.FreshnessKeys) == 2 && pemContent(a.FreshnessKeys[0]) == pemContent(a.FreshnessKeys[1]) {
-		return errors.New("anchor: a freshness key is listed twice: two keys are two devices' keys")
-	}
 	if a.Stage == StageProduction && len(a.FreshnessKeys) != 2 {
 		return errors.New("anchor: a production anchor holds two freshness keys, one per device (D-24 Q-7)")
 	}
@@ -341,7 +328,7 @@ func (a *Anchor) check() error {
 	if a.Stage == StageProduction && len(a.TestAttestationRoots) > 0 {
 		return errors.New("anchor: a production anchor holds no test attestation root (D-21 SF-2)")
 	}
-	return nil
+	return a.keysOnce()
 }
 
 // DecodeAnchor reads an anchor document strictly: no field the form does not have, every
@@ -384,7 +371,7 @@ func (a *Anchor) RootCertificates() ([]*x509.Certificate, error) {
 }
 
 // IntermediateKeys maps each listed hub intermediate's key (its DER SubjectPublicKeyInfo,
-// as a string) to its hub. A key listed twice keeps the later hub, as the Python dict does.
+// as a string) to its hub. No key is listed twice: such an anchor cannot be decoded (keysOnce).
 func (a *Anchor) IntermediateKeys() (map[string]string, error) {
 	out := make(map[string]string, len(a.HubIntermediates))
 	for _, h := range a.HubIntermediates {
