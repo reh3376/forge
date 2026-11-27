@@ -5,6 +5,7 @@
 **Updated:** 2026-04-07 — added vision: data reliability → model training → autonomous operations
 **Owner:** reh3376
 **Status:** SPECIFICATION (CONFIRMED)
+**Noted 2026-11-27 (A-22, FB-314):** where this document says MinIO, read *the object store*: any S3 store that meets Forge's capability check. MinIO's open-source project is archived; Forge ships RustFS.
 
 ---
 

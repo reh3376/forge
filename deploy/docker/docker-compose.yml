@@ -1,7 +1,7 @@
 # Forge Platform — F04 Development Stack
 # Usage: docker compose -f deploy/docker/docker-compose.yml up -d
 #
-# Tier 1: Infrastructure (PostgreSQL, TimescaleDB, Neo4j, Redis, Kafka, MinIO)
+# Tier 1: Infrastructure (PostgreSQL, TimescaleDB, Neo4j, Redis, Kafka, the object store)
 # Tier 2: Init container (schema migrations, runs once then exits)
 # Tier 3: Application (Hub API with gRPC + REST, Curation sub-mount)
 #
@@ -14,8 +14,7 @@
 #   7687  — Neo4j Bolt
 #   6379  — Redis
 #   9092  — Kafka
-#   9000  — MinIO API
-#   9001  — MinIO Console
+#   9000  — the object store (S3)
 
 services:
 
@@ -139,23 +138,24 @@ services:
       start_period: 15s
     restart: unless-stopped
 
-  minio:
-    # MinIO no longer publishes images (Docker Hub and quay.io refuse the pull, 2026-11-26), so
-    # it cannot be pinned; its replacement is FB-314. Opt in with --profile object-store; until
-    # then the hub reports object storage unreachable on its health endpoint.
-    profiles: ["object-store"]
-    image: minio/minio:latest
-    command: server /data --console-address ":9001"
+  object-store:
+    # Forge depends on the S3 protocol and names its object store by role; RustFS is the store
+    # Forge ships (FB-314, the owner 2026-11-27). Any store that passes
+    # `python -m forge_hub.storage.object_store_check` can stand in for it.
+    image: rustfs/rustfs:1.0.7@sha256:69bd3c4d8d79b74723bfd68c9fbd9085155d4d4b44a5a136d87502f3075cc68c
     environment:
-      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-forge}
-      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-changeme}
+      RUSTFS_ACCESS_KEY: ${OBJECT_STORE_ACCESS_KEY:-forge}
+      RUSTFS_SECRET_KEY: ${OBJECT_STORE_SECRET_KEY:-changeme}
+      # Encryption at rest needs a key (base64 of 32 bytes). Without one the store refuses a
+      # request to encrypt and says so, and the capability check reports encryption as not met.
+      RUSTFS_SSE_S3_MASTER_KEY: ${OBJECT_STORE_ENCRYPTION_KEY:-}
+      RUSTFS_CONSOLE_ENABLE: "false"
     ports:
       - "9000:9000"
-      - "9001:9001"
     volumes:
-      - forge-minio-data:/data
+      - forge-object-store-data:/data
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:9000/health/ready"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -232,9 +232,9 @@ services:
       NEO4J_USER: ${NEO4J_USER:-neo4j}
       NEO4J_PASSWORD: ${NEO4J_PASSWORD:-changeme}
       REDIS_URL: redis://redis:6379/0
-      MINIO_ENDPOINT: minio:9000
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-forge}
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-changeme}
+      OBJECT_STORE_ENDPOINT: object-store:9000
+      OBJECT_STORE_ACCESS_KEY: ${OBJECT_STORE_ACCESS_KEY:-forge}
+      OBJECT_STORE_SECRET_KEY: ${OBJECT_STORE_SECRET_KEY:-changeme}
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       RABBITMQ_URL: amqp://${RABBITMQ_USER:-forge}:${RABBITMQ_PASS:-changeme}@rabbitmq:5672/${RABBITMQ_VHOST:-/}
       # API
@@ -274,4 +274,4 @@ volumes:
   forge-redis-data:
   forge-kafka-data:
   forge-rabbitmq-data:
-  forge-minio-data:
+  forge-object-store-data:

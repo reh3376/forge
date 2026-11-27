@@ -4,7 +4,7 @@ Validates:
 1. HealthOrchestrator — concurrent probing, timeout handling, aggregation
 2. ComponentHealth — status enum, latency tracking
 3. PlatformHealth — status rollup (healthy/degraded/unhealthy)
-4. The RabbitMQ and MinIO probes (FB-006), against stand-in client modules
+4. The RabbitMQ and object store probes (FB-006, FB-314), against stand-in clients
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from forge_hub.api.health import (
     ComponentStatus,
     HealthOrchestrator,
     PlatformHealth,
-    check_minio,
+    check_object_store,
     check_rabbitmq,
 )
 
@@ -253,7 +253,7 @@ class TestHealthOrchestrator:
         orch.register("redis", ok)
         orch.register("kafka", ok)
         orch.register("neo4j", degraded)
-        orch.register("minio", unreachable)
+        orch.register("object-store", unreachable)
 
         result = await orch.check_all()
         # 3 OK out of 5 → degraded (not all OK)
@@ -261,7 +261,7 @@ class TestHealthOrchestrator:
 
 
 # ---------------------------------------------------------------------------
-# RabbitMQ and MinIO probes (FB-006)
+# RabbitMQ and object store probes (FB-006, FB-314)
 # ---------------------------------------------------------------------------
 
 
@@ -308,26 +308,33 @@ class TestRabbitMQProbe:
         assert "refused" in health.components["rabbitmq"]["message"]
 
 
-class TestMinioProbe:
+class TestObjectStoreProbe:
+    """The object store is named by its role and reached over S3, whichever store it is
+    (FB-314)."""
+
+    CLIENT = "forge_hub.storage.object_store_check.client_for"
+
     @pytest.mark.asyncio
     async def test_lists_buckets_with_the_configured_credentials(self):
-        module = MagicMock()
-        module.Minio.return_value.list_buckets.return_value = ["forge-archive", "forge-docs"]
-        with patch.dict(sys.modules, {"minio": module}):
-            result = await check_minio("minio:9000", "forge", "secret", secure=True)
-        assert result.name == "minio" and result.status == ComponentStatus.OK
+        with patch(self.CLIENT) as client_for:
+            client_for.return_value.list_buckets.return_value = ["forge-archive", "forge-docs"]
+            result = await check_object_store(
+                "object-store:9000", "forge", "secret", secure=True, region="plant-a"
+            )
+        assert result.name == "object-store" and result.status == ComponentStatus.OK
         assert result.details == {"bucket_count": 2}
-        module.Minio.assert_called_once_with(
-            "minio:9000", access_key="forge", secret_key="secret", secure=True
+        client_for.assert_called_once_with(
+            "object-store:9000", "forge", "secret", secure=True, region="plant-a"
         )
 
     @pytest.mark.asyncio
     async def test_the_orchestrator_reports_a_failed_listing_as_unreachable(self):
-        module = MagicMock()
-        module.Minio.return_value.list_buckets.side_effect = OSError("connection refused")
         orch = HealthOrchestrator()
-        orch.register("minio", partial(check_minio, "minio:9000", "forge", "secret"))
-        with patch.dict(sys.modules, {"minio": module}):
+        orch.register(
+            "object-store", partial(check_object_store, "object-store:9000", "forge", "secret")
+        )
+        with patch(self.CLIENT) as client_for:
+            client_for.return_value.list_buckets.side_effect = OSError("connection refused")
             health = await orch.check_all()
-        assert health.components["minio"]["status"] == "unreachable"
-        assert "connection refused" in health.components["minio"]["message"]
+        assert health.components["object-store"]["status"] == "unreachable"
+        assert "connection refused" in health.components["object-store"]["message"]

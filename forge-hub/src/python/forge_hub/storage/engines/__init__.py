@@ -1,7 +1,7 @@
 """Storage engine implementations.
 
 Each engine module provides write/read/query capabilities for a
-specific storage backend (PostgreSQL, TimescaleDB, Neo4j, Redis, MinIO).
+specific storage backend (PostgreSQL, TimescaleDB, Neo4j, Redis, the object store).
 """
 
 from forge_hub.storage.engines.neo4j_engine import Neo4jGraphWriter, Neo4jLineageWriter

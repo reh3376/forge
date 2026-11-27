@@ -109,7 +109,7 @@ class TestHealthEndpoints:
         data = resp.json()
         assert data["status"] in ("healthy", "degraded", "unhealthy")
         assert "uptime_seconds" in data
-        # Every compose-stack component is probed (RabbitMQ and MinIO since FB-006).
+        # Every compose-stack component is probed (RabbitMQ and the object store since FB-006).
         assert set(data["components"]) == {
             "postgres",
             "timescaledb",
@@ -117,7 +117,7 @@ class TestHealthEndpoints:
             "redis",
             "kafka",
             "rabbitmq",
-            "minio",
+            "object-store",
         }
 
     @pytest.mark.asyncio

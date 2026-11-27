@@ -13,7 +13,7 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The component: hub, postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio."
+      "description": "The component: hub, postgres, timescaledb, neo4j, redis, kafka, rabbitmq, object-store."
     },
     "status": {
       "type": "string",

@@ -42,8 +42,8 @@ from forge_hub.api.health import (
     HealthOrchestrator,
     PlatformHealth,
     check_kafka,
-    check_minio,
     check_neo4j,
+    check_object_store,
     check_postgres,
     check_rabbitmq,
     check_redis,
@@ -281,13 +281,14 @@ def create_app(
     # check feeds both /v1/health and the /readyz verdict.
     health_orch.register("rabbitmq", partial(check_rabbitmq, config.rabbitmq.url))
     health_orch.register(
-        "minio",
+        "object-store",
         partial(
-            check_minio,
-            config.minio.endpoint,
-            config.minio.access_key,
-            config.minio.secret_key,
-            config.minio.secure,
+            check_object_store,
+            config.object_store.endpoint,
+            config.object_store.access_key,
+            config.object_store.secret_key,
+            config.object_store.secure,
+            config.object_store.region,
         ),
     )
 

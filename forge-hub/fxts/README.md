@@ -58,4 +58,4 @@ forge-core's: [`../../forge-core/fxts/README.md`](../../forge-core/fxts/README.m
 
 | Spec | Id | Format | State | Hash | Approved by |
 |---|---|---|---|---|---|
-| [`forge-hub.fvts.json`](fvts/forge-hub.fvts.json) | `forge-hub-views` | 0.2.0 | approved | `f49ed4009279` | reh3376 |
+| [`forge-hub.fvts.json`](fvts/forge-hub.fvts.json) | `forge-hub-views` | 0.2.0 | approved | `ce547aa752d6` | reh3376 |
