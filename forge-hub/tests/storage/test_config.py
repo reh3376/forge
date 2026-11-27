@@ -4,8 +4,8 @@ import pytest
 
 from forge_hub.storage.config import (
     KafkaConfig,
-    MinioConfig,
     Neo4jConfig,
+    ObjectStoreConfig,
     PostgresConfig,
     RabbitMQConfig,
     RedisConfig,
@@ -59,11 +59,12 @@ class TestRedisConfig:
         assert cfg.url == "redis://localhost:6379/0"
 
 
-class TestMinioConfig:
+class TestObjectStoreConfig:
     def test_defaults(self):
-        cfg = MinioConfig()
+        cfg = ObjectStoreConfig()
         assert cfg.default_bucket == "forge-archive"
         assert cfg.secure is False
+        assert cfg.region is None
 
 
 class TestKafkaConfig:
@@ -109,11 +110,29 @@ class TestStorageConfig:
         assert cfg.redis.url == "redis://redis.prod:6380/1"
         assert cfg.rabbitmq.url == "amqp://prod:secret@rmq.prod:5672/forge"
 
-    def test_minio_secure_from_env(self, monkeypatch):
-        monkeypatch.delenv("MINIO_SECURE", raising=False)
-        assert StorageConfig.from_env().minio.secure is False
-        monkeypatch.setenv("MINIO_SECURE", "TRUE")
-        assert StorageConfig.from_env().minio.secure is True
+    def test_object_store_secure_from_env(self, monkeypatch):
+        monkeypatch.delenv("OBJECT_STORE_SECURE", raising=False)
+        assert StorageConfig.from_env().object_store.secure is False
+        monkeypatch.setenv("OBJECT_STORE_SECURE", "TRUE")
+        assert StorageConfig.from_env().object_store.secure is True
+
+    def test_the_object_store_is_named_by_its_role_in_the_environment(self, monkeypatch):
+        """Forge depends on S3, not on a product (FB-314): the settings say what the store
+        is for, and the name of a store that Forge once used configures nothing."""
+        monkeypatch.setenv("MINIO_ENDPOINT", "old-name:9000")
+        monkeypatch.setenv("OBJECT_STORE_ENDPOINT", "store.plant-a:9000")
+        monkeypatch.setenv("OBJECT_STORE_ACCESS_KEY", "forge-a")
+        monkeypatch.setenv("OBJECT_STORE_SECRET_KEY", "not-the-default")
+        monkeypatch.setenv("OBJECT_STORE_REGION", "plant-a")
+        store = StorageConfig.from_env().object_store
+        assert (store.endpoint, store.access_key, store.secret_key, store.region) == (
+            "store.plant-a:9000",
+            "forge-a",
+            "not-the-default",
+            "plant-a",
+        )
+        monkeypatch.setenv("OBJECT_STORE_REGION", "")
+        assert StorageConfig.from_env().object_store.region is None
 
     def test_from_env_defaults(self):
         cfg = StorageConfig.from_env()

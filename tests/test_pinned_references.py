@@ -22,7 +22,7 @@ WORKFLOWS = sorted((REPO / ".github" / "workflows").glob("*.yml"))
 DIGEST = re.compile(r"@sha256:[0-9a-f]{64}$")
 #: Images that are no longer published anywhere, so they cannot be pinned, each behind an
 #: opt-in Compose profile and with the backlog item that replaces it. This list only shrinks.
-UNPUBLISHED = {"minio/minio:latest": "FB-314"}
+UNPUBLISHED: dict[str, str] = {}
 
 
 def _dockerfile_images() -> list[str]:
@@ -87,6 +87,20 @@ def test_the_runtime_image_installs_nothing_and_runs_unprivileged() -> None:
 def test_nothing_is_mounted_from_the_host_into_a_forge_container() -> None:
     mounts = re.findall(r"^\s+- \.\./\S+", COMPOSE.read_text(encoding="utf-8"), re.M)
     assert mounts == [], f"build these into the image instead: {mounts}"
+
+
+def test_the_object_store_forge_init_writes_is_the_stacks() -> None:
+    """``forge init`` writes its own copy of the stack (FB-320). Its object store is the same
+    image by the same digest as the development stack's, so a pin moved in one place and not
+    the other fails here (FB-314)."""
+    from forge_hub.cli.main import OBJECT_STORE_IMAGE, _compose_template
+
+    stack = COMPOSE.read_text(encoding="utf-8")
+    assert "  object-store:\n" in stack
+    assert f"    image: {OBJECT_STORE_IMAGE}\n" in stack
+    assert DIGEST.search(OBJECT_STORE_IMAGE)
+    assert f"    image: {OBJECT_STORE_IMAGE}\n" in _compose_template()
+    assert "minio" not in stack.lower() and "minio" not in _compose_template().lower()
 
 
 def test_the_checks_see_what_they_refuse() -> None:

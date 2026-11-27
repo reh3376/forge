@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-27` against the repository `reh3376/forge` at the merge of PR 200 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-27` against the repository `reh3376/forge` at the merge of PR 201 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -249,7 +249,7 @@ note:
 
 ## Where Forge Is Today · Honest
 
-From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-27 at PR 200:
+From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-27 at PR 201:
 
 **Working**
 
@@ -319,7 +319,7 @@ flowchart LR
 
 - **`CLAUDE.md`** (repository root) is what every coding agent reads first: what Forge is, why, the goal, the architecture rules and the workflow.
 - **`WHERE-WE-ARE.md`** is the current state. Its "Pick-up point" paragraph says what was done last and what comes next. It changes **before every push**.
-- **`ROADMAP.md`** §1 holds the decisions in force (A-1 to A-20). §5 lists the signed records (D-1 to D-15).
+- **`ROADMAP.md`** §1 holds the decisions in force (A-1 to A-22). §5 holds the decision queue and the records signed from it (D-1 to D-19); the later records, to D-24, are listed in `WHERE-WE-ARE.md`.
 - **`docs/decisions/`** holds the signed design records. Each was decided by the owner one question at a time; a signed record is changed only by the owner.
 - **`forge-core/docs/fxts/README.md`** is the summary of the specification frameworks: which exist, what each governs, its real state and its spec count, with a page per framework (`FACTS.md`, `FATS.md`, `FMTS.md`, `FTTS.md`, `FVTS.md`, `FHTS.md`, and the planned ones). A test keeps it true to the code.
 - **`BACKLOG.md`** is the unit of work: one item per pull request; a finding is fixed or recorded, never skipped. It holds open work only: a finished entry moves to `BACKLOG-DONE.md` with the date, the commit and the pull request that fixed it, so an id cited anywhere is always in one of the two.
@@ -589,7 +589,7 @@ note:
 | Neo4j 5 | lineage and topology | in force |
 | Redis | cache and sessions | in force |
 | RabbitMQ · MQTT | module events on a unified namespace of exchanges per site and area; the embedded MQTT 3.1.1 broker | in force |
-| MinIO · Kafka | object store; the enterprise bus when volume requires it | in the compose stack; Kafka planned |
+| an S3 object store (RustFS as shipped) · Kafka | documents, archives and audit exports; the enterprise bus when volume requires it | in the compose stack, nothing stores an object yet; Kafka planned |
 
 - Modules hold only Forge-issued credentials and never connect on their own. It is module requirement M-8, checked from each module's FMTS spec (F4).
 - **Time in a database follows the time contract.** A time a module writes comes from its own governed clock or the hub's, never from the database's `now()`; the hub is to check the clocks of the databases it owns (FB-138, not built).
@@ -598,7 +598,7 @@ note:
 - Serving is API-first: consumers go through versioned APIs defined by FATS specs, never to a database directly.
 
 note:
-- The hub's health orchestrator probes all seven compose-stack components (`/v1/health`, `/readyz`, FB-006).
+- The hub's health orchestrator probes all seven compose-stack components (`/v1/health`, `/readyz`, FB-006). Each probe is cut off after 3 s. The object store's probe thread outlives that cut-off when the store accepts a connection and never answers, and enough such threads starve the hub's thread pool (FB-326).
 
 ---
 
@@ -2011,13 +2011,13 @@ note:
 ```bash
 git clone https://github.com/reh3376/forge.git && cd forge
 uv sync --locked --extra dev --extra ot        # the same command CI and the hub image run
-uv run pytest -q -rsx                          # 6,837 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
+uv run pytest -q -rsx                          # 6,863 tests in tests/, forge-core/tests and forge-hub/tests, ~1 minute; lists each skip with its reason
 uv run ruff check . && uv run ruff format --check .   # both block CI; ruff is pinned exactly
 (cd forge-core/src/go && go build ./... && go vet ./... && go test ./...)
-docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq; MinIO only with --profile object-store (FB-314)
+docker compose -f deploy/docker/docker-compose.yml up -d   # postgres, timescaledb, neo4j, redis, kafka, rabbitmq, object-store
 ```
 
-- Every image in the stack and the hub image's bases are named by digest and every CI Action by commit SHA; Dependabot moves them and a test refuses a floating reference (FB-312). The hub image installs nothing with apt and runs as an unprivileged user. The stack starts with one command: the init container runs the one migration chain against both databases (a migration enables TimescaleDB and makes hypertables only where the extension is, FB-315), then the hub comes up; CI starts the same stack with the image it builds. MinIO publishes no image any more and is opt-in until FB-314.
+- Every image in the stack and the hub image's bases are named by digest and every CI Action by commit SHA; Dependabot moves them and a test refuses a floating reference (FB-312). The hub image installs nothing with apt and runs as an unprivileged user. The stack starts with one command: the init container runs the one migration chain against both databases (a migration enables TimescaleDB and makes hypertables only where the extension is, FB-315), then the hub comes up; CI starts the same stack with the image it builds. The object store is named by its role and reached over S3 (A-22): the stack runs RustFS, pinned by digest, and `python -m forge_hub.storage.object_store_check` does each thing Forge needs on whatever store is configured (`OBJECT_STORE_*`) and says which it met. The command takes no arguments: `--help` describes it without contacting a store, and exit code 2 says the check was not run, apart from 1, the store not meeting what Forge needs. CI runs it against the pinned image on both architectures.
 - Python 3.12+, uv, ruff, Docker for the services; Go 1.26 for `forge-core/src/go/`; SoftHSM for the trust root's tests that sign on a device (`softhsm2` on Ubuntu, `brew install softhsm` on a Mac; without it those tests skip and say why, and CI requires it); Node 20 for the interim MES bridge's CI job and Node 22 for the tutorial build.
 - Every Python dependency is locked in `uv.lock`; `--locked` fails on a stale lock, so a dependency moves only through a committed re-lock (FB-096):
 
@@ -2494,7 +2494,7 @@ What is running on a site hub, how to tell it is healthy, and the command line.
 | **Neo4j** | lineage and topology |
 | **Redis** | cache and sessions |
 | **RabbitMQ** and the embedded **MQTT** broker | module events and plant-floor messaging |
-| **MinIO**, **Kafka** | object store; the enterprise bus for later |
+| an **S3 object store** (RustFS as shipped), **Kafka** | documents, archives and audit exports; the enterprise bus for later |
 
 Today this runs from **Docker Compose for development**; production is a Kubernetes deployment per hub, which is not built yet (U11).
 
@@ -2507,7 +2507,7 @@ note:
 
 ```bash
 forge health                 # the platform's own view
-curl http://<hub>/v1/health  # every component: postgres, timescaledb, neo4j, redis, kafka, rabbitmq, minio
+curl http://<hub>/v1/health  # every component: postgres, timescaledb, neo4j, redis, kafka, rabbitmq, object-store
 curl http://<hub>/readyz     # ready to serve?
 forge adapter list            # which modules are registered
 forge adapter status <module> # one module's state, including its clock offset

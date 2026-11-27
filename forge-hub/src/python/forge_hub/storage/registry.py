@@ -39,7 +39,7 @@ class StorageEngine(StrEnum):
     TIMESCALEDB = "timescaledb"
     NEO4J = "neo4j"
     REDIS = "redis"
-    MINIO = "minio"
+    OBJECT_STORE = "object-store"
     KAFKA = "kafka"
 
 

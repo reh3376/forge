@@ -268,28 +268,25 @@ async def check_rabbitmq(url: str) -> ComponentHealth:
         await connection.close()
 
 
-async def check_minio(
+async def check_object_store(
     endpoint: str,
     access_key: str,
     secret_key: str,
     secure: bool = False,
+    region: str | None = None,
 ) -> ComponentHealth:
-    """Check MinIO connectivity.
+    """Check that the object store answers (any S3 store; FB-314).
 
-    Uses the minio SDK — this is a synchronous call wrapped in
-    run_in_executor to avoid blocking the event loop.
+    The S3 client is synchronous, so the call runs in an executor and never blocks the event
+    loop. This is connectivity only; what the store can do is
+    ``forge_hub.storage.object_store_check``.
     """
     import functools
 
-    from minio import Minio
+    from forge_hub.storage.object_store_check import client_for
 
     def _probe() -> dict[str, Any]:
-        client = Minio(
-            endpoint,
-            access_key=access_key,
-            secret_key=secret_key,
-            secure=secure,
-        )
+        client = client_for(endpoint, access_key, secret_key, secure=secure, region=region)
         buckets = client.list_buckets()
         return {"bucket_count": len(buckets)}
 
@@ -299,7 +296,7 @@ async def check_minio(
         functools.partial(_probe),
     )
     return ComponentHealth(
-        name="minio",
+        name="object-store",
         status=ComponentStatus.OK,
         message="connected",
         details=details,

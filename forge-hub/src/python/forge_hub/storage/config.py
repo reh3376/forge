@@ -65,13 +65,16 @@ class RedisConfig:
 
 
 @dataclass(frozen=True)
-class MinioConfig:
-    """MinIO (S3-compatible) object storage configuration."""
+class ObjectStoreConfig:
+    """The object store, named by its role: any store that speaks S3 and passes
+    ``forge_hub.storage.object_store_check`` (FB-314). Forge ships RustFS."""
 
     endpoint: str = "localhost:9000"
     access_key: str = "forge"
     secret_key: str = "changeme"
     secure: bool = False
+    #: The region the store signs for; ``None`` leaves it to the client (most stores take any).
+    region: str | None = None
     default_bucket: str = "forge-archive"
 
 
@@ -107,7 +110,7 @@ class StorageConfig:
     timescale: TimescaleConfig = field(default_factory=TimescaleConfig)
     neo4j: Neo4jConfig = field(default_factory=Neo4jConfig)
     redis: RedisConfig = field(default_factory=RedisConfig)
-    minio: MinioConfig = field(default_factory=MinioConfig)
+    object_store: ObjectStoreConfig = field(default_factory=ObjectStoreConfig)
     kafka: KafkaConfig = field(default_factory=KafkaConfig)
     rabbitmq: RabbitMQConfig = field(default_factory=RabbitMQConfig)
 
@@ -137,11 +140,12 @@ class StorageConfig:
             redis=RedisConfig(
                 url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
             ),
-            minio=MinioConfig(
-                endpoint=os.getenv("MINIO_ENDPOINT", "localhost:9000"),
-                access_key=os.getenv("MINIO_ACCESS_KEY", "forge"),
-                secret_key=os.getenv("MINIO_SECRET_KEY", "changeme"),
-                secure=env_boolean("MINIO_SECURE", False),
+            object_store=ObjectStoreConfig(
+                endpoint=os.getenv("OBJECT_STORE_ENDPOINT", "localhost:9000"),
+                access_key=os.getenv("OBJECT_STORE_ACCESS_KEY", "forge"),
+                secret_key=os.getenv("OBJECT_STORE_SECRET_KEY", "changeme"),
+                secure=env_boolean("OBJECT_STORE_SECURE", False),
+                region=os.getenv("OBJECT_STORE_REGION") or None,
             ),
             kafka=KafkaConfig(
                 bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092"),

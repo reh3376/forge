@@ -26,7 +26,7 @@ description: "Check a change to which trust anchor counts and to the stages (D-2
 | `forge-core/src/go/trust/keys.go` | `derOf`, `publicKeyDER`, `certificateKeyDER`, `keysOnce`: the same rules and the same words |
 | `tests/trust_anchors.py` | the cases and their declared answers, apart from the code under test; it writes `testdata/anchors.json` |
 
-**Sync commit:** this change (2026-11-27, FB-317; the commit is named here after its pull request merges). See what changed since:
+**Sync commit:** `5fe4ed98` (2026-11-27, FB-317, PR 201). See what changed since:
 
 ```bash
 git log --oneline <sync>..HEAD -- forge-core/src/python/forge_core/trust/anchor.py forge-core/src/python/forge_core/trust/keys.py forge-core/src/python/forge_core/trust/stages.py forge-core/src/go/trust/anchor.go forge-core/src/go/trust/keys.go tests/trust_anchors.py

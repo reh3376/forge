@@ -26,7 +26,7 @@
         "object_label": "Hub component",
         "schema_ref": "forge://schemas/forge-hub/HealthComponent/v1",
         "schema_path": "forge-hub/fxts/fvts/objects/HealthComponent.v1.schema.json",
-        "schema_hash": "6e0ac4f1776e58814444a8c06bbcec2598e621af10cda5ff13b6d5e1ee570562",
+        "schema_hash": "88660d5c9fec3a196674b618216e383abc53b800d8611a52bde632c9c8825cd4",
         "key_field": "name",
         "delivery": "push"
       },
@@ -232,8 +232,17 @@
   },
   "integrity": {
     "hash_state": "approved",
-    "previous_hash": "9642291fff157f153470b75b466b9bb536563a889d921a98baf055299a39475d",
+    "previous_hash": "f49ed40092795c6210c40cb6dbc665da347bf78d4ebd5e327320a5ebce5cd1f6",
     "change_history": [
+      {
+        "previous_hash": "f49ed40092795c6210c40cb6dbc665da347bf78d4ebd5e327320a5ebce5cd1f6",
+        "new_hash": "ce547aa752d6500e228534cdac8a1323f918cb4ff98252bede5e07cc53b286bf",
+        "changed_at": "2026-11-27T15:29:41Z",
+        "source": "manual",
+        "changed_by": "claude",
+        "change_type": "content",
+        "reason": "FB-314: the hub's object store is named by its role; the HealthComponent schema's description says object-store where it said minio"
+      },
       {
         "previous_hash": "9642291fff157f153470b75b466b9bb536563a889d921a98baf055299a39475d",
         "new_hash": "f49ed40092795c6210c40cb6dbc665da347bf78d4ebd5e327320a5ebce5cd1f6",
@@ -254,10 +263,10 @@
       }
     ],
     "hash_method": "sha256-c14n-v1",
-    "spec_hash": "f49ed40092795c6210c40cb6dbc665da347bf78d4ebd5e327320a5ebce5cd1f6",
+    "spec_hash": "ce547aa752d6500e228534cdac8a1323f918cb4ff98252bede5e07cc53b286bf",
     "schema_version": "0.2.0",
     "schema_hash": "1a9785248467232def2fe2f01959988cfaffad20c1098382510a7c3d125b1ec7",
     "approved_by": "reh3376",
-    "approved_at": "2026-11-23T17:43:48Z"
+    "approved_at": "2026-11-27T21:58:41Z"
   }
 }

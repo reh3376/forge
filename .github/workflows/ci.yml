@@ -110,7 +110,7 @@ jobs:
       # The development stack with this image: every service up, the init container's
       # migrations against the real pinned databases, and the hub healthy. It had never started
       # the hub (migration 004 failed on plain Postgres) and nothing ran it, so nobody saw
-      # (FB-315).
+      # (FB-315). Then the object store's capability check, run from inside the hub (FB-314).
       - name: the development stack starts with it
         if: steps.changes.outputs.run == 'true'
         run: |
@@ -118,10 +118,15 @@ jobs:
           docker tag forge-hub:ci forge-ci-forge-init
           compose="docker compose -p forge-ci -f deploy/docker/docker-compose.yml"
           trap '$compose ps; $compose logs --tail 80' ERR
-          $compose up -d --wait postgres timescaledb neo4j redis kafka rabbitmq
+          # the object store encrypts at rest only when it is given a key; this run's own
+          export OBJECT_STORE_ENCRYPTION_KEY="$(openssl rand -base64 32)"
+          $compose up -d --wait postgres timescaledb neo4j redis kafka rabbitmq object-store
           $compose run --rm --no-deps forge-init
           $compose up -d --wait --no-build --no-deps forge-hub
           $compose ps
+          # The store Forge ships does everything Forge needs of an object store, on this
+          # architecture, from this image (FB-314): every capability met, nothing left behind.
+          $compose exec -T forge-hub python -m forge_hub.storage.object_store_check
       - name: export it with its provenance and write the build record
         if: steps.changes.outputs.run == 'true'
         run: |
