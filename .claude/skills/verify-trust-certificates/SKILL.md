@@ -23,7 +23,7 @@ description: "Check a change to the trust root's certificates (D-23 law 1: no ce
 | `tests/trust_world.py` | the oracle: the catalog of faults (`MUTATIONS`, `LEAF_FAULTS`) and the crafter that makes them, apart from the issuer |
 | `tests/trust_edges.py` | the edges: malformed DER, odd encodings and other hashes, each with its declared answer (`ANSWERS`) and whether Go's parser reads it |
 
-**Sync commit:** this change (2026-11-26, FB-311: the world's anchor holds two freshness keys, both files regenerated, every name and answer unchanged; the commit is named here after its pull request merges). See what changed since:
+**Sync commit:** this change (2026-11-27, FB-317: the curves moved to `keys.py`, an anchor's keys are read when it is decoded, and `IntermediateKeys` no longer meets a key twice; no certificate rule, vector or edge changed; the commit is named here after its pull request merges). See what changed since:
 
 ```bash
 git log --oneline <sync>..HEAD -- forge-core/src/python/forge_core/trust forge-core/src/go/trust forge-core/contract/lists/certificate-roles.list.json tests/trust_world.py tests/trust_edges.py
@@ -38,7 +38,7 @@ uv run pytest forge-core/tests/trust/test_certificates_law.py forge-core/tests/t
 cd forge-core/src/go && go test ./trust/ -count=1
 ```
 
-Under a second each. The expected result at the sync commit is `63 passed` and `ok` (41 vectors, 31 edges, the id table, the strict decoding test and the anchor's freshness keys, which `verify-trust-anchor` covers).
+Under a second each. The expected result at the sync commit is `63 passed` and `ok` (41 vectors, 31 edges, the id table, the strict decoding test, and the anchor's keys and freshness keys, which `verify-trust-anchor` covers).
 
 After a change to the catalog, the edges or the profile, regenerate both files and run both again:
 

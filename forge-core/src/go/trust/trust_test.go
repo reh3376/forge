@@ -428,3 +428,133 @@ func TestAnchorFreshnessKeys(t *testing.T) {
 		})
 	}
 }
+
+// TestAnchors holds DecodeAnchor to every case of testdata/anchors.json, the file the Python
+// suite reads too (FB-317): every spelling of a key in every key field, every kind of
+// certificate in both certificate fields, every pair of places a key can be named, and the
+// number of freshness keys. Regenerate with `uv run python -m tests.trust_anchors`.
+func TestAnchors(t *testing.T) {
+	data, err := os.ReadFile("testdata/anchors.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var file struct {
+		Base  map[string]json.RawMessage `json:"base"`
+		Cases []struct {
+			Name   string                     `json:"name"`
+			Change map[string]json.RawMessage `json:"change"`
+			Expect string                     `json:"expect"`
+			Says   *string                    `json:"says"`
+		} `json:"cases"`
+		BorrowedAs struct {
+			Hub string `json:"hub"`
+		} `json:"borrowed_as"`
+		Borrowed []struct {
+			Name        string  `json:"name"`
+			From        string  `json:"from"`
+			Case        string  `json:"case"`
+			Certificate int     `json:"certificate"`
+			Expect      string  `json:"expect"`
+			Says        *string `json:"says"`
+		} `json:"borrowed"`
+	}
+	if err := json.Unmarshal(data, &file); err != nil {
+		t.Fatal(err)
+	}
+	if len(file.Cases) < 100 {
+		t.Fatalf("%d cases; the file is not the generated one", len(file.Cases))
+	}
+	built := 0
+	for _, c := range file.Cases {
+		t.Run(c.Name, func(t *testing.T) {
+			doc := map[string]json.RawMessage{}
+			for k, v := range file.Base {
+				doc[k] = v
+			}
+			for k, v := range c.Change {
+				doc[k] = v
+			}
+			raw, err := json.Marshal(doc)
+			if err != nil {
+				t.Fatal(err)
+			}
+			_, err = DecodeAnchor(raw)
+			switch c.Expect {
+			case "built":
+				built++
+				if err != nil {
+					t.Fatalf("refused (%v); want built", err)
+				}
+			case "refused":
+				if err == nil {
+					t.Fatal("built; want refused")
+				}
+				if c.Says != nil && !strings.Contains(err.Error(), *c.Says) {
+					t.Fatalf("refused with %q; want it to say %q", err, *c.Says)
+				}
+			default:
+				t.Fatalf("an unknown answer %q", c.Expect)
+			}
+		})
+	}
+	if built == 0 {
+		t.Fatal("no case expects an anchor to be built; the refusals would prove nothing")
+	}
+
+	// Every certificate of the edges and the vectors, as the hub intermediate: the cases
+	// name their certificate in those files and do not repeat it.
+	chains := map[string]map[string][]string{}
+	for _, source := range []string{"edges", "vectors"} {
+		raw, err := os.ReadFile("testdata/" + source + ".json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		var read struct {
+			Cases []struct {
+				Name  string   `json:"name"`
+				Chain []string `json:"chain"`
+			} `json:"cases"`
+		}
+		if err := json.Unmarshal(raw, &read); err != nil {
+			t.Fatal(err)
+		}
+		chains[source] = map[string][]string{}
+		for _, c := range read.Cases {
+			chains[source][c.Name] = c.Chain
+		}
+	}
+	if len(file.Borrowed) < 50 {
+		t.Fatalf("%d borrowed certificates; the file is not the generated one", len(file.Borrowed))
+	}
+	for _, c := range file.Borrowed {
+		t.Run(c.Name, func(t *testing.T) {
+			chain := chains[c.From][c.Case]
+			if c.Certificate >= len(chain) {
+				t.Fatalf("%s has no case %q with a certificate %d", c.From, c.Case, c.Certificate)
+			}
+			listed, err := json.Marshal([]map[string]string{{"hub": file.BorrowedAs.Hub, "certificate": chain[c.Certificate]}})
+			if err != nil {
+				t.Fatal(err)
+			}
+			doc := map[string]json.RawMessage{}
+			for k, v := range file.Base {
+				doc[k] = v
+			}
+			doc["hub_intermediates"] = listed
+			raw, err := json.Marshal(doc)
+			if err != nil {
+				t.Fatal(err)
+			}
+			_, err = DecodeAnchor(raw)
+			if c.Expect == "built" && err != nil {
+				t.Fatalf("refused (%v); want built", err)
+			}
+			if c.Expect == "refused" && (err == nil || (c.Says != nil && !strings.Contains(err.Error(), *c.Says))) {
+				t.Fatalf("got %v; want a refusal saying %v", err, c.Says)
+			}
+			if c.Expect != "built" && c.Expect != "refused" {
+				t.Fatalf("an unknown answer %q", c.Expect)
+			}
+		})
+	}
+}

@@ -23,10 +23,10 @@ from cryptography.hazmat.primitives.asymmetric.utils import encode_dss_signature
 from pkcs11 import Attribute, KeyType, Mechanism, MechanismFlag, ObjectClass
 from pkcs11.util.ec import encode_ec_public_key, encode_named_curve_parameters
 
+from forge_core.trust.keys import CURVES
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
-
-CURVES = {"secp256r1": ec.SECP256R1, "secp384r1": ec.SECP384R1}
 
 
 class DeviceKeyError(Exception):
