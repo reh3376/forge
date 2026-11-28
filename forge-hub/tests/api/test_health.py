@@ -5,12 +5,15 @@ Validates:
 2. ComponentHealth — status enum, latency tracking
 3. PlatformHealth — status rollup (healthy/degraded/unhealthy)
 4. The RabbitMQ and object store probes (FB-006, FB-314), against stand-in clients
+5. One probe in flight per component, blocking probes on threads of their own (FB-326):
+   readable examples here; every sequence in a bound is ``test_health_probes_exhaustive.py``
 """
 
 from __future__ import annotations
 
 import asyncio
 import sys
+import threading
 from functools import partial
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -22,8 +25,8 @@ from forge_hub.api.health import (
     ComponentStatus,
     HealthOrchestrator,
     PlatformHealth,
-    check_object_store,
     check_rabbitmq,
+    probe_object_store,
 )
 
 # ---------------------------------------------------------------------------
@@ -310,31 +313,177 @@ class TestRabbitMQProbe:
 
 class TestObjectStoreProbe:
     """The object store is named by its role and reached over S3, whichever store it is
-    (FB-314)."""
+    (FB-314). Its client blocks, so the probe is a plain function the orchestrator runs on a
+    thread of its own (FB-326)."""
 
     CLIENT = "forge_hub.storage.object_store_check.client_for"
 
-    @pytest.mark.asyncio
-    async def test_lists_buckets_with_the_configured_credentials(self):
+    def test_lists_buckets_with_the_configured_credentials_and_the_checks_limit(self):
         with patch(self.CLIENT) as client_for:
             client_for.return_value.list_buckets.return_value = ["forge-archive", "forge-docs"]
-            result = await check_object_store(
+            details = probe_object_store(
                 "object-store:9000", "forge", "secret", secure=True, region="plant-a"
             )
-        assert result.name == "object-store" and result.status == ComponentStatus.OK
-        assert result.details == {"bucket_count": 2}
+        assert details == {"bucket_count": 2}
         client_for.assert_called_once_with(
-            "object-store:9000", "forge", "secret", secure=True, region="plant-a"
+            "object-store:9000",
+            "forge",
+            "secret",
+            limit=_CHECK_TIMEOUT,
+            secure=True,
+            region="plant-a",
         )
+
+    @pytest.mark.asyncio
+    async def test_the_orchestrator_reports_an_answering_store_as_ok(self):
+        orch = HealthOrchestrator()
+        orch.register_blocking(
+            "object-store", partial(probe_object_store, "object-store:9000", "forge", "secret")
+        )
+        with patch(self.CLIENT) as client_for:
+            client_for.return_value.list_buckets.return_value = ["forge-archive"]
+            health = await orch.check_all()
+        assert health.status == "healthy"
+        store = health.components["object-store"]
+        assert store["status"] == "ok" and store["message"] == "connected"
+        assert store["bucket_count"] == 1
 
     @pytest.mark.asyncio
     async def test_the_orchestrator_reports_a_failed_listing_as_unreachable(self):
         orch = HealthOrchestrator()
-        orch.register(
-            "object-store", partial(check_object_store, "object-store:9000", "forge", "secret")
+        orch.register_blocking(
+            "object-store", partial(probe_object_store, "object-store:9000", "forge", "secret")
         )
         with patch(self.CLIENT) as client_for:
             client_for.return_value.list_buckets.side_effect = OSError("connection refused")
             health = await orch.check_all()
         assert health.components["object-store"]["status"] == "unreachable"
         assert "connection refused" in health.components["object-store"]["message"]
+
+
+# ---------------------------------------------------------------------------
+# One probe in flight per component (FB-326): examples
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def short_limit(monkeypatch: pytest.MonkeyPatch) -> float:
+    """The check's limit, shortened so a test of the limit does not take three seconds."""
+    from forge_hub.api import health
+
+    monkeypatch.setattr(health, "_CHECK_TIMEOUT", 0.2)
+    return 0.2
+
+
+class TestOneProbeInFlight:
+    @pytest.mark.asyncio
+    async def test_calls_that_overlap_share_one_probe(self):
+        orch = HealthOrchestrator()
+        started = 0
+        answer = asyncio.Event()
+
+        async def check():
+            nonlocal started
+            started += 1
+            await answer.wait()
+            return ComponentHealth(name="pg", status=ComponentStatus.OK)
+
+        orch.register("pg", check)
+        calls = [asyncio.create_task(orch.check_all()) for _ in range(5)]
+        await asyncio.sleep(0.01)
+        answer.set()
+        results = await asyncio.gather(*calls)
+        assert started == 1
+        assert [r.components["pg"]["status"] for r in results] == ["ok"] * 5
+
+    @pytest.mark.asyncio
+    async def test_a_caller_that_goes_away_does_not_end_the_probe_others_wait_on(self):
+        orch = HealthOrchestrator()
+        started = 0
+        answer = asyncio.Event()
+
+        async def check():
+            nonlocal started
+            started += 1
+            await answer.wait()
+            return ComponentHealth(name="pg", status=ComponentStatus.OK)
+
+        orch.register("pg", check)
+        leaving = asyncio.create_task(orch.check_all())
+        staying = asyncio.create_task(orch.check_all())
+        await asyncio.sleep(0.01)
+        leaving.cancel()
+        await asyncio.sleep(0.01)
+        answer.set()
+        assert (await staying).components["pg"]["status"] == "ok"
+        assert started == 1 and leaving.cancelled()
+
+    @pytest.mark.asyncio
+    async def test_a_blocking_probe_that_has_not_returned_keeps_its_place(self, short_limit):
+        orch = HealthOrchestrator()
+        started = 0
+        release = threading.Event()
+
+        def probe():
+            nonlocal started
+            started += 1
+            release.wait(timeout=30)
+            return {"answered": True}
+
+        orch.register_blocking("object-store", probe)
+        first = (await orch.check_all()).components["object-store"]
+        assert first["status"] == "unreachable" and first["message"].startswith("Timeout after")
+        # the probe is still out: a later call is told at once, and starts no second probe
+        loop = asyncio.get_running_loop()
+        before = loop.time()
+        second = (await orch.check_all()).components["object-store"]
+        assert loop.time() - before < short_limit / 2
+        assert second["status"] == "unreachable" and "has not returned" in second["message"]
+        assert started == 1
+        # when it ends, its place is free: the next call starts a new probe and gets its answer
+        release.set()
+        for _ in range(100):
+            if not orch._in_flight:
+                break
+            await asyncio.sleep(0.01)
+        third = (await orch.check_all()).components["object-store"]
+        assert third["status"] == "ok" and third["answered"] is True
+        assert started == 2
+
+    @pytest.mark.asyncio
+    async def test_an_answer_that_comes_after_the_limit_is_not_remembered(self, short_limit):
+        orch = HealthOrchestrator()
+        outcomes = iter([{"late": True}, OSError("refused")])
+        release = threading.Event()
+
+        def probe():
+            outcome = next(outcomes)
+            if isinstance(outcome, dict):
+                release.wait(timeout=30)  # the first probe answers ok, after the limit
+                return outcome
+            raise outcome
+
+        orch.register_blocking("object-store", probe)
+        assert (await orch.check_all()).components["object-store"]["status"] == "unreachable"
+        release.set()
+        for _ in range(100):
+            if not orch._in_flight:
+                break
+            await asyncio.sleep(0.01)
+        # the late ok reached nobody; the next call asks again and reports what it finds now
+        after = (await orch.check_all()).components["object-store"]
+        assert after["status"] == "unreachable" and "refused" in after["message"]
+
+    @pytest.mark.asyncio
+    async def test_a_blocking_probe_runs_on_a_daemon_thread_of_its_own(self):
+        orch = HealthOrchestrator()
+        seen: list[threading.Thread] = []
+
+        def probe():
+            seen.append(threading.current_thread())
+            return {}
+
+        orch.register_blocking("kafka", probe)
+        assert (await orch.check_all()).status == "healthy"
+        assert [t.name for t in seen] == ["forge-health-kafka"]
+        assert seen[0].daemon and seen[0] is not threading.main_thread()

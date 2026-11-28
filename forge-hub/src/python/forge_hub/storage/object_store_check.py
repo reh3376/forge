@@ -33,6 +33,7 @@ import contextlib
 import hashlib
 import io
 import json
+import math
 import os
 import sys
 import time
@@ -63,6 +64,9 @@ COMMAND = "python -m forge_hub.storage.object_store_check"
 #: environment names no store a client can be built for. 0 is every capability met and
 #: nothing left behind; 1 is the check run and the store not Forge's object store as it is.
 EXIT_NOT_RUN = 2
+#: How long one call of the check may wait on the store, to connect and again to read. The
+#: check's largest request is one 5 MiB part of a multipart upload.
+CALL_LIMIT_SECONDS = 30.0
 #: How long the check locks its own record. Long enough to try to delete it, short enough to
 #: wait out, so the check leaves nothing behind.
 LOCK_SECONDS = 4
@@ -114,13 +118,31 @@ def client_for(
     access_key: str,
     secret_key: str,
     *,
+    limit: float,
     secure: bool = False,
     region: str | None = None,
 ) -> Minio:
-    """The S3 client for a store. One place makes it, for the check and the health probe."""
-    return Minio(
+    """The S3 client for a store. One place makes it, for the check and the health probe.
+
+    ``limit`` is how long a call may wait on the store, in seconds, to connect and again to
+    read, and every caller must give it. Left to itself the library waits five minutes for
+    each and tries five more times, which kept a health probe's thread on a store that had
+    stopped answering long after the probe was given up (FB-326). The client makes one
+    attempt: a store is reported as it is, not as it is after retries.
+
+    Only those two settings are narrowed, on the connection pool the library itself built.
+    Everything else is the library's own, certificate checking and its trust store included.
+    """
+    if not 0 < limit < math.inf:
+        msg = f"limit={limit!r} is not a time a call may wait on the store: give seconds above 0"
+        raise ValueError(msg)
+    client = Minio(
         endpoint, access_key=access_key, secret_key=secret_key, secure=secure, region=region
     )
+    settings = client._http.connection_pool_kw
+    settings["timeout"] = limit
+    settings["retries"] = False
+    return client
 
 
 def fetch(url: str) -> bytes:
@@ -544,7 +566,8 @@ def usage() -> str:
             "  OBJECT_STORE_REGION      the region the store signs for, when it needs one",
             "",
             "It writes to that store: buckets named forge-check-<run>, which it removes when",
-            "it is done, naming anything it could not remove.",
+            "it is done, naming anything it could not remove. No call waits on the store",
+            f"for more than {CALL_LIMIT_SECONDS:g} s.",
             f"Running it needs the permission {SCOPE}.",
             "",
             "Exit codes: 0, every capability met and nothing left behind; 1, a capability not",
@@ -586,6 +609,7 @@ def main(argv: Sequence[str] = ()) -> int:
             store.endpoint,
             store.access_key,
             store.secret_key,
+            limit=CALL_LIMIT_SECONDS,
             secure=store.secure,
             region=store.region,
         )
