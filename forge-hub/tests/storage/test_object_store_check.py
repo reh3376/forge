@@ -417,9 +417,9 @@ def test_the_command_reads_the_store_from_the_environment_and_fails_when_one_is_
     made = {}
 
     def client_for(
-        endpoint: str, access: str, secret: str, *, secure: bool, region: str | None
+        endpoint: str, access: str, secret: str, *, limit: float, secure: bool, region: str | None
     ) -> Store:
-        made.update(endpoint=endpoint, access=access, secure=secure, region=region)
+        made.update(endpoint=endpoint, access=access, secure=secure, region=region, limit=limit)
         return made.setdefault("store", Store("refuses-encryption"))
 
     monkeypatch.setenv("OBJECT_STORE_ENDPOINT", "store.plant-a:9000")
@@ -441,11 +441,61 @@ def test_the_command_reads_the_store_from_the_environment_and_fails_when_one_is_
         "access": "forge-a",
         "secure": True,
         "region": "plant-a",
+        "limit": osc.CALL_LIMIT_SECONDS,
         "store": made["store"],
     }
     said = capsys.readouterr().out
     assert f"No permission check point is wired for {osc.SCOPE}" in said
     assert "Checking the object store at https://store.plant-a:9000" in said
+
+
+# -- the client -------------------------------------------------------------
+# Left to itself the S3 library waits five minutes to connect, five to read, and tries five
+# more times. A health probe's thread waited that long on a store that had stopped answering
+# (FB-326). Every caller gives a limit; nothing else about the client changes.
+
+
+def _pool_settings(client: Any) -> dict[str, Any]:
+    return dict(client._http.connection_pool_kw)
+
+
+def test_a_client_cannot_be_built_without_a_limit() -> None:
+    with pytest.raises(TypeError, match="limit"):
+        osc.client_for("store.plant-a:9000", "a", "b")  # type: ignore[call-arg]
+    for no_limit in (0, -1, float("nan"), float("inf")):
+        with pytest.raises(ValueError, match="is not a time a call may wait"):
+            osc.client_for("store.plant-a:9000", "a", "b", limit=no_limit)
+
+
+def test_the_client_waits_no_longer_than_its_limit_and_tries_once() -> None:
+    settings = _pool_settings(osc.client_for("store.plant-a:9000", "a", "b", limit=3.0))
+    assert settings["timeout"] == 3.0
+    assert settings["retries"] is False
+
+
+@pytest.mark.parametrize("secure", [True, False])
+@pytest.mark.parametrize("ca_file", [None, "/etc/forge/site-ca.pem"])
+def test_the_clients_certificate_checking_is_the_librarys_own(
+    secure: bool, ca_file: str | None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Never weaker than the library's default: only the limit and the retries differ from a
+    client the library builds by itself, with or without TLS and with or without a site's
+    own CA file."""
+    from minio import Minio
+
+    if ca_file is None:
+        monkeypatch.delenv("SSL_CERT_FILE", raising=False)
+    else:
+        monkeypatch.setenv("SSL_CERT_FILE", ca_file)
+    ours = _pool_settings(osc.client_for("store.plant-a:9000", "a", "b", limit=3.0, secure=secure))
+    theirs = _pool_settings(Minio("store.plant-a:9000", "a", "b", secure=secure))
+    narrowed = {"timeout", "retries"}
+    assert {k: v for k, v in ours.items() if k not in narrowed} == {
+        k: v for k, v in theirs.items() if k not in narrowed
+    }
+    # and the library's default is what this was written against: certificates are required
+    assert ours["cert_reqs"] == "CERT_REQUIRED"
+    assert ours["ca_certs"] == (ca_file or theirs["ca_certs"]) and ours["ca_certs"]
 
 
 # -- the command line -------------------------------------------------------

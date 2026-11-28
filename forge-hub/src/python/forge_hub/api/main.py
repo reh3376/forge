@@ -41,13 +41,13 @@ from forge_core.models.adapter import (
 from forge_hub.api.health import (
     HealthOrchestrator,
     PlatformHealth,
-    check_kafka,
     check_neo4j,
-    check_object_store,
     check_postgres,
     check_rabbitmq,
     check_redis,
     check_timescaledb,
+    probe_kafka,
+    probe_object_store,
 )
 from forge_hub.api.registry import AdapterRegistry
 from forge_hub.context.service import build_context_router
@@ -276,14 +276,15 @@ def create_app(
         partial(check_neo4j, config.neo4j.uri, config.neo4j.user, config.neo4j.password),
     )
     health_orch.register("redis", partial(check_redis, config.redis.url))
-    health_orch.register("kafka", partial(check_kafka, config.kafka.bootstrap_servers))
+    # Kafka's and the object store's clients block: each runs on a thread of its own (FB-326)
+    health_orch.register_blocking("kafka", partial(probe_kafka, config.kafka.bootstrap_servers))
     # The two remaining compose-stack components (FB-006); every registered
     # check feeds both /v1/health and the /readyz verdict.
     health_orch.register("rabbitmq", partial(check_rabbitmq, config.rabbitmq.url))
-    health_orch.register(
+    health_orch.register_blocking(
         "object-store",
         partial(
-            check_object_store,
+            probe_object_store,
             config.object_store.endpoint,
             config.object_store.access_key,
             config.object_store.secret_key,

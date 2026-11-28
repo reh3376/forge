@@ -8,7 +8,7 @@ title: Forge Platform Tutorial
 
 Onboarding tutorial · two tracks from one landing fork · software-dev / contributor onboarding and an end-user overview of the framework.
 
-`Last verified: 2026-11-27` against the repository `reh3376/forge` at the merge of PR 201 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
+`Last verified: 2026-11-27` against the repository `reh3376/forge` at the merge of PR 202 (branch `main`). Both tracks are reviewed against each change and updated before every push, and this date moves with each push. The last review of every slide from end to end was on 2026-11-19 (FB-170).
 
 **Companions**: [`README.md`](https://github.com/reh3376/forge/blob/main/README.md) · [`docs/VISION.md`](https://github.com/reh3376/forge/blob/main/docs/VISION.md) · [`docs/WHERE-WE-ARE-GOING.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE-GOING.md) · [`docs/WHERE-WE-ARE.md`](https://github.com/reh3376/forge/blob/main/docs/WHERE-WE-ARE.md) · [`docs/ROADMAP.md`](https://github.com/reh3376/forge/blob/main/docs/ROADMAP.md) · [`docs/PRINCIPLES.md`](https://github.com/reh3376/forge/blob/main/docs/PRINCIPLES.md) · [`BACKLOG.md`](https://github.com/reh3376/forge/blob/main/BACKLOG.md)
 
@@ -286,7 +286,7 @@ From `docs/WHERE-WE-ARE.md`, the snapshot on 2026-11-27 at PR 201:
 | Python: forge-core (`forge-core/src/python/forge_core`) | 116 files, ~26,600 lines |
 | Python: forge-hub (`forge-hub/src/python/forge_hub`) | 90 files, ~17,300 lines |
 | Python: the modules (nine packages under `forge-modules`) | 144 files, ~31,400 lines |
-| Python tests | 295 files, 6,369 collected, full suite green on the locked dependency set |
+| Python tests | 308 files, 6,901 collected, full suite green on the locked dependency set |
 | Go (`forge-core/src/go/`) | 32 files, ~10,500 lines; `gofmt`, `go vet`, `go test` gate CI |
 | Interim MES bridge (`forge-modules/forge-mes/bridge`) | ~249,000 lines of TypeScript in the backend and ~87,000 in the frontend |
 | `AdapterService` RPCs | 12 |
@@ -598,7 +598,7 @@ note:
 - Serving is API-first: consumers go through versioned APIs defined by FATS specs, never to a database directly.
 
 note:
-- The hub's health orchestrator probes all seven compose-stack components (`/v1/health`, `/readyz`, FB-006). Each probe is cut off after 3 s. The object store's probe thread outlives that cut-off when the store accepts a connection and never answers, and enough such threads starve the hub's thread pool (FB-326).
+- The hub's health orchestrator probes all seven compose-stack components (`/v1/health`, `/readyz`, FB-006). Each probe is cut off after 3 s, and a component has at most one probe in flight however many health calls arrive. A probe whose client blocks (Kafka's, the object store's) runs on a daemon thread of the health module's own, never on the event loop's shared pool, so a store that accepts a connection and never answers is reported unreachable and holds one thread, not the hub's (FB-326; proved over every sequence in a bound, `.claude/skills/verify-hub-health-probes`).
 
 ---
 
@@ -2156,7 +2156,7 @@ note:
 
 ## Testing Conventions
 
-- `tests/`, `forge-core/tests` and `forge-hub/tests`: 295 files, 6,369 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
+- `tests/`, `forge-core/tests` and `forge-hub/tests`: 308 files, 6,901 collected; the full suite runs in about a minute on the locked dependency set. A skipped test states its reason, in every language; a test enforces that and CI lists the reasons on every run (owner, 2026-11-18).
 - Migration tests read the migration source and hold it to the models and writers; they do not need a database. Behavioural verification of a migration runs on a throwaway container and is recorded in the backlog row.
 - Governance tests assert schema–runner parity and run every spec through its runner; FVTS has golden messages.
 - The Go suite holds the Go models equal to the Python models through one shared fixture.
@@ -2515,6 +2515,7 @@ forge adapter status <module> # one module's state, including its clock offset
 
 - A module's health report includes how far its clock is from the hub's, and every refusal with its cause; the hub's ingest statistics show offsets per link.
 - Nothing fails quietly: a module that has been refused shows as degraded with the reason, on the status, the health and the command line.
+- A component that stops answering is reported unreachable within three seconds. It does not slow the answer about the others, and it cannot take the hub down with it.
 - The observer (health, liveness, service-level objectives, backup status) exists as a package; its objectives and alerts are a planned framework (FOTS).
 
 note:
